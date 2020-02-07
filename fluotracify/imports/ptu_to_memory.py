@@ -4,6 +4,7 @@ import struct
 import io
 import numpy as np
 
+
 def import_ptu_to_memory(inputfilepath, outputfilepath=None):
     """imports PicoQuant ptu files and returns the contents as numpy arrays.
     If outputfilepath is given, the metadata is printed in the given file.
@@ -36,31 +37,31 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
     # Otherwise it is best process the data on the fly and keep only the results.
 
     # Tag Types
-    tyEmpty8      = struct.unpack(">i", bytes.fromhex("FFFF0008"))[0]
-    tyBool8       = struct.unpack(">i", bytes.fromhex("00000008"))[0]
-    tyInt8        = struct.unpack(">i", bytes.fromhex("10000008"))[0]
-    tyBitSet64    = struct.unpack(">i", bytes.fromhex("11000008"))[0]
-    tyColor8      = struct.unpack(">i", bytes.fromhex("12000008"))[0]
-    tyFloat8      = struct.unpack(">i", bytes.fromhex("20000008"))[0]
-    tyTDateTime   = struct.unpack(">i", bytes.fromhex("21000008"))[0]
+    tyEmpty8 = struct.unpack(">i", bytes.fromhex("FFFF0008"))[0]
+    tyBool8 = struct.unpack(">i", bytes.fromhex("00000008"))[0]
+    tyInt8 = struct.unpack(">i", bytes.fromhex("10000008"))[0]
+    tyBitSet64 = struct.unpack(">i", bytes.fromhex("11000008"))[0]
+    tyColor8 = struct.unpack(">i", bytes.fromhex("12000008"))[0]
+    tyFloat8 = struct.unpack(">i", bytes.fromhex("20000008"))[0]
+    tyTDateTime = struct.unpack(">i", bytes.fromhex("21000008"))[0]
     tyFloat8Array = struct.unpack(">i", bytes.fromhex("2001FFFF"))[0]
-    tyAnsiString  = struct.unpack(">i", bytes.fromhex("4001FFFF"))[0]
-    tyWideString  = struct.unpack(">i", bytes.fromhex("4002FFFF"))[0]
-    tyBinaryBlob  = struct.unpack(">i", bytes.fromhex("FFFFFFFF"))[0]
+    tyAnsiString = struct.unpack(">i", bytes.fromhex("4001FFFF"))[0]
+    tyWideString = struct.unpack(">i", bytes.fromhex("4002FFFF"))[0]
+    tyBinaryBlob = struct.unpack(">i", bytes.fromhex("FFFFFFFF"))[0]
 
     # Record types
-    rtPicoHarpT3     = struct.unpack(">i", bytes.fromhex('00010303'))[0]
-    rtPicoHarpT2     = struct.unpack(">i", bytes.fromhex('00010203'))[0]
-    rtHydraHarpT3    = struct.unpack(">i", bytes.fromhex('00010304'))[0]
-    rtHydraHarpT2    = struct.unpack(">i", bytes.fromhex('00010204'))[0]
-    rtHydraHarp2T3   = struct.unpack(">i", bytes.fromhex('01010304'))[0]
-    rtHydraHarp2T2   = struct.unpack(">i", bytes.fromhex('01010204'))[0]
+    rtPicoHarpT3 = struct.unpack(">i", bytes.fromhex('00010303'))[0]
+    rtPicoHarpT2 = struct.unpack(">i", bytes.fromhex('00010203'))[0]
+    rtHydraHarpT3 = struct.unpack(">i", bytes.fromhex('00010304'))[0]
+    rtHydraHarpT2 = struct.unpack(">i", bytes.fromhex('00010204'))[0]
+    rtHydraHarp2T3 = struct.unpack(">i", bytes.fromhex('01010304'))[0]
+    rtHydraHarp2T2 = struct.unpack(">i", bytes.fromhex('01010204'))[0]
     rtTimeHarp260NT3 = struct.unpack(">i", bytes.fromhex('00010305'))[0]
     rtTimeHarp260NT2 = struct.unpack(">i", bytes.fromhex('00010205'))[0]
     rtTimeHarp260PT3 = struct.unpack(">i", bytes.fromhex('00010306'))[0]
     rtTimeHarp260PT2 = struct.unpack(">i", bytes.fromhex('00010206'))[0]
-    rtMultiHarpNT3   = struct.unpack(">i", bytes.fromhex('00010307'))[0]
-    rtMultiHarpNT2   = struct.unpack(">i", bytes.fromhex('00010207'))[0]
+    rtMultiHarpNT3 = struct.unpack(">i", bytes.fromhex('00010307'))[0]
+    rtMultiHarpNT2 = struct.unpack(">i", bytes.fromhex('00010207'))[0]
 
     # global variables
     global inputfile
@@ -97,7 +98,7 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
     # Write the header data to outputfile and also save it in memory.
     # There's no do ... while in Python, so an if statement inside the while loop
     # breaks out of it
-    tagDataList = []    # Contains tuples of (tagName, tagValue)
+    tagDataList = []  # Contains tuples of (tagName, tagValue)
     while True:
         tagIdent = inputfile.read(32).decode("utf-8").strip('\0')
         tagIdx = struct.unpack("<i", inputfile.read(4))[0]
@@ -131,12 +132,12 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
         elif tagTyp == tyBitSet64:
             tagInt = struct.unpack("<q", inputfile.read(8))[0]
             if outputfilepath is not None:
-                outputfile.write("{0:#0{1}x}".format(tagInt,18))
+                outputfile.write("{0:#0{1}x}".format(tagInt, 18))
             tagDataList.append((evalName, tagInt))
         elif tagTyp == tyColor8:
             tagInt = struct.unpack("<q", inputfile.read(8))[0]
             if outputfilepath is not None:
-                outputfile.write("{0:#0{1}x}".format(tagInt,18))
+                outputfile.write("{0:#0{1}x}".format(tagInt, 18))
             tagDataList.append((evalName, tagInt))
         elif tagTyp == tyFloat8:
             tagFloat = struct.unpack("<d", inputfile.read(8))[0]
@@ -146,14 +147,15 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
         elif tagTyp == tyFloat8Array:
             tagInt = struct.unpack("<q", inputfile.read(8))[0]
             if outputfilepath is not None:
-                outputfile.write("<Float array with %d entries>" % tagInt/8)
+                outputfile.write("<Float array with %d entries>" % tagInt / 8)
             tagDataList.append((evalName, tagInt))
         elif tagTyp == tyTDateTime:
             tagFloat = struct.unpack("<d", inputfile.read(8))[0]
             tagTime = int((tagFloat - 25569) * 86400)
             tagTime = time.gmtime(tagTime)
             if outputfilepath is not None:
-                outputfile.write(time.strftime("%a %b %d %H:%M:%S %Y", tagTime))
+                outputfile.write(time.strftime("%a %b %d %H:%M:%S %Y",
+                                               tagTime))
             tagDataList.append((evalName, tagTime))
         elif tagTyp == tyAnsiString:
             tagInt = struct.unpack("<q", inputfile.read(8))[0]
@@ -163,7 +165,8 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
             tagDataList.append((evalName, tagString))
         elif tagTyp == tyWideString:
             tagInt = struct.unpack("<q", inputfile.read(8))[0]
-            tagString = inputfile.read(tagInt).decode("utf-16le", errors="ignore").strip("\0")
+            tagString = inputfile.read(tagInt).decode(
+                "utf-16le", errors="ignore").strip("\0")
             if outputfilepath is not None:
                 outputfile.write(tagString)
             tagDataList.append((evalName, tagString))
@@ -188,7 +191,7 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
     print("Writing %d records, this may take a while..." % numRecords)
 
     # prepare dictionary as output of function
-    out = {} # contains np.arrays with photons, truetimes and dtimes
+    out = {}  # contains np.arrays with photons, truetimes and dtimes
     out['trueTimeArr'] = np.zeros(numRecords).astype(np.int64)
     out['dTimeArr'] = np.zeros(numRecords).astype(np.int64)
     out['chanArr'] = np.zeros(numRecords).astype(np.int64)
@@ -208,7 +211,8 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
             #                 (timeTag * globRes * 1e12)))
             truetime = timeTag * globRes * 1e12
             out['trueTimeArr'][recNum] = truetime
-            out['dTimeArr'][recNum] = dtime # picoquant demo code does not save out dtime - but for timetrace coversion, it isneeded
+            out['dTimeArr'][
+                recNum] = dtime  # picoquant demo code does not save out dtime - but for timetrace coversion, it isneeded
             out['chanArr'][recNum] = channel
         else:
             #outputfile.write("%u CHN %1x %u %8.0lf %10u\n" % (recNum, channel,\
@@ -228,7 +232,8 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
             # achieved by converting the 32 bits to a string, dividing the groups
             # with simple array slicing, and then converting back into the integers.
             try:
-                recordData = "{0:0{1}b}".format(struct.unpack("<I", inputfile.read(4))[0], 32)
+                recordData = "{0:0{1}b}".format(
+                    struct.unpack("<I", inputfile.read(4))[0], 32)
             except:
                 print("The file ended earlier than expected, at record %d/%d."\
                       % (recNum, numRecords))
@@ -237,15 +242,15 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
             channel = int(recordData[0:4], base=2)
             dtime = int(recordData[4:16], base=2)
             nsync = int(recordData[16:32], base=2)
-            if channel == 0xF: # Special record
-                if dtime == 0: # Not a marker, so overflow
+            if channel == 0xF:  # Special record
+                if dtime == 0:  # Not a marker, so overflow
                     gotOverflow(1)
                     oflcorrection += T3WRAPAROUND
                 else:
                     truensync = oflcorrection + nsync
                     gotMarker(truensync, dtime)
             else:
-                if channel == 0 or channel > 4: # Should not occur
+                if channel == 0 or channel > 4:  # Should not occur
                     print("Illegal Channel: #%1d %1u" % (dlen, channel))
                     if outputfilepath is not None:
                         outputfile.write("\nIllegal channel ")
@@ -253,7 +258,8 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
                 gotPhoton(truensync, channel, dtime)
                 dlen += 1
             if recNum % 100000 == 0:
-                sys.stdout.write("\rProgress: %.1f%%" % (float(recNum)*100/float(numRecords)))
+                sys.stdout.write("\rProgress: %.1f%%" %
+                                 (float(recNum) * 100 / float(numRecords)))
                 sys.stdout.flush()
 
     def readPT2():
@@ -261,7 +267,8 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
         T2WRAPAROUND = 210698240
         for recNum in range(0, numRecords):
             try:
-                recordData = "{0:0{1}b}".format(struct.unpack("<I", inputfile.read(4))[0], 32)
+                recordData = "{0:0{1}b}".format(
+                    struct.unpack("<I", inputfile.read(4))[0], 32)
             except:
                 print("The file ended earlier than expected, at record %d/%d."\
                       % (recNum, numRecords))
@@ -269,10 +276,10 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
 
             channel = int(recordData[0:4], base=2)
             time = int(recordData[4:32], base=2)
-            if channel == 0xF: # Special record
+            if channel == 0xF:  # Special record
                 # lower 4 bits of time are marker bits
                 markers = int(recordData[28:32], base=2)
-                if markers == 0: # Not a marker, so overflow
+                if markers == 0:  # Not a marker, so overflow
                     gotOverflow(1)
                     oflcorrection += T2WRAPAROUND
                 else:
@@ -282,14 +289,15 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
                     truetime = oflcorrection + time
                     gotMarker(truetime, markers)
             else:
-                if channel > 4: # Should not occur
+                if channel > 4:  # Should not occur
                     print("Illegal Channel: #%1d %1u" % (recNum, channel))
                     if outputfilepath is not None:
                         outputfile.write("\nIllegal channel ")
                 truetime = oflcorrection + time
                 gotPhoton(truetime, channel, time)
             if recNum % 100000 == 0:
-                sys.stdout.write("\rProgress: %.1f%%" % (float(recNum)*100/float(numRecords)))
+                sys.stdout.write("\rProgress: %.1f%%" %
+                                 (float(recNum) * 100 / float(numRecords)))
                 sys.stdout.flush()
 
     def readHT3(version):
@@ -298,7 +306,8 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
 
         for recNum in range(0, numRecords):
             try:
-                recordData = "{0:0{1}b}".format(struct.unpack("<I", inputfile.read(4))[0], 32)
+                recordData = "{0:0{1}b}".format(
+                    struct.unpack("<I", inputfile.read(4))[0], 32)
             except:
                 print("The file ended earlier than expected, at record %d/%d."\
                       % (recNum, numRecords))
@@ -309,7 +318,7 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
             dtime = int(recordData[7:22], base=2)
             nsync = int(recordData[22:32], base=2)
             if special == 1:
-                if channel == 0x3F: # Overflow
+                if channel == 0x3F:  # Overflow
                     # Number of overflows in nsync. If 0 or old version, it's an
                     # old style single overflow
                     if nsync == 0 or version == 1:
@@ -318,16 +327,15 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
                     else:
                         oflcorrection += T3WRAPAROUND * nsync
                         gotOverflow(nsync)
-                if channel >= 1 and channel <= 15: # markers
+                if channel >= 1 and channel <= 15:  # markers
                     truensync = oflcorrection + nsync
                     gotMarker(truensync, channel)
-            else: # regular input channel
+            else:  # regular input channel
                 truensync = oflcorrection + nsync
-                gotPhoton(timeTag=truensync,
-                          channel=channel,
-                          dtime=dtime)
+                gotPhoton(timeTag=truensync, channel=channel, dtime=dtime)
             if recNum % 100000 == 0:
-                sys.stdout.write("\rProgress: %.1f%%" % (float(recNum)*100/float(numRecords)))
+                sys.stdout.write("\rProgress: %.1f%%" %
+                                 (float(recNum) * 100 / float(numRecords)))
                 sys.stdout.flush()
 
     def readHT2(version):
@@ -336,7 +344,8 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
         T2WRAPAROUND_V2 = 33554432
         for recNum in range(0, numRecords):
             try:
-                recordData = "{0:0{1}b}".format(struct.unpack("<I", inputfile.read(4))[0], 32)
+                recordData = "{0:0{1}b}".format(
+                    struct.unpack("<I", inputfile.read(4))[0], 32)
             except:
                 print("The file ended earlier than expected, at record %d/%d."\
                       % (recNum, numRecords))
@@ -346,29 +355,30 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
             channel = int(recordData[1:7], base=2)
             timetag = int(recordData[7:32], base=2)
             if special == 1:
-                if channel == 0x3F: # Overflow
+                if channel == 0x3F:  # Overflow
                     # Number of overflows in nsync. If old version, it's an
                     # old style single overflow
                     if version == 1:
                         oflcorrection += T2WRAPAROUND_V1
                         gotOverflow(1)
                     else:
-                        if timetag == 0: # old style overflow, shouldn't happen
+                        if timetag == 0:  # old style overflow, shouldn't happen
                             oflcorrection += T2WRAPAROUND_V2
                             gotOverflow(1)
                         else:
                             oflcorrection += T2WRAPAROUND_V2 * timetag
-                if channel >= 1 and channel <= 15: # markers
+                if channel >= 1 and channel <= 15:  # markers
                     truetime = oflcorrection + timetag
                     gotMarker(truetime, channel)
-                if channel == 0: # sync
+                if channel == 0:  # sync
                     truetime = oflcorrection + timetag
                     gotPhoton(truetime, 0, 0)
-            else: # regular input channel
+            else:  # regular input channel
                 truetime = oflcorrection + timetag
-                gotPhoton(truetime, channel+1, 0)
+                gotPhoton(truetime, channel + 1, 0)
             if recNum % 100000 == 0:
-                sys.stdout.write("\rProgress: %.1f%%" % (float(recNum)*100/float(numRecords)))
+                sys.stdout.write("\rProgress: %.1f%%" %
+                                 (float(recNum) * 100 / float(numRecords)))
                 sys.stdout.flush()
 
     oflcorrection = 0
@@ -469,6 +479,7 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
         outputfile.close()
     return out, tagDataList, numRecords, globRes
 
+
 def time2bin(timeArr, chanArr, chanNum, winInt):
     """bins tcspc data (either dtime or truetime). winInt gives the binning window.
 
@@ -478,14 +489,15 @@ def time2bin(timeArr, chanArr, chanNum, winInt):
     timeCh = timeArr[ch_idx]
 
     # Find the first and last entry
-    firstTime = 0;#np.min(timeCh).astype(np.int32)
+    firstTime = 0
+    #np.min(timeCh).astype(np.int32)
     tempLastTime = np.max(timeCh).astype(np.int32)
 
     # We floor this as the last bin is always incomplete and so we discard photons.
     numBins = np.floor((tempLastTime - firstTime) / winInt)
     lastTime = numBins * winInt
 
-    bins = np.linspace(firstTime,lastTime, int(numBins)+1)
+    bins = np.linspace(firstTime, lastTime, int(numBins) + 1)
 
     photonsInBin, jnk = np.histogram(timeCh, bins)
 
@@ -496,6 +508,7 @@ def time2bin(timeArr, chanArr, chanNum, winInt):
 
     return photonsInBin, scale
 
+
 def calc_coincidence_value(timeSeries1, timeSeries2):
     """calculates coincidence value
 
@@ -503,7 +516,7 @@ def calc_coincidence_value(timeSeries1, timeSeries2):
     N1 = np.bincount((np.array(timeSeries1)).astype(np.int64))
     N2 = np.bincount((np.array(timeSeries2)).astype(np.int64))
 
-    n = max(N1.shape[0],N2.shape[0])
+    n = max(N1.shape[0], N2.shape[0])
     NN1 = np.zeros(n)
     NN2 = np.zeros(n)
     NN1[:N1.shape[0]] = N1
@@ -511,8 +524,9 @@ def calc_coincidence_value(timeSeries1, timeSeries2):
     N1 = NN1
     N2 = NN2
 
-    CV = (np.sum(N1*N2)/(np.sum(N1)*np.sum(N2)))*n
+    CV = (np.sum(N1 * N2) / (np.sum(N1) * np.sum(N2))) * n
     return CV
+
 
 def process_tcspc_data(chanArr, dTimeArr, trueTimeArr):
     """takes micro and macro times from tcspc data and processes photon decay
@@ -520,12 +534,12 @@ def process_tcspc_data(chanArr, dTimeArr, trueTimeArr):
 
     code is adopted from: https://github.com/dwaithe/FCS_point_correlator/blob/master/focuspoint/correlation_objects.py#L110"""
     winInt = 10
-    photonCountBin = 1 # see below: since trueTimeArr is in ns and we divide by 1e6, we get a binning in ms
+    photonCountBin = 1  # see below: since trueTimeArr is in ns and we divide by 1e6, we get a binning in ms
     tcspc = {}
     # Number of channels there are in the files.
     ch_present = np.sort(np.unique(np.array(chanArr)))
     # if self.ext == 'pt3' or self.ext == 'ptu'or self.ext == 'pt2':
-        # numOfCH =  ch_present.__len__()-1 #Minus 1 because not interested in channel 15.
+    # numOfCH =  ch_present.__len__()-1 #Minus 1 because not interested in channel 15.
     numOfCh = len(ch_present)
 
     # if the first channel did not count any photons, it should not be analyzed further
@@ -535,28 +549,33 @@ def process_tcspc_data(chanArr, dTimeArr, trueTimeArr):
         numOfCh -= 1
         ch_present += 1
 
-    print('\nnumber of channels which recorded photon counts: {}\n'.format(numOfCh))
+    print('\nnumber of channels which recorded photon counts: {}\n'.format(
+        numOfCh))
 
     # Calculates decay function for both channels.
-    photonDecayCh1, decayScale1 = time2bin(
-        timeArr=np.array(dTimeArr),
-        chanArr=np.array(chanArr),
-        chanNum=ch_present[0],
-        winInt=winInt)
+    photonDecayCh1, decayScale1 = time2bin(timeArr=np.array(dTimeArr),
+                                           chanArr=np.array(chanArr),
+                                           chanNum=ch_present[0],
+                                           winInt=winInt)
     # Time series of photon counts. For visualisation.
     timeSeries1, timeSeriesScale1 = time2bin(
-        timeArr=np.array(trueTimeArr)/1000000, # timeseries in ms (without conversion high computational cost)
+        timeArr=np.array(trueTimeArr) /
+        1000000,  # timeseries in ms (without conversion high computational cost)
         chanArr=np.array(chanArr),
         chanNum=ch_present[0],
         winInt=photonCountBin)
     unit = timeSeriesScale1[-1] / len(timeSeriesScale1)
     # Converts to counts per
-    kcount_Ch1 = np.average(timeSeries1) # needed for crossAndAuto() in correlation_objects.py
-    raw_count = np.average(timeSeries1) # This is the unnormalised intensity count for int_time duration (the first moment)
+    kcount_Ch1 = np.average(
+        timeSeries1)  # needed for crossAndAuto() in correlation_objects.py
+    raw_count = np.average(
+        timeSeries1
+    )  # This is the unnormalised intensity count for int_time duration (the first moment)
     var_count = np.var(timeSeries1)
     # brightnessNandBCH and numberNandBCh used in calc_param_fcs() in fitting_methods_SE.py, fitting_methods_PB.py
     # they are also printed in file by saveFile() used in correlation_gui.py
-    brightnessNandBCH0 = (((var_count - raw_count) / (raw_count)) / (float(unit)))
+    brightnessNandBCH0 = (((var_count - raw_count) / (raw_count)) /
+                          (float(unit)))
     if (var_count - raw_count) == 0:
         numberNandBCH0 = 0
     else:
@@ -569,21 +588,23 @@ def process_tcspc_data(chanArr, dTimeArr, trueTimeArr):
         tcspc['timeSeriesScale1'] = timeSeriesScale1
 
     elif numOfCh == 2:
-        photonDecayCh2, decayScale2 = time2bin(
-            timeArr=np.array(dTimeArr),
-            chanArr=np.array(chanArr),
-            chanNum=ch_present[1],
-            winInt=winInt)
+        photonDecayCh2, decayScale2 = time2bin(timeArr=np.array(dTimeArr),
+                                               chanArr=np.array(chanArr),
+                                               chanNum=ch_present[1],
+                                               winInt=winInt)
         timeSeries2, timeSeriesScale2 = time2bin(
-            timeArr=np.array(trueTimeArr)/1000000,
+            timeArr=np.array(trueTimeArr) / 1000000,
             chanArr=np.array(chanArr),
             chanNum=ch_present[1],
             winInt=photonCountBin)
         unit = timeSeriesScale2[-1] / len(timeSeriesScale2)
         kcount_Ch2 = np.average(timeSeries2)
-        raw_count = np.average(timeSeries2) #This is the unnormalised intensity count for int_time duration (the first moment)
+        raw_count = np.average(
+            timeSeries2
+        )  #This is the unnormalised intensity count for int_time duration (the first moment)
         var_count = np.var(timeSeries2)
-        brightnessNandBCH1 = (((var_count - raw_count) / (raw_count)) / (float(unit)))
+        brightnessNandBCH1 = (((var_count - raw_count) / (raw_count)) /
+                              (float(unit)))
         if (var_count - raw_count) == 0:
             numberNandBCH1 = 0
         else:
