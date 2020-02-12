@@ -1,4 +1,5 @@
 import os
+
 import numpy as np
 import pandas as pd
 
@@ -9,23 +10,32 @@ def import_data(path, header, frac_train, col_per_example, dropindex,
     Import a directory of CSV files created by one of the
     fluotracify.simulations methods.
 
-    input:
-    path:               Folder which contains .csv files with data
-    header:             param for pd.read_csv = rows to skip at beginning
-    frac_train:         Fraction from 0 to 1 of sample files used for training.
-                        The rest will be used for testing. For '1', all the
-                        data will be loaded in train
-    col_per_example:    Number of columns per example, first column being a
-                        trace, and then one or multiple labels
-    dropindex:          Which indeces in the csv file should be dropped
-    dropcolumns:        Which columns in the csv file should be dropped
+    Parameters
+    ----------
+    path : str
+        Folder which contains .csv files with data
+    header : int
+        param for pd.read_csv = rows to skip at beginning
+    frac_train : float in interval [0.0, 1.0]
+        Fraction of sample files used for training. The rest will be used for
+        testing. For '1.0', all the data will be loaded in train
+    col_per_example : int
+        Number of columns per example, first column being a trace, and then
+        one or multiple labels
+    dropindex : int
+        Which indeces in the csv file should be dropped
+    dropcolumns : str or int
+        Which columns in the csv file should be dropped
 
-    output:
-    train, test         pandas DataFrames containing training and testing data
-                        columnwise in the manner data_1, label_1, data_2,
-                        label_2, ...
-    nsamples:           list containing no of examples per file
-    experiment_param:   pandas DataFrame containing metadata of the files
+    Returns
+    -------
+    train, test : pandas DataFrames
+        Contain training and testing data columnwise in the manner data_1,
+        label_1, data_2, label_2, ...
+    nsamples : int
+        list containing no of examples per file
+    experiment_param :  pandas DataFrame
+        Contain metadata of the files
     """
     path_orig = path
     files = [f for f in os.listdir(path) if f.endswith('.csv')]
