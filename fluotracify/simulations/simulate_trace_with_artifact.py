@@ -198,6 +198,7 @@ def simulate_trace_array(artifact,
             out_array[:, i * 2 + 1] = np.full_like(clean_trace.shape,
                                                    np.nan,
                                                    dtype=np.double)
+            print('\nTrace {}: Nmol: {} d_mol: {}'.format(i, nmol, d_mol))
         elif artifact == 1:
             # bright clusters / spikes
             clust_trace, cluster_brightness = _simulate_bright_clusters(
@@ -212,6 +213,9 @@ def simulate_trace_array(artifact,
                 np.random.random_sample(clust_trace.shape[0]) * 10)
             # save labels
             out_array[:, i * 2 + 1] = clust_trace
+            print(
+                '\nTrace {}: Nmol: {} d_mol: {} Cluster multiplier: {}'.format(
+                    i, nmol, d_mol, cluster_brightness))
         elif artifact == 2:
             # detector dropout
             detdrop_trace, detdrop_mask = _simulate_detector_dropout(
@@ -222,7 +226,8 @@ def simulate_trace_array(artifact,
                 detdrop_trace.shape[0]) * 10 + scaling_summand + detdrop_mask
             # save labels
             out_array[:, i * 2 + 1] = detdrop_mask
-            print('\n', nmol, d_mol, -np.amin(detdrop_trace))
+            print('\nTrace {}: Nmol: {} d_mol: {} max. drop: {:.2f}'.format(
+                i, nmol, d_mol, -np.amin(detdrop_trace)))
         elif artifact == 3:
             # photobleaching
             ibleach_trace, mbleach_trace, exp_scale = _simulate_photobleaching(
@@ -234,7 +239,8 @@ def simulate_trace_array(artifact,
                 scaling_summand)
             # combine artefact traces for labels
             out_array[:, i * 2 + 1] = ibleach_trace + mbleach_trace
-            print('\n', nmol, d_mol, exp_scale)
+            print('\nTrace {}: Nmol: {} d_mol: {} scale parameter: {:.2f}'.
+                  format(i, nmol, d_mol, exp_scale))
         else:
             raise ValueError('artifact must be 0, 1, 2 or 3')
     return out_array
