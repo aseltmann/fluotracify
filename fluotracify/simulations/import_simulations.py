@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -37,7 +38,7 @@ def import_from_csv(path, header, frac_train, col_per_example, dropindex,
     experiment_param :  pandas DataFrame
         Contain metadata of the files
     """
-    path_orig = path
+    path = Path(path)
     files = [f for f in os.listdir(path) if f.endswith('.csv')]
     # sort the file names (os.listdir() returns them in arbitrary order)
     files.sort()
@@ -52,9 +53,9 @@ def import_from_csv(path, header, frac_train, col_per_example, dropindex,
     experiment_params = pd.DataFrame()
 
     for idx, file in enumerate(files):
-        path = path_orig
-        path += file
-        raw_dataset = pd.read_csv(path, sep=',', header=header)
+        file = Path(file)
+        path_and_file = path / file
+        raw_dataset = pd.read_csv(path_and_file, sep=',', header=header)
         df = raw_dataset.copy()
         try:
             df = df.drop(index=dropindex, columns=dropcolumns)
@@ -71,7 +72,7 @@ def import_from_csv(path, header, frac_train, col_per_example, dropindex,
         # save number of examples per file
         nsamples.append(round(len(converted_float.columns) / col_per_example))
         # save some parameters of the experiment from csv file
-        experiment_param = pd.read_csv(path,
+        experiment_param = pd.read_csv(path_and_file,
                                        sep=',',
                                        header=None,
                                        index_col=0,
@@ -85,9 +86,9 @@ def import_from_csv(path, header, frac_train, col_per_example, dropindex,
 
         if idx < ntrainfiles:
             train = pd.concat([train, converted_float], axis=1)
-            print('train', idx, path)
+            print('train', idx, path_and_file)
         else:
             test = pd.concat([test, converted_float], axis=1)
-            print('test', idx, path)
+            print('test', idx, path_and_file)
 
     return train, test, nsamples, experiment_params
