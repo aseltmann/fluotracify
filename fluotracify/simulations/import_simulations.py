@@ -4,8 +4,8 @@ import numpy as np
 import pandas as pd
 
 
-def import_data(path, header, frac_train, col_per_example, dropindex,
-                dropcolumns):
+def import_from_csv(path, header, frac_train, col_per_example, dropindex,
+                    dropcolumns):
     """
     Import a directory of CSV files created by one of the
     fluotracify.simulations methods.
@@ -56,10 +56,18 @@ def import_data(path, header, frac_train, col_per_example, dropindex,
         path += file
         raw_dataset = pd.read_csv(path, sep=',', header=header)
         df = raw_dataset.copy()
-        df = df.drop(index=dropindex, columns=dropcolumns)
+        try:
+            df = df.drop(index=dropindex, columns=dropcolumns)
+        except ValueError:
+            pass
         # convert from float64 to float32 and from object to float32
         # -> shrinks memory usage of train dataset from 2.4 GB to 1.2GB
-        converted_float = df.apply(pd.to_numeric, downcast='float')
+        try:
+            converted_float = df.apply(pd.to_numeric, downcast='float')
+        except ValueError:
+            raise ValueError(
+                'Probably the header parameter is too low and points to the metadata. Try a higher value.'
+            )
         # save number of examples per file
         nsamples.append(round(len(converted_float.columns) / col_per_example))
         # save some parameters of the experiment from csv file
