@@ -33,7 +33,7 @@ def simulate_trace_array(artifact,
 
     Parameters
     ----------
-    artifact : int
+    artifact : {0, 1, 2, 3}
         0 = no artifact, 1 = bright clusters, 2 = detector dropout,
         3 = photobleaching
     nsamples : int
@@ -41,7 +41,7 @@ def simulate_trace_array(artifact,
     foci_array : np.array
         Array of FWHMs in nm of the excitation PSFs used for the foci detection
     foci_distance : int
-        Distance of how much of the PSF you want to use in
+        Extent of simulated PSF (distance to center of Gaussian)
     total_sim_time : int
         Total simulation time in ms
     time_step : int
@@ -170,7 +170,7 @@ def simulate_trace_array(artifact,
     out_array = np.zeros((num_of_steps, nsamples * 2))
 
     for i in range(nsamples):
-        # define scaling summand for randomization
+        # define scaling summand for data augmentation
         scaling_summand = np.random.randint(10) * 100
         # simulate brownian motion of fast molecules
         track_arr = brownian_only_numpy(
@@ -195,7 +195,9 @@ def simulate_trace_array(artifact,
                 clean_trace * 100 +
                 np.random.random_sample(clean_trace.shape[0]) * 10 +
                 scaling_summand)
-            out_array[:, i * 2 + 1] = np.nan(clean_trace.shape[0])
+            out_array[:, i * 2 + 1] = np.full_like(clean_trace.shape,
+                                                   np.nan,
+                                                   dtype=np.double)
         elif artifact == 1:
             # bright clusters / spikes
             clust_trace, cluster_brightness = _simulate_bright_clusters(
