@@ -44,41 +44,41 @@ def savetrace_csv(artifact,
 
     header = ''
 
-    for idx, trace in enumerate(
-            range(0, len(traces_array[0, :]), col_per_example)):
-        header += 'trace{:0>3},'.format(idx + 1)
-        for jdx in range(col_per_example - 1):
-            header += 'label{:0>3}_{},'.format(idx + 1, jdx + 1)
+    for idx, _ in enumerate(traces_array[0, ::col_per_example], start=1):
+        header += 'trace{:0>3},'.format(idx)
+        for jdx in range(1, col_per_example):
+            header += 'label{:0>3}_{},'.format(idx, jdx)
+    # Remove trailing comma
+    header = header.strip(',')
 
-    with open(path_and_file_name, 'w') as myFile:
-        myFile.write('unique identifier,{}\n'.format(unique))
-        myFile.write('path and file name,{}\n'.format(path_and_file_name))
-        myFile.write(
-            'FWHMs of excitation PSFs used in nm,{}\n'.format(foci_array))
-        myFile.write(
-            'Extent of simulated PSF (distance to center of Gaussian) in nm,{}\n'
-            .format(foci_distance))
-        myFile.write('total simulation time in ms,{}\n'.format(total_sim_time))
-        myFile.write('time step in ms,{}\n'.format(time_step))
-        myFile.write('number of fast molecules,{}\n'.format(nmol))
-        myFile.write(
-            'diffusion rate of molecules in micrometer^2 / s,{}\n'.format(
-                d_mol))
-        myFile.write('width of the simulation in nm,{}\n'.format(width))
-        myFile.write('height of the simulation in nm,{}\n'.format(height))
+    # TODO: include path handling with pathlib to make code work independent
+    # of OS
+    with open(path_and_file_name, 'w') as my_file:
+        my_file.write('unique identifier,{}\n'.format(unique))
+        my_file.write('path and file name,{}\n'.format(path_and_file_name))
+        my_file.write('FWHMs of excitation PSFs used in nm,'
+                      '{}\n'.format(foci_array))
+        my_file.write('Extent of simulated PSF (distance to center of '
+                      'Gaussian) in nm,{}\n'.format(foci_distance))
+        my_file.write('total simulation time in ms,'
+                      '{}\n'.format(total_sim_time))
+        my_file.write('time step in ms,{}\n'.format(time_step))
+        my_file.write('number of fast molecules,{}\n'.format(nmol))
+        my_file.write('diffusion rate of molecules in micrometer^2 / s,'
+                      '{}\n'.format(d_mol))
+        my_file.write('width of the simulation in nm,{}\n'.format(width))
+        my_file.write('height of the simulation in nm,{}\n'.format(height))
         if artifact == 1:
-            myFile.write('number of slow clusters,{}\n'.format(nclust))
-            myFile.write(
-                'diffusion rate of clusters in micrometer^2 / s,{}\n'.format(
-                    d_clust))
+            my_file.write('number of slow clusters,{}\n'.format(nclust))
+            my_file.write('diffusion rate of clusters in micrometer^2 / s,'
+                          '{}\n'.format(d_clust))
         elif artifact == 3:
-            myFile.write(
-                'number of bleached molecules (50% immobile and 50% mobile),{}\n'.
-                format(nmol * 2))
+            my_file.write('number of bleached molecules (50% immobile and '
+                          '50% mobile),{}\n'.format(nmol * 2))
         # comments expects a str. Otherwise it printed a '# ' in first column
         # header and importing that to pandas made it an 'object' dtype which
         # uses a lot of memory
-        np.savetxt(myFile,
+        np.savetxt(my_file,
                    traces_array,
                    delimiter=',',
                    header=header,
