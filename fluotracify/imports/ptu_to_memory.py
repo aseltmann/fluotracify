@@ -8,21 +8,29 @@ import numpy as np
 
 def import_ptu_to_memory(inputfilepath, outputfilepath=None):
     """imports PicoQuant ptu files and returns the contents as numpy arrays.
-    If outputfilepath is given, the metadata is printed in the given file.
 
-    Outputs: out:                     dictionary containing three numpy arrays:
-                out['trueTimeArr']:   the macro time in ns (absolute time when
-                                      each photon arrived)
-                out['dTimeArr']:      the micro time in ns (lifetime of each
-                                      photon)
-                out['chanArr']:       number of channel where photon was
-                                      detected
-            tagDataList:              metadata from ptu header (tuples of tag
-                                      name and tag value inside a list)
-            numRecords:               number of detected photons
-            globRes:                  resolution in s
+    Parameters
+    ----------
+    inputfilepath : str
+        Path to PTU file to read
+    outputfilepath : str, optional
+        If outputfilepath is given, the metadata is printed in the given file.
 
-     Code is adopted from: https://github.com/PicoQuant/PicoQuant-Time-Tagged-File-Format-Demos/blob/master/PTU/Python/Read_PTU.py"""
+    Returns
+    -------
+    out : dict of np.arrays
+        out['trueTimeArr']: the macro time in ns (absolute time when each
+        photon arrived)
+        out['dTimeArr']: the micro time in ns (lifetime of each photon)
+        out['chanArr']: number of channel where photon was detected
+    tagDataList : list of tuples of tag name and tag value
+        metadata from ptu header
+    numRecords : int
+        number of detected photons
+    globRes : float
+        resolution in seconds
+
+    Code is adopted from: https://github.com/PicoQuant/PicoQuant-Time-Tagged-File-Format-Demos/blob/master/PTU/Python/Read_PTU.py"""
     # Read_PTU.py    Read PicoQuant Unified Histogram Files
     # This is demo code. Use at your own risk. No warranties.
     # Keno Goertz, PicoQUant GmbH, February 2018
@@ -240,8 +248,9 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
                 recordData = "{0:0{1}b}".format(
                     struct.unpack("<I", inputfile.read(4))[0], 32)
             except:
-                print("The file ended earlier than expected, at record %d/%d."
-                      % (recNum, numRecords))
+                print(
+                    "The file ended earlier than expected, at record %d/%d." %
+                    (recNum, numRecords))
                 exit(0)
 
             channel = int(recordData[0:4], base=2)
@@ -275,12 +284,13 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
                 recordData = "{0:0{1}b}".format(
                     struct.unpack("<I", inputfile.read(4))[0], 32)
             except:
-                print("The file ended earlier than expected, at record %d/%d."
-                      % (recNum, numRecords))
+                print(
+                    "The file ended earlier than expected, at record %d/%d." %
+                    (recNum, numRecords))
                 exit(0)
 
             channel = int(recordData[0:4], base=2)
-            time = int(recordData[4:32], base=2)
+            dtime = int(recordData[4:32], base=2)
             if channel == 0xF:  # Special record
                 # lower 4 bits of time are marker bits
                 markers = int(recordData[28:32], base=2)
@@ -291,15 +301,15 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
                     # Actually, the lower 4 bits for the time aren't valid
                     # because they belong to the marker. But the error caused
                     # by them is so small that we can just ignore it.
-                    truetime = oflcorrection + time
+                    truetime = oflcorrection + dtime
                     gotMarker(truetime, markers)
             else:
                 if channel > 4:  # Should not occur
                     print("Illegal Channel: #%1d %1u" % (recNum, channel))
                     if outputfilepath is not None:
                         outputfile.write("\nIllegal channel ")
-                truetime = oflcorrection + time
-                gotPhoton(truetime, channel, time)
+                truetime = oflcorrection + dtime
+                gotPhoton(truetime, channel, dtime)
             if recNum % 100000 == 0:
                 sys.stdout.write("\rProgress: %.1f%%" %
                                  (float(recNum) * 100 / float(numRecords)))
@@ -314,8 +324,9 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
                 recordData = "{0:0{1}b}".format(
                     struct.unpack("<I", inputfile.read(4))[0], 32)
             except:
-                print("The file ended earlier than expected, at record %d/%d."
-                      % (recNum, numRecords))
+                print(
+                    "The file ended earlier than expected, at record %d/%d." %
+                    (recNum, numRecords))
                 exit(0)
 
             special = int(recordData[0:1], base=2)
@@ -332,7 +343,7 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
                     else:
                         oflcorrection += T3WRAPAROUND * nsync
                         gotOverflow(nsync)
-                if channel >= 1 and channel <= 15:  # markers
+                if 1 <= channel <= 15:  # markers
                     truensync = oflcorrection + nsync
                     gotMarker(truensync, channel)
             else:  # regular input channel
@@ -352,8 +363,9 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
                 recordData = "{0:0{1}b}".format(
                     struct.unpack("<I", inputfile.read(4))[0], 32)
             except:
-                print("The file ended earlier than expected, at record %d/%d."
-                      % (recNum, numRecords))
+                print(
+                    "The file ended earlier than expected, at record %d/%d." %
+                    (recNum, numRecords))
                 exit(0)
 
             special = int(recordData[0:1], base=2)
@@ -373,7 +385,7 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
                             gotOverflow(1)
                         else:
                             oflcorrection += T2WRAPAROUND_V2 * timetag
-                if channel >= 1 and channel <= 15:  # markers
+                if 1 <= channel <= 15:  # markers
                     truetime = oflcorrection + timetag
                     gotMarker(truetime, channel)
                 if channel == 0:  # sync
@@ -486,41 +498,43 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
     return out, tagDataList, numRecords, globRes
 
 
-def time2bin(timeArr, chanArr, chanNum, winInt):
-    """bins tcspc data (either dtime or truetime). winInt gives the binning window.
+def time2bin(time_arr, chan_arr, chan_num, win_int):
+    """bins tcspc data (either dtime or truetime). win_int gives the binning window.
 
     code is adopted from: https://github.com/dwaithe/FCS_point_correlator/blob/master/focuspoint/correlation_methods/correlation_methods.py#L157"""
     # identify channel
-    ch_idx = np.where(chanArr == chanNum)[0]
-    timeCh = timeArr[ch_idx]
+    ch_idx = np.where(chan_arr == chan_num)[0]
+    time_ch = time_arr[ch_idx]
 
     # Find the first and last entry
-    firstTime = 0
-    # np.min(timeCh).astype(np.int32)
-    tempLastTime = np.max(timeCh).astype(np.int32)
+    first_time = 0
+    # np.min(time_ch).astype(np.int32)
+    temp_last_time = np.max(time_ch).astype(np.int32)
 
     # floor this as last bin is always incomplete and so we discard photons.
-    numBins = np.floor((tempLastTime - firstTime) / winInt)
-    lastTime = numBins * winInt
+    num_bins = np.floor((temp_last_time - first_time) / win_int)
+    last_time = num_bins * win_int
 
-    bins = np.linspace(firstTime, lastTime, int(numBins) + 1)
+    bins = np.linspace(first_time, last_time, int(num_bins) + 1)
 
-    photonsInBin, jnk = np.histogram(timeCh, bins)
+    photons_in_bin, _ = np.histogram(time_ch, bins)
 
     # bins are valued as half their span.
-    scale = bins[:-1] + (winInt / 2)
+    scale = bins[:-1] + (win_int / 2)
 
-    # scale =  np.arange(0,timeCh.shape[0])
+    # scale =  np.arange(0,time_ch.shape[0])
 
-    return photonsInBin, scale
+    return photons_in_bin, scale
 
 
-def calc_coincidence_value(timeSeries1, timeSeries2):
+def calc_coincidence_value(time_series1, time_series2):
     """calculates coincidence value
 
+    Notes
+    -----
     code is adopted from: https://github.com/dwaithe/FCS_point_correlator/blob/master/focuspoint/correlation_objects.py#L538"""
-    N1 = np.bincount((np.array(timeSeries1)).astype(np.int64))
-    N2 = np.bincount((np.array(timeSeries2)).astype(np.int64))
+    N1 = np.bincount(np.array(time_series1).astype(np.int64))
+    N2 = np.bincount(np.array(time_series2).astype(np.int64))
 
     n = max(N1.shape[0], N2.shape[0])
     NN1 = np.zeros(n)
@@ -534,56 +548,58 @@ def calc_coincidence_value(timeSeries1, timeSeries2):
     return CV
 
 
-def process_tcspc_data(chanArr, dTimeArr, trueTimeArr):
+def process_tcspc_data(chan_arr, dtime_arr, true_time_arr):
     """takes micro and macro times from tcspc data and processes photon decay
     and time series data.
 
+    Notes
+    -----
     code is adopted from: https://github.com/dwaithe/FCS_point_correlator/blob/master/focuspoint/correlation_objects.py#L110"""
-    winInt = 10
-    # see below: since trueTimeArr is in ns and we divide by 1e6, we get a
+    win_int = 10
+    # see below: since true_time_arr is in ns and we divide by 1e6, we get a
     # binning in ms
-    photonCountBin = 1
+    photon_count_bin = 1
     tcspc = {}
     # Number of channels there are in the files.
-    ch_present = np.sort(np.unique(np.array(chanArr)))
+    ch_present = np.sort(np.unique(np.array(chan_arr)))
     # if self.ext == 'pt3' or self.ext == 'ptu'or self.ext == 'pt2':
     # Minus 1 because not interested in channel 15.
     # numOfCH =  ch_present.__len__()-1
-    numOfCh = len(ch_present)
+    num_of_ch = len(ch_present)
 
     # if first channel did not count any photons, do not analyze further
-    firstCh_idx = np.where(chanArr == 0)[0]
-    firstCh_max = np.max(dTimeArr[firstCh_idx]).astype(np.int32)
-    if firstCh_max == 0:
-        numOfCh -= 1
+    first_ch_idx = np.where(chan_arr == 0)[0]
+    first_ch_max = np.max(dtime_arr[first_ch_idx]).astype(np.int32)
+    if first_ch_max == 0:
+        num_of_ch -= 1
         ch_present += 1
 
     print('\nnumber of channels which recorded photon counts: {}\n'.format(
-        numOfCh))
+        num_of_ch))
 
     # Calculates decay function for both channels.
-    photonDecayCh1, decayScale1 = time2bin(timeArr=np.array(dTimeArr),
-                                           chanArr=np.array(chanArr),
-                                           chanNum=ch_present[0],
-                                           winInt=winInt)
+    photon_decay_ch1, decay_scale1 = time2bin(time_arr=np.array(dtime_arr),
+                                              chan_arr=np.array(chan_arr),
+                                              chan_num=ch_present[0],
+                                              win_int=win_int)
     # Time series of photon counts. For visualisation.
-    timeSeries1, timeSeriesScale1 = time2bin(
+    time_series1, time_series_scale1 = time2bin(
         # timeseries in ms (without conversion high computational cost)
-        timeArr=np.array(trueTimeArr) / 1000000,
-        chanArr=np.array(chanArr),
-        chanNum=ch_present[0],
-        winInt=photonCountBin)
-    ##########################################
-    # FUNCTIONAL, BUT NOT USED AT THE MOMENT
-    ##########################################
-    # unit = timeSeriesScale1[-1] / len(timeSeriesScale1)
+        time_arr=np.array(true_time_arr) / 1000000,
+        chan_arr=np.array(chan_arr),
+        chan_num=ch_present[0],
+        win_int=photon_count_bin)
+    #################################################
+    # FUNCTIONAL, BUT OUTPUT NOT USED AT THE MOMENT #
+    #################################################
+    # unit = time_series_scale1[-1] / len(time_series_scale1)
     # Converts to counts per
     # kcount_Ch1 = np.average(
-    #     timeSeries1)  # needed for crossAndAuto() in correlation_objects.py
+    #     time_series1)  # needed for crossAndAuto() in correlation_objects.py
 
     # unnormalised intensity count for int_time duration (the first moment)
-    # raw_count = np.average(timeSeries1)
-    # var_count = np.var(timeSeries1)
+    # raw_count = np.average(time_series1)
+    # var_count = np.var(time_series1)
 
     # brightnessNandBCH and numberNandBCh used in calc_param_fcs() in
     # fitting_methods_SE.py, fitting_methods_PB.py
@@ -594,50 +610,50 @@ def process_tcspc_data(chanArr, dTimeArr, trueTimeArr):
     #     numberNandBCH0 = 0
     # else:
     #     numberNandBCH0 = (raw_count**2 / (var_count - raw_count))
-    ##########################################
-    if numOfCh == 1:
-        tcspc['photonDecayCh1'] = photonDecayCh1
-        tcspc['decayScale1'] = decayScale1
-        tcspc['timeSeries1'] = timeSeries1
-        tcspc['timeSeriesScale1'] = timeSeriesScale1
+    ################################################
+    if num_of_ch == 1:
+        tcspc['photon_decay_ch1'] = photon_decay_ch1
+        tcspc['decay_scale1'] = decay_scale1
+        tcspc['time_series1'] = time_series1
+        tcspc['time_series_scale1'] = time_series_scale1
 
-    elif numOfCh == 2:
-        photonDecayCh2, decayScale2 = time2bin(timeArr=np.array(dTimeArr),
-                                               chanArr=np.array(chanArr),
-                                               chanNum=ch_present[1],
-                                               winInt=winInt)
-        timeSeries2, timeSeriesScale2 = time2bin(
-            timeArr=np.array(trueTimeArr) / 1000000,
-            chanArr=np.array(chanArr),
-            chanNum=ch_present[1],
-            winInt=photonCountBin)
-        ########################################
-        # FUNCTIONAL, BUT NOT USED AT THE MOMENT
-        ########################################
-        # unit = timeSeriesScale2[-1] / len(timeSeriesScale2)
-        # kcount_Ch2 = np.average(timeSeries2)
+    elif num_of_ch == 2:
+        photon_decay_ch2, decay_scale2 = time2bin(time_arr=np.array(dtime_arr),
+                                                  chan_arr=np.array(chan_arr),
+                                                  chan_num=ch_present[1],
+                                                  win_int=win_int)
+        time_series2, time_series_scale2 = time2bin(
+            time_arr=np.array(true_time_arr) / 1000000,
+            chan_arr=np.array(chan_arr),
+            chan_num=ch_present[1],
+            win_int=photon_count_bin)
+        #################################################
+        # FUNCTIONAL, BUT OUTPUT NOT USED AT THE MOMENT #
+        #################################################
+        # unit = time_series_scale2[-1] / len(time_series_scale2)
+        # kcount_Ch2 = np.average(time_series2)
         # unnormalised intensity count for int_time duration (the first moment)
-        # raw_count = np.average(timeSeries2)
-        # var_count = np.var(timeSeries2)
+        # raw_count = np.average(time_series2)
+        # var_count = np.var(time_series2)
         # brightnessNandBCH1 = (((var_count - raw_count) / (raw_count)) /
         #                       (float(unit)))
         # if (var_count - raw_count) == 0:
         #     numberNandBCH1 = 0
         # else:
         #     numberNandBCH1 = (raw_count**2 / (var_count - raw_count))
-        # CV = calc_coincidence_value(timeSeries1=timeSeries1,
-        #                             timeSeries2=timeSeries2)
-        ########################################
-        tcspc['photonDecayCh1'] = photonDecayCh1
-        tcspc['decayScale1'] = decayScale1
-        tcspc['timeSeries1'] = timeSeries1
-        tcspc['timeSeriesScale1'] = timeSeriesScale1
-        tcspc['photonDecayCh2'] = photonDecayCh2
-        tcspc['decayScale2'] = decayScale2
-        tcspc['timeSeries2'] = timeSeries2
-        tcspc['timeSeriesScale2'] = timeSeriesScale2
+        # CV = calc_coincidence_value(time_series1=time_series1,
+        #                             time_series2=time_series2)
+        ################################################
+        tcspc['photon_decay_ch1'] = photon_decay_ch1
+        tcspc['decay_scale1'] = decay_scale1
+        tcspc['time_series1'] = time_series1
+        tcspc['time_series_scale1'] = time_series_scale1
+        tcspc['photon_decay_ch2'] = photon_decay_ch2
+        tcspc['decay_scale2'] = decay_scale2
+        tcspc['time_series2'] = time_series2
+        tcspc['time_series_scale2'] = time_series_scale2
     else:
         print('unsupported number of channels')
         return
 
-    return tcspc, numOfCh
+    return tcspc, num_of_ch
