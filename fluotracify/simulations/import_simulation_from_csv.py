@@ -7,7 +7,8 @@ import pandas as pd
 
 def import_from_csv(path, header, frac_train, col_per_example, dropindex,
                     dropcolumns):
-    """
+    """Import CSV files containing data from flotracify.simulations
+
     Import a directory of CSV files created by one of the
     fluotracify.simulations methods and output two pandas DataFrames containing
     test and train data for machine learning pipelines.
@@ -67,9 +68,8 @@ def import_from_csv(path, header, frac_train, col_per_example, dropindex,
         try:
             converted_float = df.apply(pd.to_numeric, downcast='float')
         except ValueError:
-            raise ValueError(
-                'Probably the header parameter is too low and points to the metadata. Try a higher value.'
-            )
+            raise ValueError('Probably the header parameter is too low '
+                             'and points to the metadata. Try a higher value.')
         # save number of examples per file
         nsamples.append(round(len(converted_float.columns) / col_per_example))
         # save some parameters of the experiment from csv file
