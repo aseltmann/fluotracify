@@ -9,7 +9,8 @@ def import_from_csv(path, header, frac_train, col_per_example, dropindex,
                     dropcolumns):
     """
     Import a directory of CSV files created by one of the
-    fluotracify.simulations methods.
+    fluotracify.simulations methods and output two pandas DataFrames containing
+    test and train data for machine learning pipelines.
 
     Parameters
     ----------
@@ -36,7 +37,7 @@ def import_from_csv(path, header, frac_train, col_per_example, dropindex,
     nsamples : int
         list containing no of examples per file
     experiment_param :  pandas DataFrame
-        Contain metadata of the files
+        Contains metadata of the files
     """
     path = Path(path)
     files = [f for f in os.listdir(path) if f.endswith('.csv')]
@@ -92,3 +93,44 @@ def import_from_csv(path, header, frac_train, col_per_example, dropindex,
             print('test', idx, path_and_file)
 
     return train, test, nsamples, experiment_params
+
+
+def separate_data_and_labels(array, nsamples):
+    """Take pandas DataFrame containing feature and label data and output two
+    separate pandas DataFrames for features and labels.
+
+    Parameters
+    ----------
+    array : pandas DataFrame
+        features and labels ordered columnwise in the manner: feature_1,
+        label_1, feature_2, label_2, ...
+    nsamples : list of int
+        list containing no of examples per file
+
+    Returns
+    -------
+    array_features : pandas DataFrame
+        Contains features ordered columnwise in the manner: feature_1,
+        feature_2, ...
+    labels : pandas DataFrame
+        Contains labels ordered columnwise in the manner: label_1, label_2, ...
+    """
+    if not len(set(nsamples)) == 1:
+        raise Exception(
+            'Error: The number of examples in each file have to be the same')
+
+    nsamples_int = nsamples[0]
+    label_names = []
+    feature_names = []
+
+    for i in range(nsamples_int):
+        label_names.append(array.columns[i * 2 + 1])
+        feature_names.append(array.columns[i * 2])
+
+    array_labels = array[label_names].copy()
+    array_features = array[feature_names].copy()
+
+    print('shapes of feature dataframe: {} and label dataframe: {}'.format(
+        array_features.shape, array_labels.shape))
+
+    return array_features, array_labels
