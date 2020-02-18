@@ -79,7 +79,8 @@ def import_from_csv(path, header, frac_train, col_per_example, dropindex,
                                        index_col=0,
                                        usecols=[0, 1],
                                        skipfooter=len(raw_dataset),
-                                       squeeze=True)
+                                       squeeze=True,
+                                       engine='python')
         experiment_params = pd.concat([experiment_params, experiment_param],
                                       axis=1,
                                       ignore_index=True,
