@@ -10,9 +10,9 @@ def create_tfdataset_from_pandasdf(features_df,
                                    zoomvector,
                                    label_threshold,
                                    BATCH_SIZE,
-                                   _NUM_CLASSES,
                                    is_training,
-                                   frac_val=0.2):
+                                   frac_val=0.2,
+                                   _NUM_CLASSES=None):
     """Creates a TensorFlow Dataset from a pandas DataFrame.
 
     This function was created to handle pandas DataFrames containing simulated
@@ -164,9 +164,9 @@ def create_tfdataset_from_pandasdf(features_df,
 
     def _min_max_normalize_tensor(tensor):
         """Rescale the range in [0, 1]"""
-        tensor_min = tf.math.reduce_min(tensor, axis=1)
+        tensor_min = tf.math.reduce_min(input_tensor=tensor, axis=1)
         tensor_min = tf.reshape(tensor_min, shape=(len(tensor_min), 1))
-        tensor_max = tf.math.reduce_max(tensor, axis=1)
+        tensor_max = tf.math.reduce_max(input_tensor=tensor, axis=1)
         tensor_max = tf.reshape(tensor_max, shape=(len(tensor_max), 1))
         return (tensor - tensor_min) / (tensor_max - tensor_min)
 
@@ -182,17 +182,17 @@ def create_tfdataset_from_pandasdf(features_df,
         index=0, features_df_dict=features_df_dict, col_no=col_no)
     y = _get_windowed_y_labels_from_pandasdf(index=0)
 
-    X_tensor = tf.convert_to_tensor(X.values)
-    y_tensor = tf.convert_to_tensor(y.values)
+    X_tensor = tf.convert_to_tensor(value=X.values)
+    y_tensor = tf.convert_to_tensor(value=y.values)
 
     for idx in np.arange(1, len(features_df) // win_len):
         X_window = _get_windowed_X_features_from_pandasdf(
             index=idx, features_df_dict=features_df_dict, col_no=col_no)
-        X_temp = tf.convert_to_tensor(X_window.values)
+        X_temp = tf.convert_to_tensor(value=X_window.values)
         X_tensor = tf.concat([X_tensor, X_temp], axis=0)
 
         y_window = _get_windowed_y_labels_from_pandasdf(index=idx)
-        y_temp = tf.convert_to_tensor(y_window.values)
+        y_temp = tf.convert_to_tensor(value=y_window.values)
         y_tensor = tf.concat([y_tensor, y_temp], axis=0)
 
     print('this is the shape, dtype and an example of the features after '
@@ -205,7 +205,7 @@ def create_tfdataset_from_pandasdf(features_df,
     X_tensor = _min_max_normalize_tensor(X_tensor)
     X_tensor = tf.reshape(X_tensor,
                           shape=(_NUM_EXAMPLES_total, col_no, win_len))
-    X_tensor = tf.transpose(X_tensor, [0, 2, 1])
+    X_tensor = tf.transpose(a=X_tensor, perm=[0, 2, 1])
     X_tensor = tf.cast(X_tensor, tf.float32)
     y_tensor = tf.cast(y_tensor, tf.float32)
 
