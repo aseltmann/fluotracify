@@ -5,8 +5,12 @@ import numpy as np
 import pandas as pd
 
 
-def import_from_csv(path, header, frac_train, col_per_example, dropindex,
-                    dropcolumns):
+def import_from_csv(path,
+                    header,
+                    frac_train,
+                    col_per_example,
+                    dropindex=None,
+                    dropcolumns=None):
     """Import CSV files containing data from flotracify.simulations
 
     Import a directory of CSV files created by one of the
@@ -18,16 +22,16 @@ def import_from_csv(path, header, frac_train, col_per_example, dropindex,
     path : str
         Folder which contains .csv files with data
     header : int
-        param for pd.read_csv = rows to skip at beginning
+        param for `pd.read_csv` = rows to skip at beginning
     frac_train : float in interval [0.0, 1.0]
         Fraction of sample files used for training. The rest will be used for
         testing. For '1.0', all the data will be loaded in train
     col_per_example : int
         Number of columns per example, first column being a trace, and then
         one or multiple labels
-    dropindex : int
+    dropindex : int, optional
         Which indeces in the csv file should be dropped
-    dropcolumns : str or int
+    dropcolumns : str or int, optional
         Which columns in the csv file should be dropped
 
     Returns
@@ -39,6 +43,11 @@ def import_from_csv(path, header, frac_train, col_per_example, dropindex,
         list containing no of examples per file
     experiment_param :  pandas DataFrame
         Contains metadata of the files
+
+    Raises
+    ------
+    ValueError
+        If pandas read_csv fails
     """
     path = Path(path)
     files = [f for f in os.listdir(path) if f.endswith('.csv')]
@@ -57,7 +66,11 @@ def import_from_csv(path, header, frac_train, col_per_example, dropindex,
     for idx, file in enumerate(files):
         file = Path(file)
         path_and_file = path / file
-        raw_dataset = pd.read_csv(path_and_file, sep=',', header=header)
+        try:
+            raw_dataset = pd.read_csv(path_and_file, sep=',', header=header)
+        except pd.errors.ParserError:
+            raise ValueError('Probably the header parameter is too low '
+                             'and points to the metadata. Try a higher value.')
         df = raw_dataset.copy()
         try:
             df = df.drop(index=dropindex, columns=dropcolumns)
