@@ -1,7 +1,7 @@
 import tensorflow as tf
 
 
-def get_vgg10_1d_model(win_len, col_no):
+def vgg10_1d(win_len, col_no):
     """Defines a VGG16-inspired model architecture with 10 weight layers"""
     model = tf.keras.Sequential([
         tf.keras.layers.Conv1D(filters=64,
@@ -26,7 +26,8 @@ def get_vgg10_1d_model(win_len, col_no):
     ])
     return model
 
-def get_vgg16_1d_model(win_len, col_no):
+
+def vgg16_1d(win_len, col_no):
     """Defines a VGG16-inspired model architecture with 16 weight layers"""
     model = tf.keras.Sequential([
         tf.keras.layers.Conv1D(filters=64,
@@ -59,3 +60,118 @@ def get_vgg16_1d_model(win_len, col_no):
         tf.keras.layers.Dense(1, activation='sigmoid')
     ])
     return model
+
+
+# Block definitions for U-Net
+def conv_block(input_tensor, num_filters):
+    """Convolutional layers"""
+    conv = tf.keras.layers.Conv1D(filters=num_filters,
+                                  kernel_size=3,
+                                  padding='same')(input_tensor)
+    conv = tf.keras.layers.BatchNormalization()(conv)
+    conv = tf.keras.layers.Activation('relu')(conv)
+    conv = tf.keras.layers.Conv1D(num_filters, 3, padding='same')(conv)
+    conv = tf.keras.layers.BatchNormalization()(conv)
+    conv = tf.keras.layers.Activation('relu')(conv)
+    return conv
+
+
+def encoder_block(input_tensor, num_filters):
+    """Convolutional layers plus max pool layers"""
+    encoder = conv_block(input_tensor, num_filters)
+    encoder_pool = tf.keras.layers.MaxPool1D(pool_size=2)(encoder)
+    return encoder_pool, encoder
+
+
+class Conv1DTranspose(tf.keras.layers.Layer):
+    """The 1D implementation of Conv2DTranspose
+
+    Notes
+    -----
+    Implementation taken from this thread:
+    https://github.com/tensorflow/tensorflow/issues/30309
+
+    There is already a implementation of this function in
+    tf.nn.conv1d_transpose`, but still no tf.keras.Conv1DTranspose.
+
+    The arithmetics of a transposed convolution are nicely described here:
+    https://arxiv.org/pdf/1603.07285.pdf. The original U-Net publication by
+    Ronneberger et. al. uses bed-of-nails upsampling combined with a regular
+    convolution. In a transposed convolution, these steps are combined (not
+    literally, but conceptually)
+    """
+    def __init__(self, filters, kernel_size, strides=2, padding='same'):
+        super().__init__()
+        self.conv2dtranspose = tf.keras.layers.Conv2DTranspose(
+            filters=filters,
+            kernel_size=(kernel_size, 1),
+            strides=(strides, 1),
+            padding=padding)
+
+    def call(self, x):
+        x = tf.expand_dims(input=x, axis=2)
+        x = self.conv2dtranspose(x)
+        x = tf.squeeze(input=x, axis=2)
+        return x
+
+
+def decoder_block(input_tensor, concat_tensor, num_filters):
+    """Transposed convolution and concatenation with output of corresponding
+    encoder level, then convolution of both reducing the depth
+    """
+    decoder = Conv1DTranspose(filters=num_filters, kernel_size=2)(input_tensor)
+    decoder = tf.keras.layers.concatenate([concat_tensor, decoder], axis=-1)
+    decoder = tf.keras.layers.BatchNormalization()(decoder)
+    decoder = tf.keras.layers.Activation('relu')(decoder)
+    decoder = conv_block(input_tensor=decoder, num_filters=num_filters)
+    return decoder
+
+
+def unet_1D(input_size):
+    """U-Net as described by Ronneberger et al.
+
+    Parameters
+    ----------
+    input_size : int
+        Input vector size
+
+    Returns
+    -------
+    Model as described by the tensorflow.keras Functional API
+
+    Notes
+    -----
+    - Paper: https://arxiv.org/pdf/1505.04597.pdf
+    - conceptually different approach than in the paper is the use of
+    transposed convolution opposed to a "up-convolution" consisting of
+    bed-of-nails upsampling and a 2x2 convolution
+    """
+    inputs = tf.keras.layers.Input(shape=(input_size, 1))
+
+    # down_sampling
+    encoder0_pool, encoder0 = encoder_block(input_tensor=inputs,
+                                            num_filters=64)
+    encoder1_pool, encoder1 = encoder_block(encoder0_pool, 128)
+    encoder2_pool, encoder2 = encoder_block(encoder1_pool, 256)
+    encoder3_pool, encoder3 = encoder_block(encoder2_pool, 512)
+
+    center = conv_block(input_tensor=encoder3_pool, num_filters=1024)
+
+    # up_sampling
+    decoder3 = decoder_block(input_tensor=center,
+                             concat_tensor=encoder3,
+                             num_filters=512)
+    decoder2 = decoder_block(decoder3, encoder2, 256)
+    decoder1 = decoder_block(decoder2, encoder1, 128)
+    decoder0 = decoder_block(decoder1, encoder0, 64)
+
+    # create 'binary' output vector
+    outputs = tf.keras.layers.Conv1D(filters=1,
+                                     kernel_size=1,
+                                     activation='sigmoid')(decoder0)
+
+    print('input - shape:\t', inputs.shape)
+    print('output - shape:\t', outputs.shape)
+
+    unet = tf.keras.Model(inputs=inputs, outputs=outputs)
+    return unet
