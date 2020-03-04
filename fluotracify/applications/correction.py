@@ -5,54 +5,6 @@ from fluotracify.applications import correlate
 from fluotracify.training.preprocess_data import pandasdf_preprocessing
 
 
-def correct_correlation_by_label(ntraces, traces_of_interest,
-                                 labels_of_interest, fwhm):
-    """Given corrupted traces with boolean label information, this function
-    will return the diffusion rates, transit times and length of traces after
-    taking only non-corrupted parts of the traces for correlation (where
-    labels_of_interest=False).
-
-    Parameters
-    ----------
-    ntraces : int
-        Number of ntraces from given DataFrames to choose for correlation
-    traces_of_interest : Pandas DataFrame
-        Contains the traces columnwise
-    labels_of_interest : Pandas DataFrame
-        Contains the labels columnwise
-    """
-
-    diffrates_corrected_bylabel = []
-    transit_times_corrected_bylabel = []
-    tracelen_corrected_bylabel = []
-    for ntraces_index in range(ntraces):
-        idx_corrected_bylabel = []
-        for idx, label in enumerate(labels_of_interest.iloc[:, ntraces_index]):
-            if not label:
-                idx_corrected_bylabel.append(idx)
-
-        trace_corrected_bylabel = traces_of_interest.iloc[:, ntraces_index]
-        trace_corrected_bylabel = trace_corrected_bylabel.take(
-            idx_corrected_bylabel, axis=0).values
-
-        # multipletau does not accept traces which are too short
-        if len(trace_corrected_bylabel) < 32:
-            continue
-
-        diff_corrected_bylabel, trans_corrected_bylabel, _ = correlate.correlate(
-            trace=trace_corrected_bylabel.astype(np.float64),
-            fwhm=fwhm,
-            diffrate=None,
-            time_step=1.,
-            verbose=False)
-        diffrates_corrected_bylabel.append(diff_corrected_bylabel)
-        transit_times_corrected_bylabel.append(trans_corrected_bylabel)
-        tracelen_corrected_bylabel.append(len(trace_corrected_bylabel))
-
-    return (diffrates_corrected_bylabel, transit_times_corrected_bylabel,
-            tracelen_corrected_bylabel)
-
-
 def correct_correlation_by_prediction(ntraces,
                                       traces_of_interest,
                                       model,
