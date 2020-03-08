@@ -3,19 +3,95 @@ import pandas as pd
 import tensorflow as tf
 
 
-def create_tfdataset_from_pandasdf(features_df,
-                                   labels_df,
-                                   win_len,
-                                   ntraces_index,
-                                   ntraces_delimiter,
-                                   zoomvector,
-                                   label_threshold,
-                                   BATCH_SIZE,
-                                   is_training,
-                                   frac_val=0.2,
-                                   verbose=True,
-                                   _NUM_CLASSES=None):
-    """Creates a TensorFlow Dataset from a pandas DataFrame.
+def tfds_from_pddf_for_unet(features_df,
+                            labels_df,
+                            is_training,
+                            batch_size,
+                            frac_val=0.2):
+    """TensorFlow Dataset from pandas DataFrame for UNET
+
+    This function was created to take pandas DataFrames containing simulated
+    fluorescence traces with artifacts (features) and the ground truth about
+    the artifacts (labels) as an input and to prepare the data for the training
+    pipeline (batch, shuffle, repeat, split in train + validation dataset).
+
+    Parameters
+    ----------
+    features_df, labels_df : pandas DataFrames
+        Contain features / labels ordered columnwise in the manner: feature_1,
+        feature_2, ... / label_1, label_2, ...
+    label_threshold : float
+        Threshold defining when a trace is to be labelled as corrupted
+    batch_size : int
+        Batch size for dataset creation (machine learning terminology)
+    is_training : bool
+        if True: Dataset will be repeated, shuffled and batched + a validation
+        dataset will be created (see frac_val).
+        If False: Dataset will only be batched, since it is for testing.
+    frac_val : float, optional
+        Fraction of training data used for validation (default 0.2). Only
+        relevant if is_training = True.
+
+    Returns
+    -------
+    dataset : TensorFlow Dataset
+        Contains features and labels, already batched according to BATCH_SIZE
+        (2 datasets (training, validation) if is_training = True)
+    _NUM_EXAMPLES : int
+        Number of examples in the dataset (2 numbers (training, validiation)
+        if is_training = True)
+    """
+    X_tensor = tf.convert_to_tensor(value=features_df.values)
+    X_tensor = tf.transpose(a=X_tensor, perm=[1, 0])
+    X_tensor_norm = min_max_normalize_tensor(X_tensor, axis=1)
+
+    y_tensor = tf.convert_to_tensor(value=labels_df.values)
+    y_tensor = tf.transpose(a=y_tensor, perm=[1, 0])
+    y_tensor = tf.cast(y_tensor, tf.float32)
+
+    num_total_examples = X_tensor_norm.shape[0]
+    X_tensor_norm = tf.reshape(tensor=X_tensor_norm,
+                               shape=(num_total_examples, -1, 1))
+    y_tensor = tf.reshape(tensor=y_tensor, shape=(num_total_examples, -1, 1))
+
+    if is_training:
+        # for training: split dataset in training and validation set
+        num_val_examples = round(frac_val * num_total_examples)
+        num_train_examples = num_total_examples - num_val_examples
+
+        dataset = tf.data.Dataset.from_tensor_slices((X_tensor_norm, y_tensor))
+        dataset = dataset.shuffle(buffer_size=num_total_examples)
+        dataset_train = dataset.take(num_train_examples).repeat().batch(
+            batch_size)
+        dataset_val = dataset.skip(num_train_examples).repeat().batch(
+            batch_size)
+
+        print('number of training examples: {}, number of validation '
+              'examples: {}\n\n------------------------'.format(
+                  num_train_examples, num_val_examples))
+        return (dataset_train, dataset_val, num_train_examples,
+                num_val_examples)
+    # if we create a test dataset: no validation set, no shuffling
+    dataset_test = tf.data.Dataset.from_tensor_slices(
+        (X_tensor_norm, y_tensor)).batch(batch_size)
+
+    print('number of test examples: {}\n'.format(num_total_examples))
+    return dataset_test, num_total_examples
+
+
+def tfds_from_pddf_for_vgg(features_df,
+                           labels_df,
+                           win_len,
+                           ntraces_index,
+                           ntraces_delimiter,
+                           zoomvector,
+                           label_threshold,
+                           BATCH_SIZE,
+                           is_training,
+                           frac_val=0.2,
+                           verbose=True,
+                           _NUM_CLASSES=None):
+    """TensorFlow Dataset from pandas DataFrame for VGG-style neural net
 
     This function was created to handle pandas DataFrames containing simulated
     fluorescence traces with artifacts (features) and the ground truth about
@@ -130,7 +206,7 @@ def create_tfdataset_from_pandasdf(features_df,
     # Do preprocessing: min-max feature scaling (normalization), reshaping for
     # model compatibility, downcasting because of memory
     _NUM_EXAMPLES_total = len(y_tensor.numpy())
-    X_tensor = _min_max_normalize_tensor(X_tensor)
+    X_tensor = min_max_normalize_tensor(X_tensor, axis=1)
     X_tensor = tf.reshape(X_tensor,
                           shape=(_NUM_EXAMPLES_total, col_no, win_len))
     X_tensor = tf.transpose(a=X_tensor, perm=[0, 2, 1])
@@ -253,7 +329,7 @@ def pandasdf_preprocessing(features_df,
 
     _NUM_EXAMPLES = int(len(X) / col_no)
     X = np.array(X)
-    X_norm = _min_max_normalize_tensor(X)
+    X_norm = min_max_normalize_tensor(X, axis=1)
     X_norm = np.reshape(X_norm, newshape=(_NUM_EXAMPLES, col_no, win_len))
     X_norm = np.transpose(X_norm, axes=[0, 2, 1])
     X = np.reshape(X, newshape=(_NUM_EXAMPLES, col_no, win_len))
@@ -363,10 +439,25 @@ def _get_windowed_y_labels_from_pandasdf(index, labels_df, win_len,
     return y.iloc[0, :]
 
 
-def _min_max_normalize_tensor(tensor):
-    """Rescale the range in [0, 1]"""
-    tensor_min = tf.math.reduce_min(input_tensor=tensor, axis=1)
-    tensor_min = tf.reshape(tensor_min, shape=(len(tensor_min), 1))
-    tensor_max = tf.math.reduce_max(input_tensor=tensor, axis=1)
-    tensor_max = tf.reshape(tensor_max, shape=(len(tensor_max), 1))
+def min_max_normalize_tensor(tensor, axis):
+    """Rescale the range in [0, 1]
+
+    Parameters
+    ----------
+    tensor : tensorflow tensor
+        input feature to be normalized
+    axis : int
+        axis along which `tf.math.reduce_min` and `tf.math.reduce.max` are
+        performing the respective operation
+
+    Returns
+    -------
+    normalized input tensor
+    """
+    tensor_min = tf.math.reduce_min(input_tensor=tensor,
+                                    axis=axis,
+                                    keepdims=True)
+    tensor_max = tf.math.reduce_max(input_tensor=tensor,
+                                    axis=axis,
+                                    keepdims=True)
     return (tensor - tensor_min) / (tensor_max - tensor_min)
