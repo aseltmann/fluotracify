@@ -127,7 +127,7 @@ def decoder_block(input_tensor, concat_tensor, num_filters):
     return decoder
 
 
-def unet_1D(input_size):
+def unet_1d(input_size):
     """U-Net as described by Ronneberger et al.
 
     Parameters
@@ -175,3 +175,58 @@ def unet_1D(input_size):
 
     unet = tf.keras.Model(inputs=inputs, outputs=outputs)
     return unet
+
+
+# define custom loss functions
+def binary_ce_dice_loss(y_true, y_pred, axis=-1, smooth=1e-5):
+    """Combination of binary crossentropy and dice loss
+
+    Parameters
+    -----------
+    y_true : Tensor
+        A distribution with shape: [batch_size, ....], (any dimensions).
+    y_pred : Tensor
+        The y_pred distribution, format the same with `y_true`.
+    axis : int or tuple of int
+        All dimensions are reduced, default ``-1``
+    smooth : float, optional
+        Will be added to the numerator and denominator of the dice loss.
+        - If both y_true and y_pred are empty, it makes sure dice is 1.
+        - If either y_true or y_pred are empty (all pixels are background),
+        dice = ```smooth/(small_value + smooth)``
+        - Smoothing is not really necessary for combined losses (so standard
+        value is 0)
+
+    Notes
+    -----
+    this function was influenced by code from
+        - TensorLayer project
+        https://tensorlayer.readthedocs.io/en/latest/modules/cost.html#tensorlayer.cost.dice_coe,
+        - Lars Nieradzik
+        https://lars76.github.io/neural-networks/object-detection/losses-for-segmentation/
+        - Code by Stefan Hoffmann, Applied Systems Biology group,
+        Hans-Knöll-Institute Jena
+
+    Note
+    ----
+    - binary crossentropy returns a tensor with loss for each 1D step of a
+    trace, bringing local info
+    - dice loss returns a scalar for each 1D trace, bringing global info
+    """
+    def dice_loss(y_true, y_pred, axis=axis, smooth=smooth):
+        """Soft dice coefficient for comparing the similarity of two batches
+        of data, usually used for binary image segmentation
+
+        For binary labels, the dice loss will be between 0 and 1 where 1 is a
+        total match. Reshaping is needed to combine the global dice loss with
+        the local binary_crossentropy
+        """
+        numerator = 2 * tf.math.reduce_sum(input_tensor=y_true * y_pred,
+                                           axis=axis, keepdims=True)
+        denominator = tf.math.reduce_sum(input_tensor=y_true + y_pred,
+                                         axis=axis, keepdims=True)
+
+        return 1 - (numerator + smooth) / (denominator + smooth)
+
+    return tf.keras.backend.binary_crossentropy(y_true, y_pred) + dice_loss(
+        y_true, y_pred)
