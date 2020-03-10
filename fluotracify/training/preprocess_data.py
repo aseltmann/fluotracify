@@ -7,6 +7,7 @@ def tfds_from_pddf_for_unet(features_df,
                             labels_df,
                             is_training,
                             batch_size,
+                            length_delimiter=None,
                             frac_val=0.2):
     """TensorFlow Dataset from pandas DataFrame for UNET
 
@@ -20,14 +21,15 @@ def tfds_from_pddf_for_unet(features_df,
     features_df, labels_df : pandas DataFrames
         Contain features / labels ordered columnwise in the manner: feature_1,
         feature_2, ... / label_1, label_2, ...
-    label_threshold : float
-        Threshold defining when a trace is to be labelled as corrupted
     batch_size : int
         Batch size for dataset creation (machine learning terminology)
     is_training : bool
         if True: Dataset will be repeated, shuffled and batched + a validation
         dataset will be created (see frac_val).
         If False: Dataset will only be batched, since it is for testing.
+    length_delimiter : int, optional
+        Length of the output traces in the returned dataset. If None, then the
+        whole length of the DataFrame is used
     frac_val : float, optional
         Fraction of training data used for validation (default 0.2). Only
         relevant if is_training = True.
@@ -37,15 +39,18 @@ def tfds_from_pddf_for_unet(features_df,
     dataset : TensorFlow Dataset
         Contains features and labels, already batched according to BATCH_SIZE
         (2 datasets (training, validation) if is_training = True)
-    _NUM_EXAMPLES : int
+    num_train_examples / num_val_examples / num_total_examples : int
         Number of examples in the dataset (2 numbers (training, validiation)
-        if is_training = True)
+        if is_training = True, 1 number (for test) if is_training = False)
     """
-    X_tensor = tf.convert_to_tensor(value=features_df.values)
+    features_cropped = features_df.iloc[:length_delimiter, :]
+    labels_cropped = labels_df.iloc[:length_delimiter, :]
+
+    X_tensor = tf.convert_to_tensor(value=features_cropped.values)
     X_tensor = tf.transpose(a=X_tensor, perm=[1, 0])
     X_tensor_norm = min_max_normalize_tensor(X_tensor, axis=1)
 
-    y_tensor = tf.convert_to_tensor(value=labels_df.values)
+    y_tensor = tf.convert_to_tensor(value=labels_cropped.values)
     y_tensor = tf.transpose(a=y_tensor, perm=[1, 0])
     y_tensor = tf.cast(y_tensor, tf.float32)
 
