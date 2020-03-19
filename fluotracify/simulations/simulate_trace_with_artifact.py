@@ -2,21 +2,21 @@
 # current state of the project when fluotracify is released, I might
 # fork the functions I need from the package
 import copy
+import random
 import sys
+import uuid
+from pathlib import Path
 
-import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
 
-sys.path.append("/home/lex/Programme/mynanosimpy/nanosimpy/")
-sys.path.append("/home/lex/Programme/mynanosimpy/nanosimpy/nanosimpy")
-
-from fluotracify.applications import correlate
+sys.path.append("../../../mynanosimpy/nanosimpy/")
+sys.path.append("../../../mynanosimpy/nanosimpy/nanosimpy")
 from nanosimpy.simulation_methods import (
     brownian_only_numpy,
     calculate_psf,
     integrate_over_psf,
 )
+
 
 
 def simulate_trace_array(artifact,
@@ -249,194 +249,199 @@ def simulate_trace_array(artifact,
     return out_array
 
 
-def correct_correlation_by_label(ntraces, traces_of_interest,
-                                 labels_of_interest, fwhm):
-    """Given corrupted traces with boolean label information, this function
-    will return the diffusion rates, transit times and length of traces after
-    taking only non-corrupted parts of the traces for correlation (where
-    labels_of_interest=False).
+def savetrace_csv(artifact,
+                  path_and_file_name,
+                  traces_array,
+                  col_per_example,
+                  foci_array,
+                  foci_distance,
+                  total_sim_time,
+                  time_step,
+                  nmol,
+                  d_mol,
+                  width,
+                  height,
+                  nclust=None,
+                  d_clust=None):
+    """save out a series of simulated fluorescence traces and labels indluding
+    metadata of the simulations
 
     Parameters
     ----------
-    ntraces : int
-        Number of ntraces from given DataFrames to choose for correlation
-    traces_of_interest : Pandas DataFrame
-        Contains the traces columnwise
-    labels_of_interest : Pandas DataFrame
-        Contains the labels columnwise
+    artifact : {0, 1, 2, 3}
+        0 = no artifact, 1 = bright clusters, 2 = detector dropout,
+        3 = photobleaching. For 1 and 3, additional metadata is saved out.
+        If 1 is chosen, the parameters nclust and d_clust have to be given.
+    path_and_file_name : str
+        Destination path and file name
+    traces_array : np.array
+        fluorescence traces and labels as columns (trace A, label A1, label A2,
+        trace B, label B1, label B2, ...)
+    col_per_example : int
+        Number of columns per example, first column being a trace, and then
+        one or multiple labels
+    ...
 
     Returns
     -------
-    tuple of lists
-    - diffrates_corrected_bylabel
-        diffusion rates in micrometer^2 / s
-    - transit_times_corrected_bylabel
-        transit times in ms
-    - tracelen_corrected_bylabel
-        lengths of traces after correction
+    Saves a .csv file
     """
+    unique = uuid.uuid4()
 
-    diffrates_corrected_bylabel = []
-    transit_times_corrected_bylabel = []
-    tracelen_corrected_bylabel = []
-    for ntraces_index in range(ntraces):
-        idx_corrected_bylabel = []
-        for idx, label in enumerate(labels_of_interest.iloc[:, ntraces_index]):
-            if not label:
-                idx_corrected_bylabel.append(idx)
+    header = ''
 
-        trace_corrected_bylabel = traces_of_interest.iloc[:, ntraces_index]
-        trace_corrected_bylabel = trace_corrected_bylabel.take(
-            idx_corrected_bylabel, axis=0).values
+    for idx, _ in enumerate(traces_array[0, ::col_per_example], start=1):
+        header += 'trace{:0>3},'.format(idx)
+        for jdx in range(1, col_per_example):
+            header += 'label{:0>3}_{},'.format(idx, jdx)
+    # Remove trailing comma
+    header = header.strip(',')
 
-        # multipletau does not accept traces which are too short
-        if len(trace_corrected_bylabel) < 32:
-            continue
+    # TODO: include path handling with pathlib to make code work independent
+    # of OS
+    with open(path_and_file_name, 'w') as my_file:
+        my_file.write('unique identifier,{}\n'.format(unique))
+        my_file.write('path and file name,{}\n'.format(path_and_file_name))
+        my_file.write('FWHMs of excitation PSFs used in nm,'
+                      '{}\n'.format(foci_array))
+        my_file.write('Extent of simulated PSF (distance to center of '
+                      'Gaussian) in nm,{}\n'.format(foci_distance))
+        my_file.write('total simulation time in ms,'
+                      '{}\n'.format(total_sim_time))
+        my_file.write('time step in ms,{}\n'.format(time_step))
+        my_file.write('number of fast molecules,{}\n'.format(nmol))
+        my_file.write('diffusion rate of molecules in micrometer^2 / s,'
+                      '{}\n'.format(d_mol))
+        my_file.write('width of the simulation in nm,{}\n'.format(width))
+        my_file.write('height of the simulation in nm,{}\n'.format(height))
+        if artifact == 1:
+            my_file.write('number of slow clusters,{}\n'.format(nclust))
+            my_file.write('diffusion rate of clusters in micrometer^2 / s,'
+                          '{}\n'.format(d_clust))
+        elif artifact == 3:
+            my_file.write('number of bleached molecules (50% immobile and '
+                          '50% mobile),{}\n'.format(nmol * 2))
+        # comments expects a str. Otherwise it printed a '# ' in first column
+        # header and importing that to pandas made it an 'object' dtype which
+        # uses a lot of memory
+        np.savetxt(my_file,
+                   traces_array,
+                   delimiter=',',
+                   header=header,
+                   comments='')
 
-        diff_corrected_bylabel, trans_corrected_bylabel, _ = correlate.correlate(
-            trace=trace_corrected_bylabel.astype(np.float64),
-            fwhm=fwhm,
-            diffrate=None,
-            time_step=1.,
-            verbose=False)
-        diffrates_corrected_bylabel.append(diff_corrected_bylabel)
-        transit_times_corrected_bylabel.append(trans_corrected_bylabel)
-        tracelen_corrected_bylabel.append(len(trace_corrected_bylabel))
 
-    return (diffrates_corrected_bylabel, transit_times_corrected_bylabel,
-            tracelen_corrected_bylabel)
-
-
-def plot_distribution_of_correlations_by_label_thresholds(
-        diffrate_of_interest, thresh_arr, xunit, artifact, xunit_bins, diffrates,
-        features, labels):
-    """Examine ensemble correction of simulated fluorescence traces with artifacts
-
-    The features (=fluorescence traces), labels (=ground truth of corruptions
-    for each time step of a fluorescence trace), and diffrates have to be
-    pandas DataFrames and their indeces have to match. Also, this function
-    right now only works properly, if you read in the data via
-    fluotracify.simulations.import_simulation_from_csv and if there are 100
-    traces in each file.
+def produce_training_data(folder, file_name, number_of_sets, traces_per_set,
+                          total_sim_time, artifact, nmol, d_mol):
+    """Save multiple .csv files containing simulations of Fluorescence
+    Correlation Spectroscopy measurements including labelled artifacts.
 
     Parameters
     ----------
-    diffrate_of_interest : float
-        diffusion rate used to simulate the traces of interest
-    thresh_arr : list of float
-        The different thresholds you want to apply on the label data for
-        correction
-    xunit : {0, 1}
-        0: plot histogram of diffusion rates in um^2 / s
-        1: plot histogram of transit times in ms
-    artifact : {0, 1, 2}
-        0: bright clusters / bursts
-        1: detector dropout
-        2: photobleaching
-    xunit_bins : e.g. np.arange(min, max, step)
-        Binning of the histogram of xunit, check matplotlib.pyplot.hist
-        documentation
-    diffrates : pandas DataFrame
-        Contains the simulated diffusion rates for each read-in CSV file
-        (Diffusion rate stays the same for each file, each file contains 100
-        traces)
-    features : pandas DataFrame
-        Contains simulated fluorescence traces
-    labels : pandas DataFrame
-        Contains ground truth information of the simulated artifacts for
-        each time step
+    folder : str
+        Folder used for saving
+    file_name : str
+        Name of files. Extension of style '_setXXX.csv' will be automatically
+        created.
+    number_of_sets : int
+        Number of csv files to generate
+    traces_per_set : int
+        Traces per file to generate
+    total_sim_time : int
+        Length of simulated trace in ms
+    artifact : {0, 1, 2, 3}
+        0 = no artifact, 1 = bright clusters, 2 = detector dropout,
+        3 = photobleaching
+    nmol : list or tuple
+        Number of fast molecules used for simulation. For each set, one will
+        be drawn using random.choice()
+    d_mol : list or tuple
+        Diffusion coefficients in mm^2 / s used for simulation. For each set,
+        one will be drawn using random.choice()
+
     Returns
     -------
-    Plot with subplot of xunit on the left and subplot of trace lengths on the
-    right
+    save desired number of csv files (= sets) to desired folder with desired
+    number of traces per file
 
     Raises
     ------
-    ValueError
-    - if xunit not {0, 1} or artifact not {0, 1, 2}
-
-    Notes
-    -----
-    Parameter fwhm is fixed to 250. Needs to be changed, if another FWHM is
-    simulated
+    NotADirectoryError if folder is not a directory
     """
+    p = Path(folder)
+    if not p.is_dir():
+        raise NotADirectoryError('Parameter folder should be a directory.')
 
-    fwhm = 250
-    # Calculate expected transit time for title of plot
-    transit_time_expected = ((float(fwhm) / 1000)**2 *
-                             1000) / (diffrate_of_interest * 8 * np.log(2.0))
+    foci_array = np.array([250])
+    foci_distance = 4000
+    time_step = 1.
+    width = 3000.0
+    height = 3000.0
 
-    # get pandas Series of diffrates of interest
-    diff = diffrates.where(diffrates == diffrate_of_interest).dropna()
+    for idx in range(number_of_sets):
+        nmol = random.choice(nmol)
+        d_mol = random.choice(d_mol)
 
-    traces_of_interest = pd.DataFrame()
-    for diff_idx in diff.index:
-        # number of files read in is 100, every 100th trace belongs to the
-        # same file (and the same diffusion coefficient)
-        traces_tmp = features.iloc[:, diff_idx::100]
-        traces_of_interest = pd.concat([traces_of_interest, traces_tmp],
-                                       axis=1)
+        file_name_ext = '_set{:0>3}.csv'.format(idx + 1)
+        file = ''.join([file_name, file_name_ext])
+        f = Path(file)
+        path_and_file_name = p / f
+        col_per_example = 2
 
-    ntraces = len(traces_of_interest.columns)
+        if artifact == 1:
+            # bright clusters
+            nclust = 10
+            d_clust = [0.01, 0.02]
+            d_clust = random.choice(d_clust)
+            traces = simulate_trace_array(artifact=artifact,
+                                          nsamples=traces_per_set,
+                                          foci_array=foci_array,
+                                          foci_distance=foci_distance,
+                                          total_sim_time=total_sim_time,
+                                          time_step=time_step,
+                                          nmol=nmol,
+                                          d_mol=d_mol,
+                                          width=width,
+                                          height=height,
+                                          nclust=nclust,
+                                          d_clust=d_clust)
+            savetrace_csv(artifact=artifact,
+                          path_and_file_name=path_and_file_name,
+                          traces_array=traces,
+                          col_per_example=col_per_example,
+                          foci_array=foci_array,
+                          foci_distance=foci_distance,
+                          total_sim_time=total_sim_time,
+                          time_step=time_step,
+                          nmol=nmol,
+                          d_mol=d_mol,
+                          width=width,
+                          height=height,
+                          nclust=nclust,
+                          d_clust=d_clust)
 
-    fig = plt.figure(figsize=(16, 6), constrained_layout=True)
-    gs = fig.add_gridspec(1, 3)
-    for idx, thresh in enumerate(thresh_arr):
-        print(idx, thresh)
-        labels_of_interest = pd.DataFrame()
-        for diff_idx in diff.index:
-            labels_tmp = labels.iloc[:, diff_idx::100]
-            labels_of_interest = pd.concat([labels_of_interest, labels_tmp],
-                                           axis=1)
-
-        if artifact == 0:
-            labels_of_interest = labels_of_interest > thresh
-        elif artifact == 1:
-            labels_of_interest = labels_of_interest < thresh
-        elif artifact == 2:
-            labels_of_interest = labels_of_interest > thresh
+        elif artifact == 0 or 2 or 3:
+            traces = simulate_trace_array(artifact=artifact,
+                                          nsamples=traces_per_set,
+                                          foci_array=foci_array,
+                                          foci_distance=foci_distance,
+                                          total_sim_time=total_sim_time,
+                                          time_step=time_step,
+                                          nmol=nmol,
+                                          d_mol=d_mol,
+                                          width=width,
+                                          height=height)
+            savetrace_csv(artifact=artifact,
+                          path_and_file_name=path_and_file_name,
+                          traces_array=traces,
+                          col_per_example=col_per_example,
+                          foci_array=foci_array,
+                          foci_distance=foci_distance,
+                          total_sim_time=total_sim_time,
+                          time_step=time_step,
+                          nmol=nmol,
+                          d_mol=d_mol,
+                          width=width,
+                          height=height)
         else:
-            raise ValueError('value for artifact has to be 0, 1 or 2')
-
-        out = correct_correlation_by_label(
-            ntraces=ntraces,
-            traces_of_interest=traces_of_interest,
-            labels_of_interest=labels_of_interest,
-            fwhm=fwhm)
-
-        ax1 = fig.add_subplot(gs[:, :-1])
-        ax1.hist(out[xunit],
-                 bins=xunit_bins,
-                 alpha=0.5,
-                 label='threshold: {}'.format(thresh))
-        ax2 = fig.add_subplot(gs[:, -1])
-        ax2.hist(out[2],
-                 bins=np.arange(0, 20001, 1000),
-                 alpha=0.5,
-                 label='threshold: {}'.format(thresh))
-    if xunit == 0:
-        ax1.set_title(
-            r'Diffusion rates by correlation with expected value '
-            r'{:.2f}$\mu m^2/s$'.format(diffrate_of_interest),
-            fontsize=20)
-        ax1.set_xlabel(r'Diffusion coefficients in $\mu m^2/s$', size=16)
-        ax1.axvline(x=diffrate_of_interest,
-                    color='r',
-                    label='simulated diffusion rate')
-    elif xunit == 1:
-        ax1.set_title(
-            r'Transit times by correlation with expected value {:.2f}$ms$'.
-            format(transit_time_expected),
-            fontsize=20)
-        ax1.set_xlabel(r'Transit times in $ms$', size=16)
-        ax1.axvline(x=transit_time_expected,
-                    color='r',
-                    label='simulated transit time')
-    else:
-        raise ValueError('value for xunit has to be 0 or 1')
-    ax1.set_ylabel('Number of fluorescence traces', fontsize=16)
-
-    ax1.legend(fontsize=16)
-    ax2.set_title('Length of traces for correlation', fontsize=20)
-    ax2.set_xlabel('Length of traces in $ms$', fontsize=16)
-    ax2.set_ylabel('Number of fluorescence traces', fontsize=16)
+            raise ValueError('artifact must be 0, 1, 2 or 3')
