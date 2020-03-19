@@ -5,8 +5,8 @@ import numpy as np
 from lmfit import Parameters, fit_report, minimize
 from multipletau import autocorrelate
 
-sys.path.append('/home/lex/Programme/nanosimpy/')
-sys.path.append('/home/lex/Programme/nanosimpy/nanosimpy/')
+sys.path.append('../../../mynanosimpy/nanosimpy/')
+sys.path.append('../../../mynanosimpy/nanosimpy/nanosimpy/')
 
 from nanosimpy import equations_to_fit as eq
 
