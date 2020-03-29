@@ -1,0 +1,65 @@
+#+TITLE: Lab book Fluotracify
+#+AUTHOR: Alexander Seltmann
+#+LANGUAGE: en
+#+PROPERTY: header-args :eval never-export :exports both
+
+* README
+** General:
+   - This file corresponds to my lab book for my doctoral thesis tackling
+     artifact correction in Fluorescence Correlation Spectroscopy (FCS)
+     measurements using Deep Neural Networks
+   - It contains explanations of how things are organized, of the workflow for
+     doing experiments, changes made to the code, and the observed behavior in
+     the "* Data" section.
+   - The branching model used is described in [[http://starpu-simgrid.gforge.inria.fr/misc/SIGOPS_paper.pdf][this paper]]. Following this, if you
+     are interested in the "* Data" section, you have to =git clone= the /data/
+     branch. The /master/ branch is clean from any results, it contains only
+     source code and the analysis.
+** Experiments workflow:
+   1) Create a new branch
+   2) Make sure everything is commited
+   3) ...
+   4) Do the analysis
+   5) Add to this file into "* Data" section the entry for the results, using
+      the template described below
+   6) Commit/push the results of this separate branch
+   7) Merge this new branch with the remote "data" branch
+** Example for simulation...
+** Example for ...
+** Example for ...
+* Template for data entry:
+** xp#
+*** git:
+#+begin_src sh
+git log -1
+#+end_src
+*** Notes:
+    ######################
+* Organization of git
+** remote/origin/master branch:
+   - Has all the source, analysis, scripts
+** remote/origin/xp# branches:
+   - Have all the data connected to specific experiments
+   - Also some important (not all) .pdf files
+** remote/origin/data branch:
+   - Merging all the data and source branches
+   - It is cloned only on my local machine, never clone it on a remote one
+* Git TAGs
+** Stable versions:
+*** stable13
+  StarPU version: trunk 14405
+  Simgrid: c78eee2
+  qrm_starpu: r1393
+  new_magmamorse: r1799
+*** stable13.1
+  StarPU version: trunk 14405
+  Simgrid: c78eee2
+  qrm_starpu: r1443
+  new_magmamorse: r1799
+** All tags from git:
+#+begin_src sh :results output
+ git push origin --tags
+ git tag -n1
+#+end_src
+
+#+RESULTS:
