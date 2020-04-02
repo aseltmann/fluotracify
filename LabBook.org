@@ -131,13 +131,12 @@ https://www.tensorflow.org/tensorboard/image_summaries
 - first, use "clocking" in org-mode to record time working on this branch with
   =C-c C-x C-i=
 
-#+BEGIN: clocktable :scope file :maxlevel 8
-#+CAPTION: Clock summary at [2020-03-30 Mo 21:50]
+#+BEGIN: clocktable :scope subtree :maxlevel 8
+#+CAPTION: Clock summary at [2020-04-02 Do 12:09]
 | Headline                                   | Time   |      |      |      |
 |--------------------------------------------+--------+------+------+------|
 | *Total time*                               | *4:37* |      |      |      |
 |--------------------------------------------+--------+------+------+------|
-| Data                                       | 4:37   |      |      |      |
 | \_  exp-200330-test                        |        | 4:37 |      |      |
 | \_    Experimentation diary                |        |      | 1:34 |      |
 | \_      Learn about hard vs soft links     |        |      |      | 0:08 |
@@ -157,6 +156,7 @@ git log -1
 | Date:   | Sun                                      | Mar                    | 29 | 17:41:27 | 2020 | +0200 |
 |         |                                          |                        |    |          |      |       |
 | Add     | LabBook.org                              |                        |    |          |      |       |
+|         |                                          |                        |    |          |      |       |
 *** DONE Experimentation diary
     CLOSED: [2020-03-30 Mo 21:50]
     :LOGBOOK:
@@ -212,7 +212,19 @@ git log -1
    :LOGBOOK:
    CLOCK: [2020-03-31 Di 12:51]--[2020-03-31 Di 12:59] =>  0:08
    :END:
-*** TODO Technical Setup diary
+#+BEGIN: clocktable :scope subtree :maxlevel 8
+#+CAPTION: Clock summary at [2020-04-02 Do 12:09]
+| Headline                                        | Time   |      |      |      |
+|-------------------------------------------------+--------+------+------+------|
+| *Total time*                                    | *3:06* |      |      |      |
+|-------------------------------------------------+--------+------+------+------|
+| \_  exp-200331-test                             |        | 3:06 |      |      |
+| \_    Technical Setup diary                     |        |      | 2:58 |      |
+| \_      Test if remote HPC is accessible via... |        |      |      | 2:58 |
+#+END:
+
+*** DONE Technical Setup diary
+    CLOSED: [2020-04-02 Do 11:59]
 **** DONE [#A] Test if remote HPC is accessible via org-mode
      CLOSED: [2020-04-02 Do 11:59]
      :LOGBOOK:
@@ -370,10 +382,106 @@ This naive approach seems not to work. Some research showed this as promising:
 https://github.com/ahendriksen/ob-tmux
 
 ** exp-200402-test
+   :LOGBOOK:
+   CLOCK: [2020-04-02 Do 12:05]--[2020-04-02 Do 12:07] =>  0:02
+   :END:
+*** git
+#+begin_src sh :results verbatim
+git log -1
+#+end_src
 
+#+RESULTS:
+: commit 5155597b868fd45db254bc8d631ff47d69ce8363
+: Author: Apoplex <oligolex@vivaldi.net>
+: Date:   Thu Apr 2 12:03:48 2020 +0200
+:
+:     First experiments org mode + git literate program
+*** Technical and conceptional setup
+**** TODO Execute a script on Ara cluster with literate programming
+     :LOGBOOK:
+     CLOCK: [2020-04-02 Do 21:15]--[2020-04-02 Do 21:15] =>  0:00
+     CLOCK: [2020-04-02 Do 20:40]--[2020-04-02 Do 20:50] =>  0:10
+     CLOCK: [2020-04-02 Do 14:01]--[2020-04-02 Do 15:35] =>  1:34
+     CLOCK: [2020-04-02 Do 12:08]--[2020-04-02 Do 12:26] =>  0:18
+     :END:
+1. connect to FSU VPN (still via normal terminal)
+2. connect to ara via ssh and check if a tmux session exists
+#+BEGIN_SRC sh :results output :dir :dir /ssh:ye53nis@ara-login01.rz.uni-jena.de:/home/ye53nis/ :session tmux-setup
+echo $PWD
+echo $HOSTNAME
+tmux ls
+#+END_SRC
+
+#+RESULTS:
+: /home/ye53nis
+: $ login01
+: $ ob-ara: 1 windows (created Thu Apr  2 14:06:02 2020) [185x32]
+
+2. connect to ara via ssh and start a tmux session (So that my programs on ara
+   can be run even if I am not connected)
+
+#+BEGIN_SRC sh :results silent :session ara
+ssh ye53nis@ara-login01.rz.uni-jena.de -t tmux new -d
+#+END_SRC
+
+- hurray, we created a new tmux out of this org file! lets check:
+
+#+BEGIN_SRC sh :results output :session tmux-setup
+echo $PWD
+echo $HOSTNAME
+tmux ls
+tmux attach -S /tmp/tmux-67339/ attach -s 2
+#+END_SRC
+
+#+RESULTS:
+: /home/ye53nis
+: $ login01
+: $ 2: 1 windows (created Thu Apr  2 14:35:23 2020) [185x32] (attached)
+: ob-ara: 1 windows (created Thu Apr  2 14:06:02 2020) [185x32]
+: $ tmux: unknown option -- S
+: usage: attach-session [-dr] [-t target-session]
+
+- now lets see if we can connect this tmux session to our local machine
+
+#+BEGIN_SRC sh :results silent :session ara
+REMOTE_SOCKET=$(ssh ye53nis@ara-login01.rz.uni-jena.de 'tmux list-sessions /tmp/tmux-67339/default' | head -1)
+echo $REMOTE_SOCKET
+#+END_SRC
+
+#+RESULTS:
+: ye53nis@ara-login01.rz.uni-jena.de's password:
+: sh-5.0$
+
+#+BEGIN_SRC sh :results output :session ara
+echo $REMOTE_SOCKET
+#+END_SRC
+
+#+RESULTS:
+
+3. use ob-tmux to connect to the tmux session
+
+#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session hello
+echo $PWD
+#+END_SRC
+- it does not yet work, but these commands seem to work, lets see tomorrow:
+  - =REMOTE_SOCKET=$(ssh ara 'tmux ls -F tmp/tmux-67339/default' |head -1)=
+  - =ssh ara -tfN -D ~/.tmux-local-socket-remote-machine:$REMOTE_SOCKET=
+
+***** useful notes on the way
+      - http://www.howardism.org/Technical/Emacs/literate-devops.html seems to
+        be a good blog about using org babel
+      - this also seems to be a good resource
+        https://lgfang.github.io/mynotes/utils/tmux.html
+      - how to get around "bind: address already in use" or "cannot listen to
+        port" errors:
+        https://askubuntu.com/questions/447820/ssh-l-error-bind-address-already-in-use
+        https://unix.stackexchange.com/questions/427189/how-to-cleanup-ssh-reverse-tunnel-socket-after-connection-closed
 **** TODO [#A] Setup of literate programming OR jupytex or the like
+     :LOGBOOK:
+     CLOCK: [2020-04-02 Do 13:08]--[2020-04-02 Do 13:38] =>  0:30
+     :END:
+
 **** TODO [#A] Further setup of git branching model
-**** TODO [#C] Learn calDav sync to org agenda
 **** TODO [#C] Set up Dropbox or git annex
 
 
