@@ -1,0 +1,3 @@
+[submodule "src/nanosimpy"]
+	path = src/nanosimpy
+	url = https://github.com/aseltmann/nanosimpy
