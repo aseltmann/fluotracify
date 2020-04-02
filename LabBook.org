@@ -1,7 +1,10 @@
 #+TITLE: Lab book Fluotracify
 #+AUTHOR: Alexander Seltmann
 #+LANGUAGE: en
-#+PROPERTY: header-args :eval never-export :exports both
+# If exporting the existing code and execution to html or pdf etc, uncomment the
+# following properties to avoid org-babel to execute the code blocks again, and
+# to export both the code AND the results
+# #+PROPERTY: header-args :eval never-export :exports both
 
 * README
 ** General:
@@ -36,6 +39,22 @@ git log -1
 *** Notes:
     ######################
 * Organization of git
+** tools used
+*** - Emacs =magit=
+- =gitflow-avh= (=magit-flow=) to follow the
+- possibly https://github.com/magit/magit-annex for large files. Follow this:
+  https://git-annex.branchable.com/walkthrough/
+- maybe check out git-toolbelt at some point
+  https://github.com/nvie/git-toolbelt#readme with
+  https://nvie.com/posts/git-power-tools/
+*** jupyter notebooks
+- jupytext: https://github.com/mwouts/jupytext
+- nbstripout: https://github.com/kynan/nbstripout
+*** mlflow
+- https://docs.faculty.ai/user-guide/experiments/index.html and
+  https://docs.microsoft.com/en-us/azure/databricks/_static/notebooks/hls-image-processing/02-image-segmentation-dl.html
+*** tensorflow
+https://www.tensorflow.org/tensorboard/image_summaries
 ** remote/origin/master branch:
    - Has all the source, analysis, scripts
 ** remote/origin/xp# branches:
@@ -62,4 +81,303 @@ git log -1
  git tag -n1
 #+end_src
 
+* Organization of code
+** scripts:
+*** run_bench_StarPU.sh [4/4]:                                        :@LUKA:
+    - Runs benchmarking of StarPU without Simgrid
+    - [X] Write a usage/help part, add environment variables
+    - [X] Upgrade for interective mode
+    - [X] Change verbose
+    - [X] Add frequency scaling only if the file exists, otherwise write "unknown
+** src/
+*** fluotracify/
+**** imports/
+**** simulations/
+**** training/
+**** applications/
+**** doc/
+- use Sphinx
+  - follow this: https://daler.github.io/sphinxdoc-test/includeme.html
+  - evtl export org-mode Readme to rst via https://github.com/msnoigrs/ox-rst
+  - possibly heavily use
+    http://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html
+  - for examples sphinx-galleries could be useful
+    https://sphinx-gallery.github.io/stable/getting_started.html
+
+*** nanosimpy/
+- cloned from dwaithe with refactoring for Python 3-compatibility
+
+* Changes in this Lab book template (without "* Data")
+** 2020-03-30
+   - set up lab book and form git repo accoring to setup by Luka Stanisic et al
+* Data
+** exp-200330-test
+   :PROPERTIES:
+   :Effort:   4:00
+   :END:
+   :LOGBOOK:
+   CLOCK: [2020-03-31 Di 12:51]--[2020-03-31 Di 12:51] =>  0:00
+   CLOCK: [2020-03-30 Mo 20:48]--[2020-03-30 Mo 20:54] =>  0:06
+   CLOCK: [2020-03-30 Mo 20:28]--[2020-03-30 Mo 20:48] =>  0:20
+   CLOCK: [2020-03-30 Mo 18:34]--[2020-03-30 Mo 20:28] =>  1:54
+   CLOCK: [2020-03-30 Mo 18:23]--[2020-03-30 Mo 18:24] =>  0:01
+   CLOCK: [2020-03-30 Mo 17:33]--[2020-03-30 Mo 17:58] =>  0:25
+   CLOCK: [2020-03-30 Mo 16:39]--[2020-03-30 Mo 16:39] =>  0:00
+   CLOCK: [2020-03-30 Mo 16:31]--[2020-03-30 Mo 16:38] =>  0:07
+   CLOCK: [2020-03-30 Mo 16:02]--[2020-03-30 Mo 16:03] =>  0:01
+   CLOCK: [2020-03-30 Mo 15:36]--[2020-03-30 Mo 15:43] =>  0:07
+   CLOCK: [2020-03-30 Mo 15:23]--[2020-03-30 Mo 15:25] =>  0:02
+   :END:
+- first, use "clocking" in org-mode to record time working on this branch with
+  =C-c C-x C-i=
+
+#+BEGIN: clocktable :scope file :maxlevel 8
+#+CAPTION: Clock summary at [2020-03-30 Mo 21:50]
+| Headline                                   | Time   |      |      |      |
+|--------------------------------------------+--------+------+------+------|
+| *Total time*                               | *4:37* |      |      |      |
+|--------------------------------------------+--------+------+------+------|
+| Data                                       | 4:37   |      |      |      |
+| \_  exp-200330-test                        |        | 4:37 |      |      |
+| \_    Experimentation diary                |        |      | 1:34 |      |
+| \_      Learn about hard vs soft links     |        |      |      | 0:08 |
+| \_      Learn about Org-mode's column view |        |      |      | 0:01 |
+| \_      Learning about org-mode's clocking |        |      |      | 0:19 |
+| \_      Configure Emacs setup (neotree)    |        |      |      | 1:01 |
+#+END:
+
+*** git
+#+begin_src sh
+git log -1
+#+end_src
+
 #+RESULTS:
+| commit  | 7a2f40149b15e3a639396abfe86e75bd57db55a3 |                        |    |          |      |       |
+| Author: | Apoplex                                  | <oligolex@vivaldi.net> |    |          |      |       |
+| Date:   | Sun                                      | Mar                    | 29 | 17:41:27 | 2020 | +0200 |
+|         |                                          |                        |    |          |      |       |
+| Add     | LabBook.org                              |                        |    |          |      |       |
+*** DONE Experimentation diary
+    CLOSED: [2020-03-30 Mo 21:50]
+    :LOGBOOK:
+    CLOCK: [2020-03-30 Mo 16:22]--[2020-03-30 Mo 16:24] =>  0:02
+    CLOCK: [2020-03-30 Mo 16:22]--[2020-03-30 Mo 16:22] =>  0:00
+    CLOCK: [2020-03-30 Mo 15:33]--[2020-03-30 Mo 15:36] =>  0:03
+    CLOCK: [2020-03-30 Mo 15:27]--[2020-03-30 Mo 15:27] =>  0:00
+    :END:
+**** DONE Learn about hard vs soft links
+     CLOSED: [2020-03-30 Mo 16:39]
+     :PROPERTIES:
+     :TAGS_ALL: a
+     :END:
+     :LOGBOOK:
+     CLOCK: [2020-03-30 Mo 18:23]--[2020-03-30 Mo 18:23] =>  0:00
+     CLOCK: [2020-03-30 Mo 16:26]--[2020-03-30 Mo 16:31] =>  0:05
+     CLOCK: [2020-03-30 Mo 16:19]--[2020-03-30 Mo 16:22] =>  0:03
+     :END:
+**** DONE Learn about Org-mode's column view
+     CLOSED: [2020-03-30 Mo 16:38]
+     :LOGBOOK:
+     CLOCK: [2020-03-30 Mo 17:59]--[2020-03-30 Mo 17:59] =>  0:00
+     CLOCK: [2020-03-30 Mo 17:58]--[2020-03-30 Mo 17:59] =>  0:01
+     :END:
+     - on: =C-c C-x C-c=
+     - off: press =q= while cursor is on highlighted entry
+**** DONE Learning about org-mode's clocking
+     CLOSED: [2020-03-30 Mo 19:26]
+     :LOGBOOK:
+     CLOCK: [2020-03-30 Mo 18:04]--[2020-03-30 Mo 18:21] =>  0:17
+     CLOCK: [2020-03-30 Mo 17:59]--[2020-03-30 Mo 18:01] =>  0:02
+     CLOCK: [2020-03-30 Mo 17:58]--[2020-03-30 Mo 17:58] =>  0:00
+     :END:
+     - https://writequit.org/denver-emacs/presentations/2017-04-11-time-clocking-with-org.html
+       tipps and tricks
+     - I'll keep one clock going in the "** exp#" section when I start with =C-c
+       C-x C-i=
+     - I'll check out when I leave the computer or do something else on the
+       computer with =C-c C-x C-o=
+     - When I come back, I'll jump to the current clock with =C-c C-x C-j= and
+       clock in at the last task with =C-c C-x C-x=
+**** DONE Configure Emacs setup (neotree)
+     CLOSED: [2020-03-30 Mo 20:30]
+     :LOGBOOK:
+     CLOCK: [2020-03-31 Di 12:51]--[2020-03-31 Di 12:51] =>  0:00
+     CLOCK: [2020-03-30 Mo 19:30]--[2020-03-30 Mo 20:31] =>  1:01
+     :END:
+** exp-200331-test
+   SCHEDULED: <2020-03-31 Di>
+   :PROPERTIES:
+   :Effort:   4:00
+   :END:
+   :LOGBOOK:
+   CLOCK: [2020-03-31 Di 12:51]--[2020-03-31 Di 12:59] =>  0:08
+   :END:
+*** TODO Technical Setup diary
+**** DONE [#A] Test if remote HPC is accessible via org-mode
+     CLOSED: [2020-04-02 Do 11:59]
+     :LOGBOOK:
+     CLOCK: [2020-04-02 Do 11:58]--[2020-04-02 Do 11:59] =>  0:01
+     CLOCK: [2020-04-02 Do 11:20]--[2020-04-02 Do 11:38] =>  0:18
+     CLOCK: [2020-04-01 Mi 13:38]--[2020-04-01 Mi 14:17] =>  0:39
+     CLOCK: [2020-04-01 Mi 11:28]--[2020-04-01 Mi 13:09] =>  1:41
+     CLOCK: [2020-03-31 Di 14:27]--[2020-03-31 Di 14:27] =>  0:00
+     CLOCK: [2020-03-31 Di 13:15]--[2020-03-31 Di 13:31] =>  0:16
+     CLOCK: [2020-03-31 Di 12:59]--[2020-03-31 Di 13:02] =>  0:03
+     :END:
+***** Learning =org-babel=
+- https://orgmode.org/manual/Results-of-Evaluation.html (ff) best explanation of
+  header arguments. Collection > Type > Format > Handling are classes for
+  =:results=
+  + Collection:
+    * value (default), wraps code in function, for python to output something
+      you need a return statement
+    * output: scripting mode
+  + Type:
+    * =table=, =vector=, =list=
+    * =verbatim=, puts results in a =#+begin_example=- Block
+    * =file=, can save output e.g. as pdf with =:results value file :file
+      circle.pdf=
+  + Format:
+    * =code=, =drawer=, =html= (begin_export html), =latex= (begin_export
+      latex)
+    * =link=, =graphics= include link to file on disk, if used with =file= type
+    * =org=, =raw=
+    * =pp=, pretty printed source code enclosed in a code block. Python is
+      supported!
+  + Handling
+    * =silent=, do not insert results in the org mode buffer, but echo in the
+      minibuffer
+    * =replace= (default), insert results in org buffer, remove previous results
+    * =append= / =prepend=, append results to org buffer, latest results at
+      bottom / top
+- =:var= can be used to hand a variable to the block
+- =:wrap= can be used for custom export blocks, everything given is appended to
+  the =#+BEGIN= and =#+END= block of the results  (and overrides the results
+  values). E.g. =:wrap EXPORT markdown= results in =#+BEGIN_EXPORT markdown=
+- =:post=
+- =:session=
+  + =none= (default no :session argument), each code block gets new interpreter
+    process
+  + any STRING, so that code blocks share the same environment (are run in same
+  interpreter process).
+  + plain =:session=, session name derived from source language
+- =:dir= for choosing working directory. things like =:dir ~/work= works.
+  setting =:mkdirp yes= (non-nil) creates
+  the directory, if it is not there yet
+  + (default) - current directory is used
+  + Tramp syntax works for remote code execution, e.g. =:file plot.png :dir
+    /scp:dand@yakuba.princeton.edu:= captures text for insertion in org file,
+    and inserts a link to the remote file thanks to Emacs Tramp
+  + when using =dir= with =session=, the starting dir is only set for this
+    session, not for others
+  + do not use =dir= with =:exports results= or =:exports both= to avoid org
+    inserting incorrect links
+- =:cache= if set to yes, the results are not re-evaluated if nothing changed
+  since the previous run.
+  + Suitable fo functions that only rely on input arguments (not timer, file
+    system objects, random number generators, ...).
+  + don't mix =session= and =cache=
+- =:exports= which part of code block to export (=code=, =results=, =both=,
+  =none=)
+- =:tangle=, essential for *source code extraction in literate programming*.
+  Documents on creation are /woven/ with code and documentation. on export, code
+  is /tangled/ for execution by a computer. This document for example by
+  execution would be recomposed into one or more separate files, while variables
+  will be expanded, references resolved etc
+  + =no= (default), do not extract code in a source code file
+  + =yes=, export code block to source file. file name derived from name of org
+    file, file extension derived from source code language id
+  + =:tangle FILENAME= export to source file with FILENAME. =:mkdirp yes= creates
+    parent directories
+  + =:comments= (default: =no=)
+    * =link= (formerly: =yes=), wrap the code block in comments, include links
+      pointing back to the place in the org file from where the code was tangled
+    * =org=, nearest headline text from Org file is inserted as comment
+    * =both=, both =link= and =org=
+    * =noweb=, includes =link= plus expands Noweb references and wraps them in
+      link comments inside the body of the code block
+  + =:shebang= (e.g. =shebang "#!/bin/bash=) turns results into executable
+    script files by first inserting string as the first line of tangled file +
+    turn on file's executable permission
+  + =:tangle-mode= can set permissions (overrides shebang)
+    * =:tangle-mode (identity #o444)= makes read-only
+    * =:tangle-mode (identity #o755)= makes executable
+  + =:no-expand= no code block expansion during tangling (no effect for normal
+    source block execution)
+- =:noweb= (default: =no=)
+  + =yes=, expansion of Noweb syntax references like =<< CODE-BLOCK-ID >>= when
+    evaluating, tangling, or exporting.
+  + =tangle= only when tangling, =no-export= when evaluating or tangling
+  + =strip-export=, =eval=
+  + =:noweb-ref NAME= concatenates the block to a noweb block with NAME. Can
+    also be set in a =:PROPERTY:= drawer at the sub-tree or file level.
+  + =:noweb-sep= changes the separator between each noweb reference
+    concatenation (Default: newline)
+  + =<< code-block-name(optional arguments) >>= includes the results of a code
+    block rather than its body! Note that the code block needs a NAME keyword
+    (like =#+NAME: code-block-name=).
+
+***** emacs commands for =org-babel=
+- =C-c '= to edit current code block in new major mode edit buffer containing
+  the body of the source code block, use =C-c '= again to close buffer and
+  return to the org buffer
+
+***** accessing the ara cluster of FSU
+#+BEGIN_SRC sh :results output :dir :dir /ssh:ye53nis@ara-login01.rz.uni-jena.de:/home/ye53nis/
+echo $PWD
+echo $HOSTNAME
+#+END_SRC
+
+#+RESULTS:
+: /home/ye53nis
+: login01
+
+- Nice! Can we access the different nodes?
+
+#+BEGIN_SRC sh :results output :exports both :dir :dir /ssh:ye53nis@ara-login01.rz.uni-jena.de:/home/ye53nis/
+sinfo
+#+END_SRC
+
+
+#+RESULTS:
+#+begin_example
+PARTITION   AVAIL  TIMELIMIT  NODES  STATE NODELIST
+b_test         up   10:00:00      1  alloc node001
+b_standard*    up 8-08:00:00     62    mix node[003-005,009-016,021-022,027-030,032-033,038,049-051,053,061-062,064,071-072,075,081-089,091-092,096-101,108-110,112-117,122-125,131-132]
+b_standard*    up 8-08:00:00     69  alloc node[002,006-008,017-020,023-026,031,034-037,039-048,052,054-060,063,065-070,073-074,076-080,090,093-095,102-107,111,118-121,126,133-136]
+gpu_test       up    1:00:00      1   idle node127
+gpu_p100       up 8-08:00:00      2   idle node[128-129]
+gpu_v100       up 8-08:00:00      1    mix node130
+b_fat          up 8-08:00:00      4    mix node[137-140]
+s_test         up    3:00:00      1  alloc node141
+s_standard     up 8-08:00:00     68    mix node[143-144,150,153,156-157,162,165,167,170-172,175,179-183,185-189,195-196,199-200,204-212,214-217,219-222,224-226,232,238,252-256,262-267,293,295-296,302-303,308-310]
+s+_standard     up 8-08:00:00     77  alloc node[142,145-149,154-155,158-161,163-164,166,168-169,173-174,176-178,184,190-194,197-198,201,213,223,227-231,233-237,239-251,257-258,260-261,268,294,297-301,304-307,311-316]
+s_standard     up 8-08:00:00      6   idle node[151-152,202-203,218,259]
+s_fat          up 8-08:00:00      1    mix node271
+s_fat          up 8-08:00:00      3  alloc node[269-270,272]
+#+end_example
+
+Sweet, now we would need a tmux session to be able to leave jobs running, when
+we disconnect the SSH pipe from the local machine.
+
+#+BEGIN_SRC sh :results output :exports both :dir :dir /ssh:ye53nis@ara-login01.rz.uni-jena.de:/home/ye53nis/
+tmux attach -t jupyter
+#+END_SRC
+
+#+RESULTS:
+
+This naive approach seems not to work. Some research showed this as promising:
+https://github.com/ahendriksen/ob-tmux
+
+** exp-200402-test
+
+**** TODO [#A] Setup of literate programming OR jupytex or the like
+**** TODO [#A] Further setup of git branching model
+**** TODO [#C] Learn calDav sync to org agenda
+**** TODO [#C] Set up Dropbox or git annex
+
+
+* Local variables
+# Local Variables:
+# eval: (setq-local org-babel-default-header-args:Python '((:session . "foo")))
+# End:
