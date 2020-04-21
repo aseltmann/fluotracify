@@ -150,33 +150,60 @@ ssh ara -tfN \
 | sh-5.0$ | ye53nis@ara-login01.rz.uni-jena.de's | password: |
 | >       | ye53nis@ara-login01.rz.uni-jena.de's | password: |
 
-A script which allows to print the last 32 lines of output from the tmux session
+A script which allows to print the output from the tmux session
 in an =#+begin_example=-Block below the tmux block by pressing =C-c C-o= or =C-c
-C-v C-o= when the pointer is inside the tmux block.
+C-v C-o= when the pointer is inside the tmux block. See [[https://github.com/ahendriksen/ob-tmux/issues/6#issuecomment-613914400][here]].
 
 #+BEGIN_SRC emacs-lisp
   (defun ob-tmux--insert-result ()
-      (interactive)
-      (let ((info (org-babel-get-src-block-info 'light)))
-        (when (and info (string-equal "tmux" (nth 0 info)))
-          (let* ((params (nth 2 info))
-                 (org-session (cdr (assq :session params)))
-                 (socket (cdr (assq :socket params)))
-                 (socket (when socket (expand-file-name socket)))
-                 (ob-session (ob-tmux--from-org-session org-session socket)))
-            (org-babel-insert-result
-                 (ob-tmux--execute-string ob-session
-                                          "capture-pane" "-p"
-                                          "-t" (ob-tmux--session ob-session))
-                 '("replace"))))))
+    (interactive)
+    (let ((info (org-babel-get-src-block-info 'light)))
+      (when (and info (string-equal "tmux" (nth 0 info)))
+        (let* ((params (nth 2 info))
+               (org-session (cdr (assq :session params)))
+               (socket (cdr (assq :socket params)))
+               (socket (when socket (expand-file-name socket)))
+               (ob-session (ob-tmux--from-org-session org-session socket)))
+          (org-babel-insert-result
+               (ob-tmux--execute-string ob-session
+                                        "capture-pane"
+                                        "-p" ;; print to stdout
+                                        "-S" "-" ;; start at beginning of history
+                                        "-t" (ob-tmux--session ob-session))
+               '("replace"))))))
+
+  (defun ob-tmux--edit-result ()
+    (interactive)
+    (pcase (org-babel-get-src-block-info 'light)
+      (`(,_ ,_ ,arguments ,_ ,_ ,start ,_)
+       (save-excursion
+         ;; Go to the results, if there aren't any then run the block.
+         (goto-char start)
+         (goto-char (or (org-babel-where-is-src-block-result)
+                        (progn (org-babel-execute-src-block)
+                               (org-babel-where-is-src-block-result))))
+         (end-of-line)
+         (skip-chars-forward " \r\t\n")
+         (org-edit-special)
+         (delete-trailing-whitespace)
+         (end-of-buffer)
+         t))
+      (_ nil)))
 
   (defun ob-tmux--open-src-block-result (orig-fun &rest args)
-    (ob-tmux--insert-result)
-    (apply orig-fun args))
+    (let ((info (org-babel-get-src-block-info 'light)))
+      (if (and info (string-equal "tmux" (nth 0 info)))
+          (progn
+            (ob-tmux--insert-result)
+            (ob-tmux--edit-result))
+        (apply orig-fun args))))
 
   (advice-add 'org-babel-open-src-block-result
-              :around #'ob-tmux--open-src-block-result)
+                 :around #'ob-tmux--open-src-block-result)
 #+END_SRC
+
+#+RESULTS:
+
 *** jupyter setup and ssh tunneling
 
 On the compute node of the HPC, the users' environment is managed through module
@@ -564,8 +591,10 @@ git log -1
 :
 :     First experiments org mode + git literate program
 *** Technical and conceptional setup
-**** TODO Execute a script on Ara cluster with literate programming
-     DEADLINE: <2020-04-08 Mi>
+     :LOGBOOK:
+     CLOCK: [2020-04-02 Do 13:08]--[2020-04-02 Do 13:38] =>  0:30
+     :END:
+**** Execute a script on Ara cluster with literate programming
      :LOGBOOK:
      CLOCK: [2020-04-09 Do 16:18]--[2020-04-09 Do 16:25] =>  0:07
      CLOCK: [2020-04-09 Do 13:15]--[2020-04-09 Do 13:25] =>  0:10
@@ -701,7 +730,6 @@ echo hello
 : $ sh: /scp:dand@yakuba.princeton.edu:=: No such file or directory
 : $ /ssh:ye53nis@ara-login01.rz.uni-jena.de:/home/ye53nis/ #$ /ssh:ye53nis@ara-login01.rz.uni-jena.de:/home/ye53nis/ #$ hello
 
-
 ***** useful notes on the way
       - http://www.howardism.org/Technical/Emacs/literate-devops.html seems to
         be a good blog about using org babel
@@ -711,14 +739,8 @@ echo hello
         port" errors:
         https://askubuntu.com/questions/447820/ssh-l-error-bind-address-already-in-use
         https://unix.stackexchange.com/questions/427189/how-to-cleanup-ssh-reverse-tunnel-socket-after-connection-closed
-**** TODO [#A] Setup of literate programming OR jupytex or the like
-     :LOGBOOK:
-     CLOCK: [2020-04-02 Do 13:08]--[2020-04-02 Do 13:38] =>  0:30
-     :END:
-
-**** TODO [#A] Further setup of git branching model
-**** TODO [#C] Set up Dropbox or git annex
-
+**** DONE [#A] Setup of literate programming OR jupytex or the like
+     CLOSED: [2020-04-15 Mi 12:30]
 ** exp-200410-test
    :LOGBOOK:
    CLOCK: [2020-04-10 Fr 11:47]--[2020-04-10 Fr 11:52] =>  0:05
@@ -1456,7 +1478,6 @@ zlib                      1.2.11               h7b6447c_3
     CLOCK: [2020-04-12 So 13:34]--[2020-04-12 So 14:57] =>  1:23
     CLOCK: [2020-04-12 So 13:00]--[2020-04-12 So 13:22] =>  0:22
     :END:
-
 **** Do a UNET Training
     :PROPERTIES:
     :header-args:jupyter-python: :session /jpy:localhost#8889:b2921acb-eb25-4449-9a6c-c8046cf16a03
@@ -2266,27 +2287,7 @@ KeyboardInterrupt                         Traceback (most recent call last)
 
 TOO SLOW! Investigate Error below...
 
-**** TODO Investigate Error
-- 2020-04-13 02:45:28.216446: W
-  tensorflow/stream_executor/platform/default/dso_loader.cc:55] Could not load
-  dynamic library 'libnvinfer.so.6'; dlerror: libnvinfer.so.6: cannot open
-  shared object file: No such file or directory; LD_LIBRARY_PATH:
-  /cluster/miniconda3/lib
-- 2020-04-13 02:45:28.217069: W
-  tensorflow/stream_executor/platform/default/dso_loader.cc:55] Could not load
-  dynamic library 'libnvinfer_plugin.so.6'; dlerror: libnvinfer_plugin.so.6:
-  cannot open shared object file: No such file or directory; LD_LIBRARY_PATH:
-  /cluster/miniconda3/lib
-- 2020-04-13 02:45:28.217123: W
-  tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:30] Cannot dlopen some
-  TensorRT libraries. If you would like to use Nvidia GPU with TensorRT, please
-  make sure the missing libraries mentioned above are installed properly.
-**** TODO Export pandas DataFrames as org tables instead of html
-- see https://github.com/dzop/emacs-jupyter/issues/88
-- see
-  https://github.com/gregsexton/ob-ipython/blob/7147455230841744fb5b95dcbe03320313a77124/README.org#tips-and-tricks
-**** TODO Inline-display of plots
-**** TODO fix pydot and graphviz to make model plotting work
+
 ** exp-200413-test
 *** git
 #+begin_src sh :results verbatim
@@ -2372,8 +2373,7 @@ s_fat          up 8-08:00:00      4  alloc node[269-272]
 
 #+RESULTS:
 :
-: ye53nis@ara-login01.rz.uni-jena.de's password:
-: /tmp/tmux-67339/default
+: sh-5.0$ ye53nis@ara-login01.rz.uni-jena.de's password:
 : > ye53nis@ara-login01.rz.uni-jena.de's password:
 
 #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
@@ -2392,15 +2392,6 @@ export XDG_RUNTIME_DIR=''
 export XDG_RUNTIME_DIR=""
 jupyter notebook --no-browser --port=8889
 #+END_SRC
-
-#+CALL: jpt-tunnel(port="8889", node="node308")
-
-#+RESULTS:
-|                   |                                      |           |                          |         |    |     |      |    |       |        |
-| sh-5.0$           | ye53nis@ara-login01.rz.uni-jena.de's | password: |                          |         |    |     |      |    |       |        |
-| Warning:          | Permanently                          | added     | 'node308,192.168.194.53' | (ECDSA) | to | the | list | of | known | hosts. |
-| ye53nis@node308's | password:                            |           |                          |         |    |     |      |    |       |        |
-
 
 **** ob-tmux version bug
 To check the output of my tmux session, I have to attach to the session in a
@@ -2545,9 +2536,23 @@ echo $x
     :header-args:jupyter-python: :session /jpy:localhost#8889:cbb188b7-94ad-400c-9716-0987429a4b71
     :END:
     :LOGBOOK:
-    CLOCK: [2020-04-14 Di 15:43]
+    CLOCK: [2020-04-16 Do 14:05]--[2020-04-16 Do 15:08] =>  1:03
+    CLOCK: [2020-04-16 Do 12:49]--[2020-04-16 Do 13:48] =>  0:59
+    CLOCK: [2020-04-16 Do 12:22]--[2020-04-16 Do 12:35] =>  0:13
+    CLOCK: [2020-04-15 Mi 14:09]--[2020-04-15 Mi 14:14] =>  0:05
+    CLOCK: [2020-04-15 Mi 12:23]--[2020-04-15 Mi 12:37] =>  0:14
+    CLOCK: [2020-04-14 Di 15:43]--[2020-04-14 Di 18:59] =>  3:16
     CLOCK: [2020-04-14 Di 15:23]--[2020-04-14 Di 15:43] =>  0:20
     :END:
+
+#+CALL: jpt-tunnel(port="8889", node="node308")
+
+#+RESULTS:
+|                   |                                      |           |     |    |          |      |      |             |
+| sh-5.0$           | ye53nis@ara-login01.rz.uni-jena.de's | password: |     |    |          |      |      |             |
+| ye53nis@node308's | password:                            |           |     |    |          |      |      |             |
+| Last              | login:                               | Wed       | Apr | 15 | 12:25:25 | 2020 | from | login01.ara |
+
 **** jupyter-python-metadata
 #+CALL: jupyter-python-metadata[:cache no]
 
@@ -2555,10 +2560,10 @@ echo $x
 #+BEGIN_EXAMPLE
 No of CPUs in system: 72
 No of CPUs the current process can use: 48
-load average: (0.02, 0.04, 0.05)
+load average: (0.0, 0.01, 0.05)
 posix.uname_result(sysname='Linux', nodename='node308', release='3.10.0-957.1.3.el7.x86_64', version='#1 SMP Thu Nov 29 14:49:43 UTC 2018', machine='x86_64')
 PID of process: 434265
-RAM total: 199G, RAM used: 2.1G, RAM free: 187G
+RAM total: 199G, RAM used: 2.2G, RAM free: 186G
 the current directory: /home/ye53nis
 My disk usage:
 Filesystem         Size  Used Avail Use% Mounted on
@@ -2568,11 +2573,11 @@ tmpfs               94G  793M   94G   1% /dev/shm
 tmpfs               94G   43M   94G   1% /run
 tmpfs               94G     0   94G   0% /sys/fs/cgroup
 nfs01-ib:/cluster  2.0T  313G  1.7T  16% /cluster
-nfs01-ib:/home      80T   57T   24T  72% /home
+nfs01-ib:/home      80T   58T   23T  72% /home
 /dev/sda6          169G  3.2G  166G   2% /local
 /dev/sda5          2.0G   34M  2.0G   2% /tmp
 /dev/sda3          6.0G  408M  5.6G   7% /var
-beegfs_nodev       524T  413T  112T  79% /beegfs
+beegfs_nodev       524T  415T  110T  80% /beegfs
 tmpfs               19G     0   19G   0% /run/user/0
 nfs03:/pool/work   100T   77T   24T  77% /nfsdata
 tmpfs               19G     0   19G   0% /run/user/67339
@@ -2782,4 +2787,87 @@ xz                        5.2.4                h14c3975_4
 yaml                      0.1.7                had09818_2
 zlib                      1.2.11               h7b6447c_3
 #+END_EXAMPLE
-****
+**** set output folder for jupyter-python to =data/exp-tests=
+According to the git and org-mode based worflow for reproducible research
+proposed by Stanisic et al files which are created in an experimental branch are
+kept in a folder with the same name. The first kind of files we save are plots
+from jupyter. We can customize the output folder using the following variable:
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-babel-jupyter-resource-directory "./data/exp-test/figures-jupyter")
+#+END_SRC
+
+#+RESULTS:
+: ./data/exp-test/figures-jupyter
+
+The =helpful-variable= command tells us, that changing the variable was
+successful. Probably this has to be done in every session. Now a test regarding
+if the output is really saved to this directory.
+
+#+BEGIN_SRC jupyter-python
+  import numpy as np
+  import matplotlib.pyplot as plt
+
+  x = np.arange(0, 2*np.pi, 0.1)
+  y = np.sin(x)
+
+  plt.plot(x, y)
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+| <matplotlib.lines.Line2D | at | 0x2b98f389f898> |
+[[file:./data/exp-test/figures-jupyter/b27af3a4fe8d17b3bc705c31dd4c7cca7330878a.png]]
+:END:
+
+works!
+**** TODO Set up mlflow for reproducible ml experiments
+     :LOGBOOK:
+     CLOCK: [2020-04-17 Fr 15:42]--[2020-04-17 Fr 18:30] =>  2:48
+     CLOCK: [2020-04-16 Do 20:43]--[2020-04-16 Do 21:07] =>  0:24
+     CLOCK: [2020-04-16 Do 15:52]--[2020-04-16 Do 17:02] =>  1:10
+     CLOCK: [2020-04-16 Do 15:34]--[2020-04-16 Do 15:45] =>  0:11
+     :END:
+***** Reading the docs
+- searched for papers, found [[http://sites.computer.org/debull/A18dec/A18DEC-CD.pdf#page=41][two]] [[https://mlsys.org/Conferences/2019/doc/2019/demo_33.pdf][papers]], but they don't seem very exhaustive.
+- took notes [[file:~/Dokumente/org/04_Digital-und-Technik/programmieren.org::*<2020-04-16%20Do%2012:57>%20=mlflow=][here]]
+- shall I keep MLflow files in a folder inside the =data/exp#= folder for each
+  experiment or do a central =data/mlflow= folder? → I tend towards the second
+  option. MLflow has an environment variable =MLFLOW_EXPERIMENT_NAME= which
+  would be the same as =exp#=.
+- Inside the folder, should I use "normal" files or a database for saving stuff?
+  → I tend towards normal files, since I have no experiments with databases..
+- MLflow Tracking Service API might be useful for accessing the results from
+  inside org documents.
+
+***** Reading Barredo Arrieta et al: Explainable Artificial Intelligence (XIA)
+
+
+
+**** TODO Investigate Error on GPU node
+- 2020-04-13 02:45:28.216446: W
+  tensorflow/stream_executor/platform/default/dso_loader.cc:55] Could not load
+  dynamic library 'libnvinfer.so.6'; dlerror: libnvinfer.so.6: cannot open
+  shared object file: No such file or directory; LD_LIBRARY_PATH:
+  /cluster/miniconda3/lib
+- 2020-04-13 02:45:28.217069: W
+  tensorflow/stream_executor/platform/default/dso_loader.cc:55] Could not load
+  dynamic library 'libnvinfer_plugin.so.6'; dlerror: libnvinfer_plugin.so.6:
+  cannot open shared object file: No such file or directory; LD_LIBRARY_PATH:
+  /cluster/miniconda3/lib
+- 2020-04-13 02:45:28.217123: W
+  tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:30] Cannot dlopen some
+  TensorRT libraries. If you would like to use Nvidia GPU with TensorRT, please
+  make sure the missing libraries mentioned above are installed properly
+**** TODO Export pandas DataFrames as org tables instead of html
+- see https://github.com/dzop/emacs-jupyter/issues/88
+- see
+  https://github.com/gregsexton/ob-ipython/blob/7147455230841744fb5b95dcbe03320313a77124/README.org#tips-and-tricks
+**** TODO Inline-display of plots
+**** TODO fix pydot and graphviz to make model plotting work
+**** TODO transform ML training ipynb to py files as used [[https://github.com/mlflow/mlflow/blob/master/examples/tensorflow/tf2/train_predict_2.py][here]]
+**** TODO check out python module =argparser= as used [[https://github.com/mlflow/mlflow/blob/master/examples/tensorflow/tf2/train_predict_2.py][here]]
+**** TODO check out Talos 1.0 with MLflow for Hyperparameter optimization
+*** TODO Take a look into =org-ref= for reference management and citing inside this labbook
+*** TODO [#A] Further setup of git branching model
+*** TODO [#C] Set up Dropbox or git annex
