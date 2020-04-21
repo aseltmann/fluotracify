@@ -1,7 +1,10 @@
-#+TITLE: Lab book Fluotracify
+#+TITLE: Lab Book Fluotracify
 #+AUTHOR: Alexander Seltmann
 #+LANGUAGE: en
-#+PROPERTY: header-args :eval never-export :exports both
+# If exporting the existing code and execution to html or pdf etc, uncomment the
+# following properties to avoid org-babel to execute the code blocks again, and
+# to export both the code AND the results
+# #+PROPERTY: header-args :eval never-export :exports both
 
 * README
 ** General:
@@ -24,18 +27,228 @@
       the template described below
    6) Commit/push the results of this separate branch
    7) Merge this new branch with the remote "data" branch
-** Example for simulation...
+** Example for experimental setup procedure
+*** Setting up a tmux connection from using =ob-tmux= in =org babel=
+
+- prerequisite: tmux versions need to be the same locally and on the server.
+  Let's verify that now.
+  - the local tmux version:
+#+BEGIN_SRC sh
+tmux -V
+#+END_SRC
+
+#+RESULTS:
+: tmux 3.0a
+
+  - the remote tmux version:
+#+BEGIN_SRC sh :session local
+ssh ara tmux -V
+#+END_SRC
+
+#+RESULTS:
+| ye53nis@ara-login01.rz.uni-jena.de's | password: |
+| tmux                                 | 3.0a      |
+
+- as is described in [[https://github.com/ahendriksen/ob-tmux][the ob-tmux readme]], the following code snippet creates a
+  socket on the remote machine and forwards this socket to the local machine
+  (note that =socket_path= was introduced in tmux version 2.2)
+
+#+BEGIN_SRC sh :session local
+REMOTE_SOCKET=$(ssh ara 'tmux ls -F "#{socket_path}"' | head -1)
+echo $REMOTE_SOCKET
+ssh ara -tfN \
+    -L ~/.tmux-local-socket-remote-machine:$REMOTE_SOCKET
+#+END_SRC
+
+#+RESULTS:
+| ye53nis@ara-login01.rz.uni-jena.de's | password:                            |           |
+| /tmp/tmux-67339/default              |                                      |           |
+| >                                    | ye53nis@ara-login01.rz.uni-jena.de's | password: |
+
+- now a new tmux session with name =ob-NAME= is created when using a code block
+  which looks like this: =#+BEGIN_SRC tmux :socket
+  ~/.tmux-local-socket-remote-machine :session NAME=
+- Commands can be sent now to the remote tmux session, BUT note that the output
+  is not printed yet
+- there is a workaround by calling the following function when inside an
+  =ob-tmux= block:
+
+#+BEGIN_SRC emacs-lisp
+(defun ob-tmux-get-output ()
+  (interactive)
+  (let ((info (org-babel-get-src-block-info 'light)))
+    (when (and info (string-equal "tmux" (nth 0 info)))
+      (with-help-window (help-buffer)
+	(let* ((lang (n 0 info))
+	       (block-content (nth 1 info))
+	       (params (nth 2 info))
+	       (org-session (cdr (assq :session params)))
+	       (socket (cdr (assq :socket params)))
+	       (socket (when socket (expand-file-name socket)))
+	       (ob-session (ob-tmux--from-org-session org-session socket)))
+	  (princ (ob-tmux--execute-string ob-session
+					  "capture-pane" "-p"
+					  "-t" (ob-tmux--session ob-session))))))))
+#+END_SRC
+
+#+RESULTS:
+: ob-tmux-get-output
+
+*** Setting starting a jupyter kernel from a remote jupyter session using =emacs-jupyter= in =org babel=
+1. =M-x jupyter-server-list-kernels=
+   1. set server URL, e.g. =http://localhost:8889=
+   2. set websocket URL, e.g. =http://localhost:8889=
+2. two possibilities
+   1. kernel already exists \to list of kernels and =kernel-ID= is displayed
+   2. kernel does not exist \to prompt asks if you want to start one \to *yes*
+      \to type kernel you want to start, e.g. =Python 3=
+3. In subtree where you want to use =jupyter-python= blocks with =org babel=,
+   set the =:header-args:jupyter-python :session /jpy:localhost#8889:kernel-ID=
+
 ** Example for ...
 ** Example for ...
 * Template for data entry:
-** xp#
+** exp-#date-#title
 *** git:
 #+begin_src sh
 git log -1
 #+end_src
+*** System Metadata
+#+NAME: jupyter-python-metadata
+#+BEGIN_SRC jupyter-python
+  import os
+
+  ramlist = os.popen('free -th').readlines()[-1].split()[1:]
+
+  print('No of CPUs in system:', os.cpu_count())
+  print('No of CPUs the current process can use:',
+        len(os.sched_getaffinity(0)))
+  print('load average:', os.getloadavg())
+  print(os.uname())
+  print('PID of process:', os.getpid())
+  print('RAM total: {}, RAM used: {}, RAM free: {}'.format(
+      ramlist[0], ramlist[1], ramlist[2]))
+
+  !echo the current directory: $PWD
+  !echo My disk usage:
+  !df -h
+  !conda list
+#+END_SRC
+**** TODO Add =os.environ=
+*** Tmux setup and scripts
+#+NAME: setup-tmux
+#+BEGIN_SRC sh :session local
+rm ~/.tmux-local-socket-remote-machine
+REMOTE_SOCKET=$(ssh ara 'tmux ls -F "#{socket_path}"' | head -1)
+echo $REMOTE_SOCKET
+ssh ara -tfN \
+    -L ~/.tmux-local-socket-remote-machine:$REMOTE_SOCKET
+#+END_SRC
+
+#+RESULTS: setup-tmux
+|         |                                      |           |
+| sh-5.0$ | ye53nis@ara-login01.rz.uni-jena.de's | password: |
+| >       | ye53nis@ara-login01.rz.uni-jena.de's | password: |
+
+A script which allows to print the output from the tmux session
+in an =#+begin_example=-Block below the tmux block by pressing =C-c C-o= or =C-c
+C-v C-o= when the pointer is inside the tmux block. See [[https://github.com/ahendriksen/ob-tmux/issues/6#issuecomment-613914400][here]].
+
+#+BEGIN_SRC emacs-lisp
+  (defun ob-tmux--insert-result ()
+    (interactive)
+    (let ((info (org-babel-get-src-block-info 'light)))
+      (when (and info (string-equal "tmux" (nth 0 info)))
+        (let* ((params (nth 2 info))
+               (org-session (cdr (assq :session params)))
+               (socket (cdr (assq :socket params)))
+               (socket (when socket (expand-file-name socket)))
+               (ob-session (ob-tmux--from-org-session org-session socket)))
+          (org-babel-insert-result
+               (ob-tmux--execute-string ob-session
+                                        "capture-pane"
+                                        "-p" ;; print to stdout
+                                        "-S" "-" ;; start at beginning of history
+                                        "-t" (ob-tmux--session ob-session))
+               '("replace"))))))
+
+  (defun ob-tmux--edit-result ()
+    (interactive)
+    (pcase (org-babel-get-src-block-info 'light)
+      (`(,_ ,_ ,arguments ,_ ,_ ,start ,_)
+       (save-excursion
+         ;; Go to the results, if there aren't any then run the block.
+         (goto-char start)
+         (goto-char (or (org-babel-where-is-src-block-result)
+                        (progn (org-babel-execute-src-block)
+                               (org-babel-where-is-src-block-result))))
+         (end-of-line)
+         (skip-chars-forward " \r\t\n")
+         (org-edit-special)
+         (delete-trailing-whitespace)
+         (end-of-buffer)
+         t))
+      (_ nil)))
+
+  (defun ob-tmux--open-src-block-result (orig-fun &rest args)
+    (let ((info (org-babel-get-src-block-info 'light)))
+      (if (and info (string-equal "tmux" (nth 0 info)))
+          (progn
+            (ob-tmux--insert-result)
+            (ob-tmux--edit-result))
+        (apply orig-fun args))))
+
+  (advice-add 'org-babel-open-src-block-result
+                 :around #'ob-tmux--open-src-block-result)
+#+END_SRC
+
+#+RESULTS:
+
+*** jupyter setup and ssh tunneling
+
+On the compute node of the HPC, the users' environment is managed through module
+files using the system [[https://lmod.readthedocs.io][Lmod]]. The =export XDG_RUNTIME_DIR= statements are needed
+because of a jupyter bug which did not let it start.
+
+#+NAME: jpt-tmux
+#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine
+module load tools/python/3.7
+export XDG_RUNTIME_DIR=''
+export XDG_RUNTIME_DIR=""
+jupyter notebook --no-browser --port=$port
+#+END_SRC
+
+Now this port has to be tunnelled on our local computer. While the tmux session
+above keeps running, no matter if Emacs is running or not, this following ssh
+tunnel needs to be active locally to connect to the notebook. If Emacs crashes,
+it would need to be reestablished.
+
+#+NAME: jpt-tunnel
+#+BEGIN_SRC sh :session org-tunnel :var port="8889" :var node="node001"
+ssh -t -t ara -L $port:localhost:$port ssh $node -L $port:Localhost:$port
+#+END_SRC
 *** Notes:
     ######################
 * Organization of git
+** tools used (notes)
+*** - Emacs =magit=
+- =gitflow-avh= (=magit-flow=) to follow the flow
+- possibly https://github.com/magit/magit-annex for large files. Follow this:
+  https://git-annex.branchable.com/walkthrough/
+- maybe check out git-toolbelt at some point
+  https://github.com/nvie/git-toolbelt#readme with
+  https://nvie.com/posts/git-power-tools/
+*** jupyter
+- emacs jupyter for running and connecting to kernel on server:
+  https://github.com/dzop/emacs-jupyter
+- if I actually still would use .ipynb files, these might come handy:
+  + jupytext: https://github.com/mwouts/jupytext
+  + nbstripout: https://github.com/kynan/nbstripout
+*** mlflow
+- https://docs.faculty.ai/user-guide/experiments/index.html and
+  https://docs.microsoft.com/en-us/azure/databricks/_static/notebooks/hls-image-processing/02-image-segmentation-dl.html
+*** tensorflow
+https://www.tensorflow.org/tensorboard/image_summaries
 ** remote/origin/master branch:
    - Has all the source, analysis, scripts
 ** remote/origin/xp# branches:
@@ -62,4 +275,2599 @@ git log -1
  git tag -n1
 #+end_src
 
+* Organization of code
+** scripts:
+*** run_bench_StarPU.sh [4/4]:                                        :@LUKA:
+    - Runs benchmarking of StarPU without Simgrid
+    - [X] Write a usage/help part, add environment variables
+    - [X] Upgrade for interective mode
+    - [X] Change verbose
+    - [X] Add frequency scaling only if the file exists, otherwise write "unknown
+** src/
+*** fluotracify/
+**** imports/
+**** simulations/
+**** training/
+**** applications/
+**** doc/
+- use Sphinx
+  - follow this: https://daler.github.io/sphinxdoc-test/includeme.html
+  - evtl export org-mode Readme to rst via https://github.com/msnoigrs/ox-rst
+  - possibly heavily use
+    http://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html
+  - for examples sphinx-galleries could be useful
+    https://sphinx-gallery.github.io/stable/getting_started.html
+
+*** nanosimpy/
+- cloned from dwaithe with refactoring for Python 3-compatibility
+
+* Changes in this Lab book template (without "* Data")
+** 2020-03-30
+   - set up lab book and form git repo accoring to setup by Luka Stanisic et al
+* Data
+** exp-200330-test
+   :PROPERTIES:
+   :Effort:   4:00
+   :END:
+   :LOGBOOK:
+   CLOCK: [2020-03-31 Di 12:51]--[2020-03-31 Di 12:51] =>  0:00
+   CLOCK: [2020-03-30 Mo 20:48]--[2020-03-30 Mo 20:54] =>  0:06
+   CLOCK: [2020-03-30 Mo 20:28]--[2020-03-30 Mo 20:48] =>  0:20
+   CLOCK: [2020-03-30 Mo 18:34]--[2020-03-30 Mo 20:28] =>  1:54
+   CLOCK: [2020-03-30 Mo 18:23]--[2020-03-30 Mo 18:24] =>  0:01
+   CLOCK: [2020-03-30 Mo 17:33]--[2020-03-30 Mo 17:58] =>  0:25
+   CLOCK: [2020-03-30 Mo 16:39]--[2020-03-30 Mo 16:39] =>  0:00
+   CLOCK: [2020-03-30 Mo 16:31]--[2020-03-30 Mo 16:38] =>  0:07
+   CLOCK: [2020-03-30 Mo 16:02]--[2020-03-30 Mo 16:03] =>  0:01
+   CLOCK: [2020-03-30 Mo 15:36]--[2020-03-30 Mo 15:43] =>  0:07
+   CLOCK: [2020-03-30 Mo 15:23]--[2020-03-30 Mo 15:25] =>  0:02
+   :END:
+- first, use "clocking" in org-mode to record time working on this branch with
+  =C-c C-x C-i=
+
+#+BEGIN: clocktable :scope subtree :maxlevel 8
+#+CAPTION: Clock summary at [2020-04-02 Do 12:09]
+| Headline                                   | Time   |      |      |      |
+|--------------------------------------------+--------+------+------+------|
+| *Total time*                               | *4:37* |      |      |      |
+|--------------------------------------------+--------+------+------+------|
+| \_  exp-200330-test                        |        | 4:37 |      |      |
+| \_    Experimentation diary                |        |      | 1:34 |      |
+| \_      Learn about hard vs soft links     |        |      |      | 0:08 |
+| \_      Learn about Org-mode's column view |        |      |      | 0:01 |
+| \_      Learning about org-mode's clocking |        |      |      | 0:19 |
+| \_      Configure Emacs setup (neotree)    |        |      |      | 1:01 |
+#+END:
+
+*** git
+#+begin_src sh
+git log -1
+#+end_src
+
 #+RESULTS:
+| commit  | 7a2f40149b15e3a639396abfe86e75bd57db55a3 |                        |    |          |      |       |
+| Author: | Apoplex                                  | <oligolex@vivaldi.net> |    |          |      |       |
+| Date:   | Sun                                      | Mar                    | 29 | 17:41:27 | 2020 | +0200 |
+|         |                                          |                        |    |          |      |       |
+| Add     | LabBook.org                              |                        |    |          |      |       |
+|         |                                          |                        |    |          |      |       |
+*** DONE Experimentation diary
+    CLOSED: [2020-03-30 Mo 21:50]
+    :LOGBOOK:
+    CLOCK: [2020-03-30 Mo 16:22]--[2020-03-30 Mo 16:24] =>  0:02
+    CLOCK: [2020-03-30 Mo 16:22]--[2020-03-30 Mo 16:22] =>  0:00
+    CLOCK: [2020-03-30 Mo 15:33]--[2020-03-30 Mo 15:36] =>  0:03
+    CLOCK: [2020-03-30 Mo 15:27]--[2020-03-30 Mo 15:27] =>  0:00
+    :END:
+**** DONE Learn about hard vs soft links
+     CLOSED: [2020-03-30 Mo 16:39]
+     :PROPERTIES:
+     :TAGS_ALL: a
+     :END:
+     :LOGBOOK:
+     CLOCK: [2020-03-30 Mo 18:23]--[2020-03-30 Mo 18:23] =>  0:00
+     CLOCK: [2020-03-30 Mo 16:26]--[2020-03-30 Mo 16:31] =>  0:05
+     CLOCK: [2020-03-30 Mo 16:19]--[2020-03-30 Mo 16:22] =>  0:03
+     :END:
+**** DONE Learn about Org-mode's column view
+     CLOSED: [2020-03-30 Mo 16:38]
+     :LOGBOOK:
+     CLOCK: [2020-03-30 Mo 17:59]--[2020-03-30 Mo 17:59] =>  0:00
+     CLOCK: [2020-03-30 Mo 17:58]--[2020-03-30 Mo 17:59] =>  0:01
+     :END:
+     - on: =C-c C-x C-c=
+     - off: press =q= while cursor is on highlighted entry
+**** DONE Learning about org-mode's clocking
+     CLOSED: [2020-03-30 Mo 19:26]
+     :LOGBOOK:
+     CLOCK: [2020-03-30 Mo 18:04]--[2020-03-30 Mo 18:21] =>  0:17
+     CLOCK: [2020-03-30 Mo 17:59]--[2020-03-30 Mo 18:01] =>  0:02
+     CLOCK: [2020-03-30 Mo 17:58]--[2020-03-30 Mo 17:58] =>  0:00
+     :END:
+     - https://writequit.org/denver-emacs/presentations/2017-04-11-time-clocking-with-org.html
+       tipps and tricks
+     - I'll keep one clock going in the "** exp#" section when I start with =C-c
+       C-x C-i=
+     - I'll check out when I leave the computer or do something else on the
+       computer with =C-c C-x C-o=
+     - When I come back, I'll jump to the current clock with =C-c C-x C-j= and
+       clock in at the last task with =C-c C-x C-x=
+**** DONE Configure Emacs setup (neotree)
+     CLOSED: [2020-03-30 Mo 20:30]
+     :LOGBOOK:
+     CLOCK: [2020-03-31 Di 12:51]--[2020-03-31 Di 12:51] =>  0:00
+     CLOCK: [2020-03-30 Mo 19:30]--[2020-03-30 Mo 20:31] =>  1:01
+     :END:
+** exp-200331-test
+   SCHEDULED: <2020-03-31 Di>
+   :PROPERTIES:
+   :Effort:   4:00
+   :END:
+   :LOGBOOK:
+   CLOCK: [2020-03-31 Di 12:51]--[2020-03-31 Di 12:59] =>  0:08
+   :END:
+#+BEGIN: clocktable :scope subtree :maxlevel 8
+#+CAPTION: Clock summary at [2020-04-02 Do 12:09]
+| Headline                                        | Time   |      |      |      |
+|-------------------------------------------------+--------+------+------+------|
+| *Total time*                                    | *3:06* |      |      |      |
+|-------------------------------------------------+--------+------+------+------|
+| \_  exp-200331-test                             |        | 3:06 |      |      |
+| \_    Technical Setup diary                     |        |      | 2:58 |      |
+| \_      Test if remote HPC is accessible via... |        |      |      | 2:58 |
+#+END:
+
+*** DONE Technical Setup diary
+    CLOSED: [2020-04-02 Do 11:59]
+**** DONE [#A] Test if remote HPC is accessible via org-mode
+     CLOSED: [2020-04-02 Do 11:59]
+     :LOGBOOK:
+     CLOCK: [2020-04-02 Do 11:58]--[2020-04-02 Do 11:59] =>  0:01
+     CLOCK: [2020-04-02 Do 11:20]--[2020-04-02 Do 11:38] =>  0:18
+     CLOCK: [2020-04-01 Mi 13:38]--[2020-04-01 Mi 14:17] =>  0:39
+     CLOCK: [2020-04-01 Mi 11:28]--[2020-04-01 Mi 13:09] =>  1:41
+     CLOCK: [2020-03-31 Di 14:27]--[2020-03-31 Di 14:27] =>  0:00
+     CLOCK: [2020-03-31 Di 13:15]--[2020-03-31 Di 13:31] =>  0:16
+     CLOCK: [2020-03-31 Di 12:59]--[2020-03-31 Di 13:02] =>  0:03
+     :END:
+***** Learning =org-babel=
+- https://orgmode.org/manual/Results-of-Evaluation.html (ff) best explanation of
+  header arguments. Collection > Type > Format > Handling are classes for
+  =:results=
+  + Collection:
+    * =value= (default), wraps code in function, for python to output something
+      you need a return statement
+    * =output=: scripting mode
+  + Type:
+    * =table=, =vector=, =list=
+    * =verbatim=, puts results in a =#+begin_example=- Block
+    * =file=, can save output e.g. as pdf with =:results value file :file
+      circle.pdf=
+  + Format:
+    * =code=, =drawer=, =html= (begin_export html), =latex= (begin_export
+      latex)
+    * =link=, =graphics= include link to file on disk, if used with =file= type
+    * =org=, =raw=
+    * =pp=, pretty printed source code enclosed in a code block. Python is
+      supported!
+  + Handling
+    * =silent=, do not insert results in the org mode buffer, but echo in the
+      minibuffer
+    * =replace= (default), insert results in org buffer, remove previous results
+    * =append= / =prepend=, append results to org buffer, latest results at
+      bottom / top
+- =:var= can be used to hand a variable to the block
+- =:wrap= can be used for custom export blocks, everything given is appended to
+  the =#+BEGIN= and =#+END= block of the results  (and overrides the results
+  values). E.g. =:wrap EXPORT markdown= results in =#+BEGIN_EXPORT markdown=
+- =:post=
+- =:session=
+  + =none= (default no :session argument), each code block gets new interpreter
+    process
+  + any STRING, so that code blocks share the same environment (are run in same
+  interpreter process).
+  + plain =:session=, session name derived from source language
+- =:dir= for choosing working directory. things like =:dir ~/work= works.
+  setting =:mkdirp yes= (non-nil) creates
+  the directory, if it is not there yet
+  + (default) - current directory is used
+  + Tramp syntax works for remote code execution, e.g. =:file plot.png :dir
+    /scp:dand@yakuba.princeton.edu:= captures text for insertion in org file,
+    and inserts a link to the remote file thanks to Emacs Tramp
+  + when using =dir= with =session=, the starting dir is only set for this
+    session, not for others
+  + do not use =dir= with =:exports results= or =:exports both= to avoid org
+    inserting incorrect links
+- =:cache= if set to yes, the results are not re-evaluated if nothing changed
+  since the previous run.
+  + Suitable fo functions that only rely on input arguments (not timer, file
+    system objects, random number generators, ...).
+  + don't mix =session= and =cache=
+- =:exports= which part of code block to export (=code=, =results=, =both=,
+  =none=)
+- =:tangle=, essential for *source code extraction in literate programming*.
+  Documents on creation are /woven/ with code and documentation. on export, code
+  is /tangled/ for execution by a computer. This document for example by
+  execution would be recomposed into one or more separate files, while variables
+  will be expanded, references resolved etc
+  + =no= (default), do not extract code in a source code file
+  + =yes=, export code block to source file. file name derived from name of org
+    file, file extension derived from source code language id
+  + =:tangle FILENAME= export to source file with FILENAME. =:mkdirp yes= creates
+    parent directories
+  + =:comments= (default: =no=)
+    * =link= (formerly: =yes=), wrap the code block in comments, include links
+      pointing back to the place in the org file from where the code was tangled
+    * =org=, nearest headline text from Org file is inserted as comment
+    * =both=, both =link= and =org=
+    * =noweb=, includes =link= plus expands Noweb references and wraps them in
+      link comments inside the body of the code block
+  + =:shebang= (e.g. =shebang "#!/bin/bash=) turns results into executable
+    script files by first inserting string as the first line of tangled file +
+    turn on file's executable permission
+  + =:tangle-mode= can set permissions (overrides shebang)
+    * =:tangle-mode (identity #o444)= makes read-only
+    * =:tangle-mode (identity #o755)= makes executable
+  + =:no-expand= no code block expansion during tangling (no effect for normal
+    source block execution)
+- =:noweb= (default: =no=)
+  + =yes=, expansion of Noweb syntax references like =<< CODE-BLOCK-ID >>= when
+    evaluating, tangling, or exporting.
+  + =tangle= only when tangling, =no-export= when evaluating or tangling
+  + =strip-export=, =eval=
+  + =:noweb-ref NAME= concatenates the block to a noweb block with NAME. Can
+    also be set in a =:PROPERTY:= drawer at the sub-tree or file level.
+  + =:noweb-sep= changes the separator between each noweb reference
+    concatenation (Default: newline)
+  + =<< code-block-name(optional arguments) >>= includes the results of a code
+    block rather than its body! Note that the code block needs a NAME keyword
+    (like =#+NAME: code-block-name=).
+
+***** emacs commands for =org-babel=
+- =C-c '= to edit current code block in new major mode edit buffer containing
+  the body of the source code block, use =C-c '= again to close buffer and
+  return to the org buffer
+
+***** accessing the ara cluster of FSU
+#+BEGIN_SRC sh :results output :dir :dir /ssh:ye53nis@ara-login01.rz.uni-jena.de:/home/ye53nis/
+echo $PWD
+echo $HOSTNAME
+#+END_SRC
+
+#+RESULTS:
+: /home/ye53nis
+: login01
+
+- Nice! Can we access the different nodes?
+
+#+BEGIN_SRC sh :results output :exports both :dir :dir /ssh:ye53nis@ara-login01.rz.uni-jena.de:/home/ye53nis/
+sinfo
+#+END_SRC
+
+
+#+RESULTS:
+#+begin_example
+PARTITION   AVAIL  TIMELIMIT  NODES  STATE NODELIST
+b_test         up   10:00:00      1  alloc node001
+b_standard*    up 8-08:00:00     62    mix node[003-005,009-016,021-022,027-030,032-033,038,049-051,053,061-062,064,071-072,075,081-089,091-092,096-101,108-110,112-117,122-125,131-132]
+b_standard*    up 8-08:00:00     69  alloc node[002,006-008,017-020,023-026,031,034-037,039-048,052,054-060,063,065-070,073-074,076-080,090,093-095,102-107,111,118-121,126,133-136]
+gpu_test       up    1:00:00      1   idle node127
+gpu_p100       up 8-08:00:00      2   idle node[128-129]
+gpu_v100       up 8-08:00:00      1    mix node130
+b_fat          up 8-08:00:00      4    mix node[137-140]
+s_test         up    3:00:00      1  alloc node141
+s_standard     up 8-08:00:00     68    mix node[143-144,150,153,156-157,162,165,167,170-172,175,179-183,185-189,195-196,199-200,204-212,214-217,219-222,224-226,232,238,252-256,262-267,293,295-296,302-303,308-310]
+s+_standard     up 8-08:00:00     77  alloc node[142,145-149,154-155,158-161,163-164,166,168-169,173-174,176-178,184,190-194,197-198,201,213,223,227-231,233-237,239-251,257-258,260-261,268,294,297-301,304-307,311-316]
+s_standard     up 8-08:00:00      6   idle node[151-152,202-203,218,259]
+s_fat          up 8-08:00:00      1    mix node271
+s_fat          up 8-08:00:00      3  alloc node[269-270,272]
+#+end_example
+
+Sweet, now we would need a tmux session to be able to leave jobs running, when
+we disconnect the SSH pipe from the local machine.
+
+#+BEGIN_SRC sh :results output :exports both :dir :dir /ssh:ye53nis@ara-login01.rz.uni-jena.de:/home/ye53nis/
+tmux attach -t jupyter
+#+END_SRC
+
+#+RESULTS:
+
+This naive approach seems not to work. Some research showed this as promising:
+https://github.com/ahendriksen/ob-tmux
+
+** exp-200402-test
+   :LOGBOOK:
+   CLOCK: [2020-04-02 Do 12:05]--[2020-04-02 Do 12:07] =>  0:02
+   :END:
+*** git
+#+begin_src sh :results verbatim
+git log -1
+#+end_src
+
+#+RESULTS:
+: commit 5155597b868fd45db254bc8d631ff47d69ce8363
+: Author: Apoplex <oligolex@vivaldi.net>
+: Date:   Thu Apr 2 12:03:48 2020 +0200
+:
+:     First experiments org mode + git literate program
+*** Technical and conceptional setup
+     :LOGBOOK:
+     CLOCK: [2020-04-02 Do 13:08]--[2020-04-02 Do 13:38] =>  0:30
+     :END:
+**** Execute a script on Ara cluster with literate programming
+     :LOGBOOK:
+     CLOCK: [2020-04-09 Do 16:18]--[2020-04-09 Do 16:25] =>  0:07
+     CLOCK: [2020-04-09 Do 13:15]--[2020-04-09 Do 13:25] =>  0:10
+     CLOCK: [2020-04-08 Mi 18:06]--[2020-04-08 Mi 18:10] =>  0:04
+     CLOCK: [2020-04-03 Fr 18:19]--[2020-04-03 Fr 18:19] =>  0:00
+     CLOCK: [2020-04-03 Fr 17:57]--[2020-04-03 Fr 18:02] =>  0:05
+     CLOCK: [2020-04-03 Fr 13:34]--[2020-04-03 Fr 13:34] =>  0:00
+     CLOCK: [2020-04-03 Fr 11:01]--[2020-04-03 Fr 11:50] =>  0:49
+     CLOCK: [2020-04-02 Do 21:15]--[2020-04-02 Do 21:15] =>  0:00
+     CLOCK: [2020-04-02 Do 20:40]--[2020-04-02 Do 20:50] =>  0:10
+     CLOCK: [2020-04-02 Do 14:01]--[2020-04-02 Do 15:35] =>  1:34
+     CLOCK: [2020-04-02 Do 12:08]--[2020-04-02 Do 12:26] =>  0:18
+     :END:
+1. connect to FSU VPN (still via normal terminal)
+2. connect to ara via ssh and check if a tmux session exists
+#+BEGIN_SRC sh :results output :dir :dir /ssh:ye53nis@ara-login01.rz.uni-jena.de:/home/ye53nis/ :session new-test
+  echo $PWD
+  echo $HOSTNAME
+#+END_SRC
+
+#+RESULTS:
+:
+: $ /home/ye53nis
+: $ login01
+
+#+BEGIN_SRC sh :results output :session new-test
+  tmux -V
+  tmux ls
+echo $HOSTNAME
+#+END_SRC
+
+#+RESULTS:
+: tmux 1.8
+: $ protocol version mismatch (client 7, server 8)
+: $ login01
+
+#+BEGIN_SRC sh :results output :session april-8
+  tmux attach new -d
+#+END_SRC
+
+#+RESULTS:
+: no server running on /tmp/tmux-1000/default
+
+#+BEGIN_SRC sh :results output :session april-8
+  tmux -V
+  tmux ls
+#+END_SRC
+
+#+RESULTS:
+: tmux 3.0a
+: no server running on /tmp/tmux-1000/default
+
+#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session
+echo $PWD
+#+END_SRC
+2. connect to ara via ssh and start a tmux session (So that my programs on ara
+   can be run even if I am not connected)
+
+#+BEGIN_SRC sh :results silent :session ara
+ssh ye53nis@ara-login01.rz.uni-jena.de -t tmux new -d
+#+END_SRC
+ssh <remote host> -t /path/to/tmux a -t <my-session-name>
+- hurray, we created a new tmux out of this org file! lets check:
+
+#+BEGIN_SRC sh :results output :session tmux-setup
+echo $PWD
+echo $HOSTNAME
+tmux ls
+tmux attach -S /tmp/tmux-67339/ attach -s 2
+#+END_SRC
+
+#+RESULTS:
+:
+: /home/lex/Programme/drmed-git
+: Topialex
+: error connecting to /tmp/tmux-1000/default (No such file or directory)
+: tmux: unknown option -- S
+: error connecting to /tmp/tmux-1000/default (No such file or directory)
+
+- now lets see if we can connect this tmux session to our local machine
+
+#+BEGIN_SRC sh :results silent :session ara
+REMOTE_SOCKET=$(ssh ye53nis@ara-login01.rz.uni-jena.de 'tmux list-sessions /tmp/tmux-67339/default' | head -1)
+echo $REMOTE_SOCKET
+#+END_SRC
+
+#+RESULTS:
+: ye53nis@ara-login01.rz.uni-jena.de's password:
+: sh-5.0$
+
+#+BEGIN_SRC sh :results output :session ara
+echo $REMOTE_SOCKET
+#+END_SRC
+
+#+RESULTS:
+
+3. use ob-tmux to connect to the tmux session
+
+#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session hello
+echo test
+
+
+#+END_SRC
+
+
+- it does not yet work, but these commands seem to work, lets see tomorrow:
+  - =REMOTE_SOCKET=$(ssh ara 'tmux ls -F tmp/tmux-67339/default' |head -1)=
+  - =ssh ara -tfN -D ~/.tmux-local-socket-remote-machine:$REMOTE_SOCKET=
+
+- trying out =ob-tmux=
+
+#+BEGIN_SRC tmux :session hello
+tmux attach -t
+#+END_SRC
+
+#+BEGIN_SRC tmux :session hello:new-window
+echo hello world in new-window
+#+END_SRC
+
+- trying out other connection with server
+
+#+BEGIN_SRC sh :results output :dir :dir /ssh:ye53nis@ara-login01.rz.uni-jena.de:/home/ye53nis/ :session new-test
+
+ :dir
+    /scp:dand@yakuba.princeton.edu:=
+
+#+BEGIN_SRC sh :results output :dir /scp:ye53nis@ara-login01.rz.uni-jena.de:/home/ye53nis
+echo hello
+#+END_SRC
+
+#+RESULTS:
+: sh: :dir: command not found
+: $ sh: /scp:dand@yakuba.princeton.edu:=: No such file or directory
+: $ /ssh:ye53nis@ara-login01.rz.uni-jena.de:/home/ye53nis/ #$ /ssh:ye53nis@ara-login01.rz.uni-jena.de:/home/ye53nis/ #$ hello
+
+***** useful notes on the way
+      - http://www.howardism.org/Technical/Emacs/literate-devops.html seems to
+        be a good blog about using org babel
+      - this also seems to be a good resource
+        https://lgfang.github.io/mynotes/utils/tmux.html
+      - how to get around "bind: address already in use" or "cannot listen to
+        port" errors:
+        https://askubuntu.com/questions/447820/ssh-l-error-bind-address-already-in-use
+        https://unix.stackexchange.com/questions/427189/how-to-cleanup-ssh-reverse-tunnel-socket-after-connection-closed
+**** DONE [#A] Setup of literate programming OR jupytex or the like
+     CLOSED: [2020-04-15 Mi 12:30]
+** exp-200410-test
+   :LOGBOOK:
+   CLOCK: [2020-04-10 Fr 11:47]--[2020-04-10 Fr 11:52] =>  0:05
+   :END:
+*** git
+#+begin_src sh :results verbatim
+git log -1
+#+end_src
+
+#+RESULTS:
+: commit 9ff351312ecdf37dd36df3083b0d5c95a7c7824f
+: Author: Apoplex <oligolex@vivaldi.net>
+: Date:   Fri Apr 3 01:07:16 2020 +0200
+:
+:     ssh and tmux
+*** Technical and conceptional setup
+**** Connect to jupyter kernels via =org-babel=
+     :LOGBOOK:
+     CLOCK: [2020-04-10 Fr 13:14]--[2020-04-10 Fr 14:36] =>  1:22
+     CLOCK: [2020-04-10 Fr 11:52]--[2020-04-10 Fr 12:28] =>  0:36
+     :END:
+
+1. Locally start a jupyter-python session, executed asynchro
+
+#+BEGIN_SRC jupyter-python :session py :kernel python3
+x = 'foo'
+y = 'bar'
+x + ' ' + y
+#+END_SRC
+
+#+RESULTS:
+: foo bar
+
+2. Connecting to an existing kernel
+
+#+BEGIN_SRC jupyter-python :session /home/lex/.local/share/jupyter/runtime/kernel-82cf194f-94c9-4323-b26e-d8c596e8f818.json :kernel python3
+x = 'foo'
+y = 'bar'
+x + ' ' + y
+#+END_SRC
+
+#+RESULTS:
+: foo bar
+
+1. Connecting to an existing kernel on the ara HPC
+   1. =sudo openconnect vpn.uni-jena.de=
+   2. connect to tmux session or create new one on login node
+   3.
+
+#+BEGIN_SRC jupyter-python :session /jpy:localhost#8889 :kernel python3
+x = 'foo'
+y = 'bar'
+x + ' ' + y
+#+END_SRC
+
+#+RESULTS:
+: foo bar
+
+#+BEGIN_SRC jupyter-python :session /jpy:localhost#8889 :kernel python3 :output verbatim
+  import sys
+
+print(sys.platform)
+print(sys.path)
+#+END_SRC
+
+#+RESULTS:
+: linux
+: ['/home/lex/Programme/drmed-git', '/home/lex/Programme/miniconda3/envs/tensorflow_env/lib/python37.zip', '/home/lex/Programme/miniconda3/envs/tensorflow_env/lib/python3.7', '/home/lex/Programme/miniconda3/envs/tensorflow_env/lib/python3.7/lib-dynload', '', '/home/lex/Programme/miniconda3/envs/tensorflow_env/lib/python3.7/site-packages', '/home/lex/Programme/miniconda3/envs/tensorflow_env/lib/python3.7/site-packages/IPython/extensions', '/home/lex/.ipython']
+
+It seems we are now on our local environment...
+
+#+BEGIN_SRC jupyter-python :session /jpy:localhost#8889:5f0f2373-c8d8-4bf1-a491-40fb8e314863 :kernel python3
+x = 'foo'
+y = 'bar'
+x + ' ' + y
+#+END_SRC
+
+#+RESULTS:
+: foo bar
+
+#+BEGIN_SRC jupyter-python :session /jpy:localhost#8889:5f0f2373-c8d8-4bf1-a491-40fb8e314863 :kernel python3
+  import os
+
+  ramlist = os.popen('free -th').readlines()[-1].split()[1:]
+
+  print('No of CPUs in system:', os.cpu_count())
+  print('No of CPUs the current process can use:',
+        len(os.sched_getaffinity(0)))
+  print('load average:', os.getloadavg())
+  print(os.uname())
+  print('PID of process:', os.getpid())
+  print'RAM total: {}, RAM used: {}, RAM free: {}'.format(
+      ramlist[0], ramlist[1], ramlist[2])
+
+  !echo the current directory: $PWD
+  !echo My disk usage:
+  !df -h
+  !conda list
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXAMPLE
+No of CPUs in system: 48
+No of CPUs the current process can use: 32
+load average: 0.04, 0.03, 0.05
+posix.uname_resultsysname='Linux', nodename='node020', release='3.10.0-957.1.3.el7.x86_64', version='#1 SMP Thu Nov 29 14:49:43 UTC 2018', machine='x86_64'
+PID of process: 33598
+RAM total: 137G, RAM used: 1.4G, RAM free: 111G
+the current directory: /home/ye53nis
+My disk usage:
+Filesystem           Size  Used Avail Use% Mounted on
+/dev/sda1             50G  4.3G   46G   9% /
+devtmpfs              63G     0   63G   0% /dev
+tmpfs                 63G  372M   63G   1% /dev/shm
+tmpfs                 63G   43M   63G   1% /run
+tmpfs                 63G     0   63G   0% /sys/fs/cgroup
+nfs01-ib:/home        80T   57T   24T  71% /home
+nfs03-ib:/pool/work  100T   77T   24T  77% /nfsdata
+nfs01-ib:/cluster    2.0T  312G  1.7T  16% /cluster
+/dev/sda5            2.0G   34M  2.0G   2% /tmp
+/dev/sda3            6.0G  447M  5.6G   8% /var
+/dev/sda6            169G  875M  168G   1% /local
+beegfs_nodev         524T  412T  113T  79% /beegfs
+tmpfs                 13G     0   13G   0% /run/user/67339
+# packages in environment at /cluster/miniconda3:
+#
+# Name                    Version                   Build  Channel
+_tflow_select             2.3.0                       mkl
+absl-py                   0.7.1                    py37_0
+alembic                   1.4.1                    pypi_0    pypi
+asn1crypto                0.24.0                   py37_0
+asteval                   0.9.14             pyh24bf2e0_0    conda-forge
+astor                     0.7.1                    py37_0
+astropy                   4.0                      pypi_0    pypi
+attrs                     19.1.0                   pypi_0    pypi
+backcall                  0.1.0                    pypi_0    pypi
+bcftools                  1.9                  ha228f0b_4    bioconda
+bedtools                  2.28.0               hdf88d34_0    bioconda
+blas                      1.0                         mkl
+bleach                    3.1.0                    pypi_0    pypi
+bzip2                     1.0.6                h14c3975_5
+c-ares                    1.15.0               h7b6447c_1
+ca-certificates           2019.5.15                     0
+cachetools                4.0.0                    pypi_0    pypi
+certifi                   2019.3.9                 py37_0
+cffi                      1.12.2           py37h2e261b9_1
+chardet                   3.0.4                    py37_1
+click                     7.0                      pypi_0    pypi
+cloudpickle               1.3.0                    pypi_0    pypi
+conda                     4.6.14                   py37_0
+configparse               0.1.5                    pypi_0    pypi
+configparser              4.0.2                    pypi_0    pypi
+corner                    2.0.1                    pypi_0    pypi
+cpnest                    0.9.9                    pypi_0    pypi
+cryptography              2.6.1            py37h1ba5d50_0
+curl                      7.64.1               hbc83047_0
+cycler                    0.10.0                   py37_0
+cython                    0.29.14                  pypi_0    pypi
+data                      0.4                      pypi_0    pypi
+databricks-cli            0.9.1                    pypi_0    pypi
+dbus                      1.13.6               h746ee38_0
+decorator                 4.4.0                    pypi_0    pypi
+defusedxml                0.6.0                    pypi_0    pypi
+docker                    4.2.0                    pypi_0    pypi
+entrypoints               0.3                      pypi_0    pypi
+expat                     2.2.6                he6710b0_0
+flask                     1.1.1                    pypi_0    pypi
+fontconfig                2.13.0               h9420a91_0
+freetype                  2.9.1                h8a8886c_1
+funcsigs                  1.0.2                    pypi_0    pypi
+future                    0.17.1                   py37_0
+gast                      0.2.2                    py37_0
+gitdb                     4.0.2                    pypi_0    pypi
+gitpython                 3.1.0                    pypi_0    pypi
+glib                      2.56.2               hd408876_0
+google-auth               1.11.2                   pypi_0    pypi
+google-auth-oauthlib      0.4.1                    pypi_0    pypi
+google-pasta              0.1.8                    pypi_0    pypi
+gorilla                   0.3.0                    pypi_0    pypi
+grpcio                    1.27.2                   pypi_0    pypi
+gst-plugins-base          1.14.0               hbbd80ab_1
+gstreamer                 1.14.0               hb453b48_1
+gunicorn                  20.0.4                   pypi_0    pypi
+h5py                      2.9.0            py37h7918eee_0
+hdf5                      1.10.4               hb1b8bf9_0
+htseq                     0.11.2           py37h637b7d7_1    bioconda
+htslib                    1.9                  ha228f0b_7    bioconda
+icu                       58.2                 h9c2bf20_1
+idna                      2.8                      py37_0
+intel-openmp              2019.3                      199
+ipykernel                 5.1.1                    pypi_0    pypi
+ipython                   7.5.0                    pypi_0    pypi
+ipython-genutils          0.2.0                    pypi_0    pypi
+ipywidgets                7.4.2                    pypi_0    pypi
+itsdangerous              1.1.0                    pypi_0    pypi
+jedi                      0.13.3                   pypi_0    pypi
+jinja2                    2.10.1                   pypi_0    pypi
+joblib                    0.13.2                   py37_0
+jpeg                      9b                   h024ee3a_2
+jsonschema                3.0.1                    pypi_0    pypi
+jupyter                   1.0.0                    pypi_0    pypi
+jupyter-client            5.2.4                    pypi_0    pypi
+jupyter-console           6.0.0                    pypi_0    pypi
+jupyter-core              4.4.0                    pypi_0    pypi
+keras-applications        1.0.8                    pypi_0    pypi
+keras-preprocessing       1.1.0                    pypi_0    pypi
+kiwisolver                1.1.0            py37he6710b0_0
+krb5                      1.16.1               h173b8e3_7
+last                      874                  hdbcaa40_2    bioconda
+latex                     0.7.0                    pypi_0    pypi
+libcurl                   7.64.1               h20c2e04_0
+libdeflate                1.0                  h14c3975_1    bioconda
+libedit                   3.1.20181209         hc058e9b_0
+libffi                    3.2.1                hd88cf55_4
+libgcc-ng                 8.2.0                hdf63c60_1
+libgfortran-ng            7.3.0                hdf63c60_0
+libpng                    1.6.37               hbc83047_0
+libprotobuf               3.7.1                hd408876_0
+libssh2                   1.8.2                h1ba5d50_0
+libstdcxx-ng              8.2.0                hdf63c60_1
+libuuid                   1.0.3                h1bed415_2
+libxcb                    1.13                 h1bed415_1
+libxml2                   2.9.9                he19cac6_0
+lmfit                     0.9.13             pyh24bf2e0_0    conda-forge
+mako                      1.1.2                    pypi_0    pypi
+markdown                  3.1                      py37_0
+markupsafe                1.1.1                    pypi_0    pypi
+matplotlib                3.0.3            py37h5429711_0
+minimap2                  2.17                 h84994c4_0    bioconda
+mistune                   0.8.4                    pypi_0    pypi
+mkl                       2019.3                      199
+mkl_fft                   1.0.12           py37ha843d7b_0
+mkl_random                1.0.2            py37hd81dba3_0
+mlflow                    1.7.0                    pypi_0    pypi
+mock                      2.0.0                    py37_0
+mpi4py                    3.0.3                    pypi_0    pypi
+multipletau               0.3.3                    pypi_0    pypi
+nanosim                   2.2.0                      py_0    bioconda
+nbconvert                 5.5.0                    pypi_0    pypi
+nbformat                  4.4.0                    pypi_0    pypi
+ncurses                   6.1                  he6710b0_1
+notebook                  5.7.8                    pypi_0    pypi
+numpy                     1.16.3           py37h7e9f1db_0
+numpy-base                1.16.3           py37hde5b4d6_0
+oauthlib                  3.1.0                    pypi_0    pypi
+openssl                   1.1.1c               h7b6447c_1
+opt-einsum                3.2.0                    pypi_0    pypi
+pandas                    0.24.2           py37he6710b0_0
+pandocfilters             1.4.2                    pypi_0    pypi
+parso                     0.4.0                    pypi_0    pypi
+pbr                       5.1.3                      py_0
+pcre                      8.43                 he6710b0_0
+pexpect                   4.7.0                    pypi_0    pypi
+pickleshare               0.7.5                    pypi_0    pypi
+pip                       19.0.3                   py37_0
+prometheus-client         0.7.0                    pypi_0    pypi
+prometheus-flask-exporter 0.13.0                   pypi_0    pypi
+prompt-toolkit            2.0.9                    pypi_0    pypi
+protobuf                  3.11.3                   pypi_0    pypi
+ptemcee                   1.0.0                    pypi_0    pypi
+ptyprocess                0.6.0                    pypi_0    pypi
+pyasn1                    0.4.8                    pypi_0    pypi
+pyasn1-modules            0.2.8                    pypi_0    pypi
+pybedtools                0.8.0            py37he860b03_1    bioconda
+pycosat                   0.6.3            py37h14c3975_0
+pycparser                 2.19                     py37_0
+pydot                     1.4.1                    pypi_0    pypi
+pygments                  2.4.2                    pypi_0    pypi
+pyopenssl                 19.0.0                   py37_0
+pyparsing                 2.4.0                      py_0
+pyqt                      5.9.2            py37h05f1152_2
+pyrsistent                0.15.2                   pypi_0    pypi
+pysam                     0.15.2           py37h4b7d16d_3    bioconda
+pysocks                   1.6.8                    py37_0
+pystan                    2.19.1.2dev              pypi_0    pypi
+python                    3.7.3                h0371630_0
+python-dateutil           2.8.0                    py37_0
+python-editor             1.0.4                    pypi_0    pypi
+python-graphviz           0.13.2                   pypi_0    pypi
+pytz                      2019.1                     py_0
+pyyaml                    5.3                      pypi_0    pypi
+pyzmq                     18.0.1                   pypi_0    pypi
+qt                        5.9.7                h5867ecd_1
+qtconsole                 4.5.1                    pypi_0    pypi
+querystring-parser        1.2.4                    pypi_0    pypi
+readline                  7.0                  h7b6447c_5
+requests                  2.21.0                   py37_0
+requests-oauthlib         1.3.0                    pypi_0    pypi
+rsa                       4.0                      pypi_0    pypi
+ruamel_yaml               0.15.46          py37h14c3975_0
+samtools                  1.9                 h8571acd_11    bioconda
+scikit-learn              0.21.1           py37hd81dba3_0
+scipy                     1.4.1                    pypi_0    pypi
+seaborn                   0.9.0                    pypi_0    pypi
+send2trash                1.5.0                    pypi_0    pypi
+setuptools                41.0.0                   py37_0
+shutilwhich               1.1.0                    pypi_0    pypi
+simplejson                3.17.0                   pypi_0    pypi
+sip                       4.19.8           py37hf484d3e_0
+six                       1.12.0                   py37_0
+smmap                     3.0.1                    pypi_0    pypi
+sqlalchemy                1.3.13                   pypi_0    pypi
+sqlite                    3.27.2               h7b6447c_0
+sqlparse                  0.3.1                    pypi_0    pypi
+tabulate                  0.8.6                    pypi_0    pypi
+tempdir                   0.7.1                    pypi_0    pypi
+tensorboard               2.1.1                    pypi_0    pypi
+tensorflow                2.1.0                    pypi_0    pypi
+tensorflow-estimator      2.1.0                    pypi_0    pypi
+termcolor                 1.1.0                    py37_1
+terminado                 0.8.2                    pypi_0    pypi
+testpath                  0.4.2                    pypi_0    pypi
+tifffile                  0.15.1          py37h3010b51_1001    conda-forge
+tk                        8.6.8                hbc83047_0
+tornado                   6.0.2            py37h7b6447c_0
+tqdm                      4.43.0                   pypi_0    pypi
+traitlets                 4.3.2                    pypi_0    pypi
+uncertainties             3.1.1                    py37_0    conda-forge
+urllib3                   1.24.1                   py37_0
+wcwidth                   0.1.7                    pypi_0    pypi
+webencodings              0.5.1                    pypi_0    pypi
+websocket-client          0.57.0                   pypi_0    pypi
+werkzeug                  0.15.2                     py_0
+wheel                     0.33.1                   py37_0
+widgetsnbextension        3.4.2                    pypi_0    pypi
+wrapt                     1.12.1                   pypi_0    pypi
+xz                        5.2.4                h14c3975_4
+yaml                      0.1.7                had09818_2
+zlib                      1.2.11               h7b6447c_3
+#+END_EXAMPLE
+** exp-200412-test
+*** git
+#+begin_src sh :results verbatim
+git log -1
+#+end_src
+
+#+RESULTS:
+: commit 8cb5705c0a06eb8f25a84f77a222b3736eaf704d
+: Author: Apoplex <oligolex@vivaldi.net>
+: Date:   Sun Apr 12 13:12:16 2020 +0200
+:
+:     Add tests of org-babel and emacs-jupyter
+*** Update files on ara cluster
+    :LOGBOOK:
+    CLOCK: 2020-04-12 So 23:56--2020-04-13 Mo 00:18 =>  0:22
+    CLOCK: 2020-04-12 So 15:00--2020-04-12 So 16:05 =>  1:05
+    :END:
+
+#+BEGIN_SRC sh :results output :session org-sftp :cache no
+sftp ara
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXAMPLE
+ye53nis@ara-login01.rz.uni-jena.de's password:
+Connected to ara.
+#+END_EXAMPLE
+
+#+BEGIN_SRC sh :results output table :session org-sftp
+pwd
+cd drmed-git
+ls -l
+
+lpwd
+lls -l
+#+END_SRC
+
+#+RESULTS:
+| pwd           |           |            |                               |       |     |     |       |              |
+| Remote        |   working | directory: | /home/ye53nis                 |       |     |     |       |              |
+| cd            | drmed-git |            |                               |       |     |     |       |              |
+| ls            |        -l |            |                               |       |     |     |       |              |
+| LabBook.org#  |           |            |                               |       |     |     |       |              |
+| -rw-r--r--    |         1 | ye53nis    | uj07g-iaob-ara                | 18650 | Apr |  13 | 00:08 | LICENSE      |
+| -rw-r--r--    |         1 | ye53nis    | uj07g-iaob-ara                | 57453 | Apr |  13 | 00:08 | LabBook.org  |
+| -rw-r--r--    |         1 | ye53nis    | uj07g-iaob-ara                | 19249 | Apr |  13 | 00:08 | LabBook.org~ |
+| -rw-r--r--    |         1 | ye53nis    | uj07g-iaob-ara                |    76 | Apr |  13 | 00:08 | README.md    |
+| drwxr-xr-x    |         2 | ye53nis    | uj07g-iaob-ara                |    10 | Apr |  12 | 15:50 | data         |
+| drwxr-xr-x    |         4 | ye53nis    | uj07g-iaob-ara                |    54 | Apr |  12 | 15:50 | src          |
+|               |           |            |                               |       |     |     |       |              |
+| lpwd          |           |            |                               |       |     |     |       |              |
+| Local         |   working | directory: | /home/lex/Programme/drmed-git |       |     |     |       |              |
+| lls           |        -l |            |                               |       |     |     |       |              |
+| insgesamt     |       176 |            |                               |       |     |     |       |              |
+| drwxr-xr-x    |         2 | lex        | lex                           |  4096 |  29 | Mär | 17:42 | data         |
+| LabBook.org#' |           |            |                               |       |     |     |       |              |
+| -rw-r--r--    |         2 | lex        | lex                           | 57453 |  12 | Apr | 23:54 | LabBook.org  |
+| -rw-r--r--    |         1 | lex        | lex                           | 19249 |   2 | Apr | 13:50 | LabBook.org~ |
+| -rw-r--r--    |         1 | lex        | lex                           | 18650 |   5 | Feb | 16:39 | LICENSE      |
+| -rw-r--r--    |         1 | lex        | lex                           |    76 |   5 | Feb | 16:39 | README.md    |
+| drwxr-xr-x    |         4 | lex        | lex                           |  4096 |  29 | Mär | 18:44 | src          |
+
+#+BEGIN_SRC sh :session org-sftp
+put -r .
+#+END_SRC
+
+#+RESULTS:
+| Uploading | ./     | to | home/ye53nis/drmed-git/. |
+| Entering  | ./     |    |                           |
+| Entering  | ..git |    |                           |
+
+*** SSH into ara cluster and start tmux and jupyter
+
+#+BEGIN_SRC sh :session org-ssh
+ssh ara
+#+END_SRC
+
+#+BEGIN_SRC sh :session org-ssh
+tmux ls
+#+END_SRC
+
+#+RESULTS:
+: no server running on /tmp/tmux-67339/default
+
+If no tmux session is running, a new dummy session has to be created to enable
+socket forwarding. Later, another tmux session can be used.
+#+BEGIN_SRC sh :session org-ssh
+tmux new -dP
+#+END_SRC
+
+#+RESULTS:
+: 0:
+
+Socket forwarding:
+#+CALL: setup-tmux
+
+Now create actual tmux session:
+#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
+echo $PWD
+echo test
+#+END_SRC
+
+#+BEGIN_SRC sh :session org-ssh
+tmux ls
+#+END_SRC
+
+#+RESULTS:
+|       0: | 1 | windows | created | Mon | Apr | 13 | 01:25:25 | 2020 |
+| ob-tmux: | 1 | windows | created | Mon | Apr | 13 | 01:26:33 | 2020 |
+
+#+BEGIN_SRC sh :session org-ssh :cache no
+sinfo
+#+END_SRC
+
+#+RESULTS:
+| PARTITION   | AVAIL |  TIMELIMIT | NODES | STATE | NODELIST                                                                                                                                                                      |
+| b_test      | up    |    3:00:00 |     1 | alloc | node001                                                                                                                                                                       |
+| b_standard* | up    | 8-08:00:00 |    47 | mix   | node006-007,009,014,017-019,022,028,030-034,036-039,041,043,047,051-053,062-064,066,071-072,083,085-088,092,112,117,119-121,125-126,133-136                                 |
+| b_standard* | up    | 8-08:00:00 |    84 | alloc | node002-005,008,010-013,015-016,020-021,023-027,029,035,040,042,044-046,048-050,054-061,065,067-070,073-082,084,089-091,093-111,113-116,118,122-124,131-132                 |
+| gpu_test    | up    |    1:00:00 |     1 | idle  | node127                                                                                                                                                                       |
+| gpu_p100    | up    | 8-08:00:00 |     2 | idle  | node128-129                                                                                                                                                                 |
+| gpu_v100    | up    | 8-08:00:00 |     1 | mix   | node130                                                                                                                                                                       |
+| b_fat       | up    | 8-08:00:00 |     3 | mix   | node137-138,140                                                                                                                                                             |
+| b_fat       | up    | 8-08:00:00 |     1 | alloc | node139                                                                                                                                                                       |
+| s_test      | up    |    3:00:00 |     1 | alloc | node141                                                                                                                                                                       |
+| s_standard  | up    | 8-08:00:00 |    51 | mix   | node153,159,162,164-165,170-172,174,176,178-182,185-187,196-197,204-206,208-209,211,213,218-220,229,235,253,258-261,293-295,297,299,301,303-306,309-310,314-315             |
+| s_standard  | up    | 8-08:00:00 |   100 | alloc | node142-152,154-158,160-161,163,166-169,173,175,177,183-184,188-195,198-203,207,210,212,214-217,221-228,230-234,236-252,254-257,262-268,296,298,300,302,307-308,311-313,316 |
+| s_fat       | up    | 8-08:00:00 |     3 | alloc | node269-270,272                                                                                                                                                             |
+| s_fat       | up    | 8-08:00:00 |     1 | idle  | node271                                                                                                                                                                       |
+
+#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
+srun -p gpu_p100 --time=7-10:00:00 --pty bash
+#+END_SRC
+
+#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
+module load tools/python/3.7
+export XDG_RUNTIME_DIR=''
+export XDG_RUNTIME_DIR=""
+jupyter notebook --no-browser --port=8889
+#+END_SRC
+
+Now this port has to be tunnelled on our local computer. While the tmux session
+above keeps running, no matter if Emacs is running or not, this following ssh
+tunnel needs to be active locally to connect to the notebook. If Emacs crashes,
+it would need to be reestablished.
+
+#+NAME: jpt-tunnel
+#+BEGIN_SRC sh :session org-tunnel :var port :var node
+ssh -t -t ara -L $port:localhost:$port ssh $node -L $port:Localhost:$port
+#+END_SRC
+
+#+CALL: jpt-tunnel[:cache no](port=8889, node="node128")
+
+#+RESULTS:
+|                   |                                      |           |     |    |          |      |      |             |
+| sh-5.0$           | ye53nis@ara-login01.rz.uni-jena.de's | password: |     |    |          |      |      |             |
+| ye53nis@node128's | password:                            |           |     |    |          |      |      |             |
+| Last              | login:                               | Tue       | Dec | 17 | 00:42:29 | 2019 | from | login01.ara |
+
+*** start ara cluster jupyter Python 3 kernel and get metadata
+    :PROPERTIES:
+    :header-args:jupyter-python: :session /jpy:localhost#8889:b2921acb-eb25-4449-9a6c-c8046cf16a03
+    :END:
+    :LOGBOOK:
+    CLOCK: [2020-04-13 Mo 00:18]--[2020-04-13 Mo 02:45] =>  2:27
+    :END:
+
+Start kernel according to [[*Setting starting a jupyter kernel from a remote jupyter session using =emacs-jupyter= in =org babel=][this recipe.]]
+
+#+CALL: jupyter-python-metadata[:cache no]
+
+#+RESULTS:
+#+BEGIN_EXAMPLE
+No of CPUs in system: 48
+No of CPUs the current process can use: 2
+load average: (0.0, 0.01, 0.05)
+posix.uname_result(sysname='Linux', nodename='node128', release='3.10.0-957.1.3.el7.x86_64', version='#1 SMP Thu Nov 29 14:49:43 UTC 2018', machine='x86_64')
+PID of process: 21480
+RAM total: 137G, RAM used: 1.3G, RAM free: 132G
+the current directory: /home/ye53nis
+My disk usage:
+Filesystem           Size  Used Avail Use% Mounted on
+/dev/sda1             50G  5.4G   45G  11% /
+devtmpfs              63G     0   63G   0% /dev
+tmpfs                 63G  102M   63G   1% /dev/shm
+tmpfs                 63G   43M   63G   1% /run
+tmpfs                 63G     0   63G   0% /sys/fs/cgroup
+nfs01-ib:/home        80T   57T   24T  71% /home
+nfs03-ib:/pool/work  100T   77T   24T  77% /nfsdata
+nfs01-ib:/cluster    2.0T  312G  1.7T  16% /cluster
+/dev/sda3            6.0G  567M  5.5G  10% /var
+/dev/sda5            2.0G   34M  2.0G   2% /tmp
+/dev/sda6            169G  354M  169G   1% /local
+beegfs_nodev         524T  413T  112T  79% /beegfs
+tmpfs                 13G     0   13G   0% /run/user/67339
+# packages in environment at /cluster/miniconda3:
+#
+# Name                    Version                   Build  Channel
+_tflow_select             2.3.0                       mkl
+absl-py                   0.7.1                    py37_0
+alembic                   1.4.1                    pypi_0    pypi
+asn1crypto                0.24.0                   py37_0
+asteval                   0.9.14             pyh24bf2e0_0    conda-forge
+astor                     0.7.1                    py37_0
+astropy                   4.0                      pypi_0    pypi
+attrs                     19.1.0                   pypi_0    pypi
+backcall                  0.1.0                    pypi_0    pypi
+bcftools                  1.9                  ha228f0b_4    bioconda
+bedtools                  2.28.0               hdf88d34_0    bioconda
+blas                      1.0                         mkl
+bleach                    3.1.0                    pypi_0    pypi
+bzip2                     1.0.6                h14c3975_5
+c-ares                    1.15.0               h7b6447c_1
+ca-certificates           2019.5.15                     0
+cachetools                4.0.0                    pypi_0    pypi
+certifi                   2019.3.9                 py37_0
+cffi                      1.12.2           py37h2e261b9_1
+chardet                   3.0.4                    py37_1
+click                     7.0                      pypi_0    pypi
+cloudpickle               1.3.0                    pypi_0    pypi
+conda                     4.6.14                   py37_0
+configparse               0.1.5                    pypi_0    pypi
+configparser              4.0.2                    pypi_0    pypi
+corner                    2.0.1                    pypi_0    pypi
+cpnest                    0.9.9                    pypi_0    pypi
+cryptography              2.6.1            py37h1ba5d50_0
+curl                      7.64.1               hbc83047_0
+cycler                    0.10.0                   py37_0
+cython                    0.29.14                  pypi_0    pypi
+data                      0.4                      pypi_0    pypi
+databricks-cli            0.9.1                    pypi_0    pypi
+dbus                      1.13.6               h746ee38_0
+decorator                 4.4.0                    pypi_0    pypi
+defusedxml                0.6.0                    pypi_0    pypi
+docker                    4.2.0                    pypi_0    pypi
+entrypoints               0.3                      pypi_0    pypi
+expat                     2.2.6                he6710b0_0
+flask                     1.1.1                    pypi_0    pypi
+fontconfig                2.13.0               h9420a91_0
+freetype                  2.9.1                h8a8886c_1
+funcsigs                  1.0.2                    pypi_0    pypi
+future                    0.17.1                   py37_0
+gast                      0.2.2                    py37_0
+gitdb                     4.0.2                    pypi_0    pypi
+gitpython                 3.1.0                    pypi_0    pypi
+glib                      2.56.2               hd408876_0
+google-auth               1.11.2                   pypi_0    pypi
+google-auth-oauthlib      0.4.1                    pypi_0    pypi
+google-pasta              0.1.8                    pypi_0    pypi
+gorilla                   0.3.0                    pypi_0    pypi
+grpcio                    1.27.2                   pypi_0    pypi
+gst-plugins-base          1.14.0               hbbd80ab_1
+gstreamer                 1.14.0               hb453b48_1
+gunicorn                  20.0.4                   pypi_0    pypi
+h5py                      2.9.0            py37h7918eee_0
+hdf5                      1.10.4               hb1b8bf9_0
+htseq                     0.11.2           py37h637b7d7_1    bioconda
+htslib                    1.9                  ha228f0b_7    bioconda
+icu                       58.2                 h9c2bf20_1
+idna                      2.8                      py37_0
+intel-openmp              2019.3                      199
+ipykernel                 5.1.1                    pypi_0    pypi
+ipython                   7.5.0                    pypi_0    pypi
+ipython-genutils          0.2.0                    pypi_0    pypi
+ipywidgets                7.4.2                    pypi_0    pypi
+itsdangerous              1.1.0                    pypi_0    pypi
+jedi                      0.13.3                   pypi_0    pypi
+jinja2                    2.10.1                   pypi_0    pypi
+joblib                    0.13.2                   py37_0
+jpeg                      9b                   h024ee3a_2
+jsonschema                3.0.1                    pypi_0    pypi
+jupyter                   1.0.0                    pypi_0    pypi
+jupyter-client            5.2.4                    pypi_0    pypi
+jupyter-console           6.0.0                    pypi_0    pypi
+jupyter-core              4.4.0                    pypi_0    pypi
+keras-applications        1.0.8                    pypi_0    pypi
+keras-preprocessing       1.1.0                    pypi_0    pypi
+kiwisolver                1.1.0            py37he6710b0_0
+krb5                      1.16.1               h173b8e3_7
+last                      874                  hdbcaa40_2    bioconda
+latex                     0.7.0                    pypi_0    pypi
+libcurl                   7.64.1               h20c2e04_0
+libdeflate                1.0                  h14c3975_1    bioconda
+libedit                   3.1.20181209         hc058e9b_0
+libffi                    3.2.1                hd88cf55_4
+libgcc-ng                 8.2.0                hdf63c60_1
+libgfortran-ng            7.3.0                hdf63c60_0
+libpng                    1.6.37               hbc83047_0
+libprotobuf               3.7.1                hd408876_0
+libssh2                   1.8.2                h1ba5d50_0
+libstdcxx-ng              8.2.0                hdf63c60_1
+libuuid                   1.0.3                h1bed415_2
+libxcb                    1.13                 h1bed415_1
+libxml2                   2.9.9                he19cac6_0
+lmfit                     0.9.13             pyh24bf2e0_0    conda-forge
+mako                      1.1.2                    pypi_0    pypi
+markdown                  3.1                      py37_0
+markupsafe                1.1.1                    pypi_0    pypi
+matplotlib                3.0.3            py37h5429711_0
+minimap2                  2.17                 h84994c4_0    bioconda
+mistune                   0.8.4                    pypi_0    pypi
+mkl                       2019.3                      199
+mkl_fft                   1.0.12           py37ha843d7b_0
+mkl_random                1.0.2            py37hd81dba3_0
+mlflow                    1.7.0                    pypi_0    pypi
+mock                      2.0.0                    py37_0
+mpi4py                    3.0.3                    pypi_0    pypi
+multipletau               0.3.3                    pypi_0    pypi
+nanosim                   2.2.0                      py_0    bioconda
+nbconvert                 5.5.0                    pypi_0    pypi
+nbformat                  4.4.0                    pypi_0    pypi
+ncurses                   6.1                  he6710b0_1
+notebook                  5.7.8                    pypi_0    pypi
+numpy                     1.16.3           py37h7e9f1db_0
+numpy-base                1.16.3           py37hde5b4d6_0
+oauthlib                  3.1.0                    pypi_0    pypi
+openssl                   1.1.1c               h7b6447c_1
+opt-einsum                3.2.0                    pypi_0    pypi
+pandas                    0.24.2           py37he6710b0_0
+pandocfilters             1.4.2                    pypi_0    pypi
+parso                     0.4.0                    pypi_0    pypi
+pbr                       5.1.3                      py_0
+pcre                      8.43                 he6710b0_0
+pexpect                   4.7.0                    pypi_0    pypi
+pickleshare               0.7.5                    pypi_0    pypi
+pip                       19.0.3                   py37_0
+prometheus-client         0.7.0                    pypi_0    pypi
+prometheus-flask-exporter 0.13.0                   pypi_0    pypi
+prompt-toolkit            2.0.9                    pypi_0    pypi
+protobuf                  3.11.3                   pypi_0    pypi
+ptemcee                   1.0.0                    pypi_0    pypi
+ptyprocess                0.6.0                    pypi_0    pypi
+pyasn1                    0.4.8                    pypi_0    pypi
+pyasn1-modules            0.2.8                    pypi_0    pypi
+pybedtools                0.8.0            py37he860b03_1    bioconda
+pycosat                   0.6.3            py37h14c3975_0
+pycparser                 2.19                     py37_0
+pydot                     1.4.1                    pypi_0    pypi
+pygments                  2.4.2                    pypi_0    pypi
+pyopenssl                 19.0.0                   py37_0
+pyparsing                 2.4.0                      py_0
+pyqt                      5.9.2            py37h05f1152_2
+pyrsistent                0.15.2                   pypi_0    pypi
+pysam                     0.15.2           py37h4b7d16d_3    bioconda
+pysocks                   1.6.8                    py37_0
+pystan                    2.19.1.2dev              pypi_0    pypi
+python                    3.7.3                h0371630_0
+python-dateutil           2.8.0                    py37_0
+python-editor             1.0.4                    pypi_0    pypi
+python-graphviz           0.13.2                   pypi_0    pypi
+pytz                      2019.1                     py_0
+pyyaml                    5.3                      pypi_0    pypi
+pyzmq                     18.0.1                   pypi_0    pypi
+qt                        5.9.7                h5867ecd_1
+qtconsole                 4.5.1                    pypi_0    pypi
+querystring-parser        1.2.4                    pypi_0    pypi
+readline                  7.0                  h7b6447c_5
+requests                  2.21.0                   py37_0
+requests-oauthlib         1.3.0                    pypi_0    pypi
+rsa                       4.0                      pypi_0    pypi
+ruamel_yaml               0.15.46          py37h14c3975_0
+samtools                  1.9                 h8571acd_11    bioconda
+scikit-learn              0.21.1           py37hd81dba3_0
+scipy                     1.4.1                    pypi_0    pypi
+seaborn                   0.9.0                    pypi_0    pypi
+send2trash                1.5.0                    pypi_0    pypi
+setuptools                41.0.0                   py37_0
+shutilwhich               1.1.0                    pypi_0    pypi
+simplejson                3.17.0                   pypi_0    pypi
+sip                       4.19.8           py37hf484d3e_0
+six                       1.12.0                   py37_0
+smmap                     3.0.1                    pypi_0    pypi
+sqlalchemy                1.3.13                   pypi_0    pypi
+sqlite                    3.27.2               h7b6447c_0
+sqlparse                  0.3.1                    pypi_0    pypi
+tabulate                  0.8.6                    pypi_0    pypi
+tempdir                   0.7.1                    pypi_0    pypi
+tensorboard               2.1.1                    pypi_0    pypi
+tensorflow                2.1.0                    pypi_0    pypi
+tensorflow-estimator      2.1.0                    pypi_0    pypi
+termcolor                 1.1.0                    py37_1
+terminado                 0.8.2                    pypi_0    pypi
+testpath                  0.4.2                    pypi_0    pypi
+tifffile                  0.15.1          py37h3010b51_1001    conda-forge
+tk                        8.6.8                hbc83047_0
+tornado                   6.0.2            py37h7b6447c_0
+tqdm                      4.43.0                   pypi_0    pypi
+traitlets                 4.3.2                    pypi_0    pypi
+uncertainties             3.1.1                    py37_0    conda-forge
+urllib3                   1.24.1                   py37_0
+wcwidth                   0.1.7                    pypi_0    pypi
+webencodings              0.5.1                    pypi_0    pypi
+websocket-client          0.57.0                   pypi_0    pypi
+werkzeug                  0.15.2                     py_0
+wheel                     0.33.1                   py37_0
+widgetsnbextension        3.4.2                    pypi_0    pypi
+wrapt                     1.12.1                   pypi_0    pypi
+xz                        5.2.4                h14c3975_4
+yaml                      0.1.7                had09818_2
+zlib                      1.2.11               h7b6447c_3
+#+END_EXAMPLE
+*** Technical and conceptional setup
+    :LOGBOOK:
+    CLOCK: [2020-04-12 So 14:58]--[2020-04-12 So 14:58] =>  0:00
+    CLOCK: [2020-04-12 So 13:34]--[2020-04-12 So 14:57] =>  1:23
+    CLOCK: [2020-04-12 So 13:00]--[2020-04-12 So 13:22] =>  0:22
+    :END:
+**** Do a UNET Training
+    :PROPERTIES:
+    :header-args:jupyter-python: :session /jpy:localhost#8889:b2921acb-eb25-4449-9a6c-c8046cf16a03
+    :END:
+    :LOGBOOK:
+    CLOCK: [2020-04-13 Mo 19:28]--[2020-04-13 Mo 22:35] =>  3:07
+    CLOCK: [2020-04-13 Mo 17:35]--[2020-04-13 Mo 19:20] =>  1:45
+    CLOCK: [2020-04-13 Mo 11:00]--[2020-04-13 Mo 11:00] =>  0:00
+    CLOCK: [2020-04-13 Mo 02:45]--[2020-04-13 Mo 03:30] =>  0:45
+    :END:
+
+1. Import modules
+#+BEGIN_SRC jupyter-python
+  import datetime
+  import itertools
+  import sys
+  import sklearn.metrics
+
+  import matplotlib.pyplot as plt
+  import tensorflow as tf
+  import numpy as np
+
+  sys.path.append('./fluotracify/')]
+  from fluotracify.simulations import import_simulation_from_csv as isfc
+  from fluotracify.training import preprocess_data as ppd
+  from fluotracify.training import build_model as bm
+  from fluotracify.training import evaluate
+
+  print(tf.__version__)
+  # Load the TensorBoard notebook extension
+  %load_ext tensorboard
+  tf.keras.backend.clear_session()  # For easy reset of notebook state.
+#+END_SRC
+
+#+RESULTS:
+: 2.1.0
+
+2. import .csv files in RAM
+#+BEGIN_SRC jupyter-python
+train, test, nsamples, experiment_params = isfc.import_from_csv(
+    path='/beegfs/ye53nis/saves/firstartefact_Sep2019/',
+    header=12,
+    frac_train=0.8,
+    col_per_example=2,
+    dropindex=None,
+    dropcolumns='Unnamed: 200')
+experiment_params
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+#+BEGIN_EXAMPLE
+train 0 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set027.csv
+train 1 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set087.csv
+train 2 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set003.csv
+train 3 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set056.csv
+train 4 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set076.csv
+train 5 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set094.csv
+train 6 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set017.csv
+train 7 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set074.csv
+train 8 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set055.csv
+train 9 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set096.csv
+train 10 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set054.csv
+train 11 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set093.csv
+train 12 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set079.csv
+train 13 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set014.csv
+train 14 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set008.csv
+train 15 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set031.csv
+train 16 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set023.csv
+train 17 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set025.csv
+train 18 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set034.csv
+train 19 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set009.csv
+train 20 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set044.csv
+train 21 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set063.csv
+train 22 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set004.csv
+train 23 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set072.csv
+train 24 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set046.csv
+train 25 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set049.csv
+train 26 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set007.csv
+train 27 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set100.csv
+train 28 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set083.csv
+train 29 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set077.csv
+train 30 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set061.csv
+train 31 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set081.csv
+train 32 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set091.csv
+train 33 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set069.csv
+train 34 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set052.csv
+train 35 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set028.csv
+train 36 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set019.csv
+train 37 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set057.csv
+train 38 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set064.csv
+train 39 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set075.csv
+train 40 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set002.csv
+train 41 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set062.csv
+train 42 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set043.csv
+train 43 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set042.csv
+train 44 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set005.csv
+train 45 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set016.csv
+train 46 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set018.csv
+train 47 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set041.csv
+train 48 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set039.csv
+train 49 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set006.csv
+train 50 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set092.csv
+train 51 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set060.csv
+train 52 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set001.csv
+train 53 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set035.csv
+train 54 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set029.csv
+train 55 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set051.csv
+train 56 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set012.csv
+train 57 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set036.csv
+train 58 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set024.csv
+train 59 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set053.csv
+train 60 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set011.csv
+train 61 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set032.csv
+train 62 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set067.csv
+train 63 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set058.csv
+train 64 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set080.csv
+train 65 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set086.csv
+train 66 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set033.csv
+train 67 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set085.csv
+train 68 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set015.csv
+train 69 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set090.csv
+train 70 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set020.csv
+train 71 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set030.csv
+train 72 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set050.csv
+train 73 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set098.csv
+train 74 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set099.csv
+train 75 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set070.csv
+train 76 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set021.csv
+train 77 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set095.csv
+train 78 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set073.csv
+train 79 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set078.csv
+test 80 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set026.csv
+test 81 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set038.csv
+test 82 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set082.csv
+test 83 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set047.csv
+test 84 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set040.csv
+test 85 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set066.csv
+test 86 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set059.csv
+test 87 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set013.csv
+test 88 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set089.csv
+test 89 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set071.csv
+test 90 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set088.csv
+test 91 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set037.csv
+test 92 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set022.csv
+test 93 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set084.csv
+test 94 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set010.csv
+test 95 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set097.csv
+test 96 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set068.csv
+test 97 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set065.csv
+test 98 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set048.csv
+test 99 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set045.csv
+#+END_EXAMPLE
+#+BEGIN_EXPORT html
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>0</th>
+      <th>1</th>
+      <th>2</th>
+      <th>3</th>
+      <th>4</th>
+      <th>5</th>
+      <th>6</th>
+      <th>7</th>
+      <th>8</th>
+      <th>9</th>
+      <th>...</th>
+      <th>90</th>
+      <th>91</th>
+      <th>92</th>
+      <th>93</th>
+      <th>94</th>
+      <th>95</th>
+      <th>96</th>
+      <th>97</th>
+      <th>98</th>
+      <th>99</th>
+    </tr>
+    <tr>
+      <th>0</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>unique identifier</th>
+      <td>87236092-432a-4cf3-976d-f4125faf39ba</td>
+      <td>a97099b0-b09f-46a3-b6b9-21494f23bbac</td>
+      <td>65cf62b4-ab6c-4684-9bb8-7866babd7d1e</td>
+      <td>b5d81346-5a76-49d0-a9bc-3c2927d42b81</td>
+      <td>ede6541c-2291-43fc-bd27-88ac58972f70</td>
+      <td>7d11aae7-4021-4da0-9a25-c3caaf594ce4</td>
+      <td>a8879b13-71c2-43af-8e5c-108609bc7bb4</td>
+      <td>4f37c213-656e-4b41-b94e-e6681a39cab6</td>
+      <td>5f4303d1-c15d-4526-94e9-532c84419541</td>
+      <td>b637341b-6a7d-4ec9-9093-9b96938e4178</td>
+      <td>...</td>
+      <td>c6191b86-d827-49f1-a310-005bc8515716</td>
+      <td>c213dfa4-7895-43da-aee6-61d04923a9ec</td>
+      <td>3266da57-ceb1-4154-9da7-652f5878544c</td>
+      <td>8dbe443f-2414-46d6-8fbc-3f004bc3b513</td>
+      <td>5cab4980-4d00-4abb-8f57-9cb03c684aca</td>
+      <td>32a3e173-eb56-4fd1-904a-aaea1c7f0b98</td>
+      <td>88ff65c4-77b3-49ba-851e-5830419577ca</td>
+      <td>f764599a-39e0-4a16-ab24-974959a0c736</td>
+      <td>bfa57664-7605-4f4e-bb33-2931b1f6b33d</td>
+      <td>6609d8da-a5f8-4ce9-b20d-484377f10208</td>
+    </tr>
+    <tr>
+      <th>path and file name</th>
+      <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
+      <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
+      <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
+      <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
+      <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
+      <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
+      <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
+      <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
+      <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
+      <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
+      <td>...</td>
+      <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
+      <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
+      <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
+      <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
+      <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
+      <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
+      <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
+      <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
+      <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
+      <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
+    </tr>
+    <tr>
+      <th>number of slow clusters</th>
+      <td>10</td>
+      <td>10</td>
+      <td>10</td>
+      <td>10</td>
+      <td>10</td>
+      <td>10</td>
+      <td>10</td>
+      <td>10</td>
+      <td>10</td>
+      <td>10</td>
+      <td>...</td>
+      <td>10</td>
+      <td>10</td>
+      <td>10</td>
+      <td>10</td>
+      <td>10</td>
+      <td>10</td>
+      <td>10</td>
+      <td>10</td>
+      <td>10</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <th>diffusion rate of clusters</th>
+      <td>0.01</td>
+      <td>0.02</td>
+      <td>0.01</td>
+      <td>0.01</td>
+      <td>0.02</td>
+      <td>0.01</td>
+      <td>0.02</td>
+      <td>0.01</td>
+      <td>0.01</td>
+      <td>0.01</td>
+      <td>...</td>
+      <td>0.02</td>
+      <td>0.02</td>
+      <td>0.01</td>
+      <td>0.01</td>
+      <td>0.02</td>
+      <td>0.01</td>
+      <td>0.02</td>
+      <td>0.01</td>
+      <td>0.01</td>
+      <td>0.02</td>
+    </tr>
+    <tr>
+      <th>FWHMs of excitation PSFs used</th>
+      <td>[250]</td>
+      <td>[250]</td>
+      <td>[250]</td>
+      <td>[250]</td>
+      <td>[250]</td>
+      <td>[250]</td>
+      <td>[250]</td>
+      <td>[250]</td>
+      <td>[250]</td>
+      <td>[250]</td>
+      <td>...</td>
+      <td>[250]</td>
+      <td>[250]</td>
+      <td>[250]</td>
+      <td>[250]</td>
+      <td>[250]</td>
+      <td>[250]</td>
+      <td>[250]</td>
+      <td>[250]</td>
+      <td>[250]</td>
+      <td>[250]</td>
+    </tr>
+    <tr>
+      <th>extent of the PSF</th>
+      <td>4000</td>
+      <td>4000</td>
+      <td>4000</td>
+      <td>4000</td>
+      <td>4000</td>
+      <td>4000</td>
+      <td>4000</td>
+      <td>4000</td>
+      <td>4000</td>
+      <td>4000</td>
+      <td>...</td>
+      <td>4000</td>
+      <td>4000</td>
+      <td>4000</td>
+      <td>4000</td>
+      <td>4000</td>
+      <td>4000</td>
+      <td>4000</td>
+      <td>4000</td>
+      <td>4000</td>
+      <td>4000</td>
+    </tr>
+    <tr>
+      <th>total simulation time</th>
+      <td>20000</td>
+      <td>20000</td>
+      <td>20000</td>
+      <td>20000</td>
+      <td>20000</td>
+      <td>20000</td>
+      <td>20000</td>
+      <td>20000</td>
+      <td>20000</td>
+      <td>20000</td>
+      <td>...</td>
+      <td>20000</td>
+      <td>20000</td>
+      <td>20000</td>
+      <td>20000</td>
+      <td>20000</td>
+      <td>20000</td>
+      <td>20000</td>
+      <td>20000</td>
+      <td>20000</td>
+      <td>20000</td>
+    </tr>
+    <tr>
+      <th>time step</th>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>...</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>number of fast molecules</th>
+      <td>1000</td>
+      <td>5000</td>
+      <td>2000</td>
+      <td>6000</td>
+      <td>5000</td>
+      <td>2000</td>
+      <td>2000</td>
+      <td>10000</td>
+      <td>7000</td>
+      <td>8000</td>
+      <td>...</td>
+      <td>5000</td>
+      <td>8000</td>
+      <td>2000</td>
+      <td>10000</td>
+      <td>7000</td>
+      <td>1000</td>
+      <td>2000</td>
+      <td>7000</td>
+      <td>4000</td>
+      <td>4000</td>
+    </tr>
+    <tr>
+      <th>diffusion rate of molecules</th>
+      <td>5.0</td>
+      <td>1.5</td>
+      <td>2.0</td>
+      <td>3.5</td>
+      <td>5.0</td>
+      <td>4.5</td>
+      <td>1.5</td>
+      <td>4.5</td>
+      <td>5.0</td>
+      <td>1.5</td>
+      <td>...</td>
+      <td>1.0</td>
+      <td>3.0</td>
+      <td>2.5</td>
+      <td>2.5</td>
+      <td>3.5</td>
+      <td>2.5</td>
+      <td>5.0</td>
+      <td>5.0</td>
+      <td>1.0</td>
+      <td>3.0</td>
+    </tr>
+    <tr>
+      <th>width of the simulation</th>
+      <td>3000.0</td>
+      <td>3000.0</td>
+      <td>3000.0</td>
+      <td>3000.0</td>
+      <td>3000.0</td>
+      <td>3000.0</td>
+      <td>3000.0</td>
+      <td>3000.0</td>
+      <td>3000.0</td>
+      <td>3000.0</td>
+      <td>...</td>
+      <td>3000.0</td>
+      <td>3000.0</td>
+      <td>3000.0</td>
+      <td>3000.0</td>
+      <td>3000.0</td>
+      <td>3000.0</td>
+      <td>3000.0</td>
+      <td>3000.0</td>
+      <td>3000.0</td>
+      <td>3000.0</td>
+    </tr>
+    <tr>
+      <th>height of the simulation</th>
+      <td>3000.0</td>
+      <td>3000.0</td>
+      <td>3000.0</td>
+      <td>3000.0</td>
+      <td>3000.0</td>
+      <td>3000.0</td>
+      <td>3000.0</td>
+      <td>3000.0</td>
+      <td>3000.0</td>
+      <td>3000.0</td>
+      <td>...</td>
+      <td>3000.0</td>
+      <td>3000.0</td>
+      <td>3000.0</td>
+      <td>3000.0</td>
+      <td>3000.0</td>
+      <td>3000.0</td>
+      <td>3000.0</td>
+      <td>3000.0</td>
+      <td>3000.0</td>
+      <td>3000.0</td>
+    </tr>
+    <tr>
+      <th>trace001</th>
+      <td>label001_1</td>
+      <td>label001_1</td>
+      <td>label001_1</td>
+      <td>label001_1</td>
+      <td>label001_1</td>
+      <td>label001_1</td>
+      <td>label001_1</td>
+      <td>label001_1</td>
+      <td>label001_1</td>
+      <td>label001_1</td>
+      <td>...</td>
+      <td>label001_1</td>
+      <td>label001_1</td>
+      <td>label001_1</td>
+      <td>label001_1</td>
+      <td>label001_1</td>
+      <td>label001_1</td>
+      <td>label001_1</td>
+      <td>label001_1</td>
+      <td>label001_1</td>
+      <td>label001_1</td>
+    </tr>
+  </tbody>
+</table>
+<p>13 rows × 100 columns</p>
+</div>
+#+END_EXPORT
+:END:
+
+#+BEGIN_SRC jupyter-python
+  train_data, train_labels = isfc.separate_data_and_labels(array=train,
+                                                           nsamples=nsamples)
+  test_data, test_labels = isfc.separate_data_and_labels(array=test,
+                                                         nsamples=nsamples)
+
+  train_labels_bool = train_labels > 0.04
+  test_labels_bool = test_labels > 0.04
+  print('\nfor each 20,000 timestap trace there are the following numbers '
+        'of corrupted timesteps:\n', test_labels_bool.sum(axis=0).head())
+
+  # Cleanup
+  del train, test
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXAMPLE
+shapes of feature dataframe: (20000, 8000) and label dataframe: (20000, 8000)
+shapes of feature dataframe: 20000, 2000 and label dataframe: 20000, 2000
+
+for each 20,000 timestap trace there are the following numbers of corrupted timesteps:
+ label001_1    6286
+label001_1    2568
+label001_1    4495
+label001_1    4414
+label001_1    1105
+dtype: int64
+#+END_EXAMPLE
+
+#+BEGIN_SRC jupyter-python
+  plt.hist(train_labels_bool.sum(axis=0), bins='auto')
+  plt.title('Histogram with distribution of traces with the respective number of'
+            ' corrupted timesteps')
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+: Text(0.5, 1.0, 'Histogram with distribution of traces with the respective number of corrupted timesteps')
+[[file:./.ob-jupyter/cf34ad585de69e582c30a7f8192a728e39d18f73.png]]
+:END:
+
+#+BEGIN_SRC jupyter-python
+  batch_size = 3
+  frac_val = 0.2
+  length_delimiter = 16384
+
+  dataset_train, dataset_val, num_train_examples, num_val_examples = ppd.tfds_from_pddf_for_unet(
+      features_df=train_data,
+      labels_df=train_labels_bool,
+      is_training=True,
+      batch_size=batch_size,
+      length_delimiter=length_delimiter,
+      frac_val=frac_val)
+
+  dataset_test, num_test_examples = ppd.tfds_from_pddf_for_unet(
+      features_df=test_data,
+      labels_df=test_labels_bool,
+      is_training=False,
+      batch_size=batch_size,
+      length_delimiter=length_delimiter)
+#+END_SRC
+
+#+RESULTS:
+: number of training examples: 6400, number of validation examples: 1600
+:
+: ------------------------
+: number of test examples: 2000
+
+#+BEGIN_SRC jupyter-python
+  # length of your training timeline (needs to be constant during training, can
+  # be anything when predicting) corresponding to the depth of your U-net
+  # (number of down- and upsamplings) the minimum lenght should be about 30 time
+  # steps or less
+  model = bm.unet_1d_alt(input_size=length_delimiter)
+  optimizer = tf.keras.optimizers.Adam(learning_rate=1e-5)
+  loss = bm.binary_ce_dice_loss
+
+  model.compile(loss=loss,
+                optimizer=optimizer,
+                metrics=[
+                    tf.keras.metrics.MeanIoU(num_classes=2),
+                    tf.keras.metrics.Precision(),
+                    tf.keras.metrics.Recall()
+                ])
+
+  print(model.summary())
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXAMPLE
+input - shape:	 (None, 16384, 1)
+output - shape:	 (None, 16384, 1)
+Model: "model"
+__________________________________________________________________________________________________
+Layer (type)                    Output Shape         Param #     Connected to
+==================================================================================================
+input_1 (InputLayer)            [(None, 16384, 1)]   0
+__________________________________________________________________________________________________
+encode0 (Sequential)            (None, 16384, 64)    13120       input_1[0][0]
+__________________________________________________________________________________________________
+mp_encode0 (MaxPooling1D)       (None, 8192, 64)     0           encode0[0][0]
+__________________________________________________________________________________________________
+encode1 (Sequential)            (None, 8192, 128)    75008       mp_encode0[0][0]
+__________________________________________________________________________________________________
+mp_encode1 (MaxPooling1D)       (None, 4096, 128)    0           encode1[0][0]
+__________________________________________________________________________________________________
+encode2 (Sequential)            (None, 4096, 256)    297472      mp_encode1[0][0]
+__________________________________________________________________________________________________
+mp_encode2 (MaxPooling1D)       (None, 2048, 256)    0           encode2[0][0]
+__________________________________________________________________________________________________
+encode3 (Sequential)            (None, 2048, 512)    1184768     mp_encode2[0][0]
+__________________________________________________________________________________________________
+mp_encode3 (MaxPooling1D)       (None, 1024, 512)    0           encode3[0][0]
+__________________________________________________________________________________________________
+encode4 (Sequential)            (None, 1024, 512)    1577984     mp_encode3[0][0]
+__________________________________________________________________________________________________
+mp_encode4 (MaxPooling1D)       (None, 512, 512)     0           encode4[0][0]
+__________________________________________________________________________________________________
+encode5 (Sequential)            (None, 512, 512)     1577984     mp_encode4[0][0]
+__________________________________________________________________________________________________
+mp_encode5 (MaxPooling1D)       (None, 256, 512)     0           encode5[0][0]
+__________________________________________________________________________________________________
+encode6 (Sequential)            (None, 256, 512)     1577984     mp_encode5[0][0]
+__________________________________________________________________________________________________
+mp_encode6 (MaxPooling1D)       (None, 128, 512)     0           encode6[0][0]
+__________________________________________________________________________________________________
+encode7 (Sequential)            (None, 128, 512)     1577984     mp_encode6[0][0]
+__________________________________________________________________________________________________
+mp_encode7 (MaxPooling1D)       (None, 64, 512)      0           encode7[0][0]
+__________________________________________________________________________________________________
+encode8 (Sequential)            (None, 64, 512)      1577984     mp_encode7[0][0]
+__________________________________________________________________________________________________
+mp_encode8 (MaxPooling1D)       (None, 32, 512)      0           encode8[0][0]
+__________________________________________________________________________________________________
+two_conv_center (Sequential)    (None, 32, 1024)     4728832     mp_encode8[0][0]
+__________________________________________________________________________________________________
+conv_transpose_decoder8 (Sequen (None, 64, 512)      1051136     two_conv_center[0][0]
+__________________________________________________________________________________________________
+decoder8 (Concatenate)          (None, 64, 1024)     0           encode8[0][0]
+                                                                 conv_transpose_decoder8[0][0]
+__________________________________________________________________________________________________
+two_conv_decoder8 (Sequential)  (None, 64, 512)      2364416     decoder8[0][0]
+__________________________________________________________________________________________________
+conv_transpose_decoder7 (Sequen (None, 128, 512)     526848      two_conv_decoder8[0][0]
+__________________________________________________________________________________________________
+decoder7 (Concatenate)          (None, 128, 1024)    0           encode7[0][0]
+                                                                 conv_transpose_decoder7[0][0]
+__________________________________________________________________________________________________
+two_conv_decoder7 (Sequential)  (None, 128, 512)     2364416     decoder7[0][0]
+__________________________________________________________________________________________________
+conv_transpose_decoder6 (Sequen (None, 256, 512)     526848      two_conv_decoder7[0][0]
+__________________________________________________________________________________________________
+decoder6 (Concatenate)          (None, 256, 1024)    0           encode6[0][0]
+                                                                 conv_transpose_decoder6[0][0]
+__________________________________________________________________________________________________
+two_conv_decoder6 (Sequential)  (None, 256, 512)     2364416     decoder6[0][0]
+__________________________________________________________________________________________________
+conv_transpose_decoder5 (Sequen (None, 512, 512)     526848      two_conv_decoder6[0][0]
+__________________________________________________________________________________________________
+decoder5 (Concatenate)          (None, 512, 1024)    0           encode5[0][0]
+                                                                 conv_transpose_decoder5[0][0]
+__________________________________________________________________________________________________
+two_conv_decoder5 (Sequential)  (None, 512, 512)     2364416     decoder5[0][0]
+__________________________________________________________________________________________________
+conv_transpose_decoder4 (Sequen (None, 1024, 512)    526848      two_conv_decoder5[0][0]
+__________________________________________________________________________________________________
+decoder4 (Concatenate)          (None, 1024, 1024)   0           encode4[0][0]
+                                                                 conv_transpose_decoder4[0][0]
+__________________________________________________________________________________________________
+two_conv_decoder4 (Sequential)  (None, 1024, 512)    2364416     decoder4[0][0]
+__________________________________________________________________________________________________
+conv_transpose_decoder3 (Sequen (None, 2048, 512)    526848      two_conv_decoder4[0][0]
+__________________________________________________________________________________________________
+decoder3 (Concatenate)          (None, 2048, 1024)   0           encode3[0][0]
+                                                                 conv_transpose_decoder3[0][0]
+__________________________________________________________________________________________________
+two_conv_decoder3 (Sequential)  (None, 2048, 512)    2364416     decoder3[0][0]
+__________________________________________________________________________________________________
+conv_transpose_decoder2 (Sequen (None, 4096, 256)    263424      two_conv_decoder3[0][0]
+__________________________________________________________________________________________________
+decoder2 (Concatenate)          (None, 4096, 512)    0           encode2[0][0]
+                                                                 conv_transpose_decoder2[0][0]
+__________________________________________________________________________________________________
+two_conv_decoder2 (Sequential)  (None, 4096, 256)    592384      decoder2[0][0]
+__________________________________________________________________________________________________
+conv_transpose_decoder1 (Sequen (None, 8192, 128)    66176       two_conv_decoder2[0][0]
+__________________________________________________________________________________________________
+decoder1 (Concatenate)          (None, 8192, 256)    0           encode1[0][0]
+                                                                 conv_transpose_decoder1[0][0]
+__________________________________________________________________________________________________
+two_conv_decoder1 (Sequential)  (None, 8192, 128)    148736      decoder1[0][0]
+__________________________________________________________________________________________________
+conv_transpose_decoder0 (Sequen (None, 16384, 64)    16704       two_conv_decoder1[0][0]
+__________________________________________________________________________________________________
+decoder0 (Concatenate)          (None, 16384, 128)   0           encode0[0][0]
+                                                                 conv_transpose_decoder0[0][0]
+__________________________________________________________________________________________________
+two_conv_decoder0 (Sequential)  (None, 16384, 64)    37504       decoder0[0][0]
+__________________________________________________________________________________________________
+conv1d_38 (Conv1D)              (None, 16384, 1)     65          two_conv_decoder0[0][0]
+==================================================================================================
+Total params: 33,185,985
+Trainable params: 33,146,689
+Non-trainable params: 39,296
+__________________________________________________________________________________________________
+None
+#+END_EXAMPLE
+
+#+BEGIN_SRC jupyter-python
+tf.keras.utils.plot_model(model=model,
+                          show_shapes=True,
+                          dpi=64)
+#+END_SRC
+
+#+RESULTS:
+: Failed to import pydot. You must install pydot and graphviz for `pydotprint` to work.
+
+#+BEGIN_SRC jupyter-python
+log_dir="logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+tensorboard_callback = tf.keras.callbacks.TensorBoard(
+    log_dir=log_dir,
+    histogram_freq=5,
+    write_images=True,
+    update_freq='batch')
+
+epochs = 50
+
+history = model.fit(x=dataset_train,
+                    epochs=epochs,
+                    steps_per_epoch=400,
+                    validation_data=dataset_val,
+                    validation_steps=tf.math.ceil(num_val_examples / batch_size),
+                    callbacks=[tensorboard_callback])
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+: WARNING: Logging before flag parsing goes to stderr.
+: W0413 03:23:05.926374 47620222508736 summary_ops_v2.py:1132] Model failed to serialize as JSON. Ignoring... Layers with arguments in `__init__` must override `get_config`.
+: Train for 400 steps, validate for 534.0 steps
+: Epoch 1/50
+:   8/400 [..............................] - ETA: 1:05:18 - loss: 1.4586 - mean_io_u: 0.4039 - precision: 0.2347 - recall: 0.1408
+# [goto error]
+#+BEGIN_EXAMPLE
+---------------------------------------------------------------------------
+KeyboardInterrupt                         Traceback (most recent call last)
+#+END_EXAMPLE
+:END:
+
+#+BEGIN_SRC jupyter-python
+  log_dir="logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+  tensorboard_callback = tf.keras.callbacks.TensorBoard(
+      log_dir=log_dir,
+      histogram_freq=5,
+      write_images=True,
+      update_freq='batch')
+
+  epochs = 50
+
+  history = model.fit(x=dataset_train,
+                      epochs=epochs,
+                      steps_per_epoch=400,
+                      validation_data=dataset_val,
+                      validation_steps=tf.math.ceil(num_val_examples / batch_size),
+                      callbacks=[tensorboard_callback])
+#+END_SRC
+
+
+TOO SLOW! Investigate Error below...
+
+
+** exp-200413-test
+*** git
+#+begin_src sh :results verbatim
+git log -1
+#+end_src
+
+#+RESULTS:
+: commit 8cb5705c0a06eb8f25a84f77a222b3736eaf704d
+: Author: Apoplex <oligolex@vivaldi.net>
+: Date:   Sun Apr 12 13:12:16 2020 +0200
+:
+:     Add tests of org-babel and emacs-jupyter
+
+#+begin_src sh :results verbatim
+git status
+#+end_src
+
+#+RESULTS:
+#+begin_example
+Auf Branch exp-200402-test
+Änderungen, die nicht zum Commit vorgemerkt sind:
+  (benutzen Sie "git add <Datei>...", um die Änderungen zum Commit vorzumerken)
+  (benutzen Sie "git restore <Datei>...", um die Änderungen im Arbeitsverzeichnis zu verwerfen)
+  (committen oder verwerfen Sie den unversionierten oder geänderten Inhalt in den Submodulen)
+	geändert:       LabBook.org
+	geändert:       src/fluotracify/simulations/simulate_trace_with_artifact.py
+	geändert:       src/nanosimpy (unversionierter Inhalt)
+
+Unversionierte Dateien:
+  (benutzen Sie "git add <Datei>...", um die Änderungen zum Commit vorzumerken)
+	#LabBook.org#
+	.#LabBook.org
+	.ob-jupyter/
+	LabBook.org~
+	src/fluotracify/applications/#correlate.py#
+
+keine Änderungen zum Commit vorgemerkt (benutzen Sie "git add" und/oder "git commit -a")
+#+end_example
+
+
+
+*** ssh-org, tmux
+    :LOGBOOK:
+    CLOCK: [2020-04-14 Di 14:06]--[2020-04-14 Di 14:21] =>  0:15
+    :END:
+#+BEGIN_SRC sh :session org-ssh :results verbatim
+ssh ara
+#+END_SRC
+
+#+RESULTS:
+: ye53nis@ara-login01.rz.uni-jena.de's password:
+: Last login: Mon Apr 13 17:53:11 2020 from 10.231.178.2
+
+#+BEGIN_SRC sh :session org-ssh :results verbatim
+tmux -V
+tmux ls
+echo
+sinfo
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+tmux 3.0a
+0: 1 windows (created Mon Apr 13 19:54:44 2020)
+
+PARTITION   AVAIL  TIMELIMIT  NODES  STATE NODELIST
+b_test         up    3:00:00      1  alloc node001
+b_standard*    up 8-08:00:00     45    mix node[006-007,009,014,017-019,022,028-034,036-038,041,043,047,051-053,062,064,066,071-072,085-088,092,112,117,119-121,125-126,133-136]
+b_standard*    up 8-08:00:00     86  alloc node[002-005,008,010-013,015-016,020-021,023-027,035,039-040,042,044-046,048-050,054-061,063,065,067-070,073-084,089-091,093-111,113-116,118,122-124,131-132]
+gpu_test       up    1:00:00      1   idle node127
+gpu_p100       up 8-08:00:00      2   idle node[128-129]
+gpu_v100       up 8-08:00:00      1  alloc node130
+b_fat          up 8-08:00:00      3    mix node[137-138,140]
+b_fat          up 8-08:00:00      1  alloc node139
+s_test         up    3:00:00      1  alloc node141
+s_standard     up 8-08:00:00     43    mix node[143,153,159,162,164-165,170-172,174,176,196-197,205-206,208-209,211,213,216,218,229-230,235,253,258-259,261,293-297,299,301,303-306,309-310,314-315]
+s_standard     up 8-08:00:00    107  alloc node[142,144-152,154-158,160-161,163,166-169,173,175,177-195,198-204,207,210,212,214-215,217,219-228,231-234,236-252,254-257,260,262-268,298,300,302,307,311-313,316]
+s_standard     up 8-08:00:00      1   idle node308
+s_fat          up 8-08:00:00      4  alloc node[269-272]
+#+end_example
+
+#+CALL: setup-tmux[:results output]
+
+#+RESULTS:
+:
+: sh-5.0$ ye53nis@ara-login01.rz.uni-jena.de's password:
+: > ye53nis@ara-login01.rz.uni-jena.de's password:
+
+#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
+srun -p s_standard --time=7-10:00:00 --ntasks-per-node 48 --pty bash
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+[ye53nis@login01 ~]$ srun -p s_standard --time=7-10:00:00 --ntasks-per-node 48 --pty bash
+[ye53nis@node308 ~]$
+#+end_example
+
+#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
+module load tools/python/3.7
+export XDG_RUNTIME_DIR=''
+export XDG_RUNTIME_DIR=""
+jupyter notebook --no-browser --port=8889
+#+END_SRC
+
+**** ob-tmux version bug
+To check the output of my tmux session, I have to attach to the session in a
+terminal (output directly to org is not yet supported). I noticed that I can not
+"tmux detach" out because of tmux version issues. On my local machine I've got:
+
+#+BEGIN_SRC sh :session local
+which tmux
+tmux -V
+#+END_SRC
+
+#+RESULTS:
+| /bin/tmux |      |
+| tmux      | 3.0a |
+
+if I ssh system to the HPC via command line:
+
+#+BEGIN_SRC sh :session org-ssh
+which tmux
+tmux -V
+#+END_SRC
+
+#+RESULTS:
+| /usr/local/bin/tmux |      |
+| tmux                | 3.0a |
+
+if I open a tmux session using =ob-tmux=:
+
+#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmuxtest
+echo test
+#+END_SRC
+
+Now, if I open a tmux session using =ob-tmux=, and I do these checks I get:
+
+#+BEGIN_EXAMPLE
+[ye53nis@login01 ~]$ which tmux
+/bin/tmux
+[ye53nis@login01 ~]$ tmux -V
+tmux 1.8
+#+END_EXAMPLE
+
+So I am trying now to set the value of =org-babel-tmux-location= to
+=/usr/local/bin/tmux=.  This did not solve the problem.
+[[https://github.com/ahendriksen/ob-tmux/issues/10][I opened an issue here.]]
+
+**** ob-tmux output feature
+Package maintainer ahendriksen [[https://github.com/ahendriksen/ob-tmux/issues/6#issuecomment-612921097][wrote a script]], which overrides =org-babels= =C-c
+C-o= feature to get output from the tmux session.
+
+Normal =C-c C-0= behaviour:
+
+#+BEGIN_SRC python :results output verbatim
+  import datetime
+
+  print(datetime.date.today())
+#+END_SRC
+
+#+RESULTS:
+: 2020-04-13
+
+Now this is the snippet of ahendriksen:
+
+#+BEGIN_SRC emacs-lisp
+  (defun ob-tmux--insert-result ()
+      (interactive)
+      (let ((info (org-babel-get-src-block-info 'light)))
+        (when (and info (string-equal "tmux" (nth 0 info)))
+          (let* ((params (nth 2 info))
+                 (org-session (cdr (assq :session params)))
+                 (socket (cdr (assq :socket params)))
+                 (socket (when socket (expand-file-name socket)))
+                 (ob-session (ob-tmux--from-org-session org-session socket)))
+            (org-babel-insert-result
+                 (ob-tmux--execute-string ob-session
+                                          "capture-pane" "-p"
+                                          "-t" (ob-tmux--session ob-session))
+                 '("replace"))))))
+
+  (defun ob-tmux--open-src-block-result (orig-fun &rest args)
+    (ob-tmux--insert-result)
+    (apply orig-fun args))
+
+  (advice-add 'org-babel-open-src-block-result
+              :around #'ob-tmux--open-src-block-result)
+#+END_SRC
+
+#+RESULTS:
+
+***** DONE Test on above python Block that it still works
+      CLOSED: [2020-04-13 Mo 20:58]
+***** DONE Test on a tmux block if it works
+      CLOSED: [2020-04-13 Mo 21:37]
+#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmuxtest
+echo test
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+test
+[ye53nis@login01 ~]$ sinfo
+PARTITION   AVAIL  TIMELIMIT  NODES  STATE NODELIST
+b_test         up    3:00:00      1  alloc node001
+b_standard*    up 8-08:00:00     41    mix node[006-007,009,014,017-019,022,028-034,036-038,041,043,047,051-053,062,064,066,071-072,085-086,088,092,112,117,125-126,133-136]
+b_standard*    up 8-08:00:00     90  alloc node[002-005,008,010-013,015-016,020-021,023-027,035,039-040,042,044-046,048-050,054-061,063,065,067-070,073-084,087,089-091,093-111,113-116,1
+18-124,131-132]
+gpu_test       up    1:00:00      1   idle node127
+gpu_p100       up 8-08:00:00      2   idle node[128-129]
+gpu_v100       up 8-08:00:00      1  alloc node130
+b_fat          up 8-08:00:00      3    mix node[137-138,140]
+b_fat          up 8-08:00:00      1  alloc node139
+s_test         up    3:00:00      1  alloc node141
+s_standard     up 8-08:00:00     42    mix node[143,153,159,162,164-165,170-171,174,176,196-197,205-206,208-209,211,213,216,218,229,235,253,258-259,261,293-297,299,301,303-306,308-310,3
+14-315]
+s_standard     up 8-08:00:00    107  alloc node[142,144-152,154-158,160-161,163,166-169,173,175,177-195,198-204,207,210,212,214-215,217,219-228,231-234,236-252,254-257,260,262-268,298,3
+00,302,307,311-313,316]
+s_standard     up 8-08:00:00      2   idle node[172,230]
+s_fat          up 8-08:00:00      4  alloc node[269-272]
+[ye53nis@login01 ~]$ echo test
+test
+[ye53nis@login01 ~]$ echo test
+test
+[ye53nis@login01 ~]$ echo test
+test
+[ye53nis@login01 ~]$ echo test
+test
+[ye53nis@login01 ~]$
+[ye53nis@login01 ~]$ echo test
+test
+[ye53nis@login01 ~]$
+[ye53nis@login01 ~]$
+#+end_example
+**** ob-tmux :var feature
+I opened another issue about having a =:var= feature in ob-tmux
+#+BEGIN_SRC sh :var x="8889"
+echo $x
+#+END_SRC
+
+#+RESULTS:
+: 8889
+*** jupyter session
+    :PROPERTIES:
+    :header-args:jupyter-python: :session /jpy:localhost#8889:cbb188b7-94ad-400c-9716-0987429a4b71
+    :END:
+    :LOGBOOK:
+    CLOCK: [2020-04-16 Do 14:05]--[2020-04-16 Do 15:08] =>  1:03
+    CLOCK: [2020-04-16 Do 12:49]--[2020-04-16 Do 13:48] =>  0:59
+    CLOCK: [2020-04-16 Do 12:22]--[2020-04-16 Do 12:35] =>  0:13
+    CLOCK: [2020-04-15 Mi 14:09]--[2020-04-15 Mi 14:14] =>  0:05
+    CLOCK: [2020-04-15 Mi 12:23]--[2020-04-15 Mi 12:37] =>  0:14
+    CLOCK: [2020-04-14 Di 15:43]--[2020-04-14 Di 18:59] =>  3:16
+    CLOCK: [2020-04-14 Di 15:23]--[2020-04-14 Di 15:43] =>  0:20
+    :END:
+
+#+CALL: jpt-tunnel(port="8889", node="node308")
+
+#+RESULTS:
+|                   |                                      |           |     |    |          |      |      |             |
+| sh-5.0$           | ye53nis@ara-login01.rz.uni-jena.de's | password: |     |    |          |      |      |             |
+| ye53nis@node308's | password:                            |           |     |    |          |      |      |             |
+| Last              | login:                               | Wed       | Apr | 15 | 12:25:25 | 2020 | from | login01.ara |
+
+**** jupyter-python-metadata
+#+CALL: jupyter-python-metadata[:cache no]
+
+#+RESULTS:
+#+BEGIN_EXAMPLE
+No of CPUs in system: 72
+No of CPUs the current process can use: 48
+load average: (0.0, 0.01, 0.05)
+posix.uname_result(sysname='Linux', nodename='node308', release='3.10.0-957.1.3.el7.x86_64', version='#1 SMP Thu Nov 29 14:49:43 UTC 2018', machine='x86_64')
+PID of process: 434265
+RAM total: 199G, RAM used: 2.2G, RAM free: 186G
+the current directory: /home/ye53nis
+My disk usage:
+Filesystem         Size  Used Avail Use% Mounted on
+/dev/sda1           50G  3.2G   47G   7% /
+devtmpfs            94G     0   94G   0% /dev
+tmpfs               94G  793M   94G   1% /dev/shm
+tmpfs               94G   43M   94G   1% /run
+tmpfs               94G     0   94G   0% /sys/fs/cgroup
+nfs01-ib:/cluster  2.0T  313G  1.7T  16% /cluster
+nfs01-ib:/home      80T   58T   23T  72% /home
+/dev/sda6          169G  3.2G  166G   2% /local
+/dev/sda5          2.0G   34M  2.0G   2% /tmp
+/dev/sda3          6.0G  408M  5.6G   7% /var
+beegfs_nodev       524T  415T  110T  80% /beegfs
+tmpfs               19G     0   19G   0% /run/user/0
+nfs03:/pool/work   100T   77T   24T  77% /nfsdata
+tmpfs               19G     0   19G   0% /run/user/67339
+# packages in environment at /cluster/miniconda3:
+#
+# Name                    Version                   Build  Channel
+_tflow_select             2.3.0                       mkl
+absl-py                   0.7.1                    py37_0
+alembic                   1.4.1                    pypi_0    pypi
+asn1crypto                0.24.0                   py37_0
+asteval                   0.9.14             pyh24bf2e0_0    conda-forge
+astor                     0.7.1                    py37_0
+astropy                   4.0                      pypi_0    pypi
+attrs                     19.1.0                   pypi_0    pypi
+backcall                  0.1.0                    pypi_0    pypi
+bcftools                  1.9                  ha228f0b_4    bioconda
+bedtools                  2.28.0               hdf88d34_0    bioconda
+blas                      1.0                         mkl
+bleach                    3.1.0                    pypi_0    pypi
+bzip2                     1.0.6                h14c3975_5
+c-ares                    1.15.0               h7b6447c_1
+ca-certificates           2019.5.15                     0
+cachetools                4.0.0                    pypi_0    pypi
+certifi                   2019.3.9                 py37_0
+cffi                      1.12.2           py37h2e261b9_1
+chardet                   3.0.4                    py37_1
+click                     7.0                      pypi_0    pypi
+cloudpickle               1.3.0                    pypi_0    pypi
+conda                     4.6.14                   py37_0
+configparse               0.1.5                    pypi_0    pypi
+configparser              4.0.2                    pypi_0    pypi
+corner                    2.0.1                    pypi_0    pypi
+cpnest                    0.9.9                    pypi_0    pypi
+cryptography              2.6.1            py37h1ba5d50_0
+curl                      7.64.1               hbc83047_0
+cycler                    0.10.0                   py37_0
+cython                    0.29.14                  pypi_0    pypi
+data                      0.4                      pypi_0    pypi
+databricks-cli            0.9.1                    pypi_0    pypi
+dbus                      1.13.6               h746ee38_0
+decorator                 4.4.0                    pypi_0    pypi
+defusedxml                0.6.0                    pypi_0    pypi
+docker                    4.2.0                    pypi_0    pypi
+entrypoints               0.3                      pypi_0    pypi
+expat                     2.2.6                he6710b0_0
+flask                     1.1.1                    pypi_0    pypi
+fontconfig                2.13.0               h9420a91_0
+freetype                  2.9.1                h8a8886c_1
+funcsigs                  1.0.2                    pypi_0    pypi
+future                    0.17.1                   py37_0
+gast                      0.2.2                    py37_0
+gitdb                     4.0.2                    pypi_0    pypi
+gitpython                 3.1.0                    pypi_0    pypi
+glib                      2.56.2               hd408876_0
+google-auth               1.11.2                   pypi_0    pypi
+google-auth-oauthlib      0.4.1                    pypi_0    pypi
+google-pasta              0.1.8                    pypi_0    pypi
+gorilla                   0.3.0                    pypi_0    pypi
+grpcio                    1.27.2                   pypi_0    pypi
+gst-plugins-base          1.14.0               hbbd80ab_1
+gstreamer                 1.14.0               hb453b48_1
+gunicorn                  20.0.4                   pypi_0    pypi
+h5py                      2.9.0            py37h7918eee_0
+hdf5                      1.10.4               hb1b8bf9_0
+htseq                     0.11.2           py37h637b7d7_1    bioconda
+htslib                    1.9                  ha228f0b_7    bioconda
+icu                       58.2                 h9c2bf20_1
+idna                      2.8                      py37_0
+intel-openmp              2019.3                      199
+ipykernel                 5.1.1                    pypi_0    pypi
+ipython                   7.5.0                    pypi_0    pypi
+ipython-genutils          0.2.0                    pypi_0    pypi
+ipywidgets                7.4.2                    pypi_0    pypi
+itsdangerous              1.1.0                    pypi_0    pypi
+jedi                      0.13.3                   pypi_0    pypi
+jinja2                    2.10.1                   pypi_0    pypi
+joblib                    0.13.2                   py37_0
+jpeg                      9b                   h024ee3a_2
+jsonschema                3.0.1                    pypi_0    pypi
+jupyter                   1.0.0                    pypi_0    pypi
+jupyter-client            5.2.4                    pypi_0    pypi
+jupyter-console           6.0.0                    pypi_0    pypi
+jupyter-core              4.4.0                    pypi_0    pypi
+keras-applications        1.0.8                    pypi_0    pypi
+keras-preprocessing       1.1.0                    pypi_0    pypi
+kiwisolver                1.1.0            py37he6710b0_0
+krb5                      1.16.1               h173b8e3_7
+last                      874                  hdbcaa40_2    bioconda
+latex                     0.7.0                    pypi_0    pypi
+libcurl                   7.64.1               h20c2e04_0
+libdeflate                1.0                  h14c3975_1    bioconda
+libedit                   3.1.20181209         hc058e9b_0
+libffi                    3.2.1                hd88cf55_4
+libgcc-ng                 8.2.0                hdf63c60_1
+libgfortran-ng            7.3.0                hdf63c60_0
+libpng                    1.6.37               hbc83047_0
+libprotobuf               3.7.1                hd408876_0
+libssh2                   1.8.2                h1ba5d50_0
+libstdcxx-ng              8.2.0                hdf63c60_1
+libuuid                   1.0.3                h1bed415_2
+libxcb                    1.13                 h1bed415_1
+libxml2                   2.9.9                he19cac6_0
+lmfit                     0.9.13             pyh24bf2e0_0    conda-forge
+mako                      1.1.2                    pypi_0    pypi
+markdown                  3.1                      py37_0
+markupsafe                1.1.1                    pypi_0    pypi
+matplotlib                3.0.3            py37h5429711_0
+minimap2                  2.17                 h84994c4_0    bioconda
+mistune                   0.8.4                    pypi_0    pypi
+mkl                       2019.3                      199
+mkl_fft                   1.0.12           py37ha843d7b_0
+mkl_random                1.0.2            py37hd81dba3_0
+mlflow                    1.7.0                    pypi_0    pypi
+mock                      2.0.0                    py37_0
+mpi4py                    3.0.3                    pypi_0    pypi
+multipletau               0.3.3                    pypi_0    pypi
+nanosim                   2.2.0                      py_0    bioconda
+nbconvert                 5.5.0                    pypi_0    pypi
+nbformat                  4.4.0                    pypi_0    pypi
+ncurses                   6.1                  he6710b0_1
+notebook                  5.7.8                    pypi_0    pypi
+numpy                     1.16.3           py37h7e9f1db_0
+numpy-base                1.16.3           py37hde5b4d6_0
+oauthlib                  3.1.0                    pypi_0    pypi
+openssl                   1.1.1c               h7b6447c_1
+opt-einsum                3.2.0                    pypi_0    pypi
+pandas                    0.24.2           py37he6710b0_0
+pandocfilters             1.4.2                    pypi_0    pypi
+parso                     0.4.0                    pypi_0    pypi
+pbr                       5.1.3                      py_0
+pcre                      8.43                 he6710b0_0
+pexpect                   4.7.0                    pypi_0    pypi
+pickleshare               0.7.5                    pypi_0    pypi
+pip                       19.0.3                   py37_0
+prometheus-client         0.7.0                    pypi_0    pypi
+prometheus-flask-exporter 0.13.0                   pypi_0    pypi
+prompt-toolkit            2.0.9                    pypi_0    pypi
+protobuf                  3.11.3                   pypi_0    pypi
+ptemcee                   1.0.0                    pypi_0    pypi
+ptyprocess                0.6.0                    pypi_0    pypi
+pyasn1                    0.4.8                    pypi_0    pypi
+pyasn1-modules            0.2.8                    pypi_0    pypi
+pybedtools                0.8.0            py37he860b03_1    bioconda
+pycosat                   0.6.3            py37h14c3975_0
+pycparser                 2.19                     py37_0
+pydot                     1.4.1                    pypi_0    pypi
+pygments                  2.4.2                    pypi_0    pypi
+pyopenssl                 19.0.0                   py37_0
+pyparsing                 2.4.0                      py_0
+pyqt                      5.9.2            py37h05f1152_2
+pyrsistent                0.15.2                   pypi_0    pypi
+pysam                     0.15.2           py37h4b7d16d_3    bioconda
+pysocks                   1.6.8                    py37_0
+pystan                    2.19.1.2dev              pypi_0    pypi
+python                    3.7.3                h0371630_0
+python-dateutil           2.8.0                    py37_0
+python-editor             1.0.4                    pypi_0    pypi
+python-graphviz           0.13.2                   pypi_0    pypi
+pytz                      2019.1                     py_0
+pyyaml                    5.3                      pypi_0    pypi
+pyzmq                     18.0.1                   pypi_0    pypi
+qt                        5.9.7                h5867ecd_1
+qtconsole                 4.5.1                    pypi_0    pypi
+querystring-parser        1.2.4                    pypi_0    pypi
+readline                  7.0                  h7b6447c_5
+requests                  2.21.0                   py37_0
+requests-oauthlib         1.3.0                    pypi_0    pypi
+rsa                       4.0                      pypi_0    pypi
+ruamel_yaml               0.15.46          py37h14c3975_0
+samtools                  1.9                 h8571acd_11    bioconda
+scikit-learn              0.21.1           py37hd81dba3_0
+scipy                     1.4.1                    pypi_0    pypi
+seaborn                   0.9.0                    pypi_0    pypi
+send2trash                1.5.0                    pypi_0    pypi
+setuptools                41.0.0                   py37_0
+shutilwhich               1.1.0                    pypi_0    pypi
+simplejson                3.17.0                   pypi_0    pypi
+sip                       4.19.8           py37hf484d3e_0
+six                       1.12.0                   py37_0
+smmap                     3.0.1                    pypi_0    pypi
+sqlalchemy                1.3.13                   pypi_0    pypi
+sqlite                    3.27.2               h7b6447c_0
+sqlparse                  0.3.1                    pypi_0    pypi
+tabulate                  0.8.6                    pypi_0    pypi
+tempdir                   0.7.1                    pypi_0    pypi
+tensorboard               2.1.1                    pypi_0    pypi
+tensorflow                2.1.0                    pypi_0    pypi
+tensorflow-estimator      2.1.0                    pypi_0    pypi
+termcolor                 1.1.0                    py37_1
+terminado                 0.8.2                    pypi_0    pypi
+testpath                  0.4.2                    pypi_0    pypi
+tifffile                  0.15.1          py37h3010b51_1001    conda-forge
+tk                        8.6.8                hbc83047_0
+tornado                   6.0.2            py37h7b6447c_0
+tqdm                      4.43.0                   pypi_0    pypi
+traitlets                 4.3.2                    pypi_0    pypi
+uncertainties             3.1.1                    py37_0    conda-forge
+urllib3                   1.24.1                   py37_0
+wcwidth                   0.1.7                    pypi_0    pypi
+webencodings              0.5.1                    pypi_0    pypi
+websocket-client          0.57.0                   pypi_0    pypi
+werkzeug                  0.15.2                     py_0
+wheel                     0.33.1                   py37_0
+widgetsnbextension        3.4.2                    pypi_0    pypi
+wrapt                     1.12.1                   pypi_0    pypi
+xz                        5.2.4                h14c3975_4
+yaml                      0.1.7                had09818_2
+zlib                      1.2.11               h7b6447c_3
+#+END_EXAMPLE
+**** set output folder for jupyter-python to =data/exp-tests=
+According to the git and org-mode based worflow for reproducible research
+proposed by Stanisic et al files which are created in an experimental branch are
+kept in a folder with the same name. The first kind of files we save are plots
+from jupyter. We can customize the output folder using the following variable:
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-babel-jupyter-resource-directory "./data/exp-test/figures-jupyter")
+#+END_SRC
+
+#+RESULTS:
+: ./data/exp-test/figures-jupyter
+
+The =helpful-variable= command tells us, that changing the variable was
+successful. Probably this has to be done in every session. Now a test regarding
+if the output is really saved to this directory.
+
+#+BEGIN_SRC jupyter-python
+  import numpy as np
+  import matplotlib.pyplot as plt
+
+  x = np.arange(0, 2*np.pi, 0.1)
+  y = np.sin(x)
+
+  plt.plot(x, y)
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+| <matplotlib.lines.Line2D | at | 0x2b98f389f898> |
+[[file:./data/exp-test/figures-jupyter/b27af3a4fe8d17b3bc705c31dd4c7cca7330878a.png]]
+:END:
+
+works!
+**** TODO Set up mlflow for reproducible ml experiments
+     :LOGBOOK:
+     CLOCK: [2020-04-17 Fr 15:42]--[2020-04-17 Fr 18:30] =>  2:48
+     CLOCK: [2020-04-16 Do 20:43]--[2020-04-16 Do 21:07] =>  0:24
+     CLOCK: [2020-04-16 Do 15:52]--[2020-04-16 Do 17:02] =>  1:10
+     CLOCK: [2020-04-16 Do 15:34]--[2020-04-16 Do 15:45] =>  0:11
+     :END:
+***** Reading the docs
+- searched for papers, found [[http://sites.computer.org/debull/A18dec/A18DEC-CD.pdf#page=41][two]] [[https://mlsys.org/Conferences/2019/doc/2019/demo_33.pdf][papers]], but they don't seem very exhaustive.
+- took notes [[file:~/Dokumente/org/04_Digital-und-Technik/programmieren.org::*<2020-04-16%20Do%2012:57>%20=mlflow=][here]]
+- shall I keep MLflow files in a folder inside the =data/exp#= folder for each
+  experiment or do a central =data/mlflow= folder? → I tend towards the second
+  option. MLflow has an environment variable =MLFLOW_EXPERIMENT_NAME= which
+  would be the same as =exp#=.
+- Inside the folder, should I use "normal" files or a database for saving stuff?
+  → I tend towards normal files, since I have no experiments with databases..
+- MLflow Tracking Service API might be useful for accessing the results from
+  inside org documents.
+
+***** Reading Barredo Arrieta et al: Explainable Artificial Intelligence (XIA)
+
+
+
+**** TODO Investigate Error on GPU node
+- 2020-04-13 02:45:28.216446: W
+  tensorflow/stream_executor/platform/default/dso_loader.cc:55] Could not load
+  dynamic library 'libnvinfer.so.6'; dlerror: libnvinfer.so.6: cannot open
+  shared object file: No such file or directory; LD_LIBRARY_PATH:
+  /cluster/miniconda3/lib
+- 2020-04-13 02:45:28.217069: W
+  tensorflow/stream_executor/platform/default/dso_loader.cc:55] Could not load
+  dynamic library 'libnvinfer_plugin.so.6'; dlerror: libnvinfer_plugin.so.6:
+  cannot open shared object file: No such file or directory; LD_LIBRARY_PATH:
+  /cluster/miniconda3/lib
+- 2020-04-13 02:45:28.217123: W
+  tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:30] Cannot dlopen some
+  TensorRT libraries. If you would like to use Nvidia GPU with TensorRT, please
+  make sure the missing libraries mentioned above are installed properly
+**** TODO Export pandas DataFrames as org tables instead of html
+- see https://github.com/dzop/emacs-jupyter/issues/88
+- see
+  https://github.com/gregsexton/ob-ipython/blob/7147455230841744fb5b95dcbe03320313a77124/README.org#tips-and-tricks
+**** TODO Inline-display of plots
+**** TODO fix pydot and graphviz to make model plotting work
+**** TODO transform ML training ipynb to py files as used [[https://github.com/mlflow/mlflow/blob/master/examples/tensorflow/tf2/train_predict_2.py][here]]
+**** TODO check out python module =argparser= as used [[https://github.com/mlflow/mlflow/blob/master/examples/tensorflow/tf2/train_predict_2.py][here]]
+**** TODO check out Talos 1.0 with MLflow for Hyperparameter optimization
+*** TODO Take a look into =org-ref= for reference management and citing inside this labbook
+*** TODO [#A] Further setup of git branching model
+*** TODO [#C] Set up Dropbox or git annex
