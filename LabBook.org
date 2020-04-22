@@ -29,7 +29,9 @@
    7) Merge this new branch with the remote "data" branch
 ** Example for experimental setup procedure
 *** Setting up a tmux connection from using =ob-tmux= in =org babel=
-
+    :PROPERTIES:
+    :CUSTOM_ID: sec-tmux-setup
+    :END:
 - prerequisite: tmux versions need to be the same locally and on the server.
   Let's verify that now.
   - the local tmux version:
@@ -95,6 +97,10 @@ ssh ara -tfN \
 : ob-tmux-get-output
 
 *** Setting starting a jupyter kernel from a remote jupyter session using =emacs-jupyter= in =org babel=
+    :PROPERTIES:
+    :CUSTOM_ID: sec-jupyter-setup
+    :END:
+
 1. =M-x jupyter-server-list-kernels=
    1. set server URL, e.g. =http://localhost:8889=
    2. set websocket URL, e.g. =http://localhost:8889=
@@ -136,6 +142,9 @@ git log -1
 #+END_SRC
 **** TODO Add =os.environ=
 *** Tmux setup and scripts
+    :PROPERTIES:
+    :CUSTOM_ID: scripts-tmux
+    :END:
 #+NAME: setup-tmux
 #+BEGIN_SRC sh :session local
 rm ~/.tmux-local-socket-remote-machine
@@ -351,6 +360,7 @@ git log -1
 |         |                                          |                        |    |          |      |       |
 | Add     | LabBook.org                              |                        |    |          |      |       |
 |         |                                          |                        |    |          |      |       |
+
 *** DONE Experimentation diary
     CLOSED: [2020-03-30 Mo 21:50]
     :LOGBOOK:
@@ -430,99 +440,6 @@ git log -1
      CLOCK: [2020-03-31 Di 13:15]--[2020-03-31 Di 13:31] =>  0:16
      CLOCK: [2020-03-31 Di 12:59]--[2020-03-31 Di 13:02] =>  0:03
      :END:
-***** Learning =org-babel=
-- https://orgmode.org/manual/Results-of-Evaluation.html (ff) best explanation of
-  header arguments. Collection > Type > Format > Handling are classes for
-  =:results=
-  + Collection:
-    * =value= (default), wraps code in function, for python to output something
-      you need a return statement
-    * =output=: scripting mode
-  + Type:
-    * =table=, =vector=, =list=
-    * =verbatim=, puts results in a =#+begin_example=- Block
-    * =file=, can save output e.g. as pdf with =:results value file :file
-      circle.pdf=
-  + Format:
-    * =code=, =drawer=, =html= (begin_export html), =latex= (begin_export
-      latex)
-    * =link=, =graphics= include link to file on disk, if used with =file= type
-    * =org=, =raw=
-    * =pp=, pretty printed source code enclosed in a code block. Python is
-      supported!
-  + Handling
-    * =silent=, do not insert results in the org mode buffer, but echo in the
-      minibuffer
-    * =replace= (default), insert results in org buffer, remove previous results
-    * =append= / =prepend=, append results to org buffer, latest results at
-      bottom / top
-- =:var= can be used to hand a variable to the block
-- =:wrap= can be used for custom export blocks, everything given is appended to
-  the =#+BEGIN= and =#+END= block of the results  (and overrides the results
-  values). E.g. =:wrap EXPORT markdown= results in =#+BEGIN_EXPORT markdown=
-- =:post=
-- =:session=
-  + =none= (default no :session argument), each code block gets new interpreter
-    process
-  + any STRING, so that code blocks share the same environment (are run in same
-  interpreter process).
-  + plain =:session=, session name derived from source language
-- =:dir= for choosing working directory. things like =:dir ~/work= works.
-  setting =:mkdirp yes= (non-nil) creates
-  the directory, if it is not there yet
-  + (default) - current directory is used
-  + Tramp syntax works for remote code execution, e.g. =:file plot.png :dir
-    /scp:dand@yakuba.princeton.edu:= captures text for insertion in org file,
-    and inserts a link to the remote file thanks to Emacs Tramp
-  + when using =dir= with =session=, the starting dir is only set for this
-    session, not for others
-  + do not use =dir= with =:exports results= or =:exports both= to avoid org
-    inserting incorrect links
-- =:cache= if set to yes, the results are not re-evaluated if nothing changed
-  since the previous run.
-  + Suitable fo functions that only rely on input arguments (not timer, file
-    system objects, random number generators, ...).
-  + don't mix =session= and =cache=
-- =:exports= which part of code block to export (=code=, =results=, =both=,
-  =none=)
-- =:tangle=, essential for *source code extraction in literate programming*.
-  Documents on creation are /woven/ with code and documentation. on export, code
-  is /tangled/ for execution by a computer. This document for example by
-  execution would be recomposed into one or more separate files, while variables
-  will be expanded, references resolved etc
-  + =no= (default), do not extract code in a source code file
-  + =yes=, export code block to source file. file name derived from name of org
-    file, file extension derived from source code language id
-  + =:tangle FILENAME= export to source file with FILENAME. =:mkdirp yes= creates
-    parent directories
-  + =:comments= (default: =no=)
-    * =link= (formerly: =yes=), wrap the code block in comments, include links
-      pointing back to the place in the org file from where the code was tangled
-    * =org=, nearest headline text from Org file is inserted as comment
-    * =both=, both =link= and =org=
-    * =noweb=, includes =link= plus expands Noweb references and wraps them in
-      link comments inside the body of the code block
-  + =:shebang= (e.g. =shebang "#!/bin/bash=) turns results into executable
-    script files by first inserting string as the first line of tangled file +
-    turn on file's executable permission
-  + =:tangle-mode= can set permissions (overrides shebang)
-    * =:tangle-mode (identity #o444)= makes read-only
-    * =:tangle-mode (identity #o755)= makes executable
-  + =:no-expand= no code block expansion during tangling (no effect for normal
-    source block execution)
-- =:noweb= (default: =no=)
-  + =yes=, expansion of Noweb syntax references like =<< CODE-BLOCK-ID >>= when
-    evaluating, tangling, or exporting.
-  + =tangle= only when tangling, =no-export= when evaluating or tangling
-  + =strip-export=, =eval=
-  + =:noweb-ref NAME= concatenates the block to a noweb block with NAME. Can
-    also be set in a =:PROPERTY:= drawer at the sub-tree or file level.
-  + =:noweb-sep= changes the separator between each noweb reference
-    concatenation (Default: newline)
-  + =<< code-block-name(optional arguments) >>= includes the results of a code
-    block rather than its body! Note that the code block needs a NAME keyword
-    (like =#+NAME: code-block-name=).
-
 ***** emacs commands for =org-babel=
 - =C-c '= to edit current code block in new major mode edit buffer containing
   the body of the source code block, use =C-c '= again to close buffer and
@@ -590,6 +507,7 @@ git log -1
 : Date:   Thu Apr 2 12:03:48 2020 +0200
 :
 :     First experiments org mode + git literate program
+
 *** Technical and conceptional setup
      :LOGBOOK:
      CLOCK: [2020-04-02 Do 13:08]--[2020-04-02 Do 13:38] =>  0:30
@@ -610,93 +528,92 @@ git log -1
      :END:
 1. connect to FSU VPN (still via normal terminal)
 2. connect to ara via ssh and check if a tmux session exists
-#+BEGIN_SRC sh :results output :dir :dir /ssh:ye53nis@ara-login01.rz.uni-jena.de:/home/ye53nis/ :session new-test
-  echo $PWD
-  echo $HOSTNAME
-#+END_SRC
+   #+BEGIN_SRC sh :results output :dir :dir /ssh:ye53nis@ara-login01.rz.uni-jena.de:/home/ye53nis/ :session new-test
+     echo $PWD
+     echo $HOSTNAME
+   #+END_SRC
 
-#+RESULTS:
-:
-: $ /home/ye53nis
-: $ login01
+   #+RESULTS:
+   :
+   : $ /home/ye53nis
+   : $ login01
 
-#+BEGIN_SRC sh :results output :session new-test
-  tmux -V
-  tmux ls
-echo $HOSTNAME
-#+END_SRC
+   #+BEGIN_SRC sh :results output :session new-test
+     tmux -V
+     tmux ls
+   echo $HOSTNAME
+   #+END_SRC
 
-#+RESULTS:
-: tmux 1.8
-: $ protocol version mismatch (client 7, server 8)
-: $ login01
+   #+RESULTS:
+   : tmux 1.8
+   : $ protocol version mismatch (client 7, server 8)
+   : $ login01
 
-#+BEGIN_SRC sh :results output :session april-8
-  tmux attach new -d
-#+END_SRC
+   #+BEGIN_SRC sh :results output :session april-8
+     tmux attach new -d
+   #+END_SRC
 
-#+RESULTS:
-: no server running on /tmp/tmux-1000/default
+   #+RESULTS:
+   : no server running on /tmp/tmux-1000/default
 
-#+BEGIN_SRC sh :results output :session april-8
-  tmux -V
-  tmux ls
-#+END_SRC
+   #+BEGIN_SRC sh :results output :session april-8
+     tmux -V
+     tmux ls
+   #+END_SRC
 
-#+RESULTS:
-: tmux 3.0a
-: no server running on /tmp/tmux-1000/default
+   #+RESULTS:
+   : tmux 3.0a
+   : no server running on /tmp/tmux-1000/default
 
-#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session
-echo $PWD
-#+END_SRC
-2. connect to ara via ssh and start a tmux session (So that my programs on ara
+   #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session
+   echo $PWD
+   #+END_SRC
+
+3. connect to ara via ssh and start a tmux session (So that my programs on ara
    can be run even if I am not connected)
 
-#+BEGIN_SRC sh :results silent :session ara
-ssh ye53nis@ara-login01.rz.uni-jena.de -t tmux new -d
-#+END_SRC
-ssh <remote host> -t /path/to/tmux a -t <my-session-name>
-- hurray, we created a new tmux out of this org file! lets check:
+   #+BEGIN_SRC sh :results silent :session ara
+   ssh ye53nis@ara-login01.rz.uni-jena.de -t tmux new -d
+   #+END_SRC
 
-#+BEGIN_SRC sh :results output :session tmux-setup
-echo $PWD
-echo $HOSTNAME
-tmux ls
-tmux attach -S /tmp/tmux-67339/ attach -s 2
-#+END_SRC
+   - hurray, we created a new tmux out of this org file! lets check:
 
-#+RESULTS:
-:
-: /home/lex/Programme/drmed-git
-: Topialex
-: error connecting to /tmp/tmux-1000/default (No such file or directory)
-: tmux: unknown option -- S
-: error connecting to /tmp/tmux-1000/default (No such file or directory)
+     #+BEGIN_SRC sh :results output :session tmux-setup
+     echo $PWD
+     echo $HOSTNAME
+     tmux ls
+     tmux attach -S /tmp/tmux-67339/ attach -s 2
+     #+END_SRC
 
-- now lets see if we can connect this tmux session to our local machine
+     #+RESULTS:
+     :
+     : /home/lex/Programme/drmed-git
+     : Topialex
+     : error connecting to /tmp/tmux-1000/default (No such file or directory)
+     : tmux: unknown option -- S
+     : error connecting to /tmp/tmux-1000/default (No such file or directory)
 
-#+BEGIN_SRC sh :results silent :session ara
-REMOTE_SOCKET=$(ssh ye53nis@ara-login01.rz.uni-jena.de 'tmux list-sessions /tmp/tmux-67339/default' | head -1)
-echo $REMOTE_SOCKET
-#+END_SRC
+   - now lets see if we can connect this tmux session to our local machine
 
-#+RESULTS:
-: ye53nis@ara-login01.rz.uni-jena.de's password:
-: sh-5.0$
+     #+BEGIN_SRC sh :results silent :session ara
+     REMOTE_SOCKET=$(ssh ye53nis@ara-login01.rz.uni-jena.de 'tmux list-sessions /tmp/tmux-67339/default' | head -1)
+     echo $REMOTE_SOCKET
+     #+END_SRC
 
-#+BEGIN_SRC sh :results output :session ara
-echo $REMOTE_SOCKET
-#+END_SRC
+     #+RESULTS:
+     : ye53nis@ara-login01.rz.uni-jena.de's password:
+     : sh-5.0$
 
-#+RESULTS:
+     #+BEGIN_SRC sh :results output :session ara
+     echo $REMOTE_SOCKET
+     #+END_SRC
 
-3. use ob-tmux to connect to the tmux session
+     #+RESULTS:
+
+4. use ob-tmux to connect to the tmux session
 
 #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session hello
 echo test
-
-
 #+END_SRC
 
 
@@ -717,17 +634,10 @@ echo hello world in new-window
 - trying out other connection with server
 
 #+BEGIN_SRC sh :results output :dir :dir /ssh:ye53nis@ara-login01.rz.uni-jena.de:/home/ye53nis/ :session new-test
-
- :dir
-    /scp:dand@yakuba.princeton.edu:=
-
-#+BEGIN_SRC sh :results output :dir /scp:ye53nis@ara-login01.rz.uni-jena.de:/home/ye53nis
 echo hello
 #+END_SRC
 
 #+RESULTS:
-: sh: :dir: command not found
-: $ sh: /scp:dand@yakuba.princeton.edu:=: No such file or directory
 : $ /ssh:ye53nis@ara-login01.rz.uni-jena.de:/home/ye53nis/ #$ /ssh:ye53nis@ara-login01.rz.uni-jena.de:/home/ye53nis/ #$ hello
 
 ***** useful notes on the way
@@ -756,6 +666,7 @@ git log -1
 : Date:   Fri Apr 3 01:07:16 2020 +0200
 :
 :     ssh and tmux
+
 *** Technical and conceptional setup
 **** Connect to jupyter kernels via =org-babel=
      :LOGBOOK:
@@ -765,50 +676,50 @@ git log -1
 
 1. Locally start a jupyter-python session, executed asynchro
 
-#+BEGIN_SRC jupyter-python :session py :kernel python3
-x = 'foo'
-y = 'bar'
-x + ' ' + y
-#+END_SRC
+   #+BEGIN_SRC jupyter-python :session py :kernel python3
+   x = 'foo'
+   y = 'bar'
+   x + ' ' + y
+   #+END_SRC
 
-#+RESULTS:
-: foo bar
+   #+RESULTS:
+   : foo bar
 
 2. Connecting to an existing kernel
 
-#+BEGIN_SRC jupyter-python :session /home/lex/.local/share/jupyter/runtime/kernel-82cf194f-94c9-4323-b26e-d8c596e8f818.json :kernel python3
-x = 'foo'
-y = 'bar'
-x + ' ' + y
-#+END_SRC
+   #+BEGIN_SRC jupyter-python :session /home/lex/.local/share/jupyter/runtime/kernel-82cf194f-94c9-4323-b26e-d8c596e8f818.json :kernel python3
+   x = 'foo'
+   y = 'bar'
+   x + ' ' + y
+   #+END_SRC
 
-#+RESULTS:
-: foo bar
+   #+RESULTS:
+   : foo bar
 
-1. Connecting to an existing kernel on the ara HPC
+3. Connecting to an existing kernel on the ara HPC
    1. =sudo openconnect vpn.uni-jena.de=
    2. connect to tmux session or create new one on login node
    3.
 
-#+BEGIN_SRC jupyter-python :session /jpy:localhost#8889 :kernel python3
-x = 'foo'
-y = 'bar'
-x + ' ' + y
-#+END_SRC
+   #+BEGIN_SRC jupyter-python :session /jpy:localhost#8889 :kernel python3
+   x = 'foo'
+   y = 'bar'
+   x + ' ' + y
+   #+END_SRC
 
-#+RESULTS:
-: foo bar
+   #+RESULTS:
+   : foo bar
 
-#+BEGIN_SRC jupyter-python :session /jpy:localhost#8889 :kernel python3 :output verbatim
-  import sys
+   #+BEGIN_SRC jupyter-python :session /jpy:localhost#8889 :kernel python3 :output verbatim
+     import sys
 
-print(sys.platform)
-print(sys.path)
-#+END_SRC
+   print(sys.platform)
+   print(sys.path)
+   #+END_SRC
 
-#+RESULTS:
-: linux
-: ['/home/lex/Programme/drmed-git', '/home/lex/Programme/miniconda3/envs/tensorflow_env/lib/python37.zip', '/home/lex/Programme/miniconda3/envs/tensorflow_env/lib/python3.7', '/home/lex/Programme/miniconda3/envs/tensorflow_env/lib/python3.7/lib-dynload', '', '/home/lex/Programme/miniconda3/envs/tensorflow_env/lib/python3.7/site-packages', '/home/lex/Programme/miniconda3/envs/tensorflow_env/lib/python3.7/site-packages/IPython/extensions', '/home/lex/.ipython']
+   #+RESULTS:
+   : linux
+   : ['/home/lex/Programme/drmed-git', '/home/lex/Programme/miniconda3/envs/tensorflow_env/lib/python37.zip', '/home/lex/Programme/miniconda3/envs/tensorflow_env/lib/python3.7', '/home/lex/Programme/miniconda3/envs/tensorflow_env/lib/python3.7/lib-dynload', '', '/home/lex/Programme/miniconda3/envs/tensorflow_env/lib/python3.7/site-packages', '/home/lex/Programme/miniconda3/envs/tensorflow_env/lib/python3.7/site-packages/IPython/extensions', '/home/lex/.ipython']
 
 It seems we are now on our local environment...
 
@@ -1071,6 +982,7 @@ xz                        5.2.4                h14c3975_4
 yaml                      0.1.7                had09818_2
 zlib                      1.2.11               h7b6447c_3
 #+END_EXAMPLE
+
 ** exp-200412-test
 *** git
 #+begin_src sh :results verbatim
@@ -1083,6 +995,7 @@ git log -1
 : Date:   Sun Apr 12 13:12:16 2020 +0200
 :
 :     Add tests of org-babel and emacs-jupyter
+
 *** Update files on ara cluster
     :LOGBOOK:
     CLOCK: 2020-04-12 So 23:56--2020-04-13 Mo 00:18 =>  0:22
@@ -1238,7 +1151,7 @@ ssh -t -t ara -L $port:localhost:$port ssh $node -L $port:Localhost:$port
     CLOCK: [2020-04-13 Mo 00:18]--[2020-04-13 Mo 02:45] =>  2:27
     :END:
 
-Start kernel according to [[*Setting starting a jupyter kernel from a remote jupyter session using =emacs-jupyter= in =org babel=][this recipe.]]
+Start kernel according to [[#sec-jupyter-setup][this recipe]].
 
 #+CALL: jupyter-python-metadata[:cache no]
 
@@ -1472,6 +1385,7 @@ xz                        5.2.4                h14c3975_4
 yaml                      0.1.7                had09818_2
 zlib                      1.2.11               h7b6447c_3
 #+END_EXAMPLE
+
 *** Technical and conceptional setup
     :LOGBOOK:
     CLOCK: [2020-04-12 So 14:58]--[2020-04-12 So 14:58] =>  0:00
@@ -1490,532 +1404,532 @@ zlib                      1.2.11               h7b6447c_3
     :END:
 
 1. Import modules
-#+BEGIN_SRC jupyter-python
-  import datetime
-  import itertools
-  import sys
-  import sklearn.metrics
+   #+BEGIN_SRC jupyter-python
+     import datetime
+     import itertools
+     import sys
+     import sklearn.metrics
 
-  import matplotlib.pyplot as plt
-  import tensorflow as tf
-  import numpy as np
+     import matplotlib.pyplot as plt
+     import tensorflow as tf
+     import numpy as np
 
-  sys.path.append('./fluotracify/')]
-  from fluotracify.simulations import import_simulation_from_csv as isfc
-  from fluotracify.training import preprocess_data as ppd
-  from fluotracify.training import build_model as bm
-  from fluotracify.training import evaluate
+     sys.path.append('./fluotracify/')]
+     from fluotracify.simulations import import_simulation_from_csv as isfc
+     from fluotracify.training import preprocess_data as ppd
+     from fluotracify.training import build_model as bm
+     from fluotracify.training import evaluate
 
-  print(tf.__version__)
-  # Load the TensorBoard notebook extension
-  %load_ext tensorboard
-  tf.keras.backend.clear_session()  # For easy reset of notebook state.
-#+END_SRC
+     print(tf.__version__)
+     # Load the TensorBoard notebook extension
+     %load_ext tensorboard
+     tf.keras.backend.clear_session()  # For easy reset of notebook state.
+   #+END_SRC
 
-#+RESULTS:
-: 2.1.0
+   #+RESULTS:
+   : 2.1.0
 
 2. import .csv files in RAM
-#+BEGIN_SRC jupyter-python
-train, test, nsamples, experiment_params = isfc.import_from_csv(
-    path='/beegfs/ye53nis/saves/firstartefact_Sep2019/',
-    header=12,
-    frac_train=0.8,
-    col_per_example=2,
-    dropindex=None,
-    dropcolumns='Unnamed: 200')
-experiment_params
-#+END_SRC
+   #+BEGIN_SRC jupyter-python
+   train, test, nsamples, experiment_params = isfc.import_from_csv(
+       path='/beegfs/ye53nis/saves/firstartefact_Sep2019/',
+       header=12,
+       frac_train=0.8,
+       col_per_example=2,
+       dropindex=None,
+       dropcolumns='Unnamed: 200')
+   experiment_params
+   #+END_SRC
 
-#+RESULTS:
-:RESULTS:
-#+BEGIN_EXAMPLE
-train 0 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set027.csv
-train 1 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set087.csv
-train 2 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set003.csv
-train 3 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set056.csv
-train 4 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set076.csv
-train 5 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set094.csv
-train 6 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set017.csv
-train 7 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set074.csv
-train 8 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set055.csv
-train 9 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set096.csv
-train 10 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set054.csv
-train 11 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set093.csv
-train 12 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set079.csv
-train 13 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set014.csv
-train 14 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set008.csv
-train 15 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set031.csv
-train 16 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set023.csv
-train 17 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set025.csv
-train 18 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set034.csv
-train 19 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set009.csv
-train 20 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set044.csv
-train 21 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set063.csv
-train 22 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set004.csv
-train 23 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set072.csv
-train 24 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set046.csv
-train 25 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set049.csv
-train 26 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set007.csv
-train 27 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set100.csv
-train 28 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set083.csv
-train 29 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set077.csv
-train 30 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set061.csv
-train 31 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set081.csv
-train 32 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set091.csv
-train 33 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set069.csv
-train 34 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set052.csv
-train 35 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set028.csv
-train 36 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set019.csv
-train 37 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set057.csv
-train 38 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set064.csv
-train 39 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set075.csv
-train 40 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set002.csv
-train 41 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set062.csv
-train 42 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set043.csv
-train 43 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set042.csv
-train 44 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set005.csv
-train 45 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set016.csv
-train 46 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set018.csv
-train 47 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set041.csv
-train 48 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set039.csv
-train 49 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set006.csv
-train 50 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set092.csv
-train 51 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set060.csv
-train 52 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set001.csv
-train 53 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set035.csv
-train 54 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set029.csv
-train 55 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set051.csv
-train 56 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set012.csv
-train 57 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set036.csv
-train 58 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set024.csv
-train 59 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set053.csv
-train 60 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set011.csv
-train 61 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set032.csv
-train 62 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set067.csv
-train 63 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set058.csv
-train 64 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set080.csv
-train 65 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set086.csv
-train 66 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set033.csv
-train 67 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set085.csv
-train 68 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set015.csv
-train 69 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set090.csv
-train 70 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set020.csv
-train 71 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set030.csv
-train 72 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set050.csv
-train 73 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set098.csv
-train 74 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set099.csv
-train 75 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set070.csv
-train 76 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set021.csv
-train 77 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set095.csv
-train 78 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set073.csv
-train 79 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set078.csv
-test 80 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set026.csv
-test 81 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set038.csv
-test 82 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set082.csv
-test 83 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set047.csv
-test 84 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set040.csv
-test 85 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set066.csv
-test 86 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set059.csv
-test 87 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set013.csv
-test 88 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set089.csv
-test 89 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set071.csv
-test 90 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set088.csv
-test 91 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set037.csv
-test 92 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set022.csv
-test 93 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set084.csv
-test 94 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set010.csv
-test 95 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set097.csv
-test 96 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set068.csv
-test 97 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set065.csv
-test 98 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set048.csv
-test 99 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set045.csv
-#+END_EXAMPLE
-#+BEGIN_EXPORT html
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
+   #+RESULTS:
+   :RESULTS:
+   #+BEGIN_EXAMPLE
+   train 0 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set027.csv
+   train 1 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set087.csv
+   train 2 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set003.csv
+   train 3 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set056.csv
+   train 4 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set076.csv
+   train 5 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set094.csv
+   train 6 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set017.csv
+   train 7 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set074.csv
+   train 8 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set055.csv
+   train 9 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set096.csv
+   train 10 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set054.csv
+   train 11 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set093.csv
+   train 12 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set079.csv
+   train 13 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set014.csv
+   train 14 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set008.csv
+   train 15 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set031.csv
+   train 16 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set023.csv
+   train 17 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set025.csv
+   train 18 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set034.csv
+   train 19 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set009.csv
+   train 20 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set044.csv
+   train 21 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set063.csv
+   train 22 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set004.csv
+   train 23 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set072.csv
+   train 24 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set046.csv
+   train 25 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set049.csv
+   train 26 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set007.csv
+   train 27 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set100.csv
+   train 28 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set083.csv
+   train 29 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set077.csv
+   train 30 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set061.csv
+   train 31 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set081.csv
+   train 32 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set091.csv
+   train 33 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set069.csv
+   train 34 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set052.csv
+   train 35 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set028.csv
+   train 36 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set019.csv
+   train 37 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set057.csv
+   train 38 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set064.csv
+   train 39 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set075.csv
+   train 40 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set002.csv
+   train 41 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set062.csv
+   train 42 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set043.csv
+   train 43 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set042.csv
+   train 44 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set005.csv
+   train 45 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set016.csv
+   train 46 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set018.csv
+   train 47 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set041.csv
+   train 48 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set039.csv
+   train 49 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set006.csv
+   train 50 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set092.csv
+   train 51 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set060.csv
+   train 52 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set001.csv
+   train 53 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set035.csv
+   train 54 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set029.csv
+   train 55 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set051.csv
+   train 56 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set012.csv
+   train 57 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set036.csv
+   train 58 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set024.csv
+   train 59 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set053.csv
+   train 60 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set011.csv
+   train 61 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set032.csv
+   train 62 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set067.csv
+   train 63 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set058.csv
+   train 64 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set080.csv
+   train 65 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set086.csv
+   train 66 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set033.csv
+   train 67 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set085.csv
+   train 68 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set015.csv
+   train 69 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set090.csv
+   train 70 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set020.csv
+   train 71 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set030.csv
+   train 72 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set050.csv
+   train 73 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set098.csv
+   train 74 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set099.csv
+   train 75 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set070.csv
+   train 76 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set021.csv
+   train 77 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set095.csv
+   train 78 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set073.csv
+   train 79 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set078.csv
+   test 80 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set026.csv
+   test 81 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set038.csv
+   test 82 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set082.csv
+   test 83 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set047.csv
+   test 84 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set040.csv
+   test 85 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set066.csv
+   test 86 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set059.csv
+   test 87 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set013.csv
+   test 88 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set089.csv
+   test 89 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set071.csv
+   test 90 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set088.csv
+   test 91 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set037.csv
+   test 92 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set022.csv
+   test 93 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set084.csv
+   test 94 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set010.csv
+   test 95 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set097.csv
+   test 96 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set068.csv
+   test 97 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set065.csv
+   test 98 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set048.csv
+   test 99 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set045.csv
+   #+END_EXAMPLE
+   #+BEGIN_EXPORT html
+   <div>
+   <style scoped>
+       .dataframe tbody tr th:only-of-type {
+           vertical-align: middle;
+       }
 
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
+       .dataframe tbody tr th {
+           vertical-align: top;
+       }
 
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>0</th>
-      <th>1</th>
-      <th>2</th>
-      <th>3</th>
-      <th>4</th>
-      <th>5</th>
-      <th>6</th>
-      <th>7</th>
-      <th>8</th>
-      <th>9</th>
-      <th>...</th>
-      <th>90</th>
-      <th>91</th>
-      <th>92</th>
-      <th>93</th>
-      <th>94</th>
-      <th>95</th>
-      <th>96</th>
-      <th>97</th>
-      <th>98</th>
-      <th>99</th>
-    </tr>
-    <tr>
-      <th>0</th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>unique identifier</th>
-      <td>87236092-432a-4cf3-976d-f4125faf39ba</td>
-      <td>a97099b0-b09f-46a3-b6b9-21494f23bbac</td>
-      <td>65cf62b4-ab6c-4684-9bb8-7866babd7d1e</td>
-      <td>b5d81346-5a76-49d0-a9bc-3c2927d42b81</td>
-      <td>ede6541c-2291-43fc-bd27-88ac58972f70</td>
-      <td>7d11aae7-4021-4da0-9a25-c3caaf594ce4</td>
-      <td>a8879b13-71c2-43af-8e5c-108609bc7bb4</td>
-      <td>4f37c213-656e-4b41-b94e-e6681a39cab6</td>
-      <td>5f4303d1-c15d-4526-94e9-532c84419541</td>
-      <td>b637341b-6a7d-4ec9-9093-9b96938e4178</td>
-      <td>...</td>
-      <td>c6191b86-d827-49f1-a310-005bc8515716</td>
-      <td>c213dfa4-7895-43da-aee6-61d04923a9ec</td>
-      <td>3266da57-ceb1-4154-9da7-652f5878544c</td>
-      <td>8dbe443f-2414-46d6-8fbc-3f004bc3b513</td>
-      <td>5cab4980-4d00-4abb-8f57-9cb03c684aca</td>
-      <td>32a3e173-eb56-4fd1-904a-aaea1c7f0b98</td>
-      <td>88ff65c4-77b3-49ba-851e-5830419577ca</td>
-      <td>f764599a-39e0-4a16-ab24-974959a0c736</td>
-      <td>bfa57664-7605-4f4e-bb33-2931b1f6b33d</td>
-      <td>6609d8da-a5f8-4ce9-b20d-484377f10208</td>
-    </tr>
-    <tr>
-      <th>path and file name</th>
-      <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
-      <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
-      <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
-      <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
-      <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
-      <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
-      <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
-      <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
-      <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
-      <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
-      <td>...</td>
-      <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
-      <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
-      <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
-      <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
-      <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
-      <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
-      <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
-      <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
-      <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
-      <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
-    </tr>
-    <tr>
-      <th>number of slow clusters</th>
-      <td>10</td>
-      <td>10</td>
-      <td>10</td>
-      <td>10</td>
-      <td>10</td>
-      <td>10</td>
-      <td>10</td>
-      <td>10</td>
-      <td>10</td>
-      <td>10</td>
-      <td>...</td>
-      <td>10</td>
-      <td>10</td>
-      <td>10</td>
-      <td>10</td>
-      <td>10</td>
-      <td>10</td>
-      <td>10</td>
-      <td>10</td>
-      <td>10</td>
-      <td>10</td>
-    </tr>
-    <tr>
-      <th>diffusion rate of clusters</th>
-      <td>0.01</td>
-      <td>0.02</td>
-      <td>0.01</td>
-      <td>0.01</td>
-      <td>0.02</td>
-      <td>0.01</td>
-      <td>0.02</td>
-      <td>0.01</td>
-      <td>0.01</td>
-      <td>0.01</td>
-      <td>...</td>
-      <td>0.02</td>
-      <td>0.02</td>
-      <td>0.01</td>
-      <td>0.01</td>
-      <td>0.02</td>
-      <td>0.01</td>
-      <td>0.02</td>
-      <td>0.01</td>
-      <td>0.01</td>
-      <td>0.02</td>
-    </tr>
-    <tr>
-      <th>FWHMs of excitation PSFs used</th>
-      <td>[250]</td>
-      <td>[250]</td>
-      <td>[250]</td>
-      <td>[250]</td>
-      <td>[250]</td>
-      <td>[250]</td>
-      <td>[250]</td>
-      <td>[250]</td>
-      <td>[250]</td>
-      <td>[250]</td>
-      <td>...</td>
-      <td>[250]</td>
-      <td>[250]</td>
-      <td>[250]</td>
-      <td>[250]</td>
-      <td>[250]</td>
-      <td>[250]</td>
-      <td>[250]</td>
-      <td>[250]</td>
-      <td>[250]</td>
-      <td>[250]</td>
-    </tr>
-    <tr>
-      <th>extent of the PSF</th>
-      <td>4000</td>
-      <td>4000</td>
-      <td>4000</td>
-      <td>4000</td>
-      <td>4000</td>
-      <td>4000</td>
-      <td>4000</td>
-      <td>4000</td>
-      <td>4000</td>
-      <td>4000</td>
-      <td>...</td>
-      <td>4000</td>
-      <td>4000</td>
-      <td>4000</td>
-      <td>4000</td>
-      <td>4000</td>
-      <td>4000</td>
-      <td>4000</td>
-      <td>4000</td>
-      <td>4000</td>
-      <td>4000</td>
-    </tr>
-    <tr>
-      <th>total simulation time</th>
-      <td>20000</td>
-      <td>20000</td>
-      <td>20000</td>
-      <td>20000</td>
-      <td>20000</td>
-      <td>20000</td>
-      <td>20000</td>
-      <td>20000</td>
-      <td>20000</td>
-      <td>20000</td>
-      <td>...</td>
-      <td>20000</td>
-      <td>20000</td>
-      <td>20000</td>
-      <td>20000</td>
-      <td>20000</td>
-      <td>20000</td>
-      <td>20000</td>
-      <td>20000</td>
-      <td>20000</td>
-      <td>20000</td>
-    </tr>
-    <tr>
-      <th>time step</th>
-      <td>1.0</td>
-      <td>1.0</td>
-      <td>1.0</td>
-      <td>1.0</td>
-      <td>1.0</td>
-      <td>1.0</td>
-      <td>1.0</td>
-      <td>1.0</td>
-      <td>1.0</td>
-      <td>1.0</td>
-      <td>...</td>
-      <td>1.0</td>
-      <td>1.0</td>
-      <td>1.0</td>
-      <td>1.0</td>
-      <td>1.0</td>
-      <td>1.0</td>
-      <td>1.0</td>
-      <td>1.0</td>
-      <td>1.0</td>
-      <td>1.0</td>
-    </tr>
-    <tr>
-      <th>number of fast molecules</th>
-      <td>1000</td>
-      <td>5000</td>
-      <td>2000</td>
-      <td>6000</td>
-      <td>5000</td>
-      <td>2000</td>
-      <td>2000</td>
-      <td>10000</td>
-      <td>7000</td>
-      <td>8000</td>
-      <td>...</td>
-      <td>5000</td>
-      <td>8000</td>
-      <td>2000</td>
-      <td>10000</td>
-      <td>7000</td>
-      <td>1000</td>
-      <td>2000</td>
-      <td>7000</td>
-      <td>4000</td>
-      <td>4000</td>
-    </tr>
-    <tr>
-      <th>diffusion rate of molecules</th>
-      <td>5.0</td>
-      <td>1.5</td>
-      <td>2.0</td>
-      <td>3.5</td>
-      <td>5.0</td>
-      <td>4.5</td>
-      <td>1.5</td>
-      <td>4.5</td>
-      <td>5.0</td>
-      <td>1.5</td>
-      <td>...</td>
-      <td>1.0</td>
-      <td>3.0</td>
-      <td>2.5</td>
-      <td>2.5</td>
-      <td>3.5</td>
-      <td>2.5</td>
-      <td>5.0</td>
-      <td>5.0</td>
-      <td>1.0</td>
-      <td>3.0</td>
-    </tr>
-    <tr>
-      <th>width of the simulation</th>
-      <td>3000.0</td>
-      <td>3000.0</td>
-      <td>3000.0</td>
-      <td>3000.0</td>
-      <td>3000.0</td>
-      <td>3000.0</td>
-      <td>3000.0</td>
-      <td>3000.0</td>
-      <td>3000.0</td>
-      <td>3000.0</td>
-      <td>...</td>
-      <td>3000.0</td>
-      <td>3000.0</td>
-      <td>3000.0</td>
-      <td>3000.0</td>
-      <td>3000.0</td>
-      <td>3000.0</td>
-      <td>3000.0</td>
-      <td>3000.0</td>
-      <td>3000.0</td>
-      <td>3000.0</td>
-    </tr>
-    <tr>
-      <th>height of the simulation</th>
-      <td>3000.0</td>
-      <td>3000.0</td>
-      <td>3000.0</td>
-      <td>3000.0</td>
-      <td>3000.0</td>
-      <td>3000.0</td>
-      <td>3000.0</td>
-      <td>3000.0</td>
-      <td>3000.0</td>
-      <td>3000.0</td>
-      <td>...</td>
-      <td>3000.0</td>
-      <td>3000.0</td>
-      <td>3000.0</td>
-      <td>3000.0</td>
-      <td>3000.0</td>
-      <td>3000.0</td>
-      <td>3000.0</td>
-      <td>3000.0</td>
-      <td>3000.0</td>
-      <td>3000.0</td>
-    </tr>
-    <tr>
-      <th>trace001</th>
-      <td>label001_1</td>
-      <td>label001_1</td>
-      <td>label001_1</td>
-      <td>label001_1</td>
-      <td>label001_1</td>
-      <td>label001_1</td>
-      <td>label001_1</td>
-      <td>label001_1</td>
-      <td>label001_1</td>
-      <td>label001_1</td>
-      <td>...</td>
-      <td>label001_1</td>
-      <td>label001_1</td>
-      <td>label001_1</td>
-      <td>label001_1</td>
-      <td>label001_1</td>
-      <td>label001_1</td>
-      <td>label001_1</td>
-      <td>label001_1</td>
-      <td>label001_1</td>
-      <td>label001_1</td>
-    </tr>
-  </tbody>
-</table>
-<p>13 rows × 100 columns</p>
-</div>
-#+END_EXPORT
-:END:
+       .dataframe thead th {
+           text-align: right;
+       }
+   </style>
+   <table border="1" class="dataframe">
+     <thead>
+       <tr style="text-align: right;">
+         <th></th>
+         <th>0</th>
+         <th>1</th>
+         <th>2</th>
+         <th>3</th>
+         <th>4</th>
+         <th>5</th>
+         <th>6</th>
+         <th>7</th>
+         <th>8</th>
+         <th>9</th>
+         <th>...</th>
+         <th>90</th>
+         <th>91</th>
+         <th>92</th>
+         <th>93</th>
+         <th>94</th>
+         <th>95</th>
+         <th>96</th>
+         <th>97</th>
+         <th>98</th>
+         <th>99</th>
+       </tr>
+       <tr>
+         <th>0</th>
+         <th></th>
+         <th></th>
+         <th></th>
+         <th></th>
+         <th></th>
+         <th></th>
+         <th></th>
+         <th></th>
+         <th></th>
+         <th></th>
+         <th></th>
+         <th></th>
+         <th></th>
+         <th></th>
+         <th></th>
+         <th></th>
+         <th></th>
+         <th></th>
+         <th></th>
+         <th></th>
+         <th></th>
+       </tr>
+     </thead>
+     <tbody>
+       <tr>
+         <th>unique identifier</th>
+         <td>87236092-432a-4cf3-976d-f4125faf39ba</td>
+         <td>a97099b0-b09f-46a3-b6b9-21494f23bbac</td>
+         <td>65cf62b4-ab6c-4684-9bb8-7866babd7d1e</td>
+         <td>b5d81346-5a76-49d0-a9bc-3c2927d42b81</td>
+         <td>ede6541c-2291-43fc-bd27-88ac58972f70</td>
+         <td>7d11aae7-4021-4da0-9a25-c3caaf594ce4</td>
+         <td>a8879b13-71c2-43af-8e5c-108609bc7bb4</td>
+         <td>4f37c213-656e-4b41-b94e-e6681a39cab6</td>
+         <td>5f4303d1-c15d-4526-94e9-532c84419541</td>
+         <td>b637341b-6a7d-4ec9-9093-9b96938e4178</td>
+         <td>...</td>
+         <td>c6191b86-d827-49f1-a310-005bc8515716</td>
+         <td>c213dfa4-7895-43da-aee6-61d04923a9ec</td>
+         <td>3266da57-ceb1-4154-9da7-652f5878544c</td>
+         <td>8dbe443f-2414-46d6-8fbc-3f004bc3b513</td>
+         <td>5cab4980-4d00-4abb-8f57-9cb03c684aca</td>
+         <td>32a3e173-eb56-4fd1-904a-aaea1c7f0b98</td>
+         <td>88ff65c4-77b3-49ba-851e-5830419577ca</td>
+         <td>f764599a-39e0-4a16-ab24-974959a0c736</td>
+         <td>bfa57664-7605-4f4e-bb33-2931b1f6b33d</td>
+         <td>6609d8da-a5f8-4ce9-b20d-484377f10208</td>
+       </tr>
+       <tr>
+         <th>path and file name</th>
+         <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
+         <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
+         <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
+         <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
+         <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
+         <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
+         <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
+         <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
+         <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
+         <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
+         <td>...</td>
+         <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
+         <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
+         <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
+         <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
+         <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
+         <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
+         <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
+         <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
+         <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
+         <td>/beegfs/ye53nis/saves/firstartefact_Sep2019/tr...</td>
+       </tr>
+       <tr>
+         <th>number of slow clusters</th>
+         <td>10</td>
+         <td>10</td>
+         <td>10</td>
+         <td>10</td>
+         <td>10</td>
+         <td>10</td>
+         <td>10</td>
+         <td>10</td>
+         <td>10</td>
+         <td>10</td>
+         <td>...</td>
+         <td>10</td>
+         <td>10</td>
+         <td>10</td>
+         <td>10</td>
+         <td>10</td>
+         <td>10</td>
+         <td>10</td>
+         <td>10</td>
+         <td>10</td>
+         <td>10</td>
+       </tr>
+       <tr>
+         <th>diffusion rate of clusters</th>
+         <td>0.01</td>
+         <td>0.02</td>
+         <td>0.01</td>
+         <td>0.01</td>
+         <td>0.02</td>
+         <td>0.01</td>
+         <td>0.02</td>
+         <td>0.01</td>
+         <td>0.01</td>
+         <td>0.01</td>
+         <td>...</td>
+         <td>0.02</td>
+         <td>0.02</td>
+         <td>0.01</td>
+         <td>0.01</td>
+         <td>0.02</td>
+         <td>0.01</td>
+         <td>0.02</td>
+         <td>0.01</td>
+         <td>0.01</td>
+         <td>0.02</td>
+       </tr>
+       <tr>
+         <th>FWHMs of excitation PSFs used</th>
+         <td>[250]</td>
+         <td>[250]</td>
+         <td>[250]</td>
+         <td>[250]</td>
+         <td>[250]</td>
+         <td>[250]</td>
+         <td>[250]</td>
+         <td>[250]</td>
+         <td>[250]</td>
+         <td>[250]</td>
+         <td>...</td>
+         <td>[250]</td>
+         <td>[250]</td>
+         <td>[250]</td>
+         <td>[250]</td>
+         <td>[250]</td>
+         <td>[250]</td>
+         <td>[250]</td>
+         <td>[250]</td>
+         <td>[250]</td>
+         <td>[250]</td>
+       </tr>
+       <tr>
+         <th>extent of the PSF</th>
+         <td>4000</td>
+         <td>4000</td>
+         <td>4000</td>
+         <td>4000</td>
+         <td>4000</td>
+         <td>4000</td>
+         <td>4000</td>
+         <td>4000</td>
+         <td>4000</td>
+         <td>4000</td>
+         <td>...</td>
+         <td>4000</td>
+         <td>4000</td>
+         <td>4000</td>
+         <td>4000</td>
+         <td>4000</td>
+         <td>4000</td>
+         <td>4000</td>
+         <td>4000</td>
+         <td>4000</td>
+         <td>4000</td>
+       </tr>
+       <tr>
+         <th>total simulation time</th>
+         <td>20000</td>
+         <td>20000</td>
+         <td>20000</td>
+         <td>20000</td>
+         <td>20000</td>
+         <td>20000</td>
+         <td>20000</td>
+         <td>20000</td>
+         <td>20000</td>
+         <td>20000</td>
+         <td>...</td>
+         <td>20000</td>
+         <td>20000</td>
+         <td>20000</td>
+         <td>20000</td>
+         <td>20000</td>
+         <td>20000</td>
+         <td>20000</td>
+         <td>20000</td>
+         <td>20000</td>
+         <td>20000</td>
+       </tr>
+       <tr>
+         <th>time step</th>
+         <td>1.0</td>
+         <td>1.0</td>
+         <td>1.0</td>
+         <td>1.0</td>
+         <td>1.0</td>
+         <td>1.0</td>
+         <td>1.0</td>
+         <td>1.0</td>
+         <td>1.0</td>
+         <td>1.0</td>
+         <td>...</td>
+         <td>1.0</td>
+         <td>1.0</td>
+         <td>1.0</td>
+         <td>1.0</td>
+         <td>1.0</td>
+         <td>1.0</td>
+         <td>1.0</td>
+         <td>1.0</td>
+         <td>1.0</td>
+         <td>1.0</td>
+       </tr>
+       <tr>
+         <th>number of fast molecules</th>
+         <td>1000</td>
+         <td>5000</td>
+         <td>2000</td>
+         <td>6000</td>
+         <td>5000</td>
+         <td>2000</td>
+         <td>2000</td>
+         <td>10000</td>
+         <td>7000</td>
+         <td>8000</td>
+         <td>...</td>
+         <td>5000</td>
+         <td>8000</td>
+         <td>2000</td>
+         <td>10000</td>
+         <td>7000</td>
+         <td>1000</td>
+         <td>2000</td>
+         <td>7000</td>
+         <td>4000</td>
+         <td>4000</td>
+       </tr>
+       <tr>
+         <th>diffusion rate of molecules</th>
+         <td>5.0</td>
+         <td>1.5</td>
+         <td>2.0</td>
+         <td>3.5</td>
+         <td>5.0</td>
+         <td>4.5</td>
+         <td>1.5</td>
+         <td>4.5</td>
+         <td>5.0</td>
+         <td>1.5</td>
+         <td>...</td>
+         <td>1.0</td>
+         <td>3.0</td>
+         <td>2.5</td>
+         <td>2.5</td>
+         <td>3.5</td>
+         <td>2.5</td>
+         <td>5.0</td>
+         <td>5.0</td>
+         <td>1.0</td>
+         <td>3.0</td>
+       </tr>
+       <tr>
+         <th>width of the simulation</th>
+         <td>3000.0</td>
+         <td>3000.0</td>
+         <td>3000.0</td>
+         <td>3000.0</td>
+         <td>3000.0</td>
+         <td>3000.0</td>
+         <td>3000.0</td>
+         <td>3000.0</td>
+         <td>3000.0</td>
+         <td>3000.0</td>
+         <td>...</td>
+         <td>3000.0</td>
+         <td>3000.0</td>
+         <td>3000.0</td>
+         <td>3000.0</td>
+         <td>3000.0</td>
+         <td>3000.0</td>
+         <td>3000.0</td>
+         <td>3000.0</td>
+         <td>3000.0</td>
+         <td>3000.0</td>
+       </tr>
+       <tr>
+         <th>height of the simulation</th>
+         <td>3000.0</td>
+         <td>3000.0</td>
+         <td>3000.0</td>
+         <td>3000.0</td>
+         <td>3000.0</td>
+         <td>3000.0</td>
+         <td>3000.0</td>
+         <td>3000.0</td>
+         <td>3000.0</td>
+         <td>3000.0</td>
+         <td>...</td>
+         <td>3000.0</td>
+         <td>3000.0</td>
+         <td>3000.0</td>
+         <td>3000.0</td>
+         <td>3000.0</td>
+         <td>3000.0</td>
+         <td>3000.0</td>
+         <td>3000.0</td>
+         <td>3000.0</td>
+         <td>3000.0</td>
+       </tr>
+       <tr>
+         <th>trace001</th>
+         <td>label001_1</td>
+         <td>label001_1</td>
+         <td>label001_1</td>
+         <td>label001_1</td>
+         <td>label001_1</td>
+         <td>label001_1</td>
+         <td>label001_1</td>
+         <td>label001_1</td>
+         <td>label001_1</td>
+         <td>label001_1</td>
+         <td>...</td>
+         <td>label001_1</td>
+         <td>label001_1</td>
+         <td>label001_1</td>
+         <td>label001_1</td>
+         <td>label001_1</td>
+         <td>label001_1</td>
+         <td>label001_1</td>
+         <td>label001_1</td>
+         <td>label001_1</td>
+         <td>label001_1</td>
+       </tr>
+     </tbody>
+   </table>
+   <p>13 rows × 100 columns</p>
+   </div>
+   #+END_EXPORT
+   :END:
 
 #+BEGIN_SRC jupyter-python
   train_data, train_labels = isfc.separate_data_and_labels(array=train,
@@ -2285,8 +2199,27 @@ KeyboardInterrupt                         Traceback (most recent call last)
 #+END_SRC
 
 
-TOO SLOW! Investigate Error below...
-
+TOO SLOW! Investigate Errors...
+**** TODO Investigate Error on GPU node
+- 2020-04-13 02:45:28.216446: W
+  tensorflow/stream_executor/platform/default/dso_loader.cc:55] Could not load
+  dynamic library 'libnvinfer.so.6'; dlerror: libnvinfer.so.6: cannot open
+  shared object file: No such file or directory; LD_LIBRARY_PATH:
+  /cluster/miniconda3/lib
+- 2020-04-13 02:45:28.217069: W
+  tensorflow/stream_executor/platform/default/dso_loader.cc:55] Could not load
+  dynamic library 'libnvinfer_plugin.so.6'; dlerror: libnvinfer_plugin.so.6:
+  cannot open shared object file: No such file or directory; LD_LIBRARY_PATH:
+  /cluster/miniconda3/lib
+- 2020-04-13 02:45:28.217123: W
+  tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:30] Cannot dlopen some
+  TensorRT libraries. If you would like to use Nvidia GPU with TensorRT, please
+  make sure the missing libraries mentioned above are installed properly
+**** TODO Export pandas DataFrames as org tables instead of html
+- see https://github.com/dzop/emacs-jupyter/issues/88
+- see
+  https://github.com/gregsexton/ob-ipython/blob/7147455230841744fb5b95dcbe03320313a77124/README.org#tips-and-tricks
+**** TODO Inline-display of plots
 
 ** exp-200413-test
 *** git
@@ -2326,8 +2259,6 @@ Unversionierte Dateien:
 
 keine Änderungen zum Commit vorgemerkt (benutzen Sie "git add" und/oder "git commit -a")
 #+end_example
-
-
 
 *** ssh-org, tmux
     :LOGBOOK:
@@ -2434,7 +2365,7 @@ tmux 1.8
 #+END_EXAMPLE
 
 So I am trying now to set the value of =org-babel-tmux-location= to
-=/usr/local/bin/tmux=.  This did not solve the problem.
+=/usr/local/bin/tmux=.   This did not solve the problem.
 [[https://github.com/ahendriksen/ob-tmux/issues/10][I opened an issue here.]]
 
 **** ob-tmux output feature
@@ -2787,6 +2718,7 @@ xz                        5.2.4                h14c3975_4
 yaml                      0.1.7                had09818_2
 zlib                      1.2.11               h7b6447c_3
 #+END_EXAMPLE
+
 **** set output folder for jupyter-python to =data/exp-tests=
 According to the git and org-mode based worflow for reproducible research
 proposed by Stanisic et al files which are created in an experimental branch are
