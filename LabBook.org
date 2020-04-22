@@ -24,17 +24,227 @@
       the template described below
    6) Commit/push the results of this separate branch
    7) Merge this new branch with the remote "data" branch
-** Example for simulation...
-** Example for ...
+** Example for experimental setup procedure
+*** Setting up a tmux connection from using =ob-tmux= in =org-babel=
+    :PROPERTIES:
+    :CUSTOM_ID: sec-tmux-setup
+    :END:
+    - prerequisite: tmux versions need to be the same locally and on the server.
+      Let's verify that now.
+      - the local tmux version:
+
+        #+BEGIN_SRC sh
+        tmux -V
+        #+END_SRC
+
+        #+RESULTS:
+        : tmux 3.0a
+
+      - the remote tmux version:
+
+       #+BEGIN_SRC sh :session local
+        ssh ara tmux -V
+      #+END_SRC
+
+        #+RESULTS:
+        | ye53nis@ara-login01.rz.uni-jena.de's | password: |
+        | tmux                                 | 3.0a      |
+
+    - as is described in [[https://github.com/ahendriksen/ob-tmux][the ob-tmux readme]], the following code snippet creates
+      a socket on the remote machine and forwards this socket to the local
+      machine (note that =socket_path= was introduced in tmux version 2.2)
+
+      #+BEGIN_SRC sh :session local
+      REMOTE_SOCKET=$(ssh ara 'tmux ls -F "#{socket_path}"' | head -1)
+      echo $REMOTE_SOCKET
+      ssh ara -tfN \
+          -L ~/.tmux-local-socket-remote-machine:$REMOTE_SOCKET
+      #+END_SRC
+
+      #+RESULTS:
+      | ye53nis@ara-login01.rz.uni-jena.de's | password:                            |           |
+      | /tmp/tmux-67339/default              |                                      |           |
+      | >                                    | ye53nis@ara-login01.rz.uni-jena.de's | password: |
+
+    - now a new tmux session with name =ob-NAME= is created when using a code
+      block which looks like this: =#+BEGIN_SRC tmux :socket
+      ~/.tmux-local-socket-remote-machine :session NAME=
+    - Commands can be sent now to the remote tmux session, BUT note that the
+      output is not printed yet
+    - there is a workaround for getting output back to our LabBook.org: A [[#scripts-tmux][script]]
+      which allows to print the output from the tmux session in an
+      =#+begin_example=-Block below the tmux block by pressing =C-c C-o= or =C-c
+      C-v C-o= when the pointer is inside the tmux block.
+
+*** Setting starting a jupyter kernel from a remote jupyter session using =emacs-jupyter= in =org babel=
+    :PROPERTIES:
+    :CUSTOM_ID: sec-jupyter-setup
+    :END:
+
+    1. =M-x jupyter-server-list-kernels=
+       1. set server URL, e.g. =http://localhost:8889=
+       2. set websocket URL, e.g. =http://localhost:8889=
+    2. two possibilities
+       1. kernel already exists $\to$ list of kernels and =kernel-ID= is displayed
+       2. kernel does not exist $\to$ prompt asks if you want to start one $\to$
+          *yes* $\to$ type kernel you want to start, e.g. =Python 3=
+    3. In subtree where you want to use =jupyter-python= blocks with =org
+       babel=, set the =:header-args:jupyter-python :session
+       /jpy:localhost#kernel:8889-ID=
+** tools used (notes)
+*** Emacs =magit=
+   - =gitflow-avh= (=magit-flow=) to follow the flow
+   - possibly https://github.com/magit/magit-annex for large files. Follow this:
+     https://git-annex.branchable.com/walkthrough/
+   - maybe check out git-toolbelt at some point
+     https://github.com/nvie/git-toolbelt#readme with
+     https://nvie.com/posts/git-power-tools/
+*** jupyter
+   - emacs jupyter for running and connecting to kernel on server:
+     https://github.com/dzop/emacs-jupyter
+   - if I actually still would use .ipynb files, these might come handy:
+     + jupytext: https://github.com/mwouts/jupytext
+     + nbstripout: https://github.com/kynan/nbstripout
+*** mlflow
+   - https://docs.faculty.ai/user-guide/experiments/index.html and
+     https://docs.microsoft.com/en-us/azure/databricks/_static/notebooks/hls-image-processing/02-image-segmentation-dl.html
+*** tensorflow
+   - https://www.tensorflow.org/tensorboard/image_summaries
+
 ** Example for ...
 * Template for data entry:
-** xp#
+** exp-#date-#title
 *** git:
 #+begin_src sh
 git log -1
 #+end_src
+*** System Metadata:
+#+NAME: jupyter-python-metadata
+#+BEGIN_SRC jupyter-python
+  import os
+
+  ramlist = os.popen('free -th').readlines()[-1].split()[1:]
+
+  print('No of CPUs in system:', os.cpu_count())
+  print('No of CPUs the current process can use:',
+        len(os.sched_getaffinity(0)))
+  print('load average:', os.getloadavg())
+  print(os.uname())
+  print('PID of process:', os.getpid())
+  print('RAM total: {}, RAM used: {}, RAM free: {}'.format(
+      ramlist[0], ramlist[1], ramlist[2]))
+
+  !echo the current directory: $PWD
+  !echo My disk usage:
+  !df -h
+  !conda list
+#+END_SRC
+**** TODO Add =os.environ=
+*** Tmux setup and scripts
+    :PROPERTIES:
+    :CUSTOM_ID: scripts-tmux
+    :END:
+#+NAME: setup-tmux
+#+BEGIN_SRC sh :session local
+rm ~/.tmux-local-socket-remote-machine
+REMOTE_SOCKET=$(ssh ara 'tmux ls -F "#{socket_path}"' | head -1)
+echo $REMOTE_SOCKET
+ssh ara -tfN \
+    -L ~/.tmux-local-socket-remote-machine:$REMOTE_SOCKET
+#+END_SRC
+
+#+RESULTS: setup-tmux
+|         |                                      |           |
+| sh-5.0$ | ye53nis@ara-login01.rz.uni-jena.de's | password: |
+| >       | ye53nis@ara-login01.rz.uni-jena.de's | password: |
+
+A script which allows to print the output from the tmux session
+in an =#+begin_example=-Block below the tmux block by pressing =C-c C-o= or =C-c
+C-v C-o= when the pointer is inside the tmux block. See [[https://github.com/ahendriksen/ob-tmux/issues/6#issuecomment-613914400][here]].
+
+#+BEGIN_SRC emacs-lisp
+  (defun ob-tmux--insert-result ()
+    (interactive)
+    (let ((info (org-babel-get-src-block-info 'light)))
+      (when (and info (string-equal "tmux" (nth 0 info)))
+        (let* ((params (nth 2 info))
+               (org-session (cdr (assq :session params)))
+               (socket (cdr (assq :socket params)))
+               (socket (when socket (expand-file-name socket)))
+               (ob-session (ob-tmux--from-org-session org-session socket)))
+          (org-babel-insert-result
+               (ob-tmux--execute-string ob-session
+                                        "capture-pane"
+                                        "-p" ;; print to stdout
+                                        "-S" "-" ;; start at beginning of history
+                                        "-t" (ob-tmux--session ob-session))
+               '("replace"))))))
+
+  (defun ob-tmux--edit-result ()
+    (interactive)
+    (pcase (org-babel-get-src-block-info 'light)
+      (`(,_ ,_ ,arguments ,_ ,_ ,start ,_)
+       (save-excursion
+         ;; Go to the results, if there aren't any then run the block.
+         (goto-char start)
+         (goto-char (or (org-babel-where-is-src-block-result)
+                        (progn (org-babel-execute-src-block)
+                               (org-babel-where-is-src-block-result))))
+         (end-of-line)
+         (skip-chars-forward " \r\t\n")
+         (org-edit-special)
+         (delete-trailing-whitespace)
+         (end-of-buffer)
+         t))
+      (_ nil)))
+
+  (defun ob-tmux--open-src-block-result (orig-fun &rest args)
+    (let ((info (org-babel-get-src-block-info 'light)))
+      (if (and info (string-equal "tmux" (nth 0 info)))
+          (progn
+            (ob-tmux--insert-result)
+            (ob-tmux--edit-result))
+        (apply orig-fun args))))
+
+  (advice-add 'org-babel-open-src-block-result
+                 :around #'ob-tmux--open-src-block-result)
+#+END_SRC
+
+#+RESULTS:
+
+*** jupyter setup and ssh tunneling
+
+On the compute node of the HPC, the users' environment is managed through module
+files using the system [[https://lmod.readthedocs.io][Lmod]]. The =export XDG_RUNTIME_DIR= statements are needed
+because of a jupyter bug which did not let it start. Right now, =ob-tmux= does
+not support a =:var= header like normal =org-babel= does. So the =$port=
+variable has to be set before calling this function:
+
+#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine
+export
+#+END_SRC
+
+
+#+NAME: jpt-tmux
+#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine
+module load tools/python/3.7
+export XDG_RUNTIME_DIR=''
+export XDG_RUNTIME_DIR=""
+jupyter notebook --no-browser --port=$port
+#+END_SRC
+
+Now this port has to be tunnelled on our local computer. While the tmux session
+above keeps running, no matter if Emacs is running or not, this following ssh
+tunnel needs to be active locally to connect to the notebook. If Emacs crashes,
+it would need to be reestablished.
+
+#+NAME: jpt-tunnel
+#+BEGIN_SRC sh :session org-tunnel :var port="8889" :var node="node001"
+ssh -t -t ara -L $port:localhost:$port ssh $node -L $port:Localhost:$port
+#+END_SRC
 *** Notes:
     ######################
+
 * Organization of git
 ** remote/origin/master branch:
    - Has all the source, analysis, scripts
@@ -43,23 +253,56 @@ git log -1
    - Also some important (not all) .pdf files
 ** remote/origin/data branch:
    - Merging all the data and source branches
-   - It is cloned only on my local machine, never clone it on a remote one
-* Git TAGs
-** Stable versions:
-*** stable13
-  StarPU version: trunk 14405
-  Simgrid: c78eee2
-  qrm_starpu: r1393
-  new_magmamorse: r1799
-*** stable13.1
-  StarPU version: trunk 14405
-  Simgrid: c78eee2
-  qrm_starpu: r1443
-  new_magmamorse: r1799
-** All tags from git:
-#+begin_src sh :results output
- git push origin --tags
- git tag -n1
-#+end_src
+** Git TAGs
+*** Stable versions:
+**** stable13
+    StarPU version: trunk 14405
+    Simgrid: c78eee2
+    qrm_starpu: r1393
+    new_magmamorse: r1799
+**** stable13.1
+    StarPU version: trunk 14405
+    Simgrid: c78eee2
+    qrm_starpu: r1443
+    new_magmamorse: r1799
+*** All tags from git:
+   #+begin_src sh :results output
+    git push origin --tags
+    git tag -n1
+   #+end_src
 
-#+RESULTS:
+   #+RESULTS:
+   : exp-200402-test Merge branch 'exp-200402-test' into data
+* Organization of code
+** scripts:
+*** run_bench_StarPU.sh [4/4]:                                        :@LUKA:
+    - Runs benchmarking of StarPU without Simgrid
+    - [X] Write a usage/help part, add environment variables
+    - [X] Upgrade for interective mode
+    - [X] Change verbose
+    - [X] Add frequency scaling only if the file exists, otherwise write "unknown
+** src/
+*** fluotracify/
+**** imports/
+**** simulations/
+**** training/
+**** applications/
+**** doc/
+    - use Sphinx
+      - follow this: https://daler.github.io/sphinxdoc-test/includeme.html
+      - evtl export org-mode Readme to rst via https://github.com/msnoigrs/ox-rst
+      - possibly heavily use
+        http://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html
+    - for examples sphinx-galleries could be useful
+      https://sphinx-gallery.github.io/stable/getting_started.html
+
+*** nanosimpy/
+    - cloned from dwaithe with refactoring for Python 3-compatibility
+
+* Changes in this Lab book template (without "* Data")
+** 2020-04-22
+   - added parts of README which describe the experimental process
+   - added templates for system metadata, tmux, jupyter setup
+   - added organization of code
+** 2020-03-30
+   - set up lab book and form git repo accoring to setup by Luka Stanisic et al
