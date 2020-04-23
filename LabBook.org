@@ -224,6 +224,7 @@ variable has to be set before calling this function:
 export
 #+END_SRC
 
+Then call:
 
 #+NAME: jpt-tmux
 #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine
@@ -275,12 +276,6 @@ ssh -t -t ara -L $port:localhost:$port ssh $node -L $port:Localhost:$port
    : exp-200402-test Merge branch 'exp-200402-test' into data
 * Organization of code
 ** scripts:
-*** run_bench_StarPU.sh [4/4]:                                        :@LUKA:
-    - Runs benchmarking of StarPU without Simgrid
-    - [X] Write a usage/help part, add environment variables
-    - [X] Upgrade for interective mode
-    - [X] Change verbose
-    - [X] Add frequency scaling only if the file exists, otherwise write "unknown
 ** src/
 *** fluotracify/
 **** imports/
@@ -299,10 +294,18 @@ ssh -t -t ara -L $port:localhost:$port ssh $node -L $port:Localhost:$port
 *** nanosimpy/
     - cloned from dwaithe with refactoring for Python 3-compatibility
 
-* Changes in this Lab book template (without "* Data")
-** 2020-04-22
-   - added parts of README which describe the experimental process
-   - added templates for system metadata, tmux, jupyter setup
-   - added organization of code
-** 2020-03-30
-   - set up lab book and form git repo accoring to setup by Luka Stanisic et al
+* Changes in this repository (without "* Data" in this file)
+** Changes in LabBook.org (without "* Data")
+*** 2020-04-22
+    - added parts of README which describe the experimental process
+    - added templates for system metadata, tmux, jupyter setup
+    - added organization of code
+*** 2020-03-30
+    - set up lab book and form git repo accoring to setup by Luka Stanisic et al
+** Changes in src/fluotracify
+
+* DEVELOPMENT TESTING (don't merge in master)
+  :LOGBOOK:
+  CLOCK: [2020-04-23 Do 13:35]
+  :END:
+** connect LabBook to HPC with jupyter etc
