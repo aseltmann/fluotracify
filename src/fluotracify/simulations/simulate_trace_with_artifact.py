@@ -11,12 +11,12 @@ import numpy as np
 
 sys.path.append("../../../mynanosimpy/nanosimpy/")
 sys.path.append("../../../mynanosimpy/nanosimpy/nanosimpy")
+
 from nanosimpy.simulation_methods import (
     brownian_only_numpy,
     calculate_psf,
     integrate_over_psf,
 )
-
 
 
 def simulate_trace_array(artifact,
@@ -30,7 +30,8 @@ def simulate_trace_array(artifact,
                          width,
                          height,
                          nclust=None,
-                         d_clust=None):
+                         d_clust=None,
+                         label_for=0):
     """Simulate a fluorescence trace using the nanosimpy package and
     introduce artifacts
 
@@ -61,6 +62,9 @@ def simulate_trace_array(artifact,
         Number of bright slowly diffusing clusters (only for artifact = 1)
     d_clust float, optional
         Diffusion rate of slowly diffusing clusters (only for artifact = 1)
+    label_for : {0, 1}, optional
+        0 = classification or segmentation (only artifact is label, standard)
+        1 = variational autoencoder (only clean trace is label)
 
     Returns
     -------
@@ -99,19 +103,17 @@ def simulate_trace_array(artifact,
 
     def _simulate_detector_dropout(clean_trace):
         num_of_dropouts = np.random.randint(50)
-        detdrop_trace = clean_trace * 100
         # simulate detector dropout
-        detdrop_mask = np.zeros(detdrop_trace.shape[0])
+        detdrop_mask = np.zeros(clean_trace.shape[0])
         for _ in range(num_of_dropouts):
             length_of_dropout = np.random.randint(25)
-            start = int(np.random.random_sample() * detdrop_trace.shape[0])
+            start = int(np.random.random_sample() * clean_trace.shape[0])
             end = int(start + length_of_dropout)
             for mid in range(end - start):
                 depth_of_dropout = np.random.random_sample()
                 detdrop_mask[start + mid:start + mid +
-                             1] = (-np.amin(detdrop_trace)) * depth_of_dropout
-
-        return detdrop_trace, detdrop_mask
+                             1] = (-np.amin(clean_trace)) * depth_of_dropout
+        return clean_trace, detdrop_mask
 
     def _simulate_photobleaching(track_arr,
                                  psf,
@@ -192,12 +194,13 @@ def simulate_trace_array(artifact,
             psx=pos_x,
         )
         clean_trace = out_clean["trace"][0]
+        # add random noise
+        clean_trace = (clean_trace * 100 +
+                       np.random.random_sample(clean_trace.shape[0]) * 10 +
+                       scaling_summand)
         if artifact == 0:
             # no artifact
-            out_array[:, i * 2] = (
-                clean_trace * 100 +
-                np.random.random_sample(clean_trace.shape[0]) * 10 +
-                scaling_summand)
+            out_array[:, i * 2] = clean_trace
             out_array[:, i * 2 + 1] = np.full_like(clean_trace.shape,
                                                    np.nan,
                                                    dtype=np.double)
@@ -207,15 +210,14 @@ def simulate_trace_array(artifact,
             clust_trace, cluster_brightness = _simulate_bright_clusters(
                 psf=psf, pos_x=pos_x, pos_y=pos_y)
             # combine fast and slow molecules
-            out_array[:, i * 2] = (
-                clean_trace * 100 +
-                np.random.random_sample(clean_trace.shape[0]) * 10 +
-                scaling_summand)
-            out_array[:, i * 2] += (
+            out_array[:, i * 2] = clean_trace + (
                 clust_trace * cluster_brightness +
                 np.random.random_sample(clust_trace.shape[0]) * 10)
             # save labels
-            out_array[:, i * 2 + 1] = clust_trace
+            if label_for == 0:
+                out_array[:, i * 2 + 1] = clust_trace
+            elif label_for == 1:
+                out_array[:, i * 2 + 1] = clean_trace
             print(
                 '\nTrace {}: Nmol: {} d_mol: {} Cluster multiplier: {}'.format(
                     i, nmol, d_mol, cluster_brightness))
@@ -223,12 +225,13 @@ def simulate_trace_array(artifact,
             # detector dropout
             detdrop_trace, detdrop_mask = _simulate_detector_dropout(
                 clean_trace=clean_trace)
-
             # combine
-            out_array[:, i * 2] = detdrop_trace + np.random.random_sample(
-                detdrop_trace.shape[0]) * 10 + scaling_summand + detdrop_mask
+            out_array[:, i * 2] = detdrop_trace + detdrop_mask
             # save labels
-            out_array[:, i * 2 + 1] = detdrop_mask
+            if label_for == 0:
+                out_array[:, i * 2 + 1] = detdrop_mask
+            elif label_for == 1:
+                out_array[:, i * 2 + 1] = detdrop_trace
             print('\nTrace {}: Nmol: {} d_mol: {} max. drop: {:.2f}'.format(
                 i, nmol, d_mol, -np.amin(detdrop_trace)))
         elif artifact == 3:
@@ -236,12 +239,15 @@ def simulate_trace_array(artifact,
             ibleach_trace, mbleach_trace, exp_scale = _simulate_photobleaching(
                 track_arr=track_arr, psf=psf, pos_x=pos_x, pos_y=pos_y)
             # combine all traces for features
-            out_array[:, i * 2] = (
-                (clean_trace + ibleach_trace + mbleach_trace) * 100 +
+            out_array[:, i * 2] = clean_trace + (
+                (ibleach_trace + mbleach_trace) * 100 +
                 np.random.random_sample(clean_trace.shape[0]) * 10 +
                 scaling_summand)
             # combine artefact traces for labels
-            out_array[:, i * 2 + 1] = ibleach_trace + mbleach_trace
+            if label_for == 0:
+                out_array[:, i * 2 + 1] = ibleach_trace + mbleach_trace
+            elif label_for == 1:
+                out_array[:, i * 2 + 1] = clean_trace
             print('\nTrace {}: Nmol: {} d_mol: {} scale parameter: {:.2f}'.
                   format(i, nmol, d_mol, exp_scale))
         else:
@@ -331,8 +337,15 @@ def savetrace_csv(artifact,
                    comments='')
 
 
-def produce_training_data(folder, file_name, number_of_sets, traces_per_set,
-                          total_sim_time, artifact, nmol, d_mol):
+def produce_training_data(folder,
+                          file_name,
+                          number_of_sets,
+                          traces_per_set,
+                          total_sim_time,
+                          artifact,
+                          nmol_arr,
+                          d_mol_arr,
+                          label_for=0):
     """Save multiple .csv files containing simulations of Fluorescence
     Correlation Spectroscopy measurements including labelled artifacts.
 
@@ -352,12 +365,15 @@ def produce_training_data(folder, file_name, number_of_sets, traces_per_set,
     artifact : {0, 1, 2, 3}
         0 = no artifact, 1 = bright clusters, 2 = detector dropout,
         3 = photobleaching
-    nmol : list or tuple
+    nmol_arr : list or tuple
         Number of fast molecules used for simulation. For each set, one will
         be drawn using random.choice()
-    d_mol : list or tuple
+    d_mol_arr : list or tuple
         Diffusion coefficients in mm^2 / s used for simulation. For each set,
         one will be drawn using random.choice()
+    label_for : {0, 1}, optional
+        0 = classification or segmentation (only artifact is label, standard)
+        1 = variational autoencoder (only clean trace is label)
 
     Returns
     -------
@@ -379,8 +395,9 @@ def produce_training_data(folder, file_name, number_of_sets, traces_per_set,
     height = 3000.0
 
     for idx in range(number_of_sets):
-        nmol = random.choice(nmol)
-        d_mol = random.choice(d_mol)
+        print('Set {} ------------------------'.format(idx))
+        nmol = random.choice(nmol_arr)
+        d_mol = random.choice(d_mol_arr)
 
         file_name_ext = '_set{:0>3}.csv'.format(idx + 1)
         file = ''.join([file_name, file_name_ext])
@@ -404,7 +421,8 @@ def produce_training_data(folder, file_name, number_of_sets, traces_per_set,
                                           width=width,
                                           height=height,
                                           nclust=nclust,
-                                          d_clust=d_clust)
+                                          d_clust=d_clust,
+                                          label_for=label_for)
             savetrace_csv(artifact=artifact,
                           path_and_file_name=path_and_file_name,
                           traces_array=traces,
@@ -430,7 +448,8 @@ def produce_training_data(folder, file_name, number_of_sets, traces_per_set,
                                           nmol=nmol,
                                           d_mol=d_mol,
                                           width=width,
-                                          height=height)
+                                          height=height,
+                                          label_for=label_for)
             savetrace_csv(artifact=artifact,
                           path_and_file_name=path_and_file_name,
                           traces_array=traces,
