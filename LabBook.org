@@ -592,7 +592,7 @@ Note: t
 *** Reading Barredo Arrieta et al: Explainable Artificial Intelligence (XIA)
 *** Set up git on HPC
     :LOGBOOK:
-    CLOCK: [2020-04-24 Fr 13:53]
+    CLOCK: [2020-04-24 Fr 13:53]--[2020-04-24 Fr 14:15] =>  0:22
     :END:
 #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session ob-tmux:mlflow
   git clone https://github.com/aseltmann/fluotracify
