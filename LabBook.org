@@ -485,8 +485,8 @@ expression should be returned as written, not evaluated.
   No of CPUs the current process can use: 48
   load average: (0.08, 0.03, 0.05)
   posix.uname_result(sysname='Linux', nodename='node018', release='3.10.0-957.1.3.el7.x86_64', version='#1 SMP Thu Nov 29 14:49:43 UTC 2018', machine='x86_64')
-  PID of process: 16338
-  RAM total: 137G, RAM used: 1.6G, RAM free: 126G
+  PID of process: 86937
+  RAM total: 137G, RAM used: 1.7G, RAM free: 126G
   the current directory: /home/ye53nis
   My disk usage:
   Filesystem           Size  Used Avail Use% Mounted on
@@ -501,7 +501,7 @@ expression should be returned as written, not evaluated.
   /dev/sda5            2.0G   34M  2.0G   2% /tmp
   /dev/sda6            169G  3.9G  165G   3% /local
   /dev/sda3            6.0G  481M  5.6G   8% /var
-  beegfs_nodev         524T  419T  106T  80% /beegfs
+  beegfs_nodev         524T  421T  104T  81% /beegfs
   tmpfs                 13G     0   13G   0% /run/user/67339
 #+end_example
 
@@ -577,7 +577,7 @@ expression should be returned as written, not evaluated.
 Note: t
 
 **** Note: do it like for jupyter: srun a bash script, then execute mlflow
-*** Reading the docs
+*** Reading the docs: mlflow
 - searched for papers, found [[http://sites.computer.org/debull/A18dec/A18DEC-CD.pdf#page=41][two]] [[https://mlsys.org/Conferences/2019/doc/2019/demo_33.pdf][papers]], but they don't seem very exhaustive.
 - took notes [[file:~/Dokumente/org/04_Digital-und-Technik/programmieren.org::*<2020-04-16 Do 12:57> =mlflow=][here]]
 - shall I keep MLflow files in a folder inside the =data/exp#= folder for each
@@ -592,6 +592,7 @@ Note: t
 *** Reading Barredo Arrieta et al: Explainable Artificial Intelligence (XIA)
 *** Set up git on HPC
     :LOGBOOK:
+    CLOCK: [2020-04-24 Fr 14:35]--[2020-04-24 Fr 17:53] =>  3:18
     CLOCK: [2020-04-24 Fr 13:53]--[2020-04-24 Fr 14:15] =>  0:22
     :END:
 #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session ob-tmux:mlflow
@@ -601,6 +602,11 @@ Note: t
 Wanted to git pull my repository on HPC, noticed that it already exists - and
 has uncommited changes. Have to sort that out.
 
+Git runs now on HPC, but had to resolve merge conflicts in code → used *Magit*
+and especially *Ediff*. Watched these resources:
+- https://www.youtube.com/watch?v=9S2pMZ6U5Tc&t=715s - short resource on smerge
+  and ediff
+- https://www.youtube.com/watch?v=j-k-lkilbEs - nice intro to magit in general
 
 *** run mlflow test
 #+BEGIN_SRC sh :session local
@@ -640,9 +646,14 @@ has uncommited changes. Have to sort that out.
 #+CALL: setup-tmux[:session local]
 
 #+RESULTS:
-| ye53nis@ara-login01.rz.uni-jena.de's | password:                            |           |
-| /tmp/tmux-67339/default              |                                      |           |
-| >                                    | ye53nis@ara-login01.rz.uni-jena.de's | password: |
+| sh-5.0$ | ye53nis@ara-login01.rz.uni-jena.de's | password: |
+| >       | ye53nis@ara-login01.rz.uni-jena.de's | password: |
 
 #+CALL: jpt-tunnel(port="8889", node="node018")
+
+#+RESULTS:
+| sh-5.0$           | ye53nis@ara-login01.rz.uni-jena.de's | password: |     |    |          |      |      |             |
+| ye53nis@node018's | password:                            |           |     |    |          |      |      |             |
+| Last              | login:                               | Fri       | Apr | 24 | 11:09:51 | 2020 | from | login01.ara |
+
 #+CALL: jupyter-python-metadata(conda_list='False)
