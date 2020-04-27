@@ -654,6 +654,6 @@ and especially *Ediff*. Watched these resources:
 #+RESULTS:
 | sh-5.0$           | ye53nis@ara-login01.rz.uni-jena.de's | password: |     |    |          |      |      |             |
 | ye53nis@node018's | password:                            |           |     |    |          |      |      |             |
-| Last              | login:                               | Fri       | Apr | 24 | 11:09:51 | 2020 | from | login01.ara |
+| Last              | login:                               | Sat       | Apr | 25 | 13:40:36 | 2020 | from | login01.ara |
 
 #+CALL: jupyter-python-metadata(conda_list='False)
