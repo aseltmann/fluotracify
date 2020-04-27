@@ -278,6 +278,11 @@ def decoder(input_tensor, concat_tensor, filters, name):
     return decode
 
 
+# length of your training timeline (needs to be constant during training, can
+# be anything when predicting) corresponding to the depth of your U-net
+# (number of down- and upsamplings) the minimum lenght should be about 30 time
+# steps or less
+
 def unet_1d_alt(input_size):
     """U-Net as described by Ronneberger et al.
 
