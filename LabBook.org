@@ -118,9 +118,10 @@
 #+begin_src sh
 git log -1
 #+end_src
+
 *** System Metadata:
 #+NAME: jupyter-python-metadata
-#+BEGIN_SRC jupyter-python
+#+BEGIN_SRC jupyter-python :var conda_list="true"
   import os
 
   ramlist = os.popen('free -th').readlines()[-1].split()[1:]
@@ -137,8 +138,10 @@ git log -1
   !echo the current directory: $PWD
   !echo My disk usage:
   !df -h
-  !conda list
+  if conda_list:
+      !conda list
 #+END_SRC
+
 **** TODO Add =os.environ=
 *** Tmux setup and scripts
     :PROPERTIES:
@@ -218,10 +221,10 @@ On the compute node of the HPC, the users' environment is managed through module
 files using the system [[https://lmod.readthedocs.io][Lmod]]. The =export XDG_RUNTIME_DIR= statements are needed
 because of a jupyter bug which did not let it start. Right now, =ob-tmux= does
 not support a =:var= header like normal =org-babel= does. So the =$port=
-variable has to be set before calling this function:
+variable has to be set before calling a block similar to this one:
 
 #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine
-export
+export PORT=8889
 #+END_SRC
 
 Then call:
@@ -231,7 +234,7 @@ Then call:
 module load tools/python/3.7
 export XDG_RUNTIME_DIR=''
 export XDG_RUNTIME_DIR=""
-jupyter notebook --no-browser --port=$port
+jupyter notebook --no-browser --port=$PORT
 #+END_SRC
 
 Now this port has to be tunnelled on our local computer. While the tmux session
@@ -243,6 +246,7 @@ it would need to be reestablished.
 #+BEGIN_SRC sh :session org-tunnel :var port="8889" :var node="node001"
 ssh -t -t ara -L $port:localhost:$port ssh $node -L $port:Localhost:$port
 #+END_SRC
+
 *** Notes:
     ######################
 
