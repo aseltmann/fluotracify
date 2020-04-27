@@ -308,7 +308,7 @@ ssh -t -t ara -L $port:localhost:$port ssh $node -L $port:Localhost:$port
     - set up lab book and form git repo accoring to setup by Luka Stanisic et al
 ** Changes in src/fluotracify
 
-* TODO DEVELOPMENT TESTING (don't merge in master)
+* DEVELOPMENT TESTING (don't merge in master)
   :LOGBOOK:
   CLOCK: [2020-04-23 Do 13:35]--[2020-04-23 Do 14:57] =>  1:22
   :END:
