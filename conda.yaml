@@ -1,0 +1,10 @@
+name: fluotracify
+channels:
+  - defaults
+  - conda-forge
+#   - file:///home/lex/Programme/drmed-git/src/
+dependencies:
+  - tensorflow
+  - numpy
+  - pandas
+  - mlflow
