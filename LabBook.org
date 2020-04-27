@@ -308,8 +308,341 @@ ssh -t -t ara -L $port:localhost:$port ssh $node -L $port:Localhost:$port
     - set up lab book and form git repo accoring to setup by Luka Stanisic et al
 ** Changes in src/fluotracify
 
-* DEVELOPMENT TESTING (don't merge in master)
+* TODO DEVELOPMENT TESTING (don't merge in master)
   :LOGBOOK:
-  CLOCK: [2020-04-23 Do 13:35]
+  CLOCK: [2020-04-23 Do 13:35]--[2020-04-23 Do 14:57] =>  1:22
   :END:
+** configured custom yasnippets,
+   - check =yas-describe-tables= for current snippets
+   - use =C-c & C-n= to create new snippet (its put in =.emacs.d/snippets/=)
+
+#+BEGIN_SRC sh :session local
+  ls -Rl ~/.emacs.d/snippets/
+#+END_SRC
+
+#+RESULTS:
+| /home/lex/.emacs.d/snippets/:         |     |    |       |                       |
+| total                                 |     |    |       |                       |
+| drwxr-xr-x                            | Apr | 23 | 15:23 | org-mode              |
+| /home/lex/.emacs.d/snippets/org-mode: |     |    |       |                       |
+| total                                 |     |    |       |                       |
+| -rw-r--r--                            | Apr | 23 | 14:32 | jupyter-python-block  |
+| -rw-r--r--                            | Apr | 23 | 14:35 | jupyter-python-header |
+| -rw-r--r--                            | Apr | 23 | 15:23 | lmod-srun             |
+| -rw-r--r--                            | Apr | 23 | 14:53 | src2                  |
+| -rw-r--r--                            | Apr | 23 | 15:00 | tmux                  |
+
+** fix hardlinks of org-files outside =Dokumente/org=
+#+BEGIN_SRC sh :session local :results verbatim
+  cd Dokumente/org/linkedfiles
+  ls -li
+  find / -samefile LabBook.org
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+total 84
+4992947 -rw-r--r-- 2 lex lex 11786 Apr 23 14:14 LabBook.org
+ 404446 -rw-r--r-- 1 lex lex 21544 Apr  4 22:53 LabBook.org~
+ 404411 -rw-r--r-- 2 lex lex 23355 Apr 20 01:44 lexbn-source.org
+4328628 -rw-r--r-- 1 lex lex 20829 Apr 19 14:37 lexbn-source.org~
+
+/home/lex/Dokumente/org/linkedfiles/LabBook.org
+/home/lex/Programme/drmed-git/LabBook.org
+#+end_example
+
 ** connect LabBook to HPC with jupyter etc
+   :LOGBOOK:
+   CLOCK: [2020-04-23 Do 17:30]--[2020-04-23 Do 17:46] =>  0:16
+   CLOCK: [2020-04-23 Do 16:05]--[2020-04-23 Do 16:38] =>  0:33
+   CLOCK: [2020-04-23 Do 15:20]--[2020-04-23 Do 15:50] =>  0:30
+   CLOCK: [2020-04-23 Do 14:57]--[2020-04-23 Do 15:07] =>  0:10
+   :END:
+*** connect to compute node
+#+BEGIN_SRC sh :session org-ssh :results verbatim
+  ssh ara
+#+END_SRC
+
+#+RESULTS:
+: ssh: Could not resolve hostname ara: Name or service not known
+
+#+BEGIN_SRC sh :session org-ssh
+  sinfo
+#+END_SRC
+
+#+RESULTS:
+| PARTITION   | AVAIL |  TIMELIMIT | NODES | STATE | NODELIST                                                                                                                                                                                          |
+| b_test      | up    |    3:00:00 |     1 | idle  | node001                                                                                                                                                                                           |
+| b_standard* | up    | 8-08:00:00 |    48 | mix   | node[003,007-008,023-026,029,031,033-038,040,053,063-064,066-072,075-078,083-085,090-094,117-119,121-125,131,133]                                                                                 |
+| b_standard* | up    | 8-08:00:00 |    82 | alloc | node[002,004-006,009-022,027-028,030,032,039,041-045,047-052,054-062,065,073-074,079-082,086-089,095-116,120,126,132,134-136]                                                                     |
+| b_standard* | up    | 8-08:00:00 |     1 | idle  | node046                                                                                                                                                                                           |
+| gpu_test    | up    |    1:00:00 |     1 | idle  | node127                                                                                                                                                                                           |
+| gpu_p100    | up    | 8-08:00:00 |     2 | mix   | node[128-129]                                                                                                                                                                                     |
+| gpu_v100    | up    | 8-08:00:00 |     1 | idle  | node130                                                                                                                                                                                           |
+| b_fat       | up    | 8-08:00:00 |     4 | mix   | node[137-140]                                                                                                                                                                                     |
+| s_test      | up    |    3:00:00 |     1 | idle  | node141                                                                                                                                                                                           |
+| s_standard  | up    | 8-08:00:00 |    68 | mix   | node[144,151,162-163,167,169,171-172,177-181,186,191,196-198,200,203-209,212-214,216,218,221-222,224-231,233,235-237,241-249,255,257,259-260,265-268,297,303-304,309-310,315]                     |
+| s_standard  | up    | 8-08:00:00 |    83 | alloc | node[142-143,145-150,152-161,164-166,168,170,173-176,182-185,187-190,192-195,199,201-202,210-211,215,217,219-220,223,232,234,238-240,250-254,256,258,261-264,293-296,298-302,305-308,311-314,316] |
+| s_fat       | up    | 8-08:00:00 |     3 | mix   | node[269-270,272]                                                                                                                                                                                 |
+| s_fat       | up    | 8-08:00:00 |     1 | alloc | node271                                                                                                                                                                                           |
+
+#+BEGIN_SRC sh :session org-ssh
+  tmux ls
+#+END_SRC
+
+#+RESULTS:
+|       0: | 1 | windows | (created | Mon | Apr | 13 | 19:54:44 | 2020 |
+| ob-tmux: | 1 | windows | (created | Mon | Apr | 13 | 19:55:21 | 2020 |
+
+
+#+CALL:setup-tmux
+
+#+RESULTS:
+| ye53nis@ara-login01.rz.uni-jena.de's | password:                            |           |
+| /tmp/tmux-67339/default              |                                      |           |
+| >                                    | ye53nis@ara-login01.rz.uni-jena.de's | password: |
+
+#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session ob-tmux
+  echo test
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+  [ye53nis@login01 ~]$ echo test
+  test
+  [ye53nis@login01 ~]$
+#+end_example
+
+#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session ob-tmux
+  srun -p b_standard --time=7-10:00:00 --ntasks-per-node 48 --pty bash
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+  [ye53nis@login01 ~]$ srun -p b_standard --time=7-10:00:00 --ntasks-per-node 48 -
+  -pty bash
+  [ye53nis@node018 ~]$
+#+end_example
+
+*** start and connect to jupyter
+:PROPERTIES:
+:header-args:jupyter-python: :session /jpy:localhost#8889:6be3aedd-62d4-4fc2-b816-af41e3986de9
+:END:
+
+#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session ob-tmux
+  export PORT=8889
+#+END_SRC
+
+#+CALL: jpt-tmux[:session ob-tmux]
+
+#+RESULTS:
+#+begin_example
+  [ye53nis@node018 ~]$ export PORT=8889
+  [ye53nis@node018 ~]$ module load tools/python/3.7
+  [ye53nis@node018 ~]$ export XDG_RUNTIME_DIR=''
+  [ye53nis@node018 ~]$ export XDG_RUNTIME_DIR=""
+  [ye53nis@node018 ~]$ jupyter notebook --no-browser --port=$PORT
+  [I 16:09:30.912 NotebookApp] Serving notebooks from local directory: /home/ye53n
+  is
+  [I 16:09:30.912 NotebookApp] The Jupyter Notebook is running at:
+  [I 16:09:30.912 NotebookApp] http://localhost:8889/?token=8cd6a262f7384ed4780611
+  af96fb9cb4db8733a4cf654eaf
+  [I 16:09:30.912 NotebookApp] Use Control-C to stop this server and shut down all
+   kernels (twice to skip confirmation).
+  [C 16:09:30.957 NotebookApp]
+
+      To access the notebook, open this file in a browser:
+          file:///home/ye53nis/.local/share/jupyter/runtime/nbserver-50353-open.ht
+  ml
+      Or copy and paste one of these URLs:
+          http://localhost:8889/?token=8cd6a262f7384ed4780611af96fb9cb4db8733a4cf6
+  54eaf
+#+end_example
+
+#+CALL: jpt-tunnel(port="8889", node="node018")
+
+#+RESULTS:
+| sh-5.0$           | sh-5.0$   | ye53nis@ara-login01.rz.uni-jena.de's | password: |    |          |      |      |             |
+| ye53nis@node018's | password: |                                      |           |    |          |      |      |             |
+| Last              | login:    | Thu                                  | Apr       | 23 | 16:20:50 | 2020 | from | login01.ara |
+
+I started a Python3 kernel using =jupyter-server-list-kernels=. Then I added the
+kernel ID to the =:PROPERTIES:= drawer of this (and following) subtrees.
+
+#+begin_example
+python3           6be3aedd-62d4-4fc2-b816-af41e3986de9   2 minutes ago        starting   0
+#+end_example
+
+Passing a boolean value to a variable in =org-babel= was not trivial: you have to
+use the infamous *single quote '* from emacs-lisp programming to show that the
+expression should be returned as written, not evaluated.
+
+#+CALL: jupyter-python-metadata(conda_list='False)
+
+#+RESULTS:
+#+begin_example
+  No of CPUs in system: 48
+  No of CPUs the current process can use: 48
+  load average: (0.08, 0.03, 0.05)
+  posix.uname_result(sysname='Linux', nodename='node018', release='3.10.0-957.1.3.el7.x86_64', version='#1 SMP Thu Nov 29 14:49:43 UTC 2018', machine='x86_64')
+  PID of process: 16338
+  RAM total: 137G, RAM used: 1.6G, RAM free: 126G
+  the current directory: /home/ye53nis
+  My disk usage:
+  Filesystem           Size  Used Avail Use% Mounted on
+  /dev/sda1             50G  4.3G   46G   9% /
+  devtmpfs              63G     0   63G   0% /dev
+  tmpfs                 63G  559M   63G   1% /dev/shm
+  tmpfs                 63G   59M   63G   1% /run
+  tmpfs                 63G     0   63G   0% /sys/fs/cgroup
+  nfs01-ib:/cluster    2.0T  316G  1.7T  16% /cluster
+  nfs03-ib:/pool/work  100T   78T   23T  78% /nfsdata
+  nfs01-ib:/home        80T   59T   22T  73% /home
+  /dev/sda5            2.0G   34M  2.0G   2% /tmp
+  /dev/sda6            169G  3.9G  165G   3% /local
+  /dev/sda3            6.0G  481M  5.6G   8% /var
+  beegfs_nodev         524T  419T  106T  80% /beegfs
+  tmpfs                 13G     0   13G   0% /run/user/67339
+#+end_example
+
+** set up mlflow
+   :LOGBOOK:
+   CLOCK: [2020-04-24 Fr 13:09]--[2020-04-24 Fr 13:52] =>  0:43
+   CLOCK: [2020-04-24 Fr 11:07]--[2020-04-24 Fr 11:30] =>  0:23
+   CLOCK: [2020-04-23 Do 19:05]--[2020-04-23 Do 19:50] =>  0:45
+   CLOCK: [2020-04-23 Do 17:59]--[2020-04-23 Do 18:49] =>  0:50
+   CLOCK: [2020-04-23 Do 17:46]--[2020-04-23 Do 17:51] =>  0:05
+   :END:
+   :PROPERTIES:
+   :header-args:jupyter-python: :session /jpy:localhost#8889:6be3aedd-62d4-4fc2-b816-af41e3986de9
+   :END:
+
+*** how do I submit mlflow jobs?
+- I will need two sessions
+  - one *tmux session* for running the jupyter kernel, having a REPL, fast and
+    interactive coding. I need tmux bc the connection to the node would break if
+    I log out of ssh.
+    #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session ob-tmux
+      echo tüdelü
+    #+END_SRC
+  - one *sh ssh session* for sending command line commands. SLURM handles the
+    job and outputs files - so it should continue, even if I log out
+- alternative solution: tmux windows (*note: after using tmux windows, the
+  normal =:session tmux= without window specification doesn't work anymore*)
+  - this is window =mlflow= for sending mlflow commands. we have to request some
+    computation power by SLURM again
+    #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session ob-tmux:mlflow
+      echo pwd
+    #+END_SRC
+  - this is window =ob1= (name automatically created when you don't specify a
+    window name) where our jupyter kernel runs:
+    #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session ob-tmux:ob1
+      echo testö
+    #+END_SRC
+**** Failed approaches:
+- then jobs are submitted e.g. as bash scripts (this is just an example from the
+  wiki):
+  #+BEGIN_SRC sh
+    #!/bin/bash
+    #SBATCH --job-name=pc1-intro
+    #SBATCH --partition=s_standard
+    #SBATCH --nodes=4
+    #SBATCH --ntasks-per-node=36
+    #SBATCH --time=1:00
+    module purge
+    module load tools/python/3.7 mpi/intel/2019-Update5
+    srun python intro.py
+  #+END_SRC
+- test:
+  #+NAME: sh-test-script
+  #+BEGIN_SRC sh :shebang "#!/bin/bash"
+    #SBATCH --job-name=pc1-intro
+    #SBATCH --partition=s_test
+    #SBATCH --nodes=1
+    hostname
+  #+END_SRC
+
+#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session ob-tmux:mlflow :noweb yes
+  sbatch <<sh-test-script>>
+#+END_SRC
+
+  #+BEGIN_SRC sh :session org-ssh :noweb yes :tangle yes
+    sbatch <<sh-test-script>>
+  #+END_SRC
+
+  #+RESULTS:
+  |                                                   |
+  | sbatch: error: Unable to open file sh-test-script |
+
+Note: t
+
+**** Note: do it like for jupyter: srun a bash script, then execute mlflow
+*** Reading the docs
+- searched for papers, found [[http://sites.computer.org/debull/A18dec/A18DEC-CD.pdf#page=41][two]] [[https://mlsys.org/Conferences/2019/doc/2019/demo_33.pdf][papers]], but they don't seem very exhaustive.
+- took notes [[file:~/Dokumente/org/04_Digital-und-Technik/programmieren.org::*<2020-04-16 Do 12:57> =mlflow=][here]]
+- shall I keep MLflow files in a folder inside the =data/exp#= folder for each
+  experiment or do a central =data/mlflow= folder? → I tend towards the second
+  option. MLflow has an environment variable =MLFLOW_EXPERIMENT_NAME= which
+  would be the same as =exp#=.
+- Inside the folder, should I use "normal" files or a database for saving stuff?
+  → I tend towards normal files, since I have no experiments with databases..
+- MLflow Tracking Service API might be useful for accessing the results from
+  inside org documents.
+
+*** Reading Barredo Arrieta et al: Explainable Artificial Intelligence (XIA)
+*** Set up git on HPC
+    :LOGBOOK:
+    CLOCK: [2020-04-24 Fr 13:53]
+    :END:
+#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session ob-tmux:mlflow
+  git clone https://github.com/aseltmann/fluotracify
+#+END_SRC
+
+Wanted to git pull my repository on HPC, noticed that it already exists - and
+has uncommited changes. Have to sort that out.
+
+
+*** run mlflow test
+#+BEGIN_SRC sh :session local
+  export MLFLOW_EXPERIMENT_NAME=exp-devtest
+  export MLFLOW_TRACKING_URI=file:data/
+#+END_SRC
+
+** TODOs
+**** TODO Investigate Error on GPU node
+- 2020-04-13 02:45:28.216446: W
+  tensorflow/stream_executor/platform/default/dso_loader.cc:55] Could not load
+  dynamic library 'libnvinfer.so.6'; dlerror: libnvinfer.so.6: cannot open
+  shared object file: No such file or directory; LD_LIBRARY_PATH:
+  /cluster/miniconda3/lib
+- 2020-04-13 02:45:28.217069: W
+  tensorflow/stream_executor/platform/default/dso_loader.cc:55] Could not load
+  dynamic library 'libnvinfer_plugin.so.6'; dlerror: libnvinfer_plugin.so.6:
+  cannot open shared object file: No such file or directory; LD_LIBRARY_PATH:
+  /cluster/miniconda3/lib
+- 2020-04-13 02:45:28.217123: W
+  tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:30] Cannot dlopen some
+  TensorRT libraries. If you would like to use Nvidia GPU with TensorRT, please
+  make sure the missing libraries mentioned above are installed properly
+**** TODO Export pandas DataFrames as org tables instead of html
+- see https://github.com/dzop/emacs-jupyter/issues/88
+- see
+  https://github.com/gregsexton/ob-ipython/blob/7147455230841744fb5b95dcbe03320313a77124/README.org#tips-and-tricks
+**** TODO Inline-display of plots
+**** TODO fix pydot and graphviz to make model plotting work
+**** TODO transform ML training ipynb to py files as used [[https://github.com/mlflow/mlflow/blob/master/examples/tensorflow/tf2/train_predict_2.py][here]]
+**** TODO check out python module =argparser= as used [[https://github.com/mlflow/mlflow/blob/master/examples/tensorflow/tf2/train_predict_2.py][here]]
+**** TODO check out Talos 1.0 with MLflow for Hyperparameter optimization
+*** TODO Take a look into =org-ref= for reference management and citing inside this labbook
+*** TODO [#A] Further setup of git branching model
+*** TODO [#C] Set up Dropbox or git annex
+* Reconnect
+#+CALL: setup-tmux[:session local]
+
+#+RESULTS:
+| ye53nis@ara-login01.rz.uni-jena.de's | password:                            |           |
+| /tmp/tmux-67339/default              |                                      |           |
+| >                                    | ye53nis@ara-login01.rz.uni-jena.de's | password: |
+
+#+CALL: jpt-tunnel(port="8889", node="node018")
+#+CALL: jupyter-python-metadata(conda_list='False)
