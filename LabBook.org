@@ -603,16 +603,348 @@ Wanted to git pull my repository on HPC, noticed that it already exists - and
 has uncommited changes. Have to sort that out.
 
 Git runs now on HPC, but had to resolve merge conflicts in code → used *Magit*
-and especially *Ediff*. Watched these resources:
+and especially Ediff. Watched these resources:
 - https://www.youtube.com/watch?v=9S2pMZ6U5Tc&t=715s - short resource on smerge
   and ediff
 - https://www.youtube.com/watch?v=j-k-lkilbEs - nice intro to magit in general
 
 *** run mlflow test
-#+BEGIN_SRC sh :session local
-  export MLFLOW_EXPERIMENT_NAME=exp-devtest
-  export MLFLOW_TRACKING_URI=file:data/
+**** Use a local tmux session:
+
+#+BEGIN_SRC tmux :session local
+  pwd
 #+END_SRC
+
+#+RESULTS:
+#+begin_example
+  (base) [lex@Topialex ~]$ pwd
+  /home/lex
+#+end_example
+
+#+BEGIN_SRC tmux :session local
+  export MLFLOW_EXPERIMENT_NAME=exp-devtest
+  export MLFLOW_EXPERIMENT_ID=0.1
+  export MLFLOW_TRACKING_URI=file:./data/mlruns
+#+END_SRC
+
+#+BEGIN_SRC tmux :session local
+  conda activate tensorflow_env
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+  (base) [lex@Topialex ~]$ conda activate tensorflow_env
+  (tensorflow_env) [lex@Topialex ~]$
+#+end_example
+
+#+BEGIN_SRC tmux :session local
+  mlflow run .
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+  (tensorflow_env) [lex@Topialex ~]$ mlflow run .
+  Specify only one of 'experiment-name' or 'experiment-id' options.
+  (tensorflow_env) [lex@Topialex ~]$
+#+end_example
+
+#+BEGIN_SRC tmux :session local2
+  export MLFLOW_EXPERIMENT_NAME=exp-devtest
+  export MLFLOW_TRACKING_URI=file:./data/mlruns
+#+END_SRC
+
+#+BEGIN_SRC tmux :session local2
+  conda activate tensorflow_env
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+  (base) [lex@Topialex ~]$ conda activate tensorflow_env
+  (tensorflow_env) [lex@Topialex ~]$
+#+end_example
+
+#+BEGIN_SRC tmux :session local2
+  mlflow run /home/lex/Programme/drmed-git/
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+  (tensorflow_env) [lex@Topialex ~]$ mlflow run /home/lex/Programme/drmed-git/
+  2020/04/28 01:17:01 INFO mlflow.projects: === Created directory /tmp/tmp_goyesz7
+   for downloading remote URIs passed to arguments of type 'path' ===
+  2020/04/28 01:17:01 INFO mlflow.projects: === Running command 'source /home/lex/
+  Programme/miniconda3/bin/../etc/profile.d/conda.sh && conda activate mlflow-1114
+  b06fb561908fc3f52e89d8342d7e52709c81 1>&2 && python src/fluotracify/training/tra
+  in.py 5 0.2 16384 1e-5 10' in run with ID 'c0f7e64fdda64801860e9805948db29d' ===
+
+  /home/lex/Programme/miniconda3/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709
+  c81/lib/python3.7/site-packages/tensorflow_core/python/pywrap_tensorflow_interna
+  l.py:15: DeprecationWarning: the imp module is deprecated in favour of importlib
+  ; see the module's documentation for alternative uses
+    import imp
+  2.1.0
+  train 0 /home/lex/Programme/Jupyter/DOKTOR/saves/firstartefact/subsample_rand/tr
+  aces_brightclust_rand_Sep2019_set003.csv
+  train 1 /home/lex/Programme/Jupyter/DOKTOR/saves/firstartefact/subsample_rand/tr
+  aces_brightclust_rand_Sep2019_set002.csv
+  test 2 /home/lex/Programme/Jupyter/DOKTOR/saves/firstartefact/subsample_rand/tra
+  ces_brightclust_rand_Sep2019_set001.csv
+  shapes of feature dataframe: (20000, 200) and label dataframe: (20000, 200)
+  shapes of feature dataframe: (20000, 100) and label dataframe: (20000, 100)
+
+  for each 20,000 timestap trace there are the following numbers of corrupted time
+  steps:
+   label001_1     4124
+  label002_1     2261
+  label003_1       45
+  label004_1    13108
+  label005_1     2306
+  dtype: int64
+  2020-04-28 01:17:15.293658: I tensorflow/core/platform/cpu_feature_guard.cc:142]
+   Your CPU supports instructions that this TensorFlow binary was not compiled to
+  use: SSE4.1 SSE4.2 AVX AVX2 FMA
+  2020-04-28 01:17:15.340845: I tensorflow/core/platform/profile_utils/cpu_utils.c
+  c:94] CPU Frequency: 2400500000 Hz
+  2020-04-28 01:17:15.342222: I tensorflow/compiler/xla/service/service.cc:168] XL
+  A service 0x5654fb291850 initialized for platform Host (this does not guarantee
+  that XLA will be used). Devices:
+  2020-04-28 01:17:15.342284: I tensorflow/compiler/xla/service/service.cc:176]
+  StreamExecutor device (0): Host, Default Version
+  2020-04-28 01:17:15.344811: I tensorflow/core/common_runtime/process_util.cc:147
+  ] Creating new thread pool with default inter op setting: 2. Tune using inter_op
+  _parallelism_threads for best performance.
+  number of training examples: 160, number of validation examples: 40
+
+  ------------------------
+  number of test examples: 100
+
+  Traceback (most recent call last):
+    File "src/fluotracify/training/train.py", line 65, in <module>
+      with mlflow.start_run():
+    File "/home/lex/Programme/miniconda3/envs/mlflow-1114b06fb561908fc3f52e89d8342
+  d7e52709c81/lib/python3.7/site-packages/mlflow/tracking/fluent.py", line 122, in
+   start_run
+      active_run_obj = MlflowClient().get_run(existing_run_id)
+    File "/home/lex/Programme/miniconda3/envs/mlflow-1114b06fb561908fc3f52e89d8342
+  d7e52709c81/lib/python3.7/site-packages/mlflow/tracking/client.py", line 96, in
+  get_run
+      return self._tracking_client.get_run(run_id)
+    File "/home/lex/Programme/miniconda3/envs/mlflow-1114b06fb561908fc3f52e89d8342
+  d7e52709c81/lib/python3.7/site-packages/mlflow/tracking/_tracking_service/client
+  .py", line 49, in get_run
+      return self.store.get_run(run_id)
+    File "/home/lex/Programme/miniconda3/envs/mlflow-1114b06fb561908fc3f52e89d8342
+  d7e52709c81/lib/python3.7/site-packages/mlflow/store/tracking/file_store.py", li
+  ne 423, in get_run
+      run_info = self._get_run_info(run_id)
+    File "/home/lex/Programme/miniconda3/envs/mlflow-1114b06fb561908fc3f52e89d8342
+  d7e52709c81/lib/python3.7/site-packages/mlflow/store/tracking/file_store.py", li
+  ne 442, in _get_run_info
+      databricks_pb2.RESOURCE_DOES_NOT_EXIST)
+  mlflow.exceptions.MlflowException: Run 'c0f7e64fdda64801860e9805948db29d' not fo
+  und
+  Exception ignored in: <function _RandomSeedGeneratorDeleter.__del__ at 0x7fb42c4
+  f4440>
+  Traceback (most recent call last):
+    File "/home/lex/Programme/miniconda3/envs/mlflow-1114b06fb561908fc3f52e89d8342
+  d7e52709c81/lib/python3.7/site-packages/tensorflow_core/python/data/ops/dataset_
+  ops.py", line 3462, in __del__
+  AttributeError: 'NoneType' object has no attribute 'device'
+  2020/04/28 01:17:16 ERROR mlflow.cli: === Run (ID 'c0f7e64fdda64801860e9805948db
+  29d') failed ===
+  (tensorflow_env) [lex@Topialex ~]$
+#+end_example
+
+**** use remote tmux
+#+BEGIN_SRC sh :session org-ssh
+  ssh ara
+#+END_SRC
+
+#+RESULTS:
+| Permission                           | denied,   | please | try    | again. |          |          |      |                |            |                |    |           |
+| ye53nis@ara-login01.rz.uni-jena.de's | password: |        |        |        |          |          |      |                |            |                |    |           |
+| Last                                 | failed    | login: | Tue    | Apr    |       28 | 11:05:11 | CEST |           2020 | from       | 10.231.181.150 | on | ssh:notty |
+| There                                | was       | 1      | failed | login  |  attempt |    since | the  |           last | successful |         login. |    |           |
+| Last                                 | login:    | Tue    | Apr    | 28     | 10:57:34 |     2020 | from | 10.231.181.150 |            |                |    |           |
+
+#+BEGIN_SRC sh :session org-ssh
+  sinfo
+#+END_SRC
+
+#+RESULTS:
+| PARTITION   | AVAIL |  TIMELIMIT | NODES | STATE | NODELIST                                                                                                                                                                          |
+| b_test      | up    |    3:00:00 |     1 | down* | node001                                                                                                                                                                           |
+| b_standard* | up    | 8-08:00:00 |    30 | mix   | node[005-006,008,010,014,016,023,025,029,031,039,043,046,063-066,069-071,086,108,110,120,126,131-132,134-136]                                                                     |
+| b_standard* | up    | 8-08:00:00 |    93 | alloc | node[002-004,009,011-013,015,017-022,024,026-028,030,032-038,040-042,044-045,047-062,072-084,087-107,109,111-114,117-118,121-123,125,133]                                         |
+| b_standard* | up    | 8-08:00:00 |     8 | idle  | node[007,067-068,085,115-116,119,124]                                                                                                                                             |
+| gpu_test    | up    |    1:00:00 |     1 | idle  | node127                                                                                                                                                                           |
+| gpu_p100    | up    | 8-08:00:00 |     2 | idle  | node[128-129]                                                                                                                                                                     |
+| gpu_v100    | up    | 8-08:00:00 |     1 | mix   | node130                                                                                                                                                                           |
+| b_fat       | up    | 8-08:00:00 |     1 | mix   | node139                                                                                                                                                                           |
+| b_fat       | up    | 8-08:00:00 |     3 | alloc | node[137-138,140]                                                                                                                                                                 |
+| s_test      | up    |    3:00:00 |     1 | idle  | node141                                                                                                                                                                           |
+| s_standard  | up    | 8-08:00:00 |    44 | mix   | node[151,155,167,169,177,186,191,196-200,203,216,218,224-231,233,235,241-246,249,255,259-260,265-268,297,303,309-310,315]                                                         |
+| s_standard  | up    | 8-08:00:00 |   107 | alloc | node[142-150,152-154,156-166,168,170-176,178-185,187-190,192-195,201-202,204-215,217,219-223,232,234,236-240,247-248,250-254,256-258,261-264,293-296,298-302,304-308,311-314,316] |
+| s_fat       | up    | 8-08:00:00 |     1 | mix   | node269                                                                                                                                                                           |
+| s_fat       | up    | 8-08:00:00 |     3 | alloc | node[270-272]                                                                                                                                                                     |
+
+#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
+    srun -p b_standard --time=7-08:00:00 --ntasks-per-node 48 --pty bash
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+  [ye53nis@login01 drmed-git]$ srun -p b_standard --time=7-08:00:00 --ntasks-per-node 48 --pty bash
+  [ye53nis@node007 drmed-git]$
+#+end_example
+
+#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
+  export MLFLOW_EXPERIMENT_NAME=exp-devtest
+  export MLFLOW_TRACKING_URI=file:./data/mlruns
+#+END_SRC
+
+#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
+  module load tools/python/3.7
+  module load module-git
+  mlflow --version
+  git --version
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+  [ye53nis@node007 drmed-git]$ mlflow --version
+  git --version
+  /cluster/miniconda3/lib/python3.7/site-packages/jinja2/runtime.py:318: DeprecationWarning: Using or importing the ABCs from 'collections' instead of from 'collections.abc' is deprecated since Python 3.3,and in 3.9 it will stop working
+    from collections import Mapping
+  mlflow, version 1.7.0
+  [ye53nis@node007 drmed-git]$ git --version
+  git version 1.8.3.1
+  [ye53nis@node007 drmed-git]$
+#+end_example
+
+#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
+  mlflow run . --no-conda
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+  [ye53nis@node001 drmed-git]$ mlflow run .
+  /cluster/miniconda3/lib/python3.7/site-packages/jinja2/runtime.py:318: DeprecationWarning: Using or importing the ABCs from 'collections' instead of from 'collections.abc' is deprecated
+   since Python 3.3,and in 3.9 it will stop working
+    from collections import Mapping
+  Notice: failed to import Git (the git executable is probably not on your PATH), so Git SHA is not available. Error: Failed to initialize: Bad git executable.
+  The git executable must be specified in one of the following ways:
+      - be included in your $PATH
+      - be set via $GIT_PYTHON_GIT_EXECUTABLE
+      - explicitly set via git.refresh()
+
+  All git commands will error until this is rectified.
+
+  This initial warning can be silenced or aggravated in the future by setting the
+  $GIT_PYTHON_REFRESH environment variable. Use one of the following values:
+      - quiet|q|silence|s|none|n|0: for no warning or exception
+      - warn|w|warning|1: for a printed warning
+      - error|e|raise|r|2: for a raised exception
+
+  Example:
+      export GIT_PYTHON_REFRESH=quiet
+
+  2020/04/28 11:13:04 WARNING mlflow.tracking.context.git_context: Failed to import Git (the Git executable is probably not on your PATH), so Git SHA is not available. Error: Failed to in
+  itialize: Bad git executable.
+  The git executable must be specified in one of the following ways:
+      - be included in your $PATH
+      - be set via $GIT_PYTHON_GIT_EXECUTABLE
+      - explicitly set via git.refresh()
+
+  All git commands will error until this is rectified.
+
+  This initial warning can be silenced or aggravated in the future by setting the
+  $GIT_PYTHON_REFRESH environment variable. Use one of the following values:
+      - quiet|q|silence|s|none|n|0: for no warning or exception
+      - warn|w|warning|1: for a printed warning
+      - error|e|raise|r|2: for a raised exception
+
+  Example:
+      export GIT_PYTHON_REFRESH=quiet
+
+  Traceback (most recent call last):
+    File "/cluster/miniconda3/lib/python3.7/site-packages/git/__init__.py", line 83, in <module>
+      refresh()
+    File "/cluster/miniconda3/lib/python3.7/site-packages/git/__init__.py", line 73, in refresh
+      if not Git.refresh(path=path):
+    File "/cluster/miniconda3/lib/python3.7/site-packages/git/cmd.py", line 278, in refresh
+      raise ImportError(err)
+  ImportError: Bad git executable.
+  The git executable must be specified in one of the following ways:
+      - be included in your $PATH
+      - be set via $GIT_PYTHON_GIT_EXECUTABLE
+      - explicitly set via git.refresh()
+
+  All git commands will error until this is rectified.
+
+  This initial warning can be silenced or aggravated in the future by setting the
+  $GIT_PYTHON_REFRESH environment variable. Use one of the following values:
+      - quiet|q|silence|s|none|n|0: for no warning or exception
+      - warn|w|warning|1: for a printed warning
+      - error|e|raise|r|2: for a raised exception
+
+  Example:
+      export GIT_PYTHON_REFRESH=quiet
+
+
+  During handling of the above exception, another exception occurred:
+
+  Traceback (most recent call last):
+    File "/cluster/miniconda3/bin/mlflow", line 10, in <module>
+      sys.exit(cli())
+    File "/cluster/miniconda3/lib/python3.7/site-packages/click/core.py", line 764, in __call__
+      return self.main(*args, **kwargs)
+    File "/cluster/miniconda3/lib/python3.7/site-packages/click/core.py", line 717, in main
+      rv = self.invoke(ctx)
+    File "/cluster/miniconda3/lib/python3.7/site-packages/click/core.py", line 1137, in invoke
+      return _process_result(sub_ctx.command.invoke(sub_ctx))
+    File "/cluster/miniconda3/lib/python3.7/site-packages/click/core.py", line 956, in invoke
+      return ctx.invoke(self.callback, **ctx.params)
+    File "/cluster/miniconda3/lib/python3.7/site-packages/click/core.py", line 555, in invoke
+      return callback(*args, **kwargs)
+    File "/cluster/miniconda3/lib/python3.7/site-packages/mlflow/cli.py", line 138, in run
+      run_id=run_id
+    File "/cluster/miniconda3/lib/python3.7/site-packages/mlflow/projects/__init__.py", line 288, in run
+      use_conda=use_conda, storage_dir=storage_dir, synchronous=synchronous, run_id=run_id)
+    File "/cluster/miniconda3/lib/python3.7/site-packages/mlflow/projects/__init__.py", line 120, in _run
+      repo_url = _get_git_repo_url(work_dir)
+    File "/cluster/miniconda3/lib/python3.7/site-packages/mlflow/projects/utils.py", line 34, in _get_git_repo_url
+      from git import Repo
+    File "/cluster/miniconda3/lib/python3.7/site-packages/git/__init__.py", line 85, in <module>
+      raise ImportError('Failed to initialize: {0}'.format(exc))
+  ImportError: Failed to initialize: Bad git executable.
+  The git executable must be specified in one of the following ways:
+      - be included in your $PATH
+      - be set via $GIT_PYTHON_GIT_EXECUTABLE
+      - explicitly set via git.refresh()
+
+  All git commands will error until this is rectified.
+
+  This initial warning can be silenced or aggravated in the future by setting the
+  $GIT_PYTHON_REFRESH environment variable. Use one of the following values:
+      - quiet|q|silence|s|none|n|0: for no warning or exception
+      - warn|w|warning|1: for a printed warning
+      - error|e|raise|r|2: for a raised exception
+
+  Example:
+      export GIT_PYTHON_REFRESH=quiet
+
+  [ye53nis@node001 drmed-git]$
+#+end_example
+
+
+#+BEGIN_SRC sh :dir ~/Programme/drmed-git :session local
+
+#+END_SRC
+
+#+RESULTS:
+|                               |
+| /home/lex/Programme/drmed-git |
 
 ** TODOs
 **** TODO Investigate Error on GPU node
@@ -646,8 +978,9 @@ and especially *Ediff*. Watched these resources:
 #+CALL: setup-tmux[:session local]
 
 #+RESULTS:
-| sh-5.0$ | ye53nis@ara-login01.rz.uni-jena.de's | password: |
-| >       | ye53nis@ara-login01.rz.uni-jena.de's | password: |
+| ye53nis@ara-login01.rz.uni-jena.de's | password:                            |           |
+| /tmp/tmux-67339/default              |                                      |           |
+| >                                    | ye53nis@ara-login01.rz.uni-jena.de's | password: |
 
 #+CALL: jpt-tunnel(port="8889", node="node018")
 
