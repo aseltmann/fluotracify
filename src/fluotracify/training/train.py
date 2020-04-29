@@ -13,6 +13,7 @@ if True:  # isort workaround
     from fluotracify.training import build_model as bm, preprocess_data as ppd
 
 print(tf.__version__)
+print(fluotracify_path)
 
 mlflow.tensorflow.autolog()
 
