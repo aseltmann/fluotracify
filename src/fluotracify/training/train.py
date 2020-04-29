@@ -4,7 +4,8 @@ import mlflow
 import mlflow.tensorflow
 import tensorflow as tf
 
-fluotracify_path = float(sys.argv[1]) if len(sys.argv) > 1 else '~/Programme/drmed-git/src/'
+fluotracify_path = sys.argv[1] if len(
+    sys.argv) > 1 else '~/Programme/drmed-git/src/'
 sys.path.append(fluotracify_path)
 
 if True:  # isort workaround
@@ -16,8 +17,15 @@ print(tf.__version__)
 mlflow.tensorflow.autolog()
 
 if __name__ == "__main__":
+    batch_size = int(sys.argv[2]) if len(sys.argv) > 2 else 5
+    frac_val = float(sys.argv[3]) if len(sys.argv) > 3 else 0.2
+    length_delimiter = int(sys.argv[4]) if len(sys.argv) > 4 else 16384
+    learning_rate = float(sys.argv[5]) if len(sys.argv) > 5 else 1e-5
+    epochs = int(sys.argv[6]) if len(sys.argv) > 6 else 10
+    csv_path = sys.argv[7] if len(sys.argv) > 7 else '/home/lex/Programme/Jupyter/DOKTOR/saves/firstartefact/subsample_rand/'
+
     train, test, nsamples, experiment_params = isfc.import_from_csv(
-        path='/home/lex/Programme/Jupyter/DOKTOR/saves/firstartefact/subsample_rand/',
+        path=csv_path,
         header=12,
         frac_train=0.8,
         col_per_example=2,
@@ -40,15 +48,6 @@ if __name__ == "__main__":
 
     # Cleanup
     del train, test
-
-    batch_size = float(sys.argv[2]) if len(sys.argv) > 2 else 5
-    batch_size = int(batch_size)
-    frac_val = float(sys.argv[3]) if len(sys.argv) > 3 else 0.2
-    length_delimiter = float(sys.argv[4]) if len(sys.argv) > 4 else 16384
-    length_delimiter = int(length_delimiter)
-    learning_rate = float(sys.argv[5]) if len(sys.argv) > 5 else 1e-5
-    epochs = float(sys.argv[6]) if len(sys.argv) > 6 else 10
-    epochs = int(epochs)
 
     dataset_train, dataset_val, num_train_examples, num_val_examples = ppd.tfds_from_pddf_for_unet(
         features_df=train_data,
