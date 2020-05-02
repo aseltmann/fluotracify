@@ -1,0 +1,15 @@
+artifact_uri: file:./data/mlruns/1/cda4eec66a6947c38ec2ee2006563ae5/artifacts
+end_time: 1588424858258
+entry_point_name: ''
+experiment_id: '1'
+lifecycle_stage: active
+name: ''
+run_id: cda4eec66a6947c38ec2ee2006563ae5
+run_uuid: cda4eec66a6947c38ec2ee2006563ae5
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1588423619699
+status: 3
+tags: []
+user_id: ye53nis
