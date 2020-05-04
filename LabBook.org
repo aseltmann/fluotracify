@@ -157,9 +157,10 @@ ssh ara -tfN \
 #+END_SRC
 
 #+RESULTS: setup-tmux
-|         |                                      |           |
-| sh-5.0$ | ye53nis@ara-login01.rz.uni-jena.de's | password: |
-| >       | ye53nis@ara-login01.rz.uni-jena.de's | password: |
+| rm:                                  | cannot                               | remove    | '/home/lex/.tmux-local-socket-remote-machine': | No | such | file | or | directory |
+| ye53nis@ara-login01.rz.uni-jena.de's | password:                            |           |                                                |    |      |      |    |           |
+| /tmp/tmux-67339/default              |                                      |           |                                                |    |      |      |    |           |
+| >                                    | ye53nis@ara-login01.rz.uni-jena.de's | password: |                                                |    |      |      |    |           |
 
 A script which allows to print the output from the tmux session
 in an =#+begin_example=-Block below the tmux block by pressing =C-c C-o= or =C-c
@@ -772,54 +773,61 @@ and especially Ediff. Watched these resources:
 #+END_SRC
 
 #+RESULTS:
-| PARTITION   | AVAIL |  TIMELIMIT | NODES | STATE | NODELIST                                                                                                                                                                          |
-| b_test      | up    |    3:00:00 |     1 | down* | node001                                                                                                                                                                           |
-| b_standard* | up    | 8-08:00:00 |    30 | mix   | node[005-006,008,010,014,016,023,025,029,031,039,043,046,063-066,069-071,086,108,110,120,126,131-132,134-136]                                                                     |
-| b_standard* | up    | 8-08:00:00 |    93 | alloc | node[002-004,009,011-013,015,017-022,024,026-028,030,032-038,040-042,044-045,047-062,072-084,087-107,109,111-114,117-118,121-123,125,133]                                         |
-| b_standard* | up    | 8-08:00:00 |     8 | idle  | node[007,067-068,085,115-116,119,124]                                                                                                                                             |
-| gpu_test    | up    |    1:00:00 |     1 | idle  | node127                                                                                                                                                                           |
-| gpu_p100    | up    | 8-08:00:00 |     2 | idle  | node[128-129]                                                                                                                                                                     |
-| gpu_v100    | up    | 8-08:00:00 |     1 | mix   | node130                                                                                                                                                                           |
-| b_fat       | up    | 8-08:00:00 |     1 | mix   | node139                                                                                                                                                                           |
-| b_fat       | up    | 8-08:00:00 |     3 | alloc | node[137-138,140]                                                                                                                                                                 |
-| s_test      | up    |    3:00:00 |     1 | idle  | node141                                                                                                                                                                           |
-| s_standard  | up    | 8-08:00:00 |    44 | mix   | node[151,155,167,169,177,186,191,196-200,203,216,218,224-231,233,235,241-246,249,255,259-260,265-268,297,303,309-310,315]                                                         |
-| s_standard  | up    | 8-08:00:00 |   107 | alloc | node[142-150,152-154,156-166,168,170-176,178-185,187-190,192-195,201-202,204-215,217,219-223,232,234,236-240,247-248,250-254,256-258,261-264,293-296,298-302,304-308,311-314,316] |
-| s_fat       | up    | 8-08:00:00 |     1 | mix   | node269                                                                                                                                                                           |
-| s_fat       | up    | 8-08:00:00 |     3 | alloc | node[270-272]                                                                                                                                                                     |
+| PARTITION   | AVAIL |  TIMELIMIT | NODES | STATE | NODELIST                                                                                                                                                                                                          |
+| b_test      | up    |    3:00:00 |     1 | idle  | node001                                                                                                                                                                                                           |
+| b_standard* | up    | 8-08:00:00 |    26 | mix   | node[005-006,008,014,018,025-026,029,031,039,043,046,063-064,070-071,085-086,108,110,120,126,132,134-136]                                                                                                         |
+| b_standard* | up    | 8-08:00:00 |    96 | alloc | node[002-004,009-013,015-017,019-024,027-028,030,032-037,040-042,045,047-062,065,067-068,072-082,084,087-107,109,111-116,119,121-125,131]                                                                         |
+| b_standard* | up    | 8-08:00:00 |     9 | idle  | node[007,038,044,066,069,083,117-118,133]                                                                                                                                                                         |
+| gpu_test    | up    |    1:00:00 |     1 | mix   | node127                                                                                                                                                                                                           |
+| gpu_p100    | up    | 8-08:00:00 |     2 | mix   | node[128-129]                                                                                                                                                                                                     |
+| gpu_v100    | up    | 8-08:00:00 |     1 | mix   | node130                                                                                                                                                                                                           |
+| b_fat       | up    | 8-08:00:00 |     2 | mix   | node[139-140]                                                                                                                                                                                                     |
+| b_fat       | up    | 8-08:00:00 |     2 | alloc | node[137-138]                                                                                                                                                                                                     |
+| s_test      | up    |    3:00:00 |     1 | alloc | node141                                                                                                                                                                                                           |
+| s_standard  | up    | 8-08:00:00 |    50 | mix   | node[146,151,155,157,162-163,167,169,177,183,186,191,196-200,203,219,224-231,233,235,239,241-246,249,255,257,259-260,265-268,297,303,309-310,315]                                                                 |
+| s_standard  | up    | 8-08:00:00 |    97 | alloc | node[142-145,147-150,154,156,158-161,164-166,168,170-176,178-182,184-185,187-190,192-195,201-202,204-218,220-223,232,234,236-238,240,247-248,250-254,256,258,261-264,293-296,298-301,304-305,307-308,311-314,316] |
+| s_standard  | up    | 8-08:00:00 |     4 | idle  | node[152-153,302,306]                                                                                                                                                                                             |
+| s_fat       | up    | 8-08:00:00 |     4 | alloc | node[269-272]                                                                                                                                                                                                     |
 
 #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
     srun -p b_standard --time=7-08:00:00 --ntasks-per-node 48 --pty bash
 #+END_SRC
 
 #+RESULTS:
-#+begin_example
-  [ye53nis@login01 drmed-git]$ srun -p b_standard --time=7-08:00:00 --ntasks-per-node 48 --pty bash
-  [ye53nis@node007 drmed-git]$
-#+end_example
+: server version is too old for client
 
 #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
   export MLFLOW_EXPERIMENT_NAME=exp-devtest
   export MLFLOW_TRACKING_URI=file:./data/mlruns
 #+END_SRC
 
+#+BEGIN_SRC emacs-lisp
+  (setq org-babel-tmux-location "/usr/local/bin/tmux")
+#+END_SRC
+
+#+RESULTS:
+: /usr/local/bin/tmux
+
+
 #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
   module load tools/python/3.7
   module load module-git
   mlflow --version
   git --version
+  cd drmed-git
 #+END_SRC
 
 #+RESULTS:
 #+begin_example
-  [ye53nis@node007 drmed-git]$ mlflow --version
+  [ye53nis@node007 ~]$ mlflow --version
   git --version
-  /cluster/miniconda3/lib/python3.7/site-packages/jinja2/runtime.py:318: DeprecationWarning: Using or importing the ABCs from 'collections' instead of from 'collections.abc' is deprecated since Python 3.3,and in 3.9 it will stop working
+  /cluster/miniconda3/lib/python3.7/site-packages/jinja2/runtime.py:318: DeprecationWarning: Using or importing the ABCs from 'collections' instead of from 'collections.abc' is deprecated since Python 3.3,and
+   in 3.9 it will stop working
     from collections import Mapping
   mlflow, version 1.7.0
-  [ye53nis@node007 drmed-git]$ git --version
+  [ye53nis@node007 ~]$ git --version
   git version 1.8.3.1
-  [ye53nis@node007 drmed-git]$
+  [ye53nis@node007 ~]$
 #+end_example
 
 #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
@@ -828,123 +836,634 @@ and especially Ediff. Watched these resources:
 
 #+RESULTS:
 #+begin_example
-  [ye53nis@node001 drmed-git]$ mlflow run .
-  /cluster/miniconda3/lib/python3.7/site-packages/jinja2/runtime.py:318: DeprecationWarning: Using or importing the ABCs from 'collections' instead of from 'collections.abc' is deprecated
-   since Python 3.3,and in 3.9 it will stop working
+  [ye53nis@node007 ~]$ mlflow run . --no-conda
+  /cluster/miniconda3/lib/python3.7/site-packages/jinja2/runtime.py:318: DeprecationWarning: Using or importing the ABCs from 'collections' instead of from 'collections.abc' is deprecated since Python 3.3,and
+   in 3.9 it will stop working
     from collections import Mapping
-  Notice: failed to import Git (the git executable is probably not on your PATH), so Git SHA is not available. Error: Failed to initialize: Bad git executable.
-  The git executable must be specified in one of the following ways:
-      - be included in your $PATH
-      - be set via $GIT_PYTHON_GIT_EXECUTABLE
-      - explicitly set via git.refresh()
-
-  All git commands will error until this is rectified.
-
-  This initial warning can be silenced or aggravated in the future by setting the
-  $GIT_PYTHON_REFRESH environment variable. Use one of the following values:
-      - quiet|q|silence|s|none|n|0: for no warning or exception
-      - warn|w|warning|1: for a printed warning
-      - error|e|raise|r|2: for a raised exception
-
-  Example:
-      export GIT_PYTHON_REFRESH=quiet
-
-  2020/04/28 11:13:04 WARNING mlflow.tracking.context.git_context: Failed to import Git (the Git executable is probably not on your PATH), so Git SHA is not available. Error: Failed to in
-  itialize: Bad git executable.
-  The git executable must be specified in one of the following ways:
-      - be included in your $PATH
-      - be set via $GIT_PYTHON_GIT_EXECUTABLE
-      - explicitly set via git.refresh()
-
-  All git commands will error until this is rectified.
-
-  This initial warning can be silenced or aggravated in the future by setting the
-  $GIT_PYTHON_REFRESH environment variable. Use one of the following values:
-      - quiet|q|silence|s|none|n|0: for no warning or exception
-      - warn|w|warning|1: for a printed warning
-      - error|e|raise|r|2: for a raised exception
-
-  Example:
-      export GIT_PYTHON_REFRESH=quiet
-
-  Traceback (most recent call last):
-    File "/cluster/miniconda3/lib/python3.7/site-packages/git/__init__.py", line 83, in <module>
-      refresh()
-    File "/cluster/miniconda3/lib/python3.7/site-packages/git/__init__.py", line 73, in refresh
-      if not Git.refresh(path=path):
-    File "/cluster/miniconda3/lib/python3.7/site-packages/git/cmd.py", line 278, in refresh
-      raise ImportError(err)
-  ImportError: Bad git executable.
-  The git executable must be specified in one of the following ways:
-      - be included in your $PATH
-      - be set via $GIT_PYTHON_GIT_EXECUTABLE
-      - explicitly set via git.refresh()
-
-  All git commands will error until this is rectified.
-
-  This initial warning can be silenced or aggravated in the future by setting the
-  $GIT_PYTHON_REFRESH environment variable. Use one of the following values:
-      - quiet|q|silence|s|none|n|0: for no warning or exception
-      - warn|w|warning|1: for a printed warning
-      - error|e|raise|r|2: for a raised exception
-
-  Example:
-      export GIT_PYTHON_REFRESH=quiet
-
-
-  During handling of the above exception, another exception occurred:
-
-  Traceback (most recent call last):
-    File "/cluster/miniconda3/bin/mlflow", line 10, in <module>
-      sys.exit(cli())
-    File "/cluster/miniconda3/lib/python3.7/site-packages/click/core.py", line 764, in __call__
-      return self.main(*args, **kwargs)
-    File "/cluster/miniconda3/lib/python3.7/site-packages/click/core.py", line 717, in main
-      rv = self.invoke(ctx)
-    File "/cluster/miniconda3/lib/python3.7/site-packages/click/core.py", line 1137, in invoke
-      return _process_result(sub_ctx.command.invoke(sub_ctx))
-    File "/cluster/miniconda3/lib/python3.7/site-packages/click/core.py", line 956, in invoke
-      return ctx.invoke(self.callback, **ctx.params)
-    File "/cluster/miniconda3/lib/python3.7/site-packages/click/core.py", line 555, in invoke
-      return callback(*args, **kwargs)
-    File "/cluster/miniconda3/lib/python3.7/site-packages/mlflow/cli.py", line 138, in run
-      run_id=run_id
-    File "/cluster/miniconda3/lib/python3.7/site-packages/mlflow/projects/__init__.py", line 288, in run
-      use_conda=use_conda, storage_dir=storage_dir, synchronous=synchronous, run_id=run_id)
-    File "/cluster/miniconda3/lib/python3.7/site-packages/mlflow/projects/__init__.py", line 120, in _run
-      repo_url = _get_git_repo_url(work_dir)
-    File "/cluster/miniconda3/lib/python3.7/site-packages/mlflow/projects/utils.py", line 34, in _get_git_repo_url
-      from git import Repo
-    File "/cluster/miniconda3/lib/python3.7/site-packages/git/__init__.py", line 85, in <module>
-      raise ImportError('Failed to initialize: {0}'.format(exc))
-  ImportError: Failed to initialize: Bad git executable.
-  The git executable must be specified in one of the following ways:
-      - be included in your $PATH
-      - be set via $GIT_PYTHON_GIT_EXECUTABLE
-      - explicitly set via git.refresh()
-
-  All git commands will error until this is rectified.
-
-  This initial warning can be silenced or aggravated in the future by setting the
-  $GIT_PYTHON_REFRESH environment variable. Use one of the following values:
-      - quiet|q|silence|s|none|n|0: for no warning or exception
-      - warn|w|warning|1: for a printed warning
-      - error|e|raise|r|2: for a raised exception
-
-  Example:
-      export GIT_PYTHON_REFRESH=quiet
-
-  [ye53nis@node001 drmed-git]$
+  INFO: 'exp-devtest' does not exist. Creating a new experiment
+  2020/04/29 13:31:21 ERROR mlflow.cli: === Could not find main among entry points [] or interpret main as a runnable script. Supported script file extensions: ['.py', '.sh'] ===
+  [ye53nis@node007 ~]$
 #+end_example
 
-
-#+BEGIN_SRC sh :dir ~/Programme/drmed-git :session local
-
+#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
+  mlflow run . -P fluotracify_path=~/drmed-git/src/ -P csv_path=/beegfs/ye53nis/saves/firstartifact_Sep2019_subsample/
 #+END_SRC
 
 #+RESULTS:
-|                               |
-| /home/lex/Programme/drmed-git |
+#+begin_example
+  [ye53nis@node007 drmed-git]$ mlflow run . -P fluotracify_path=~/drmed-git/src/ -P csv_path=/beegfs/ye53nis/saves/firstartifact_Sep2019_subsample/
+  /cluster/miniconda3/lib/python3.7/site-packages/jinja2/runtime.py:318: DeprecationWarning: Using or importing the ABCs from 'collections' instead of from 'collections.abc' is deprecated since Python 3.3,and
+   in 3.9 it will stop working
+    from collections import Mapping
+  2020/04/30 17:56:53 INFO mlflow.projects: === Creating conda environment mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81 ===
+  Collecting package metadata (repodata.json): done
+  Solving environment: done
+
+  Downloading and Extracting Packages
+  gorilla-0.3.0        | 11 KB     | ################################################################################################################################################################### | 100%
+  pyasn1-0.4.8         | 58 KB     | ################################################################################################################################################################### | 100%
+  mako-1.1.2           | 63 KB     | ################################################################################################################################################################### | 100%
+  flask-1.1.2          | 74 KB     | ################################################################################################################################################################### | 100%
+  tensorboard-2.1.0    | 3.3 MB    | ################################################################################################################################################################### | 100%
+  google-auth-1.13.1   | 57 KB     | ################################################################################################################################################################### | 100%
+  tensorflow-estimator | 251 KB    | ################################################################################################################################################################### | 100%
+  ncurses-6.2          | 817 KB    | ################################################################################################################################################################### | 100%
+  intel-openmp-2020.0  | 756 KB    | ################################################################################################################################################################### | 100%
+  cloudpickle-1.4.0    | 29 KB     | ################################################################################################################################################################### | 100%
+  mlflow-1.8.0         | 3.2 MB    | ################################################################################################################################################################### | 100%
+  databricks-cli-0.9.1 | 48 KB     | ################################################################################################################################################################### | 100%
+  mkl-service-2.3.0    | 218 KB    | ################################################################################################################################################################### | 100%
+  markupsafe-1.1.1     | 29 KB     | ################################################################################################################################################################### | 100%
+  libstdcxx-ng-9.1.0   | 3.1 MB    | ################################################################################################################################################################### | 100%
+  prometheus_client-0. | 42 KB     | ################################################################################################################################################################### | 100%
+  appdirs-1.4.3        | 15 KB     | ################################################################################################################################################################### | 100%
+  libprotobuf-3.11.4   | 2.9 MB    | ################################################################################################################################################################### | 100%
+  protobuf-3.11.4      | 636 KB    | ################################################################################################################################################################### | 100%
+  tensorflow-2.1.0     | 4 KB      | ################################################################################################################################################################### | 100%
+  configparser-3.7.4   | 43 KB     | ################################################################################################################################################################### | 100%
+  opt_einsum-3.1.0     | 54 KB     | ################################################################################################################################################################### | 100%
+  oauthlib-3.1.0       | 88 KB     | ################################################################################################################################################################### | 100%
+  python-dateutil-2.8. | 224 KB    | ################################################################################################################################################################### | 100%
+  werkzeug-1.0.1       | 240 KB    | ################################################################################################################################################################### | 100%
+  tabulate-0.8.3       | 39 KB     | ################################################################################################################################################################### | 100%
+  jinja2-2.11.2        | 103 KB    | ################################################################################################################################################################### | 100%
+  c-ares-1.15.0        | 89 KB     | ################################################################################################################################################################### | 100%
+  requests-oauthlib-1. | 22 KB     | ################################################################################################################################################################### | 100%
+  docker-pycreds-0.4.0 | 14 KB     | ################################################################################################################################################################### | 100%
+  packaging-20.3       | 36 KB     | ################################################################################################################################################################### | 100%
+  keras-preprocessing- | 36 KB     | ################################################################################################################################################################### | 100%
+  itsdangerous-1.1.0   | 28 KB     | ################################################################################################################################################################### | 100%
+  mkl-2020.0           | 128.9 MB  | ################################################################################################################################################################### | 100%
+  keras-applications-1 | 33 KB     | ################################################################################################################################################################### | 100%
+  scipy-1.4.1          | 14.5 MB   | ################################################################################################################################################################### | 100%
+  blinker-1.4          | 22 KB     | ################################################################################################################################################################### | 100%
+  google-auth-oauthlib | 20 KB     | ################################################################################################################################################################### | 100%
+  wrapt-1.12.1         | 49 KB     | ################################################################################################################################################################### | 100%
+  click-7.1.1          | 71 KB     | ################################################################################################################################################################### | 100%
+  h5py-2.10.0          | 1.0 MB    | ################################################################################################################################################################### | 100%
+  rsa-4.0              | 29 KB     | ################################################################################################################################################################### | 100%
+  pyjwt-1.7.1          | 33 KB     | ################################################################################################################################################################### | 100%
+  pyasn1-modules-0.2.7 | 63 KB     | ################################################################################################################################################################### | 100%
+  google-pasta-0.2.0   | 44 KB     | ################################################################################################################################################################### | 100%
+  mkl_fft-1.0.15       | 154 KB    | ################################################################################################################################################################### | 100%
+  alembic-1.4.2        | 117 KB    | ################################################################################################################################################################### | 100%
+  backports-1.0        | 139 KB    | ################################################################################################################################################################### | 100%
+  entrypoints-0.3      | 12 KB     | ################################################################################################################################################################### | 100%
+  pyyaml-5.3.1         | 181 KB    | ################################################################################################################################################################### | 100%
+  querystring_parser-1 | 10 KB     | ################################################################################################################################################################### | 100%
+  prometheus_flask_exp | 15 KB     | ################################################################################################################################################################### | 100%
+  cachetools-3.1.1     | 14 KB     | ################################################################################################################################################################### | 100%
+  smmap-3.0.2          | 26 KB     | ################################################################################################################################################################### | 100%
+  simplejson-3.17.0    | 101 KB    | ################################################################################################################################################################### | 100%
+  pyparsing-2.4.6      | 64 KB     | ################################################################################################################################################################### | 100%
+  pytz-2019.3          | 231 KB    | ################################################################################################################################################################### | 100%
+  sqlalchemy-1.3.13    | 1.4 MB    | ################################################################################################################################################################### | 100%
+  absl-py-0.9.0        | 167 KB    | ################################################################################################################################################################### | 100%
+  numpy-base-1.18.1    | 4.2 MB    | ################################################################################################################################################################### | 100%
+  mkl_random-1.1.0     | 321 KB    | ################################################################################################################################################################### | 100%
+  python-editor-1.0.4  | 11 KB     | ################################################################################################################################################################### | 100%
+  gunicorn-20.0.4      | 123 KB    | ################################################################################################################################################################### | 100%
+  tensorflow-base-2.1. | 95.2 MB   | ################################################################################################################################################################### | 100%
+  markdown-3.1.1       | 118 KB    | ################################################################################################################################################################### | 100%
+  astor-0.8.0          | 46 KB     | ################################################################################################################################################################### | 100%
+  grpcio-1.27.2        | 1.3 MB    | ################################################################################################################################################################### | 100%
+  sqlparse-0.3.1       | 34 KB     | ################################################################################################################################################################### | 100%
+  gitdb-4.0.2          | 49 KB     | ################################################################################################################################################################### | 100%
+  pandas-1.0.3         | 8.6 MB    | ################################################################################################################################################################### | 100%
+  docker-py-4.2.0      | 188 KB    | ################################################################################################################################################################### | 100%
+  websocket-client-0.5 | 62 KB     | ################################################################################################################################################################### | 100%
+  numpy-1.18.1         | 5 KB      | ################################################################################################################################################################### | 100%
+  gitpython-3.1.1      | 328 KB    | ################################################################################################################################################################### | 100%
+  Preparing transaction: done
+  Verifying transaction: done
+  Executing transaction: done
+  #
+  # To activate this environment, use
+  #
+  #     $ conda activate mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81
+  #
+  # To deactivate an active environment, use
+  #
+  #     $ conda deactivate
+
+  2020/04/30 18:00:02 INFO mlflow.projects: === Created directory /tmp/tmpbcxyzo3m for downloading remote URIs passed to arguments of type 'path' ===
+  2020/04/30 18:00:02 INFO mlflow.projects: === Running command 'source activate mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81 1>&2 && python src/fluotracify/training/train.py /home/ye53nis/drmed-git/src 5
+  0.2 16384 1e-5 10 /beegfs/ye53nis/saves/firstartifact_Sep2019_subsample' in run with ID '09b669bd51ba4317a6ba4db833a3abb1' ===
+  /home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/tensorflow_core/python/pywrap_tensorflow_internal.py:15: DeprecationWarning: the imp module is deprecate
+  d in favour of importlib; see the module's documentation for alternative uses
+    import imp
+  2.1.0
+  /home/ye53nis/drmed-git/src
+  train 0 /beegfs/ye53nis/saves/firstartifact_Sep2019_subsample/traces_cluster_rand_Sep2019_set003.csv
+  train 1 /beegfs/ye53nis/saves/firstartifact_Sep2019_subsample/traces_cluster_rand_Sep2019_set002.csv
+  test 2 /beegfs/ye53nis/saves/firstartifact_Sep2019_subsample/traces_cluster_rand_Sep2019_set001.csv
+  shapes of feature dataframe: (20000, 200) and label dataframe: (20000, 200)
+  shapes of feature dataframe: (20000, 100) and label dataframe: (20000, 100)
+
+  for each 20,000 timestap trace there are the following numbers of corrupted timesteps:
+   label001_1     4124
+  label002_1     2261
+  label003_1       45
+  label004_1    13108
+  label005_1     2306
+  dtype: int64
+  2020-04-30 18:00:19.551555: I tensorflow/core/platform/cpu_feature_guard.cc:142] Your CPU supports instructions that this TensorFlow binary was not compiled to use: SSE4.1 SSE4.2 AVX AVX2 FMA
+  2020-04-30 18:00:19.563688: I tensorflow/core/platform/profile_utils/cpu_utils.cc:94] CPU Frequency: 2194920000 Hz
+  2020-04-30 18:00:19.566795: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x55b0cba23c70 initialized for platform Host (this does not guarantee that XLA will be used). Devices:
+  2020-04-30 18:00:19.566832: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): Host, Default Version
+  2020-04-30 18:00:19.567000: I tensorflow/core/common_runtime/process_util.cc:147] Creating new thread pool with default inter op setting: 2. Tune using inter_op_parallelism_threads for best performance.
+  number of training examples: 160, number of validation examples: 40
+
+  ------------------------
+  number of test examples: 100
+
+  input - shape:   (None, 16384, 1)
+  output - shape:  (None, 16384, 1)
+  /home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/tensorflow_core/python/keras/engine/training_utils.py:1389: DeprecationWarning: Using or importing the A
+  BCs from 'collections' instead of from 'collections.abc' is deprecated since Python 3.3,and in 3.9 it will stop working
+    if isinstance(sample_weight_mode, collections.Mapping):
+  /home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/mlflow/utils/autologging_utils.py:60: DeprecationWarning: inspect.getargspec() is deprecated since Pytho
+  n 3.0, use inspect.signature() or inspect.getfullargspec()
+    all_param_names, _, _, all_default_values = inspect.getargspec(fn)  # pylint: disable=W1505
+  /home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/mlflow/utils/autologging_utils.py:70: UserWarning: Logging to MLflow failed: Changing param values is no
+  t allowed. Param with key='batch_size' was already logged with value='5' for run ID='09b669bd51ba4317a6ba4db833a3abb1'. Attempted logging new value 'None'.
+    try_mlflow_log(mlflow.log_params, defaults)
+  Train for 32.0 steps, validate for 8.0 steps
+  WARNING:tensorflow:Model failed to serialize as JSON. Ignoring... Layers with arguments in `__init__` must override `get_config`.
+  Epoch 1/10
+  2020-04-30 18:00:46.639927: I tensorflow/core/profiler/lib/profiler_session.cc:225] Profiler session started.
+  32/32 [==============================] - 133s 4s/step - loss: 1.6587 - mean_io_u: 0.4028 - precision: 0.2306 - recall: 0.7511 - val_loss: 1.5574 - val_mean_io_u: 0.3914 - val_precision: 0.1894 - val_recall:
+   0.6051
+  Epoch 2/10
+  31/32 [============================>.] - ETA: 3s - loss: 1.6133 - mean_io_u: 0.4082 - precision: 0.2488 - recall: 0.7948/home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.
+  7/site-packages/mlflow/tensorflow.py:549: UserWarning: Logging to MLflow failed: Got invalid value tf.Tensor(1.6116152, shape=(), dtype=float32) for metric 'val_loss' (timestamp=1588262662579). Please speci
+  fy value as a valid double (64-bit floating point)
+    try_mlflow_log(mlflow.log_metrics, logs, step=epoch)
+  32/32 [==============================] - 107s 3s/step - loss: 1.6042 - mean_io_u: 0.4055 - precision: 0.2566 - recall: 0.7927 - val_loss: 1.6116 - val_mean_io_u: 0.4122 - val_precision: 0.1641 - val_recall:
+   0.8504
+  Epoch 3/10
+  32/32 [==============================] - 107s 3s/step - loss: 1.5036 - mean_io_u: 0.3934 - precision: 0.3298 - recall: 0.8165 - val_loss: 1.6282 - val_mean_io_u: 0.4021 - val_precision: 0.1870 - val_recall:
+   0.9343
+  Epoch 4/10
+  32/32 [==============================] - 105s 3s/step - loss: 1.4783 - mean_io_u: 0.4014 - precision: 0.3343 - recall: 0.8179 - val_loss: 1.6338 - val_mean_io_u: 0.3861 - val_precision: 0.2262 - val_recall:
+   0.9908
+  Epoch 5/10
+  32/32 [==============================] - 106s 3s/step - loss: 1.4398 - mean_io_u: 0.4006 - precision: 0.3735 - recall: 0.8220 - val_loss: 1.7444 - val_mean_io_u: 0.4101 - val_precision: 0.1798 - val_recall:
+   0.9999
+  Epoch 6/10
+  32/32 [==============================] - 107s 3s/step - loss: 1.3941 - mean_io_u: 0.3988 - precision: 0.4144 - recall: 0.8005 - val_loss: 1.8832 - val_mean_io_u: 0.4179 - val_precision: 0.1642 - val_recall:
+   0.9999
+  Epoch 7/10
+  32/32 [==============================] - 107s 3s/step - loss: 1.3660 - mean_io_u: 0.4000 - precision: 0.4544 - recall: 0.8108 - val_loss: 2.0017 - val_mean_io_u: 0.3885 - val_precision: 0.2230 - val_recall:
+   0.9999
+  Epoch 8/10
+  32/32 [==============================] - 106s 3s/step - loss: 1.3169 - mean_io_u: 0.3993 - precision: 0.5203 - recall: 0.8057 - val_loss: 2.5556 - val_mean_io_u: 0.4147 - val_precision: 0.1706 - val_recall:
+   0.9999
+  Epoch 9/10
+  32/32 [==============================] - 108s 3s/step - loss: 1.3050 - mean_io_u: 0.4047 - precision: 0.5429 - recall: 0.8009 - val_loss: 3.0439 - val_mean_io_u: 0.3991 - val_precision: 0.2017 - val_recall:
+   0.9999
+  Epoch 10/10
+  32/32 [==============================] - 107s 3s/step - loss: 1.2911 - mean_io_u: 0.4098 - precision: 0.5691 - recall: 0.7966 - val_loss: 3.6402 - val_mean_io_u: 0.3934 - val_precision: 0.2132 - val_recall:
+   1.0000
+  /home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/mlflow/tensorflow.py:552: UserWarning: Logging to MLflow failed: Layers with arguments in `__init__` mus
+  t override `get_config`.
+    try_mlflow_log(mlflow.keras.log_model, self.model, artifact_path='model')
+  20/20 [==============================] - 17s 843ms/step - loss: 3.5632 - mean_io_u: 0.3849 - precision: 0.2301 - recall: 1.0000
+  /home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/tensorflow_core/python/keras/engine/training_v2_utils.py:544: DeprecationWarning: Using or importing the
+   ABCs from 'collections' instead of from 'collections.abc' is deprecated since Python 3.3,and in 3.9 it will stop working
+    if isinstance(inputs, collections.Sequence):
+  2020-04-30 18:19:28.557139: W tensorflow/python/util/util.cc:319] Sets are not currently considered sequences, but this may change in the future, so consider avoiding using them.
+  WARNING:tensorflow:From /home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/tensorflow_core/python/ops/resource_variable_ops.py:1786: calling BaseResourceVa
+  riable.__init__ (from tensorflow.python.ops.resource_variable_ops) with constraint is deprecated and will be removed in a future version.
+  Instructions for updating:
+  If using Keras pass *_constraint arguments to layers.
+  2020/04/30 18:19:46 INFO mlflow.projects: === Run (ID '09b669bd51ba4317a6ba4db833a3abb1') succeeded ===
+  [ye53nis@node007 drmed-git]$
+#+end_example
+
+Success!!!
+** Find solution for large file problem
+   :LOGBOOK:
+   CLOCK: [2020-05-02 Sa 13:17]--[2020-05-02 Sa 13:43] =>  0:26
+   :END:
+*** using =git-lfs=
+    :LOGBOOK:
+    CLOCK: [2020-05-02 Sa 14:41]--[2020-05-02 Sa 16:13] =>  1:32
+    :END:
+Problem: the deep network =unet.tf= is too big (>300MB) and github only allows a
+maximum file size of 100MB. Two possible solutions:
+- *Git Large File Storage*: https://git-lfs.github.com/ replace large files with text pointers inside
+  Git. Configured with a =.gitattributes= file per project. Git commands stay
+  the same
+- *Git-annex*: https://git-annex.branchable.com/ own git annex command line
+  tool. "stupid filename and metadata tracker".
+- See [[file:~/Dokumente/org/04_Digital-und-Technik/software-setup.org::*=git-annex= vs =git-lfs=][here]] for notes
+
+NOTE: *git commands should not be done on compute node, it's easier on login
+node via normal ssh*
+
+#+BEGIN_SRC sh :session org-ssh
+  ssh ara
+#+END_SRC
+
+#+BEGIN_SRC sh :session org-ssh :results output
+  pwd
+  git status
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+/home/ye53nis/drmed-git
+# On branch develop
+Your branch is ahead of 'origin/develop' by 1 commit.
+(use "git push" to publish your local commits)
+
+Untracked files:
+(use "git add <file>..." to include in what will be committed)
+
+data/exp-devtest/
+nothing added to commit but untracked files present (use "git add" to track)
+#+end_example
+
+Encountered problem: git-lfs only syncs files *inside* the repo. The advised way
+to save large files on the HPC is to use the dedicated =/beegfs= file system,
+which is optimised for that stuff. My current repo is in =/home=
+- version 1: migrate git repo to beegfs - effectively abandoning =/home=
+- version 2: stay at =/home= and keep track of =/beegfs= using tools like
+  =git-annex=
+
+I am trying version 1 now
+*** run mlflow model as above, but save everything on =/beegfs=
+    :LOGBOOK:
+    CLOCK: [2020-05-02 Sa 16:13]--[2020-05-02 Sa 16:15] =>  0:02
+    :END:
+#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
+  pwd
+  cd /beegfs/ye53nis/drmed-git/
+  pwd
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+  [ye53nis@node007 drmed-git]$ pwd
+  /home/ye53nis/drmed-git
+  [ye53nis@node007 drmed-git]$ cd /beegfs/ye53nis/drmed-git/
+  [ye53nis@node007 drmed-git]$ pwd
+  /beegfs/ye53nis/drmed-git
+#+end_example
+
+#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
+  git status
+  git log -1
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+  [ye53nis@node007 drmed-git]$ git status
+  # On branch develop
+  nothing to commit, working directory clean
+  [ye53nis@node007 drmed-git]$ git log -1
+  commit 9e6182fbeae831a151342827efa59581e4310ae6
+  Author: Alex Seltmann <seltmann@posteo.de>
+  Date:   Sat May 2 13:23:42 2020 +0200
+
+      first successful mlflow run without trained net
+#+end_example
+
+#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
+  mlflow run . -P fluotracify_path=/beegfs/ye53nis/drmed-git/src/ -P csv_path=/beegfs/ye53nis/saves/firstartifact_Sep2019_subsample/
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+  [ye53nis@node007 drmed-git]$ mlflow run . -P fluotracify_path=/beegfs/ye53nis/drmed-git/src/ -P csv_path=/beegfs/ye53nis/saves/firstartifact_Sep2019_subsample/
+  /cluster/miniconda3/lib/python3.7/site-packages/jinja2/runtime.py:318: DeprecationWarning: Using or importing the ABCs from 'collections' instead of from 'collections.abc' is deprecated since Python 3.3,and
+   in 3.9 it will stop working
+    from collections import Mapping
+  WARNING:root:Malformed experiment '1'. Detailed error Yaml file './data/mlruns/1/meta.yaml' does not exist.
+  Traceback (most recent call last):
+    File "/cluster/miniconda3/lib/python3.7/site-packages/mlflow/store/tracking/file_store.py", line 197, in list_experiments
+      experiment = self._get_experiment(exp_id, view_type)
+    File "/cluster/miniconda3/lib/python3.7/site-packages/mlflow/store/tracking/file_store.py", line 256, in _get_experiment
+      meta = read_yaml(experiment_dir, FileStore.META_DATA_FILE_NAME)
+    File "/cluster/miniconda3/lib/python3.7/site-packages/mlflow/utils/file_utils.py", line 160, in read_yaml
+      raise MissingConfigException("Yaml file '%s' does not exist." % file_path)
+  mlflow.exceptions.MissingConfigException: Yaml file './data/mlruns/1/meta.yaml' does not exist.
+  INFO: 'exp-devtest' does not exist. Creating a new experiment
+  WARNING:root:Malformed experiment '1'. Detailed error Yaml file './data/mlruns/1/meta.yaml' does not exist.
+  Traceback (most recent call last):
+    File "/cluster/miniconda3/lib/python3.7/site-packages/mlflow/store/tracking/file_store.py", line 197, in list_experiments
+      experiment = self._get_experiment(exp_id, view_type)
+    File "/cluster/miniconda3/lib/python3.7/site-packages/mlflow/store/tracking/file_store.py", line 256, in _get_experiment
+      meta = read_yaml(experiment_dir, FileStore.META_DATA_FILE_NAME)
+    File "/cluster/miniconda3/lib/python3.7/site-packages/mlflow/utils/file_utils.py", line 160, in read_yaml
+      raise MissingConfigException("Yaml file '%s' does not exist." % file_path)
+  mlflow.exceptions.MissingConfigException: Yaml file './data/mlruns/1/meta.yaml' does not exist.
+  WARNING:root:Malformed experiment '1'. Detailed error Yaml file './data/mlruns/1/meta.yaml' does not exist.
+  Traceback (most recent call last):
+    File "/cluster/miniconda3/lib/python3.7/site-packages/mlflow/store/tracking/file_store.py", line 197, in list_experiments
+      experiment = self._get_experiment(exp_id, view_type)
+    File "/cluster/miniconda3/lib/python3.7/site-packages/mlflow/store/tracking/file_store.py", line 256, in _get_experiment
+      meta = read_yaml(experiment_dir, FileStore.META_DATA_FILE_NAME)
+    File "/cluster/miniconda3/lib/python3.7/site-packages/mlflow/utils/file_utils.py", line 160, in read_yaml
+      raise MissingConfigException("Yaml file '%s' does not exist." % file_path)
+  mlflow.exceptions.MissingConfigException: Yaml file './data/mlruns/1/meta.yaml' does not exist.
+  2020/05/02 14:47:02 INFO mlflow.projects: === Created directory /tmp/tmp7uyf926z for downloading remote URIs passed to arguments of type 'path' ===
+  2020/05/02 14:47:02 INFO mlflow.projects: === Running command 'source activate mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81 1>&2 && python src/fluotracify/training/train.py /beegfs/ye53nis/drmed-git/src
+  5 0.2 16384 1e-5 10 /beegfs/ye53nis/saves/firstartifact_Sep2019_subsample' in run with ID 'cda4eec66a6947c38ec2ee2006563ae5' ===
+  /home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/tensorflow_core/python/pywrap_tensorflow_internal.py:15: DeprecationWarning: the imp module is deprecate
+  d in favour of importlib; see the module's documentation for alternative uses
+    import imp
+  ^[[B^[[B^[[B^[[B^[[B^[[B2.1.0
+  /beegfs/ye53nis/drmed-git/src
+  train 0 /beegfs/ye53nis/saves/firstartifact_Sep2019_subsample/traces_cluster_rand_Sep2019_set003.csv
+  train 1 /beegfs/ye53nis/saves/firstartifact_Sep2019_subsample/traces_cluster_rand_Sep2019_set002.csv
+  test 2 /beegfs/ye53nis/saves/firstartifact_Sep2019_subsample/traces_cluster_rand_Sep2019_set001.csv
+  shapes of feature dataframe: (20000, 200) and label dataframe: (20000, 200)
+  shapes of feature dataframe: (20000, 100) and label dataframe: (20000, 100)
+
+  for each 20,000 timestap trace there are the following numbers of corrupted timesteps:
+   label001_1     4124
+  label002_1     2261
+  label003_1       45
+  label004_1    13108
+  label005_1     2306
+  dtype: int64
+  2020-05-02 14:48:01.189272: I tensorflow/core/platform/cpu_feature_guard.cc:142] Your CPU supports instructions that this TensorFlow binary was not compiled to use: SSE4.1 SSE4.2 AVX AVX2 FMA
+  2020-05-02 14:48:01.222648: I tensorflow/core/platform/profile_utils/cpu_utils.cc:94] CPU Frequency: 2194920000 Hz
+  2020-05-02 14:48:01.226156: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x563a41791e20 initialized for platform Host (this does not guarantee that XLA will be used). Devices:
+  2020-05-02 14:48:01.226237: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): Host, Default Version
+  2020-05-02 14:48:01.226502: I tensorflow/core/common_runtime/process_util.cc:147] Creating new thread pool with default inter op setting: 2. Tune using inter_op_parallelism_threads for best performance.
+  number of training examples: 160, number of validation examples: 40
+
+  ------------------------
+  number of test examples: 100
+
+  input - shape:   (None, 16384, 1)
+  output - shape:  (None, 16384, 1)
+  /home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/tensorflow_core/python/keras/engine/training_utils.py:1389: DeprecationWarning: Using or importing the A
+  BCs from 'collections' instead of from 'collections.abc' is deprecated since Python 3.3,and in 3.9 it will stop working
+    if isinstance(sample_weight_mode, collections.Mapping):
+  /home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/mlflow/utils/autologging_utils.py:60: DeprecationWarning: inspect.getargspec() is deprecated since Pytho
+  n 3.0, use inspect.signature() or inspect.getfullargspec()
+    all_param_names, _, _, all_default_values = inspect.getargspec(fn)  # pylint: disable=W1505
+  /home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/mlflow/utils/autologging_utils.py:70: UserWarning: Logging to MLflow failed: Changing param values is no
+  t allowed. Param with key='batch_size' was already logged with value='5' for run ID='cda4eec66a6947c38ec2ee2006563ae5'. Attempted logging new value 'None'.
+    try_mlflow_log(mlflow.log_params, defaults)
+  Train for 32.0 steps, validate for 8.0 steps
+  WARNING:tensorflow:Model failed to serialize as JSON. Ignoring... Layers with arguments in `__init__` must override `get_config`.
+  Epoch 1/10
+  2020-05-02 14:48:28.731100: I tensorflow/core/profiler/lib/profiler_session.cc:225] Profiler session started.
+  32/32 [==============================] - 133s 4s/step - loss: 1.6869 - mean_io_u: 0.4035 - precision: 0.1949 - recall: 0.6740 - val_loss: 1.5778 - val_mean_io_u: 0.4210 - val_precision: 0.1500 - val_recall:
+   5.7965e-05
+  Epoch 2/10
+  31/32 [============================>.] - ETA: 3s - loss: 1.5936 - mean_io_u: 0.4047 - precision: 0.2461 - recall: 0.7594/home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.
+  7/site-packages/mlflow/tensorflow.py:549: UserWarning: Logging to MLflow failed: Got invalid value tf.Tensor(1.5411952, shape=(), dtype=float32) for metric 'val_loss' (timestamp=1588423924159). Please speci
+  fy value as a valid double (64-bit floating point)
+    try_mlflow_log(mlflow.log_metrics, logs, step=epoch)
+  32/32 [==============================] - 106s 3s/step - loss: 1.5935 - mean_io_u: 0.4051 - precision: 0.2456 - recall: 0.7601 - val_loss: 1.5412 - val_mean_io_u: 0.3977 - val_precision: 0.3000 - val_recall:
+   8.9508e-05
+  Epoch 3/10
+  32/32 [==============================] - 108s 3s/step - loss: 1.5357 - mean_io_u: 0.4039 - precision: 0.2901 - recall: 0.8025 - val_loss: 1.5201 - val_mean_io_u: 0.3834 - val_precision: 0.2500 - val_recall:
+   6.5409e-05
+  Epoch 4/10
+  32/32 [==============================] - 109s 3s/step - loss: 1.4929 - mean_io_u: 0.4041 - precision: 0.3227 - recall: 0.8099 - val_loss: 1.5400 - val_mean_io_u: 0.3990 - val_precision: 0.2011 - val_recall:
+   0.0535
+  Epoch 5/10
+  32/32 [==============================] - 108s 3s/step - loss: 1.4589 - mean_io_u: 0.4054 - precision: 0.3445 - recall: 0.7970 - val_loss: 1.5471 - val_mean_io_u: 0.3927 - val_precision: 0.2178 - val_recall:
+   0.3854
+  Epoch 6/10
+  32/32 [==============================] - 108s 3s/step - loss: 1.4293 - mean_io_u: 0.4059 - precision: 0.3692 - recall: 0.7784 - val_loss: 1.6078 - val_mean_io_u: 0.4057 - val_precision: 0.1891 - val_recall:
+   0.9730
+  Epoch 7/10
+  32/32 [==============================] - 108s 3s/step - loss: 1.3821 - mean_io_u: 0.4005 - precision: 0.4276 - recall: 0.7645 - val_loss: 1.7784 - val_mean_io_u: 0.4182 - val_precision: 0.1636 - val_recall:
+   0.9998
+  Epoch 8/10
+  32/32 [==============================] - 109s 3s/step - loss: 1.3219 - mean_io_u: 0.3993 - precision: 0.5042 - recall: 0.8182 - val_loss: 1.9800 - val_mean_io_u: 0.3925 - val_precision: 0.2150 - val_recall:
+   0.9999
+  Epoch 9/10
+  32/32 [==============================] - 107s 3s/step - loss: 1.2852 - mean_io_u: 0.3930 - precision: 0.5602 - recall: 0.7957 - val_loss: 2.5127 - val_mean_io_u: 0.4206 - val_precision: 0.1587 - val_recall:
+   1.0000
+  Epoch 10/10
+  32/32 [==============================] - 108s 3s/step - loss: 1.2926 - mean_io_u: 0.4057 - precision: 0.5469 - recall: 0.8147 - val_loss: 2.9090 - val_mean_io_u: 0.3916 - val_precision: 0.2169 - val_recall:
+   1.0000
+  /home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/mlflow/tensorflow.py:552: UserWarning: Logging to MLflow failed: Layers with arguments in `__init__` mus
+  t override `get_config`.
+    try_mlflow_log(mlflow.keras.log_model, self.model, artifact_path='model')
+  20/20 [==============================] - 17s 865ms/step - loss: 2.9045 - mean_io_u: 0.3849 - precision: 0.2301 - recall: 1.0000
+  /home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/tensorflow_core/python/keras/engine/training_v2_utils.py:544: DeprecationWarning: Using or importing the
+   ABCs from 'collections' instead of from 'collections.abc' is deprecated since Python 3.3,and in 3.9 it will stop working
+    if isinstance(inputs, collections.Sequence):
+  2020-05-02 15:07:19.835685: W tensorflow/python/util/util.cc:319] Sets are not currently considered sequences, but this may change in the future, so consider avoiding using them.
+  WARNING:tensorflow:From /home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/tensorflow_core/python/ops/resource_variable_ops.py:1786: calling BaseResourceVa
+  riable.__init__ (from tensorflow.python.ops.resource_variable_ops) with constraint is deprecated and will be removed in a future version.
+  Instructions for updating:
+  If using Keras pass *_constraint arguments to layers.
+  2020/05/02 15:07:38 INFO mlflow.projects: === Run (ID 'cda4eec66a6947c38ec2ee2006563ae5') succeeded ===
+  [ye53nis@node007 drmed-git]$
+#+end_example
+
+Comparison to run at =/home=:
+- some "misformed experiment" warning. Probably bc I tried to rebase the repo on
+  the remote, because I committed the big =unet.tf= folder and wanted to redo
+  that (it seemed that failed and my first test run got lost)
+- same conda env got loaded, and the run seems to have conducted without
+  problems, jippieh!
+
+*** checking out mlflow error messages [/]
+    :LOGBOOK:
+    CLOCK: [2020-05-02 Sa 16:15]--[2020-05-02 Sa 18:06] =>  1:51
+    :END:
+
+**** TODO tensorflow: your CPU supports instructions that this TF binary was not compiled to use
+
+#+begin_example
+  2020-05-02 14:48:01.189272: I tensorflow/core/platform/cpu_feature_guard.cc:142]
+    Your CPU supports instructions that this TensorFlow binary was not
+    compiled to use: SSE4.1 SSE4.2 AVX AVX2 FMA
+  2020-05-02 14:48:01.222648: I tensorflow/core/platform/profile_utils/cpu_utils.cc:94]
+    CPU Frequency: 2194920000 Hz
+  2020-05-02 14:48:01.226156: I tensorflow/compiler/xla/service/service.cc:168]
+    XLA service 0x563a41791e20 initialized for platform Host (this does not
+    guarantee that XLA will be used). Devices:
+  2020-05-02 14:48:01.226237: I tensorflow/compiler/xla/service/service.cc:176]
+    StreamExecutor device (0): Host, Default Version
+  2020-05-02 14:48:01.226502: I tensorflow/core/common_runtime/process_util.cc:147]
+    Creating new thread pool with default inter op setting: 2.
+    Tune using inter_op_parallelism_threads for best performance.
+
+  2020-05-02 15:07:19.835685: W tensorflow/python/util/util.cc:319]
+    Sets are not currently considered sequences, but this may change in the future,
+    so consider avoiding using them.
+#+end_example
+
+See [[https://github.com/tensorflow/tensorflow/issues/34369][this Github issue]]: the second part of the error is related to the first one,
+and thus can be ignored (or solved following one of the paths below)
+
+See [[https://stackoverflow.com/questions/47068709/your-cpu-supports-instructions-that-this-tensorflow-binary-was-not-compiled-to-u][here]]: It's only an issue if you run the code on a CPU!
+
+The mentioned SSE, AVX, FMA etc are extensions from Intel and AMD to
+speed up linear algebra computation, e.g. dot-product, matrix multiply,
+convolution, etc. AVX and FMA speed them up on a CPU up to 300%. The warning
+states that the CPU does support them, but =tensorflow= does not with the
+default installation.
+
+If you have a GPU:
+- don't care about AVX etc support, because running on a GPU is way better
+- you can ignore this warning by:
+  #+BEGIN_SRC python
+    # Just disables the warning, doesn't enable AVX/FMA
+    import os
+    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+  #+END_SRC
+  or
+  #+BEGIN_SRC sh
+    export TF_CPP_MIN_LOG_LEVEL=2
+  #+END_SRC
+
+If you don't have a GPU / don't want to use it:
+- default tensorflow is intended to be compatible with as many CPUs as possible,
+  that's why these libraries are note preinstalled
+- *build tensorflow from the source optimized for /your/ CPU* - that's quite
+  some additional work... if I should do this, here is TF [[https://www.tensorflow.org/install/source][guide]]
+***** TODO Run this code on a GPU node, then decide. Maybe use docker to easily use TF on the nodes
+**** TODO mlflow: ABCs from 'collections'
+
+  #+begin_example
+    /home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/tensorflow_core/python/keras/engine/training_utils.py:1389:
+      DeprecationWarning: Using or importing the ABCs from 'collections' instead of from
+      'collections.abc' is deprecated since Python 3.3,and in 3.9 it will stop working
+      if isinstance(sample_weight_mode, collections.Mapping):
+    /home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/mlflow/utils/autologging_utils.py:60:
+      DeprecationWarning: inspect.getargspec() is deprecated since Python 3.0,
+      use inspect.signature() or inspect.getfullargspec()
+  #+end_example
+
+I suspect these will be solved with an =mlflow= update.
+
+**** TODO calling BaseResourceVariable.__init__
+
+#+begin_example
+    WARNING:tensorflow:From /home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/tensorflow_core/python/ops/resource_variable_ops.py:1786:
+      calling BaseResourceVariable.__init__ (from tensorflow.python.ops.resource_variable_ops)
+      with constraint is deprecated and will be removed in a future version.
+      Instructions for updating:
+      If using Keras pass *_constraint arguments to layers.
+    WARNING:tensorflow:Model failed to serialize as JSON.
+      Ignoring... Layers with arguments in `__init__` must override `get_config`.
+
+    /home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/mlflow/tensorflow.py:552:
+      UserWarning: Logging to MLflow failed: Layers with arguments in `__init__` must override `get_config`.
+      try_mlflow_log(mlflow.keras.log_model, self.model, artifact_path='model')
+#+end_example
+
+The =BaseResourceVariable= one seems to be connected to keras' SavedModel
+ format and happens in the [[https://www.tensorflow.org/tutorials/keras/save_and_load][official TF keras tutorial]] when using
+=model.save('saved_model/my_model')=.
+
+I am still not settled on how to save models anyway. I think I will use
+[[https://mlflow.org/docs/latest/python_api/mlflow.tensorflow.html#mlflow.tensorflow.save_model][mlflow.tensorflow.save_model()]] or =mlflow.tensorflow.log_model= (not sure what
+the difference is). BUT this needs a /serialized/ collection of TF graphs and
+variables. Maybe I have to do some more work, see below...
+
+from [[https://www.tensorflow.org/guide/keras/save_and_serialize][TF keras guide]]:
+- Saving the architecture (= layers and how these layers are connected) → model
+  can be created with freshly initialized state for weights and no compilation
+  info
+  - Sequential model / functional API model: are explicit graphs of layers,
+    config always available in a structured form.
+    - =layer.get_config()= or =model.get_config()= will return Python dict
+      containing the config of the model
+    - Model can be reconstructed
+      - Sequential model: =Sequential.from_config(config)=
+      - Functional API model: =Model.from_config(config)=
+  - Custom objects
+    - Models and layers: In order to save/load a model with custom-defined
+      layers, or a subclassed model, you should overwrite the =get_config= and
+      optionally =from_config= methods. Additionally, you should use register
+      the custom object so that Keras is aware of it.
+    - Custom functions (e.g. activation loss...) do not need =get_config=,
+      function name is sufficient for loading as long as it is registered as a
+      custom object
+    - defining =Get_config=: should return a JSON-serializable dict in order to
+      be compatible with Keras architecture- and model-saving APIs
+    - defining =from_config(config)=: should return a new layer or model object
+      that is created from the config. Default implementation returns
+      =cls(**config)=
+
+See [[https://stackoverflow.com/questions/58678836/notimplementederror-layers-with-arguments-in-init-must-override-get-conf][this SO question]]:
+- an example for a class which makes =model.save= fail:
+  #+BEGIN_SRC python
+    class encoder(tf.keras.layers.Layer):
+
+        def __init__(
+            self,
+            vocab_size, num_layers, units, d_model, num_heads, dropout,
+            **kwargs,
+        ):
+            super().__init__(**kwargs)
+            self.vocab_size = vocab_size
+            self.num_layers = num_layers
+            self.units = units
+            self.d_model = d_model
+            self.num_heads = num_heads
+            self.dropout = dropout
+
+        # Other methods etc.
+  #+END_SRC
+- and now you need to override this method:
+  #+BEGIN_SRC python
+        def get_config(self):
+
+            config = super().get_config().copy()
+            config.update({
+                'vocab_size': self.vocab_size,
+                'num_layers': self.num_layers,
+                'units': self.units,
+                'd_model': self.d_model,
+                'num_heads': self.num_heads,
+                'dropout': self.dropout,
+            })
+            return config
+  #+END_SRC
+- and for =layer.from_config=:
+  #+BEGIN_SRC python
+        @classmethod
+        def from_config(cls, config):
+            return cls(**config)
+  #+END_SRC
+**** TODO Logging to MLflow failed: Changing param values is not allowed
+
+#+BEGIN_example
+  /home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/mlflow/utils/autologging_utils.py:70:
+    UserWarning: Logging to MLflow failed:
+    Changing param values is not allowed.
+    Param with key='batch_size' was already logged with value='5' for run ID='cda4eec66a6947c38ec2ee2006563ae5'.
+    Attempted logging new value 'None'.
+  try_mlflow_log(mlflow.log_params, defaults)
+#+END_example
+
+Couldn't find anything googling that. Probably has something to do with naming
+the variable =batch_size=, which may be a variable the autologging feature
+already uses?
+
+**** TODO invalid value tf.Tensor(..., dtype=float32). Please specify value as a valid double
+
+#+begin_example
+  /home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/mlflow/tensorflow.py:549:
+    UserWarning: Logging to MLflow failed:
+    Got invalid value tf.Tensor(1.5411952, shape=(), dtype=float32) for metric 'val_loss'
+    (timestamp=1588423924159). Please specify value as a valid double (64-bit floating point)
+  try_mlflow_log(mlflow.log_metrics, logs, step=epoch)
+#+end_example
+
+Check out if val_loss got logged in the end. → doesn't seem so. It can be found
+under =artifacts/tensorboard_logs= and these are not text files, but some binary
+files.
+
+In theory, validation loss and training loss should be logged by mlflow as well
+(and custom metrics as well) → check that they are a valid 64-bit integer value.
+
 
 ** TODOs
 **** TODO Investigate Error on GPU node
@@ -970,17 +1489,21 @@ and especially Ediff. Watched these resources:
 **** TODO fix pydot and graphviz to make model plotting work
 **** TODO transform ML training ipynb to py files as used [[https://github.com/mlflow/mlflow/blob/master/examples/tensorflow/tf2/train_predict_2.py][here]]
 **** TODO check out python module =argparser= as used [[https://github.com/mlflow/mlflow/blob/master/examples/tensorflow/tf2/train_predict_2.py][here]]
-**** TODO check out Talos 1.0 with MLflow for Hyperparameter optimization
-*** TODO Take a look into =org-ref= for reference management and citing inside this labbook
 *** TODO [#A] Further setup of git branching model
-*** TODO [#C] Set up Dropbox or git annex
+*** PENDING Fix isort and sys.path conflicts
+    - State "PENDING"    from "TODO"       [2020-05-02 Sa 13:06] \\
+      Waiting for isort 5.0.0 release
+See here: https://github.com/timothycrosley/isort/issues/468#issuecomment-570899233
+*** TODO Implement talos 1.0 with mlflow, see [[file:~/Dokumente/org/04_Digital-und-Technik/programmieren.org::*Querying runs programmatically][here]]
+*** TODO [#C] Set up nice package using cookiecutter, poetry, See [[https://stackoverflow.com/questions/49474575/how-to-install-my-own-python-module-package-via-conda-and-watch-its-changes][here]]
 * Reconnect
 #+CALL: setup-tmux[:session local]
 
 #+RESULTS:
-| ye53nis@ara-login01.rz.uni-jena.de's | password:                            |           |
-| /tmp/tmux-67339/default              |                                      |           |
-| >                                    | ye53nis@ara-login01.rz.uni-jena.de's | password: |
+| sh-5.0$                              | ye53nis@ara-login01.rz.uni-jena.de's | password: |     |        |
+| Permission                           | denied,                              | please    | try | again. |
+| ye53nis@ara-login01.rz.uni-jena.de's | password:                            |           |     |        |
+| >                                    | ye53nis@ara-login01.rz.uni-jena.de's | password: |     |        |
 
 #+CALL: jpt-tunnel(port="8889", node="node018")
 
@@ -990,3 +1513,12 @@ and especially Ediff. Watched these resources:
 | Last              | login:                               | Sat       | Apr | 25 | 13:40:36 | 2020 | from | login01.ara |
 
 #+CALL: jupyter-python-metadata(conda_list='False)
+
+
+#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
+  pwd
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+#+end_example
