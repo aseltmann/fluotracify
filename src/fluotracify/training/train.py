@@ -15,10 +15,11 @@ if True:  # isort workaround
 print(tf.__version__)
 print(fluotracify_path)
 
+tf.keras.backend.set_floatx('float64')
 mlflow.tensorflow.autolog()
 
 if __name__ == "__main__":
-    batch_size = int(sys.argv[2]) if len(sys.argv) > 2 else 5
+    _batch_size = int(sys.argv[2]) if len(sys.argv) > 2 else 5
     frac_val = float(sys.argv[3]) if len(sys.argv) > 3 else 0.2
     length_delimiter = int(sys.argv[4]) if len(sys.argv) > 4 else 16384
     learning_rate = float(sys.argv[5]) if len(sys.argv) > 5 else 1e-5
@@ -54,7 +55,7 @@ if __name__ == "__main__":
         features_df=train_data,
         labels_df=train_labels_bool,
         is_training=True,
-        batch_size=batch_size,
+        batch_size=_batch_size,
         length_delimiter=length_delimiter,
         frac_val=frac_val)
 
@@ -62,7 +63,7 @@ if __name__ == "__main__":
         features_df=test_data,
         labels_df=test_labels_bool,
         is_training=False,
-        batch_size=batch_size,
+        batch_size=_batch_size,
         length_delimiter=length_delimiter)
 
     with mlflow.start_run():
@@ -81,11 +82,11 @@ if __name__ == "__main__":
         model.fit(x=dataset_train,
                   epochs=epochs,
                   steps_per_epoch=tf.math.ceil(num_train_examples /
-                                               batch_size),
+                                               _batch_size),
                   validation_data=dataset_val,
-                  validation_steps=tf.math.ceil(num_val_examples / batch_size))
+                  validation_steps=tf.math.ceil(num_val_examples / _batch_size))
         model.evaluate(dataset_test,
-                       steps=tf.math.ceil(num_test_examples / batch_size))
+                       steps=tf.math.ceil(num_test_examples / _batch_size))
         model.predict(dataset_test)
         model.reset_metrics()
         model.save('data/exp-devtest/unet.tf', save_format='tf')
