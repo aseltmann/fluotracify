@@ -1,5 +1,10 @@
 # Emacs stuff
 *.py~
+<<<<<<< HEAD
+=======
+*.org~
+*.html~
+>>>>>>> 915bc3d... Update README.md and .gitignore
 .projectile
 
 # Byte-compiled / optimized / DLL files
