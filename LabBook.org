@@ -2,6 +2,7 @@
 #+AUTHOR: Alexander Seltmann
 #+LANGUAGE: en
 #+PROPERTY: header-args :eval never-export :exports both
+#+OPTIONS: toc:3
 
 * README
 ** General:
@@ -89,8 +90,17 @@
        2. kernel does not exist $\to$ prompt asks if you want to start one $\to$
           *yes* $\to$ type kernel you want to start, e.g. =Python 3=
     3. In subtree where you want to use =jupyter-python= blocks with =org
-       babel=, set the =:header-args:jupyter-python :session
-       /jpy:localhost#kernel:8889-ID=
+       babel=
+       1. set the =:header-args:jupyter-python :session
+          /jpy:localhost#kernel:8889-ID=
+       2. We can customize the output folder using the following variable:
+          #+BEGIN_SRC  emacs-lisp
+            (setq org-babel-jupyter-resource-directory "./data/exp-test/figures-jupyter")
+          #+END_SRC
+
+          #+RESULTS:
+          : ./data/exp-test/figures-jupyter
+
 ** tools used (notes)
 *** Emacs =magit=
    - =gitflow-avh= (=magit-flow=) to follow the flow
@@ -253,24 +263,39 @@ ssh -t -t ara -L $port:localhost:$port ssh $node -L $port:Localhost:$port
 
 * Organization of git
 ** remote/origin/master branch:
-   - Has all the source, analysis, scripts
-** remote/origin/xp# branches:
-   - Have all the data connected to specific experiments
-   - Also some important (not all) .pdf files
+  - contains all the source code in folder **src/** which is used for experiments.
+  - contains the **LabBook.org** template
+  - contains setup- and metadata files such as **MLproject** or **conda.yaml**
+  - the log contains only lasting alterations on the folders and files mentioned
+    above, which are e.g. used for conducting experiments or which introduce new
+    features. Day-to-day changes in code
+** remote/origin/exp### branches:
+  - if an experiment is done, the code and templates will be branched out from
+    *master* in an *exp###* branch, ### meaning some meaningful descriptor.
+  - all data generated during the experiment (e.g. .csv files, plots, images,
+    etc), is stored in a folder with the name **data/exp-###**, except machine
+    learning-specific data and metadata from `mlflow` runs, which are saved
+    under **data/mlruns** (this allows easily comparing machine learning runs
+    with different experimental settings)
+  - The **LabBook.org** file is essential
+    - If possible, all code is executed from inside this file (meaning analysis
+      scripts or calling the code from the **scr/** directory).
+    - All other steps taken during an experiment are noted down, as well as
+      conclusions or my thought process while conducting the experiment
+    - Provenance data, such as Metadata about the environment the code was
+      executed in, the command line output of the code, and some
+** remote/origin/develop branch:
+  - this is the branch I use for day to day work on features and exploration.
+    All of my current activity can be followed here.
 ** remote/origin/data branch:
-   - Merging all the data and source branches
+  - contains a full cronicle of the whole research process
+  - all *exp###* branches are merged here. Afterwards the original branch is
+    deleted and on the data branch there is a *Git tag* which shows the merge
+    commit to make accessing single experiments easy.
+  - the *develop* branch is merged here as well.
+
 ** Git TAGs
 *** Stable versions:
-**** stable13
-    StarPU version: trunk 14405
-    Simgrid: c78eee2
-    qrm_starpu: r1393
-    new_magmamorse: r1799
-**** stable13.1
-    StarPU version: trunk 14405
-    Simgrid: c78eee2
-    qrm_starpu: r1443
-    new_magmamorse: r1799
 *** All tags from git:
    #+begin_src sh :results output
     git push origin --tags
