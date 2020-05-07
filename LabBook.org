@@ -421,7 +421,7 @@ total 84
 | ob-tmux: | 1 | windows | (created | Mon | Apr | 13 | 19:55:21 | 2020 |
 
 
-#+CALL:setup-tmux
+#+CALL:setup-tmux[:session local]
 
 #+RESULTS:
 | ye53nis@ara-login01.rz.uni-jena.de's | password:                            |           |
@@ -452,51 +452,48 @@ total 84
 
 *** start and connect to jupyter
 :PROPERTIES:
-:header-args:jupyter-python: :session /jpy:localhost#8889:6be3aedd-62d4-4fc2-b816-af41e3986de9
+:header-args:jupyter-python: :session /jpy:localhost#8889:2912b27f-1dbe-4a8e-9c59-6cc02f5434cf
 :END:
 
-#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session ob-tmux
+#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
   export PORT=8889
 #+END_SRC
 
-#+CALL: jpt-tmux[:session ob-tmux]
+
+#+CALL: jpt-tmux[:session tmux]
 
 #+RESULTS:
 #+begin_example
-  [ye53nis@node018 ~]$ export PORT=8889
-  [ye53nis@node018 ~]$ module load tools/python/3.7
-  [ye53nis@node018 ~]$ export XDG_RUNTIME_DIR=''
-  [ye53nis@node018 ~]$ export XDG_RUNTIME_DIR=""
-  [ye53nis@node018 ~]$ jupyter notebook --no-browser --port=$PORT
-  [I 16:09:30.912 NotebookApp] Serving notebooks from local directory: /home/ye53n
-  is
-  [I 16:09:30.912 NotebookApp] The Jupyter Notebook is running at:
-  [I 16:09:30.912 NotebookApp] http://localhost:8889/?token=8cd6a262f7384ed4780611
-  af96fb9cb4db8733a4cf654eaf
-  [I 16:09:30.912 NotebookApp] Use Control-C to stop this server and shut down all
-   kernels (twice to skip confirmation).
-  [C 16:09:30.957 NotebookApp]
+[ye53nis@node007 drmed-git]$ export PORT=8889
+[ye53nis@node007 drmed-git]$ module load tools/python/3.7
+[ye53nis@node007 drmed-git]$ export XDG_RUNTIME_DIR=''
+[ye53nis@node007 drmed-git]$ export XDG_RUNTIME_DIR=""
+[ye53nis@node007 drmed-git]$ jupyter notebook --no-browser --port=$PORT
+[I 16:44:59.413 NotebookApp] Serving notebooks from local directory: /beegfs/ye53nis/drmed-git
+[I 16:44:59.413 NotebookApp] The Jupyter Notebook is running at:
+[I 16:44:59.413 NotebookApp] http://localhost:8889/?token=552a9cff48203d5a263cb083b80b939dbbc856758df651dd
+[I 16:44:59.413 NotebookApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+[C 16:44:59.425 NotebookApp]
 
-      To access the notebook, open this file in a browser:
-          file:///home/ye53nis/.local/share/jupyter/runtime/nbserver-50353-open.ht
-  ml
-      Or copy and paste one of these URLs:
-          http://localhost:8889/?token=8cd6a262f7384ed4780611af96fb9cb4db8733a4cf6
-  54eaf
+    To access the notebook, open this file in a browser:
+        file:///home/ye53nis/.local/share/jupyter/runtime/nbserver-84165-open.html
+    Or copy and paste one of these URLs:
+        http://localhost:8889/?token=552a9cff48203d5a263cb083b80b939dbbc856758df651dd
 #+end_example
 
-#+CALL: jpt-tunnel(port="8889", node="node018")
+#+CALL: jpt-tunnel(port="8889", node="node007")
 
 #+RESULTS:
-| sh-5.0$           | sh-5.0$   | ye53nis@ara-login01.rz.uni-jena.de's | password: |    |          |      |      |             |
-| ye53nis@node018's | password: |                                      |           |    |          |      |      |             |
-| Last              | login:    | Thu                                  | Apr       | 23 | 16:20:50 | 2020 | from | login01.ara |
+| Connection        | closed                               | by        |          10.138.225.252 | port    | 22 |     |      |    |       |        |
+| sh-5.0$           | ye53nis@ara-login01.rz.uni-jena.de's | password: |                         |         |    |     |      |    |       |        |
+| Warning:          | Permanently                          | added     | 'node007,192.168.193.7' | (ECDSA) | to | the | list | of | known | hosts. |
+| ye53nis@node007's | password:                            |           |                         |         |    |     |      |    |       |        |
 
 I started a Python3 kernel using =jupyter-server-list-kernels=. Then I added the
 kernel ID to the =:PROPERTIES:= drawer of this (and following) subtrees.
 
 #+begin_example
-python3           6be3aedd-62d4-4fc2-b816-af41e3986de9   2 minutes ago        starting   0
+python3           2912b27f-1dbe-4a8e-9c59-6cc02f5434cf   2 minutes ago        starting   0
 #+end_example
 
 Passing a boolean value to a variable in =org-babel= was not trivial: you have to
@@ -510,24 +507,24 @@ expression should be returned as written, not evaluated.
   No of CPUs in system: 48
   No of CPUs the current process can use: 48
   load average: (0.08, 0.03, 0.05)
-  posix.uname_result(sysname='Linux', nodename='node018', release='3.10.0-957.1.3.el7.x86_64', version='#1 SMP Thu Nov 29 14:49:43 UTC 2018', machine='x86_64')
-  PID of process: 86937
-  RAM total: 137G, RAM used: 1.7G, RAM free: 126G
-  the current directory: /home/ye53nis
+  posix.uname_result(sysname='Linux', nodename='node007', release='3.10.0-957.1.3.el7.x86_64', version='#1 SMP Thu Nov 29 14:49:43 UTC 2018', machine='x86_64')
+  PID of process: 92855
+  RAM total: 137G, RAM used: 1.3G, RAM free: 120G
+  the current directory: /beegfs/ye53nis/drmed-git
   My disk usage:
   Filesystem           Size  Used Avail Use% Mounted on
   /dev/sda1             50G  4.3G   46G   9% /
   devtmpfs              63G     0   63G   0% /dev
-  tmpfs                 63G  559M   63G   1% /dev/shm
+  tmpfs                 63G  199M   63G   1% /dev/shm
   tmpfs                 63G   59M   63G   1% /run
   tmpfs                 63G     0   63G   0% /sys/fs/cgroup
   nfs01-ib:/cluster    2.0T  316G  1.7T  16% /cluster
-  nfs03-ib:/pool/work  100T   78T   23T  78% /nfsdata
   nfs01-ib:/home        80T   59T   22T  73% /home
+  nfs03-ib:/pool/work  100T   78T   23T  78% /nfsdata
+  /dev/sda3            6.0G  441M  5.6G   8% /var
   /dev/sda5            2.0G   34M  2.0G   2% /tmp
-  /dev/sda6            169G  3.9G  165G   3% /local
-  /dev/sda3            6.0G  481M  5.6G   8% /var
-  beegfs_nodev         524T  421T  104T  81% /beegfs
+  /dev/sda6            169G  5.5G  163G   4% /local
+  beegfs_nodev         524T  427T   98T  82% /beegfs
   tmpfs                 13G     0   13G   0% /run/user/67339
 #+end_example
 
@@ -1073,6 +1070,7 @@ Success!!!
    :END:
 *** using =git-lfs=
     :LOGBOOK:
+    CLOCK: [2020-05-05 Di 13:37]--[2020-05-05 Di 13:38] =>  0:01
     CLOCK: [2020-05-02 Sa 14:41]--[2020-05-02 Sa 16:13] =>  1:32
     :END:
 Problem: the deep network =unet.tf= is too big (>300MB) and github only allows a
@@ -1118,10 +1116,20 @@ which is optimised for that stuff. My current repo is in =/home=
   =git-annex=
 
 I am trying version 1 now
-*** run mlflow model as above, but save everything on =/beegfs=
-    :LOGBOOK:
-    CLOCK: [2020-05-02 Sa 16:13]--[2020-05-02 Sa 16:15] =>  0:02
-    :END:
+
+Works!!
+
+My =-gitattributes= file has the following line to track all contents of a
+folder which contains ".tf" somewhere in =data/=
+#+begin_example
+  data/**/*.tf/** filter=lfs diff=lfs merge=lfs -text
+#+end_example
+
+** run mlflow model as above, but save everything on =/beegfs=
+
+   :LOGBOOK:
+   CLOCK: [2020-05-02 Sa 16:13]--[2020-05-02 Sa 16:15] =>  0:02
+   :END:
 #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
   pwd
   cd /beegfs/ye53nis/drmed-git/
@@ -1130,11 +1138,12 @@ I am trying version 1 now
 
 #+RESULTS:
 #+begin_example
-  [ye53nis@node007 drmed-git]$ pwd
-  /home/ye53nis/drmed-git
-  [ye53nis@node007 drmed-git]$ cd /beegfs/ye53nis/drmed-git/
-  [ye53nis@node007 drmed-git]$ pwd
+  (base) [ye53nis@login01 ~]$ pwd
+  /home/ye53nis
+  (base) [ye53nis@login01 ~]$ cd /beegfs/ye53nis/drmed-git/
+  (base) [ye53nis@login01 drmed-git]$ pwd
   /beegfs/ye53nis/drmed-git
+  (base) [ye53nis@login01 drmed-git]$
 #+end_example
 
 #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
@@ -1295,12 +1304,14 @@ Comparison to run at =/home=:
 - same conda env got loaded, and the run seems to have conducted without
   problems, jippieh!
 
-*** checking out mlflow error messages [/]
+*** checking out mlflow error messages [0/5]
     :LOGBOOK:
+    CLOCK: [2020-05-05 Di 14:30]--[2020-05-05 Di 15:38] =>  1:08
+    CLOCK: [2020-05-05 Di 13:43]--[2020-05-05 Di 14:09] =>  0:26
     CLOCK: [2020-05-02 Sa 16:15]--[2020-05-02 Sa 18:06] =>  1:51
     :END:
 
-**** TODO tensorflow: your CPU supports instructions that this TF binary was not compiled to use
+**** TODO 1. tensorflow: your CPU supports instructions that this TF binary was not compiled to use
 
 #+begin_example
   2020-05-02 14:48:01.189272: I tensorflow/core/platform/cpu_feature_guard.cc:142]
@@ -1352,7 +1363,7 @@ If you don't have a GPU / don't want to use it:
 - *build tensorflow from the source optimized for /your/ CPU* - that's quite
   some additional work... if I should do this, here is TF [[https://www.tensorflow.org/install/source][guide]]
 ***** TODO Run this code on a GPU node, then decide. Maybe use docker to easily use TF on the nodes
-**** TODO mlflow: ABCs from 'collections'
+**** TODO 2. mlflow: ABCs from 'collections'
 
   #+begin_example
     /home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/tensorflow_core/python/keras/engine/training_utils.py:1389:
@@ -1366,8 +1377,13 @@ If you don't have a GPU / don't want to use it:
 
 I suspect these will be solved with an =mlflow= update.
 
-**** TODO calling BaseResourceVariable.__init__
+**** PENDING 3. calling BaseResourceVariable.__init__
 
+     - State "PENDING"    from "TODO"       [2020-05-05 Di 15:01] \\
+       Wait till this commit
+       https://github.com/tensorflow/tensorflow/commit/1e2c8c6873770a70ace0613a65c11826666c4623#diff-aa6c341a4b212afc57b49be73e689dc2
+       which introduces Conv1DTranspose officially is released. If it takes too long:
+       install tf-nightly, but this might be unstable.
 #+begin_example
     WARNING:tensorflow:From /home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/tensorflow_core/python/ops/resource_variable_ops.py:1786:
       calling BaseResourceVariable.__init__ (from tensorflow.python.ops.resource_variable_ops)
@@ -1457,7 +1473,11 @@ See [[https://stackoverflow.com/questions/58678836/notimplementederror-layers-wi
         def from_config(cls, config):
             return cls(**config)
   #+END_SRC
-**** TODO Logging to MLflow failed: Changing param values is not allowed
+**** PENDING 4. Logging to MLflow failed: Changing param values is not allowed
+
+     - State "PENDING"    from "TODO"       [2020-05-05 Di 13:46] \\
+       Renamed batch_size to _batch_size to emphasize the local character. let's see if
+       the error still occurs
 
 #+BEGIN_example
   /home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/mlflow/utils/autologging_utils.py:70:
@@ -1472,8 +1492,11 @@ Couldn't find anything googling that. Probably has something to do with naming
 the variable =batch_size=, which may be a variable the autologging feature
 already uses?
 
-**** TODO invalid value tf.Tensor(..., dtype=float32). Please specify value as a valid double
+**** PENDING 5. invalid value tf.Tensor(..., dtype=float32). Please specify value as a valid double
 
+     - State "TODO"       from "PENDING"    [2020-05-05 Di 15:26]
+     - State "PENDING"    from "TODO"       [2020-05-05 Di 13:53] \\
+       I added tf.keras.backend.set_floatx('float64')
 #+begin_example
   /home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/mlflow/tensorflow.py:549:
     UserWarning: Logging to MLflow failed:
@@ -1488,6 +1511,540 @@ files.
 
 In theory, validation loss and training loss should be logged by mlflow as well
 (and custom metrics as well) → check that they are a valid 64-bit integer value.
+
+**** Test run fixing 4. and 5.
+
+     :LOGBOOK:
+     CLOCK: [2020-05-06 Mi 16:10]--[2020-05-06 Mi 17:17] =>  1:07
+     :END:
+
+#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
+  pwd
+  git log -1
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+  [ye53nis@node007 drmed-git]$ pwd
+  /beegfs/ye53nis/drmed-git
+  [ye53nis@node007 drmed-git]$ git log -1
+  commit e9983783a946d57f95b3a28405c5a2d74108f6b9
+  Author: Apoplex <oligolex@vivaldi.net>
+  Date:   Tue May 5 15:07:02 2020 +0200
+
+      Set tf.keras standard to float64; rename var
+  [ye53nis@node007 drmed-git]$
+#+end_example
+
+#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
+  mlflow run . -P fluotracify_path=/beegfs/ye53nis/drmed-git/src/ -P csv_path=/beegfs/ye53nis/saves/firstartifact_Sep2019_subsample/
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+
+  ------------------------
+  number of test examples: 100
+
+  input - shape:   (None, 16384, 1)
+  output - shape:  (None, 16384, 1)
+  Traceback (most recent call last):
+    File "src/fluotracify/training/train.py", line 79, in <module>
+      tf.keras.metrics.Recall()
+    File "/home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/tensorflow_core/python/training/tracking/base.py", line 457, in _method_wrapper
+      result = method(self, *args, **kwargs)
+    File "/home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/tensorflow_core/python/keras/engine/training.py", line 439, in compile
+      masks=self._prepare_output_masks())
+    File "/home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/tensorflow_core/python/keras/engine/training.py", line 2004, in _handle_metrics
+      target, output, output_mask))
+    File "/home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/tensorflow_core/python/keras/engine/training.py", line 1955, in _handle_per_output_metrics
+      metric_fn, y_true, y_pred, weights=weights, mask=mask)
+    File "/home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/tensorflow_core/python/keras/engine/training_utils.py", line 1155, in call_metric_function
+      return metric_fn(y_true, y_pred, sample_weight=weights)
+    File "/home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/tensorflow_core/python/keras/metrics.py", line 196, in __call__
+      replica_local_fn, *args, **kwargs)
+    File "/home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/tensorflow_core/python/keras/distribute/distributed_training_utils.py", line 1135, in call_repli
+  ca_local_fn
+      return fn(*args, **kwargs)
+    File "/home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/tensorflow_core/python/keras/metrics.py", line 179, in replica_local_fn
+      update_op = self.update_state(*args, **kwargs)  # pylint: disable=not-callable
+    File "/home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/tensorflow_core/python/keras/utils/metrics_utils.py", line 76, in decorated
+      update_op = update_state_fn(*args, **kwargs)
+    File "/home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/tensorflow_core/python/keras/metrics.py", line 1216, in update_state
+      sample_weight=sample_weight)
+    File "/home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/tensorflow_core/python/keras/utils/metrics_utils.py", line 440, in update_confusion_matrix_varia
+  bles
+      variables_to_update[matrix_cond]))
+    File "/home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/tensorflow_core/python/keras/utils/metrics_utils.py", line 416, in weighted_assign_add
+      return var.assign_add(math_ops.reduce_sum(label_and_pred, 1))
+    File "/home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/tensorflow_core/python/ops/resource_variable_ops.py", line 785, in assign_add
+      self.handle, ops.convert_to_tensor(delta, dtype=self.dtype),
+    File "/home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/tensorflow_core/python/framework/ops.py", line 1290, in convert_to_tensor
+      (dtype.name, value.dtype.name, value))
+  ValueError: Tensor conversion requested dtype float64 for Tensor with dtype float32: <tf.Tensor 'metrics/precision/Sum:0' shape=(1,) dtype=float32>
+  2020/05/05 15:16:13 ERROR mlflow.cli: === Run (ID '0fcf9dc61b3148d6b535b5e66a8a3db0') failed ===
+  [ye53nis@node007 drmed-git]$
+#+end_example
+
+there is an issue with tf.metrics see [[https://github.com/tensorflow/tensorflow/issues/36790][here]]. For now,
+tf.keras.backend.set_floatx('float64') doesn't work.
+
+Next try: log the metrics manually and see if that works.
+Or: Check first if the tensorboard metrics stored in =mlruns/artifacts= is maybe enough
+
+I found a [[https://medium.com/@ij_82957/how-to-reduce-mlflow-logging-overhead-by-using-log-batch-b61301cc540f][nice article]] dealing with how to log metrics from a history object.
+For now I implement a approach based on =mlflow.log_metrics()=. There is a
+faster approch using =mlflow.entities.Metric=, =mlflow.tracking.MlflowClient=
+and =mlflow_client.log_batch()=. But I want to try the naive approach first.
+
+
+**** start and connect to jupyter
+   :PROPERTIES:
+   :header-args:jupyter-python: :session /jpy:localhost#8889:9e7e4701-35b1-4031-8f44-ed2586b82d49
+   :END:
+#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
+  srun -p gpu_test --time=1:00:00 --gres=gpu:2 --mem-per-cpu=1000 --ntasks-per-node=48 --pty bash
+#+END_SRC
+
+#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
+  module load nvidia/cuda/10.1.168
+  module load nvidia/cudnn/7.5.1.10
+  conda activate tensorflow_nightly
+  export PORT=8889
+  export XDG_RUNTIME_DIR=''
+  export XDG_RUNTIME_DIR=""
+  export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/cluster/nvidia/cuda/10.1.168/extras/CUPTI/lib64
+  jupyter notebook --no-browser --port=$PORT
+#+END_SRC
+
+#+CALL: jpt-tunnel(port="8889", node="node127")
+
+#+RESULTS:
+| sh-5.0$           | ye53nis@ara-login01.rz.uni-jena.de's | password: |     |   |          |      |      |             |
+| ye53nis@node127's | password:                            |           |     |   |          |      |      |             |
+| Last              | login:                               | Wed       | May | 6 | 23:16:52 | 2020 | from | login01.ara |
+
+I nstarted a Python3 kernel using =jupyter-server-list-kernels=. Then I added the
+kernel ID to the =:PROPERTIES:= drawer of this (and following) subtrees.
+
+#+begin_example
+python3          9e7e4701-35b1-4031-8f44-ed2586b82d49   2 minutes ago        starting   0
+#+end_example
+
+Passing a boolean value to a variable in =org-babel= was not trivial: you have to
+use the infamous *single quote '* from emacs-lisp programming to show that the
+expression should be returned as written, not evaluated.
+
+#+CALL: jupyter-python-metadata(conda_list='False)
+
+#+RESULTS:
+#+begin_example
+  No of CPUs in system: 48
+  No of CPUs the current process can use: 48
+  load average: (0.07, 0.09, 0.76)
+  posix.uname_result(sysname='Linux', nodename='node127', release='3.10.0-957.1.3.el7.x86_64', version='#1 SMP Thu Nov 29 14:49:43 UTC 2018', machine='x86_64')
+  PID of process: 28280
+  RAM total: 137G, RAM used: 1.3G, RAM free: 15G
+  the current directory: /home/ye53nis
+  My disk usage:
+  Filesystem           Size  Used Avail Use% Mounted on
+  /dev/sda1             50G  5.7G   45G  12% /
+  devtmpfs              63G     0   63G   0% /dev
+  tmpfs                 63G   25M   63G   1% /dev/shm
+  tmpfs                 63G   59M   63G   1% /run
+  tmpfs                 63G     0   63G   0% /sys/fs/cgroup
+  nfs03-ib:/pool/work  100T   78T   23T  78% /nfsdata
+  nfs01-ib:/cluster    2.0T  316G  1.7T  16% /cluster
+  nfs01-ib:/home        80T   59T   22T  73% /home
+  /dev/sda5            2.0G   34M  2.0G   2% /tmp
+  /dev/sda6            169G  320M  169G   1% /local
+  /dev/sda3            6.0G  543M  5.5G   9% /var
+  beegfs_nodev         524T  427T   98T  82% /beegfs
+  tmpfs                 13G     0   13G   0% /run/user/67339
+#+end_example
+
+#+BEGIN_SRC jupyter-python
+  %cd /beegfs/ye53nis/drmed-git
+#+END_SRC
+
+#+RESULTS:
+: /beegfs/ye53nis/drmed-git
+
+#+BEGIN_SRC jupyter-python
+  import sys
+  import matplotlib.pyplot as plt
+  import tensorflow as tf
+  sys.path.append('/beegfs/ye53nis/drmed-git/src/')
+  from fluotracify.simulations import import_simulation_from_csv as isfc
+  from fluotracify.training import build_model as bm, preprocess_data as ppd
+  tf.config.list_physical_devices('GPU')
+#+END_SRC
+
+#+RESULTS:
+: []
+
+#+BEGIN_SRC jupyter-python
+  _batch_size = 5
+  frac_val = 0.2
+  length_delimiter = 16384
+  learning_rate = 1e-5
+  epochs = 10
+  csv_path = '/beegfs/ye53nis/saves/firstartifact_Sep2019_subsample/'
+#+END_SRC
+
+#+RESULTS:
+
+#+BEGIN_SRC jupyter-python
+  train, test, nsamples, experiment_params = isfc.import_from_csv(
+      path=csv_path,
+      header=12,
+      frac_train=0.8,
+      col_per_example=2,
+      dropindex=None,
+      dropcolumns='Unnamed: 200')
+
+  train_data, train_labels = isfc.separate_data_and_labels(array=train,
+                                                           nsamples=nsamples)
+  test_data, test_labels = isfc.separate_data_and_labels(array=test,
+                                                         nsamples=nsamples)
+
+  # get bool as ground truth
+  train_labels_bool = train_labels > 0.04
+
+  test_labels_bool = test_labels > 0.04
+  print(
+      '\nfor each 20,000 timestap trace there are the following numbers '
+      'of corrupted timesteps:\n',
+      test_labels_bool.sum(axis=0).head())
+
+  # Cleanup
+  del train, test
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+  train 0 /beegfs/ye53nis/saves/firstartifact_Sep2019_subsample/traces_cluster_rand_Sep2019_set003.csv
+  train 1 /beegfs/ye53nis/saves/firstartifact_Sep2019_subsample/traces_cluster_rand_Sep2019_set002.csv
+  test 2 /beegfs/ye53nis/saves/firstartifact_Sep2019_subsample/traces_cluster_rand_Sep2019_set001.csv
+  shapes of feature dataframe: (20000, 200) and label dataframe: (20000, 200)
+  shapes of feature dataframe: (20000, 100) and label dataframe: (20000, 100)
+
+  for each 20,000 timestap trace there are the following numbers of corrupted timesteps:
+   label001_1     4124
+  label002_1     2261
+  label003_1       45
+  label004_1    13108
+  label005_1     2306
+  dtype: int64
+#+end_example
+
+#+BEGIN_SRC jupyter-python
+  dataset_train, dataset_val, num_train_examples, num_val_examples = ppd.tfds_from_pddf_for_unet(
+      features_df=train_data,
+      labels_df=train_labels_bool,
+      is_training=True,
+      batch_size=_batch_size,
+      length_delimiter=length_delimiter,
+      frac_val=frac_val)
+
+  dataset_test, num_test_examples = ppd.tfds_from_pddf_for_unet(
+      features_df=test_data,
+      labels_df=test_labels_bool,
+      is_training=False,
+      batch_size=_batch_size,
+      length_delimiter=length_delimiter)
+#+END_SRC
+
+#+RESULTS:
+: number of training examples: 160, number of validation examples: 40
+:
+: ------------------------
+: number of test examples: 100
+:
+
+#+BEGIN_SRC jupyter-python
+strategy = tf.distribute.MirroredStrategy()
+print('Number of devices: {}'.format(strategy.num_replicas_in_sync))
+#+END_SRC
+
+#+RESULTS:
+: WARNING:tensorflow:There are non-GPU devices in `tf.distribute.Strategy`, not using nccl allreduce.
+: INFO:tensorflow:Using MirroredStrategy with devices ('/job:localhost/replica:0/task:0/device:CPU:0',)
+: Number of devices: 1
+
+#+BEGIN_SRC jupyter-python
+  model = bm.unet_1d_alt(input_size=length_delimiter)
+  optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
+  loss = bm.binary_ce_dice_loss
+
+  model.compile(loss=loss,
+                optimizer=optimizer,
+                metrics=[
+                    tf.keras.metrics.MeanIoU(num_classes=2),
+                    tf.keras.metrics.Precision(),
+                    tf.keras.metrics.Recall()
+                ])
+
+  history = model.fit(
+      x=dataset_train,
+      epochs=epochs,
+      steps_per_epoch=tf.math.ceil(num_train_examples / _batch_size),
+      validation_data=dataset_val,
+      validation_steps=tf.math.ceil(num_val_examples / _batch_size))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+  input - shape:	 (None, 16384, 1)
+  output - shape:	 (None, 16384, 1)
+  Epoch 1/10
+  32/32 [==============================] - 97s 3s/step - loss: 1.5873 - mean_io_u: 0.3986 - precision: 0.2489 - recall: 0.5378 - val_loss: 1.4996 - val_mean_io_u: 0.3783 - val_precision: 0.0000e+00 - val_recall: 0.0000e+00
+  Epoch 2/10
+  32/32 [==============================] - 93s 3s/step - loss: 1.5293 - mean_io_u: 0.4037 - precision: 0.3027 - recall: 0.6539 - val_loss: 1.4801 - val_mean_io_u: 0.3782 - val_precision: 0.0000e+00 - val_recall: 0.0000e+00
+  Epoch 3/10
+  32/32 [==============================] - 94s 3s/step - loss: 1.4660 - mean_io_u: 0.4071 - precision: 0.3465 - recall: 0.7087 - val_loss: 1.4734 - val_mean_io_u: 0.3934 - val_precision: 0.0000e+00 - val_recall: 0.0000e+00
+  Epoch 4/10
+32/32 [==============================] - 92s 3s/step - loss: 1.4164 - mean_io_u: 0.4035 - precision: 0.4074 - recall: 0.7071 - val_loss: 1.4653 - val_mean_io_u: 0.3894 - val_precision: 0.0000e+00 - val_recall: 0.0000e+00
+  Epoch 5/10
+32/32 [==============================] - 91s 3s/step - loss: 1.3456 - mean_io_u: 0.3991 - precision: 0.4956 - recall: 0.7108 - val_loss: 1.4867 - val_mean_io_u: 0.4216 - val_precision: 0.0000e+00 - val_recall: 0.0000e+00
+  Epoch 6/10
+32/32 [==============================] - 91s 3s/step - loss: 1.3310 - mean_io_u: 0.4111 - precision: 0.5083 - recall: 0.7445 - val_loss: 1.5757 - val_mean_io_u: 0.3901 - val_precision: 0.2414 - val_recall: 0.9313
+  Epoch 7/10
+32/32 [==============================] - 93s 3s/step - loss: 1.2963 - mean_io_u: 0.4076 - precision: 0.5743 - recall: 0.7135 - val_loss: 1.7852 - val_mean_io_u: 0.3509 - val_precision: 0.2983 - val_recall: 0.9997
+  Epoch 8/10
+32/32 [==============================] - 93s 3s/step - loss: 1.2417 - mean_io_u: 0.4025 - precision: 0.6651 - recall: 0.7382 - val_loss: 2.6641 - val_mean_io_u: 0.3951 - val_precision: 0.2097 - val_recall: 0.9998
+  Epoch 9/10
+32/32 [==============================] - 95s 3s/step - loss: 1.2306 - mean_io_u: 0.4079 - precision: 0.6707 - recall: 0.7559 - val_loss: 3.5447 - val_mean_io_u: 0.4057 - val_precision: 0.1887 - val_recall: 1.0000
+  Epoch 10/10
+32/32 [==============================] - 92s 3s/step - loss: 1.2321 - mean_io_u: 0.4104 - precision: 0.6717 - recall: 0.7411 - val_loss: 4.2015 - val_mean_io_u: 0.3820 - val_precision: 0.2359 - val_recall: 1.0000
+#+end_example
+
+These GPU modules were missing:
+libcublas.so.10 - I wrote to Sabine Irmer about that
+libcudnn.so.7 - There was an extra =module load nvidia/cudnn/7.5.1.10= available
+
+#+BEGIN_SRC jupyter-python :results scalar
+  history.history
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+  {'loss': [1.5873368978500366,
+    1.5292785167694092,
+    1.4659773111343384,
+    1.416449785232544,
+    1.345642328262329,
+    1.3310154676437378,
+    1.2963486909866333,
+    1.2417198419570923,
+    1.2305928468704224,
+    1.2321150302886963],
+   'mean_io_u': [0.3985559344291687,
+    0.4037455916404724,
+    0.4071432948112488,
+    0.40351858735084534,
+    0.39908209443092346,
+    0.41106948256492615,
+    0.4076460599899292,
+    0.40254250168800354,
+    0.4079275131225586,
+    0.41036319732666016],
+   'precision': [0.2488986849784851,
+    0.30270472168922424,
+    0.34654930233955383,
+    0.4073646366596222,
+    0.49564093351364136,
+    0.5083103179931641,
+    0.5742575526237488,
+    0.6650815606117249,
+    0.6706622838973999,
+    0.671720564365387],
+   'recall': [0.537831723690033,
+    0.6538828611373901,
+    0.7087317705154419,
+    0.7070884108543396,
+    0.7108414173126221,
+    0.7444652915000916,
+    0.7134528160095215,
+    0.7382367849349976,
+    0.7559362649917603,
+    0.741098940372467],
+   'val_loss': [1.49961519241333,
+    1.48013174533844,
+    1.473410964012146,
+    1.4653061628341675,
+    1.4866881370544434,
+    1.5756771564483643,
+    1.785191297531128,
+    2.664144515991211,
+    3.5446887016296387,
+    4.201501369476318],
+   'val_mean_io_u': [0.3783065676689148,
+    0.37820738554000854,
+    0.3933570981025696,
+    0.3894149661064148,
+    0.42156678438186646,
+    0.3901313841342926,
+    0.3508506715297699,
+    0.3951469361782074,
+    0.4056693911552429,
+    0.38204270601272583],
+   'val_precision': [0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.24144163727760315,
+    0.2983255386352539,
+    0.2097124308347702,
+    0.18867774307727814,
+    0.23592336475849152],
+   'val_recall': [0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.9312672019004822,
+    0.9996521472930908,
+    0.9997889995574951,
+    0.9999595880508423,
+    0.9999547004699707]}
+#+end_example
+
+#+BEGIN_SRC jupyter-python :results scalar
+  model.evaluate(dataset_test,
+                 steps=tf.math.ceil(num_test_examples / _batch_size))
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+: 20/20 [==============================] - 10s 519ms/step - loss: 4.2488 - mean_io_u: 0.3849 - precision: 0.2301 - recall: 1.0000
+: [4.248773097991943,
+:  0.38494813442230225,
+:  0.23011629283428192,
+:  0.9999707937240601]
+:END:
+
+#+BEGIN_SRC jupyter-python :display image
+  it = iter(dataset_test)
+
+  fig, ax = plt.subplots(5, figsize=(16, 12))
+  count = 0
+  while count < 5:
+      example = next(it)
+      ax[count].plot(example[0][0])
+      prediction = model.predict(example[0])
+      prediction = prediction[0] > 0.5
+      ax[count].plot(prediction*2)
+      ax[count].plot(example[1][0])
+      count += 1
+#+END_SRC
+
+#+RESULTS:
+: 0c67d91d-f101-4868-b9a4-ed8cee57bee9
+
+** Reading out mlflow logs
+
+#+BEGIN_SRC tmux :session local
+  conda activate tensorflow_env
+  cd Programme/drmed-git
+  export MLFLOW_EXPERIMENT_NAME=exp-devtest
+  export MLFLOW_EXPERIMENT_ID=0.1
+  export MLFLOW_TRACKING_URI=file:./data/mlruns
+#+END_SRC
+
+#+BEGIN_SRC tmux :session local
+  mlflow artifacts list -r cda4eec66a6947c38ec2ee2006563ae5
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+  [{
+    "path": "model_summary.txt",
+    "is_dir": false,
+    "file_size": "10888"
+  }, {
+    "path": "tensorboard_logs",
+    "is_dir": true
+  }]
+#+end_example
+
+#+BEGIN_SRC tmux :session local
+  mlflow experiments list
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+    Experiment Id  Name         Artifact Location
+  ---------------  -----------  --------------------
+                0  Default      file:./data/mlruns/0
+                1  exp-devtest  file:./data/mlruns/1
+#+end_example
+
+#+BEGIN_SRC tmux :session local
+  mlflow runs describe --run-id cda4eec66a6947c38ec2ee2006563ae5
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+  {
+      "info": {
+          "artifact_uri": "file:./data/mlruns/1/cda4eec66a6947c38ec2ee2006563ae5/artifacts",
+          "end_time": 1588424858258,
+          "experiment_id": "1",
+          "lifecycle_stage": "active",
+          "run_id": "cda4eec66a6947c38ec2ee2006563ae5",
+          "run_uuid": "cda4eec66a6947c38ec2ee2006563ae5",
+          "start_time": 1588423619699,
+          "status": "FINISHED",
+          "user_id": "ye53nis"
+      },
+      "data": {
+          "metrics": {},
+          "params": {
+              "opt_beta_1": "0.9",
+              "validation_steps": "tf.Tensor(8.0, shape=(), dtype=float32)",
+              "opt_learning_rate": "1e-05",
+              "fluotracify_path": "/beegfs/ye53nis/drmed-git/src/",
+              "opt_amsgrad": "False",
+              "frac_val": "0.2",
+              "batch_size": "5",
+              "epochs": "10",
+              "opt_decay": "0.0",
+              "steps_per_epoch": "tf.Tensor(32.0, shape=(), dtype=float32)",
+              "length_delimiter": "16384",
+              "opt_name": "Adam",
+              "opt_beta_2": "0.999",
+              "csv_path": "/beegfs/ye53nis/saves/firstartifact_Sep2019_subsample/",
+              "learning_rate": "1e-5",
+              "opt_epsilon": "1e-07"
+          },
+          "tags": {
+              "mlflow.source.git.repoURL": "https://github.com/aseltmann/fluotracify",
+              "mlflow.source.type": "PROJECT",
+              "mlflow.source.name": "file:///beegfs/ye53nis/drmed-git",
+              "mlflow.user": "ye53nis",
+              "mlflow.source.git.commit": "9e6182fbeae831a151342827efa59581e4310ae6",
+              "mlflow.gitRepoURL": "https://github.com/aseltmann/fluotracify",
+              "mlflow.project.backend": "local",
+              "mlflow.project.env": "conda",
+              "mlflow.project.entryPoint": "main"
+          }
+      }
+  }
+
+#+end_example
+
+#+BEGIN_SRC tmux :session local
+  tensorboard --logdir=data/mlruns/1/cda4eec66a6947c38ec2ee2006563ae5/artifacts/tensorboard_logs
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+  Serving TensorBoard on localhost; to expose to the network, use a proxy or pass --bind_all
+  TensorBoard 2.0.0 at http://localhost:6006/ (Press CTRL+C to quit)
+#+end_example
+
 
 
 ** TODOs
@@ -1522,23 +2079,18 @@ See here: https://github.com/timothycrosley/isort/issues/468#issuecomment-570899
 *** TODO Implement talos 1.0 with mlflow, see [[file:~/Dokumente/org/04_Digital-und-Technik/programmieren.org::*Querying runs programmatically][here]]
 *** TODO [#C] Set up nice package using cookiecutter, poetry, See [[https://stackoverflow.com/questions/49474575/how-to-install-my-own-python-module-package-via-conda-and-watch-its-changes][here]]
 * Reconnect
+  :LOGBOOK:
+  CLOCK: [2020-05-04 Mo 14:59]--[2020-05-04 Mo 14:59] =>  0:00
+  :END:
+** Tmux on Ara
 #+CALL: setup-tmux[:session local]
 
 #+RESULTS:
-| sh-5.0$                              | ye53nis@ara-login01.rz.uni-jena.de's | password: |     |        |
-| Permission                           | denied,                              | please    | try | again. |
-| ye53nis@ara-login01.rz.uni-jena.de's | password:                            |           |     |        |
-| >                                    | ye53nis@ara-login01.rz.uni-jena.de's | password: |     |        |
+| ye53nis@ara-login01.rz.uni-jena.de's | password:                            |           |
+| /tmp/tmux-67339/default              |                                      |           |
+| >                                    | ye53nis@ara-login01.rz.uni-jena.de's | password: |
 
-#+CALL: jpt-tunnel(port="8889", node="node018")
-
-#+RESULTS:
-| sh-5.0$           | ye53nis@ara-login01.rz.uni-jena.de's | password: |     |    |          |      |      |             |
-| ye53nis@node018's | password:                            |           |     |    |          |      |      |             |
-| Last              | login:                               | Sat       | Apr | 25 | 13:40:36 | 2020 | from | login01.ara |
-
-#+CALL: jupyter-python-metadata(conda_list='False)
-
+Test:
 
 #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
   pwd
@@ -1547,3 +2099,15 @@ See here: https://github.com/timothycrosley/isort/issues/468#issuecomment-570899
 #+RESULTS:
 #+begin_example
 #+end_example
+
+** Jupyter on Ara
+#+CALL: jpt-tunnel(port="8889", node="node018")
+
+#+RESULTS:
+| sh-5.0$           | ye53nis@ara-login01.rz.uni-jena.de's | password: |     |    |          |      |      |             |
+| ye53nis@node018's | password:                            |           |     |    |          |      |      |             |
+| Last              | login:                               | Sat       | Apr | 25 | 13:40:36 | 2020 | from | login01.ara |
+
+Test:
+
+#+CALL: jupyter-python-metadata(conda_list='False)
