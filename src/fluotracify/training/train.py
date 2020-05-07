@@ -13,9 +13,10 @@ if True:  # isort workaround
     from fluotracify.training import build_model as bm, preprocess_data as ppd
 
 print(tf.__version__)
-print(fluotracify_path)
+print('fluotracify path: ', fluotracify_path)
+print('GPUs: ', tf.config.list_physical_devices('GPU'))
 
-tf.keras.backend.set_floatx('float64')
+
 mlflow.tensorflow.autolog()
 
 if __name__ == "__main__":
@@ -24,7 +25,9 @@ if __name__ == "__main__":
     length_delimiter = int(sys.argv[4]) if len(sys.argv) > 4 else 16384
     learning_rate = float(sys.argv[5]) if len(sys.argv) > 5 else 1e-5
     epochs = int(sys.argv[6]) if len(sys.argv) > 6 else 10
-    csv_path = sys.argv[7] if len(sys.argv) > 7 else '/home/lex/Programme/Jupyter/DOKTOR/saves/firstartefact/subsample_rand/'
+    csv_path = sys.argv[7] if len(
+        sys.argv
+    ) > 7 else '/home/lex/Programme/Jupyter/DOKTOR/saves/firstartefact/subsample_rand/'
 
     train, test, nsamples, experiment_params = isfc.import_from_csv(
         path=csv_path,
@@ -79,14 +82,20 @@ if __name__ == "__main__":
                           tf.keras.metrics.Recall()
                       ])
 
-        model.fit(x=dataset_train,
-                  epochs=epochs,
-                  steps_per_epoch=tf.math.ceil(num_train_examples /
-                                               _batch_size),
-                  validation_data=dataset_val,
-                  validation_steps=tf.math.ceil(num_val_examples / _batch_size))
+        history = model.fit(
+            x=dataset_train,
+            epochs=epochs,
+            steps_per_epoch=tf.math.ceil(num_train_examples / _batch_size),
+            validation_data=dataset_val,
+            validation_steps=tf.math.ceil(num_val_examples / _batch_size))
+
+        for i in history.epoch:
+            metrics = {}
+            for metric_name in history.history:
+                metrics[metric_name] = history.history[metric_name][i]
+            mlflow.log_metrics(metrics, step=i)
+
         model.evaluate(dataset_test,
                        steps=tf.math.ceil(num_test_examples / _batch_size))
-        model.predict(dataset_test)
-        model.reset_metrics()
+
         model.save('data/exp-devtest/unet.tf', save_format='tf')
