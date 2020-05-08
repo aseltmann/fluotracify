@@ -4,8 +4,7 @@ import mlflow
 import mlflow.tensorflow
 import tensorflow as tf
 
-fluotracify_path = sys.argv[1] if len(
-    sys.argv) > 1 else '~/Programme/drmed-git/src/'
+fluotracify_path = sys.argv[1] if len(sys.argv) > 1 else '~/Programme/drmed-git/src/'
 sys.path.append(fluotracify_path)
 
 if True:  # isort workaround
@@ -16,7 +15,6 @@ print(tf.__version__)
 print('fluotracify path: ', fluotracify_path)
 print('GPUs: ', tf.config.list_physical_devices('GPU'))
 
-
 mlflow.tensorflow.autolog()
 
 if __name__ == "__main__":
@@ -25,9 +23,7 @@ if __name__ == "__main__":
     length_delimiter = int(sys.argv[4]) if len(sys.argv) > 4 else 16384
     learning_rate = float(sys.argv[5]) if len(sys.argv) > 5 else 1e-5
     epochs = int(sys.argv[6]) if len(sys.argv) > 6 else 10
-    csv_path = sys.argv[7] if len(
-        sys.argv
-    ) > 7 else '/home/lex/Programme/Jupyter/DOKTOR/saves/firstartefact/subsample_rand/'
+    csv_path = sys.argv[7] if len(sys.argv) > 7 else '/home/lex/Programme/Jupyter/DOKTOR/saves/firstartefact/subsample_rand/'
 
     train, test, nsamples, experiment_params = isfc.import_from_csv(
         path=csv_path,
@@ -46,10 +42,8 @@ if __name__ == "__main__":
     train_labels_bool = train_labels > 0.04
 
     test_labels_bool = test_labels > 0.04
-    print(
-        '\nfor each 20,000 timestap trace there are the following numbers '
-        'of corrupted timesteps:\n',
-        test_labels_bool.sum(axis=0).head())
+    print('\nfor each 20,000 timestap trace there are the following numbers '
+          'of corrupted timesteps:\n', test_labels_bool.sum(axis=0).head())
 
     # Cleanup
     del train, test
@@ -92,8 +86,9 @@ if __name__ == "__main__":
         for i in history.epoch:
             metrics = {}
             for metric_name in history.history:
-                metrics[metric_name] = history.history[metric_name][i]
-            mlflow.log_metrics(metrics, step=i)
+                metric_value = history.history[metric_name][i]
+                metrics[metric_name] = metric_value
+            mlflow.log_metrics(metrics=metrics, step=i)
 
         model.evaluate(dataset_test,
                        steps=tf.math.ceil(num_test_examples / _batch_size))
