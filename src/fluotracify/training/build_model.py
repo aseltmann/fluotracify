@@ -234,10 +234,22 @@ def binary_ce_dice_loss(y_true, y_pred, axis=-1, smooth=1e-5):
 
 
 # Alternative U-Net definition
-def convtrans(filters, name):
+def convtrans_old(filters, name):
     """Sequential API: Conv1DTranspose, BatchNorm"""
     upsamp = tf.keras.Sequential(name=name)
     upsamp.add(Conv1DTranspose(filters=filters, kernel_size=2, strides=2))
+    upsamp.add(tf.keras.layers.BatchNormalization())
+    upsamp.add(tf.keras.layers.Activation('relu'))
+    return upsamp
+
+
+def convtrans(filters, name):
+    """Sequential API: Conv1DTranspose, BatchNorm"""
+    upsamp = tf.keras.Sequential(name=name)
+    upsamp.add(
+        tf.keras.layers.Conv1DTranspose(filters=filters,
+                                        kernel_size=2,
+                                        strides=2))
     upsamp.add(tf.keras.layers.BatchNormalization())
     upsamp.add(tf.keras.layers.Activation('relu'))
     return upsamp
@@ -282,6 +294,7 @@ def decoder(input_tensor, concat_tensor, filters, name):
 # be anything when predicting) corresponding to the depth of your U-net
 # (number of down- and upsamplings) the minimum lenght should be about 30 time
 # steps or less
+
 
 def unet_1d_alt(input_size):
     """U-Net as described by Ronneberger et al.
