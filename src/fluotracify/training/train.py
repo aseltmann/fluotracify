@@ -22,11 +22,14 @@ if __name__ == "__main__":
     BATCH_SIZE = int(sys.argv[2]) if len(sys.argv) > 2 else 5
     FRAC_VAL = float(sys.argv[3]) if len(sys.argv) > 3 else 0.2
     LENGTH_DELIMITER = int(sys.argv[4]) if len(sys.argv) > 4 else 16384
-    LEARNING_RATE = float(sys.argv[5]) if len(sys.argv) > 5 else 1e-5
+    LEARNING_RATE = sys.argv[5] if len(sys.argv) > 5 else 1e-5
     EPOCHS = int(sys.argv[6]) if len(sys.argv) > 6 else 10
     CSV_PATH = sys.argv[7] if len(sys.argv) > 7 else '/home/lex/Programme/Jupyter/DOKTOR/saves/firstartefact/subsample_rand/'
     LOG_DIR_TB = "/tmp/tb"
-    # FIXME (PENDING): currently, mlflow does not support logging lists
+    # FIXME (PENDING): at some point, I want to plot metrics vs thresholds
+    # from TF side, this is possible by providing the `thresholds`
+    # argument as a list of thresholds
+    # but currently, mlflow does not support logging lists
     METRICS_THRESHOLDS = 0.5
 
     train, test, nsamples, experiment_params = isfc.import_from_csv(
