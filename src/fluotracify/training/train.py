@@ -1,5 +1,6 @@
 import sys
 
+import matplotlib
 import mlflow
 import mlflow.tensorflow
 import tensorflow as tf
@@ -12,6 +13,9 @@ if True:  # isort workaround
     from fluotracify.simulations import import_simulation_from_csv as isfc
     from fluotracify.training import build_model as bm, preprocess_data as ppd
     from fluotracify.training import evaluate
+
+# fixes a problem when calling plotting functions on the server
+matplotlib.use('agg')
 
 print(tf.version.VERSION)
 print('GPUs: ', tf.config.list_physical_devices('GPU'))
@@ -141,7 +145,7 @@ if __name__ == "__main__":
                                         thresholds=METRICS_THRESHOLDS),
         tf.keras.metrics.Precision(name='precision',
                                    thresholds=METRICS_THRESHOLDS),
-        tf.keras.metrics.Recall(name='recall',thresholds=METRICS_THRESHOLDS),
+        tf.keras.metrics.Recall(name='recall', thresholds=METRICS_THRESHOLDS),
         tf.keras.metrics.BinaryAccuracy(name='accuracy', threshold=0.5),
         tf.keras.metrics.AUC(num_thresholds=100, name='auc')
     ]
