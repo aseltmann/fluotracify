@@ -24,9 +24,10 @@ if __name__ == "__main__":
     LENGTH_DELIMITER = int(sys.argv[4]) if len(sys.argv) > 4 else 16384
     LEARNING_RATE = float(sys.argv[5]) if len(sys.argv) > 5 else 1e-5
     EPOCHS = int(sys.argv[6]) if len(sys.argv) > 6 else 10
-    CSV_PATH = sys.argv[7] if len(
-        sys.argv
-    ) > 7 else '/home/lex/Programme/Jupyter/DOKTOR/saves/firstartefact/subsample_rand/'
+    CSV_PATH = sys.argv[7] if len(sys.argv) > 7 else '/home/lex/Programme/Jupyter/DOKTOR/saves/firstartefact/subsample_rand/'
+    LOG_DIR_TB = "/tmp/tb"
+    # FIXME (PENDING): currently, mlflow does not support logging lists
+    METRICS_THRESHOLDS = 0.5
 
     train, test, nsamples, experiment_params = isfc.import_from_csv(
         path=CSV_PATH,
@@ -66,20 +67,32 @@ if __name__ == "__main__":
         batch_size=BATCH_SIZE,
         length_delimiter=LENGTH_DELIMITER)
 
-    log_dir = "/tmp/tb"
-    tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir,
+    model = bm.unet_1d_alt(input_size=LENGTH_DELIMITER)
+    optimizer = tf.keras.optimizers.Adam()
+    loss = bm.binary_ce_dice_loss()
+
+    tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=LOG_DIR_TB,
                                                           histogram_freq=5,
                                                           write_graph=False,
                                                           write_images=True,
                                                           update_freq='epoch')
 
-    file_writer_image = tf.summary.create_file_writer(log_dir + '/image')
-    file_writer_lr = tf.summary.create_file_writer(log_dir + "/metrics")
+    file_writer_image = tf.summary.create_file_writer(LOG_DIR_TB + '/image')
+    file_writer_lr = tf.summary.create_file_writer(LOG_DIR_TB + "/metrics")
     file_writer_lr.set_as_default()
 
     def log_plots(epoch, logs):
+        """Image logging function for tf.keras.callbacks.LambdaCallback
+
+        Notes
+        -----
+        - `tf.keras.callbacks.LambdaCallback` expects two positional arguments
+          `epoch` and `logs`, if `on_epoch_end` is being used
+        - see https://www.tensorflow.org/api_docs/python/tf/keras/callbacks/LambdaCallback
+        """
         figure = evaluate.plot_trace_and_pred_from_tfds(dataset=dataset_test,
-                                                        ntraces=5)
+                                                        ntraces=5,
+                                                        model=model)
         # Convert matplotlib figure to image
         image = evaluate.plot_to_image(figure)
         # Log the image as an image summary
@@ -89,6 +102,13 @@ if __name__ == "__main__":
     def lr_schedule(epoch):
         """
         Returns a custom learning rate that decreases as epochs progress.
+
+        Notes
+        -----
+        - function is supposed to be used with
+          `tf.keras.callbacks.LearningRateScheduler`. It takes an epoch index
+          as input (integer, indexed from 0) and returns a new learning rate
+          as output (float)
         """
         learning_rate = 0.2
         if epoch > 1:
@@ -107,18 +127,19 @@ if __name__ == "__main__":
     lr_callback = tf.keras.callbacks.LearningRateScheduler(lr_schedule)
     image_callback = tf.keras.callbacks.LambdaCallback(on_epoch_end=log_plots)
 
-    model = bm.unet_1d_alt(input_size=LENGTH_DELIMITER)
-    optimizer = tf.keras.optimizers.Adam(learning_rate=LEARNING_RATE)
-    loss = bm.binary_ce_dice_loss()
-    thresholds = 0.5  # currently, mlflow does not support logging lists
     metrics = [
-        tf.keras.metrics.TruePositives(name='tp', thresholds=thresholds),
-        tf.keras.metrics.FalsePositives(name='fp', thresholds=thresholds),
-        tf.keras.metrics.TrueNegatives(name='tn', thresholds=thresholds),
-        tf.keras.metrics.FalseNegatives(name='fn', thresholds=thresholds),
+        tf.keras.metrics.TruePositives(name='tp',
+                                       thresholds=METRICS_THRESHOLDS),
+        tf.keras.metrics.FalsePositives(name='fp',
+                                        thresholds=METRICS_THRESHOLDS),
+        tf.keras.metrics.TrueNegatives(name='tn',
+                                       thresholds=METRICS_THRESHOLDS),
+        tf.keras.metrics.FalseNegatives(name='fn',
+                                        thresholds=METRICS_THRESHOLDS),
+        tf.keras.metrics.Precision(name='precision',
+                                   thresholds=METRICS_THRESHOLDS),
+        tf.keras.metrics.Recall(name='recall',thresholds=METRICS_THRESHOLDS),
         tf.keras.metrics.BinaryAccuracy(name='accuracy', threshold=0.5),
-        tf.keras.metrics.Precision(name='precision', thresholds=thresholds),
-        tf.keras.metrics.Recall(name='recall', thresholds=thresholds),
         tf.keras.metrics.AUC(num_thresholds=100, name='auc')
     ]
 

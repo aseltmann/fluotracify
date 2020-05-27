@@ -228,7 +228,8 @@ def binary_ce_dice_loss(axis=-1, smooth=1e-5):
         - Code by Stefan Hoffmann, Applied Systems Biology group,
         Hans-Knöll-Institute Jena
     To be able to load the custom loss function in Keras, it must only take
-    (y_true, y_pred) as parameters - that is why this setup seems so complicated.
+    (y_true, y_pred) as parameters - that is why this setup seems so
+    complicated.
 
     Note
     ----
