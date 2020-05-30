@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <title>Lab book Fluotracify</title>
-<!-- 2020-05-07 Do 18:20 -->
+<!-- 2020-05-13 Mi 16:03 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="generator" content="Org-mode">
@@ -188,7 +188,12 @@ $(function() {
 
     $('.bs-docs-sidebar').affix();
 });
-</script>
+</script><style type="text/css">.example {background-color: #FBFBBF;}</style>
+<style type="text/css">pre.src-emacs-lisp {background-color: #F7ECFB;}</style>
+<style type="text/css">pre.src-sh {background-color: #F0FBE9;}</style>
+<style type="text/css">pre.src-tmux {background-color: #E1EED8;}</style>
+<style type="text/css">pre.src-python {background-color: #E6EDF4;}</style>
+<style type="text/css">pre.src-jupyter-python {background-color: #FAEAE1;}</style>
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -229,23 +234,100 @@ MathJax.Hub.Config({
 <ul class="org-ul">
 <li>This file corresponds to my lab book for my doctoral thesis tackling
 artifact correction in Fluorescence Correlation Spectroscopy (FCS)
-measurements using Deep Neural Networks
+measurements using Deep Neural Networks. It also contains notes taken
+during the process of setting up this workflow for reproducible research.
 </li>
-<li>It contains explanations of how things are organized, of the workflow for
-doing experiments, changes made to the code, and the observed behavior in
-the "* Data" section.
+<li>This file contains explanations of how things are organized, of the
+workflow for doing experiments, changes made to the code, and the observed
+behavior in the "* Data" section.
 </li>
-<li>The branching model used is described in <a href="http://starpu-simgrid.gforge.inria.fr/misc/SIGOPS_paper.pdf">this paper</a>. Following this, if you
+<li>The branching model used is described in <a href="http://starpu-simgrid.gforge.inria.fr/misc/SIGOPS_paper.pdf">this paper</a>. Therefore: if you
 are interested in the "* Data" section, you have to <code>git clone</code> the <i>data</i>
-branch. The <i>master</i> branch is clean from any results, it contains only
-source code and the analysis.
+branch of the repository. The <i>master</i> branch is clean from any results, it
+contains only source code and the analysis.
+</li>
+<li>This project is my take on <a href="https://en.wikipedia.org/wiki/Open-notebook_science">Open-notebook science</a>. The idea was postulated in
+a blog post in 2006:
+<blockquote>
+<p>
+&#x2026; there is a URL to a laboratory notebook that is freely available and
+indexed on common search engines. It does not necessarily have to look like
+a paper notebook but it is essential that all of the information available
+to the researchers to make their conclusions is equally available to the
+rest of the world &#x2014;Jean-Claude Bradley
+</p>
+</blockquote>
+</li>
+<li>Proposal on how to deal with truly private data (e.g. notes from a
+confidential meeting with a colleague), which might otherwise be noted in a
+normal Lab notebook: do not include them here. Only notes relevant to the
+current project should be taken
 </li>
 </ul>
 </div>
 </div>
 <div id="outline-container-sec-1-2" class="outline-3">
-<h3 id="sec-1-2"><span class="section-number-3">1.2</span> Experiments workflow:</h3>
+<h3 id="sec-1-2"><span class="section-number-3">1.2</span> Code block languages used in this document</h3>
 <div class="outline-text-3" id="text-1-2">
+<div class="org-src-container">
+
+<pre class="src src-sh"><span style="color: #586e75;"># </span><span style="color: #586e75;">This is a sh block for shell / bash scripting. In the context of this file,</span>
+<span style="color: #586e75;"># </span><span style="color: #586e75;">these blocks are mainly used for operations on my local computer.</span>
+<span style="color: #586e75;"># </span><span style="color: #586e75;">In the LabBook.html rendering of this document, these blocks will have a</span>
+<span style="color: #586e75;"># </span><span style="color: #586e75;">light green colour (#F0FBE9)</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-tmux"><span style="color: #586e75;"># </span><span style="color: #586e75;">This block can open and access tmux sessions, used for shell scripting on</span>
+<span style="color: #586e75;"># </span><span style="color: #586e75;">remote computing clusters.</span>
+<span style="color: #586e75;"># </span><span style="color: #586e75;">In the LabBook.html rendering of this document, these blocks will have a</span>
+<span style="color: #586e75;"># </span><span style="color: #586e75;">distinct light green colour (#E1EED8)</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-python"><span style="color: #586e75;"># </span><span style="color: #586e75;">This is a python block. In the context of this file, it is seldomly used</span>
+<span style="color: #586e75;"># </span><span style="color: #586e75;">(only for examplary scripts.)</span>
+<span style="color: #586e75;"># </span><span style="color: #586e75;">In the LabBook.html rendering of this document, these blocks will have a</span>
+<span style="color: #586e75;"># </span><span style="color: #586e75;">light blue colour (#E6EDF4)</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-jupyter-python"><span style="color: #586e75;"># </span><span style="color: #586e75;">This is a jupyter-python block. The code is sent to a jupyter kernel running</span>
+<span style="color: #586e75;"># </span><span style="color: #586e75;">on a remote high performance computing cluster. Most of my jupyter code is</span>
+<span style="color: #586e75;"># </span><span style="color: #586e75;">executed this way.</span>
+<span style="color: #586e75;"># </span><span style="color: #586e75;">In the LabBook.html rendering of this document, these blocks will have a</span>
+<span style="color: #586e75;"># </span><span style="color: #586e75;">light orange colour (#FAEAE1)</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-emacs-lisp"><span style="color: #586e75;">;; </span><span style="color: #586e75;">This is a emacs-lisp block, the language used to customize Emacs, which is</span>
+<span style="color: #586e75;">;; </span><span style="color: #586e75;">sometimes necessary, since the reproducible workflow of this LabBook is</span>
+<span style="color: #586e75;">;; </span><span style="color: #586e75;">tightly integrated with Emacs and org-mode.</span>
+<span style="color: #586e75;">;; </span><span style="color: #586e75;">In the LabBook.html rendering of this document, these blocks will have a</span>
+<span style="color: #586e75;">;; </span><span style="color: #586e75;">light violet colour (#F7ECFB)</span>
+</pre>
+</div>
+
+<pre class="example">
+This is a literal example block. It can be used very flexibly - in the context
+of this document the output of most code blocks is displayed this way.
+In the LabBook.html rendering of this document, these blocks will have a light
+yellow colour (#FBFBBF)
+</pre>
+</div>
+</div>
+
+<div id="outline-container-sec-1-3" class="outline-3">
+<h3 id="sec-1-3"><span class="section-number-3">1.3</span> Experiments workflow:</h3>
+<div class="outline-text-3" id="text-1-3">
 <ol class="org-ol">
 <li>Create a new branch
 </li>
@@ -265,11 +347,11 @@ the template described below
 </ol>
 </div>
 </div>
-<div id="outline-container-sec-1-3" class="outline-3">
-<h3 id="sec-1-3"><span class="section-number-3">1.3</span> Example for experimental setup procedure</h3>
-<div class="outline-text-3" id="text-1-3">
+<div id="outline-container-sec-1-4" class="outline-3">
+<h3 id="sec-1-4"><span class="section-number-3">1.4</span> Example for experimental setup procedure</h3>
+<div class="outline-text-3" id="text-1-4">
 </div><div id="outline-container-sec-tmux-setup" class="outline-4">
-<h4 id="sec-tmux-setup"><a id="sec-1-3-1" name="sec-1-3-1"></a><span class="section-number-4">1.3.1</span> Setting up a tmux connection from using <code>ob-tmux</code> in <code>org-babel</code></h4>
+<h4 id="sec-tmux-setup"><a id="sec-1-4-1" name="sec-1-4-1"></a><span class="section-number-4">1.4.1</span> Setting up a tmux connection from using <code>ob-tmux</code> in <code>org-babel</code></h4>
 <div class="outline-text-4" id="text-sec-tmux-setup">
 <ul class="org-ul">
 <li>prerequisite: tmux versions need to be the same locally and on the server.
@@ -382,7 +464,7 @@ which allows to print the output from the tmux session in an
 </div>
 
 <div id="outline-container-sec-jupyter-setup" class="outline-4">
-<h4 id="sec-jupyter-setup"><a id="sec-1-3-2" name="sec-1-3-2"></a><span class="section-number-4">1.3.2</span> Setting starting a jupyter kernel from a remote jupyter session using <code>emacs-jupyter</code> in <code>org babel</code></h4>
+<h4 id="sec-jupyter-setup"><a id="sec-1-4-2" name="sec-1-4-2"></a><span class="section-number-4">1.4.2</span> Setting starting a jupyter kernel from a remote jupyter session using <code>emacs-jupyter</code> in <code>org babel</code></h4>
 <div class="outline-text-4" id="text-sec-jupyter-setup">
 <ol class="org-ol">
 <li><code>M-x jupyter-server-list-kernels</code>
@@ -426,12 +508,12 @@ which allows to print the output from the tmux session in an
 </div>
 </div>
 
-<div id="outline-container-sec-1-4" class="outline-3">
-<h3 id="sec-1-4"><span class="section-number-3">1.4</span> tools used (notes)</h3>
-<div class="outline-text-3" id="text-1-4">
-</div><div id="outline-container-sec-1-4-1" class="outline-4">
-<h4 id="sec-1-4-1"><span class="section-number-4">1.4.1</span> Emacs <code>magit</code></h4>
-<div class="outline-text-4" id="text-1-4-1">
+<div id="outline-container-sec-1-5" class="outline-3">
+<h3 id="sec-1-5"><span class="section-number-3">1.5</span> tools used (notes)</h3>
+<div class="outline-text-3" id="text-1-5">
+</div><div id="outline-container-sec-1-5-1" class="outline-4">
+<h4 id="sec-1-5-1"><span class="section-number-4">1.5.1</span> Emacs <code>magit</code></h4>
+<div class="outline-text-4" id="text-1-5-1">
 <ul class="org-ul">
 <li><code>gitflow-avh</code> (<code>magit-flow</code>) to follow the flow
 </li>
@@ -445,9 +527,9 @@ which allows to print the output from the tmux session in an
 </ul>
 </div>
 </div>
-<div id="outline-container-sec-1-4-2" class="outline-4">
-<h4 id="sec-1-4-2"><span class="section-number-4">1.4.2</span> jupyter</h4>
-<div class="outline-text-4" id="text-1-4-2">
+<div id="outline-container-sec-1-5-2" class="outline-4">
+<h4 id="sec-1-5-2"><span class="section-number-4">1.5.2</span> jupyter</h4>
+<div class="outline-text-4" id="text-1-5-2">
 <ul class="org-ul">
 <li>emacs jupyter for running and connecting to kernel on server:
 <a href="https://github.com/dzop/emacs-jupyter">https://github.com/dzop/emacs-jupyter</a>
@@ -463,9 +545,9 @@ which allows to print the output from the tmux session in an
 </ul>
 </div>
 </div>
-<div id="outline-container-sec-1-4-3" class="outline-4">
-<h4 id="sec-1-4-3"><span class="section-number-4">1.4.3</span> mlflow</h4>
-<div class="outline-text-4" id="text-1-4-3">
+<div id="outline-container-sec-1-5-3" class="outline-4">
+<h4 id="sec-1-5-3"><span class="section-number-4">1.5.3</span> mlflow</h4>
+<div class="outline-text-4" id="text-1-5-3">
 <ul class="org-ul">
 <li><a href="https://docs.faculty.ai/user-guide/experiments/index.html">https://docs.faculty.ai/user-guide/experiments/index.html</a> and
 <a href="https://docs.microsoft.com/en-us/azure/databricks/_static/notebooks/hls-image-processing/02-image-segmentation-dl.html">https://docs.microsoft.com/en-us/azure/databricks/_static/notebooks/hls-image-processing/02-image-segmentation-dl.html</a>
@@ -473,9 +555,9 @@ which allows to print the output from the tmux session in an
 </ul>
 </div>
 </div>
-<div id="outline-container-sec-1-4-4" class="outline-4">
-<h4 id="sec-1-4-4"><span class="section-number-4">1.4.4</span> tensorflow</h4>
-<div class="outline-text-4" id="text-1-4-4">
+<div id="outline-container-sec-1-5-4" class="outline-4">
+<h4 id="sec-1-5-4"><span class="section-number-4">1.5.4</span> tensorflow</h4>
+<div class="outline-text-4" id="text-1-5-4">
 <ul class="org-ul">
 <li><a href="https://www.tensorflow.org/tensorboard/image_summaries">https://www.tensorflow.org/tensorboard/image_summaries</a>
 </li>
@@ -484,8 +566,8 @@ which allows to print the output from the tmux session in an
 </div>
 </div>
 
-<div id="outline-container-sec-1-5" class="outline-3">
-<h3 id="sec-1-5"><span class="section-number-3">1.5</span> Example for &#x2026;</h3>
+<div id="outline-container-sec-1-6" class="outline-3">
+<h3 id="sec-1-6"><span class="section-number-3">1.6</span> Example for &#x2026;</h3>
 </div>
 </div>
 <div id="outline-container-sec-2" class="outline-2">
@@ -512,16 +594,16 @@ which allows to print the output from the tmux session in an
 
 <pre class="src src-jupyter-python" id="jupyter-python-metadata"><span style="color: #859900; font-weight: bold;">import</span> os
 
-<span style="color: #839496; background-color: #002b36;">ramlist</span> = os.popen(<span style="color: #2aa198;">'free -th'</span>).readlines()[-<span style="color: #839496; background-color: #002b36;">1</span>].split()[<span style="color: #839496; background-color: #002b36;">1</span>:]
+ramlist = os.popen(<span style="color: #2aa198;">'free -th'</span>).readlines()[-1].split()[1:]
 
 print(<span style="color: #2aa198;">'No of CPUs in system:'</span>, os.cpu_count())
 print(<span style="color: #2aa198;">'No of CPUs the current process can use:'</span>,
-<span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span> <span style="color: #839496; font-weight: bold;">len</span>(os.sched_getaffinity(<span style="color: #839496; background-color: #002b36;">0</span>)))
+<span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span> <span style="color: #839496; font-weight: bold;">len</span>(os.sched_getaffinity(0)))
 print(<span style="color: #2aa198;">'load average:'</span>, os.getloadavg())
 print(os.uname())
 print(<span style="color: #2aa198;">'PID of process:'</span>, os.getpid())
 print(<span style="color: #2aa198;">'RAM total: {}, RAM used: {}, RAM free: {}'</span>.format(
-<span style="background-color: #073642;"> </span>   ramlist[<span style="color: #839496; background-color: #002b36;">0</span>], ramlist[<span style="color: #839496; background-color: #002b36;">1</span>], ramlist[<span style="color: #839496; background-color: #002b36;">2</span>]))
+<span style="background-color: #073642;"> </span>   ramlist[0], ramlist[1], ramlist[2]))
 
 !echo the current directory: $PWD
 !echo My disk usage:
@@ -701,7 +783,8 @@ Then call:
 
 <div class="org-src-container">
 
-<pre class="src src-tmux" id="jpt-tmux">module load tools/python/3.7
+<pre class="src src-tmux" id="jpt-tmux">conda activate tensorflow_nightly
+<span style="color: #839496; font-weight: bold;">export</span> <span style="color: #268bd2;">PORT</span>=8889
 <span style="color: #839496; font-weight: bold;">export</span> <span style="color: #268bd2;">XDG_RUNTIME_DIR</span>=<span style="color: #2aa198;">''</span>
 <span style="color: #839496; font-weight: bold;">export</span> <span style="color: #268bd2;">XDG_RUNTIME_DIR</span>=<span style="color: #2aa198;">""</span>
 jupyter notebook --no-browser --port=$<span style="color: #268bd2;">PORT</span>
@@ -2712,7 +2795,7 @@ If you have a GPU:
 
 <pre class="src src-python"><span style="color: #586e75;"># </span><span style="color: #586e75;">Just disables the warning, doesn't enable AVX/FMA</span>
 <span style="color: #859900; font-weight: bold;">import</span> os
-<span style="color: #839496; background-color: #002b36;">os.environ</span>[<span style="color: #2aa198;">'TF_CPP_MIN_LOG_LEVEL'</span>] = <span style="color: #2aa198;">'2'</span>
+os.environ[<span style="color: #2aa198;">'TF_CPP_MIN_LOG_LEVEL'</span>] = <span style="color: #2aa198;">'2'</span>
 </pre>
 </div>
 <p>
@@ -2872,7 +2955,7 @@ See <a href="https://stackoverflow.com/questions/58678836/notimplementederror-la
 
 <pre class="src src-python"><span style="color: #859900; font-weight: bold;">def</span> <span style="color: #268bd2;">get_config</span>(<span style="color: #859900; font-weight: bold;">self</span>):
 
-<span style="background-color: #073642;"> </span>   <span style="color: #839496; background-color: #002b36;">config</span> = <span style="color: #839496; font-weight: bold;">super</span>().get_config().copy()
+<span style="background-color: #073642;"> </span>   config = <span style="color: #839496; font-weight: bold;">super</span>().get_config().copy()
 <span style="background-color: #073642;"> </span>   config.update({
 <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="color: #2aa198;">'vocab_size'</span>: <span style="color: #859900; font-weight: bold;">self</span>.vocab_size,
 <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="color: #2aa198;">'num_layers'</span>: <span style="color: #859900; font-weight: bold;">self</span>.num_layers,
@@ -2951,7 +3034,7 @@ In theory, validation loss and training loss should be logged by mlflow as well
 </div>
 </li>
 
-<li><a id="sec-6-6-1-6" name="sec-6-6-1-6"></a>Test run fixing 4. and 5.<br ><div class="outline-text-5" id="text-6-6-1-6">
+<li><a id="sec-6-6-1-6" name="sec-6-6-1-6"></a>Test run 1: fixing 4. and 5.<br ><div class="outline-text-5" id="text-6-6-1-6">
 <div class="org-src-container">
 
 <pre class="src src-tmux"><span style="color: #839496; font-weight: bold;">pwd</span>
@@ -3041,8 +3124,7 @@ and <code>mlflow_client.log_batch()</code>. But I want to try the naive approach
 </div>
 </li>
 
-
-<li><a id="sec-6-6-1-7" name="sec-6-6-1-7"></a>start and connect to jupyter<br ><div class="outline-text-5" id="text-6-6-1-7">
+<li><a id="sec-6-6-1-7" name="sec-6-6-1-7"></a>Test run 2: do dynamic testing using jupyter<br ><div class="outline-text-5" id="text-6-6-1-7">
 <div class="org-src-container">
 
 <pre class="src src-tmux">srun -p gpu_test --time=1:00:00 --gres=gpu:2 --mem-per-cpu=1000 --ntasks-per-node=48 --pty bash
@@ -3124,7 +3206,7 @@ jupyter notebook --no-browser --port=$<span style="color: #268bd2;">PORT</span>
 </table>
 
 <p>
-I nstarted a Python3 kernel using <code>jupyter-server-list-kernels</code>. Then I added the
+I started a Python3 kernel using <code>jupyter-server-list-kernels</code>. Then I added the
 kernel ID to the <code>:PROPERTIES:</code> drawer of this (and following) subtrees.
 </p>
 
@@ -3132,35 +3214,30 @@ kernel ID to the <code>:PROPERTIES:</code> drawer of this (and following) subtre
 python3          9e7e4701-35b1-4031-8f44-ed2586b82d49   2 minutes ago        starting   0
 </pre>
 
-<p>
-Passing a boolean value to a variable in <code>org-babel</code> was not trivial: you have to
-use the infamous <b>single quote '</b> from emacs-lisp programming to show that the
-expression should be returned as written, not evaluated.
-</p>
-
 <pre class="example">
-No of CPUs in system: 48
-No of CPUs the current process can use: 48
-load average: (0.07, 0.09, 0.76)
-posix.uname_result(sysname='Linux', nodename='node127', release='3.10.0-957.1.3.el7.x86_64', version='#1 SMP Thu Nov 29 14:49:43 UTC 2018', machine='x86_64')
-PID of process: 28280
-RAM total: 137G, RAM used: 1.3G, RAM free: 15G
+No of CPUs in system: 72
+No of CPUs the current process can use: 24
+load average: (0.09, 1.05, 11.15)
+posix.uname_result(sysname='Linux', nodename='node243', release='3.10.0-957.1.3.el7.x86_64', version='#1 SMP Thu Nov 29 14:49:43 UTC 2018', machine='x86_64')
+PID of process: 448659
+RAM total: 199G, RAM used: 2.3G, RAM free: 154G
 the current directory: /home/ye53nis
 My disk usage:
 Filesystem           Size  Used Avail Use% Mounted on
-/dev/sda1             50G  5.7G   45G  12% /
-devtmpfs              63G     0   63G   0% /dev
-tmpfs                 63G   25M   63G   1% /dev/shm
-tmpfs                 63G   59M   63G   1% /run
-tmpfs                 63G     0   63G   0% /sys/fs/cgroup
+/dev/sda1             50G  3.2G   47G   7% /
+devtmpfs              94G     0   94G   0% /dev
+tmpfs                 94G 1018M   93G   2% /dev/shm
+tmpfs                 94G   59M   94G   1% /run
+tmpfs                 94G     0   94G   0% /sys/fs/cgroup
 nfs03-ib:/pool/work  100T   78T   23T  78% /nfsdata
-nfs01-ib:/cluster    2.0T  316G  1.7T  16% /cluster
 nfs01-ib:/home        80T   59T   22T  73% /home
+nfs01-ib:/cluster    2.0T  316G  1.7T  16% /cluster
+nfs02-ib:/data01      88T   59T   29T  68% /data01
 /dev/sda5            2.0G   34M  2.0G   2% /tmp
-/dev/sda6            169G  320M  169G   1% /local
-/dev/sda3            6.0G  543M  5.5G   9% /var
-beegfs_nodev         524T  427T   98T  82% /beegfs
-tmpfs                 13G     0   13G   0% /run/user/67339
+/dev/sda6            169G  4.3G  165G   3% /local
+/dev/sda3            6.0G  404M  5.6G   7% /var
+beegfs_nodev         524T  425T  100T  82% /beegfs
+tmpfs                 19G     0   19G   0% /run/user/67339
 </pre>
 
 <div class="org-src-container">
@@ -3193,38 +3270,38 @@ tf.config.list_physical_devices(<span style="color: #2aa198;">'GPU'</span>)
 
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python"><span style="color: #839496; background-color: #002b36;">_batch_size</span> = <span style="color: #839496; background-color: #002b36;">5</span>
-<span style="color: #839496; background-color: #002b36;">frac_val</span> = <span style="color: #839496; background-color: #002b36;">0</span>.<span style="color: #839496; background-color: #002b36;">2</span>
-<span style="color: #839496; background-color: #002b36;">length_delimiter</span> = <span style="color: #839496; background-color: #002b36;">16384</span>
-<span style="color: #839496; background-color: #002b36;">learning_rate</span> = 1e-<span style="color: #839496; background-color: #002b36;">5</span>
-<span style="color: #839496; background-color: #002b36;">epochs</span> = <span style="color: #839496; background-color: #002b36;">10</span>
-<span style="color: #839496; background-color: #002b36;">csv_path</span> = <span style="color: #2aa198;">'/beegfs/ye53nis/saves/firstartifact_Sep2019_subsample/'</span>
+<pre class="src src-jupyter-python">_batch_size = 5
+frac_val = 0.2
+length_delimiter = 16384
+learning_rate = 1e-5
+epochs = 2
+csv_path = <span style="color: #2aa198;">'/beegfs/ye53nis/saves/firstartifact_Sep2019_subsample/'</span>
 </pre>
 </div>
 
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python"><span style="color: #839496; background-color: #002b36;">train</span>, <span style="color: #839496; background-color: #002b36;">test</span>, <span style="color: #839496; background-color: #002b36;">nsamples</span>, <span style="color: #839496; background-color: #002b36;">experiment_params</span> = isfc.import_from_csv(
-<span style="background-color: #073642;"> </span>   <span style="color: #839496; background-color: #002b36;">path</span>=csv_path,
-<span style="background-color: #073642;"> </span>   <span style="color: #839496; background-color: #002b36;">header</span>=<span style="color: #839496; background-color: #002b36;">12</span>,
-<span style="background-color: #073642;"> </span>   <span style="color: #839496; background-color: #002b36;">frac_train</span>=<span style="color: #839496; background-color: #002b36;">0</span>.<span style="color: #839496; background-color: #002b36;">8</span>,
-<span style="background-color: #073642;"> </span>   <span style="color: #839496; background-color: #002b36;">col_per_example</span>=<span style="color: #839496; background-color: #002b36;">2</span>,
-<span style="background-color: #073642;"> </span>   <span style="color: #839496; background-color: #002b36;">dropindex</span>=<span style="color: #859900; font-weight: bold;">None</span>,
-<span style="background-color: #073642;"> </span>   <span style="color: #839496; background-color: #002b36;">dropcolumns</span>=<span style="color: #2aa198;">'Unnamed: 200'</span>)
+<pre class="src src-jupyter-python">train, test, nsamples, experiment_params = isfc.import_from_csv(
+<span style="background-color: #073642;"> </span>   path=csv_path,
+<span style="background-color: #073642;"> </span>   header=12,
+<span style="background-color: #073642;"> </span>   frac_train=0.8,
+<span style="background-color: #073642;"> </span>   col_per_example=2,
+<span style="background-color: #073642;"> </span>   dropindex=<span style="color: #859900; font-weight: bold;">None</span>,
+<span style="background-color: #073642;"> </span>   dropcolumns=<span style="color: #2aa198;">'Unnamed: 200'</span>)
 
-<span style="color: #839496; background-color: #002b36;">train_data</span>, <span style="color: #839496; background-color: #002b36;">train_labels</span> = isfc.separate_data_and_labels(<span style="color: #839496; background-color: #002b36;">array</span>=train,
-<span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span><span style="color: #839496; background-color: #002b36;">nsamples</span>=nsamples)
-<span style="color: #839496; background-color: #002b36;">test_data</span>, <span style="color: #839496; background-color: #002b36;">test_labels</span> = isfc.separate_data_and_labels(<span style="color: #839496; background-color: #002b36;">array</span>=test,
-<span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>  <span style="color: #839496; background-color: #002b36;">nsamples</span>=nsamples)
+train_data, train_labels = isfc.separate_data_and_labels(array=train,
+<span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>nsamples=nsamples)
+test_data, test_labels = isfc.separate_data_and_labels(array=test,
+<span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>  nsamples=nsamples)
 
 <span style="color: #586e75;"># </span><span style="color: #586e75;">get bool as ground truth</span>
-<span style="color: #839496; background-color: #002b36;">train_labels_bool</span> = train_labels &gt; <span style="color: #839496; background-color: #002b36;">0</span>.<span style="color: #839496; background-color: #002b36;">04</span>
+train_labels_bool = train_labels &gt; 0.04
 
-<span style="color: #839496; background-color: #002b36;">test_labels_bool</span> = test_labels &gt; <span style="color: #839496; background-color: #002b36;">0</span>.<span style="color: #839496; background-color: #002b36;">04</span>
+test_labels_bool = test_labels &gt; 0.04
 print(
 <span style="background-color: #073642;"> </span>   <span style="color: #2aa198;">'\nfor each 20,000 timestap trace there are the following numbers '</span>
 <span style="background-color: #073642;"> </span>   <span style="color: #2aa198;">'of corrupted timesteps:\n'</span>,
-<span style="background-color: #073642;"> </span>   test_labels_bool.sum(<span style="color: #839496; background-color: #002b36;">axis</span>=<span style="color: #839496; background-color: #002b36;">0</span>).head())
+<span style="background-color: #073642;"> </span>   test_labels_bool.sum(axis=0).head())
 
 <span style="color: #586e75;"># </span><span style="color: #586e75;">Cleanup</span>
 <span style="color: #859900; font-weight: bold;">del</span> train, test
@@ -3249,20 +3326,20 @@ dtype: int64
 
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python"><span style="color: #839496; background-color: #002b36;">dataset_train</span>, <span style="color: #839496; background-color: #002b36;">dataset_val</span>, <span style="color: #839496; background-color: #002b36;">num_train_examples</span>, <span style="color: #839496; background-color: #002b36;">num_val_examples</span> = ppd.tfds_from_pddf_for_unet(
-<span style="background-color: #073642;"> </span>   <span style="color: #839496; background-color: #002b36;">features_df</span>=train_data,
-<span style="background-color: #073642;"> </span>   <span style="color: #839496; background-color: #002b36;">labels_df</span>=train_labels_bool,
-<span style="background-color: #073642;"> </span>   <span style="color: #839496; background-color: #002b36;">is_training</span>=<span style="color: #859900; font-weight: bold;">True</span>,
-<span style="background-color: #073642;"> </span>   <span style="color: #839496; background-color: #002b36;">batch_size</span>=_batch_size,
-<span style="background-color: #073642;"> </span>   <span style="color: #839496; background-color: #002b36;">length_delimiter</span>=length_delimiter,
-<span style="background-color: #073642;"> </span>   <span style="color: #839496; background-color: #002b36;">frac_val</span>=frac_val)
+<pre class="src src-jupyter-python">dataset_train, dataset_val, num_train_examples, num_val_examples = ppd.tfds_from_pddf_for_unet(
+<span style="background-color: #073642;"> </span>   features_df=train_data,
+<span style="background-color: #073642;"> </span>   labels_df=train_labels_bool,
+<span style="background-color: #073642;"> </span>   is_training=<span style="color: #859900; font-weight: bold;">True</span>,
+<span style="background-color: #073642;"> </span>   batch_size=_batch_size,
+<span style="background-color: #073642;"> </span>   length_delimiter=length_delimiter,
+<span style="background-color: #073642;"> </span>   frac_val=frac_val)
 
-<span style="color: #839496; background-color: #002b36;">dataset_test</span>, <span style="color: #839496; background-color: #002b36;">num_test_examples</span> = ppd.tfds_from_pddf_for_unet(
-<span style="background-color: #073642;"> </span>   <span style="color: #839496; background-color: #002b36;">features_df</span>=test_data,
-<span style="background-color: #073642;"> </span>   <span style="color: #839496; background-color: #002b36;">labels_df</span>=test_labels_bool,
-<span style="background-color: #073642;"> </span>   <span style="color: #839496; background-color: #002b36;">is_training</span>=<span style="color: #859900; font-weight: bold;">False</span>,
-<span style="background-color: #073642;"> </span>   <span style="color: #839496; background-color: #002b36;">batch_size</span>=_batch_size,
-<span style="background-color: #073642;"> </span>   <span style="color: #839496; background-color: #002b36;">length_delimiter</span>=length_delimiter)
+dataset_test, num_test_examples = ppd.tfds_from_pddf_for_unet(
+<span style="background-color: #073642;"> </span>   features_df=test_data,
+<span style="background-color: #073642;"> </span>   labels_df=test_labels_bool,
+<span style="background-color: #073642;"> </span>   is_training=<span style="color: #859900; font-weight: bold;">False</span>,
+<span style="background-color: #073642;"> </span>   batch_size=_batch_size,
+<span style="background-color: #073642;"> </span>   length_delimiter=length_delimiter)
 </pre>
 </div>
 
@@ -3277,7 +3354,7 @@ number of test examples: 100
 
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python"><span style="color: #839496; background-color: #002b36;">strategy</span> = tf.distribute.MirroredStrategy()
+<pre class="src src-jupyter-python">strategy = tf.distribute.MirroredStrategy()
 print(<span style="color: #2aa198;">'Number of devices: {}'</span>.format(strategy.num_replicas_in_sync))
 </pre>
 </div>
@@ -3291,51 +3368,36 @@ Number of devices: 1
 
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python"><span style="color: #839496; background-color: #002b36;">model</span> = bm.unet_1d_alt(<span style="color: #839496; background-color: #002b36;">input_size</span>=length_delimiter)
-<span style="color: #839496; background-color: #002b36;">optimizer</span> = tf.keras.optimizers.Adam(<span style="color: #839496; background-color: #002b36;">learning_rate</span>=learning_rate)
-<span style="color: #839496; background-color: #002b36;">loss</span> = bm.binary_ce_dice_loss
+<pre class="src src-jupyter-python">model = bm.unet_1d_alt(input_size=length_delimiter)
+optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
+loss = bm.binary_ce_dice_loss
 
-model.compile(<span style="color: #839496; background-color: #002b36;">loss</span>=loss,
-<span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span> <span style="color: #839496; background-color: #002b36;">optimizer</span>=optimizer,
-<span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span> <span style="color: #839496; background-color: #002b36;">metrics</span>=[
-<span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span> tf.keras.metrics.MeanIoU(<span style="color: #839496; background-color: #002b36;">num_classes</span>=<span style="color: #839496; background-color: #002b36;">2</span>),
+model.compile(loss=loss,
+<span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span> optimizer=optimizer,
+<span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span> metrics=[
+<span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span> tf.keras.metrics.MeanIoU(num_classes=2),
 <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span> tf.keras.metrics.Precision(),
 <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span> tf.keras.metrics.Recall()
 <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span> ])
 
-<span style="color: #839496; background-color: #002b36;">history</span> = model.fit(
-<span style="background-color: #073642;"> </span>   <span style="color: #839496; background-color: #002b36;">x</span>=dataset_train,
-<span style="background-color: #073642;"> </span>   <span style="color: #839496; background-color: #002b36;">epochs</span>=epochs,
-<span style="background-color: #073642;"> </span>   <span style="color: #839496; background-color: #002b36;">steps_per_epoch</span>=tf.math.ceil(num_train_examples / _batch_size),
-<span style="background-color: #073642;"> </span>   <span style="color: #839496; background-color: #002b36;">validation_data</span>=dataset_val,
-<span style="background-color: #073642;"> </span>   <span style="color: #839496; background-color: #002b36;">validation_steps</span>=tf.math.ceil(num_val_examples / _batch_size))
+history = model.fit(
+<span style="background-color: #073642;"> </span>   x=dataset_train,
+<span style="background-color: #073642;"> </span>   epochs=epochs,
+<span style="background-color: #073642;"> </span>   steps_per_epoch=tf.math.ceil(num_train_examples / _batch_size),
+<span style="background-color: #073642;"> </span>   validation_data=dataset_val,
+<span style="background-color: #073642;"> </span>   validation_steps=tf.math.ceil(num_val_examples / _batch_size))
 </pre>
 </div>
 
 <pre class="example">
-  input - shape:	 (None, 16384, 1)
-  output - shape:	 (None, 16384, 1)
-  Epoch 1/10
-  32/32 [==============================] - 97s 3s/step - loss: 1.5873 - mean_io_u: 0.3986 - precision: 0.2489 - recall: 0.5378 - val_loss: 1.4996 - val_mean_io_u: 0.3783 - val_precision: 0.0000e+00 - val_recall: 0.0000e+00
-  Epoch 2/10
-  32/32 [==============================] - 93s 3s/step - loss: 1.5293 - mean_io_u: 0.4037 - precision: 0.3027 - recall: 0.6539 - val_loss: 1.4801 - val_mean_io_u: 0.3782 - val_precision: 0.0000e+00 - val_recall: 0.0000e+00
-  Epoch 3/10
-  32/32 [==============================] - 94s 3s/step - loss: 1.4660 - mean_io_u: 0.4071 - precision: 0.3465 - recall: 0.7087 - val_loss: 1.4734 - val_mean_io_u: 0.3934 - val_precision: 0.0000e+00 - val_recall: 0.0000e+00
-  Epoch 4/10
-32/32 [==============================] - 92s 3s/step - loss: 1.4164 - mean_io_u: 0.4035 - precision: 0.4074 - recall: 0.7071 - val_loss: 1.4653 - val_mean_io_u: 0.3894 - val_precision: 0.0000e+00 - val_recall: 0.0000e+00
-  Epoch 5/10
-32/32 [==============================] - 91s 3s/step - loss: 1.3456 - mean_io_u: 0.3991 - precision: 0.4956 - recall: 0.7108 - val_loss: 1.4867 - val_mean_io_u: 0.4216 - val_precision: 0.0000e+00 - val_recall: 0.0000e+00
-  Epoch 6/10
-32/32 [==============================] - 91s 3s/step - loss: 1.3310 - mean_io_u: 0.4111 - precision: 0.5083 - recall: 0.7445 - val_loss: 1.5757 - val_mean_io_u: 0.3901 - val_precision: 0.2414 - val_recall: 0.9313
-  Epoch 7/10
-32/32 [==============================] - 93s 3s/step - loss: 1.2963 - mean_io_u: 0.4076 - precision: 0.5743 - recall: 0.7135 - val_loss: 1.7852 - val_mean_io_u: 0.3509 - val_precision: 0.2983 - val_recall: 0.9997
-  Epoch 8/10
-32/32 [==============================] - 93s 3s/step - loss: 1.2417 - mean_io_u: 0.4025 - precision: 0.6651 - recall: 0.7382 - val_loss: 2.6641 - val_mean_io_u: 0.3951 - val_precision: 0.2097 - val_recall: 0.9998
-  Epoch 9/10
-32/32 [==============================] - 95s 3s/step - loss: 1.2306 - mean_io_u: 0.4079 - precision: 0.6707 - recall: 0.7559 - val_loss: 3.5447 - val_mean_io_u: 0.4057 - val_precision: 0.1887 - val_recall: 1.0000
-  Epoch 10/10
-32/32 [==============================] - 92s 3s/step - loss: 1.2321 - mean_io_u: 0.4104 - precision: 0.6717 - recall: 0.7411 - val_loss: 4.2015 - val_mean_io_u: 0.3820 - val_precision: 0.2359 - val_recall: 1.0000
+input - shape:	 (None, 16384, 1)
+output - shape:	 (None, 16384, 1)
+Epoch 1/2
+32/32 [==============================] - 50s 2s/step - loss: 1.6011 - mean_io_u: 0.4080 - precision: 0.2163 - recall: 0.6183 - val_loss: 1.5998 - val_mean_io_u: 0.4234 - val_precision: 0.1501 - val_recall: 0.8740
+Epoch 2/2
+32/32 [==============================] - 49s 2s/step - loss: 1.5107 - mean_io_u: 0.3981 - precision: 0.3011 - recall: 0.6895 - val_loss: 1.6026 - val_mean_io_u: 0.4151 - val_precision: 0.1624 - val_recall: 0.8894
 </pre>
+
 
 <p>
 These GPU modules were missing:
@@ -3360,8 +3422,8 @@ libcudnn.so.7 - There was an extra <code>module load nvidia/cudnn/7.5.1.10</code
   1.2417198419570923,
   1.2305928468704224,
   1.2321150302886963],
- 'mean_io_u': [0.3985559344291687,
-  0.4037455916404724,
+ 'mean_io_u': [0.0,
+  3985559344291687.4037455916404724,
   0.4071432948112488,
   0.40351858735084534,
   0.39908209443092346,
@@ -3435,7 +3497,7 @@ libcudnn.so.7 - There was an extra <code>module load nvidia/cudnn/7.5.1.10</code
 <div class="org-src-container">
 
 <pre class="src src-jupyter-python">model.evaluate(dataset_test,
-<span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>  <span style="color: #839496; background-color: #002b36;">steps</span>=tf.math.ceil(num_test_examples / _batch_size))
+<span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>   <span style="background-color: #073642;"> </span>  steps=tf.math.ceil(num_test_examples / _batch_size))
 </pre>
 </div>
 
@@ -3449,23 +3511,288 @@ libcudnn.so.7 - There was an extra <code>module load nvidia/cudnn/7.5.1.10</code
 
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python"><span style="color: #839496; background-color: #002b36;">it</span> = <span style="color: #839496; font-weight: bold;">iter</span>(dataset_test)
+<pre class="src src-jupyter-python">it = <span style="color: #839496; font-weight: bold;">iter</span>(dataset_test)
 
-<span style="color: #839496; background-color: #002b36;">fig</span>, <span style="color: #839496; background-color: #002b36;">ax</span> = plt.subplots(<span style="color: #839496; background-color: #002b36;">5</span>, <span style="color: #839496; background-color: #002b36;">figsize</span>=(<span style="color: #839496; background-color: #002b36;">16</span>, <span style="color: #839496; background-color: #002b36;">12</span>))
-<span style="color: #839496; background-color: #002b36;">count</span> = <span style="color: #839496; background-color: #002b36;">0</span>
-<span style="color: #859900; font-weight: bold;">while</span> count &lt; <span style="color: #839496; background-color: #002b36;">5</span>:
-<span style="background-color: #073642;"> </span>   <span style="color: #839496; background-color: #002b36;">example</span> = <span style="color: #839496; font-weight: bold;">next</span>(it)
-<span style="background-color: #073642;"> </span>   ax[count].plot(example[<span style="color: #839496; background-color: #002b36;">0</span>][<span style="color: #839496; background-color: #002b36;">0</span>])
-<span style="background-color: #073642;"> </span>   <span style="color: #839496; background-color: #002b36;">prediction</span> = model.predict(example[<span style="color: #839496; background-color: #002b36;">0</span>])
-<span style="background-color: #073642;"> </span>   <span style="color: #839496; background-color: #002b36;">prediction</span> = prediction[<span style="color: #839496; background-color: #002b36;">0</span>] &gt; <span style="color: #839496; background-color: #002b36;">0</span>.<span style="color: #839496; background-color: #002b36;">5</span>
-<span style="background-color: #073642;"> </span>   ax[count].plot(prediction*<span style="color: #839496; background-color: #002b36;">2</span>)
-<span style="background-color: #073642;"> </span>   ax[count].plot(example[<span style="color: #839496; background-color: #002b36;">1</span>][<span style="color: #839496; background-color: #002b36;">0</span>])
-<span style="background-color: #073642;"> </span>   <span style="color: #839496; background-color: #002b36;">count</span> += <span style="color: #839496; background-color: #002b36;">1</span>
+fig, ax = plt.subplots(5, figsize=(16, 12))
+count = 0
+<span style="color: #859900; font-weight: bold;">while</span> count &lt; 5:
+<span style="background-color: #073642;"> </span>   example = <span style="color: #839496; font-weight: bold;">next</span>(it)
+<span style="background-color: #073642;"> </span>   ax[count].plot(example[0][0])
+<span style="background-color: #073642;"> </span>   prediction = model.predict(example[0])
+<span style="background-color: #073642;"> </span>   prediction = prediction[0] &gt; 0.5
+<span style="background-color: #073642;"> </span>   ax[count].plot(prediction*2)
+<span style="background-color: #073642;"> </span>   ax[count].plot(example[1][0])
+<span style="background-color: #073642;"> </span>   count += 1
 </pre>
 </div>
 
 <pre class="example">
 0c67d91d-f101-4868-b9a4-ed8cee57bee9
+</pre>
+</div>
+</li>
+
+
+<li><a id="sec-6-6-1-8" name="sec-6-6-1-8"></a>Test run 3: fixing 4. and 5. part 2<br ><div class="outline-text-5" id="text-6-6-1-8">
+<div class="org-src-container">
+
+<pre class="src src-tmux">srun -p s_standard --time=7-10:00:00 --ntasks-per-node=36 --mem-per-cpu=2000 --pty bash
+</pre>
+</div>
+
+<pre class="example">
+(tensorflow_nightly) [ye53nis@login01 ~]$ srun -p s_standard --time=7-10:00:00 --ntasks-per-node=24 --mem-per-cpu=2000 --pty bash
+(base) [ye53nis@node262 ~]$
+</pre>
+
+<div class="org-src-container">
+
+<pre class="src src-tmux"><span style="color: #839496; font-weight: bold;">cd</span> /beegfs/ye53nis/drmed-git
+git log -1
+</pre>
+</div>
+
+<pre class="example">
+commit 00cf780bf75e57ef38c5fcf06cbbbb18abc38a13
+Author: Apoplex &lt;oligolex@vivaldi.net&gt;
+Date:   Thu May 7 19:00:51 2020 +0200
+
+    Mention LabBook.html; fix links
+</pre>
+
+<div class="org-src-container">
+
+<pre class="src src-tmux">mlflow run . -P <span style="color: #268bd2;">fluotracify_path</span>=/beegfs/ye53nis/drmed-git/src/ -P <span style="color: #268bd2;">csv_path</span>=/beegfs/ye53nis/saves/firstartifact_Sep2019_subsample/
+</pre>
+</div>
+
+<pre class="example">
+(base) [ye53nis@node262 drmed-git]$ mlflow run . -P fluotracify_path=/beegfs/ye53nis/drmed-git/src/ -P csv_path=/beegfs/ye53nis/saves/firstartifact_Sep2019_subsample/
+/cluster/miniconda3/lib/python3.7/site-packages/jinja2/runtime.py:318: DeprecationWarning: Using or importing the ABCs from 'collections' instead of from 'collections.abc' is deprecated since Python 3.3,and
+ in 3.9 it will stop working
+  from collections import Mapping
+2020/05/08 15:04:40 INFO mlflow.projects: === Created directory /tmp/tmps8r9h7ee for downloading remote URIs passed to arguments of type 'path' ===
+2020/05/08 15:04:40 INFO mlflow.projects: === Running command 'source /cluster/miniconda3/bin/../etc/profile.d/conda.sh &amp;&amp; conda activate mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81 1&gt;&amp;2 &amp;&amp; python src/f
+luotracify/training/train.py /beegfs/ye53nis/drmed-git/src 5 0.2 16384 1e-5 10 /beegfs/ye53nis/saves/firstartifact_Sep2019_subsample' in run with ID 'f360fcfaeb7f4750bdc5ef8326d2240a' ===
+/home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/tensorflow_core/python/pywrap_tensorflow_internal.py:15: DeprecationWarning: the imp module is deprecate
+d in favour of importlib; see the module's documentation for alternative uses
+  import imp
+2.1.0
+fluotracify path:  /beegfs/ye53nis/drmed-git/src
+GPUs:  []
+train 0 /beegfs/ye53nis/saves/firstartifact_Sep2019_subsample/traces_cluster_rand_Sep2019_set003.csv
+train 1 /beegfs/ye53nis/saves/firstartifact_Sep2019_subsample/traces_cluster_rand_Sep2019_set002.csv
+test 2 /beegfs/ye53nis/saves/firstartifact_Sep2019_subsample/traces_cluster_rand_Sep2019_set001.csv
+shapes of feature dataframe: (20000, 200) and label dataframe: (20000, 200)
+shapes of feature dataframe: (20000, 100) and label dataframe: (20000, 100)
+
+for each 20,000 timestap trace there are the following numbers of corrupted timesteps:
+ label001_1     4124
+label002_1     2261
+label003_1       45
+label004_1    13108
+label005_1     2306
+dtype: int64
+2020-05-08 15:05:42.782717: I tensorflow/core/platform/cpu_feature_guard.cc:142] Your CPU supports instructions that this TensorFlow binary was not compiled to use: SSE4.1 SSE4.2 AVX AVX2 AVX512F FMA
+2020-05-08 15:05:42.797518: I tensorflow/core/platform/profile_utils/cpu_utils.cc:94] CPU Frequency: 2300000000 Hz
+2020-05-08 15:05:42.800274: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x564142ebde50 initialized for platform Host (this does not guarantee that XLA will be used). Devices:
+2020-05-08 15:05:42.800378: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): Host, Default Version
+2020-05-08 15:05:42.800727: I tensorflow/core/common_runtime/process_util.cc:147] Creating new thread pool with default inter op setting: 2. Tune using inter_op_parallelism_threads for best performance.
+number of training examples: 160, number of validation examples: 40
+
+------------------------
+number of test examples: 100
+
+input - shape:   (None, 16384, 1)
+output - shape:  (None, 16384, 1)
+/home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/tensorflow_core/python/keras/engine/training_utils.py:1389: DeprecationWarning: Using or importing the A
+BCs from 'collections' instead of from 'collections.abc' is deprecated since Python 3.3,and in 3.9 it will stop working
+  if isinstance(sample_weight_mode, collections.Mapping):
+/home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/mlflow/utils/autologging_utils.py:60: DeprecationWarning: inspect.getargspec() is deprecated since Pytho
+n 3.0, use inspect.signature() or inspect.getfullargspec()
+  all_param_names, _, _, all_default_values = inspect.getargspec(fn)  # pylint: disable=W1505
+/home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/mlflow/utils/autologging_utils.py:70: UserWarning: Logging to MLflow failed: Changing param values is no
+t allowed. Param with key='batch_size' was already logged with value='5' for run ID='f360fcfaeb7f4750bdc5ef8326d2240a'. Attempted logging new value 'None'.
+  try_mlflow_log(mlflow.log_params, defaults)
+Train for 32.0 steps, validate for 8.0 steps
+WARNING:tensorflow:Model failed to serialize as JSON. Ignoring... Layers with arguments in `__init__` must override `get_config`.
+Epoch 1/10
+2020-05-08 15:06:09.400241: I tensorflow/core/profiler/lib/profiler_session.cc:225] Profiler session started.
+32/32 [==============================] - 157s 5s/step - loss: 1.4794 - mean_io_u: 0.4027 - precision: 0.1746 - recall: 0.0652 - val_loss: 1.5356 - val_mean_io_u: 0.4155 - val_precision: 0.0000e+00 - val_rec
+all: 0.0000e+00
+Epoch 2/10
+31/32 [============================&gt;.] - ETA: 4s - loss: 1.4003 - mean_io_u: 0.4062 - precision: 0.4050 - recall: 0.1508/home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.
+7/site-packages/mlflow/tensorflow.py:549: UserWarning: Logging to MLflow failed: Got invalid value tf.Tensor(1.497927, shape=(), dtype=float32) for metric 'val_loss' (timestamp=1588943442066). Please specif
+y value as a valid double (64-bit floating point)
+  try_mlflow_log(mlflow.log_metrics, logs, step=epoch)
+32/32 [==============================] - 139s 4s/step - loss: 1.3997 - mean_io_u: 0.4061 - precision: 0.4134 - recall: 0.1530 - val_loss: 1.4979 - val_mean_io_u: 0.4137 - val_precision: 0.0000e+00 - val_rec
+all: 0.0000e+00
+Epoch 3/10
+32/32 [==============================] - 134s 4s/step - loss: 1.3425 - mean_io_u: 0.4005 - precision: 0.6062 - recall: 0.2561 - val_loss: 1.4643 - val_mean_io_u: 0.3848 - val_precision: 0.0000e+00 - val_rec
+all: 0.0000e+00
+Epoch 4/10
+32/32 [==============================] - 132s 4s/step - loss: 1.3102 - mean_io_u: 0.3982 - precision: 0.6693 - recall: 0.3802 - val_loss: 1.4749 - val_mean_io_u: 0.4106 - val_precision: 0.0000e+00 - val_rec
+all: 0.0000e+00
+Epoch 5/10
+32/32 [==============================] - 133s 4s/step - loss: 1.2738 - mean_io_u: 0.3999 - precision: 0.6858 - recall: 0.5133 - val_loss: 1.5032 - val_mean_io_u: 0.3820 - val_precision: 0.2813 - val_recall:
+ 0.2903
+Epoch 6/10
+32/32 [==============================] - 133s 4s/step - loss: 1.2496 - mean_io_u: 0.4049 - precision: 0.6634 - recall: 0.6284 - val_loss: 1.7162 - val_mean_io_u: 0.4237 - val_precision: 0.1578 - val_recall:
+ 0.8926
+Epoch 7/10
+32/32 [==============================] - 143s 4s/step - loss: 1.2230 - mean_io_u: 0.4051 - precision: 0.6847 - recall: 0.6793 - val_loss: 1.9898 - val_mean_io_u: 0.4048 - val_precision: 0.1904 - val_recall:
+ 0.9998
+Epoch 8/10
+32/32 [==============================] - 139s 4s/step - loss: 1.1948 - mean_io_u: 0.4042 - precision: 0.7137 - recall: 0.7155 - val_loss: 2.4641 - val_mean_io_u: 0.3941 - val_precision: 0.2117 - val_recall:
+ 0.9998
+Epoch 9/10
+32/32 [==============================] - 142s 4s/step - loss: 1.1701 - mean_io_u: 0.4010 - precision: 0.7509 - recall: 0.7258 - val_loss: 2.9713 - val_mean_io_u: 0.3751 - val_precision: 0.2497 - val_recall:
+ 0.9999
+Epoch 10/10
+32/32 [==============================] - 135s 4s/step - loss: 1.1252 - mean_io_u: 0.3996 - precision: 0.7899 - recall: 0.7900 - val_loss: 3.6660 - val_mean_io_u: 0.4050 - val_precision: 0.1901 - val_recall:
+ 0.9998
+/home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/mlflow/tensorflow.py:552: UserWarning: Logging to MLflow failed: Layers with arguments in `__init__` mus
+t override `get_config`.
+  try_mlflow_log(mlflow.keras.log_model, self.model, artifact_path='model')
+Traceback (most recent call last):
+  File "src/fluotracify/training/train.py", line 96, in &lt;module&gt;
+    mlflow.log_metrics(metrics, step=i)
+  File "/home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/mlflow/tracking/fluent.py", line 271, in log_metrics
+    MlflowClient().log_batch(run_id=run_id, metrics=metrics_arr, params=[], tags=[])
+  File "/home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/mlflow/tracking/client.py", line 249, in log_batch
+    self._tracking_client.log_batch(run_id, metrics, params, tags)
+  File "/home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/mlflow/tracking/_tracking_service/client.py", line 229, in log_batch
+    _validate_metric(metric.key, metric.value, metric.timestamp, metric.step)
+  File "/home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/mlflow/utils/validation.py", line 70, in _validate_metric
+    INVALID_PARAMETER_VALUE)
+mlflow.exceptions.MlflowException: Got invalid value tf.Tensor(1.5356212, shape=(), dtype=float32) for metric 'val_loss' (timestamp=1588944533682). Please specify value as a valid double (64-bit floating po
+int)
+2020/05/08 15:28:54 ERROR mlflow.cli: === Run (ID 'f360fcfaeb7f4750bdc5ef8326d2240a') failed ===
+</pre>
+
+<div class="org-src-container">
+
+<pre class="src src-tmux">git log -1
+</pre>
+</div>
+
+<pre class="example">
+commit 5319f00ac246f426ea266d07f94effa8a18068a8
+Author: Apoplex &lt;oligolex@vivaldi.net&gt;
+Date:   Fri May 8 15:59:18 2020 +0200
+
+    try to make log_metrics work
+</pre>
+
+<p>
+Two things changed: now running tensorflow nightly
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-tmux">mlflow run . -P <span style="color: #268bd2;">fluotracify_path</span>=/beegfs/ye53nis/drmed-git/src/ -P <span style="color: #268bd2;">csv_path</span>=/beegfs/ye53nis/saves/firstartifact_Sep2019_subsample/
+</pre>
+</div>
+
+<pre class="example">
+2020/05/08 16:23:44 INFO mlflow.projects: === Created directory /tmp/tmp6tg_wyna for downloading remote URIs passed to arguments of type 'path' ===
+2020/05/08 16:23:44 INFO mlflow.projects: === Running command 'source /cluster/miniconda3/bin/../etc/profile.d/conda.sh &amp;&amp; conda activate mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81 1&gt;&amp;2 &amp;&amp; python src/f
+luotracify/training/train.py /beegfs/ye53nis/drmed-git/src 5 0.2 16384 1e-5 10 /beegfs/ye53nis/saves/firstartifact_Sep2019_subsample' in run with ID 'aeacaed2624a4e3ebbe240ff97e74fd0' ===
+/home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/tensorflow_core/python/pywrap_tensorflow_internal.py:15: DeprecationWarning: the imp module is deprecate
+d in favour of importlib; see the module's documentation for alternative uses
+  import imp
+2.1.0
+fluotracify path:  /beegfs/ye53nis/drmed-git/src
+GPUs:  []
+train 0 /beegfs/ye53nis/saves/firstartifact_Sep2019_subsample/traces_cluster_rand_Sep2019_set003.csv
+train 1 /beegfs/ye53nis/saves/firstartifact_Sep2019_subsample/traces_cluster_rand_Sep2019_set002.csv
+test 2 /beegfs/ye53nis/saves/firstartifact_Sep2019_subsample/traces_cluster_rand_Sep2019_set001.csv
+shapes of feature dataframe: (20000, 200) and label dataframe: (20000, 200)
+shapes of feature dataframe: (20000, 100) and label dataframe: (20000, 100)
+
+for each 20,000 timestap trace there are the following numbers of corrupted timesteps:
+ label001_1     4124
+label002_1     2261
+label003_1       45
+label004_1    13108
+label005_1     2306
+dtype: int64
+2020-05-08 16:23:54.416673: I tensorflow/core/platform/cpu_feature_guard.cc:142] Your CPU supports instructions that this TensorFlow binary was not compiled to use: SSE4.1 SSE4.2 AVX AVX2 AVX512F FMA
+2020-05-08 16:23:54.427207: I tensorflow/core/platform/profile_utils/cpu_utils.cc:94] CPU Frequency: 2300000000 Hz
+2020-05-08 16:23:54.428400: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x556200e8fe40 initialized for platform Host (this does not guarantee that XLA will be used). Devices:
+2020-05-08 16:23:54.428430: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): Host, Default Version
+2020-05-08 16:23:54.428559: I tensorflow/core/common_runtime/process_util.cc:147] Creating new thread pool with default inter op setting: 2. Tune using inter_op_parallelism_threads for best performance.
+number of training examples: 160, number of validation examples: 40
+
+------------------------
+number of test examples: 100
+
+input - shape:   (None, 16384, 1)
+output - shape:  (None, 16384, 1)
+/home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/tensorflow_core/python/keras/engine/training_utils.py:1389: DeprecationWarning: Using or importing the A
+BCs from 'collections' instead of from 'collections.abc' is deprecated since Python 3.3,and in 3.9 it will stop working
+  if isinstance(sample_weight_mode, collections.Mapping):
+/home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/mlflow/utils/autologging_utils.py:60: DeprecationWarning: inspect.getargspec() is deprecated since Pytho
+n 3.0, use inspect.signature() or inspect.getfullargspec()
+  all_param_names, _, _, all_default_values = inspect.getargspec(fn)  # pylint: disable=W1505
+/home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/mlflow/utils/autologging_utils.py:70: UserWarning: Logging to MLflow failed: Changing param values is no
+t allowed. Param with key='batch_size' was already logged with value='5' for run ID='aeacaed2624a4e3ebbe240ff97e74fd0'. Attempted logging new value 'None'.
+  try_mlflow_log(mlflow.log_params, defaults)
+Train for 32.0 steps, validate for 8.0 steps
+WARNING:tensorflow:Model failed to serialize as JSON. Ignoring... Layers with arguments in `__init__` must override `get_config`.
+Epoch 1/10
+2020-05-08 16:24:20.043922: I tensorflow/core/profiler/lib/profiler_session.cc:225] Profiler session started.
+32/32 [==============================] - 156s 5s/step - loss: 1.5595 - mean_io_u: 0.4046 - precision: 0.2138 - recall: 0.4436 - val_loss: 1.5276 - val_mean_io_u: 0.3947 - val_precision: 0.0000e+00 - val_rec
+all: 0.0000e+00
+Epoch 2/10
+31/32 [============================&gt;.] - ETA: 4s - loss: 1.4620 - mean_io_u: 0.4036 - precision: 0.3204 - recall: 0.6043/home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.
+7/site-packages/mlflow/tensorflow.py:549: UserWarning: Logging to MLflow failed: Got invalid value tf.Tensor(1.5336354, shape=(), dtype=float32) for metric 'val_loss' (timestamp=1588948133109). Please speci
+fy value as a valid double (64-bit floating point)
+  try_mlflow_log(mlflow.log_metrics, logs, step=epoch)
+32/32 [==============================] - 140s 4s/step - loss: 1.4617 - mean_io_u: 0.4027 - precision: 0.3222 - recall: 0.6023 - val_loss: 1.5336 - val_mean_io_u: 0.4152 - val_precision: 0.0000e+00 - val_rec
+all: 0.0000e+00
+Epoch 3/10
+32/32 [==============================] - 135s 4s/step - loss: 1.3917 - mean_io_u: 0.3939 - precision: 0.4246 - recall: 0.6836 - val_loss: 1.5311 - val_mean_io_u: 0.4055 - val_precision: 0.1513 - val_recall:
+ 0.0404
+Epoch 4/10
+32/32 [==============================] - 143s 4s/step - loss: 1.3645 - mean_io_u: 0.4012 - precision: 0.4491 - recall: 0.7378 - val_loss: 1.5464 - val_mean_io_u: 0.3922 - val_precision: 0.2166 - val_recall:
+ 0.5154
+Epoch 5/10
+32/32 [==============================] - 136s 4s/step - loss: 1.3427 - mean_io_u: 0.4034 - precision: 0.4764 - recall: 0.7502 - val_loss: 1.6451 - val_mean_io_u: 0.4045 - val_precision: 0.1937 - val_recall:
+ 0.7729
+Epoch 6/10
+32/32 [==============================] - 136s 4s/step - loss: 1.2957 - mean_io_u: 0.4052 - precision: 0.5425 - recall: 0.7886 - val_loss: 1.9099 - val_mean_io_u: 0.3994 - val_precision: 0.2013 - val_recall:
+ 0.9999
+Epoch 7/10
+32/32 [==============================] - 140s 4s/step - loss: 1.2704 - mean_io_u: 0.4004 - precision: 0.5900 - recall: 0.7747 - val_loss: 2.4546 - val_mean_io_u: 0.3892 - val_precision: 0.2216 - val_recall:
+ 0.9999
+Epoch 8/10
+32/32 [==============================] - 141s 4s/step - loss: 1.2297 - mean_io_u: 0.3955 - precision: 0.6516 - recall: 0.7727 - val_loss: 3.6472 - val_mean_io_u: 0.4207 - val_precision: 0.1586 - val_recall:
+ 0.9999
+Epoch 9/10
+32/32 [==============================] - 137s 4s/step - loss: 1.2099 - mean_io_u: 0.4049 - precision: 0.6759 - recall: 0.8141 - val_loss: 4.4598 - val_mean_io_u: 0.4071 - val_precision: 0.1859 - val_recall:
+ 0.9999
+Epoch 10/10
+32/32 [==============================] - 136s 4s/step - loss: 1.1920 - mean_io_u: 0.3994 - precision: 0.7333 - recall: 0.7710 - val_loss: 5.2335 - val_mean_io_u: 0.4005 - val_precision: 0.1991 - val_recall:
+ 0.9999
+/home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/mlflow/tensorflow.py:552: UserWarning: Logging to MLflow failed: Layers with arguments in `__init__` mus
+t override `get_config`.
+  try_mlflow_log(mlflow.keras.log_model, self.model, artifact_path='model')
+Traceback (most recent call last):
+  File "src/fluotracify/training/train.py", line 92, in &lt;module&gt;
+    mlflow.log_metrics(metrics, step=i)
+  File "/home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/mlflow/tracking/fluent.py", line 271, in log_metrics
+    MlflowClient().log_batch(run_id=run_id, metrics=metrics_arr, params=[], tags=[])
+  File "/home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/mlflow/tracking/client.py", line 249, in log_batch
+    self._tracking_client.log_batch(run_id, metrics, params, tags)
+  File "/home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/mlflow/tracking/_tracking_service/client.py", line 229, in log_batch
+    _validate_metric(metric.key, metric.value, metric.timestamp, metric.step)
+  File "/home/ye53nis/.conda/envs/mlflow-1114b06fb561908fc3f52e89d8342d7e52709c81/lib/python3.7/site-packages/mlflow/utils/validation.py", line 70, in _validate_metric
+    INVALID_PARAMETER_VALUE)
+mlflow.exceptions.MlflowException: Got invalid value tf.Tensor(1.5594830736517906, shape=(), dtype=float64) for metric 'loss' (timestamp=1588949235987). Please specify value as a valid double (64-bit floati
+ng point)
+2020/05/08 16:47:16 ERROR mlflow.cli: === Run (ID 'aeacaed2624a4e3ebbe240ff97e74fd0') failed ===
+(tensorflow_nightly) [ye53nis@node262 drmed-git]$
 </pre>
 </div>
 </li></ol>
@@ -3586,16 +3913,153 @@ TensorBoard 2.0.0 at http://localhost:6006/ (Press CTRL+C to quit)
 
 
 <div id="outline-container-sec-6-8" class="outline-3">
-<h3 id="sec-6-8"><span class="section-number-3">6.8</span> TODOs</h3>
+<h3 id="sec-6-8"><span class="section-number-3">6.8</span> Changing Appearance of this org-mode document and the html export LabBook.html</h3>
 <div class="outline-text-3" id="text-6-8">
-</div><ol class="org-ol"><li><a id="sec-6-8-0-1" name="sec-6-8-0-1"></a><span class="label label-primary TODO">TODO</span> Investigate Error on GPU node<br ><div class="outline-text-5" id="text-6-8-0-1">
+<p>
+I try to make it easy to distinguish different org source code blocks by visual
+cues. Let's take the <a href="https://github.com/ozh/github-colors/blob/master/colors.json">colours Github uses</a>:
+</p>
+
+<ul class="org-ul">
+<li>emacs-lisp: #c065db
+</li>
+<li>shell: #89e051
+</li>
+<li>python: #3572A5
+</li>
+<li>jupyter: #DA5B0B
+</li>
+</ul>
+
+<p>
+Then I went to <a href="https://htmlcolorcodes.com/color-picker/">https://htmlcolorcodes.com/color-picker/</a>
+</p>
+
+<p>
+for tmux I chose a different <b>tone</b> coming from shell's #89e051
+</p>
+<ul class="org-ul">
+<li>#85bc62
+</li>
+</ul>
+<p>
+for example blocks I chose a light yellow (html export only). Ideally this would
+be set for all <code>#+results</code> - I opened a github issue with <code>ox-twbs</code> <a href="https://github.com/marsmining/ox-twbs/issues/59%20">here</a>.
+</p>
+
+<ul class="org-ul">
+<li>#FBFBBF
+</li>
+</ul>
+
+<p>
+then to get lighter versions of these colours in html export i chose <b>tints</b>
+coming from the respective original colour:
+</p>
+<ul class="org-ul">
+<li>emacs-lisp: #efd8f6 #F7ECFB
+</li>
+<li>shell: #d3f3be #F0FBE9
+</li>
+<li>tmux: #94c476 #E1EED8
+</li>
+<li>python: #b3cadd #E6EDF4
+</li>
+<li>jupyter-python: #f1c1a4 #FAEAE1
+</li>
+</ul>
+
+<p>
+for colouring of code blocks inside my dark-themed Emacs setup, I chose
+different <b>shades</b> coming from the respective original colour
+</p>
+<ul class="org-ul">
+<li>emacs-lisp: #482652
+</li>
+<li>shell: #223814
+</li>
+<li>tmux: #324725
+</li>
+<li>python: #142b3e
+</li>
+<li>jupyter-python: #522204 #371703 #6d2d05
+</li>
+</ul>
+
+
+<div class="org-src-container">
+
+<pre class="src src-emacs-lisp">(<span style="color: #859900; font-weight: bold;">setq</span> org-src-block-faces '((<span style="color: #2aa198;">"emacs-lisp"</span> (<span style="color: #839496; font-weight: bold;">:background</span> <span style="color: #2aa198;">"#482652"</span>))
+                            (<span style="color: #2aa198;">"sh"</span> (<span style="color: #839496; font-weight: bold;">:background</span> <span style="color: #2aa198;">"#223814"</span>))
+                            (<span style="color: #2aa198;">"tmux"</span> (<span style="color: #839496; font-weight: bold;">:background</span> <span style="color: #2aa198;">"#324725"</span>))
+                            (<span style="color: #2aa198;">"python"</span> (<span style="color: #839496; font-weight: bold;">:background</span> <span style="color: #2aa198;">"#142b3e"</span>))
+                            (<span style="color: #2aa198;">"jupyter-python"</span> (<span style="color: #839496; font-weight: bold;">:background</span> <span style="color: #2aa198;">"#371703"</span>))
+                            ))
+</pre>
+</div>
+
+<table class="table table-striped table-bordered table-hover table-condensed">
+
+
+<colgroup>
+<col  class="left">
+
+<col  class="left">
+</colgroup>
+<tbody>
+<tr>
+<td class="text-left">emacs-lisp</td>
+<td class="text-left">(:background #482652)</td>
+</tr>
+
+<tr>
+<td class="text-left">sh</td>
+<td class="text-left">(:background #223814)</td>
+</tr>
+
+<tr>
+<td class="text-left">tmux</td>
+<td class="text-left">(:background #324725)</td>
+</tr>
+
+<tr>
+<td class="text-left">python</td>
+<td class="text-left">(:background #142b3e)</td>
+</tr>
+
+<tr>
+<td class="text-left">jupyter-python</td>
+<td class="text-left">(:background #371703)</td>
+</tr>
+</tbody>
+</table>
+
+
+<p>
+Also, I found this interesting javascript export option - thats how the org mode
+documentation is made
+<a href="https://orgmode.org/manual/JavaScript-support.html#JavaScript-support">https://orgmode.org/manual/JavaScript-support.html#JavaScript-support</a>
+</p>
+</div>
+</div>
+
+
+
+<div id="outline-container-sec-6-9" class="outline-3">
+<h3 id="sec-6-9"><span class="section-number-3">6.9</span> TODOs</h3>
+<div class="outline-text-3" id="text-6-9">
+</div><ol class="org-ol"><li><a id="sec-6-9-0-1" name="sec-6-9-0-1"></a><span class="label label-primary TODO">TODO</span> Investigate Error on GPU node<br ><div class="outline-text-5" id="text-6-9-0-1">
 <ul class="org-ul">
 <li>2020-04-13 02:45:28.216446: W
 tensorflow/stream<sub>executor</sub>/platform/default/dso<sub>loader.cc</sub>:55] Could not load
 dynamic library 'libnvinfer.so.6'; dlerror: libnvinfer.so.6: cannot open
-shared object file: No such file or directory; LD<sub>LIBRARY</sub><sub>PATH</sub>:
-/cluster/miniconda3/lib
 </li>
+</ul>
+
+<p>
+/cluster/miniconda3/lib
+</p>
+<ul class="org-ul">
 <li>2020-04-13 02:45:28.217069: W
 tensorflow/stream<sub>executor</sub>/platform/default/dso<sub>loader.cc</sub>:55] Could not load
 dynamic library 'libnvinfer<sub>plugin.so.6</sub>'; dlerror: libnvinfer<sub>plugin.so.6</sub>:
@@ -3610,7 +4074,7 @@ make sure the missing libraries mentioned above are installed properly
 </ul>
 </div>
 </li>
-<li><a id="sec-6-8-0-2" name="sec-6-8-0-2"></a><span class="label label-primary TODO">TODO</span> Export pandas DataFrames as org tables instead of html<br ><div class="outline-text-5" id="text-6-8-0-2">
+<li><a id="sec-6-9-0-2" name="sec-6-9-0-2"></a><span class="label label-primary TODO">TODO</span> Export pandas DataFrames as org tables instead of html<br ><div class="outline-text-5" id="text-6-9-0-2">
 <ul class="org-ul">
 <li>see <a href="https://github.com/dzop/emacs-jupyter/issues/88">https://github.com/dzop/emacs-jupyter/issues/88</a>
 </li>
@@ -3620,16 +4084,16 @@ make sure the missing libraries mentioned above are installed properly
 </ul>
 </div>
 </li>
-<li><a id="sec-6-8-0-3" name="sec-6-8-0-3"></a><span class="label label-primary TODO">TODO</span> Inline-display of plots<br ></li>
-<li><a id="sec-6-8-0-4" name="sec-6-8-0-4"></a><span class="label label-primary TODO">TODO</span> fix pydot and graphviz to make model plotting work<br ></li>
-<li><a id="sec-6-8-0-5" name="sec-6-8-0-5"></a><span class="label label-primary TODO">TODO</span> transform ML training ipynb to py files as used <a href="https://github.com/mlflow/mlflow/blob/master/examples/tensorflow/tf2/train_predict_2.py">here</a><br ></li>
-<li><a id="sec-6-8-0-6" name="sec-6-8-0-6"></a><span class="label label-primary TODO">TODO</span> check out python module <code>argparser</code> as used <a href="https://github.com/mlflow/mlflow/blob/master/examples/tensorflow/tf2/train_predict_2.py">here</a><br ></li></ol>
-<div id="outline-container-sec-6-8-1" class="outline-4">
-<h4 id="sec-6-8-1"><span class="section-number-4">6.8.1</span> <span class="label label-primary TODO">TODO</span> Further setup of git branching model</h4>
+<li><a id="sec-6-9-0-3" name="sec-6-9-0-3"></a><span class="label label-primary TODO">TODO</span> Inline-display of plots<br ></li>
+<li><a id="sec-6-9-0-4" name="sec-6-9-0-4"></a><span class="label label-primary TODO">TODO</span> fix pydot and graphviz to make model plotting work<br ></li>
+<li><a id="sec-6-9-0-5" name="sec-6-9-0-5"></a><span class="label label-primary TODO">TODO</span> transform ML training ipynb to py files as used <a href="https://github.com/mlflow/mlflow/blob/master/examples/tensorflow/tf2/train_predict_2.py">here</a><br ></li>
+<li><a id="sec-6-9-0-6" name="sec-6-9-0-6"></a><span class="label label-primary TODO">TODO</span> check out python module <code>argparser</code> as used <a href="https://github.com/mlflow/mlflow/blob/master/examples/tensorflow/tf2/train_predict_2.py">here</a><br ></li></ol>
+<div id="outline-container-sec-6-9-1" class="outline-4">
+<h4 id="sec-6-9-1"><span class="section-number-4">6.9.1</span> <span class="label label-primary TODO">TODO</span> Further setup of git branching model</h4>
 </div>
-<div id="outline-container-sec-6-8-2" class="outline-4">
-<h4 id="sec-6-8-2"><span class="section-number-4">6.8.2</span> <span class="label label-primary PENDING">PENDING</span> Fix isort and sys.path conflicts</h4>
-<div class="outline-text-4" id="text-6-8-2">
+<div id="outline-container-sec-6-9-2" class="outline-4">
+<h4 id="sec-6-9-2"><span class="section-number-4">6.9.2</span> <span class="label label-primary PENDING">PENDING</span> Fix isort and sys.path conflicts</h4>
+<div class="outline-text-4" id="text-6-9-2">
 <ul class="org-ul">
 <li>State "PENDING"    from "TODO"       <span class="timestamp-wrapper"><span class="timestamp">[2020-05-02 Sa 13:06] </span></span> <br >
 Waiting for isort 5.0.0 release
@@ -3640,11 +4104,11 @@ See here: <a href="https://github.com/timothycrosley/isort/issues/468#issuecomme
 </p>
 </div>
 </div>
-<div id="outline-container-sec-6-8-3" class="outline-4">
-<h4 id="sec-6-8-3"><span class="section-number-4">6.8.3</span> <span class="label label-primary TODO">TODO</span> Implement talos 1.0 with mlflow, see <a href="file:///home/lex/Dokumente/org/04_Digital-und-Technik/programmieren.html#MissingReference">here</a></h4>
+<div id="outline-container-sec-6-9-3" class="outline-4">
+<h4 id="sec-6-9-3"><span class="section-number-4">6.9.3</span> <span class="label label-primary TODO">TODO</span> Implement talos 1.0 with mlflow, see <a href="file:///home/lex/Dokumente/org/04_Digital-und-Technik/programmieren.html#MissingReference">here</a></h4>
 </div>
-<div id="outline-container-sec-6-8-4" class="outline-4">
-<h4 id="sec-6-8-4"><span class="section-number-4">6.8.4</span> <span class="label label-primary TODO">TODO</span> Set up nice package using cookiecutter, poetry, See <a href="https://stackoverflow.com/questions/49474575/how-to-install-my-own-python-module-package-via-conda-and-watch-its-changes">here</a></h4>
+<div id="outline-container-sec-6-9-4" class="outline-4">
+<h4 id="sec-6-9-4"><span class="section-number-4">6.9.4</span> <span class="label label-primary TODO">TODO</span> Set up nice package using cookiecutter, poetry, See <a href="https://stackoverflow.com/questions/49474575/how-to-install-my-own-python-module-package-via-conda-and-watch-its-changes">here</a></h4>
 </div>
 </div>
 </div>
@@ -3664,16 +4128,52 @@ See here: <a href="https://github.com/timothycrosley/isort/issues/468#issuecomme
 <col  class="left">
 
 <col  class="left">
+
+<col  class="left">
+
+<col  class="left">
+
+<col  class="left">
+
+<col  class="left">
+
+<col  class="left">
+
+<col  class="left">
 </colgroup>
 <tbody>
 <tr>
+<td class="text-left">rm:</td>
+<td class="text-left">cannot</td>
+<td class="text-left">remove</td>
+<td class="text-left">'<i>home/lex</i>.tmux-local-socket-remote-machine':</td>
+<td class="text-left">No</td>
+<td class="text-left">such</td>
+<td class="text-left">file</td>
+<td class="text-left">or</td>
+<td class="text-left">directory</td>
+</tr>
+
+<tr>
 <td class="text-left">ye53nis@ara-login01.rz.uni-jena.de's</td>
 <td class="text-left">password:</td>
+<td class="text-left">&#xa0;</td>
+<td class="text-left">&#xa0;</td>
+<td class="text-left">&#xa0;</td>
+<td class="text-left">&#xa0;</td>
+<td class="text-left">&#xa0;</td>
+<td class="text-left">&#xa0;</td>
 <td class="text-left">&#xa0;</td>
 </tr>
 
 <tr>
 <td class="text-left">/tmp/tmux-67339/default</td>
+<td class="text-left">&#xa0;</td>
+<td class="text-left">&#xa0;</td>
+<td class="text-left">&#xa0;</td>
+<td class="text-left">&#xa0;</td>
+<td class="text-left">&#xa0;</td>
+<td class="text-left">&#xa0;</td>
 <td class="text-left">&#xa0;</td>
 <td class="text-left">&#xa0;</td>
 </tr>
@@ -3682,6 +4182,12 @@ See here: <a href="https://github.com/timothycrosley/isort/issues/468#issuecomme
 <td class="text-left">&gt;</td>
 <td class="text-left">ye53nis@ara-login01.rz.uni-jena.de's</td>
 <td class="text-left">password:</td>
+<td class="text-left">&#xa0;</td>
+<td class="text-left">&#xa0;</td>
+<td class="text-left">&#xa0;</td>
+<td class="text-left">&#xa0;</td>
+<td class="text-left">&#xa0;</td>
+<td class="text-left">&#xa0;</td>
 </tr>
 </tbody>
 </table>
@@ -3705,6 +4211,16 @@ Test:
 <div id="outline-container-sec-7-2" class="outline-3">
 <h3 id="sec-7-2"><span class="section-number-3">7.2</span> Jupyter on Ara</h3>
 <div class="outline-text-3" id="text-7-2">
+<div class="org-src-container">
+
+<pre class="src src-tmux">srun -p s_standard --time=7-10:00:00 --ntasks-per-node=24 --mem-per-cpu=2000 --pty bash
+</pre>
+</div>
+
+<pre class="example">
+(base) [ye53nis@node243 ~]$
+</pre>
+
 <table class="table table-striped table-bordered table-hover table-condensed">
 
 
@@ -3741,7 +4257,7 @@ Test:
 </tr>
 
 <tr>
-<td class="text-left">ye53nis@node018's</td>
+<td class="text-left">ye53nis@node243's</td>
 <td class="text-left">password:</td>
 <td class="text-left">&#xa0;</td>
 <td class="text-left">&#xa0;</td>
@@ -3755,10 +4271,10 @@ Test:
 <tr>
 <td class="text-left">Last</td>
 <td class="text-left">login:</td>
-<td class="text-left">Sat</td>
-<td class="text-left">Apr</td>
-<td class="text-left">25</td>
-<td class="text-left">13:40:36</td>
+<td class="text-left">Sun</td>
+<td class="text-left">May</td>
+<td class="text-left">10</td>
+<td class="text-left">23:55:44</td>
 <td class="text-left">2020</td>
 <td class="text-left">from</td>
 <td class="text-left">login01.ara</td>
@@ -3767,8 +4283,108 @@ Test:
 </table>
 
 <p>
+I started a Python3 kernel using <code>jupyter-server-list-kernels</code>. Then I added the
+kernel ID to the <code>:PROPERTIES:</code> drawer of this (and following) subtrees.
+</p>
+
+<pre class="example">
+python3           704d35be-572a-4268-a70b-565164b8620f   a few seconds ago    idle       1
+</pre>
+
+<p>
 Test:
 </p>
+
+<pre class="example">
+No of CPUs in system: 72
+No of CPUs the current process can use: 24
+load average: (0.1, 0.04, 0.05)
+posix.uname_result(sysname='Linux', nodename='node243', release='3.10.0-957.1.3.el7.x86_64', version='#1 SMP Thu Nov 29 14:49:43 UTC 2018', machine='x86_64')
+PID of process: 448659
+RAM total: 199G, RAM used: 8.3G, RAM free: 147G
+the current directory: /beegfs/ye53nis/drmed-git
+My disk usage:
+Filesystem           Size  Used Avail Use% Mounted on
+/dev/sda1             50G  3.2G   47G   7% /
+devtmpfs              94G     0   94G   0% /dev
+tmpfs                 94G 1018M   93G   2% /dev/shm
+tmpfs                 94G   67M   94G   1% /run
+tmpfs                 94G     0   94G   0% /sys/fs/cgroup
+nfs03-ib:/pool/work  100T   79T   22T  79% /nfsdata
+nfs01-ib:/home        80T   59T   22T  74% /home
+nfs01-ib:/cluster    2.0T  316G  1.7T  16% /cluster
+nfs02-ib:/data01      88T   59T   29T  68% /data01
+/dev/sda5            2.0G   34M  2.0G   2% /tmp
+/dev/sda6            169G  4.3G  165G   3% /local
+/dev/sda3            6.0G  404M  5.6G   7% /var
+beegfs_nodev         524T  430T   95T  82% /beegfs
+tmpfs                 19G     0   19G   0% /run/user/67339
+</pre>
+</div>
+</div>
+<div id="outline-container-sec-7-3" class="outline-3">
+<h3 id="sec-7-3"><span class="section-number-3">7.3</span> Tensorboard tunnel</h3>
+<div class="outline-text-3" id="text-7-3">
+<table class="table table-striped table-bordered table-hover table-condensed">
+
+
+<colgroup>
+<col  class="left">
+
+<col  class="left">
+
+<col  class="left">
+
+<col  class="left">
+
+<col  class="left">
+
+<col  class="left">
+
+<col  class="left">
+
+<col  class="left">
+
+<col  class="left">
+</colgroup>
+<tbody>
+<tr>
+<td class="text-left">sh-5.0$</td>
+<td class="text-left">ye53nis@ara-login01.rz.uni-jena.de's</td>
+<td class="text-left">password:</td>
+<td class="text-left">&#xa0;</td>
+<td class="text-left">&#xa0;</td>
+<td class="text-left">&#xa0;</td>
+<td class="text-left">&#xa0;</td>
+<td class="text-left">&#xa0;</td>
+<td class="text-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="text-left">ye53nis@node243's</td>
+<td class="text-left">password:</td>
+<td class="text-left">&#xa0;</td>
+<td class="text-left">&#xa0;</td>
+<td class="text-left">&#xa0;</td>
+<td class="text-left">&#xa0;</td>
+<td class="text-left">&#xa0;</td>
+<td class="text-left">&#xa0;</td>
+<td class="text-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="text-left">Last</td>
+<td class="text-left">login:</td>
+<td class="text-left">Sun</td>
+<td class="text-left">May</td>
+<td class="text-left">10</td>
+<td class="text-left">15:46:02</td>
+<td class="text-left">2020</td>
+<td class="text-left">from</td>
+<td class="text-left">login01.ara</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 </div>
@@ -3778,22 +4394,23 @@ Test:
 <li><a href="#sec-1">1. README</a>
 <ul class="nav">
 <li><a href="#sec-1-1">1.1. General:</a></li>
-<li><a href="#sec-1-2">1.2. Experiments workflow:</a></li>
-<li><a href="#sec-1-3">1.3. Example for experimental setup procedure</a>
+<li><a href="#sec-1-2">1.2. Code block languages used in this document</a></li>
+<li><a href="#sec-1-3">1.3. Experiments workflow:</a></li>
+<li><a href="#sec-1-4">1.4. Example for experimental setup procedure</a>
 <ul class="nav">
-<li><a href="#sec-tmux-setup">1.3.1. Setting up a tmux connection from using <code>ob-tmux</code> in <code>org-babel</code></a></li>
-<li><a href="#sec-jupyter-setup">1.3.2. Setting starting a jupyter kernel from a remote jupyter session using <code>emacs-jupyter</code> in <code>org babel</code></a></li>
+<li><a href="#sec-tmux-setup">1.4.1. Setting up a tmux connection from using <code>ob-tmux</code> in <code>org-babel</code></a></li>
+<li><a href="#sec-jupyter-setup">1.4.2. Setting starting a jupyter kernel from a remote jupyter session using <code>emacs-jupyter</code> in <code>org babel</code></a></li>
 </ul>
 </li>
-<li><a href="#sec-1-4">1.4. tools used (notes)</a>
+<li><a href="#sec-1-5">1.5. tools used (notes)</a>
 <ul class="nav">
-<li><a href="#sec-1-4-1">1.4.1. Emacs <code>magit</code></a></li>
-<li><a href="#sec-1-4-2">1.4.2. jupyter</a></li>
-<li><a href="#sec-1-4-3">1.4.3. mlflow</a></li>
-<li><a href="#sec-1-4-4">1.4.4. tensorflow</a></li>
+<li><a href="#sec-1-5-1">1.5.1. Emacs <code>magit</code></a></li>
+<li><a href="#sec-1-5-2">1.5.2. jupyter</a></li>
+<li><a href="#sec-1-5-3">1.5.3. mlflow</a></li>
+<li><a href="#sec-1-5-4">1.5.4. tensorflow</a></li>
 </ul>
 </li>
-<li><a href="#sec-1-5">1.5. Example for &#x2026;</a></li>
+<li><a href="#sec-1-6">1.6. Example for &#x2026;</a></li>
 </ul>
 </li>
 <li><a href="#sec-2">2. Template for data entry:</a>
@@ -3875,12 +4492,13 @@ Test:
 </ul>
 </li>
 <li><a href="#sec-6-7">6.7. Reading out mlflow logs</a></li>
-<li><a href="#sec-6-8">6.8. TODOs</a>
+<li><a href="#sec-6-8">6.8. Changing Appearance of this org-mode document and the html export LabBook.html</a></li>
+<li><a href="#sec-6-9">6.9. TODOs</a>
 <ul class="nav">
-<li><a href="#sec-6-8-1">6.8.1. Further setup of git branching model</a></li>
-<li><a href="#sec-6-8-2">6.8.2. Fix isort and sys.path conflicts</a></li>
-<li><a href="#sec-6-8-3">6.8.3. Implement talos 1.0 with mlflow, see here</a></li>
-<li><a href="#sec-6-8-4">6.8.4. Set up nice package using cookiecutter, poetry, See here</a></li>
+<li><a href="#sec-6-9-1">6.9.1. Further setup of git branching model</a></li>
+<li><a href="#sec-6-9-2">6.9.2. Fix isort and sys.path conflicts</a></li>
+<li><a href="#sec-6-9-3">6.9.3. Implement talos 1.0 with mlflow, see here</a></li>
+<li><a href="#sec-6-9-4">6.9.4. Set up nice package using cookiecutter, poetry, See here</a></li>
 </ul>
 </li>
 </ul>
@@ -3889,6 +4507,7 @@ Test:
 <ul class="nav">
 <li><a href="#sec-7-1">7.1. Tmux on Ara</a></li>
 <li><a href="#sec-7-2">7.2. Jupyter on Ara</a></li>
+<li><a href="#sec-7-3">7.3. Tensorboard tunnel</a></li>
 </ul>
 </li>
 </ul>
@@ -3897,7 +4516,7 @@ Test:
 </div></div></div>
 <footer id="postamble" class="">
 <div><p class="author">Author: Alexander Seltmann</p>
-<p class="date">Created: 2020-05-07 Do 18:20</p>
+<p class="date">Created: 2020-05-13 Mi 16:03</p>
 <p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 26.3 (<a href="http://orgmode.org">Org-mode</a> 9.3.6)</p>
 </div>
 </footer>
