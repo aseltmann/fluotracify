@@ -5,9 +5,11 @@ conda_env: conda.yaml
 entry_points:
   main:
     parameters:
+      fluotracify_path: {type: path, default: ~/Programme/drmed-git/src/}
       batch_size: {type: float, default: 5}
       frac_val: {type: float, default: 0.2}
       length_delimiter: {type: float, default: 16384}
       learning_rate: {type: float, default: 1e-5}
       epochs: {type: float, default: 10}
-    command: "python src/fluotracify/training/train.py {batch_size} {frac_val} {length_delimiter} {learning_rate} {epochs}"
+      csv_path: {type: path, default: ~/Programme/Jupyter/DOKTOR/saves/firstartefact/subsample_rand/}
+    command: "python src/fluotracify/training/train.py {fluotracify_path} {batch_size} {frac_val} {length_delimiter} {learning_rate} {epochs} {csv_path}"
