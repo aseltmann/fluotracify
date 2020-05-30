@@ -3,29 +3,226 @@
 #+LANGUAGE: en
 #+PROPERTY: header-args :eval never-export :exports both
 #+OPTIONS: toc:3
+#+HTML_HEAD_EXTRA: <style type="text/css">.example {background-color: #FBFBBF;}</style>
+#+HTML_HEAD_EXTRA: <style type="text/css">pre.src-emacs-lisp {background-color: #F7ECFB;}</style>
+#+HTML_HEAD_EXTRA: <style type="text/css">pre.src-sh {background-color: #F0FBE9;}</style>
+#+HTML_HEAD_EXTRA: <style type="text/css">pre.src-tmux {background-color: #E1EED8;}</style>
+#+HTML_HEAD_EXTRA: <style type="text/css">pre.src-python {background-color: #E6EDF4;}</style>
+#+HTML_HEAD_EXTRA: <style type="text/css">pre.src-jupyter-python {background-color: #FAEAE1;}</style>
 
 * README
 ** General:
    - This file corresponds to my lab book for my doctoral thesis tackling
      artifact correction in Fluorescence Correlation Spectroscopy (FCS)
-     measurements using Deep Neural Networks
-   - It contains explanations of how things are organized, of the workflow for
-     doing experiments, changes made to the code, and the observed behavior in
-     the "* Data" section.
-   - The branching model used is described in [[http://starpu-simgrid.gforge.inria.fr/misc/SIGOPS_paper.pdf][this paper]]. Following this, if you
+     measurements using Deep Neural Networks. It also contains notes taken
+     during the process of setting up this workflow for reproducible research.
+   - This file contains explanations of how things are organized, of the
+     workflow for doing experiments, changes made to the code, and the observed
+     behavior in the "* Data" section.
+   - The branching model used is described in [[http://starpu-simgrid.gforge.inria.fr/misc/SIGOPS_paper.pdf][this paper]]. Therefore: if you
      are interested in the "* Data" section, you have to =git clone= the /data/
-     branch. The /master/ branch is clean from any results, it contains only
-     source code and the analysis.
+     branch of the repository. The /master/ branch is clean from any results, it
+     contains only source code and the analysis.
+   - This project is my take on [[https://en.wikipedia.org/wiki/Open-notebook_science][Open-notebook science]]. The idea was postulated in
+     a blog post in 2006:
+     #+BEGIN_QUOTE
+     ... there is a URL to a laboratory notebook that is freely available and
+     indexed on common search engines. It does not necessarily have to look like
+     a paper notebook but it is essential that all of the information available
+     to the researchers to make their conclusions is equally available to the
+     rest of the world ---Jean-Claude Bradley
+     #+END_QUOTE
+   - Proposal on how to deal with truly private data (e.g. notes from a
+     confidential meeting with a colleague), which might otherwise be noted in a
+     normal Lab notebook: do not include them here. Only notes relevant to the
+     current project should be taken
+** Code block languages used in this document
+
+   #+BEGIN_SRC sh
+     # This is a sh block for shell / bash scripting. In the context of this file,
+     # these blocks are mainly used for operations on my local computer.
+     # In the LabBook.html rendering of this document, these blocks will have a
+     # light green colour (#F0FBE9)
+   #+END_SRC
+
+   #+BEGIN_SRC tmux
+     # This block can open and access tmux sessions, used for shell scripting on
+     # remote computing clusters.
+     # In the LabBook.html rendering of this document, these blocks will have a
+     # distinct light green colour (#E1EED8)
+   #+END_SRC
+
+   #+BEGIN_SRC python
+     # This is a python block. In the context of this file, it is seldomly used
+     # (only for examplary scripts.)
+     # In the LabBook.html rendering of this document, these blocks will have a
+     # light blue colour (#E6EDF4)
+   #+END_SRC
+
+   #+BEGIN_SRC jupyter-python :session /jpy:localhost#8889:704d35be-572a-4268-a70b-565164b8620f
+     # This is a jupyter-python block. The code is sent to a jupyter kernel running
+     # on a remote high performance computing cluster. Most of my jupyter code is
+     # executed this way.
+     # In the LabBook.html rendering of this document, these blocks will have a
+     # light orange colour (#FAEAE1)
+   #+END_SRC
+
+   #+BEGIN_SRC emacs-lisp
+     ;; This is a emacs-lisp block, the language used to customize Emacs, which is
+     ;; sometimes necessary, since the reproducible workflow of this LabBook is
+     ;; tightly integrated with Emacs and org-mode.
+     ;; In the LabBook.html rendering of this document, these blocks will have a
+     ;; light violet colour (#F7ECFB)
+   #+END_SRC
+
+   #+begin_example
+     This is a literal example block. It can be used very flexibly - in the context
+     of this document the output of most code blocks is displayed this way.
+     In the LabBook.html rendering of this document, these blocks will have a light
+     yellow colour (#FBFBBF)
+   #+end_example
+
 ** Experiments workflow:
-   1) Create a new branch
-   2) Make sure everything is commited
-   3) ...
-   4) Do the analysis
-   5) Add to this file into "* Data" section the entry for the results, using
-      the template described below
+   1) Create a new branch from =master=
+   2) Print out the git log from the latest commit and the metadata
+   3) Call the analysis scripts, follow the principles outlined in
+      [[* Organization of code]]
+   4) All machine learning runs are saved in =data/mlruns=, all other data in
+      =data/#experiment-name=
+   5) Add a "** #experiment-name" section to this file under [[* Data]]
    6) Commit/push the results of this separate branch
-   7) Merge this new branch with the remote "data" branch
+   7) Merge this new branch with the remote =data= branch
 ** Example for experimental setup procedure
+
+*** Setting starting a jupyter kernel from a remote jupyter session using =emacs-jupyter= in =org babel=
+    :PROPERTIES:
+    :CUSTOM_ID: sec-jupyter-setup
+    :END:
+
+** tools used (notes)
+*** Emacs =magit=
+   - =gitflow-avh= (=magit-flow=) to follow the flow
+   - possibly https://github.com/magit/magit-annex for large files. Follow this:
+     https://git-annex.branchable.com/walkthrough/
+   - maybe check out git-toolbelt at some point
+     https://github.com/nvie/git-toolbelt#readme with
+     https://nvie.com/posts/git-power-tools/
+*** jupyter
+   - emacs jupyter for running and connecting to kernel on server:
+     https://github.com/dzop/emacs-jupyter
+   - if I actually still would use .ipynb files, these might come handy:
+     + jupytext: https://github.com/mwouts/jupytext
+     + nbstripout: https://github.com/kynan/nbstripout
+*** mlflow
+   - https://docs.faculty.ai/user-guide/experiments/index.html and
+     https://docs.microsoft.com/en-us/azure/databricks/_static/notebooks/hls-image-processing/02-image-segmentation-dl.html
+*** tensorflow
+   - https://www.tensorflow.org/tensorboard/image_summaries
+
+* Template for data entry and setup notes:
+** exp-#date-#title
+*** git:
+
+    #+begin_src sh
+    git log -1
+    #+end_src
+
+*** System Metadata:
+
+    #+NAME: jp-metadata
+    #+BEGIN_SRC jupyter-python :var _long="true"
+      import os
+      import pprint
+
+      ramlist = os.popen('free -th').readlines()[-1].split()[1:]
+
+      print('No of CPUs in system:', os.cpu_count())
+      print('No of CPUs the current process can use:',
+            len(os.sched_getaffinity(0)))
+      print('load average:', os.getloadavg())
+      print('os.uname(): ', os.uname())
+      print('PID of process:', os.getpid())
+      print('RAM total: {}, RAM used: {}, RAM free: {}'.format(
+          ramlist[0], ramlist[1], ramlist[2]))
+
+      !echo the current directory: $PWD
+      !echo My disk usage:
+      !df -h
+      if _long:
+          !conda list
+          pprint.pprint(dict(os.environ), sort_dicts=False)
+
+    #+END_SRC
+
+*** Tmux setup and scripts
+    :PROPERTIES:
+    :CUSTOM_ID: scripts-tmux
+    :END:
+
+    #+NAME: setup-tmux
+    #+BEGIN_SRC sh :session local
+    rm ~/.tmux-local-socket-remote-machine
+    REMOTE_SOCKET=$(ssh ara 'tmux ls -F "#{socket_path}"' | head -1)
+    echo $REMOTE_SOCKET
+    ssh ara -tfN \
+        -L ~/.tmux-local-socket-remote-machine:$REMOTE_SOCKET
+    #+END_SRC
+
+    #+RESULTS: setup-tmux
+    | rm:                                  | cannot                               | remove    | '/home/lex/.tmux-local-socket-remote-machine': | No | such | file | or | directory |
+    | ye53nis@ara-login01.rz.uni-jena.de's | password:                            |           |                                                |    |      |      |    |           |
+    | /tmp/tmux-67339/default              |                                      |           |                                                |    |      |      |    |           |
+    | >                                    | ye53nis@ara-login01.rz.uni-jena.de's | password: |                                                |    |      |      |    |           |
+
+*** SSH tunneling
+    :PROPERTIES:
+    :CUSTOM_ID: ssh-tunneling
+    :END:
+
+    Different applications can be run on the remote compute node. If I want to
+    access them at the local machine, and open them with the browser, I use this
+    tunneling script.
+
+    #+NAME: ssh-tunnel
+    #+BEGIN_SRC sh :session org-tunnel :var port="8889" :var node="node001"
+    ssh -t -t ara -L $port:localhost:$port ssh $node -L $port:Localhost:$port
+    #+END_SRC
+
+    Apps I use that way:
+    - Jupyter lab for running Python 3-Kernels
+    - TensorBoard
+    - Mlflow ui
+
+*** jupyter scripts
+    :PROPERTIES:
+    :CUSTOM_ID: scripts-jp
+    :END:
+
+    Starting a jupyter instance on a server where the necessary libraries are
+    installed is easy using this script:
+
+    #+NAME: jpt-tmux
+    #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine
+    conda activate tensorflow_nightly
+    export PORT=8889
+    export XDG_RUNTIME_DIR=''
+    export XDG_RUNTIME_DIR=""
+    jupyter lab --no-browser --port=$PORT
+    #+END_SRC
+
+    On the compute node of the HPC, the users' environment is managed through
+    module files using the system [[https://lmod.readthedocs.io][Lmod]]. The =export XDG_RUNTIME_DIR= statements
+    are needed because of a jupyter bug which did not let it start. Right now,
+    =ob-tmux= does not support a =:var= header like normal =org-babel= does. So
+    the =$port= variable has to be set here in the template.
+
+    Now this port has to be tunnelled on our local computer (See
+    [[#ssh-tunneling]]). While the tmux session above keeps running, no matter if
+    Emacs is running or not, this following ssh tunnel needs to be active
+    locally to connect to the notebook. If you close Emacs, it would need to be
+    reestablished (see [[* Reconnect]])
+
+** Setup notes
 *** Setting up a tmux connection from using =ob-tmux= in =org-babel=
     :PROPERTIES:
     :CUSTOM_ID: sec-tmux-setup
@@ -77,189 +274,49 @@
       =#+begin_example=-Block below the tmux block by pressing =C-c C-o= or =C-c
       C-v C-o= when the pointer is inside the tmux block.
 
-*** Setting starting a jupyter kernel from a remote jupyter session using =emacs-jupyter= in =org babel=
-    :PROPERTIES:
-    :CUSTOM_ID: sec-jupyter-setup
-    :END:
+*** =emacs-jupyter= Setup
 
-    1. =M-x jupyter-server-list-kernels=
-       1. set server URL, e.g. =http://localhost:8889=
-       2. set websocket URL, e.g. =http://localhost:8889=
-    2. two possibilities
-       1. kernel already exists $\to$ list of kernels and =kernel-ID= is displayed
-       2. kernel does not exist $\to$ prompt asks if you want to start one $\to$
-          *yes* $\to$ type kernel you want to start, e.g. =Python 3=
-    3. In subtree where you want to use =jupyter-python= blocks with =org
+    =Emacs-jupyter= aims to be an API for a lot of functionalities of the
+    =jupyter= project. The documentation can be found on [[https://github.com/dzop/emacs-jupyter][GitHub]].
+
+    1. For the *whole document*: connect ot a running jupyter instance
+       1. =M-x jupyter-server-list-kernels=
+          1. set server URL, e.g. =http://localhost:8889=
+          2. set websocket URL, e.g. =http://localhost:8889=
+       2. two possibilities
+          1. kernel already exists $\to$ list of kernels and =kernel-ID= is displayed
+          2. kernel does not exist $\to$ prompt asks if you want to start one $\to$
+             *yes* $\to$ type kernel you want to start, e.g. =Python 3=
+    2. In the *subtree* where you want to use =jupyter-python= blocks with =org
        babel=
        1. set the =:header-args:jupyter-python :session
           /jpy:localhost#kernel:8889-ID=
-       2. We can customize the output folder using the following variable:
+       2. customize the output folder using the following org-mode variable:
           #+BEGIN_SRC  emacs-lisp
-            (setq org-babel-jupyter-resource-directory "./data/exp-test/figures-jupyter")
+            (setq org-babel-jupyter-resource-directory "./data/exp-test/plots")
           #+END_SRC
 
           #+RESULTS:
-          : ./data/exp-test/figures-jupyter
-
-** tools used (notes)
-*** Emacs =magit=
-   - =gitflow-avh= (=magit-flow=) to follow the flow
-   - possibly https://github.com/magit/magit-annex for large files. Follow this:
-     https://git-annex.branchable.com/walkthrough/
-   - maybe check out git-toolbelt at some point
-     https://github.com/nvie/git-toolbelt#readme with
-     https://nvie.com/posts/git-power-tools/
-*** jupyter
-   - emacs jupyter for running and connecting to kernel on server:
-     https://github.com/dzop/emacs-jupyter
-   - if I actually still would use .ipynb files, these might come handy:
-     + jupytext: https://github.com/mwouts/jupytext
-     + nbstripout: https://github.com/kynan/nbstripout
-*** mlflow
-   - https://docs.faculty.ai/user-guide/experiments/index.html and
-     https://docs.microsoft.com/en-us/azure/databricks/_static/notebooks/hls-image-processing/02-image-segmentation-dl.html
-*** tensorflow
-   - https://www.tensorflow.org/tensorboard/image_summaries
-
-** Example for ...
-* Template for data entry:
-** exp-#date-#title
-*** git:
-#+begin_src sh
-git log -1
-#+end_src
-
-*** System Metadata:
-#+NAME: jupyter-python-metadata
-#+BEGIN_SRC jupyter-python :var conda_list="true"
-  import os
-
-  ramlist = os.popen('free -th').readlines()[-1].split()[1:]
-
-  print('No of CPUs in system:', os.cpu_count())
-  print('No of CPUs the current process can use:',
-        len(os.sched_getaffinity(0)))
-  print('load average:', os.getloadavg())
-  print(os.uname())
-  print('PID of process:', os.getpid())
-  print('RAM total: {}, RAM used: {}, RAM free: {}'.format(
-      ramlist[0], ramlist[1], ramlist[2]))
-
-  !echo the current directory: $PWD
-  !echo My disk usage:
-  !df -h
-  if conda_list:
-      !conda list
-#+END_SRC
-
-**** TODO Add =os.environ=
-*** Tmux setup and scripts
-    :PROPERTIES:
-    :CUSTOM_ID: scripts-tmux
-    :END:
-#+NAME: setup-tmux
-#+BEGIN_SRC sh :session local
-rm ~/.tmux-local-socket-remote-machine
-REMOTE_SOCKET=$(ssh ara 'tmux ls -F "#{socket_path}"' | head -1)
-echo $REMOTE_SOCKET
-ssh ara -tfN \
-    -L ~/.tmux-local-socket-remote-machine:$REMOTE_SOCKET
-#+END_SRC
-
-#+RESULTS: setup-tmux
-| rm:                                  | cannot                               | remove    | '/home/lex/.tmux-local-socket-remote-machine': | No | such | file | or | directory |
-| ye53nis@ara-login01.rz.uni-jena.de's | password:                            |           |                                                |    |      |      |    |           |
-| /tmp/tmux-67339/default              |                                      |           |                                                |    |      |      |    |           |
-| >                                    | ye53nis@ara-login01.rz.uni-jena.de's | password: |                                                |    |      |      |    |           |
-
-A script which allows to print the output from the tmux session
-in an =#+begin_example=-Block below the tmux block by pressing =C-c C-o= or =C-c
-C-v C-o= when the pointer is inside the tmux block. See [[https://github.com/ahendriksen/ob-tmux/issues/6#issuecomment-613914400][here]].
-
-#+BEGIN_SRC emacs-lisp
-  (defun ob-tmux--insert-result ()
-    (interactive)
-    (let ((info (org-babel-get-src-block-info 'light)))
-      (when (and info (string-equal "tmux" (nth 0 info)))
-        (let* ((params (nth 2 info))
-               (org-session (cdr (assq :session params)))
-               (socket (cdr (assq :socket params)))
-               (socket (when socket (expand-file-name socket)))
-               (ob-session (ob-tmux--from-org-session org-session socket)))
-          (org-babel-insert-result
-               (ob-tmux--execute-string ob-session
-                                        "capture-pane"
-                                        "-p" ;; print to stdout
-                                        "-S" "-" ;; start at beginning of history
-                                        "-t" (ob-tmux--session ob-session))
-               '("replace"))))))
-
-  (defun ob-tmux--edit-result ()
-    (interactive)
-    (pcase (org-babel-get-src-block-info 'light)
-      (`(,_ ,_ ,arguments ,_ ,_ ,start ,_)
-       (save-excursion
-         ;; Go to the results, if there aren't any then run the block.
-         (goto-char start)
-         (goto-char (or (org-babel-where-is-src-block-result)
-                        (progn (org-babel-execute-src-block)
-                               (org-babel-where-is-src-block-result))))
-         (end-of-line)
-         (skip-chars-forward " \r\t\n")
-         (org-edit-special)
-         (delete-trailing-whitespace)
-         (end-of-buffer)
-         t))
-      (_ nil)))
-
-  (defun ob-tmux--open-src-block-result (orig-fun &rest args)
-    (let ((info (org-babel-get-src-block-info 'light)))
-      (if (and info (string-equal "tmux" (nth 0 info)))
-          (progn
-            (ob-tmux--insert-result)
-            (ob-tmux--edit-result))
-        (apply orig-fun args))))
-
-  (advice-add 'org-babel-open-src-block-result
-                 :around #'ob-tmux--open-src-block-result)
-#+END_SRC
-
-#+RESULTS:
-
-*** jupyter setup and ssh tunneling
-
-On the compute node of the HPC, the users' environment is managed through module
-files using the system [[https://lmod.readthedocs.io][Lmod]]. The =export XDG_RUNTIME_DIR= statements are needed
-because of a jupyter bug which did not let it start. Right now, =ob-tmux= does
-not support a =:var= header like normal =org-babel= does. So the =$port=
-variable has to be set before calling a block similar to this one:
-
-#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine
-export PORT=8889
-#+END_SRC
-
-Then call:
-
-#+NAME: jpt-tmux
-#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine
-module load tools/python/3.7
-export XDG_RUNTIME_DIR=''
-export XDG_RUNTIME_DIR=""
-jupyter notebook --no-browser --port=$PORT
-#+END_SRC
-
-Now this port has to be tunnelled on our local computer. While the tmux session
-above keeps running, no matter if Emacs is running or not, this following ssh
-tunnel needs to be active locally to connect to the notebook. If Emacs crashes,
-it would need to be reestablished.
-
-#+NAME: jpt-tunnel
-#+BEGIN_SRC sh :session org-tunnel :var port="8889" :var node="node001"
-ssh -t -t ara -L $port:localhost:$port ssh $node -L $port:Localhost:$port
-#+END_SRC
-
-*** Notes:
-    ######################
+          : ./data/exp-test/plots
+    3. For each *individual block*, the following customizations might be useful
+       1. jupyter kernels can return multiple kinds of rich output (images,
+          html, ...) or scalar data (plain text, numbers, lists, ...). To force
+          a plain output, use =:results scalar=
+       2. to change the priority of different rich outputs, use =:display=
+          header argument, e.g. =:display text/plain text/html= prioritizes
+          plain text over html. All supported mimetypes in default order:
+          1. text/org
+          2. image/svg+xml, image/jpeg, image/png
+          3. text/html
+          4. text/markdown
+          5. text/latex
+          6. text/plain
+       3. We can set jupyter to output pandas DataFrames as org tables
+          automatically using the source block header argument =:pandoc t=
+       4. useful keybindings
+          - =M-i= to open the documentation for wherever your pointer is (like
+            pressing =Shift-TAB= in Jupyter notebooks)
+          - =C-c C-i= to interrupt the kernel, =C-c C-r= to restart the kernel
 
 * Organization of git
 ** remote/origin/master branch:
@@ -271,12 +328,13 @@ ssh -t -t ara -L $port:localhost:$port ssh $node -L $port:Localhost:$port
     features. Day-to-day changes in code
 ** remote/origin/exp### branches:
   - if an experiment is done, the code and templates will be branched out from
-    *master* in an *exp###* branch, ### meaning some meaningful descriptor.
+    *master* in an *#experiment-name* branch, ### meaning some meaningful
+    descriptor.
   - all data generated during the experiment (e.g. .csv files, plots, images,
-    etc), is stored in a folder with the name **data/exp-###**, except machine
-    learning-specific data and metadata from `mlflow` runs, which are saved
-    under **data/mlruns** (this allows easily comparing machine learning runs
-    with different experimental settings)
+    etc), is stored in a folder with the name **data/#experiment-name**, except
+    machine learning-specific data and metadata from `mlflow` runs, which are
+    saved under **data/mlruns** (this allows easily comparing machine learning
+    runs with different experimental settings)
   - The **LabBook.org** file is essential
     - If possible, all code is executed from inside this file (meaning analysis
       scripts or calling the code from the **scr/** directory).
@@ -289,9 +347,9 @@ ssh -t -t ara -L $port:localhost:$port ssh $node -L $port:Localhost:$port
     All of my current activity can be followed here.
 ** remote/origin/data branch:
   - contains a full cronicle of the whole research process
-  - all *exp###* branches are merged here. Afterwards the original branch is
-    deleted and on the data branch there is a *Git tag* which shows the merge
-    commit to make accessing single experiments easy.
+  - all *#experiment-name* branches are merged here. Afterwards the original
+    branch is deleted and on the data branch there is a *Git tag* which shows
+    the merge commit to make accessing single experiments easy.
   - the *develop* branch is merged here as well.
 
 ** Git TAGs
@@ -326,6 +384,19 @@ ssh -t -t ara -L $port:localhost:$port ssh $node -L $port:Localhost:$port
 
 * Changes in this repository (without "* Data" in this file)
 ** Changes in LabBook.org (without "* Data")
+*** 2020-05-31
+    - extend general documentation in README
+    - Add code block examples
+    - extend documentation on experiment workflow
+    - move setup notes from README to "Template for data entry and setup notes"
+    - remove emacs-lisp code for custom tmux block functions (not relevant
+      enough)
+    - change named "jpt-tmux" from starting a jupyter notebook to starting
+      jupyter lab. Load a conda environment instead of using Lmod's =module
+      load=
+*** 2020-05-07
+    - extend documentation on git model
+    - extend documentation on jupyter setup
 *** 2020-04-22
     - added parts of README which describe the experimental process
     - added templates for system metadata, tmux, jupyter setup
