@@ -32,11 +32,13 @@ if __name__ == "__main__":
     STEPS_PER_EPOCH = int(sys.argv[8]) if len(sys.argv) > 8 else 10
     VALIDATION_STEPS = int(sys.argv[9]) if len(sys.argv) > 9 else 10
     LOG_DIR_TB = "/tmp/tb"
+    LABEL_THRESH = 0.04
     # FIXME (PENDING): at some point, I want to plot metrics vs thresholds
     # from TF side, this is possible by providing the `thresholds`
     # argument as a list of thresholds
     # but currently, mlflow does not support logging lists
     METRICS_THRESHOLDS = 0.5
+    EXP_PARAM_PATH = '/tmp/experiment_params.csv'
 
     train, test, nsamples, experiment_params = isfc.import_from_csv(
         path=CSV_PATH,
@@ -44,7 +46,9 @@ if __name__ == "__main__":
         frac_train=0.8,
         col_per_example=2,
         dropindex=None,
-        dropcolumns='Unnamed: 200')
+        dropcolumns=None)
+
+    experiment_params.to_csv(EXP_PARAM_PATH)
 
     train_data, train_labels = isfc.separate_data_and_labels(array=train,
                                                              nsamples=nsamples)
@@ -52,9 +56,9 @@ if __name__ == "__main__":
                                                            nsamples=nsamples)
 
     # get bool as ground truth
-    train_labels_bool = train_labels > 0.04
+    train_labels_bool = train_labels > LABEL_THRESH
 
-    test_labels_bool = test_labels > 0.04
+    test_labels_bool = test_labels > LABEL_THRESH
     print('\nfor each 20,000 timestap trace there are the following numbers '
           'of corrupted timesteps:\n', test_labels_bool.sum(axis=0).head())
 
@@ -120,13 +124,16 @@ if __name__ == "__main__":
           as output (float)
         """
         learning_rate = 0.2
-        if epoch > 1:
+        if epoch > 10:
             learning_rate = 0.02
-        if epoch > 3:
+        if epoch > 20:
             learning_rate = 0.01
-        if epoch > 5:
+        if epoch > 40:
             learning_rate = 0.001
-
+        if epoch > 60:
+            learning_rate = 0.0001
+        if epoch > 80:
+            learning_rate = 0.00001
         # log in tensorflow
         tf.summary.scalar('learning rate', data=learning_rate, step=epoch)
         # log in mlflow
@@ -170,3 +177,8 @@ if __name__ == "__main__":
         conda_env=mlflow.keras.get_default_conda_env(keras_module=tf.keras),
         custom_objects={'binary_ce_dice': bm.binary_ce_dice_loss()},
         keras_module=tf.keras)
+
+    mlflow.log_artifact(EXP_PARAM_PATH)
+    mlflow.log_params({'num_train_examples': num_train_examples,
+                       'num_val_examples': num_val_examples,
+                       'num_test_examples': num_test_examples})
