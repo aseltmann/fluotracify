@@ -404,3 +404,242 @@
 *** 2020-03-30
     - set up lab book and form git repo accoring to setup by Luka Stanisic et al
 ** Changes in src/fluotracify
+* Data
+** exp-310520-unet
+
+*** Connect
+
+**** Tmux on Ara
+#+CALL: setup-tmux[:session local]
+
+#+RESULTS:
+| sh-5.0$ | ye53nis@ara-login01.rz.uni-jena.de's | password: |
+| >       | ye53nis@ara-login01.rz.uni-jena.de's | password: |
+
+Test:
+
+#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
+  pwd
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+  (tensorflow_nightly) [ye53nis@login01 drmed-git]$ pwd
+  /beegfs/ye53nis/drmed-git
+#+end_example
+
+#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
+  pwd
+#+END_SRC
+
+**** Compute node for script execution
+#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
+  srun -p s_standard --time=7-10:00:00 --ntasks-per-node=24 --mem-per-cpu=2000 --pty bash
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+  (base) [ye53nis@node171 drmed-git]$
+#+end_example
+
+**** Jupyter on Ara
+   :PROPERTIES:
+   :header-args:jupyter-python: :session /jpy:localhost#8889:749074c4-797a-4e72-957c-f87331800ef8
+   :END:
+
+1. Request compute node via tmux
+   #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session jpmux
+     srun -p s_standard --time=7-10:00:00 --ntasks-per-node=24 --mem-per-cpu=2000 --pty bash
+   #+END_SRC
+2.
+#+CALL: jpt-tmux[:session jpmux]
+
+#+RESULTS:
+#+begin_example
+  (tensorflow_nightly) [ye53nis@node146 drmed-git]$ jupyter lab --no-browser --port=$PORT
+  [I 21:44:33.348 LabApp] JupyterLab extension loaded from /home/ye53nis/.conda/envs/tensorflow_nightly/lib/python3.8/site-packages/jupyterlab
+  [I 21:44:33.348 LabApp] JupyterLab application directory is /home/ye53nis/.conda/envs/tensorflow_nightly/share/jupyter/lab
+  [I 21:44:33.353 LabApp] Serving notebooks from local directory: /beegfs/ye53nis/drmed-git
+  [I 21:44:33.353 LabApp] The Jupyter Notebook is running at:
+  [I 21:44:33.353 LabApp] http://localhost:8889/?token=baceda81f9f1b1ef453aef855e00bc58c338ac8f2efcbf00
+  [I 21:44:33.353 LabApp]  or http://127.0.0.1:8889/?token=baceda81f9f1b1ef453aef855e00bc58c338ac8f2efcbf00
+  [I 21:44:33.353 LabApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+  [C 21:44:33.668 LabApp]
+
+      To access the notebook, open this file in a browser:
+          file:///home/ye53nis/.local/share/jupyter/runtime/nbserver-442384-open.html
+      Or copy and paste one of these URLs:
+          http://localhost:8889/?token=baceda81f9f1b1ef453aef855e00bc58c338ac8f2efcbf00
+       or http://127.0.0.1:8889/?token=baceda81f9f1b1ef453aef855e00bc58c338ac8f2efcbf00
+#+end_example
+
+#+CALL: ssh-tunnel(port="8889", node="node146")
+
+#+RESULTS:
+| sh-5.0$           | ye53nis@ara-login01.rz.uni-jena.de's | password: |     |    |          |      |      |             |
+| ye53nis@node146's | password:                            |           |     |    |          |      |      |             |
+| Last              | login:                               | Mon       | May | 25 | 13:42:48 | 2020 | from | login01.ara |
+
+I started a Python3 kernel using =jupyter-server-list-kernels=. Then I added the
+kernel ID to the =:PROPERTIES:= drawer of this (and following) subtrees.
+
+#+begin_example
+python3           749074c4-797a-4e72-957c-f87331800ef8   a few seconds ago    starting   0
+#+end_example
+
+Test:
+
+#+CALL: jp-metadata(_long='True)
+
+#+RESULTS:
+#+begin_example
+  No of CPUs in system: 72
+  No of CPUs the current process can use: 24
+  load average: (43.52, 43.44, 43.4)
+  os.uname():  posix.uname_result(sysname='Linux', nodename='node171', release='3.10.0-957.1.3.el7.x86_64', version='#1 SMP Thu Nov 29 14:49:43 UTC 2018', machine='x86_64')
+  PID of process: 143415
+  RAM total: 199G, RAM used: 37G, RAM free: 62G
+  the current directory: /home/ye53nis
+  My disk usage:
+  Filesystem           Size  Used Avail Use% Mounted on
+  /dev/sda1             50G  3.2G   47G   7% /
+  devtmpfs              94G     0   94G   0% /dev
+  tmpfs                 94G  751M   94G   1% /dev/shm
+  tmpfs                 94G  219M   94G   1% /run
+  tmpfs                 94G     0   94G   0% /sys/fs/cgroup
+  nfs01-ib:/cluster    2.0T  316G  1.7T  16% /cluster
+  nfs02-ib:/data01      88T   60T   29T  68% /data01
+  nfs03-ib:/pool/work  100T   79T   22T  79% /nfsdata
+  nfs01-ib:/home        80T   59T   22T  74% /home
+  /dev/sda5            2.0G   83M  2.0G   5% /tmp
+  /dev/sda3            6.0G  402M  5.6G   7% /var
+  /dev/sda6            169G   57M  169G   1% /local
+  beegfs_nodev         524T  442T   83T  85% /beegfs
+  tmpfs                 19G     0   19G   0% /run/user/68191
+  tmpfs                 19G     0   19G   0% /run/user/67339
+  /bin/sh: conda: command not found
+  {'SLURM_CHECKPOINT_IMAGE_DIR': '/var/slurm/checkpoint',
+   'SLURM_NODELIST': 'node171',
+   'SLURM_JOB_NAME': 'bash',
+   'XDG_SESSION_ID': '8541',
+   'SLURMD_NODENAME': 'node171',
+   'SLURM_TOPOLOGY_ADDR': 'node171',
+   'SLURM_NTASKS_PER_NODE': '24',
+   'HOSTNAME': 'login01',
+   'SLURM_PRIO_PROCESS': '0',
+   'SLURM_SRUN_COMM_PORT': '45585',
+   'SHELL': '/bin/bash',
+   'TERM': 'xterm-color',
+   'SLURM_JOB_QOS': 'qstand',
+   'SLURM_PTY_WIN_ROW': '24',
+   'HISTSIZE': '1000',
+   'TMPDIR': '/tmp',
+   'SLURM_TOPOLOGY_ADDR_PATTERN': 'node',
+   'SSH_CLIENT': '10.231.190.186 48592 22',
+   'CONDA_SHLVL': '2',
+   'CONDA_PROMPT_MODIFIER': '(tensorflow_nightly) ',
+   'GSETTINGS_SCHEMA_DIR_CONDA_BACKUP': '',
+   'WINDOWID': '0',
+   'QTDIR': '/usr/lib64/qt-3.3',
+   'QTINC': '/usr/lib64/qt-3.3/include',
+   'SSH_TTY': '/dev/pts/57',
+   'QT_GRAPHICSSYSTEM_CHECKED': '1',
+   'SLURM_NNODES': '1',
+   'USER': 'ye53nis',
+   'http_proxy': 'http://internet4nzm.rz.uni-jena.de:3128',
+   'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=01;05;37;41:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.axv=01;35:*.anx=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=01;36:*.au=01;36:*.flac=01;36:*.mid=01;36:*.midi=01;36:*.mka=01;36:*.mp3=01;36:*.mpc=01;36:*.ogg=01;36:*.ra=01;36:*.wav=01;36:*.axa=01;36:*.oga=01;36:*.spx=01;36:*.xspf=01;36:',
+   'CONDA_EXE': '/cluster/miniconda3/bin/conda',
+   'SLURM_STEP_NUM_NODES': '1',
+   'SLURM_JOBID': '386457',
+   'SRUN_DEBUG': '3',
+   'SLURM_NTASKS': '24',
+   'SLURM_LAUNCH_NODE_IPADDR': '192.168.192.5',
+   'SLURM_STEP_ID': '0',
+   'TMUX': '/tmp/tmux-67339/default,47311,2',
+   '_CE_CONDA': '',
+   'CONDA_PREFIX_1': '/cluster/miniconda3',
+   'SLURM_STEP_LAUNCHER_PORT': '45585',
+   'SLURM_TASKS_PER_NODE': '24',
+   'MAIL': '/var/spool/mail/ye53nis',
+   'PATH': '/home/ye53nis/.conda/envs/tensorflow_nightly/bin:/home/lex/Programme/miniconda3/envs/tensorflow_env/bin:/home/lex/Programme/miniconda3/condabin:/home/lex/.local/bin:/bin:/usr/bin:/usr/local/bin:/usr/local/sbin:/usr/lib/jvm/default/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/var/lib/snapd/snap/bin:/home/lex/Programme/miniconda3/bin:/usr/sbin:/home/ye53nis/.local/bin:/home/ye53nis/bin',
+   'GSETTINGS_SCHEMA_DIR': '/home/ye53nis/.conda/envs/tensorflow_nightly/share/glib-2.0/schemas',
+   'SLURM_WORKING_CLUSTER': 'hpc:192.168.192.1:6817:8448',
+   'SLURM_JOB_ID': '386457',
+   'CONDA_PREFIX': '/home/ye53nis/.conda/envs/tensorflow_nightly',
+   'SLURM_JOB_USER': 'ye53nis',
+   'SLURM_STEPID': '0',
+   'PWD': '/home/ye53nis',
+   'SLURM_SRUN_COMM_HOST': '192.168.192.5',
+   'LANG': 'en_US.UTF-8',
+   'SLURM_PTY_WIN_COL': '80',
+   'SLURM_UMASK': '0022',
+   'MODULEPATH': '/usr/share/Modules/modulefiles:/etc/modulefiles:/cluster/modulefiles',
+   'SLURM_JOB_UID': '67339',
+   'LOADEDMODULES': '',
+   'SLURM_NODEID': '0',
+   'TMUX_PANE': '%2',
+   'SLURM_SUBMIT_DIR': '/home/ye53nis',
+   'SLURM_TASK_PID': '416264',
+   'SLURM_NPROCS': '24',
+   'SLURM_CPUS_ON_NODE': '24',
+   'SLURM_DISTRIBUTION': 'block',
+   'https_proxy': 'https://internet4nzm.rz.uni-jena.de:3128',
+   'SLURM_PROCID': '0',
+   'HISTCONTROL': 'ignoredups',
+   '_CE_M': '',
+   'SLURM_JOB_NODELIST': 'node171',
+   'SLURM_PTY_PORT': '37693',
+   'HOME': '/home/ye53nis',
+   'SHLVL': '3',
+   'SLURM_LOCALID': '0',
+   'SLURM_JOB_GID': '13280',
+   'SLURM_JOB_CPUS_PER_NODE': '24',
+   'SLURM_CLUSTER_NAME': 'hpc',
+   'SLURM_GTIDS': '0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23',
+   'SLURM_SUBMIT_HOST': 'login01',
+   'SLURM_JOB_PARTITION': 's_standard',
+   'MATHEMATICA_HOME': '/cluster/apps/mathematica/11.3',
+   'CONDA_PYTHON_EXE': '/cluster/miniconda3/bin/python',
+   'LOGNAME': 'ye53nis',
+   'SLURM_STEP_NUM_TASKS': '24',
+   'QTLIB': '/usr/lib64/qt-3.3/lib',
+   'SLURM_JOB_ACCOUNT': 'iaob',
+   'SLURM_JOB_NUM_NODES': '1',
+   'MODULESHOME': '/usr/share/Modules',
+   'CONDA_DEFAULT_ENV': 'tensorflow_nightly',
+   'LESSOPEN': '||/usr/bin/lesspipe.sh %s',
+   'SLURM_STEP_TASKS_PER_NODE': '24',
+   'PORT': '8889',
+   'SLURM_STEP_NODELIST': 'node171',
+   'DISPLAY': ':0',
+   'XDG_RUNTIME_DIR': '',
+   'XAUTHORITY': '/tmp/xauth-1000-_0',
+   'BASH_FUNC_module()': '() {  eval `/usr/bin/modulecmd bash $*`\n}',
+   '_': '/home/ye53nis/.conda/envs/tensorflow_nightly/bin/jupyter',
+   'KERNEL_LAUNCH_TIMEOUT': '40',
+   'JPY_PARENT_PID': '417110',
+   'CLICOLOR': '1',
+   'PAGER': 'cat',
+   'GIT_PAGER': 'cat',
+   'MPLBACKEND': 'module://ipykernel.pylab.backend_inline'}
+
+  os.environ
+   None
+#+end_example
+**** Tensorboard tunnel, Mlflow ui tunnel
+#+CALL: ssh-tunnel[:session local](port="6006", node="node146")
+
+#+RESULTS:
+| sh-5.0$           | ye53nis@ara-login01.rz.uni-jena.de's | password: |     |    |          |      |      |             |
+| ye53nis@node146's | password:                            |           |     |    |          |      |      |             |
+| Last              | login:                               | Mon       | May | 25 | 13:13:33 | 2020 | from | login01.ara |
+*** git
+
+    #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
+    git status
+    git log -1
+    #+END_SRC
+
+    #+RESULTS:
+    #+begin_example
+    #+end_example
