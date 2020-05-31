@@ -128,10 +128,10 @@ if __name__ == "__main__":
             learning_rate = 0.02
         if epoch > 20:
             learning_rate = 0.01
-        if epoch > 40:
+        if epoch > 30:
             learning_rate = 0.001
-        if epoch > 60:
-            learning_rate = 0.0001
+        if epoch > 50:
+            learning_rate = 0.00001
         if epoch > 80:
             learning_rate = 0.00001
         # log in tensorflow
