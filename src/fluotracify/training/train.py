@@ -46,7 +46,7 @@ if __name__ == "__main__":
         frac_train=0.8,
         col_per_example=2,
         dropindex=None,
-        dropcolumns=None)
+        dropcolumns='Unnamed: 200')
 
     experiment_params.to_csv(EXP_PARAM_PATH)
 
