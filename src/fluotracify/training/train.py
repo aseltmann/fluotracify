@@ -29,6 +29,8 @@ if __name__ == "__main__":
     LEARNING_RATE = sys.argv[5] if len(sys.argv) > 5 else 1e-5
     EPOCHS = int(sys.argv[6]) if len(sys.argv) > 6 else 10
     CSV_PATH = sys.argv[7] if len(sys.argv) > 7 else '/home/lex/Programme/Jupyter/DOKTOR/saves/firstartefact/subsample_rand/'
+    STEPS_PER_EPOCH = int(sys.argv[8]) if len(sys.argv) > 8 else 10
+    VALIDATION_STEPS = int(sys.argv[9]) if len(sys.argv) > 9 else 10
     LOG_DIR_TB = "/tmp/tb"
     # FIXME (PENDING): at some point, I want to plot metrics vs thresholds
     # from TF side, this is possible by providing the `thresholds`
@@ -154,11 +156,9 @@ if __name__ == "__main__":
 
     model.fit(x=dataset_train,
               epochs=EPOCHS,
-              steps_per_epoch=int(
-                  tf.math.ceil(num_train_examples / BATCH_SIZE).numpy()),
+              steps_per_epoch=STEPS_PER_EPOCH,
               validation_data=dataset_val,
-              validation_steps=int(
-                  tf.math.ceil(num_val_examples / BATCH_SIZE).numpy()),
+              validation_steps=VALIDATION_STEPS,
               callbacks=[tensorboard_callback, image_callback, lr_callback])
 
     model.evaluate(dataset_test,
