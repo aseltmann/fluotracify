@@ -444,47 +444,55 @@ Test:
 
 **** Jupyter on Ara
    :PROPERTIES:
-   :header-args:jupyter-python: :session /jpy:localhost#8889:749074c4-797a-4e72-957c-f87331800ef8
+   :header-args:jupyter-python: :session /jpy:localhost#8889:7fe3d66b-d802-4f0f-b105-9536a917b816
    :END:
 
 1. Request compute node via tmux
    #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session jpmux
      srun -p s_standard --time=7-10:00:00 --ntasks-per-node=24 --mem-per-cpu=2000 --pty bash
    #+END_SRC
-2.
-#+CALL: jpt-tmux[:session jpmux]
+
+   #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session jpmux
+     cd /home/ye53nis/DOKTOR
+   #+END_SRC
+
+2. Start Jupyter Lab
+   #+CALL: jpt-tmux[:session jpmux]
+
+   #+RESULTS:
+   #+begin_example
+     (tensorflow_nightly) [ye53nis@node218 DOKTOR]$ jupyter lab --no-browser --port=$PORT
+     [I 12:37:59.396 LabApp] JupyterLab extension loaded from /home/ye53nis/.conda/envs/tensorflow_nightly/lib/python3.8/site-packages/jupyterlab
+     [I 12:37:59.397 LabApp] JupyterLab application directory is /home/ye53nis/.conda/envs/tensorflow_nightly/share/jupyter/lab
+     [I 12:37:59.400 LabApp] Serving notebooks from local directory: /home/ye53nis/DOKTOR
+     [I 12:37:59.401 LabApp] The Jupyter Notebook is running at:
+     [I 12:37:59.401 LabApp] http://localhost:8889/?token=557514d363cb49a7120cc235008392a0d7e7bbe7e50fd3d7
+     [I 12:37:59.401 LabApp]  or http://127.0.0.1:8889/?token=557514d363cb49a7120cc235008392a0d7e7bbe7e50fd3d7
+     [I 12:37:59.401 LabApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+     [C 12:37:59.408 LabApp]
+
+         To access the notebook, open this file in a browser:
+             file:///home/ye53nis/.local/share/jupyter/runtime/nbserver-7566-open.html
+         Or copy and paste one of these URLs:
+             http://localhost:8889/?token=557514d363cb49a7120cc235008392a0d7e7bbe7e50fd3d7
+          or http://127.0.0.1:8889/?token=557514d363cb49a7120cc235008392a0d7e7bbe7e50fd3d7
+     TermSocket.open: 1
+     [I 12:38:06.159 LabApp] New terminal with specified name: 1
+     TermSocket.open: Opened 1
+   #+end_example
+
+#+CALL: ssh-tunnel(port="8889", node="node218")
 
 #+RESULTS:
-#+begin_example
-  (tensorflow_nightly) [ye53nis@node146 drmed-git]$ jupyter lab --no-browser --port=$PORT
-  [I 21:44:33.348 LabApp] JupyterLab extension loaded from /home/ye53nis/.conda/envs/tensorflow_nightly/lib/python3.8/site-packages/jupyterlab
-  [I 21:44:33.348 LabApp] JupyterLab application directory is /home/ye53nis/.conda/envs/tensorflow_nightly/share/jupyter/lab
-  [I 21:44:33.353 LabApp] Serving notebooks from local directory: /beegfs/ye53nis/drmed-git
-  [I 21:44:33.353 LabApp] The Jupyter Notebook is running at:
-  [I 21:44:33.353 LabApp] http://localhost:8889/?token=baceda81f9f1b1ef453aef855e00bc58c338ac8f2efcbf00
-  [I 21:44:33.353 LabApp]  or http://127.0.0.1:8889/?token=baceda81f9f1b1ef453aef855e00bc58c338ac8f2efcbf00
-  [I 21:44:33.353 LabApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
-  [C 21:44:33.668 LabApp]
-
-      To access the notebook, open this file in a browser:
-          file:///home/ye53nis/.local/share/jupyter/runtime/nbserver-442384-open.html
-      Or copy and paste one of these URLs:
-          http://localhost:8889/?token=baceda81f9f1b1ef453aef855e00bc58c338ac8f2efcbf00
-       or http://127.0.0.1:8889/?token=baceda81f9f1b1ef453aef855e00bc58c338ac8f2efcbf00
-#+end_example
-
-#+CALL: ssh-tunnel(port="8889", node="node146")
-
-#+RESULTS:
-| sh-5.0$           | ye53nis@ara-login01.rz.uni-jena.de's | password: |     |    |          |      |      |             |
-| ye53nis@node146's | password:                            |           |     |    |          |      |      |             |
-| Last              | login:                               | Mon       | May | 25 | 13:42:48 | 2020 | from | login01.ara |
+| sh-5.0$           | sh-5.0$     | ye53nis@ara-login01.rz.uni-jena.de's | password:                 |         |    |     |      |    |       |        |
+| Warning:          | Permanently | added                                | 'node218,192.168.193.218' | (ECDSA) | to | the | list | of | known | hosts. |
+| ye53nis@node218's | password:   |                                      |                           |         |    |     |      |    |       |        |
 
 I started a Python3 kernel using =jupyter-server-list-kernels=. Then I added the
 kernel ID to the =:PROPERTIES:= drawer of this (and following) subtrees.
 
 #+begin_example
-python3           749074c4-797a-4e72-957c-f87331800ef8   a few seconds ago    starting   0
+python3           7fe3d66b-d802-4f0f-b105-9536a917b816   a few seconds ago    starting   0
 #+end_example
 
 Test:
@@ -495,43 +503,42 @@ Test:
 #+begin_example
   No of CPUs in system: 72
   No of CPUs the current process can use: 24
-  load average: (43.52, 43.44, 43.4)
-  os.uname():  posix.uname_result(sysname='Linux', nodename='node171', release='3.10.0-957.1.3.el7.x86_64', version='#1 SMP Thu Nov 29 14:49:43 UTC 2018', machine='x86_64')
-  PID of process: 143415
-  RAM total: 199G, RAM used: 37G, RAM free: 62G
-  the current directory: /home/ye53nis
+  load average: (1.06, 1.01, 0.97)
+  os.uname():  posix.uname_result(sysname='Linux', nodename='node218', release='3.10.0-957.1.3.el7.x86_64', version='#1 SMP Thu Nov 29 14:49:43 UTC 2018', machine='x86_64')
+  PID of process: 10254
+  RAM total: 199G, RAM used: 6.0G, RAM free: 181G
+  the current directory: /home/ye53nis/DOKTOR
   My disk usage:
   Filesystem           Size  Used Avail Use% Mounted on
   /dev/sda1             50G  3.2G   47G   7% /
   devtmpfs              94G     0   94G   0% /dev
-  tmpfs                 94G  751M   94G   1% /dev/shm
-  tmpfs                 94G  219M   94G   1% /run
+  tmpfs                 94G  725M   94G   1% /dev/shm
+  tmpfs                 94G   75M   94G   1% /run
   tmpfs                 94G     0   94G   0% /sys/fs/cgroup
-  nfs01-ib:/cluster    2.0T  316G  1.7T  16% /cluster
-  nfs02-ib:/data01      88T   60T   29T  68% /data01
+  nfs02-ib:/data01      88T   61T   27T  70% /data01
   nfs03-ib:/pool/work  100T   79T   22T  79% /nfsdata
-  nfs01-ib:/home        80T   59T   22T  74% /home
-  /dev/sda5            2.0G   83M  2.0G   5% /tmp
-  /dev/sda3            6.0G  402M  5.6G   7% /var
-  /dev/sda6            169G   57M  169G   1% /local
-  beegfs_nodev         524T  442T   83T  85% /beegfs
-  tmpfs                 19G     0   19G   0% /run/user/68191
+  nfs01-ib:/home        80T   61T   20T  76% /home
+  nfs01-ib:/cluster    2.0T  316G  1.7T  16% /cluster
+  /dev/sda3            6.0G  412M  5.6G   7% /var
+  /dev/sda6            169G  2.8G  166G   2% /local
+  /dev/sda5            2.0G   34M  2.0G   2% /tmp
+  beegfs_nodev         524T  453T   72T  87% /beegfs
   tmpfs                 19G     0   19G   0% /run/user/67339
   /bin/sh: conda: command not found
   {'SLURM_CHECKPOINT_IMAGE_DIR': '/var/slurm/checkpoint',
-   'SLURM_NODELIST': 'node171',
+   'SLURM_NODELIST': 'node218',
    'SLURM_JOB_NAME': 'bash',
    'XDG_SESSION_ID': '8541',
-   'SLURMD_NODENAME': 'node171',
-   'SLURM_TOPOLOGY_ADDR': 'node171',
+   'SLURMD_NODENAME': 'node218',
+   'SLURM_TOPOLOGY_ADDR': 'node218',
    'SLURM_NTASKS_PER_NODE': '24',
    'HOSTNAME': 'login01',
    'SLURM_PRIO_PROCESS': '0',
-   'SLURM_SRUN_COMM_PORT': '45585',
+   'SLURM_SRUN_COMM_PORT': '45911',
    'SHELL': '/bin/bash',
    'TERM': 'xterm-color',
    'SLURM_JOB_QOS': 'qstand',
-   'SLURM_PTY_WIN_ROW': '24',
+   'SLURM_PTY_WIN_ROW': '52',
    'HISTSIZE': '1000',
    'TMPDIR': '/tmp',
    'SLURM_TOPOLOGY_ADDR_PATTERN': 'node',
@@ -540,6 +547,7 @@ Test:
    'CONDA_PROMPT_MODIFIER': '(tensorflow_nightly) ',
    'GSETTINGS_SCHEMA_DIR_CONDA_BACKUP': '',
    'WINDOWID': '0',
+   'OLDPWD': '/beegfs/ye53nis/drmed-git',
    'QTDIR': '/usr/lib64/qt-3.3',
    'QTINC': '/usr/lib64/qt-3.3/include',
    'SSH_TTY': '/dev/pts/57',
@@ -550,7 +558,7 @@ Test:
    'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=01;05;37;41:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.axv=01;35:*.anx=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=01;36:*.au=01;36:*.flac=01;36:*.mid=01;36:*.midi=01;36:*.mka=01;36:*.mp3=01;36:*.mpc=01;36:*.ogg=01;36:*.ra=01;36:*.wav=01;36:*.axa=01;36:*.oga=01;36:*.spx=01;36:*.xspf=01;36:',
    'CONDA_EXE': '/cluster/miniconda3/bin/conda',
    'SLURM_STEP_NUM_NODES': '1',
-   'SLURM_JOBID': '386457',
+   'SLURM_JOBID': '392142',
    'SRUN_DEBUG': '3',
    'SLURM_NTASKS': '24',
    'SLURM_LAUNCH_NODE_IPADDR': '192.168.192.5',
@@ -558,28 +566,28 @@ Test:
    'TMUX': '/tmp/tmux-67339/default,47311,2',
    '_CE_CONDA': '',
    'CONDA_PREFIX_1': '/cluster/miniconda3',
-   'SLURM_STEP_LAUNCHER_PORT': '45585',
+   'SLURM_STEP_LAUNCHER_PORT': '45911',
    'SLURM_TASKS_PER_NODE': '24',
    'MAIL': '/var/spool/mail/ye53nis',
    'PATH': '/home/ye53nis/.conda/envs/tensorflow_nightly/bin:/home/lex/Programme/miniconda3/envs/tensorflow_env/bin:/home/lex/Programme/miniconda3/condabin:/home/lex/.local/bin:/bin:/usr/bin:/usr/local/bin:/usr/local/sbin:/usr/lib/jvm/default/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/var/lib/snapd/snap/bin:/home/lex/Programme/miniconda3/bin:/usr/sbin:/home/ye53nis/.local/bin:/home/ye53nis/bin',
    'GSETTINGS_SCHEMA_DIR': '/home/ye53nis/.conda/envs/tensorflow_nightly/share/glib-2.0/schemas',
    'SLURM_WORKING_CLUSTER': 'hpc:192.168.192.1:6817:8448',
-   'SLURM_JOB_ID': '386457',
+   'SLURM_JOB_ID': '392142',
    'CONDA_PREFIX': '/home/ye53nis/.conda/envs/tensorflow_nightly',
    'SLURM_JOB_USER': 'ye53nis',
    'SLURM_STEPID': '0',
-   'PWD': '/home/ye53nis',
+   'PWD': '/home/ye53nis/DOKTOR',
    'SLURM_SRUN_COMM_HOST': '192.168.192.5',
    'LANG': 'en_US.UTF-8',
-   'SLURM_PTY_WIN_COL': '80',
+   'SLURM_PTY_WIN_COL': '206',
    'SLURM_UMASK': '0022',
    'MODULEPATH': '/usr/share/Modules/modulefiles:/etc/modulefiles:/cluster/modulefiles',
    'SLURM_JOB_UID': '67339',
    'LOADEDMODULES': '',
    'SLURM_NODEID': '0',
    'TMUX_PANE': '%2',
-   'SLURM_SUBMIT_DIR': '/home/ye53nis',
-   'SLURM_TASK_PID': '416264',
+   'SLURM_SUBMIT_DIR': '/beegfs/ye53nis/drmed-git',
+   'SLURM_TASK_PID': '696',
    'SLURM_NPROCS': '24',
    'SLURM_CPUS_ON_NODE': '24',
    'SLURM_DISTRIBUTION': 'block',
@@ -587,8 +595,8 @@ Test:
    'SLURM_PROCID': '0',
    'HISTCONTROL': 'ignoredups',
    '_CE_M': '',
-   'SLURM_JOB_NODELIST': 'node171',
-   'SLURM_PTY_PORT': '37693',
+   'SLURM_JOB_NODELIST': 'node218',
+   'SLURM_PTY_PORT': '37811',
    'HOME': '/home/ye53nis',
    'SHLVL': '3',
    'SLURM_LOCALID': '0',
@@ -610,29 +618,26 @@ Test:
    'LESSOPEN': '||/usr/bin/lesspipe.sh %s',
    'SLURM_STEP_TASKS_PER_NODE': '24',
    'PORT': '8889',
-   'SLURM_STEP_NODELIST': 'node171',
+   'SLURM_STEP_NODELIST': 'node218',
    'DISPLAY': ':0',
    'XDG_RUNTIME_DIR': '',
    'XAUTHORITY': '/tmp/xauth-1000-_0',
    'BASH_FUNC_module()': '() {  eval `/usr/bin/modulecmd bash $*`\n}',
    '_': '/home/ye53nis/.conda/envs/tensorflow_nightly/bin/jupyter',
    'KERNEL_LAUNCH_TIMEOUT': '40',
-   'JPY_PARENT_PID': '417110',
+   'JPY_PARENT_PID': '7566',
    'CLICOLOR': '1',
    'PAGER': 'cat',
    'GIT_PAGER': 'cat',
    'MPLBACKEND': 'module://ipykernel.pylab.backend_inline'}
-
-  os.environ
-   None
 #+end_example
 **** Tensorboard tunnel, Mlflow ui tunnel
-#+CALL: ssh-tunnel[:session local](port="6006", node="node146")
+#+CALL: ssh-tunnel[:session local](port="5000", node="node171")
 
 #+RESULTS:
 | sh-5.0$           | ye53nis@ara-login01.rz.uni-jena.de's | password: |     |    |          |      |      |             |
-| ye53nis@node146's | password:                            |           |     |    |          |      |      |             |
-| Last              | login:                               | Mon       | May | 25 | 13:13:33 | 2020 | from | login01.ara |
+| ye53nis@node171's | password:                            |           |     |    |          |      |      |             |
+| Last              | login:                               | Sun       | May | 31 | 15:29:02 | 2020 | from | login01.ara |
 *** git
 
     #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
@@ -642,4 +647,884 @@ Test:
 
     #+RESULTS:
     #+begin_example
+      (tensorflow_nightly) [ye53nis@node171 drmed-git]$ git status
+      # On branch exp-310520-unet
+      # Untracked files:
+      #   (use "git add <file>..." to include in what will be committed)
+      #
+      #       data/
+      #       experiment_params.csv
+      #       mlruns/
+      #       tramp.YDPCnB
+      nothing added to commit but untracked files present (use "git add" to track)
+
+      (tensorflow_nightly) [ye53nis@node171 drmed-git]$ git log -1
+      commit 2225d6fa18cca9044960b6e86a56ec9fb4362d5d
+      Author: Apoplex <oligolex@vivaldi.net>
+      Date:   Sun May 31 21:34:12 2020 +0200
+
+          Change learning rate
     #+end_example
+
+*** mlflow environment variables
+#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
+  conda activate tensorflow_nightly
+  cd /beegfs/ye53nis/drmed-git
+  export MLFLOW_EXPERIMENT_NAME=exp-310520-unet
+  export MLFLOW_TRACKING_URI=file:./data/mlruns
+  mkdir data/exp-310520-unet
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+  (tensorflow_nightly) [ye53nis@node171 drmed-git]$
+#+end_example
+
+*** Learning rate schedule
+#+BEGIN_SRC python
+learning_rate = 0.2
+        if epoch > 10:
+            learning_rate = 0.02
+        if epoch > 20:
+            learning_rate = 0.01
+        if epoch > 40:
+            learning_rate = 0.001
+        if epoch > 60:
+            learning_rate = 0.0001
+        if epoch > 80:
+            learning_rate = 0.00001
+
+#+END_SRC
+
+*** test runs
+**** no 1 - experiment creation failed
+#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
+  mlflow run . -P fluotracify_path=/beegfs/ye53nis/drmed-git/src/ -P epochs=2 -P learning_rate=None -P csv_path=/beegfs/ye53nis/saves/firstartifact_Mar2020 -P steps_per_epoch=400 -P validation_steps=200
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+(tensorflow_nightly) [ye53nis@node171 drmed-git]$ mlflow run . -P fluotracify_path=/beegfs/ye53nis/drmed-git/src/ -P epochs=2 -P learning_rate=None -P csv_path=/beegfs/ye53nis/saves/firstartifact_Mar2020 -P
+   steps_per_epoch=400 -P validation_steps=200
+  WARNING:root:Malformed experiment '1'. Detailed error Yaml file './data/mlruns/1/meta.yaml' does not exist.
+  Traceback (most recent call last):
+    File "/home/ye53nis/.conda/envs/tensorflow_nightly/lib/python3.8/site-packages/mlflow/store/tracking/file_store.py", line 197, in list_experiments
+      experiment = self._get_experiment(exp_id, view_type)
+    File "/home/ye53nis/.conda/envs/tensorflow_nightly/lib/python3.8/site-packages/mlflow/store/tracking/file_store.py", line 260, in _get_experiment
+      meta = read_yaml(experiment_dir, FileStore.META_DATA_FILE_NAME)
+    File "/home/ye53nis/.conda/envs/tensorflow_nightly/lib/python3.8/site-packages/mlflow/utils/file_utils.py", line 167, in read_yaml
+      raise MissingConfigException("Yaml file '%s' does not exist." % file_path)
+  mlflow.exceptions.MissingConfigException: Yaml file './data/mlruns/1/meta.yaml' does not exist.
+  INFO: 'exp-310520-unet' does not exist. Creating a new experiment
+  WARNING:root:Malformed experiment '1'. Detailed error Yaml file './data/mlruns/1/meta.yaml' does not exist.
+  Traceback (most recent call last):
+    File "/home/ye53nis/.conda/envs/tensorflow_nightly/lib/python3.8/site-packages/mlflow/store/tracking/file_store.py", line 197, in list_experiments
+      experiment = self._get_experiment(exp_id, view_type)
+    File "/home/ye53nis/.conda/envs/tensorflow_nightly/lib/python3.8/site-packages/mlflow/store/tracking/file_store.py", line 260, in _get_experiment
+      meta = read_yaml(experiment_dir, FileStore.META_DATA_FILE_NAME)
+    File "/home/ye53nis/.conda/envs/tensorflow_nightly/lib/python3.8/site-packages/mlflow/utils/file_utils.py", line 167, in read_yaml
+      raise MissingConfigException("Yaml file '%s' does not exist." % file_path)
+  mlflow.exceptions.MissingConfigException: Yaml file './data/mlruns/1/meta.yaml' does not exist.
+  WARNING:root:Malformed experiment '1'. Detailed error Yaml file './data/mlruns/1/meta.yaml' does not exist.
+  Traceback (most recent call last):
+    File "/home/ye53nis/.conda/envs/tensorflow_nightly/lib/python3.8/site-packages/mlflow/store/tracking/file_store.py", line 197, in list_experiments
+      experiment = self._get_experiment(exp_id, view_type)
+    File "/home/ye53nis/.conda/envs/tensorflow_nightly/lib/python3.8/site-packages/mlflow/store/tracking/file_store.py", line 260, in _get_experiment
+      meta = read_yaml(experiment_dir, FileStore.META_DATA_FILE_NAME)
+    File "/home/ye53nis/.conda/envs/tensorflow_nightly/lib/python3.8/site-packages/mlflow/utils/file_utils.py", line 167, in read_yaml
+      raise MissingConfigException("Yaml file '%s' does not exist." % file_path)
+  mlflow.exceptions.MissingConfigException: Yaml file './data/mlruns/1/meta.yaml' does not exist.
+  2020/05/31 14:00:34 INFO mlflow.projects: === Created directory /tmp/tmpfhabm3p4 for downloading remote URIs passed to arguments of type 'path' ===
+  2020/05/31 14:00:34 INFO mlflow.projects: === Running command 'source /cluster/miniconda3/bin/../etc/profile.d/conda.sh && conda activate mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b 1>&2 && python src/f
+  luotracify/training/train.py /beegfs/ye53nis/drmed-git/src 5 0.2 16384 None 2 /beegfs/ye53nis/saves/firstartifact_Mar2020 400 200' in run with ID 'b37371694a004638a6cd7a94d4d2e77f' ===
+  2020-05-31 14:00:38.667018: W tensorflow/stream_executor/platform/default/dso_loader.cc:55] Could not load dynamic library 'libcudart.so.10.1'; dlerror: libcudart.so.10.1: cannot open shared object file: No
+   such file or directory
+  2020-05-31 14:00:38.667107: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+  /home/ye53nis/.conda/envs/mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b/lib/python3.8/site-packages/tensorflow/python/framework/load_library.py:23: DeprecationWarning: the imp module is deprecated in favo
+  ur of importlib; see the module's documentation for alternative uses
+    import imp
+  2.3.0-dev20200527
+  2020-05-31 14:00:42.422965: W tensorflow/stream_executor/platform/default/dso_loader.cc:55] Could not load dynamic library 'libcuda.so.1'; dlerror: libcuda.so.1: cannot open shared object file: No such file
+   or directory
+  2020-05-31 14:00:42.422998: E tensorflow/stream_executor/cuda/cuda_driver.cc:313] failed call to cuInit: UNKNOWN ERROR (303)
+  2020-05-31 14:00:42.423020: I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:156] kernel driver does not appear to be running on this host (node171): /proc/driver/nvidia/version does not exist
+  GPUs:  []
+  train 0 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set027.csv
+  train 1 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set087.csv
+  train 2 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set003.csv
+  train 3 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set056.csv
+  train 4 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set076.csv
+  train 5 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set094.csv
+  train 6 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set017.csv
+  train 7 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set074.csv
+  train 8 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set055.csv
+  train 9 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set096.csv
+  train 10 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set054.csv
+  train 11 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set093.csv
+  train 12 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set079.csv
+  train 13 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set014.csv
+  train 14 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set008.csv
+  train 15 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set031.csv
+  train 16 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set023.csv
+  train 17 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set025.csv
+  train 18 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set034.csv
+  train 19 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set009.csv
+  train 20 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set044.csv
+  train 21 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set063.csv
+  train 22 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set004.csv
+  train 23 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set072.csv
+  train 24 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set046.csv
+  train 25 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set049.csv
+  train 26 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set007.csv
+  train 27 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set100.csv
+  train 28 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set083.csv
+  train 29 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set077.csv
+  train 30 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set061.csv
+  train 31 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set081.csv
+  train 32 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set091.csv
+  train 33 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set069.csv
+  train 34 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set052.csv
+  train 35 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set028.csv
+  train 36 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set019.csv
+  train 37 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set057.csv
+  train 38 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set064.csv
+  train 39 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set075.csv
+  train 40 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set002.csv
+  train 41 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set062.csv
+  train 42 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set043.csv
+  train 43 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set042.csv
+  train 44 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set005.csv
+  train 45 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set016.csv
+  train 46 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set018.csv
+  train 47 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set041.csv
+  train 48 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set039.csv
+  train 49 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set006.csv
+  train 50 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set092.csv
+  train 51 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set060.csv
+  train 52 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set001.csv
+  train 53 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set035.csv
+  train 54 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set029.csv
+  train 55 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set051.csv
+  train 56 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set012.csv
+  train 57 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set036.csv
+  train 58 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set024.csv
+  train 59 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set053.csv
+  train 60 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set011.csv
+  train 61 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set032.csv
+  train 62 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set067.csv
+  train 63 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set058.csv
+  train 64 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set080.csv
+  train 65 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set086.csv
+  train 66 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set033.csv
+  train 67 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set085.csv
+  train 68 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set015.csv
+  train 69 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set090.csv
+  train 70 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set020.csv
+  train 71 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set030.csv
+  train 72 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set050.csv
+  train 73 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set098.csv
+  train 74 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set099.csv
+  train 75 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set070.csv
+  train 76 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set021.csv
+  train 77 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set095.csv
+  train 78 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set073.csv
+  train 79 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set078.csv
+  test 80 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set026.csv
+  test 81 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set038.csv
+  test 82 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set082.csv
+  test 83 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set047.csv
+  test 84 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set040.csv
+  test 85 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set066.csv
+  test 86 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set059.csv
+  test 87 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set013.csv
+  test 88 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set089.csv
+  test 89 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set071.csv
+  test 90 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set088.csv
+  test 91 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set037.csv
+  test 92 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set022.csv
+  test 93 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set084.csv
+  test 94 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set010.csv
+  test 95 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set097.csv
+  test 96 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set068.csv
+  test 97 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set065.csv
+  test 98 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set048.csv
+  test 99 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set045.csv
+  shapes of feature dataframe: (16384, 8000) and label dataframe: (16384, 8000)
+  shapes of feature dataframe: (16384, 2000) and label dataframe: (16384, 2000)
+
+  for each 20,000 timestap trace there are the following numbers of corrupted timesteps:
+   label001_1    16384
+  label001_1    16384
+  label001_1    16384
+  label001_1    16384
+  label001_1    16384
+  dtype: int64
+  2020-05-31 14:05:15.534482: I tensorflow/core/platform/cpu_feature_guard.cc:142] This TensorFlow binary is optimized with Intel(R) MKL-DNN to use the following CPU instructions in performance-critical opera
+  tions:  AVX2 AVX512F FMA
+  To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+  2020-05-31 14:05:15.544530: I tensorflow/core/platform/profile_utils/cpu_utils.cc:104] CPU Frequency: 2300000000 Hz
+  2020-05-31 14:05:15.545867: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x557b10ed44b0 initialized for platform Host (this does not guarantee that XLA will be used). Devices:
+  2020-05-31 14:05:15.545896: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): Host, Default Version
+  number of training examples: 6400, number of validation examples: 1600
+
+  ------------------------
+  number of test examples: 2000
+
+  input - shape:   (None, 16384, 1)
+  output - shape:  (None, 16384, 1)
+  2020-05-31 14:05:22.334555: I tensorflow/core/profiler/lib/profiler_session.cc:163] Profiler session started.
+  /home/ye53nis/.conda/envs/mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b/lib/python3.8/site-packages/tensorflow/python/training/tracking/data_structures.py:739: DeprecationWarning: Using or importing the A
+  BCs from 'collections' instead of from 'collections.abc' is deprecated since Python 3.3, and in 3.9 it will stop working
+    if not isinstance(wrapped_dict, collections.Mapping):
+  /home/ye53nis/.conda/envs/mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b/lib/python3.8/site-packages/mlflow/utils/autologging_utils.py:60: DeprecationWarning: inspect.getargspec() is deprecated since Pytho
+  n 3.0, use inspect.signature() or inspect.getfullargspec()
+    all_param_names, _, _, all_default_values = inspect.getargspec(fn)  # pylint: disable=W1505
+  Epoch 1/2
+  /home/ye53nis/.conda/envs/mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b/lib/python3.8/site-packages/tensorflow/python/framework/indexed_slices.py:347: DeprecationWarning: Using or importing the ABCs from
+  'collections' instead of from 'collections.abc' is deprecated since Python 3.3, and in 3.9 it will stop working
+    if not isinstance(values, collections.Sequence):
+    1/400 [..............................] - ETA: 0s - loss: 0.7153 - tp: 66972.0000 - fp: 0.0000e+00 - tn: 0.0000e+00 - fn: 14948.0000 - precision: 1.0000 - recall: 0.8175 - accuracy: 0.8175 - auc: 0.0000e+0
+  02020-05-31 14:05:34.823955: I tensorflow/core/profiler/lib/profiler_session.cc:163] Profiler session started.
+  WARNING:tensorflow:From /home/ye53nis/.conda/envs/mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b/lib/python3.8/site-packages/tensorflow/python/ops/summary_ops_v2.py:1277: stop (from tensorflow.python.eager
+  .profiler) is deprecated and will be removed after 2020-07-01.
+  Instructions for updating:
+  use `tf.profiler.experimental.stop` instead.
+  2020-05-31 14:05:36.334154: I tensorflow/core/profiler/rpc/client/save_profile.cc:176] Creating directory: /tmp/tb/train/plugins/profile/2020_05_31_14_05_36
+  2020-05-31 14:05:36.348656: I tensorflow/core/profiler/rpc/client/save_profile.cc:182] Dumped gzipped tool data for trace.json.gz to /tmp/tb/train/plugins/profile/2020_05_31_14_05_36/node171.trace.json.gz
+  2020-05-31 14:05:36.375326: I tensorflow/core/profiler/rpc/client/save_profile.cc:176] Creating directory: /tmp/tb/train/plugins/profile/2020_05_31_14_05_36
+  2020-05-31 14:05:36.375452: I tensorflow/core/profiler/rpc/client/save_profile.cc:182] Dumped gzipped tool data for memory_profile.json.gz to /tmp/tb/train/plugins/profile/2020_05_31_14_05_36/node171.memory
+  _profile.json.gz
+  2020-05-31 14:05:36.377489: I tensorflow/python/profiler/internal/profiler_wrapper.cc:111] Creating directory: /tmp/tb/train/plugins/profile/2020_05_31_14_05_36Dumped tool data for xplane.pb to /tmp/tb/trai
+  n/plugins/profile/2020_05_31_14_05_36/node171.xplane.pb
+  Dumped tool data for overview_page.pb to /tmp/tb/train/plugins/profile/2020_05_31_14_05_36/node171.overview_page.pb
+  Dumped tool data for input_pipeline.pb to /tmp/tb/train/plugins/profile/2020_05_31_14_05_36/node171.input_pipeline.pb
+  Dumped tool data for tensorflow_stats.pb to /tmp/tb/train/plugins/profile/2020_05_31_14_05_36/node171.tensorflow_stats.pb
+  Dumped tool data for kernel_stats.pb to /tmp/tb/train/plugins/profile/2020_05_31_14_05_36/node171.kernel_stats.pb
+
+  400/400 [==============================] - 651s 2s/step - loss: 0.0019 - tp: 32753052.0000 - fp: 0.0000e+00 - tn: 0.0000e+00 - fn: 14948.0000 - precision: 1.0000 - recall: 0.9995 - accuracy: 0.9995 - auc: 0
+  .0000e+00 - val_loss: 7.3428e-23 - val_tp: 16384000.0000 - val_fp: 0.0000e+00 - val_tn: 0.0000e+00 - val_fn: 0.0000e+00 - val_precision: 1.0000 - val_recall: 1.0000 - val_accuracy: 1.0000 - val_auc: 0.0000e
+  +00
+  Epoch 2/2
+  400/400 [==============================] - 645s 2s/step - loss: 2.1658e-09 - tp: 32768000.0000 - fp: 0.0000e+00 - tn: 0.0000e+00 - fn: 0.0000e+00 - precision: 1.0000 - recall: 1.0000 - accuracy: 1.0000 - au
+  c: 0.0000e+00 - val_loss: 8.7165e-23 - val_tp: 16384000.0000 - val_fp: 0.0000e+00 - val_tn: 0.0000e+00 - val_fn: 0.0000e+00 - val_precision: 1.0000 - val_recall: 1.0000 - val_accuracy: 1.0000 - val_auc: 0.0
+  000e+00
+  400/400 [==============================] - 119s 298ms/step - loss: 9.0078e-23 - tp: 32768000.0000 - fp: 0.0000e+00 - tn: 0.0000e+00 - fn: 0.0000e+00 - precision: 1.0000 - recall: 1.0000 - accuracy: 1.0000 -
+   auc: 0.0000e+00
+  2020/05/31 14:29:15 INFO mlflow.projects: === Run (ID 'b37371694a004638a6cd7a94d4d2e77f') succeeded ===
+  (tensorflow_nightly) [ye53nis@node171 drmed-git]$ Regard
+#+end_example
+
+#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
+  mlflow ui
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+  (tensorflow_nightly) [ye53nis@node171 drmed-git]$ mlflow ui
+  [2020-05-31 15:27:54 +0200] [200865] [INFO] Starting gunicorn 20.0.4
+  [2020-05-31 15:27:54 +0200] [200865] [INFO] Listening at: http://127.0.0.1:5000 (200865)
+  [2020-05-31 15:27:54 +0200] [200865] [INFO] Using worker: sync
+  [2020-05-31 15:27:54 +0200] [200871] [INFO] Booting worker with pid: 200871
+#+end_example
+**** no 2
+
+#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
+  mlflow run . -P fluotracify_path=/beegfs/ye53nis/drmed-git/src/ -P epochs=2 -P learning_rate=None -P csv_path=/beegfs/ye53nis/saves/firstartifact_Mar2020 -P steps_per_epoch=10 -P validation_steps=10
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+  (tensorflow_nightly) [ye53nis@node171 drmed-git]$ mlflow run . -P fluotracify_path=/beegfs/ye53nis/drmed-git/src/ -P epochs=2 -P learning_rate=None -P csv_path=/beegfs/ye53nis/saves/firstartifact_Mar2020 -P
+   steps_per_epoch=10 -P validation_steps=10
+  INFO: 'exp-310520-unet' does not exist. Creating a new experiment
+  2020/05/31 15:45:30 INFO mlflow.projects: === Created directory /tmp/tmp2vv5kiic for downloading remote URIs passed to arguments of type 'path' ===
+  2020/05/31 15:45:30 INFO mlflow.projects: === Running command 'source /cluster/miniconda3/bin/../etc/profile.d/conda.sh && conda activate mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b 1>&2 && python src/f
+  luotracify/training/train.py /beegfs/ye53nis/drmed-git/src 5 0.2 16384 None 2 /beegfs/ye53nis/saves/firstartifact_Mar2020 10 10' in run with ID '7f23f6ba7a244914b3cbbebd731d50a1' ===
+  2020-05-31 15:45:31.886019: W tensorflow/stream_executor/platform/default/dso_loader.cc:55] Could not load dynamic library 'libcudart.so.10.1'; dlerror: libcudart.so.10.1: cannot open shared object file: No
+   such file or directory
+  2020-05-31 15:45:31.886068: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+  /home/ye53nis/.conda/envs/mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b/lib/python3.8/site-packages/tensorflow/python/framework/load_library.py:23: DeprecationWarning: the imp module is deprecated in favo
+  ur of importlib; see the module's documentation for alternative uses
+    import imp
+  2.3.0-dev20200527
+  2020-05-31 15:45:35.151500: W tensorflow/stream_executor/platform/default/dso_loader.cc:55] Could not load dynamic library 'libcuda.so.1'; dlerror: libcuda.so.1: cannot open shared object file: No such file
+   or directory
+  2020-05-31 15:45:35.151549: E tensorflow/stream_executor/cuda/cuda_driver.cc:313] failed call to cuInit: UNKNOWN ERROR (303)
+  2020-05-31 15:45:35.151589: I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:156] kernel driver does not appear to be running on this host (node171): /proc/driver/nvidia/version does not exist
+  GPUs:  []
+  train 0 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set027.csv
+  train 1 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set087.csv
+  train 2 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set003.csv
+  train 3 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set056.csv
+  train 4 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set076.csv
+  train 5 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set094.csv
+  train 6 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set017.csv
+  train 7 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set074.csv
+  train 8 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set055.csv
+  train 9 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set096.csv
+  train 10 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set054.csv
+  train 11 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set093.csv
+  train 12 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set079.csv
+  train 13 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set014.csv
+  train 14 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set008.csv
+  train 15 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set031.csv
+  train 16 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set023.csv
+  train 17 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set025.csv
+  train 18 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set034.csv
+  train 19 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set009.csv
+  train 20 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set044.csv
+  train 21 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set063.csv
+  train 22 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set004.csv
+  train 23 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set072.csv
+  train 24 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set046.csv
+  train 25 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set049.csv
+  train 26 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set007.csv
+  train 27 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set100.csv
+  train 28 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set083.csv
+  train 29 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set077.csv
+  train 30 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set061.csv
+  train 31 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set081.csv
+  train 32 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set091.csv
+  train 33 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set069.csv
+  train 34 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set052.csv
+  train 35 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set028.csv
+  train 36 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set019.csv
+  train 37 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set057.csv
+  train 38 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set064.csv
+  train 39 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set075.csv
+  train 40 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set002.csv
+  train 41 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set062.csv
+  train 42 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set043.csv
+  train 43 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set042.csv
+  train 44 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set005.csv
+  train 45 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set016.csv
+  train 46 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set018.csv
+  train 47 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set041.csv
+  train 48 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set039.csv
+  train 49 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set006.csv
+  train 50 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set092.csv
+  train 51 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set060.csv
+  train 52 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set001.csv
+  train 53 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set035.csv
+  train 54 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set029.csv
+  train 55 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set051.csv
+  train 56 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set012.csv
+  train 57 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set036.csv
+  train 58 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set024.csv
+  train 59 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set053.csv
+  train 60 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set011.csv
+  train 61 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set032.csv
+  train 62 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set067.csv
+  train 63 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set058.csv
+  train 64 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set080.csv
+  train 65 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set086.csv
+  train 66 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set033.csv
+  train 67 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set085.csv
+  train 68 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set015.csv
+  train 69 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set090.csv
+  train 70 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set020.csv
+  train 71 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set030.csv
+  train 72 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set050.csv
+  train 73 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set098.csv
+  train 74 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set099.csv
+  train 75 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set070.csv
+  train 76 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set021.csv
+  train 77 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set095.csv
+  train 78 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set073.csv
+  train 79 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set078.csv
+  test 80 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set026.csv
+  test 81 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set038.csv
+  test 82 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set082.csv
+  test 83 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set047.csv
+  test 84 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set040.csv
+  test 85 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set066.csv
+  test 86 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set059.csv
+  test 87 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set013.csv
+  test 88 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set089.csv
+  test 89 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set071.csv
+  test 90 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set088.csv
+  test 91 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set037.csv
+  test 92 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set022.csv
+  test 93 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set084.csv
+  test 94 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set010.csv
+  test 95 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set097.csv
+  test 96 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set068.csv
+  test 97 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set065.csv
+  test 98 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set048.csv
+  test 99 /beegfs/ye53nis/saves/firstartifact_Mar2020/traces_brightclust_Mar2020_set045.csv
+  shapes of feature dataframe: (16384, 8000) and label dataframe: (16384, 8000)
+  shapes of feature dataframe: (16384, 2000) and label dataframe: (16384, 2000)
+
+  for each 20,000 timestap trace there are the following numbers of corrupted timesteps:
+   label001_1    16384
+  label001_1    16384
+  label001_1    16384
+  label001_1    16384
+  label001_1    16384
+  dtype: int64
+  2020-05-31 15:49:25.643578: I tensorflow/core/platform/cpu_feature_guard.cc:142] This TensorFlow binary is optimized with Intel(R) MKL-DNN to use the following CPU instructions in performance-critical opera
+  tions:  AVX2 AVX512F FMA
+  To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+  2020-05-31 15:49:25.653635: I tensorflow/core/platform/profile_utils/cpu_utils.cc:104] CPU Frequency: 2300000000 Hz
+  2020-05-31 15:49:25.655125: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x556ab2694730 initialized for platform Host (this does not guarantee that XLA will be used). Devices:
+  2020-05-31 15:49:25.655169: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): Host, Default Version
+  number of training examples: 6400, number of validation examples: 1600
+
+  ------------------------
+  number of test examples: 2000
+
+  input - shape:   (None, 16384, 1)
+  output - shape:  (None, 16384, 1)
+  2020-05-31 15:49:32.395226: I tensorflow/core/profiler/lib/profiler_session.cc:163] Profiler session started.
+  /home/ye53nis/.conda/envs/mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b/lib/python3.8/site-packages/tensorflow/python/training/tracking/data_structures.py:739: DeprecationWarning: Using or importing the A
+  BCs from 'collections' instead of from 'collections.abc' is deprecated since Python 3.3, and in 3.9 it will stop working
+    if not isinstance(wrapped_dict, collections.Mapping):
+  /home/ye53nis/.conda/envs/mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b/lib/python3.8/site-packages/mlflow/utils/autologging_utils.py:60: DeprecationWarning: inspect.getargspec() is deprecated since Pytho
+  n 3.0, use inspect.signature() or inspect.getfullargspec()
+    all_param_names, _, _, all_default_values = inspect.getargspec(fn)  # pylint: disable=W1505
+  Epoch 1/2
+  /home/ye53nis/.conda/envs/mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b/lib/python3.8/site-packages/tensorflow/python/framework/indexed_slices.py:347: DeprecationWarning: Using or importing the ABCs from
+  'collections' instead of from 'collections.abc' is deprecated since Python 3.3, and in 3.9 it will stop working
+    if not isinstance(values, collections.Sequence):
+   1/10 [==>...........................] - ETA: 0s - loss: 0.5648 - tp: 72554.0000 - fp: 0.0000e+00 - tn: 0.0000e+00 - fn: 9366.0000 - precision: 1.0000 - recall: 0.8857 - accuracy: 0.8857 - auc: 0.0000e+0020
+  20-05-31 15:49:44.598769: I tensorflow/core/profiler/lib/profiler_session.cc:163] Profiler session started.
+  WARNING:tensorflow:From /home/ye53nis/.conda/envs/mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b/lib/python3.8/site-packages/tensorflow/python/ops/summary_ops_v2.py:1277: stop (from tensorflow.python.eager
+  .profiler) is deprecated and will be removed after 2020-07-01.
+  Instructions for updating:
+  use `tf.profiler.experimental.stop` instead.
+  2020-05-31 15:49:46.123954: I tensorflow/core/profiler/rpc/client/save_profile.cc:176] Creating directory: /tmp/tb/train/plugins/profile/2020_05_31_15_49_46
+  2020-05-31 15:49:46.137599: I tensorflow/core/profiler/rpc/client/save_profile.cc:182] Dumped gzipped tool data for trace.json.gz to /tmp/tb/train/plugins/profile/2020_05_31_15_49_46/node171.trace.json.gz
+  2020-05-31 15:49:46.163428: I tensorflow/core/profiler/rpc/client/save_profile.cc:176] Creating directory: /tmp/tb/train/plugins/profile/2020_05_31_15_49_46
+  2020-05-31 15:49:46.163531: I tensorflow/core/profiler/rpc/client/save_profile.cc:182] Dumped gzipped tool data for memory_profile.json.gz to /tmp/tb/train/plugins/profile/2020_05_31_15_49_46/node171.memory
+  _profile.json.gz
+  2020-05-31 15:49:46.165569: I tensorflow/python/profiler/internal/profiler_wrapper.cc:111] Creating directory: /tmp/tb/train/plugins/profile/2020_05_31_15_49_46Dumped tool data for xplane.pb to /tmp/tb/trai
+  n/plugins/profile/2020_05_31_15_49_46/node171.xplane.pb
+  Dumped tool data for overview_page.pb to /tmp/tb/train/plugins/profile/2020_05_31_15_49_46/node171.overview_page.pb
+  Dumped tool data for input_pipeline.pb to /tmp/tb/train/plugins/profile/2020_05_31_15_49_46/node171.input_pipeline.pb
+  Dumped tool data for tensorflow_stats.pb to /tmp/tb/train/plugins/profile/2020_05_31_15_49_46/node171.tensorflow_stats.pb
+  Dumped tool data for kernel_stats.pb to /tmp/tb/train/plugins/profile/2020_05_31_15_49_46/node171.kernel_stats.pb
+
+  10/10 [==============================] - 23s 2s/step - loss: 0.0638 - tp: 809834.0000 - fp: 0.0000e+00 - tn: 0.0000e+00 - fn: 9366.0000 - precision: 1.0000 - recall: 0.9886 - accuracy: 0.9886 - auc: 0.0000e
+  +00 - val_loss: 0.0000e+00 - val_tp: 819200.0000 - val_fp: 0.0000e+00 - val_tn: 0.0000e+00 - val_fn: 0.0000e+00 - val_precision: 1.0000 - val_recall: 1.0000 - val_accuracy: 1.0000 - val_auc: 0.0000e+00
+  Epoch 2/2
+  10/10 [==============================] - 18s 2s/step - loss: 6.4955e-17 - tp: 819200.0000 - fp: 0.0000e+00 - tn: 0.0000e+00 - fn: 0.0000e+00 - precision: 1.0000 - recall: 1.0000 - accuracy: 1.0000 - auc: 0.
+  0000e+00 - val_loss: 0.0000e+00 - val_tp: 819200.0000 - val_fp: 0.0000e+00 - val_tn: 0.0000e+00 - val_fn: 0.0000e+00 - val_precision: 1.0000 - val_recall: 1.0000 - val_accuracy: 1.0000 - val_auc: 0.0000e+00
+  400/400 [==============================] - 120s 300ms/step - loss: 0.0000e+00 - tp: 32768000.0000 - fp: 0.0000e+00 - tn: 0.0000e+00 - fn: 0.0000e+00 - precision: 1.0000 - recall: 1.0000 - accuracy: 1.0000 -
+   auc: 0.0000e+00
+  2020/05/31 15:52:36 INFO mlflow.projects: === Run (ID '7f23f6ba7a244914b3cbbebd731d50a1') succeeded ===
+#+end_example
+
+These two test runs used the wrong dataset! the =firstartifact_Mar2020= dataset
+is bright clusters, but the label is the uncorrupted trace, not just the
+artifact information. This dataset is meant for a Variational
+Autoencoder-Training.
+*** real run
+
+#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
+  mlflow run . -P fluotracify_path=/beegfs/ye53nis/drmed-git/src/ -P epochs=70 -P learning_rate=None -P csv_path=/beegfs/ye53nis/saves/firstartefact_Sep2019 -P steps_per_epoch=400 -P validation_steps=200
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+  (tensorflow_nightly) [ye53nis@node171 drmed-git]$ mlflow run . -P fluotracify_path=/beegfs/ye53nis/drmed-git/src/ -P epochs=70 -P learning_rate=None -P csv_path=/beegfs/ye53nis/saves/firstartefact_Sep2019 -
+  P steps_per_epoch=400 -P validation_steps=200
+  2020/05/31 21:39:53 INFO mlflow.projects: === Created directory /tmp/tmpnc10f5ut for downloading remote URIs passed to arguments of type 'path' ===
+  2020/05/31 21:39:53 INFO mlflow.projects: === Running command 'source /cluster/miniconda3/bin/../etc/profile.d/conda.sh && conda activate mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b 1>&2 && python src/f
+  luotracify/training/train.py /beegfs/ye53nis/drmed-git/src 5 0.2 16384 None 70 /beegfs/ye53nis/saves/firstartefact_Sep2019 400 200' in run with ID '1aefda1366f04f5da5d1fc2241ad9208' ===
+  2020-05-31 21:39:54.753597: W tensorflow/stream_executor/platform/default/dso_loader.cc:55] Could not load dynamic library 'libcudart.so.10.1'; dlerror: libcudart.so.10.1: cannot open shared object file: No
+   such file or directory
+  2020-05-31 21:39:54.753646: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+  /home/ye53nis/.conda/envs/mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b/lib/python3.8/site-packages/tensorflow/python/framework/load_library.py:23: DeprecationWarning: the imp module is deprecated in favo
+  ur of importlib; see the module's documentation for alternative uses
+    import imp
+  2.3.0-dev20200527
+  2020-05-31 21:39:57.636018: W tensorflow/stream_executor/platform/default/dso_loader.cc:55] Could not load dynamic library 'libcuda.so.1'; dlerror: libcuda.so.1: cannot open shared object file: No such file
+   or directory
+  2020-05-31 21:39:57.636052: E tensorflow/stream_executor/cuda/cuda_driver.cc:313] failed call to cuInit: UNKNOWN ERROR (303)
+  2020-05-31 21:39:57.636075: I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:156] kernel driver does not appear to be running on this host (node171): /proc/driver/nvidia/version does not exist
+  GPUs:  []
+  train 0 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set027.csv
+  train 1 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set087.csv
+  train 2 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set003.csv
+  train 3 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set056.csv
+  train 4 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set076.csv
+  train 5 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set094.csv
+  train 6 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set017.csv
+  train 7 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set074.csv
+  train 8 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set055.csv
+  train 9 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set096.csv
+  train 10 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set054.csv
+  train 11 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set093.csv
+  train 12 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set079.csv
+  train 13 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set014.csv
+  train 14 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set008.csv
+  train 15 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set031.csv
+  train 16 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set023.csv
+  train 17 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set025.csv
+  train 18 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set034.csv
+  train 19 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set009.csv
+  train 20 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set044.csv
+  train 21 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set063.csv
+  train 22 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set004.csv
+  train 23 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set072.csv
+  train 24 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set046.csv
+  train 25 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set049.csv
+  train 26 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set007.csv
+  train 27 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set100.csv
+  train 28 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set083.csv
+  train 29 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set077.csv
+  train 30 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set061.csv
+  train 31 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set081.csv
+  train 32 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set091.csv
+  train 33 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set069.csv
+  train 34 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set052.csv
+  train 35 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set028.csv
+  train 36 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set019.csv
+  train 37 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set057.csv
+  train 38 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set064.csv
+  train 39 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set075.csv
+  train 40 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set002.csv
+  train 41 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set062.csv
+  train 42 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set043.csv
+  train 43 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set042.csv
+  train 44 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set005.csv
+  train 45 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set016.csv
+  train 46 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set018.csv
+  train 47 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set041.csv
+  train 48 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set039.csv
+  train 49 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set006.csv
+  train 50 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set092.csv
+  train 51 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set060.csv
+  train 52 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set001.csv
+  train 53 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set035.csv
+  train 54 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set029.csv
+  train 55 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set051.csv
+  train 56 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set012.csv
+  train 57 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set036.csv
+  train 58 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set024.csv
+  train 59 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set053.csv
+  train 60 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set011.csv
+  train 61 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set032.csv
+  train 62 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set067.csv
+  train 63 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set058.csv
+  train 64 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set080.csv
+  train 65 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set086.csv
+  train 66 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set033.csv
+  train 67 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set085.csv
+  train 68 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set015.csv
+  train 69 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set090.csv
+  train 70 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set020.csv
+  train 71 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set030.csv
+  train 72 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set050.csv
+  train 73 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set098.csv
+  train 74 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set099.csv
+  train 75 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set070.csv
+  train 76 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set021.csv
+  train 77 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set095.csv
+  train 78 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set073.csv
+  train 79 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set078.csv
+  test 80 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set026.csv
+  test 81 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set038.csv
+  test 82 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set082.csv
+  test 83 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set047.csv
+  test 84 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set040.csv
+  test 85 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set066.csv
+  test 86 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set059.csv
+  test 87 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set013.csv
+  test 88 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set089.csv
+  test 89 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set071.csv
+  test 90 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set088.csv
+  test 91 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set037.csv
+  test 92 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set022.csv
+  test 93 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set084.csv
+  test 94 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set010.csv
+  test 95 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set097.csv
+  test 96 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set068.csv
+  test 97 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set065.csv
+  test 98 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set048.csv
+  test 99 /beegfs/ye53nis/saves/firstartefact_Sep2019/traces_cluster_rand_Sep2019_set045.csv
+  shapes of feature dataframe: (20000, 8000) and label dataframe: (20000, 8000)
+  shapes of feature dataframe: (20000, 2000) and label dataframe: (20000, 2000)
+
+  for each 20,000 timestap trace there are the following numbers of corrupted timesteps:
+   label001_1    6286
+  label001_1    2568
+  label001_1    4495
+  label001_1    4414
+  label001_1    1105
+  dtype: int64
+  2020-05-31 21:44:15.811359: I tensorflow/core/platform/cpu_feature_guard.cc:142] This TensorFlow binary is optimized with Intel(R) MKL-DNN to use the following CPU instructions in performance-critical opera
+  tions:  AVX2 AVX512F FMA
+  To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+  2020-05-31 21:44:15.820877: I tensorflow/core/platform/profile_utils/cpu_utils.cc:104] CPU Frequency: 2300000000 Hz
+  2020-05-31 21:44:15.822374: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x55acbe3932e0 initialized for platform Host (this does not guarantee that XLA will be used). Devices:
+  2020-05-31 21:44:15.822402: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): Host, Default Version
+  number of training examples: 6400, number of validation examples: 1600
+
+  ------------------------
+  number of test examples: 2000
+
+  input - shape:   (None, 16384, 1)
+  output - shape:  (None, 16384, 1)
+  2020-05-31 21:44:19.667769: I tensorflow/core/profiler/lib/profiler_session.cc:163] Profiler session started.
+  /home/ye53nis/.conda/envs/mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b/lib/python3.8/site-packages/tensorflow/python/training/tracking/data_structures.py:739: DeprecationWarning: Using or importing the A
+  BCs from 'collections' instead of from 'collections.abc' is deprecated since Python 3.3, and in 3.9 it will stop working
+    if not isinstance(wrapped_dict, collections.Mapping):
+  /home/ye53nis/.conda/envs/mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b/lib/python3.8/site-packages/mlflow/utils/autologging_utils.py:60: DeprecationWarning: inspect.getargspec() is deprecated since Pytho
+  n 3.0, use inspect.signature() or inspect.getfullargspec()
+    all_param_names, _, _, all_default_values = inspect.getargspec(fn)  # pylint: disable=W1505
+  Epoch 1/70
+  /home/ye53nis/.conda/envs/mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b/lib/python3.8/site-packages/tensorflow/python/framework/indexed_slices.py:347: DeprecationWarning: Using or importing the ABCs from
+  'collections' instead of from 'collections.abc' is deprecated since Python 3.3, and in 3.9 it will stop working
+    if not isinstance(values, collections.Sequence):
+    1/400 [..............................] - ETA: 0s - loss: 1.5974 - tp: 3783.0000 - fp: 23102.0000 - tn: 47580.0000 - fn: 7455.0000 - precision: 0.1407 - recall: 0.3366 - accuracy: 0.6270 - auc: 0.51772020-
+  05-31 21:44:31.349376: I tensorflow/core/profiler/lib/profiler_session.cc:163] Profiler session started.
+  WARNING:tensorflow:From /home/ye53nis/.conda/envs/mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b/lib/python3.8/site-packages/tensorflow/python/ops/summary_ops_v2.py:1277: stop (from tensorflow.python.eager
+  .profiler) is deprecated and will be removed after 2020-07-01.
+  Instructions for updating:
+  use `tf.profiler.experimental.stop` instead.
+  2020-05-31 21:44:32.843703: I tensorflow/core/profiler/rpc/client/save_profile.cc:176] Creating directory: /tmp/tb/train/plugins/profile/2020_05_31_21_44_32
+  2020-05-31 21:44:32.857345: I tensorflow/core/profiler/rpc/client/save_profile.cc:182] Dumped gzipped tool data for trace.json.gz to /tmp/tb/train/plugins/profile/2020_05_31_21_44_32/node171.trace.json.gz
+  2020-05-31 21:44:32.882350: I tensorflow/core/profiler/rpc/client/save_profile.cc:176] Creating directory: /tmp/tb/train/plugins/profile/2020_05_31_21_44_32
+  2020-05-31 21:44:32.882475: I tensorflow/core/profiler/rpc/client/save_profile.cc:182] Dumped gzipped tool data for memory_profile.json.gz to /tmp/tb/train/plugins/profile/2020_05_31_21_44_32/node171.memory
+  _profile.json.gz
+  2020-05-31 21:44:32.884516: I tensorflow/python/profiler/internal/profiler_wrapper.cc:111] Creating directory: /tmp/tb/train/plugins/profile/2020_05_31_21_44_32Dumped tool data for xplane.pb to /tmp/tb/trai
+  n/plugins/profile/2020_05_31_21_44_32/node171.xplane.pb
+  Dumped tool data for overview_page.pb to /tmp/tb/train/plugins/profile/2020_05_31_21_44_32/node171.overview_page.pb
+  Dumped tool data for input_pipeline.pb to /tmp/tb/train/plugins/profile/2020_05_31_21_44_32/node171.input_pipeline.pb
+  Dumped tool data for tensorflow_stats.pb to /tmp/tb/train/plugins/profile/2020_05_31_21_44_32/node171.tensorflow_stats.pb
+  Dumped tool data for kernel_stats.pb to /tmp/tb/train/plugins/profile/2020_05_31_21_44_32/node171.kernel_stats.pb
+
+  400/400 [==============================] - 648s 2s/step - loss: 1.2332 - tp: 3788781.0000 - fp: 1219922.0000 - tn: 24049440.0000 - fn: 3709858.0000 - precision: 0.7564 - recall: 0.5053 - accuracy: 0.8496 -
+  auc: 0.8489 - val_loss: 322.0566 - val_tp: 3646493.0000 - val_fp: 12737507.0000 - val_tn: 0.0000e+00 - val_fn: 0.0000e+00 - val_precision: 0.2226 - val_recall: 1.0000 - val_accuracy: 0.2226 - val_auc: 0.500
+  0
+  Epoch 2/70
+  400/400 [==============================] - 644s 2s/step - loss: 1.0109 - tp: 5005706.0000 - fp: 1436756.0000 - tn: 23682896.0000 - fn: 2642650.0000 - precision: 0.7770 - recall: 0.6545 - accuracy: 0.8755 -
+  auc: 0.8979 - val_loss: 606.1023 - val_tp: 3756979.0000 - val_fp: 12626343.0000 - val_tn: 645.0000 - val_fn: 33.0000 - val_precision: 0.2293 - val_recall: 1.0000 - val_accuracy: 0.2293 - val_auc: 0.5000
+  Epoch 3/70
+  400/400 [==============================] - 628s 2s/step - loss: 0.8285 - tp: 5051785.0000 - fp: 1374618.0000 - tn: 23855938.0000 - fn: 2485671.0000 - precision: 0.7861 - recall: 0.6702 - accuracy: 0.8822 -
+  auc: 0.9026 - val_loss: 10.0331 - val_tp: 3878641.0000 - val_fp: 12500019.0000 - val_tn: 4304.0000 - val_fn: 1036.0000 - val_precision: 0.2368 - val_recall: 0.9997 - val_accuracy: 0.2370 - val_auc: 0.5000
+  Epoch 4/70
+  400/400 [==============================] - 629s 2s/step - loss: 0.6738 - tp: 5537594.0000 - fp: 1337082.0000 - tn: 23959264.0000 - fn: 1934060.0000 - precision: 0.8055 - recall: 0.7411 - accuracy: 0.9002 -
+  auc: 0.9303 - val_loss: 1.2653 - val_tp: 3303018.0000 - val_fp: 1870945.0000 - val_tn: 10869556.0000 - val_fn: 340481.0000 - val_precision: 0.6384 - val_recall: 0.9066 - val_accuracy: 0.8650 - val_auc: 0.92
+  24
+  Epoch 5/70
+  400/400 [==============================] - 631s 2s/step - loss: 0.5958 - tp: 5587069.0000 - fp: 1162314.0000 - tn: 24313792.0000 - fn: 1704840.0000 - precision: 0.8278 - recall: 0.7662 - accuracy: 0.9125 -
+  auc: 0.9409 - val_loss: 1.2564 - val_tp: 2402186.0000 - val_fp: 760086.0000 - val_tn: 11788196.0000 - val_fn: 1433532.0000 - val_precision: 0.7596 - val_recall: 0.6263 - val_accuracy: 0.8661 - val_auc: 0.84
+  39
+  Epoch 6/70
+  400/400 [==============================] - 632s 2s/step - loss: 0.5248 - tp: 6187578.0000 - fp: 1102970.0000 - tn: 24040936.0000 - fn: 1436530.0000 - precision: 0.8487 - recall: 0.8116 - accuracy: 0.9225 -
+  auc: 0.9536 - val_loss: 3.8886 - val_tp: 3699587.0000 - val_fp: 5786776.0000 - val_tn: 6872632.0000 - val_fn: 25005.0000 - val_precision: 0.3900 - val_recall: 0.9933 - val_accuracy: 0.6453 - val_auc: 0.8590
+  Epoch 7/70
+  400/400 [==============================] - 629s 2s/step - loss: 0.5417 - tp: 6075103.0000 - fp: 1198710.0000 - tn: 23976388.0000 - fn: 1517805.0000 - precision: 0.8352 - recall: 0.8001 - accuracy: 0.9171 -
+  auc: 0.9507 - val_loss: 0.6575 - val_tp: 3549691.0000 - val_fp: 1710464.0000 - val_tn: 10816997.0000 - val_fn: 306848.0000 - val_precision: 0.6748 - val_recall: 0.9204 - val_accuracy: 0.8769 - val_auc: 0.95
+  25
+  Epoch 8/70
+  400/400 [==============================] - 630s 2s/step - loss: 0.5261 - tp: 6041081.0000 - fp: 1000532.0000 - tn: 24306236.0000 - fn: 1420140.0000 - precision: 0.8579 - recall: 0.8097 - accuracy: 0.9261 -
+  auc: 0.9527 - val_loss: 21.2177 - val_tp: 3715793.0000 - val_fp: 9558636.0000 - val_tn: 3103000.0000 - val_fn: 6571.0000 - val_precision: 0.2799 - val_recall: 0.9982 - val_accuracy: 0.4162 - val_auc: 0.6830
+  Epoch 9/70
+  400/400 [==============================] - 634s 2s/step - loss: 0.5777 - tp: 5925253.0000 - fp: 1206548.0000 - tn: 23980040.0000 - fn: 1656156.0000 - precision: 0.8308 - recall: 0.7816 - accuracy: 0.9126 -
+  auc: 0.9467 - val_loss: 1.4550 - val_tp: 2525888.0000 - val_fp: 1794119.0000 - val_tn: 10974268.0000 - val_fn: 1089725.0000 - val_precision: 0.5847 - val_recall: 0.6986 - val_accuracy: 0.8240 - val_auc: 0.8
+  157
+  Epoch 10/70
+  400/400 [==============================] - 633s 2s/step - loss: 0.4670 - tp: 6137276.0000 - fp: 1085998.0000 - tn: 24173720.0000 - fn: 1370997.0000 - precision: 0.8497 - recall: 0.8174 - accuracy: 0.9250 -
+  auc: 0.9596 - val_loss: 0.4228 - val_tp: 3267331.0000 - val_fp: 512452.0000 - val_tn: 12134530.0000 - val_fn: 469687.0000 - val_precision: 0.8644 - val_recall: 0.8743 - val_accuracy: 0.9401 - val_auc: 0.958
+  6
+  Epoch 11/70
+  400/400 [==============================] - 636s 2s/step - loss: 0.4183 - tp: 6387249.0000 - fp: 950432.0000 - tn: 24334356.0000 - fn: 1095980.0000 - precision: 0.8705 - recall: 0.8535 - accuracy: 0.9375 - a
+  uc: 0.9662 - val_loss: 2.5835 - val_tp: 3791404.0000 - val_fp: 10983628.0000 - val_tn: 1606117.0000 - val_fn: 2851.0000 - val_precision: 0.2566 - val_recall: 0.9992 - val_accuracy: 0.3294 - val_auc: 0.9205
+  Epoch 12/70
+  400/400 [==============================] - 633s 2s/step - loss: 0.3622 - tp: 6622657.0000 - fp: 875498.0000 - tn: 24381258.0000 - fn: 888583.0000 - precision: 0.8832 - recall: 0.8817 - accuracy: 0.9462 - au
+  c: 0.9716 - val_loss: 0.3789 - val_tp: 3055309.0000 - val_fp: 146845.0000 - val_tn: 12452879.0000 - val_fn: 728967.0000 - val_precision: 0.9541 - val_recall: 0.8074 - val_accuracy: 0.9465 - val_auc: 0.9659
+  Epoch 13/70
+  400/400 [==============================] - 631s 2s/step - loss: 0.3590 - tp: 6660677.0000 - fp: 869994.0000 - tn: 24335574.0000 - fn: 901756.0000 - precision: 0.8845 - recall: 0.8808 - accuracy: 0.9459 - au
+  c: 0.9722 - val_loss: 0.4284 - val_tp: 2585078.0000 - val_fp: 26120.0000 - val_tn: 12713922.0000 - val_fn: 1058880.0000 - val_precision: 0.9900 - val_recall: 0.7094 - val_accuracy: 0.9338 - val_auc: 0.9595
+  Epoch 14/70
+  400/400 [==============================] - 631s 2s/step - loss: 0.3391 - tp: 6632643.0000 - fp: 838058.0000 - tn: 24461996.0000 - fn: 835290.0000 - precision: 0.8878 - recall: 0.8881 - accuracy: 0.9489 - au
+  c: 0.9747 - val_loss: 0.3533 - val_tp: 3003363.0000 - val_fp: 127052.0000 - val_tn: 12492719.0000 - val_fn: 760866.0000 - val_precision: 0.9594 - val_recall: 0.7979 - val_accuracy: 0.9458 - val_auc: 0.9766
+  Epoch 15/70
+  400/400 [==============================] - 634s 2s/step - loss: 0.3422 - tp: 6682203.0000 - fp: 861078.0000 - tn: 24351496.0000 - fn: 873232.0000 - precision: 0.8858 - recall: 0.8844 - accuracy: 0.9471 - au
+  c: 0.9741 - val_loss: 0.3630 - val_tp: 2919284.0000 - val_fp: 89104.0000 - val_tn: 12597566.0000 - val_fn: 778046.0000 - val_precision: 0.9704 - val_recall: 0.7896 - val_accuracy: 0.9471 - val_auc: 0.9763
+  Epoch 16/70
+  400/400 [==============================] - 632s 2s/step - loss: 0.3356 - tp: 6670288.0000 - fp: 818050.0000 - tn: 24453228.0000 - fn: 826432.0000 - precision: 0.8908 - recall: 0.8898 - accuracy: 0.9498 - au
+  c: 0.9748 - val_loss: 0.7556 - val_tp: 1874704.0000 - val_fp: 1072.0000 - val_tn: 12589343.0000 - val_fn: 1918881.0000 - val_precision: 0.9994 - val_recall: 0.4942 - val_accuracy: 0.8828 - val_auc: 0.9213
+  Epoch 17/70
+  400/400 [==============================] - 629s 2s/step - loss: 0.3260 - tp: 6760875.0000 - fp: 795293.0000 - tn: 24413246.0000 - fn: 798585.0000 - precision: 0.8947 - recall: 0.8944 - accuracy: 0.9514 - au
+  c: 0.9761 - val_loss: 0.4649 - val_tp: 2671759.0000 - val_fp: 36166.0000 - val_tn: 12592753.0000 - val_fn: 1083322.0000 - val_precision: 0.9866 - val_recall: 0.7115 - val_accuracy: 0.9317 - val_auc: 0.9546
+  Epoch 18/70
+  400/400 [==============================] - 631s 2s/step - loss: 0.3309 - tp: 6559233.0000 - fp: 790466.0000 - tn: 24604904.0000 - fn: 813389.0000 - precision: 0.8924 - recall: 0.8897 - accuracy: 0.9511 - au
+  c: 0.9751 - val_loss: 0.4767 - val_tp: 2812359.0000 - val_fp: 90282.0000 - val_tn: 12389838.0000 - val_fn: 1091521.0000 - val_precision: 0.9689 - val_recall: 0.7204 - val_accuracy: 0.9279 - val_auc: 0.9586
+  Epoch 19/70
+  400/400 [==============================] - 631s 2s/step - loss: 0.3375 - tp: 6783791.0000 - fp: 866853.0000 - tn: 24263056.0000 - fn: 854305.0000 - precision: 0.8867 - recall: 0.8882 - accuracy: 0.9475 - au
+  c: 0.9752 - val_loss: 0.3983 - val_tp: 2551077.0000 - val_fp: 35530.0000 - val_tn: 12721430.0000 - val_fn: 1075963.0000 - val_precision: 0.9863 - val_recall: 0.7033 - val_accuracy: 0.9322 - val_auc: 0.9710
+  Epoch 20/70
+  400/400 [==============================] - 632s 2s/step - loss: 0.3254 - tp: 6564303.0000 - fp: 830891.0000 - tn: 24563264.0000 - fn: 809541.0000 - precision: 0.8876 - recall: 0.8902 - accuracy: 0.9499 - au
+  c: 0.9757 - val_loss: 0.5314 - val_tp: 2046949.0000 - val_fp: 3561.0000 - val_tn: 12714086.0000 - val_fn: 1619404.0000 - val_precision: 0.9983 - val_recall: 0.5583 - val_accuracy: 0.9009 - val_auc: 0.9545
+  Epoch 21/70
+  400/400 [==============================] - 640s 2s/step - loss: 0.3196 - tp: 6686380.0000 - fp: 775563.0000 - tn: 24496560.0000 - fn: 809502.0000 - precision: 0.8961 - recall: 0.8920 - accuracy: 0.9516 - au
+  c: 0.9765 - val_loss: 0.4055 - val_tp: 2871943.0000 - val_fp: 218969.0000 - val_tn: 12467101.0000 - val_fn: 825987.0000 - val_precision: 0.9292 - val_recall: 0.7766 - val_accuracy: 0.9362 - val_auc: 0.9714
+  Epoch 22/70
+  400/400 [==============================] - 625s 2s/step - loss: 0.3154 - tp: 6756372.0000 - fp: 777461.0000 - tn: 24450556.0000 - fn: 783609.0000 - precision: 0.8968 - recall: 0.8961 - accuracy: 0.9524 - au
+  c: 0.9770 - val_loss: 0.3362 - val_tp: 3143955.0000 - val_fp: 135752.0000 - val_tn: 12411791.0000 - val_fn: 692502.0000 - val_precision: 0.9586 - val_recall: 0.8195 - val_accuracy: 0.9494 - val_auc: 0.9754
+  Epoch 23/70
+  400/400 [==============================] - 633s 2s/step - loss: 0.3294 - tp: 6975026.0000 - fp: 773797.0000 - tn: 24208046.0000 - fn: 811140.0000 - precision: 0.9001 - recall: 0.8958 - accuracy: 0.9516 - au
+  c: 0.9760 - val_loss: 0.3650 - val_tp: 2827380.0000 - val_fp: 88109.0000 - val_tn: 12626725.0000 - val_fn: 841786.0000 - val_precision: 0.9698 - val_recall: 0.7706 - val_accuracy: 0.9432 - val_auc: 0.9697
+  Epoch 24/70
+  400/400 [==============================] - 629s 2s/step - loss: 0.3184 - tp: 6701853.0000 - fp: 767247.0000 - tn: 24524388.0000 - fn: 774508.0000 - precision: 0.8973 - recall: 0.8964 - accuracy: 0.9529 - au
+  c: 0.9767 - val_loss: 0.5394 - val_tp: 2252899.0000 - val_fp: 4050.0000 - val_tn: 12590875.0000 - val_fn: 1536176.0000 - val_precision: 0.9982 - val_recall: 0.5946 - val_accuracy: 0.9060 - val_auc: 0.9528
+  Epoch 25/70
+  400/400 [==============================] - 633s 2s/step - loss: 0.3189 - tp: 6642243.0000 - fp: 777194.0000 - tn: 24527812.0000 - fn: 820758.0000 - precision: 0.8952 - recall: 0.8900 - accuracy: 0.9512 - au
+  c: 0.9762 - val_loss: 0.3377 - val_tp: 3281478.0000 - val_fp: 329375.0000 - val_tn: 12262368.0000 - val_fn: 510779.0000 - val_precision: 0.9088 - val_recall: 0.8653 - val_accuracy: 0.9487 - val_auc: 0.9760
+  Epoch 26/70
+  400/400 [==============================] - 636s 2s/step - loss: 0.3137 - tp: 6689776.0000 - fp: 788613.0000 - tn: 24505860.0000 - fn: 783748.0000 - precision: 0.8945 - recall: 0.8951 - accuracy: 0.9520 - au
+  c: 0.9772 - val_loss: 0.4429 - val_tp: 2772106.0000 - val_fp: 45921.0000 - val_tn: 12444722.0000 - val_fn: 1121251.0000 - val_precision: 0.9837 - val_recall: 0.7120 - val_accuracy: 0.9288 - val_auc: 0.9625
+  Epoch 27/70
+  400/400 [==============================] - 632s 2s/step - loss: 0.3110 - tp: 6754135.0000 - fp: 761746.0000 - tn: 24463904.0000 - fn: 788220.0000 - precision: 0.8986 - recall: 0.8955 - accuracy: 0.9527 - au
+  c: 0.9778 - val_loss: 0.3217 - val_tp: 3322329.0000 - val_fp: 341816.0000 - val_tn: 12309980.0000 - val_fn: 409875.0000 - val_precision: 0.9067 - val_recall: 0.8902 - val_accuracy: 0.9541 - val_auc: 0.9829
+  Epoch 28/70
+  400/400 [==============================] - 632s 2s/step - loss: 0.3143 - tp: 6711103.0000 - fp: 764757.0000 - tn: 24512308.0000 - fn: 779835.0000 - precision: 0.8977 - recall: 0.8959 - accuracy: 0.9529 - au
+  c: 0.9772 - val_loss: 0.5518 - val_tp: 2137267.0000 - val_fp: 8417.0000 - val_tn: 12762333.0000 - val_fn: 1475983.0000 - val_precision: 0.9961 - val_recall: 0.5915 - val_accuracy: 0.9094 - val_auc: 0.9459
+  Epoch 29/70
+  400/400 [==============================] - 636s 2s/step - loss: 0.3172 - tp: 6808597.0000 - fp: 762146.0000 - tn: 24410300.0000 - fn: 786963.0000 - precision: 0.8993 - recall: 0.8964 - accuracy: 0.9527 - au
+  c: 0.9773 - val_loss: 0.3880 - val_tp: 3284429.0000 - val_fp: 149353.0000 - val_tn: 12279814.0000 - val_fn: 670404.0000 - val_precision: 0.9565 - val_recall: 0.8305 - val_accuracy: 0.9500 - val_auc: 0.9824
+  Epoch 30/70
+  400/400 [==============================] - 636s 2s/step - loss: 0.3119 - tp: 6732407.0000 - fp: 734825.0000 - tn: 24527008.0000 - fn: 773770.0000 - precision: 0.9016 - recall: 0.8969 - accuracy: 0.9540 - au
+  c: 0.9770 - val_loss: 0.3304 - val_tp: 3197972.0000 - val_fp: 378897.0000 - val_tn: 12377137.0000 - val_fn: 429994.0000 - val_precision: 0.8941 - val_recall: 0.8815 - val_accuracy: 0.9506 - val_auc: 0.9788
+  Epoch 31/70
+  400/400 [==============================] - 639s 2s/step - loss: 0.3172 - tp: 6584008.0000 - fp: 749012.0000 - tn: 24635250.0000 - fn: 799720.0000 - precision: 0.8979 - recall: 0.8917 - accuracy: 0.9527 - au
+  c: 0.9763 - val_loss: 0.4527 - val_tp: 3349009.0000 - val_fp: 338939.0000 - val_tn: 12288817.0000 - val_fn: 407235.0000 - val_precision: 0.9081 - val_recall: 0.8916 - val_accuracy: 0.9545 - val_auc: 0.9822
+  Epoch 32/70
+  400/400 [==============================] - 632s 2s/step - loss: 0.3146 - tp: 6690763.0000 - fp: 766270.0000 - tn: 24531178.0000 - fn: 779790.0000 - precision: 0.8972 - recall: 0.8956 - accuracy: 0.9528 - au
+  c: 0.9763 - val_loss: 0.3255 - val_tp: 2945281.0000 - val_fp: 103765.0000 - val_tn: 12623298.0000 - val_fn: 711656.0000 - val_precision: 0.9660 - val_recall: 0.8054 - val_accuracy: 0.9502 - val_auc: 0.9761
+  Epoch 33/70
+  400/400 [==============================] - 632s 2s/step - loss: 0.2975 - tp: 6744548.0000 - fp: 747413.0000 - tn: 24547794.0000 - fn: 728248.0000 - precision: 0.9002 - recall: 0.9025 - accuracy: 0.9550 - au
+  c: 0.9787 - val_loss: 0.3461 - val_tp: 2865337.0000 - val_fp: 80568.0000 - val_tn: 12713439.0000 - val_fn: 724656.0000 - val_precision: 0.9727 - val_recall: 0.7981 - val_accuracy: 0.9509 - val_auc: 0.9780
+  Epoch 34/70
+  400/400 [==============================] - 635s 2s/step - loss: 0.3060 - tp: 6610739.0000 - fp: 717355.0000 - tn: 24665928.0000 - fn: 773982.0000 - precision: 0.9021 - recall: 0.8952 - accuracy: 0.9545 - au
+  c: 0.9768 - val_loss: 0.3895 - val_tp: 2875845.0000 - val_fp: 64187.0000 - val_tn: 12593693.0000 - val_fn: 850275.0000 - val_precision: 0.9782 - val_recall: 0.7718 - val_accuracy: 0.9442 - val_auc: 0.9762
+  Epoch 35/70
+  400/400 [==============================] - 632s 2s/step - loss: 0.3131 - tp: 6658644.0000 - fp: 787948.0000 - tn: 24555564.0000 - fn: 765835.0000 - precision: 0.8942 - recall: 0.8968 - accuracy: 0.9526 - au
+  c: 0.9770 - val_loss: 0.3298 - val_tp: 3291381.0000 - val_fp: 128257.0000 - val_tn: 12266428.0000 - val_fn: 697934.0000 - val_precision: 0.9625 - val_recall: 0.8250 - val_accuracy: 0.9496 - val_auc: 0.9787
+  Epoch 36/70
+  400/400 [==============================] - 631s 2s/step - loss: 0.3076 - tp: 6714273.0000 - fp: 757539.0000 - tn: 24536108.0000 - fn: 760070.0000 - precision: 0.8986 - recall: 0.8983 - accuracy: 0.9537 - au
+  c: 0.9776 - val_loss: 0.3586 - val_tp: 2828629.0000 - val_fp: 70731.0000 - val_tn: 12691571.0000 - val_fn: 793069.0000 - val_precision: 0.9756 - val_recall: 0.7810 - val_accuracy: 0.9473 - val_auc: 0.9764
+  Epoch 37/70
+  400/400 [==============================] - 630s 2s/step - loss: 0.3019 - tp: 6673190.0000 - fp: 759238.0000 - tn: 24567992.0000 - fn: 767563.0000 - precision: 0.8978 - recall: 0.8968 - accuracy: 0.9534 - au
+  c: 0.9783 - val_loss: 0.3614 - val_tp: 3049928.0000 - val_fp: 93276.0000 - val_tn: 12445161.0000 - val_fn: 795635.0000 - val_precision: 0.9703 - val_recall: 0.7931 - val_accuracy: 0.9457 - val_auc: 0.9755
+  Epoch 38/70
+  400/400 [==============================] - 631s 2s/step - loss: 0.3022 - tp: 6902334.0000 - fp: 772344.0000 - tn: 24353052.0000 - fn: 740273.0000 - precision: 0.8994 - recall: 0.9031 - accuracy: 0.9538 - au
+  c: 0.9785 - val_loss: 0.3220 - val_tp: 2932889.0000 - val_fp: 104394.0000 - val_tn: 12669356.0000 - val_fn: 677361.0000 - val_precision: 0.9656 - val_recall: 0.8124 - val_accuracy: 0.9523 - val_auc: 0.9783
+  Epoch 39/70
+  400/400 [==============================] - 632s 2s/step - loss: 0.2978 - tp: 6800883.0000 - fp: 734721.0000 - tn: 24491858.0000 - fn: 740536.0000 - precision: 0.9025 - recall: 0.9018 - accuracy: 0.9550 - au
+  c: 0.9785 - val_loss: 0.3295 - val_tp: 3082233.0000 - val_fp: 128611.0000 - val_tn: 12542874.0000 - val_fn: 630282.0000 - val_precision: 0.9599 - val_recall: 0.8302 - val_accuracy: 0.9537 - val_auc: 0.9799
+  Epoch 40/70
+  400/400 [==============================] - 634s 2s/step - loss: 0.3083 - tp: 6769252.0000 - fp: 762049.0000 - tn: 24472648.0000 - fn: 764043.0000 - precision: 0.8988 - recall: 0.8986 - accuracy: 0.9534 - au
+  c: 0.9771 - val_loss: 0.3593 - val_tp: 2826188.0000 - val_fp: 59581.0000 - val_tn: 12671875.0000 - val_fn: 826356.0000 - val_precision: 0.9794 - val_recall: 0.7738 - val_accuracy: 0.9459 - val_auc: 0.9756
+  Epoch 41/70
+  400/400 [==============================] - 630s 2s/step - loss: 0.2953 - tp: 6718090.0000 - fp: 747344.0000 - tn: 24561188.0000 - fn: 741388.0000 - precision: 0.8999 - recall: 0.9006 - accuracy: 0.9546 - au
+  c: 0.9793 - val_loss: 0.3628 - val_tp: 2996938.0000 - val_fp: 97647.0000 - val_tn: 12518986.0000 - val_fn: 770429.0000 - val_precision: 0.9684 - val_recall: 0.7955 - val_accuracy: 0.9470 - val_auc: 0.9774
+  Epoch 42/70
+  400/400 [==============================] - 629s 2s/step - loss: 0.3039 - tp: 6654758.0000 - fp: 731543.0000 - tn: 24611838.0000 - fn: 769861.0000 - precision: 0.9010 - recall: 0.8963 - accuracy: 0.9542 - au
+  c: 0.9775 - val_loss: 0.3282 - val_tp: 2923757.0000 - val_fp: 81924.0000 - val_tn: 12615035.0000 - val_fn: 763284.0000 - val_precision: 0.9727 - val_recall: 0.7930 - val_accuracy: 0.9484 - val_auc: 0.9759
+  Epoch 43/70
+  400/400 [==============================] - 636s 2s/step - loss: 0.2937 - tp: 6435979.0000 - fp: 733398.0000 - tn: 24870358.0000 - fn: 728270.0000 - precision: 0.8977 - recall: 0.8983 - accuracy: 0.9554 - au
+  c: 0.9781 - val_loss: 0.3116 - val_tp: 3021625.0000 - val_fp: 126888.0000 - val_tn: 12599400.0000 - val_fn: 636087.0000 - val_precision: 0.9597 - val_recall: 0.8261 - val_accuracy: 0.9534 - val_auc: 0.9791
+  Epoch 44/70
+  400/400 [==============================] - 638s 2s/step - loss: 0.3207 - tp: 6810749.0000 - fp: 779963.0000 - tn: 24383824.0000 - fn: 793469.0000 - precision: 0.8972 - recall: 0.8957 - accuracy: 0.9520 - au
+  c: 0.9763 - val_loss: 0.3609 - val_tp: 3046190.0000 - val_fp: 96429.0000 - val_tn: 12529182.0000 - val_fn: 712199.0000 - val_precision: 0.9693 - val_recall: 0.8105 - val_accuracy: 0.9506 - val_auc: 0.9784
+  Epoch 45/70
+  400/400 [==============================] - 631s 2s/step - loss: 0.3025 - tp: 7086768.0000 - fp: 750575.0000 - tn: 24182492.0000 - fn: 748166.0000 - precision: 0.9042 - recall: 0.9045 - accuracy: 0.9543 - au
+  c: 0.9790 - val_loss: 0.3397 - val_tp: 2823520.0000 - val_fp: 64000.0000 - val_tn: 12722924.0000 - val_fn: 773556.0000 - val_precision: 0.9778 - val_recall: 0.7849 - val_accuracy: 0.9489 - val_auc: 0.9768
+  Epoch 46/70
+  400/400 [==============================] - 639s 2s/step - loss: 0.3029 - tp: 6575419.0000 - fp: 752434.0000 - tn: 24679216.0000 - fn: 760935.0000 - precision: 0.8973 - recall: 0.8963 - accuracy: 0.9538 - au
+  c: 0.9777 - val_loss: 0.3449 - val_tp: 3214822.0000 - val_fp: 77887.0000 - val_tn: 12327207.0000 - val_fn: 764084.0000 - val_precision: 0.9763 - val_recall: 0.8080 - val_accuracy: 0.9486 - val_auc: 0.9800
+  Epoch 47/70
+  400/400 [==============================] - 638s 2s/step - loss: 0.2988 - tp: 7041341.0000 - fp: 779154.0000 - tn: 24212120.0000 - fn: 735391.0000 - precision: 0.9004 - recall: 0.9054 - accuracy: 0.9538 - au
+  c: 0.9794 - val_loss: 0.3507 - val_tp: 2992658.0000 - val_fp: 83764.0000 - val_tn: 12550469.0000 - val_fn: 757109.0000 - val_precision: 0.9728 - val_recall: 0.7981 - val_accuracy: 0.9487 - val_auc: 0.9795
+  Epoch 48/70
+  400/400 [==============================] - 633s 2s/step - loss: 0.3015 - tp: 6740728.0000 - fp: 737863.0000 - tn: 24521192.0000 - fn: 768220.0000 - precision: 0.9013 - recall: 0.8977 - accuracy: 0.9540 - au
+  c: 0.9781 - val_loss: 0.3456 - val_tp: 3135590.0000 - val_fp: 126895.0000 - val_tn: 12407028.0000 - val_fn: 714487.0000 - val_precision: 0.9611 - val_recall: 0.8144 - val_accuracy: 0.9486 - val_auc: 0.9755
+  Epoch 49/70
+  400/400 [==============================] - 630s 2s/step - loss: 0.2965 - tp: 6929622.0000 - fp: 773455.0000 - tn: 24334720.0000 - fn: 730210.0000 - precision: 0.8996 - recall: 0.9047 - accuracy: 0.9541 - au
+  c: 0.9793 - val_loss: 0.3253 - val_tp: 2923894.0000 - val_fp: 87045.0000 - val_tn: 12668721.0000 - val_fn: 704340.0000 - val_precision: 0.9711 - val_recall: 0.8059 - val_accuracy: 0.9517 - val_auc: 0.9786
+  Epoch 50/70
+  400/400 [==============================] - 631s 2s/step - loss: 0.3053 - tp: 6698368.0000 - fp: 772097.0000 - tn: 24544316.0000 - fn: 753212.0000 - precision: 0.8966 - recall: 0.8989 - accuracy: 0.9535 - au
+  c: 0.9778 - val_loss: 0.3687 - val_tp: 2958570.0000 - val_fp: 52523.0000 - val_tn: 12513477.0000 - val_fn: 859430.0000 - val_precision: 0.9826 - val_recall: 0.7749 - val_accuracy: 0.9443 - val_auc: 0.9771
+  Epoch 51/70
+  400/400 [==============================] - 635s 2s/step - loss: 0.2971 - tp: 6664028.0000 - fp: 737094.0000 - tn: 24626012.0000 - fn: 740867.0000 - precision: 0.9004 - recall: 0.8999 - accuracy: 0.9549 - au
+  c: 0.9786 - val_loss: 0.3459 - val_tp: 3029844.0000 - val_fp: 116426.0000 - val_tn: 12539360.0000 - val_fn: 698370.0000 - val_precision: 0.9630 - val_recall: 0.8127 - val_accuracy: 0.9503 - val_auc: 0.9793
+  Epoch 52/70
+  400/400 [==============================] - 633s 2s/step - loss: 0.3026 - tp: 6753347.0000 - fp: 678789.0000 - tn: 24527348.0000 - fn: 808513.0000 - precision: 0.9087 - recall: 0.8931 - accuracy: 0.9546 - au
+  c: 0.9785 - val_loss: 0.3330 - val_tp: 2851126.0000 - val_fp: 109294.0000 - val_tn: 12699895.0000 - val_fn: 723685.0000 - val_precision: 0.9631 - val_recall: 0.7976 - val_accuracy: 0.9492 - val_auc: 0.9762
+  Epoch 53/70
+  400/400 [==============================] - 636s 2s/step - loss: 0.2980 - tp: 6803599.0000 - fp: 685524.0000 - tn: 24488690.0000 - fn: 790195.0000 - precision: 0.9085 - recall: 0.8959 - accuracy: 0.9550 - au
+  c: 0.9786 - val_loss: 0.3384 - val_tp: 2978082.0000 - val_fp: 84198.0000 - val_tn: 12570606.0000 - val_fn: 751114.0000 - val_precision: 0.9725 - val_recall: 0.7986 - val_accuracy: 0.9490 - val_auc: 0.9782
+  Epoch 54/70
+  400/400 [==============================] - 636s 2s/step - loss: 0.3008 - tp: 6617352.0000 - fp: 660115.0000 - tn: 24672528.0000 - fn: 818008.0000 - precision: 0.9093 - recall: 0.8900 - accuracy: 0.9549 - au
+  c: 0.9776 - val_loss: 0.3487 - val_tp: 3069049.0000 - val_fp: 100663.0000 - val_tn: 12450296.0000 - val_fn: 763992.0000 - val_precision: 0.9682 - val_recall: 0.8007 - val_accuracy: 0.9472 - val_auc: 0.9767
+  Epoch 55/70
+  400/400 [==============================] - 634s 2s/step - loss: 0.3041 - tp: 6727196.0000 - fp: 696140.0000 - tn: 24540392.0000 - fn: 804270.0000 - precision: 0.9062 - recall: 0.8932 - accuracy: 0.9542 - au
+  c: 0.9781 - val_loss: 0.3201 - val_tp: 2941382.0000 - val_fp: 99527.0000 - val_tn: 12647545.0000 - val_fn: 695546.0000 - val_precision: 0.9673 - val_recall: 0.8088 - val_accuracy: 0.9515 - val_auc: 0.9784
+  Epoch 56/70
+  400/400 [==============================] - 636s 2s/step - loss: 0.2960 - tp: 6826521.0000 - fp: 708283.0000 - tn: 24472022.0000 - fn: 761183.0000 - precision: 0.9060 - recall: 0.8997 - accuracy: 0.9552 - au
+  c: 0.9793 - val_loss: 0.3209 - val_tp: 2942017.0000 - val_fp: 95854.0000 - val_tn: 12658328.0000 - val_fn: 687801.0000 - val_precision: 0.9684 - val_recall: 0.8105 - val_accuracy: 0.9522 - val_auc: 0.9787
+  Epoch 57/70
+  400/400 [==============================] - 638s 2s/step - loss: 0.2978 - tp: 6648554.0000 - fp: 686959.0000 - tn: 24654000.0000 - fn: 778489.0000 - precision: 0.9064 - recall: 0.8952 - accuracy: 0.9553 - au
+  c: 0.9782 - val_loss: 0.3418 - val_tp: 3047748.0000 - val_fp: 90564.0000 - val_tn: 12482669.0000 - val_fn: 763019.0000 - val_precision: 0.9711 - val_recall: 0.7998 - val_accuracy: 0.9479 - val_auc: 0.9784
+  Epoch 58/70
+  400/400 [==============================] - 637s 2s/step - loss: 0.3043 - tp: 6628231.0000 - fp: 693416.0000 - tn: 24639726.0000 - fn: 806627.0000 - precision: 0.9053 - recall: 0.8915 - accuracy: 0.9542 - au
+  c: 0.9777 - val_loss: 0.3313 - val_tp: 3159765.0000 - val_fp: 106822.0000 - val_tn: 12398325.0000 - val_fn: 719088.0000 - val_precision: 0.9673 - val_recall: 0.8146 - val_accuracy: 0.9496 - val_auc: 0.9780
+  Epoch 59/70
+  400/400 [==============================] - 637s 2s/step - loss: 0.3006 - tp: 6652559.0000 - fp: 718848.0000 - tn: 24625476.0000 - fn: 771096.0000 - precision: 0.9025 - recall: 0.8961 - accuracy: 0.9545 - au
+  c: 0.9786 - val_loss: 0.3533 - val_tp: 3040082.0000 - val_fp: 82199.0000 - val_tn: 12530147.0000 - val_fn: 731572.0000 - val_precision: 0.9737 - val_recall: 0.8060 - val_accuracy: 0.9503 - val_auc: 0.9795
+  Epoch 60/70
+  400/400 [==============================] - 634s 2s/step - loss: 0.3137 - tp: 6891311.0000 - fp: 715443.0000 - tn: 24333106.0000 - fn: 828145.0000 - precision: 0.9059 - recall: 0.8927 - accuracy: 0.9529 - au
+  c: 0.9774 - val_loss: 0.3250 - val_tp: 2930627.0000 - val_fp: 99442.0000 - val_tn: 12670646.0000 - val_fn: 683285.0000 - val_precision: 0.9672 - val_recall: 0.8109 - val_accuracy: 0.9522 - val_auc: 0.9785
+  Epoch 61/70
+  400/400 [==============================] - 641s 2s/step - loss: 0.3028 - tp: 6738706.0000 - fp: 737970.0000 - tn: 24529770.0000 - fn: 761545.0000 - precision: 0.9013 - recall: 0.8985 - accuracy: 0.9542 - au
+  c: 0.9783 - val_loss: 0.3347 - val_tp: 3211606.0000 - val_fp: 100010.0000 - val_tn: 12350882.0000 - val_fn: 721502.0000 - val_precision: 0.9698 - val_recall: 0.8166 - val_accuracy: 0.9499 - val_auc: 0.9791
+  Epoch 62/70
+  400/400 [==============================] - 635s 2s/step - loss: 0.3047 - tp: 6492872.0000 - fp: 710243.0000 - tn: 24764572.0000 - fn: 800309.0000 - precision: 0.9014 - recall: 0.8903 - accuracy: 0.9539 - au
+  c: 0.9771 - val_loss: 0.3868 - val_tp: 3110246.0000 - val_fp: 71777.0000 - val_tn: 12369449.0000 - val_fn: 832528.0000 - val_precision: 0.9774 - val_recall: 0.7888 - val_accuracy: 0.9448 - val_auc: 0.9764
+  Epoch 63/70
+  400/400 [==============================] - 633s 2s/step - loss: 0.3033 - tp: 6979600.0000 - fp: 720858.0000 - tn: 24300348.0000 - fn: 767184.0000 - precision: 0.9064 - recall: 0.9010 - accuracy: 0.9546 - au
+  c: 0.9788 - val_loss: 0.3340 - val_tp: 3093435.0000 - val_fp: 85835.0000 - val_tn: 12442850.0000 - val_fn: 761880.0000 - val_precision: 0.9730 - val_recall: 0.8024 - val_accuracy: 0.9483 - val_auc: 0.9784
+  Epoch 64/70
+  400/400 [==============================] - 637s 2s/step - loss: 0.2992 - tp: 6684955.0000 - fp: 717935.0000 - tn: 24597880.0000 - fn: 767241.0000 - precision: 0.9030 - recall: 0.8970 - accuracy: 0.9547 - au
+  c: 0.9787 - val_loss: 0.3498 - val_tp: 2864609.0000 - val_fp: 82878.0000 - val_tn: 12711063.0000 - val_fn: 725450.0000 - val_precision: 0.9719 - val_recall: 0.7979 - val_accuracy: 0.9507 - val_auc: 0.9786
+  Epoch 65/70
+  400/400 [==============================] - 637s 2s/step - loss: 0.2992 - tp: 6881058.0000 - fp: 713083.0000 - tn: 24387492.0000 - fn: 786363.0000 - precision: 0.9061 - recall: 0.8974 - accuracy: 0.9542 - au
+  c: 0.9792 - val_loss: 0.3161 - val_tp: 3129890.0000 - val_fp: 123769.0000 - val_tn: 12482708.0000 - val_fn: 647633.0000 - val_precision: 0.9620 - val_recall: 0.8286 - val_accuracy: 0.9529 - val_auc: 0.9799
+  Epoch 66/70
+  400/400 [==============================] - 638s 2s/step - loss: 0.2998 - tp: 6513297.0000 - fp: 696712.0000 - tn: 24803000.0000 - fn: 754991.0000 - precision: 0.9034 - recall: 0.8961 - accuracy: 0.9557 - au
+  c: 0.9779 - val_loss: 0.3222 - val_tp: 3039732.0000 - val_fp: 95061.0000 - val_tn: 12541210.0000 - val_fn: 707997.0000 - val_precision: 0.9697 - val_recall: 0.8111 - val_accuracy: 0.9510 - val_auc: 0.9783
+  Epoch 67/70
+  400/400 [==============================] - 635s 2s/step - loss: 0.3011 - tp: 6869971.0000 - fp: 709956.0000 - tn: 24396884.0000 - fn: 791177.0000 - precision: 0.9063 - recall: 0.8967 - accuracy: 0.9542 - au
+  c: 0.9787 - val_loss: 0.3435 - val_tp: 3137473.0000 - val_fp: 93385.0000 - val_tn: 12425599.0000 - val_fn: 727543.0000 - val_precision: 0.9711 - val_recall: 0.8118 - val_accuracy: 0.9499 - val_auc: 0.9791
+  Epoch 68/70
+  400/400 [==============================] - 632s 2s/step - loss: 0.3034 - tp: 6640807.0000 - fp: 757137.0000 - tn: 24604356.0000 - fn: 765698.0000 - precision: 0.8977 - recall: 0.8966 - accuracy: 0.9535 - au
+  c: 0.9781 - val_loss: 0.3824 - val_tp: 3081203.0000 - val_fp: 98009.0000 - val_tn: 12448722.0000 - val_fn: 756066.0000 - val_precision: 0.9692 - val_recall: 0.8030 - val_accuracy: 0.9479 - val_auc: 0.9776
+  Epoch 69/70
+  400/400 [==============================] - 636s 2s/step - loss: 0.2988 - tp: 6698533.0000 - fp: 734236.0000 - tn: 24588786.0000 - fn: 746437.0000 - precision: 0.9012 - recall: 0.8997 - accuracy: 0.9548 - au
+  c: 0.9788 - val_loss: 0.3604 - val_tp: 2967778.0000 - val_fp: 93005.0000 - val_tn: 12540155.0000 - val_fn: 783062.0000 - val_precision: 0.9696 - val_recall: 0.7912 - val_accuracy: 0.9465 - val_auc: 0.9780
+  Epoch 70/70
+  400/400 [==============================] - 638s 2s/step - loss: 0.2996 - tp: 6725869.0000 - fp: 711970.0000 - tn: 24565164.0000 - fn: 765019.0000 - precision: 0.9043 - recall: 0.8979 - accuracy: 0.9549 - au
+  c: 0.9786 - val_loss: 0.3505 - val_tp: 3050870.0000 - val_fp: 101786.0000 - val_tn: 12476995.0000 - val_fn: 754349.0000 - val_precision: 0.9677 - val_recall: 0.8018 - val_accuracy: 0.9477 - val_auc: 0.9771
+  400/400 [==============================] - 121s 301ms/step - loss: 0.3684 - tp: 6266358.0000 - fp: 308665.0000 - tn: 24781578.0000 - fn: 1411378.0000 - precision: 0.9531 - recall: 0.8162 - accuracy: 0.9475
+  - auc: 0.9778
+  2020/06/01 10:07:50 INFO mlflow.projects: === Run (ID '1aefda1366f04f5da5d1fc2241ad9208') succeeded ===
+  (tensorflow_nightly) [ye53nis@node171 drmed-git]$
+#+end_example
+
+#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
+  mlflow ui
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+  (tensorflow_nightly) [ye53nis@node171 drmed-git]$ mlflow ui
+  [2020-06-01 10:38:40 +0200] [298787] [INFO] Starting gunicorn 20.0.4
+  [2020-06-01 10:38:40 +0200] [298787] [INFO] Listening at: http://127.0.0.1:5000 (298787)
+  [2020-06-01 10:38:40 +0200] [298787] [INFO] Using worker: sync
+  [2020-06-01 10:38:40 +0200] [298793] [INFO] Booting worker with pid: 298793
+#+end_example
