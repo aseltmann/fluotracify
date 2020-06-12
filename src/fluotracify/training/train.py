@@ -123,17 +123,25 @@ if __name__ == "__main__":
           as input (integer, indexed from 0) and returns a new learning rate
           as output (float)
         """
-        learning_rate = 0.2
+        learning_rate = 0.1
         if epoch > 10:
-            learning_rate = 0.02
-        if epoch > 20:
             learning_rate = 0.01
-        if epoch > 30:
+        if epoch > 20:
             learning_rate = 0.001
+        if epoch > 30:
+            learning_rate = 0.0001
+        if epoch > 40:
+            learning_rate = 0.00001
         if epoch > 50:
-            learning_rate = 0.00001
+            learning_rate = 0.000001
+        if epoch > 60:
+            learning_rate = 0.00000001
+        if epoch > 70:
+            learning_rate = 0.0000000001
         if epoch > 80:
-            learning_rate = 0.00001
+            learning_rate = 0.000000000001
+        if epoch > 90:
+            learning_rate = 0.00000000000001
         # log in tensorflow
         tf.summary.scalar('learning rate', data=learning_rate, step=epoch)
         # log in mlflow
