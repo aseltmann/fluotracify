@@ -32,7 +32,7 @@ def correct_correlation_by_prediction(ntraces,
     transit_times_corrected_bypred = []
     tracelen_corrected_bypred = []
 
-    features_orig, features_prepro, _NUM_EXAMPLES, _ = pandasdf_preprocessing(
+    features_orig, features_prepro, _num_examples, _ = pandasdf_preprocessing(
         features_df=traces_of_interest,
         win_len=win_len,
         ntraces_index=0,
@@ -41,7 +41,7 @@ def correct_correlation_by_prediction(ntraces,
         verbose=False)
 
     for ntraces_index in range(ntraces):
-        chunks_index = np.r_[np.arange(ntraces_index, _NUM_EXAMPLES,
+        chunks_index = np.r_[np.arange(ntraces_index, _num_examples,
                                        ntraces)].astype(np.int64)
         predtrace = features_prepro.take(chunks_index, axis=0)
         predictions = model.predict(predtrace, verbose=0)

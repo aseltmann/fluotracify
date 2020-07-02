@@ -4,8 +4,8 @@ import pandas as pd
 import seaborn as sns
 
 from fluotracify.applications.correction import correct_correlation_by_prediction
-from fluotracify.simulations.plot_simulations import correct_correlation_by_label
 from fluotracify.applications.correlate import correlation_of_arbitrary_trace
+from fluotracify.simulations.plot_simulations import correct_correlation_by_label
 
 
 def plot_distribution_of_correlations_by_label_thresholds(
@@ -189,6 +189,8 @@ def plot_distribution_of_correlations_corrected_by_prediction(
     fwhm = 250
     win_len = 128
     zoomvector = (5, 21)
+    # we assume 100 traces per file
+    nfiles = int(features.shape[1] / 100)
 
     # Calculate expected transit time for title of plot
     transit_time_expected = ((float(fwhm) / 1000)**2 *
@@ -201,8 +203,8 @@ def plot_distribution_of_correlations_corrected_by_prediction(
     traces_of_interest = pd.DataFrame()
     labels_of_interest = pd.DataFrame()
     for diff_idx in diff.index:
-        traces_tmp = features.iloc[:, diff_idx::100]
-        labels_tmp = labels.iloc[:, diff_idx::100]
+        traces_tmp = features.iloc[:, diff_idx::nfiles]
+        labels_tmp = labels.iloc[:, diff_idx::nfiles]
         traces_of_interest = pd.concat([traces_of_interest, traces_tmp],
                                        axis=1)
         labels_of_interest = pd.concat([labels_of_interest, labels_tmp],
@@ -246,16 +248,14 @@ def plot_distribution_of_correlations_corrected_by_prediction(
         # has to be DataFrame for prediction preprocessing
         traces_corrupted = pd.DataFrame(traces_corrupted)
         labels_corrupted = pd.DataFrame(labels_corrupted)
-
-        ntraces = len(traces_corrupted.columns)
     else:
         print('number of traces to plot: {}'.format(number_of_traces))
         traces_corrupted = pd.DataFrame(
             traces_of_interest[:, :number_of_traces])
         labels_corrupted = pd.DataFrame(
             labels_of_interest[:, :number_of_traces])
-        ntraces = len(traces_corrupted.columns)
 
+    ntraces = len(traces_corrupted.columns)
     lab_out = correct_correlation_by_label(ntraces=ntraces,
                                            traces_of_interest=traces_corrupted,
                                            labels_of_interest=labels_corrupted,

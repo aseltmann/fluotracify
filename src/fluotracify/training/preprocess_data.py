@@ -191,7 +191,7 @@ def tfds_from_pddf_for_vgg(features_df,
             ntraces_delimiter=ntraces_delimiter,
             zoomvector=zoomvector)
         X_temp = tf.convert_to_tensor(value=X_window.values)
-        X_tensor = tf.concat([X_tensor, X_temp], axis=0)
+        X_tensor = tf.concat(values=[X_tensor, X_temp], axis=0)
 
         y_window = _get_windowed_y_labels_from_pandasdf(
             index=idx,
@@ -200,7 +200,7 @@ def tfds_from_pddf_for_vgg(features_df,
             ntraces_delimiter=ntraces_delimiter,
             label_threshold=label_threshold)
         y_temp = tf.convert_to_tensor(value=y_window.values)
-        y_tensor = tf.concat([y_tensor, y_temp], axis=0)
+        y_tensor = tf.concat(values=[y_tensor, y_temp], axis=0)
 
     if verbose:
         print('this is the shape, dtype and an example of the features after '
@@ -254,7 +254,45 @@ def tfds_from_pddf_for_vgg(features_df,
     print('number of test examples: {}\n'.format(_NUM_EXAMPLES_total))
     return dataset_test, _NUM_EXAMPLES_total
 
+def unet_preprocesing():
+    """Preprocessing for UNET for application / deployment
 
+    This function takes pandas DataFrames containing 1D fluorescence traces
+    and preprocesses them so that they can be fed for prediction to the UNET
+    trained in the fluotracfiy project
+
+    Parameters
+    ----------
+    features_df : pandas DataFrames
+        Contain features ordered columnwise in the manner: feature_1,
+        feature_2, ...
+    length_delimiter : int, optional
+        Length of the output traces in the returned dataset. If None, then the
+        whole length of the DataFrame is used
+    ntraces_index : int
+        Index of trace used (which column to pick out of features_df)
+    ntraces_delimiter : int
+        Number of traces used / end value in slicing /
+        None: no delimiter = use all
+
+    Returns
+    -------
+    X : numpy array
+        Contains input features with original input values
+    X_norm : numpy array
+        Contains features after preprocessing for model application
+    num_examples : int64
+        Number of examples in the dataset
+    """
+    # handle different lengths of traces of experimental data
+    features_df = features_df.iloc[:, ntraces_index:(ntraces_index +
+                                                     ntraces_delimiter)]
+    features_df = features_df.dropna()
+    
+    features_cropped = features_df.iloc[:length_delimiter, :]
+    
+
+# FIXME: Rename to vgg_preprocessing()
 def pandasdf_preprocessing(features_df,
                            win_len,
                            ntraces_index,
