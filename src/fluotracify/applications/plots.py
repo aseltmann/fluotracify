@@ -3,8 +3,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
-from fluotracify.applications.correction import correct_correlation_by_prediction
-from fluotracify.applications.correlate import correlation_of_arbitrary_trace
+from fluotracify.applications import correction, correlate
 from fluotracify.simulations.plot_simulations import correct_correlation_by_label
 
 
@@ -118,6 +117,7 @@ def plot_distribution_of_correlations_corrected_by_prediction(
         pred_thresh,
         xunit,
         artifact,
+        model_type,
         xunit_bins,
         diffrates,
         features,
@@ -149,6 +149,9 @@ def plot_distribution_of_correlations_corrected_by_prediction(
         0: bright clusters / bursts
         1: detector dropout
         2: photobleaching
+    model_type : {0, 1}
+        0: vgg
+        1: unet
     xunit_bins : int or sequence of scalars or str, optional
         Binning of the histogram of xunit, see
         https://docs.scipy.org/doc/numpy/reference/generated/numpy.histogram.html
@@ -189,8 +192,7 @@ def plot_distribution_of_correlations_corrected_by_prediction(
     fwhm = 250
     win_len = 128
     zoomvector = (5, 21)
-    # we assume 100 traces per file
-    nfiles = int(features.shape[1] / 100)
+    length_delimiter = 16384
 
     # Calculate expected transit time for title of plot
     transit_time_expected = ((float(fwhm) / 1000)**2 *
@@ -198,6 +200,9 @@ def plot_distribution_of_correlations_corrected_by_prediction(
 
     # get pandas Series of diffrates of interest
     diff = diffrates.where(diffrates == diffrate_of_interest).dropna()
+
+    # get number of files for slicing the traces of interest
+    nfiles = int(features.shape[1] / 100)
 
     # get traces and labels according to the desired diffrate
     traces_of_interest = pd.DataFrame()
@@ -261,20 +266,32 @@ def plot_distribution_of_correlations_corrected_by_prediction(
                                            labels_of_interest=labels_corrupted,
                                            fwhm=fwhm)
     print('processed correlation with correction by label')
-    pred_out = correct_correlation_by_prediction(
-        ntraces=ntraces,
-        traces_of_interest=traces_corrupted,
-        model=model,
-        pred_thresh=pred_thresh,
-        win_len=win_len,
-        zoomvector=zoomvector,
-        fwhm=fwhm)
+    if model_type == 0:
+        pred_out = correction.correct_correlation_by_vgg_prediction(
+            ntraces=ntraces,
+            traces_of_interest=traces_corrupted,
+            model=model,
+            pred_thresh=pred_thresh,
+            win_len=win_len,
+            zoomvector=zoomvector,
+            fwhm=fwhm)
+    elif model_type == 1:
+        pred_out = correction.correct_correlation_by_unet_prediction(
+            ntraces=ntraces,
+            traces_of_interest=traces_corrupted,
+            model=model,
+            pred_thresh=pred_thresh,
+            length_delimiter=length_delimiter,
+            fwhm=fwhm)
+    else:
+        raise ValueError('value for model_type has to be 0 or 1')
     print('processed correlation with correction by prediction')
-    corrupt_out = correlation_of_arbitrary_trace(
+
+    corrupt_out = correlate.correlation_of_arbitrary_trace(
         ntraces=ntraces, traces_of_interest=traces_corrupted, fwhm=fwhm)
     print('processed correlation without correction')
     if plotperfect:
-        perfect_out = correlation_of_arbitrary_trace(
+        perfect_out = correlate.correlation_of_arbitrary_trace(
             ntraces=ntraces, traces_of_interest=traces_perfect, fwhm=fwhm)
 
     # PART 2: Plotting
