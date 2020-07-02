@@ -5,10 +5,9 @@ import numpy as np
 from lmfit import Parameters, fit_report, minimize
 from multipletau import autocorrelate
 
-sys.path.append('../../../mynanosimpy/nanosimpy/')
-sys.path.append('../../../mynanosimpy/nanosimpy/nanosimpy/')
-
-from nanosimpy import equations_to_fit as eq
+sys.path.append('../../nanosimpy/nanosimpy/')
+# from nanosimpy
+import equations_to_fit as eq
 
 
 def correlate(trace, fwhm, diffrate, time_step=1., verbose=True):

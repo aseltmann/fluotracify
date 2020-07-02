@@ -3,10 +3,8 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
-from fluotracify.applications.correction import (
-    correct_correlation_by_label,
-    correct_correlation_by_prediction,
-)
+from fluotracify.applications.correction import correct_correlation_by_prediction
+from fluotracify.simulations.plot_simulations import correct_correlation_by_label
 from fluotracify.applications.correlate import correlation_of_arbitrary_trace
 
 
