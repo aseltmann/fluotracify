@@ -291,13 +291,13 @@ def unet_preprocessing(features_df, length_delimiter, ntraces_index):
 
     return X, X_norm
 
-# FIXME: Rename to vgg_preprocessing()
-def pandasdf_preprocessing(features_df,
-                           win_len,
-                           ntraces_index,
-                           ntraces_delimiter,
-                           zoomvector,
-                           verbose=True):
+
+def vgg_preprocessing(features_df,
+                      win_len,
+                      ntraces_index,
+                      ntraces_delimiter,
+                      zoomvector,
+                      verbose=True):
     """Does the preprocessing like in the training pipeline (zoom levels,
     window length) for arbitrary fluorescence traces
 
