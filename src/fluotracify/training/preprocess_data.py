@@ -254,12 +254,13 @@ def tfds_from_pddf_for_vgg(features_df,
     print('number of test examples: {}\n'.format(_NUM_EXAMPLES_total))
     return dataset_test, _NUM_EXAMPLES_total
 
-def unet_preprocesing():
+
+def unet_preprocesing(features_df, length_delimiter, ntraces_index):
     """Preprocessing for UNET for application / deployment
 
-    This function takes pandas DataFrames containing 1D fluorescence traces
-    and preprocesses them so that they can be fed for prediction to the UNET
-    trained in the fluotracfiy project
+    This function preprocesses one trace from a pandas DataFrames containing
+    1D fluorescence traces and preprocesses it so that it can be fed for
+    prediction to the UNET trained in the fluotracfiy project
 
     Parameters
     ----------
@@ -271,9 +272,6 @@ def unet_preprocesing():
         whole length of the DataFrame is used
     ntraces_index : int
         Index of trace used (which column to pick out of features_df)
-    ntraces_delimiter : int
-        Number of traces used / end value in slicing /
-        None: no delimiter = use all
 
     Returns
     -------
@@ -281,16 +279,18 @@ def unet_preprocesing():
         Contains input features with original input values
     X_norm : numpy array
         Contains features after preprocessing for model application
-    num_examples : int64
-        Number of examples in the dataset
     """
     # handle different lengths of traces of experimental data
-    features_df = features_df.iloc[:, ntraces_index:(ntraces_index +
-                                                     ntraces_delimiter)]
+    features_df = features_df.iloc[:length_delimiter,
+                                   ntraces_index:(ntraces_index + 1)]
     features_df = features_df.dropna()
-    
-    features_cropped = features_df.iloc[:length_delimiter, :]
-    
+
+    X = np.array(features_df)
+    X_norm = min_max_normalize_tensor(X, axis=1)
+    X_norm = np.reshape(X_norm, newshape=(1, -1, 1))
+    X = np.reshape(X, newshape=(1, -1, 1))
+
+    return X, X_norm
 
 # FIXME: Rename to vgg_preprocessing()
 def pandasdf_preprocessing(features_df,
