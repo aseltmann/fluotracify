@@ -247,3 +247,5 @@ def correct_correlation_by_unet_prediction(ntraces,
             plt.xlabel(r'delay time $\tau$ in ms', fontsize=12)
             plt.tight_layout()
             plt.show()
+    return (diffrates_corrected_bypred, transit_times_corrected_bypred,
+            tracelen_corrected_bypred)
