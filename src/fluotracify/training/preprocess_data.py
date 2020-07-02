@@ -285,10 +285,9 @@ def unet_preprocessing(features_df, length_delimiter, ntraces_index):
                                    ntraces_index:(ntraces_index + 1)]
     features_df = features_df.dropna()
 
-    X = np.array(features_df)
+    X = np.array(features_df).flatten()
     X_norm = min_max_normalize_tensor(X, axis=0)
     X_norm = np.reshape(X_norm, newshape=(1, -1, 1))
-    X = np.reshape(X, newshape=(1, -1, 1))
 
     return X, X_norm
 
