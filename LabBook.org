@@ -2920,10 +2920,12 @@ future. See [[https://lwn.net/Articles/774125/][here.]]
   from fluotracify.training import build_model as bm, preprocess_data as ppd
 
   %cd /home/lex/Programme/drmed-git
+  print(tf.__version__)
 #+END_SRC
 
 #+RESULTS:
 : /home/lex/Programme/drmed-git
+: 2.3.0-dev20200519
 
 #+BEGIN_SRC jupyter-python
   mlflow.set_tracking_uri('file://{}/data/mlruns'.format(project_path))
@@ -2938,6 +2940,13 @@ future. See [[https://lwn.net/Articles/774125/][here.]]
 : /home/lex/Programme/drmed-git/data/mlruns/0/1aefda1366f04f5da5d1fc2241ad9208/artifacts/model
 
 #+BEGIN_SRC jupyter-python
+  bm.binary_ce_dice_loss()
+#+END_SRC
+
+#+RESULTS:
+: <function fluotracify.training.build_model.binary_ce_dice_loss.<locals>.binary_ce_dice(y_true, y_pred)>
+
+#+BEGIN_SRC jupyter-python
   # mlflow.keras module
   model_keras = mlflow.keras.load_model(model_uri=model_path,
                                         custom_objects={'binary_ce_dice': bm.binary_ce_dice_loss()})
@@ -2945,11 +2954,7 @@ future. See [[https://lwn.net/Articles/774125/][here.]]
 #+END_SRC
 
 #+RESULTS:
-:RESULTS:
-: /home/lex/Programme/miniconda3/envs/tf-nightly-lab/lib/python3.8/site-packages/tensorflow/python/training/tracking/data_structures.py:739: DeprecationWarning: Using or importing the ABCs from 'collections' instead of from 'collections.abc' is deprecated since Python 3.3, and in 3.9 it will stop working
-:   if not isinstance(wrapped_dict, collections.Mapping):
-: <tensorflow.python.keras.engine.functional.Functional at 0x7f3bbcea7c70>
-:END:
+: <tensorflow.python.keras.engine.functional.Functional at 0x7f3afa29d0a0>
 
 #+BEGIN_SRC jupyter-python
   data, _, nsamples, experiment_params = isfc.import_from_csv(
