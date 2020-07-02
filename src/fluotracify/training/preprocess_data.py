@@ -255,7 +255,7 @@ def tfds_from_pddf_for_vgg(features_df,
     return dataset_test, _NUM_EXAMPLES_total
 
 
-def unet_preprocesing(features_df, length_delimiter, ntraces_index):
+def unet_preprocessing(features_df, length_delimiter, ntraces_index):
     """Preprocessing for UNET for application / deployment
 
     This function preprocesses one trace from a pandas DataFrames containing
@@ -286,7 +286,7 @@ def unet_preprocesing(features_df, length_delimiter, ntraces_index):
     features_df = features_df.dropna()
 
     X = np.array(features_df)
-    X_norm = min_max_normalize_tensor(X, axis=1)
+    X_norm = min_max_normalize_tensor(X, axis=0)
     X_norm = np.reshape(X_norm, newshape=(1, -1, 1))
     X = np.reshape(X, newshape=(1, -1, 1))
 
