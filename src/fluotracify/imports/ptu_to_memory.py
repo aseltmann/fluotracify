@@ -6,7 +6,7 @@ import time
 import numpy as np
 
 
-def import_ptu_to_memory(inputfilepath, outputfilepath=None):
+def import_ptu_to_memory(inputfilepath, outputfilepath=None, verbose=True):
     """imports PicoQuant ptu files and returns the contents as numpy arrays.
 
     Parameters
@@ -199,7 +199,8 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
     # get important variables from headers
     numRecords = tagValues[tagNames.index("TTResult_NumberOfRecords")]
     globRes = tagValues[tagNames.index("MeasDesc_GlobalResolution")]
-    print("Writing %d records, this may take a while..." % numRecords)
+    if verbose:
+        print("Writing %d records, this may take a while..." % numRecords)
 
     # prepare dictionary as output of function
     out = {}  # contains np.arrays with photons, truetimes and dtimes
@@ -272,9 +273,10 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
                 gotPhoton(truensync, channel, dtime)
                 dlen += 1
             if recNum % 100000 == 0:
-                sys.stdout.write("\rProgress: %.1f%%" %
-                                 (float(recNum) * 100 / float(numRecords)))
-                sys.stdout.flush()
+                if verbose:
+                    sys.stdout.write("\rProgress: %.1f%%" %
+                                     (float(recNum) * 100 / float(numRecords)))
+                    sys.stdout.flush()
 
     def readPT2():
         global inputfile, outputfile, recNum, oflcorrection, numRecords
@@ -311,9 +313,10 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
                 truetime = oflcorrection + dtime
                 gotPhoton(truetime, channel, dtime)
             if recNum % 100000 == 0:
-                sys.stdout.write("\rProgress: %.1f%%" %
-                                 (float(recNum) * 100 / float(numRecords)))
-                sys.stdout.flush()
+                if verbose:
+                    sys.stdout.write("\rProgress: %.1f%%" %
+                                     (float(recNum) * 100 / float(numRecords)))
+                    sys.stdout.flush()
 
     def readHT3(version):
         global inputfile, outputfile, recNum, oflcorrection, numRecords
@@ -350,9 +353,10 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
                 truensync = oflcorrection + nsync
                 gotPhoton(timeTag=truensync, channel=channel, dtime=dtime)
             if recNum % 100000 == 0:
-                sys.stdout.write("\rProgress: %.1f%%" %
-                                 (float(recNum) * 100 / float(numRecords)))
-                sys.stdout.flush()
+                if verbose:
+                    sys.stdout.write("\rProgress: %.1f%%" %
+                                     (float(recNum) * 100 / float(numRecords)))
+                    sys.stdout.flush()
 
     def readHT2(version):
         global inputfile, outputfile, recNum, oflcorrection, numRecords
@@ -395,9 +399,10 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
                 truetime = oflcorrection + timetag
                 gotPhoton(truetime, channel + 1, 0)
             if recNum % 100000 == 0:
-                sys.stdout.write("\rProgress: %.1f%%" %
-                                 (float(recNum) * 100 / float(numRecords)))
-                sys.stdout.flush()
+                if verbose:
+                    sys.stdout.write("\rProgress: %.1f%%" %
+                                     (float(recNum) * 100 / float(numRecords)))
+                    sys.stdout.flush()
 
     oflcorrection = 0
     dlen = 0
@@ -499,7 +504,8 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
 
 
 def time2bin(time_arr, chan_arr, chan_num, win_int):
-    """bins tcspc data (either dtime or truetime). win_int gives the binning window.
+    """bins tcspc data (either dtime or truetime). win_int gives the binning
+    window.
 
     code is adopted from: https://github.com/dwaithe/FCS_point_correlator/blob/master/focuspoint/correlation_methods/correlation_methods.py#L157"""
     # identify channel
@@ -548,13 +554,44 @@ def calc_coincidence_value(time_series1, time_series2):
     return CV
 
 
-def process_tcspc_data(chan_arr, dtime_arr, true_time_arr):
-    """takes micro and macro times from tcspc data and processes photon decay
-    and time series data.
+def process_tcspc_data(chan_arr, dtime_arr, true_time_arr, verbose=True):
+    """Process tcspc data from .ptu files and return a timetrace
+
+    Takes micro and macro times from tcspc data and processes photon decay
+    and time series data. 
+
+    Parameters
+    ----------
+    chan_arr : np.ndarray of integers
+        Recording channel number for each recorded event
+    dtime_arr : np.ndarray of integers
+        Micro time of each event in ns (lifetime of each photon)
+    true_time_arr : np.ndarray of integers
+        Macro time of the whole recording in ns (absolute time when each
+        photon arrived)
+    verbose : bool
+        if True, prints out information while processing
+
+    Returns
+    -------
+    tcspc : dict of np.arrays
+        if num_of_ch == 1 it contains
+            tcspc['photon_decay_ch1'] : photon decay function (y)
+            tcspc['decay_scale1'] : photon decay function (x)
+            tcspc['time_series1'] : time series of trace in ms (y)
+            tcspc['time_series_scale1'] : time series of trace in ms (x)
+        if num_of_ch == 2 it contains the above + additionally
+            tcspc['photon_decay_ch2'] : photon decay function channel 2 (y)
+            tcspc['decay_scale2'] : photon decay function channel 2 (x)
+            tcspc['time_series2'] : time series of trace in ms ch 2 (y)
+            tcspc['time_series_scale2'] : time series of trace ch 2 (x)
+    num_of_ch : integer
+        number of detected channels
 
     Notes
     -----
     code is adopted from: https://github.com/dwaithe/FCS_point_correlator/blob/master/focuspoint/correlation_objects.py#L110"""
+    # this is used for the photon decay curve
     win_int = 10
     # see below: since true_time_arr is in ns and we divide by 1e6, we get a
     # binning in ms
@@ -574,8 +611,9 @@ def process_tcspc_data(chan_arr, dtime_arr, true_time_arr):
         num_of_ch -= 1
         ch_present += 1
 
-    print('\nnumber of channels which recorded photon counts: {}\n'.format(
-        num_of_ch))
+    if verbose:
+        print('\nnumber of channels which recorded photon counts: {}\n'.format(
+            num_of_ch))
 
     # Calculates decay function for both channels.
     photon_decay_ch1, decay_scale1 = time2bin(time_arr=np.array(dtime_arr),
@@ -653,7 +691,6 @@ def process_tcspc_data(chan_arr, dtime_arr, true_time_arr):
         tcspc['time_series2'] = time_series2
         tcspc['time_series_scale2'] = time_series_scale2
     else:
-        print('unsupported number of channels')
-        return
+        raise ValueError('{} is an unsupported number of channels'.format(num_of_ch))
 
     return tcspc, num_of_ch
