@@ -6,7 +6,7 @@ from lmfit import Parameters, fit_report, minimize
 from multipletau import autocorrelate
 
 # from nanosimpy
-if True: # isort workaround
+if True:  # isort workaround
     sys.path.append('../../../src/')
     import nanosimpy.nanosimpy.equations_to_fit as eq
 

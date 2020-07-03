@@ -713,7 +713,7 @@ def process_tcspc_data(chan_arr,
     return tcspc, num_of_ch
 
 
-def import_from_ptu(path, file_delimiter=None, verbose=False):
+def import_from_ptu(path, photon_count_bin, file_delimiter=None, verbose=False):
     """Import .ptu files containing TCSPC data
 
     Import a directory of .ptu files containing TCSPC data, convert them to
@@ -725,6 +725,10 @@ def import_from_ptu(path, file_delimiter=None, verbose=False):
     ----------
     path : str
         Folder which contains .ptu files with data
+    photon_count_bin : integer
+        Size of bin in ns which shall be used to construct the time trace.
+        E.g. 1e6 gives a time trace binned to ms, 1e3 gives a time trace binned
+        to us
     file_delimiter : int or None
         If None, read in all files in path. If set to an integer, this is the
         maximum number of .ptu files which will be read in. This is useful for
@@ -784,6 +788,7 @@ def import_from_ptu(path, file_delimiter=None, verbose=False):
             chan_arr=out['chanArr'],
             dtime_arr=out['dTimeArr'],
             true_time_arr=out['trueTimeArr'],
+            photon_count_bin=photon_count_bin,
             verbose=False)
 
         if num_of_ch > 1:
