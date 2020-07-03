@@ -785,7 +785,9 @@ def import_from_ptu(path, file_delimiter=None, verbose=False):
                              'are currently not supported.')
 
         ptu_exp_data = pd.DataFrame(processed_tcspc['time_series1'])
-        ptu_exps_data = pd.concat([ptu_exps_data, ptu_exp_data],
+        ptu_exp_data_float = ptu_exp_data.apply(pd.to_numeric,
+                                                downcast='int')
+        ptu_exps_data = pd.concat([ptu_exps_data, ptu_exp_data_float],
                                   axis=1,
                                   ignore_index=True,
                                   sort=False)
