@@ -559,7 +559,11 @@ def calc_coincidence_value(time_series1, time_series2):
     return CV
 
 
-def process_tcspc_data(chan_arr, dtime_arr, true_time_arr, verbose=True):
+def process_tcspc_data(chan_arr,
+                       dtime_arr,
+                       true_time_arr,
+                       photon_count_bin,
+                       verbose=True):
     """Process tcspc data from .ptu files and return a timetrace
 
     Takes micro and macro times from tcspc data and processes photon decay
@@ -574,6 +578,10 @@ def process_tcspc_data(chan_arr, dtime_arr, true_time_arr, verbose=True):
     true_time_arr : np.ndarray of integers
         Macro time of the whole recording in ns (absolute time when each
         photon arrived)
+    photon_count_bin : integer
+        Size of bin in ns which shall be used to construct the time trace.
+        E.g. 1e6 gives a time trace binned to ms, 1e3 gives a time trace binned
+        to us
     verbose : bool
         if True, prints out information while processing
 
@@ -603,9 +611,7 @@ def process_tcspc_data(chan_arr, dtime_arr, true_time_arr, verbose=True):
     code is adopted from: https://github.com/dwaithe/FCS_point_correlator/blob/master/focuspoint/correlation_objects.py#L110"""
     # this is used for the photon decay curve
     win_int = 10
-    # see below: since true_time_arr is in ns and we divide by 1e6, we get a
-    # binning in ms
-    photon_count_bin = 1
+
     tcspc = {}
     # Number of channels there are in the files.
     ch_present = np.sort(np.unique(np.array(chan_arr)))
@@ -633,10 +639,10 @@ def process_tcspc_data(chan_arr, dtime_arr, true_time_arr, verbose=True):
     # Time series of photon counts. For visualisation.
     time_series1, time_series_scale1 = time2bin(
         # timeseries in ms (without conversion high computational cost)
-        time_arr=np.array(true_time_arr) / 1000000,
+        time_arr=np.array(true_time_arr) / photon_count_bin,
         chan_arr=np.array(chan_arr),
         chan_num=ch_present[0],
-        win_int=photon_count_bin)
+        win_int=1)
     #################################################
     # FUNCTIONAL, BUT OUTPUT NOT USED AT THE MOMENT #
     #################################################
@@ -671,10 +677,10 @@ def process_tcspc_data(chan_arr, dtime_arr, true_time_arr, verbose=True):
                                                   chan_num=ch_present[1],
                                                   win_int=win_int)
         time_series2, time_series_scale2 = time2bin(
-            time_arr=np.array(true_time_arr) / 1000000,
+            time_arr=np.array(true_time_arr) / photon_count_bin,
             chan_arr=np.array(chan_arr),
             chan_num=ch_present[1],
-            win_int=photon_count_bin)
+            win_int=1)
         #################################################
         # FUNCTIONAL, BUT OUTPUT NOT USED AT THE MOMENT #
         #################################################
