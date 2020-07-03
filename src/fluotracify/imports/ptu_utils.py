@@ -707,7 +707,7 @@ def process_tcspc_data(chan_arr, dtime_arr, true_time_arr, verbose=True):
     return tcspc, num_of_ch
 
 
-def import_from_ptu(path, verbose=False):
+def import_from_ptu(path, file_delimiter=None, verbose=False):
     """Import .ptu files containing TCSPC data
 
     Import a directory of .ptu files containing TCSPC data, convert them to
@@ -719,6 +719,11 @@ def import_from_ptu(path, verbose=False):
     ----------
     path : str
         Folder which contains .ptu files with data
+    file_delimiter : int or None
+        If None, read in all files in path. If set to an integer, this is the
+        maximum number of .ptu files which will be read in. This is useful for
+        test purposes, since reading in even a single file takes quite some
+        time.
 
     Returns
     -------
@@ -797,3 +802,8 @@ def import_from_ptu(path, verbose=False):
                                       axis=1,
                                       ignore_index=True,
                                       sort=False)
+
+        if file_delimiter is not None and (idx + 1) > file_delimiter:
+            break
+
+    return ptu_exps_data, ptu_exps_metadata
