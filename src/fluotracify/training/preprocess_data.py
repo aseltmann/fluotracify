@@ -286,6 +286,7 @@ def unet_preprocessing(features_df, length_delimiter, ntraces_index):
     features_df = features_df.dropna()
 
     X = np.array(features_df).flatten()
+    X = X.astype(np.float64)
     X_norm = min_max_normalize_tensor(X, axis=0)
     X_norm = np.reshape(X_norm, newshape=(1, -1, 1))
 
