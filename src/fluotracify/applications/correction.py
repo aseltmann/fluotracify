@@ -138,6 +138,8 @@ def correct_correlation_by_unet_prediction(ntraces,
                                            pred_thresh,
                                            length_delimiter,
                                            fwhm,
+                                           traces_for_correlation=None,
+                                           bin_for_correlation=None,
                                            verbose=False):
     """Given corrupted traces, this function will apply a trained
     convolutional neural network on the data to correct the traces and return
@@ -153,7 +155,27 @@ def correct_correlation_by_unet_prediction(ntraces,
         model loaded by tf.keras.models.load_model, should be compiled already
     pred_thresh : float between 0 and 1
         If prediction is lower, it is assumed to show 'no corruption'
+    traces_for_correlation : pandas DataFrame or None
+        If None, traces_of_interest is used for prediction and correlation. If
+        an extra pd DataFrame is supplied, the artifacts will be predicted
+        using traces_of_interest, and the correction and correlation will be
+        done no traces_for_correlation. This makes sense, if the diffusion
+        processes are too fast for a binning window of 1ms, so the same traces
+        with a smaller binning window can be supplied in traces_for_correlation
+    bin_for_correlation : integer
+        Size of bin in ns which was used to construct the time trace.
+        E.g. 1e6 gives a time trace binned to ms, 1e3 gives a time trace binned
+        to us. It is assumed that the bin for the prediction traces is 1e6 and
+        that the bin_for_correlation is smaller. If the bin_for_correlation is
+        1e6 or higher, the traces_for_correlation are not used.
     """
+    if traces_for_correlation is not None:
+        if len(traces_for_correlation.columns) != len(
+                traces_of_interest.columns):
+            raise ValueError('traces_for_correlation and traces_of_interest'
+                             'have to have the same column number, since they'
+                             'have to come from the same tcspc data')
+
     diffrates_corrected_bypred = []
     transit_times_corrected_bypred = []
     tracelen_corrected_bypred = []
@@ -168,13 +190,29 @@ def correct_correlation_by_unet_prediction(ntraces,
         predictions = model.predict(features_prepro, verbose=0)
         predictions = predictions.flatten()
 
+        if traces_for_correlation is None or bin_for_correlation >= 1e6:
+            pass
+        else:
+            repeat_pred_by = int(1e6 / bin_for_correlation)
+            predictions = np.repeat(predictions, repeat_pred_by)
+
         idx_corrected_bypred = []
         for jdx, pred in enumerate(predictions):
             if pred < pred_thresh:
                 idx_corrected_bypred.append(jdx)
 
+        if traces_for_correlation is None or bin_for_correlation >= 1e6:
+            time_step_for_correlation = 1.
+        else:
+            features_orig = traces_for_correlation.iloc[:, ntraces_index:(
+                ntraces_index + 1)]
+            features_orig = features_orig.dropna()
+            features_orig = np.array(features_orig).flatten()
+            features_orig = features_orig[:(length_delimiter * repeat_pred_by)]
+            time_step_for_correlation = float(bin_for_correlation / 1e6)
+
         trace_corrected_bypred = features_orig.take(idx_corrected_bypred,
-                                                    axis=0)
+                                                    axis=0).astype(np.float64)
 
         # multipletau does not accept traces which are too short
         if len(trace_corrected_bypred) < 32:
@@ -184,7 +222,7 @@ def correct_correlation_by_unet_prediction(ntraces,
             trace=trace_corrected_bypred,
             fwhm=fwhm,
             diffrate=None,
-            time_step=1.,
+            time_step=time_step_for_correlation,
             verbose=False)
 
         diffrates_corrected_bypred.append(diff_corrected_bypred)
@@ -197,7 +235,7 @@ def correct_correlation_by_unet_prediction(ntraces,
                          '{}'.format(ntraces_index + 1),
                          fontsize=20,
                          y=1.05)
-            x_fill_pred = np.arange(0, len(features_orig), 1)
+            x_fill_pred = np.arange(0, len(predictions), 1)
             where_fill_pred = predictions >= pred_thresh
             plt.subplot(221)
             plt.ylabel('intensity in AU', fontsize=12)
@@ -215,10 +253,10 @@ def correct_correlation_by_unet_prediction(ntraces,
             plt.subplot(222)
             print('correlation of corrupted trace:')
             diff_corrupted, trans_corrupted, _ = correlate.correlate(
-                trace=features_orig,
+                trace=features_orig.astype(np.float64),
                 fwhm=fwhm,
                 diffrate=None,
-                time_step=1.,
+                time_step=time_step_for_correlation,
                 verbose=True)
             plt.title(r'Correlation of trace with artefacts (D = {:0.4f} $\mu '
                       'm^2$ / $s$)'.format(diff_corrupted),
@@ -237,7 +275,7 @@ def correct_correlation_by_unet_prediction(ntraces,
                 trace=trace_corrected_bypred,
                 fwhm=fwhm,
                 diffrate=None,
-                time_step=1.,
+                time_step=time_step_for_correlation,
                 verbose=True)
             plt.title(
                 r'Correlation of trace corrected by prediction (D = '
