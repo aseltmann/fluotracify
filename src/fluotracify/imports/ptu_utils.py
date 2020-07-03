@@ -804,5 +804,5 @@ def import_from_ptu(path, file_delimiter=None, verbose=False):
         if file_delimiter is not None and (idx + 1) > file_delimiter:
             break
 
-    ptu_exp_data = ptu_exp_data.apply(pd.to_numeric, downcast='integer')
+    ptu_exps_data = ptu_exps_data.apply(pd.to_numeric, downcast='integer')
     return ptu_exps_data, ptu_exps_metadata
