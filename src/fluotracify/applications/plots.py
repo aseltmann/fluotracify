@@ -647,12 +647,12 @@ def plot_experimental_traces_from_ptu_corrected_by_unet_prediction(
              alpha=0.3,
              label='Tb-PEX5-eGFP, corrected by prediction with '
              'threshold: {}'.format(pred_thresh),
-             color='C0')
+             color='C1')
     ax1.hist(orig_out1[xunit],
              bins=xunit_bins,
-             alpha=0.5,
+             alpha=0.3,
              label='Tb-PEX5-eGFP without correction',
-             color='C1')
+             color='C0')
     if additional_path:
         ax1.hist(pred_out2[xunit],
                  bins=xunit_bins,
@@ -664,30 +664,30 @@ def plot_experimental_traces_from_ptu_corrected_by_unet_prediction(
                  bins=xunit_bins,
                  alpha=0.3,
                  label='Hs-PEX5-eGFP without correction',
-                 color='C4')
+                 color='C2')
 
     ax2 = fig.add_subplot(gs[0, -1])
     ax2.hist(pred_out1[2],
-             bins=np.arange(0, 10001, 1000),
+             bins=np.arange(0, 10001, 500),
              alpha=0.3,
              label='trace length of Tb-PEX5-eGFP after correction',
-             color='C0')
-    ax2.hist(orig_out1[2],
-             bins=np.arange(0, 10001, 1000),
-             alpha=0.5,
-             label='trace length of Tb-PEX5-eGFP without correction',
              color='C1')
+    ax2.hist(orig_out1[2],
+             bins=np.arange(0, 10001, 500),
+             alpha=0.3,
+             label='trace length of Tb-PEX5-eGFP without correction',
+             color='C0')
     if additional_path:
         ax2.hist(pred_out2[2],
-                 bins=np.arange(0, 10001, 1000),
+                 bins=np.arange(0, 10001, 500),
                  alpha=0.3,
                  label='trace length of Hs-PEX5-eGFP after correction',
                  color='C3')
         ax2.hist(orig_out2[2],
-                 bins=np.arange(0, 10001, 1000),
+                 bins=np.arange(0, 10001, 500),
                  alpha=0.3,
                  label='trace length of "clean" PEX5-eGFP without correction',
-                 color='C4')
+                 color='C2')
 
     if additional_path:
         datadf = pd.DataFrame(data=[
