@@ -226,7 +226,8 @@ def correct_correlation_by_unet_prediction(ntraces,
             features_orig = features_orig.dropna()
             features_orig = np.array(features_orig).flatten()
             features_orig = features_orig[:(length_delimiter * repeat_pred_by)]
-            time_step_for_correlation = float(bin_for_correlation / 1e6)
+            # time_step_for_correlation = float(bin_for_correlation / 1e6)
+            time_step_for_correlation = 1.
 
         trace_corrected_bypred = features_orig.take(idx_corrected_bypred,
                                                     axis=0).astype(np.float64)

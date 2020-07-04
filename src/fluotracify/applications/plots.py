@@ -540,7 +540,9 @@ def plot_experimental_traces_from_ptu_corrected_by_unet_prediction(
             fwhm=fwhm)
     elif photon_count_bin < 1e6:
         # correlate function expects time_step for shifting x-axis
-        time_step_for_correlation = float(photon_count_bin / 1e6)
+        # time_step_for_correlation = float(photon_count_bin / 1e6)
+        # I changed it back to "1." because it gave strange results
+        time_step_for_correlation = 1.
 
         print('Different binning was chosen for correlation. Loading first'
               'dataset with bin={}. This can take a while...'.format(
