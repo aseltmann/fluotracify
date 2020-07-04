@@ -448,7 +448,8 @@ def plot_experimental_traces_from_ptu_corrected_by_unet_prediction(
         xunit_bins,
         photon_count_bin=1e6,
         additional_path=None,
-        number_of_traces=None):
+        number_of_traces=None,
+        verbose=False):
     """plot the distribution of correlations after correcting fluorescence
     traces corrupted by the given artifact applying different thresholds
 
@@ -479,6 +480,8 @@ def plot_experimental_traces_from_ptu_corrected_by_unet_prediction(
     additional_path : str, optional
         Folder which contains .ptu files with data. Idea is that you have two
         experiments whoses distributions you want to compare in one plot.
+    verbose : bool
+        If True, print out each file which was loaded
 
     Returns
     -------
@@ -516,7 +519,7 @@ def plot_experimental_traces_from_ptu_corrected_by_unet_prediction(
             path=path,
             file_delimiter=number_of_traces,
             photon_count_bin=1e6,
-            verbose=False)
+            verbose=verbose)
     except ValueError:
         raise ValueError('There was an error in loading .ptu files'
                          'from folder {}'.format(path))
@@ -579,7 +582,7 @@ def plot_experimental_traces_from_ptu_corrected_by_unet_prediction(
                 path=additional_path,
                 file_delimiter=number_of_traces,
                 photon_count_bin=1e6,
-                verbose=False)
+                verbose=verbose)
         except ValueError:
             raise ValueError(
                 'There was an error in loading .ptu files '
