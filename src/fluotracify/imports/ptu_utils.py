@@ -765,8 +765,7 @@ def import_from_ptu(path, photon_count_bin, file_delimiter=None, verbose=False):
         process_tcspc_data())
     """
 
-    path = Path(
-        '/beegfs/ye53nis/data/Pablo_structured_experiment/all_dirty_ptu/')
+    path = Path(path)
     files = [f for f in os.listdir(path) if f.endswith('.ptu')]
 
     ptu_exps_metadata = pd.DataFrame()
