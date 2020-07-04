@@ -136,8 +136,8 @@ def correct_correlation_by_unet_prediction(ntraces,
                                            traces_of_interest,
                                            model,
                                            pred_thresh,
-                                           length_delimiter,
                                            fwhm,
+                                           length_delimiter=None,
                                            traces_for_correlation=None,
                                            bin_for_correlation=None,
                                            verbose=False):
@@ -155,19 +155,36 @@ def correct_correlation_by_unet_prediction(ntraces,
         model loaded by tf.keras.models.load_model, should be compiled already
     pred_thresh : float between 0 and 1
         If prediction is lower, it is assumed to show 'no corruption'
-    traces_for_correlation : pandas DataFrame or None
+
+    fwhm : float
+        The full width half maximum of the excitation beam in nm. Used for
+        Calculation of the diffusion coefficient.
+    length_delimiter : int, optional
+        Length of the output traces in the returned dataset. If None, then the
+        whole length of the DataFrame is used
+    traces_for_correlation : pandas DataFrame or None, optional
         If None, traces_of_interest is used for prediction and correlation. If
         an extra pd DataFrame is supplied, the artifacts will be predicted
         using traces_of_interest, and the correction and correlation will be
         done no traces_for_correlation. This makes sense, if the diffusion
         processes are too fast for a binning window of 1ms, so the same traces
         with a smaller binning window can be supplied in traces_for_correlation
-    bin_for_correlation : integer
+    bin_for_correlation : integer, optional
         Size of bin in ns which was used to construct the time trace.
         E.g. 1e6 gives a time trace binned to ms, 1e3 gives a time trace binned
         to us. It is assumed that the bin for the prediction traces is 1e6 and
         that the bin_for_correlation is smaller. If the bin_for_correlation is
         1e6 or higher, the traces_for_correlation are not used.
+
+    Returns
+    -------
+    out : tuple of lists
+        diffrates_corrected_bypred : list of float
+            Contains diffusion rates corrected by prediction
+        transit_times_corrected_bypred : list of float
+            Contains transit times corrected by prediction
+        tracelen_corrected_bypred : list of int
+            Contains lengths of traces after correction by prediction
     """
     if traces_for_correlation is not None:
         if len(traces_for_correlation.columns) != len(
