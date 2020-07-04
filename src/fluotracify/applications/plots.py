@@ -529,7 +529,7 @@ def plot_experimental_traces_from_ptu_corrected_by_unet_prediction(
             fwhm=fwhm,
             time_step=1.,
             length_delimiter=length_delimiter)
-        print('Processing correlation with correction by prediction'
+        print('Processing correlation with correction by prediction '
               'of first dataset')
         pred_out1 = correction.correct_correlation_by_unet_prediction(
             ntraces=number_of_traces,
@@ -544,7 +544,7 @@ def plot_experimental_traces_from_ptu_corrected_by_unet_prediction(
         # I changed it back to "1." because it gave strange results
         time_step_for_correlation = 1.
 
-        print('Different binning was chosen for correlation. Loading first'
+        print('Different binning was chosen for correlation. Loading first '
               'dataset with bin={}. This can take a while...'.format(
                   photon_count_bin))
         ptu_cor, _ = ptu.import_from_ptu(path=path,
@@ -558,7 +558,7 @@ def plot_experimental_traces_from_ptu_corrected_by_unet_prediction(
             fwhm=fwhm,
             time_step=time_step_for_correlation,
             length_delimiter=length_delimiter)
-        print('Processing correlation with correction by prediction'
+        print('Processing correlation with correction by prediction '
               'of first dataset')
         pred_out1 = correction.correct_correlation_by_unet_prediction(
             ntraces=number_of_traces,
@@ -567,7 +567,7 @@ def plot_experimental_traces_from_ptu_corrected_by_unet_prediction(
             pred_thresh=pred_thresh,
             length_delimiter=length_delimiter,
             fwhm=fwhm,
-            traces_for_correlation=ptu_cor.astype(np.foat64),
+            traces_for_correlation=ptu_cor.astype(np.float64),
             bin_for_correlation=photon_count_bin)
     else:
         raise ValueError('photon_count_bin has to be a positive integer')
@@ -582,7 +582,7 @@ def plot_experimental_traces_from_ptu_corrected_by_unet_prediction(
                 verbose=False)
         except ValueError:
             raise ValueError(
-                'There was an error in loading .ptu files'
+                'There was an error in loading .ptu files '
                 'from the additional path {}'.format(additional_path))
 
         if photon_count_bin >= 1e6:
@@ -593,7 +593,7 @@ def plot_experimental_traces_from_ptu_corrected_by_unet_prediction(
                 fwhm=fwhm,
                 time_step=1.,
                 length_delimiter=length_delimiter)
-            print('Processing correlation with correction by prediction'
+            print('Processing correlation with correction by prediction '
                   'of second dataset')
             pred_out2 = correction.correct_correlation_by_unet_prediction(
                 ntraces=number_of_traces,
@@ -604,7 +604,7 @@ def plot_experimental_traces_from_ptu_corrected_by_unet_prediction(
                 fwhm=fwhm)
         elif photon_count_bin < 1e6:
             print('Diferent binning was chosen for correlation. Loading second'
-                  'dataset with bin={}. This can take a while...'.format(
+                  ' dataset with bin={}. This can take a while...'.format(
                       photon_count_bin))
             ptu_cor2, _ = ptu.import_from_ptu(
                 path=additional_path,
@@ -618,7 +618,7 @@ def plot_experimental_traces_from_ptu_corrected_by_unet_prediction(
                 fwhm=fwhm,
                 time_step=time_step_for_correlation,
                 length_delimiter=length_delimiter)
-            print('Processing correlation with correction by prediction'
+            print('Processing correlation with correction by prediction '
                   'of second dataset')
             pred_out2 = correction.correct_correlation_by_unet_prediction(
                 ntraces=number_of_traces,
@@ -627,7 +627,7 @@ def plot_experimental_traces_from_ptu_corrected_by_unet_prediction(
                 pred_thresh=pred_thresh,
                 length_delimiter=length_delimiter,
                 fwhm=fwhm,
-                traces_for_correlation=ptu_cor2.astype(np.foat64),
+                traces_for_correlation=ptu_cor2.astype(np.float64),
                 bin_for_correlation=photon_count_bin)
 
     # PART 2: Plotting
@@ -645,7 +645,7 @@ def plot_experimental_traces_from_ptu_corrected_by_unet_prediction(
     ax1.hist(pred_out1[xunit],
              bins=xunit_bins,
              alpha=0.3,
-             label='Tb-PEX5-eGFP, corrected by prediction with'
+             label='Tb-PEX5-eGFP, corrected by prediction with '
              'threshold: {}'.format(pred_thresh),
              color='C0')
     ax1.hist(orig_out1[xunit],
@@ -657,7 +657,7 @@ def plot_experimental_traces_from_ptu_corrected_by_unet_prediction(
         ax1.hist(pred_out2[xunit],
                  bins=xunit_bins,
                  alpha=0.3,
-                 label='Hs-PEX5-eGFP, corrected by prediction with'
+                 label='Hs-PEX5-eGFP, corrected by prediction with '
                  'threshold: {}'.format(pred_thresh),
                  color='C3')
         ax1.hist(orig_out2[xunit],
