@@ -245,7 +245,11 @@ def correct_correlation_by_unet_prediction(ntraces,
 
         diffrates_corrected_bypred.append(diff_corrected_bypred)
         transit_times_corrected_bypred.append(trans_corrected_bypred)
-        tracelen_corrected_bypred.append(len(trace_corrected_bypred))
+        if traces_for_correlation is None or bin_for_correlation >= 1e6:
+            tracelen_corrected_bypred.append(len(trace_corrected_bypred))
+        else:
+            tracelen_corrected_bypred.append(
+                len(trace_corrected_bypred) / repeat_pred_by)
 
         if verbose:
             plt.figure(figsize=(16, 9))

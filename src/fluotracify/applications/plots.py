@@ -759,8 +759,8 @@ def plot_experimental_traces_from_ptu_corrected_by_unet_prediction(
     # ax3.spines['bottom'].set_visible(False)
 
     if additional_path:
-        out = (orig_out1, pred_out1, ptu_metadata1)
-    else:
         out = (orig_out1, pred_out1, ptu_metadata1, orig_out2, pred_out2,
                ptu_metadata2)
+    else:
+        out = (orig_out1, pred_out1, ptu_metadata1)
     return out
