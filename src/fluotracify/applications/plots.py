@@ -606,7 +606,7 @@ def plot_experimental_traces_from_ptu_corrected_by_unet_prediction(
                 length_delimiter=length_delimiter,
                 fwhm=fwhm)
         elif photon_count_bin < 1e6:
-            print('Diferent binning was chosen for correlation. Loading second'
+            print('Different binning was chosen for correlation. Loading second'
                   ' dataset with bin={}. This can take a while...'.format(
                       photon_count_bin))
             ptu_cor2, _ = ptu.import_from_ptu(
