@@ -178,7 +178,28 @@ def unet_1d(input_size):
 
 
 # define custom loss functions
-def binary_ce_dice_loss(y_true, y_pred, axis=-1, smooth=1e-5):
+def binary_ce_dice_loss_coef(y_true, y_pred, axis, smooth):
+    def dice_loss(y_true, y_pred, axis, smooth):
+        """Soft dice coefficient for comparing the similarity of two batches
+        of data, usually used for binary image segmentation
+
+        For binary labels, the dice loss will be between 0 and 1 where 1 is a
+        total match. Reshaping is needed to combine the global dice loss with
+        the local binary_crossentropy
+        """
+        numerator = 2 * tf.math.reduce_sum(
+            input_tensor=y_true * y_pred, axis=axis, keepdims=True)
+        denominator = tf.math.reduce_sum(input_tensor=y_true + y_pred,
+                                         axis=axis,
+                                         keepdims=True)
+
+        return 1 - (numerator + smooth) / (denominator + smooth)
+
+    return tf.keras.backend.binary_crossentropy(y_true, y_pred) + dice_loss(
+        y_true, y_pred, axis, smooth)
+
+
+def binary_ce_dice_loss(axis=-1, smooth=1e-5):
     """Combination of binary crossentropy and dice loss
 
     Parameters
@@ -206,6 +227,9 @@ def binary_ce_dice_loss(y_true, y_pred, axis=-1, smooth=1e-5):
         https://lars76.github.io/neural-networks/object-detection/losses-for-segmentation/
         - Code by Stefan Hoffmann, Applied Systems Biology group,
         Hans-Knöll-Institute Jena
+    To be able to load the custom loss function in Keras, it must only take
+    (y_true, y_pred) as parameters - that is why this setup seems so
+    complicated.
 
     Note
     ----
@@ -213,31 +237,29 @@ def binary_ce_dice_loss(y_true, y_pred, axis=-1, smooth=1e-5):
     trace, bringing local info
     - dice loss returns a scalar for each 1D trace, bringing global info
     """
-    def dice_loss(y_true, y_pred, axis=axis, smooth=smooth):
-        """Soft dice coefficient for comparing the similarity of two batches
-        of data, usually used for binary image segmentation
+    def binary_ce_dice(y_true, y_pred):
+        return binary_ce_dice_loss_coef(y_true, y_pred, axis, smooth)
 
-        For binary labels, the dice loss will be between 0 and 1 where 1 is a
-        total match. Reshaping is needed to combine the global dice loss with
-        the local binary_crossentropy
-        """
-        numerator = 2 * tf.math.reduce_sum(
-            input_tensor=y_true * y_pred, axis=axis, keepdims=True)
-        denominator = tf.math.reduce_sum(input_tensor=y_true + y_pred,
-                                         axis=axis,
-                                         keepdims=True)
-
-        return 1 - (numerator + smooth) / (denominator + smooth)
-
-    return tf.keras.backend.binary_crossentropy(y_true, y_pred) + dice_loss(
-        y_true, y_pred)
+    return binary_ce_dice
 
 
 # Alternative U-Net definition
-def convtrans(filters, name):
+def convtrans_old(filters, name):
     """Sequential API: Conv1DTranspose, BatchNorm"""
     upsamp = tf.keras.Sequential(name=name)
     upsamp.add(Conv1DTranspose(filters=filters, kernel_size=2, strides=2))
+    upsamp.add(tf.keras.layers.BatchNormalization())
+    upsamp.add(tf.keras.layers.Activation('relu'))
+    return upsamp
+
+
+def convtrans(filters, name):
+    """Sequential API: Conv1DTranspose, BatchNorm"""
+    upsamp = tf.keras.Sequential(name=name)
+    upsamp.add(
+        tf.keras.layers.Conv1DTranspose(filters=filters,
+                                        kernel_size=2,
+                                        strides=2))
     upsamp.add(tf.keras.layers.BatchNormalization())
     upsamp.add(tf.keras.layers.Activation('relu'))
     return upsamp
@@ -276,6 +298,12 @@ def decoder(input_tensor, concat_tensor, filters, name):
                                          name=name)
     decode = twoconv(filters=filters, name='two_conv_{}'.format(name))(decode)
     return decode
+
+
+# length of your training timeline (needs to be constant during training, can
+# be anything when predicting) corresponding to the depth of your U-net
+# (number of down- and upsamplings) the minimum lenght should be about 30 time
+# steps or less
 
 
 def unet_1d_alt(input_size):
