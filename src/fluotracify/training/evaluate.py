@@ -1,5 +1,9 @@
+import io
+
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
+import tensorflow as tf
 
 
 def plot_history(history):
@@ -121,3 +125,53 @@ def predict_traces(dataset, model, num_rows, num_cols, batch_to_sample,
         _plot_probability_bar(i, predictions, names)
 
     plt.show()
+
+def plot_trace_and_pred_from_df(df, ntraces, model):
+    fig, ax = plt.subplots(ntraces, figsize=(16, ntraces*2))
+
+    for i in range(ntraces):
+        pred_trace = df.iloc[:16384, i].to_numpy().reshape(1, -1, 1)
+        prediction = model.predict(pred_trace)
+        prediction = prediction.flatten()
+        pred_trace = pred_trace.flatten()
+        ax[i].plot(pred_trace / np.max(pred_trace))
+        ax[i].plot(prediction)
+    return fig
+
+def plot_trace_and_pred_from_tfds(dataset, ntraces, model):
+    fig, ax = plt.subplots(ntraces, figsize=(16, ntraces*2))
+    pred_iterator = dataset.unbatch().take(ntraces).as_numpy_iterator()
+
+    for i in range(ntraces):
+        pred_data = pred_iterator.next()
+        pred_trace = pred_data[0].reshape(1, -1, 1)
+        prediction = model.predict(pred_trace)
+        prediction = prediction.flatten()
+        pred_trace = pred_trace.flatten()
+        pred_label = pred_data[1].flatten()
+        ax[i].plot(pred_trace / np.max(pred_trace))
+        ax[i].plot(prediction)
+        ax[i].plot(pred_label)
+    plt.tight_layout()
+    return fig
+
+def plot_to_image(figure):
+    """Converts the matplotlib plot specified by 'figure' to a PNG image and
+    returns it. The supplied figure is closed and inaccessible after this call.
+
+    Notes
+    -----
+    - Stolen from https://www.tensorflow.org/tensorboard/image_summaries
+    """
+    # Save the plot to a PNG in memory.
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    # Closing the figure prevents it from being displayed directly inside
+    # the notebook.
+    plt.close(figure)
+    buf.seek(0)
+    # Convert PNG buffer to TF image
+    image = tf.image.decode_png(buf.getvalue(), channels=4)
+    # Add the batch dimension
+    image = tf.expand_dims(image, 0)
+    return image
