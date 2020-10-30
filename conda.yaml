@@ -1,0 +1,13 @@
+name: fluotracify-tf-nightly
+channels:
+  - defaults
+  - conda-forge
+#   - file:///home/lex/Programme/drmed-git/src/
+dependencies:
+  - numpy
+  - pandas
+  - matplotlib
+  - mlflow
+  - pip
+  - pip:
+    - tf-nightly

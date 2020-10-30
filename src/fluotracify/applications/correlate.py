@@ -5,10 +5,10 @@ import numpy as np
 from lmfit import Parameters, fit_report, minimize
 from multipletau import autocorrelate
 
-sys.path.append('../../../mynanosimpy/nanosimpy/')
-sys.path.append('../../../mynanosimpy/nanosimpy/nanosimpy/')
-
-from nanosimpy import equations_to_fit as eq
+# from nanosimpy
+if True:  # isort workaround
+    sys.path.append('../../../src/')
+    import nanosimpy.nanosimpy.equations_to_fit as eq
 
 
 def correlate(trace, fwhm, diffrate, time_step=1., verbose=True):
@@ -64,8 +64,8 @@ def correlate(trace, fwhm, diffrate, time_step=1., verbose=True):
     residual_var = res.residual
     output = fit_report(res.params)
     transit_time = res.params['txy1'].value
-    diffrate_calc = (float(fwhm) / 1000)**2 / (8 * np.log(2.0) *
-                                               transit_time / 1000)
+    diffrate_calc = (float(fwhm) / 1000)**2 / (8 * np.log(2.0) * transit_time /
+                                               1000)
     if verbose:
         plt.semilogx(out[:, 0], out[:, 1], 'g', label='correlation')
         plt.semilogx(out[:, 0], fit, 'r', label='fit')
@@ -82,20 +82,36 @@ def correlate(trace, fwhm, diffrate, time_step=1., verbose=True):
                                          fit, residual_var)
 
 
-def correlation_of_arbitrary_trace(ntraces, traces_of_interest, fwhm):
+def correlation_of_arbitrary_trace(ntraces,
+                                   traces_of_interest,
+                                   fwhm,
+                                   time_step,
+                                   length_delimiter=None):
+    """Takes pandas DataFrame of fluorescence traces ordered columnwise and
+    performs an autocorrelation analysis on each trace
+
+    Parameters
+    ----------
+    ntraces : int
+        Number of ntraces from given DataFrames to choose for correlation
+    traces_of_interest : Pandas DataFrame
+        Contains the traces columnwise
+    fwhm : float
+        The full width half maximum of the excitation beam in nm. Used for
+        Calculation of the diffusion coefficient.
+    """
     diffrates_arb = []
     transit_times_arb = []
     tracelen_arb = []
 
     for ntraces_index in range(ntraces):
-        trace_arb = traces_of_interest.iloc[:, ntraces_index]
+        trace_arb = traces_of_interest.iloc[:length_delimiter, ntraces_index]
 
-        diff_arb, trans_arb, _ = correlate(
-            trace=trace_arb,
-            fwhm=fwhm,
-            diffrate=None,
-            time_step=1.,
-            verbose=False)
+        diff_arb, trans_arb, _ = correlate(trace=trace_arb,
+                                           fwhm=fwhm,
+                                           diffrate=None,
+                                           time_step=time_step,
+                                           verbose=False)
         diffrates_arb.append(diff_arb)
         transit_times_arb.append(trans_arb)
         tracelen_arb.append(len(trace_arb))
