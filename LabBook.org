@@ -340,8 +340,8 @@
       scripts or calling the code from the **scr/** directory).
     - All other steps taken during an experiment are noted down, as well as
       conclusions or my thought process while conducting the experiment
-    - Provenance data, such as Metadata about the environment the code was
-      executed in, the command line output of the code, and some
+    - Provenance data, such as metadata about the environment the code was
+      executed in, the command line output of the code, and some plots
 ** remote/origin/develop branch:
   - this is the branch I use for day to day work on features and exploration.
     All of my current activity can be followed here.
