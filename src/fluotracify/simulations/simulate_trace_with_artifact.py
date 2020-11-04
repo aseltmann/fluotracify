@@ -9,9 +9,6 @@ from pathlib import Path
 
 import numpy as np
 
-sys.path.append("../../../mynanosimpy/nanosimpy/")
-sys.path.append("../../../mynanosimpy/nanosimpy/nanosimpy")
-
 from nanosimpy.simulation_methods import (
     brownian_only_numpy,
     calculate_psf,
