@@ -203,7 +203,7 @@
 
     #+NAME: jpt-tmux
     #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine
-    conda activate tensorflow_nightly
+    conda activate tf-nightly
     export PORT=8889
     export XDG_RUNTIME_DIR=''
     export XDG_RUNTIME_DIR=""
@@ -384,6 +384,9 @@
 
 * Changes in this repository (without "* Data" in this file)
 ** Changes in LabBook.org (without "* Data")
+*** 2020-11-04
+    - update "jupyter scripts" in  [[* Template for data entry and setup notes:]]
+      for new conda environment on server (now =conda activate tf-nightly=)
 *** 2020-05-31
     - extend general documentation in README
     - Add code block examples
