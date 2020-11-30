@@ -9,7 +9,7 @@ import uuid
 import numpy as np
 
 from pathlib import Path
-from fluotracify.simulation_methods import (
+from fluotracify.simulations.simulation_methods import (
     brownian_only_numpy,
     calculate_psf,
     integrate_over_psf,
