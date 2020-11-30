@@ -9,7 +9,7 @@ from pathlib import Path
 
 import numpy as np
 
-from nanosimpy.simulation_methods import (
+from fluotracify.simulation_methods import (
     brownian_only_numpy,
     calculate_psf,
     integrate_over_psf,
