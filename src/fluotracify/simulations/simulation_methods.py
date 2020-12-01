@@ -85,6 +85,7 @@ def brownian_only_numpy(total_sim_time, time_step, num_of_mol, D, width,
         #          (2.0 * (R - 2) * np.sin(phi))) + offset, 0).astype(np.int32)
         #     bool_to_adapt = (track_arr[b][0, :] - offset)**2 + (
         #         track_arr[b][1, :] - offset)**2 >= R2
+    return track_arr
 
 
 def calculate_psf(fwhms, distance):
