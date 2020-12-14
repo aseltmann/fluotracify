@@ -3961,22 +3961,6 @@ I encountered some errors.
     CLOSED: [2020-05-28 Do 00:39]
 e.g. I want lr_schedule AND image logging? → Works by using two differee file_writers
 
-*** TODO use =mlflow.keras.log_model()= instead of tf =model.save=
-#+BEGIN_SRC python
-  mlflow.keras.log_model(keras_model,
-                         artifact_path,
-                         conda_env=None,
-                         custom_objects=None,
-                         keras_module=None,
-                         registered_model_name=None,
-                         **kwargs)
-#+END_SRC
-- keras_model=model
-- artifact_path='model'
-- conda_env=None (loads mlflow.keras.get_default_conda_env())
-- custom_objects={'binary_ce_dice': bm.binary_ce_dice_loss()}
-
-
 *** CANCELED idea: use TensorBoards Fairness examination, e.g. see [[https://github.com/tensorflow/fairness-indicators/blob/master/fairness_indicators/documentation/examples/Fairness_Indicators_Lineage_Case_Study.ipynb][here]]+
     CLOSED: [2020-05-25 Mo 23:48]
 
@@ -4030,46 +4014,6 @@ there are multiple layers to it:
     - when to use: when error rates (misclassifying something as positive) are
       more concerning than classifying the positives, so where /positives lead
       to negative actions/, such as face detection
-*** TODO Choosing some additional metrics
-Which measures make sense for Artifact classification / segmentation:
-- Recall! - I want all the artifacts
-- Precision - slightly less important
-- Combining the two, but giving recall a higher weight is possible with the
-  *F-Measure*
-  \[F_{\beta} = (1 + \beta^2) \cdot
-  \frac{\text{precision}\cdot\text{recall}}{\beta^2\cdot\text{precision} +
-  \text{recall}}\]
-  - To get an evenly weighted version, we could use the \[F_{1} = 2 \cdot \frac{\text{precision}\cdot\text{recall}}{\text{precision} + \text{recall}}\], but even
-    better is probably the measure \[F_{2} = 5
-    \cdot\frac{\text{precision}\cdot\text{recall}}{4\cdot\text{precision} + \text{recall}}\]
-  - just note that if using $F_2$ the outcome depends even stronger on the used
-    threshold for deciding if a predicted probability is 1 or 0 → *there is a
-    =threshold= argument for the =tf.keras.metrics= :)*
-  - PROBLEM: no tf.keras.metrics.Fmeasure (or similar) - mmmh...
-- AUC = Area Under the ROC Curve
-  - is scale-invariante → measures how well predictions are ranked, rather than
-    their absolute values
-    - Cave: not always desirable, e.g. if we do need well calibrated probability outputs
-  - is classification-threshold-invariant
-    - Cave: not always desirable, e.g. when there are wide disparities in the
-      cost of false negatives vs false positives, it may be critical to minimize
-      one type of classification error → this is actually a thing in artifact
-      classification, since we want to minimize the false negatives
-
-This is the list I came up with:
-
-#+BEGIN_SRC python
-thresholds = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
-metrics = [tf.keras.metrics.TruePositives(name='tp', thresholds=thresholds),
-           tf.keras.metrics.FalsePositives(name='fp', thresholds=thresholds),
-           tf.keras.metrics.TrueNegatives(name='tn', thresholds=thresholds),
-           tf.keras.metrics.FalseNegatives(name='fn', thresholds=thresholds),
-           tf.keras.metrics.BinaryAccuracy(name='accuracy', threshold=0.5),
-           tf.keras.metrics.Precision(name='precision', thresholds=thresholds),
-           tf.keras.metrics.Recall(name='recall', thresholds=thresholds),
-           tf.keras.metrics.AUC(num_thresholds=100, name='auc')]
-#+END_SRC
-*** TODO compute metrics vs threshold → there is a =thresholds= argument for =tf.keras.metrics= :)
 *** Note: extract images from tf logs programmatically: [[https://stackoverflow.com/questions/47232779/how-to-extract-and-save-images-from-tensorboard-event-summary][here]]
 intro: [[https://github.com/tensorflow/fairness-indicators/blob/master/fairness_indicators/documentation/guidance.md][here]]
 ** run mlflow model after TensorBoard logs
@@ -4739,7 +4683,464 @@ Yippieeeeh, I don't need the complicated =OrgFormatter!=
 **** DONE Add =os.environ=
      CLOSED: [2020-05-28 Do 14:12]
 ** TODOs
-**** TODO Investigate Error on GPU node
+
+** Coming back to the lab after STEX2 <2020-11-02 Mo>
+   :LOGBOOK:
+   CLOCK: [2020-12-06 So 23:53]--[2020-12-06 So 23:53] =>  0:00
+   CLOCK: [2020-12-02 Mi 23:06]--[2020-12-06 So 21:19] => 94:13
+   CLOCK: [2020-12-01 Di 11:19]--[2020-12-01 Di 11:57] =>  0:38
+   CLOCK: [2020-12-01 Di 10:27]--[2020-12-01 Di 10:44] =>  0:17
+   CLOCK: [2020-11-06 Fr 21:11]--[2020-11-06 Fr 21:11] =>  0:00
+   CLOCK: [2020-11-06 Fr 15:04]--[2020-11-06 Fr 15:26] =>  0:22
+
+   CLOCK: [2020-11-06 Fr 14:14]--[2020-11-06 Fr 14:19] =>  0:05
+   CLOCK: [2020-11-06 Fr 12:44]--[2020-11-06 Fr 13:24] =>  0:40
+   CLOCK: [2020-11-06 Fr 12:10]--[2020-11-06 Fr 12:13] =>  0:03
+   CLOCK: [2020-11-05 Do 17:24]--[2020-11-05 Do 17:25] =>  0:01
+   CLOCK: [2020-11-05 Do 13:02]--[2020-11-05 Do 13:52] =>  0:50
+   CLOCK: [2020-11-05 Do 01:12]--[2020-11-05 Do 01:12] =>  0:00
+   CLOCK: [2020-11-04 Mi 22:34]--[2020-11-04 Mi 23:07] =>  0:33
+   CLOCK: [2020-11-04 Mi 18:24]--[2020-11-04 Mi 18:35] =>  0:11
+   CLOCK: [2020-11-04 Mi 17:35]--[2020-11-04 Mi 18:01] =>  0:26
+   CLOCK: [2020-11-04 Mi 16:19]--[2020-11-04 Mi 17:18] =>  0:59
+   CLOCK: [2020-11-04 Mi 15:34]--[2020-11-04 Mi 15:44] =>  0:10
+   CLOCK: [2020-11-04 Mi 14:51]--[2020-11-04 Mi 15:04] =>  0:13
+   CLOCK: [2020-11-04 Mi 13:20]--[2020-11-04 Mi 14:01] =>  0:41
+   CLOCK: [2020-11-04 Mi 11:38]--[2020-11-04 Mi 11:53] =>  0:15
+   CLOCK: [2020-11-03 Di 20:16]--[2020-11-03 Di 20:16] =>  0:00
+   CLOCK: [2020-11-03 Di 15:50]--[2020-11-03 Di 16:12] =>  0:22
+   CLOCK: [2020-11-03 Di 14:01]--[2020-11-03 Di 14:15] =>  0:14
+   CLOCK: [2020-11-03 Di 13:03]--[2020-11-03 Di 13:45] =>  0:42
+   CLOCK: [2020-11-03 Di 11:11]--[2020-11-03 Di 11:19] =>  0:08
+   CLOCK: [2020-11-02 Mo 14:43]--[2020-11-02 Mo 17:01] =>  2:18
+   :END:
+*** upate tensorflow and mlflow in tensorflow_nightly environment on ara
+
+    - we need:
+    - numpy
+    - pandas
+    - matplotlib
+    - seaborn
+    - mlflow
+    - jupyterlab
+    - pip
+    - pip:
+      - tf-nightly
+      - fcsfiles
+      - multipletau
+
+#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
+  (base) [ye53nis@node181 drmed-git]$ conda create -n tf-nightly numpy pandas matplotlib seaborn tifffile jupyterlab pip
+  (base) [ye53nis@node181 drmed-git]$ conda install -n tf-nightly -c conda-forge mlflow=1.11.0
+  (base) [ye53nis@node181 drmed-git]$ conda activate tf-nightly
+  (tf-nightly) [ye53nis@node181 drmed-git]$ pip install fcsfiles multipletau tf-nightly
+#+END_SRC
+
+    #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
+  conda list -n tf-nightly
+    #+END_SRC
+
+    #+RESULTS:
+    #+begin_example
+      (tf-nightly) [ye53nis@node181 drmed-git]$ conda list -n tf-nightly
+      # packages in environment at /home/ye53nis/.conda/envs/tf-nightly:
+      #
+      # Name                    Version                   Build  Channel
+      _libgcc_mutex             0.1                        main
+      absl-py                   0.11.0                   pypi_0    pypi
+      alembic                   1.4.1                      py_0    conda-forge
+      appdirs                   1.4.4              pyh9f0ad1d_0    conda-forge
+      argon2-cffi               20.1.0           py38h7b6447c_1
+      asn1crypto                1.4.0              pyh9f0ad1d_0    conda-forge
+      astunparse                1.6.3                    pypi_0    pypi
+      async_generator           1.10                       py_0
+      attrs                     20.2.0                     py_0
+      azure-core                1.8.2              pyh9f0ad1d_0    conda-forge
+      azure-storage-blob        12.5.0             pyh9f0ad1d_0    conda-forge
+      backcall                  0.2.0                      py_0
+      blas                      1.0                         mkl
+      bleach                    3.2.1                      py_0
+      blinker                   1.4                        py_1    conda-forge
+      brotlipy                  0.7.0           py38h7b6447c_1000
+      ca-certificates           2020.6.20            hecda079_0    conda-forge
+      cachetools                4.1.1                    pypi_0    pypi
+      certifi                   2020.6.20        py38h924ce5b_2    conda-forge
+      cffi                      1.14.3           py38he30daa8_0
+      chardet                   3.0.4                 py38_1003
+      click                     7.1.2              pyh9f0ad1d_0    conda-forge
+      cloudpickle               1.6.0                      py_0    conda-forge
+      configparser              5.0.1                      py_0    conda-forge
+      cryptography              3.1.1            py38h1ba5d50_0
+      cycler                    0.10.0                   py38_0
+      databricks-cli            0.9.1                      py_0    conda-forge
+      dbus                      1.13.18              hb2f20db_0
+      decorator                 4.4.2                      py_0
+      defusedxml                0.6.0                      py_0
+      docker-py                 4.3.1            py38h32f6830_1    conda-forge
+      docker-pycreds            0.4.0                      py_0    conda-forge
+      entrypoints               0.3                      py38_0
+      expat                     2.2.10               he6710b0_2
++++   fcsfiles                  2020.9.18                pypi_0    pypi
+      flask                     1.1.2              pyh9f0ad1d_0    conda-forge
+      flatbuffers               1.12                     pypi_0    pypi
+      fontconfig                2.13.0               h9420a91_0
+      freetype                  2.10.4               h5ab3b9f_0
+      gast                      0.3.3                    pypi_0    pypi
+      gitdb                     4.0.5                      py_0    conda-forge
+      gitpython                 3.1.11                     py_0    conda-forge
+      glib                      2.66.1               h92f7085_0
+      google-auth               1.23.0                   pypi_0    pypi
+      google-auth-oauthlib      0.4.2                    pypi_0    pypi
+      google-pasta              0.2.0                    pypi_0    pypi
+      gorilla                   0.3.0                      py_0    conda-forge
+      grpcio                    1.32.0                   pypi_0    pypi
+      gst-plugins-base          1.14.0               hbbd80ab_1
+      gstreamer                 1.14.0               hb31296c_0
+      gunicorn                  20.0.4           py38h32f6830_2    conda-forge
+      h5py                      2.10.0                   pypi_0    pypi
+      icu                       58.2                 he6710b0_3
+      idna                      2.10                       py_0
+      importlib-metadata        2.0.0                      py_1
+      importlib_metadata        2.0.0                         1
+      intel-openmp              2020.2                      254
+      ipykernel                 5.3.4            py38h5ca1d4c_0
+      ipython                   7.18.1           py38h5ca1d4c_0
+      ipython_genutils          0.2.0                    py38_0
+      isodate                   0.6.0                      py_1    conda-forge
+      itsdangerous              1.1.0                      py_0    conda-forge
+      jedi                      0.17.2                   py38_0
+      jinja2                    2.11.2                     py_0
+      jpeg                      9b                   h024ee3a_2
+      json5                     0.9.5                      py_0
+      jsonschema                3.2.0                      py_2
+      jupyter_client            6.1.7                      py_0
+      jupyter_core              4.6.3                    py38_0
++++   jupyterlab                2.2.6                      py_0
+      jupyterlab_pygments       0.1.2                      py_0
+      jupyterlab_server         1.2.0                      py_0
+      keras-preprocessing       1.1.2                    pypi_0    pypi
+      kiwisolver                1.3.0            py38h2531618_0
+      lcms2                     2.11                 h396b838_0
+      ld_impl_linux-64          2.33.1               h53a641e_7
+      libedit                   3.1.20191231         h14c3975_1
+      libffi                    3.3                  he6710b0_2
+      libgcc-ng                 9.1.0                hdf63c60_0
+      libgfortran-ng            7.3.0                hdf63c60_0
+      libpng                    1.6.37               hbc83047_0
+      libprotobuf               3.13.0.1             h8b12597_0    conda-forge
+      libsodium                 1.0.18               h7b6447c_0
+      libstdcxx-ng              9.1.0                hdf63c60_0
+      libtiff                   4.1.0                h2733197_1
+      libuuid                   1.0.3                h1bed415_2
+      libxcb                    1.14                 h7b6447c_0
+      libxml2                   2.9.10               hb55368b_3
+      lz4-c                     1.9.2                heb0550a_3
+      mako                      1.1.3              pyh9f0ad1d_0    conda-forge
+      markdown                  3.3.3                    pypi_0    pypi
+      markupsafe                1.1.1            py38h7b6447c_0
+      matplotlib                3.3.2                         0
+      matplotlib-base           3.3.2            py38h817c723_0
+      mistune                   0.8.4           py38h7b6447c_1000
+      mkl                       2020.2                      256
+      mkl-service               2.3.0            py38he904b0f_0
+      mkl_fft                   1.2.0            py38h23d657b_0
+      mkl_random                1.1.1            py38h0573a6f_0
++++   mlflow                    1.11.0           py38h32f6830_1    conda-forge
+      msrest                    0.6.19             pyh9f0ad1d_0    conda-forge
++++   multipletau               0.3.3                    pypi_0    pypi
+      nbclient                  0.5.1                      py_0
+      nbconvert                 6.0.7                    py38_0
+      nbformat                  5.0.8                      py_0
+      ncurses                   6.2                  he6710b0_1
+      nest-asyncio              1.4.1                      py_0
+      notebook                  6.1.4                    py38_0
++++   numpy                     1.19.2           py38h54aff64_0
+      numpy-base                1.19.2           py38hfa32c7d_0
+      oauthlib                  3.0.1                      py_0    conda-forge
+      olefile                   0.46                       py_0
+      openssl                   1.1.1h               h516909a_0    conda-forge
+      opt-einsum                3.3.0                    pypi_0    pypi
+      packaging                 20.4                       py_0
++++   pandas                    1.1.3            py38he6710b0_0
+      pandoc                    2.11                 hb0f4dca_0
+      pandocfilters             1.4.2                    py38_1
+      parso                     0.7.0                      py_0
+      pcre                      8.44                 he6710b0_0
+      pexpect                   4.8.0                    py38_0
+      pickleshare               0.7.5                 py38_1000
+      pillow                    8.0.1            py38he98fc37_0
++++   pip                       20.2.4                   py38_0
+      prometheus_client         0.8.0                      py_0
+      prometheus_flask_exporter 0.18.1             pyh9f0ad1d_0    conda-forge
+      prompt-toolkit            3.0.8                      py_0
+      protobuf                  3.13.0.1         py38h950e882_1    conda-forge
+      ptyprocess                0.6.0                    py38_0
+      pyasn1                    0.4.8                    pypi_0    pypi
+      pyasn1-modules            0.2.8                    pypi_0    pypi
+      pycparser                 2.20                       py_2
+      pygments                  2.7.2              pyhd3eb1b0_0
+      pyjwt                     1.7.1                      py_0    conda-forge
+      pyopenssl                 19.1.0                     py_1
+      pyparsing                 2.4.7                      py_0
+      pyqt                      5.9.2            py38h05f1152_4
+      pyrsistent                0.17.3           py38h7b6447c_0
+      pysocks                   1.7.1                    py38_0
+      python                    3.8.5                h7579374_1
+      python-dateutil           2.8.1                      py_0
+      python-editor             1.0.4                      py_0    conda-forge
+      python_abi                3.8                      1_cp38    conda-forge
+      pytz                      2020.1                     py_0
+      pyyaml                    5.3.1            py38h8df0ef7_1    conda-forge
+      pyzmq                     19.0.2           py38he6710b0_1
+      qt                        5.9.7                h5867ecd_1
+      querystring_parser        1.2.4                      py_0    conda-forge
+      readline                  8.0                  h7b6447c_0
+      requests                  2.24.0                     py_0
+      requests-oauthlib         1.3.0              pyh9f0ad1d_0    conda-forge
+      rsa                       4.6                      pypi_0    pypi
++++   scipy                     1.5.2            py38h0b6359f_0
+      seaborn                   0.11.0                     py_0
+      send2trash                1.5.0                    py38_0
+      setuptools                50.3.0           py38hb0f4dca_1
+      sip                       4.19.13          py38he6710b0_0
+      six                       1.15.0                     py_0
+      smmap                     3.0.4              pyh9f0ad1d_0    conda-forge
+      sqlalchemy                1.3.13           py38h516909a_0    conda-forge
+      sqlite                    3.33.0               h62c20be_0
+      sqlparse                  0.4.1              pyh9f0ad1d_0    conda-forge
+      tabulate                  0.8.7              pyh9f0ad1d_0    conda-forge
++++   tb-nightly                2.4.0a20201102           pypi_0    pypi
+      tensorboard-plugin-wit    1.7.0                    pypi_0    pypi
+      termcolor                 1.1.0                    pypi_0    pypi
+      terminado                 0.9.1                    py38_0
+      testpath                  0.4.4                      py_0
+      tf-estimator-nightly      2.4.0.dev2020102301          pypi_0    pypi
++++   tf-nightly                2.5.0.dev20201029          pypi_0    pypi
++++   tifffile                  2020.10.1        py38hdd07704_2
+      tk                        8.6.10               hbc83047_0
+      tornado                   6.0.4            py38h7b6447c_1
+      traitlets                 5.0.5                      py_0
+      typing-extensions         3.7.4.3                  pypi_0    pypi
+      urllib3                   1.25.11                    py_0
+      wcwidth                   0.2.5                      py_0
+      webencodings              0.5.1                    py38_1
+      websocket-client          0.57.0           py38h32f6830_3    conda-forge
+      werkzeug                  1.0.1              pyh9f0ad1d_0    conda-forge
+      wheel                     0.35.1                     py_0
+      wrapt                     1.12.1                   pypi_0    pypi
+      xz                        5.2.5                h7b6447c_0
+      yaml                      0.2.5                h516909a_0    conda-forge
+      zeromq                    4.3.3                he6710b0_3
+      zipp                      3.4.0              pyhd3eb1b0_0
+      zlib                      1.2.11               h7b6447c_3
+      zstd                      1.4.5                h9ceee32_0
+      (tf-nightly) [ye53nis@node181 drmed-git]$
+    #+end_example
+
+*** planning next experiments
+**** TODO new simulations with different transit times
+***** some theoretical calculations
+     - for now I've got:
+     - $0.5 \frac{\mu m^2}{s} ~ 22.54ms$ → we need a trace length of 2-3 orders
+       of magnitude longer, so $2.25s…7.13s…22.54s$ (10^2, 10^2.5, 10^3)
+     - $1 \frac{\mu m^2}{s} ~ 11.27ms$ → $1.13s…3.56s…11.27s$
+     - $2 \frac{\mu m^2}{s} ~ 5.64ms$ → $0.56s…1.78s…5.64s$
+     - $3 \frac{\mu m^2}{s} ~ 3.76ms$ → $0.38s…1.19s…3.76s$
+     - $4 \frac{\mu m^2}{s} ~ 2.82ms$ → $0.28s…0.89s…2.82s$
+     - $5 \frac{\mu m^2}{s} ~ 2.25ms$ → $0.23s…0.71s…2.25s$
+     - now Falk said the most important processes are between $0.1…1 \frac{\mu
+       m^2}{s}$ and
+       the maximum amplitudes are between $10^{-3}…1(10)\frac{\mu
+       m^2}{s}$ which means:
+     - $0.001 \frac{\mu m^2}{s} ~ 11271ms$ → $1127s(18.8min)…3564s(59.4min)…11271s(188min)$
+     - $0.01 \frac{\mu m^2}{s} ~ 1127ms$ → $113s…356s(6min)…1127s(18.8min)$
+     - $0.0113 \frac{\mu m^2}{s} ~ 997ms$ → $\bold{100s}…315s(5.3min)…997s(16.6min)$
+     - $0.02 \frac{\mu m^2}{s} ~ 563ms$ → $56s…178s…564s(9.4min)$
+     - $0.0225 \frac{\mu m^2}{s} ~ 501ms$ → $\bold{50s}…158s…501s(8.4min)$
+     - $0.03 \frac{\mu m^2}{s} ~ 376ms$ → $38s…119s…376s$
+     - $0.035 \frac{\mu m^2}{s} ~ 322ms$ → $32s…\bold{102s}…322s$
+     - $0.04 \frac{\mu m^2}{s} ~ 282ms$ → $28s…89s…282s(4.7min)$
+     - $0.056 \frac{\mu m^2}{s} ~ 201ms$ → $\bold{20s}…63.6s…201s$
+     - $0.06 \frac{\mu m^2}{s} ~ 188ms$ → $19s…59s…188s$
+     - $0.069 \frac{\mu m^2}{s} ~ 163ms$ → $\bold{16.3s}…52s…163s \to 2^{14}$
+       for unet
+     - $0.071 \frac{\mu m^2}{s} ~ 159ms$ → $15.9s…\bold{50s}…159s$
+     - $0.08 \frac{\mu m^2}{s} ~ 141ms$ → $14.1s…45s…141s$
+     - $0.1 \frac{\mu m^2}{s} ~ 112.7ms$ → $11.3s…35.6s…112.7s$
+     - $0.113 \frac{\mu m^2}{s} ~ 99.7ms$ → $9.97s…31.5s…\bold{99.7s}$
+     - $0.18 \frac{\mu m^2}{s} ~ 62.6ms$ → $6.26s…\bold{19.8s}…63s}$
+     - $0.2 \frac{\mu m^2}{s} ~ 56.36ms$ → $5.64s…17.8s…56.4s$
+     - $0.225 \frac{\mu m^2}{s} ~ 50.1ms$ → $5.01s…15.8s…\bold{50.1s}$
+     - $0.56 \frac{\mu m^2}{s} ~ 20.1ms$ → $2.01s…6.36s…\bold{20.1s}$
+     - $1.12 \frac{\mu m^2}{s} ~ 10.1ms$ → $1.01s…3.19s…\bold{10.1s}$
+     - $2.25 \frac{\mu m^2}{s} ~ 5.01ms$ → $0.5s…1.58s…\bold{5.01s}$
+     - $10 \frac{\mu m^2}{s} ~ 1.13ms$ → $0.11s…0.36s…\bold{1.13s}$
+     - $50 \frac{\mu m^2}{s} ~ \boldsymbol{0.225ms}$ → $0.023s…0.071s…\bold{0.225s}$
+     - for 100s trace length we have the following constraints:
+       - conservative (3-fold): $0.113\frac{\mu m^2}{s}$
+       - middle (2.5-fold): $0.035\frac{\mu m^2}{s}$
+       - minimum (2-fold): $0.0113\frac{\mu m^2}{s}$
+     - for 50s trace length we have the following constraints:
+       - conservative (3-fold): $0.225\frac{\mu m^2}{s}$
+       - middle (2.5-fold): $0.071\frac{\mu m^2}{s}$
+       - minimum (2-fold): $0.0225\frac{\mu m^2}{s}$
+     - for 20s trace length we have the following constraints:
+       - conservative (3-fold): $0.56\frac{\mu m^2}{s}$
+       - middle (2.5-fold): $0.18\frac{\mu m^2}{s}$
+       - minimum (2-fold): $0.056\frac{\mu m^2}{s}$
+***** Coming back to my project
+      - Pablo fitted the 400 Hs-PEX5-eGFP samples and got an average transit
+        time of 0.225ms
+      - which simulations have I got already?
+
+      |   D | sim | where   | max 5000 Intensity                 |
+      |-----+-----+---------+------------------------------------|
+      | 0.5 |  11 | Sep2019 | 10, 25, 39, 60, 74, 84, 85, 86     |
+      |   1 |   8 | Sep2019 | 16, 20, 43, 46, 87, 90, 98         |
+      | 1.5 |   7 | Sep2019 | 1, 6, 18                           |
+      |   2 |   9 | Sep2019 | 2, 15, 22, 33, 53, 72              |
+      | 2.5 |  18 | Sep2019 | 11, 27, 34, 51, 79, 81, 92, 95     |
+      |   3 |  13 | Sep2019 | 23, 36, 38, 50, 55, 58, 78, 80, 99 |
+      | 3.5 |   7 | Sep2019 | 68                                 |
+      |   4 |   6 | Sep2019 | 30, 52, 66, 82                     |
+      | 4.5 |  11 | Sep2019 | 5, 12, 41, 76                      |
+      |   5 |  10 | Sep2019 | 0, 4, 32, 42, 96                   |
+      |     |     |         |                                    |
+***** DONE uninstall git lfs (annoying 3 authentications and no benefit...)
+      CLOSED: [2020-12-14 Mo 13:33]
+      1. =git lfs uninstall=
+      2. remove lfs stuff from =.gitattributes=:
+         #+begin_example
+         *.tf filter=lfs diff=lfs merge=lfs -text
+         data/**/*.tf/** filter=lfs diff=lfs merge=lfs -text
+         *.h5 filter=lfs diff=lfs merge=lfs -text
+         #+end_example
+      3. do =git rm --cached= for each of the files stored in git lfs
+         #+begin_example
+         data/mlruns/1/47b870b8fdcb4445956635c6758caff3/artifacts/model/data/model.h5
+         data/mlruns/1/e54a6138a1c94873b2fb0c399bf42edc/artifacts/model/data/model.h5
+         #+end_example
+      4. since I don't need these runs, I don't add them manually, but leave
+         them where they are (at the =/beegfs= at the hpc)
+      5. commit everything
+      6. remove junk with =rm -rf .git/lfs=
+***** TODO Changes in Simulation
+      - took nmol_arr out of =produce_training_data=:
+        #+begin_example
+        nmol_arr : list or tuple
+          Number of fast molecules used for simulation. For each set, one will
+          be drawn using random.choice()
+        #+end_example
+        and fixed it to the following:
+        #+begin_src python
+        nmol = random.choice([500, 1000, 1500, 2000, 2500, 3000, 3500])
+        #+end_src
+      - fixed printing: if you want to print out to the same line (e.g. in a
+        for-loop), just use the string marker =\r=, e.g.:
+        #+begin_src python
+          import sys
+          num_of_mol = 500
+          for b in range(0, num_of_mol):
+              per = int((float(b) / float(num_of_mol)) * 100)
+              sys.stdout.write("\rProcessing tracks: [{:20}] {}% complete".format('=' * int(per / 5), per))
+        #+end_src
+
+
+***** TODO do scaling in =integrate_over_psf=
+***** DONE fork nanosimpy functions into my own package
+     CLOSED: [2020-11-30 Mo 10:21]
+     - always dealing with the unmaintained nanosimpy package is tedious
+*** Reading End-to-End Lung cancer screening (Ardila, Kiraly, Bharadwaj, Choi et al, 2019)
+    - link: [[docview:~/Dokumente/Forschung/Literatur/ML-applications/Ardila, D.
+      End-to-end lung cancer screening 3D DL on low-dose chest CT_PRINTED.pdf]]
+
+
+    - try Focal Loss [[docview:~/Dokumente/Forschung/Literatur/maths/Lin, T-Y et
+      al (Facebook). Focal Loss for Dense Object Detection.pdf]]
+      - they used it for a CNN that took whole-CT volumes instead of the regular
+        (balanced) Cross entropy to mitigate the sparsity of positive examples
+    - use localization metrics! such as their self-defined Hit@N (although this
+      is compared with a manual labelling - not sure, maybe in some subset of
+      self-taken FCS curves? Maybe ask 5 FCS researchers to check?? :D)
+    - In the end it was an ensemble of 10? networks or so working together. And
+      I think *All* of them were pretrained!! Important! Probably because there
+      were only 398 cancer-positives for training this was even more important.
+      - e.g. for Cancer ROI detection first a general dataset for *nodule
+        detection* then the specific dataset to only detect *malignant nodules*
+      - e.g. full volume model was pretained on imagenet.
+    - interesting: the end-score for prediction was combined from the two most
+      malignous ROIs using the *noisy-or* equation $1 - (1 -
+      p_1)(1 - p_2)$
+    - also interesting: statistical evaluation
+      - confidence intervals computed bassed on the percentiles of 1000 random
+        resamplings (bootstraps) of the data
+      - for comparison reader-model differences the metrics were computed after
+        these 1000 resamplings as well
+      - P values for sensitivity and specifity based on
+        - standard permutation test using 10,000 random resamplings
+        - for each resampling, randomly swapped reader and model results for
+          each case
+        - then performed a two-sided hypothesis test comparing model-reader
+          difference with distribution of 10,000 model-reader differences across
+          the resampled data
+        - result: empirical p-value
+
+** TODOs
+*** TODO use =mlflow.keras.log_model()= instead of tf =model.save=
+#+BEGIN_SRC python
+  mlflow.keras.log_model(keras_model,
+                         artifact_path,
+                         conda_env=None,
+                         custom_objects=None,
+                         keras_module=None,
+                         registered_model_name=None,
+                         **kwargs)
+#+END_SRC
+- keras_model=model
+- artifact_path='model'
+- conda_env=None (loads mlflow.keras.get_default_conda_env())
+- custom_objects={'binary_ce_dice': bm.binary_ce_dice_loss()}
+*** TODO Choosing some additional metrics
+Which measures make sense for Artifact classification / segmentation:
+- Recall! - I want all the artifacts
+- Precision - slightly less important
+- Combining the two, but giving recall a higher weight is possible with the
+  *F-Measure*
+  \[F_{\beta} = (1 + \beta^2) \cdot
+  \frac{\text{precision}\cdot\text{recall}}{\beta^2\cdot\text{precision} +
+  \text{recall}}\]
+  - To get an evenly weighted version, we could use the \[F_{1} = 2 \cdot \frac{\text{precision}\cdot\text{recall}}{\text{precision} + \text{recall}}\], but even
+    better is probably the measure \[F_{2} = 5
+    \cdot\frac{\text{precision}\cdot\text{recall}}{4\cdot\text{precision} + \text{recall}}\]
+  - just note that if using $F_2$ the outcome depends even stronger on the used
+    threshold for deciding if a predicted probability is 1 or 0 → *there is a
+    =threshold= argument for the =tf.keras.metrics= :)*
+  - PROBLEM: no tf.keras.metrics.Fmeasure (or similar) - mmmh...
+- AUC = Area Under the ROC Curve
+  - is scale-invariante → measures how well predictions are ranked, rather than
+    their absolute values
+    - Cave: not always desirable, e.g. if we do need well calibrated probability outputs
+  - is classification-threshold-invariant
+    - Cave: not always desirable, e.g. when there are wide disparities in the
+      cost of false negatives vs false positives, it may be critical to minimize
+      one type of classification error → this is actually a thing in artifact
+      classification, since we want to minimize the false negatives
+
+This is the list I came up with:
+
+#+BEGIN_SRC python
+thresholds = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+metrics = [tf.keras.metrics.TruePositives(name='tp', thresholds=thresholds),
+           tf.keras.metrics.FalsePositives(name='fp', thresholds=thresholds),
+           tf.keras.metrics.TrueNegatives(name='tn', thresholds=thresholds),
+           tf.keras.metrics.FalseNegatives(name='fn', thresholds=thresholds),
+           tf.keras.metrics.BinaryAccuracy(name='accuracy', threshold=0.5),
+           tf.keras.metrics.Precision(name='precision', thresholds=thresholds),
+           tf.keras.metrics.Recall(name='recall', thresholds=thresholds),
+           tf.keras.metrics.AUC(num_thresholds=100, name='auc')]
+#+END_SRC
+*** TODO compute metrics vs threshold → there is a =thresholds= argument for =tf.keras.metrics= :)
+*** TODO Investigate Error on GPU node
 - 2020-04-13 02:45:28.216446: W
   tensorflow/stream_executor/platform/default/dso_loader.cc:55] Could not load
   dynamic library 'libnvinfer.so.6'; dlerror: libnvinfer.so.6: cannot open
@@ -4754,8 +5155,8 @@ Yippieeeeh, I don't need the complicated =OrgFormatter!=
   tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:30] Cannot dlopen some
   TensorRT libraries. If you would like to use Nvidia GPU with TensorRT, please
   make sure the missing libraries mentioned above are installed properly
-**** TODO fix pydot and graphviz to make model plotting work
-**** TODO check out python module =argparser= as used [[https://github.com/mlflow/mlflow/blob/master/examples/tensorflow/tf2/train_predict_2.py][here]]
+*** TODO fix pydot and graphviz to make model plotting work
+*** TODO check out python module =argparser= as used [[https://github.com/mlflow/mlflow/blob/master/examples/tensorflow/tf2/train_predict_2.py][here]]
 *** PENDING Fix isort and sys.path conflicts
     - State "PENDING"    from "TODO"       [2020-05-02 Sa 13:06] \\
       Waiting for isort 5.0.0 release
@@ -4781,6 +5182,10 @@ Test:
   pwd
 #+END_SRC
 
+#+RESULTS:
+#+begin_example
+#+end_example
+
 ** Compute node for script execution
 #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
   srun -p s_standard --time=7-10:00:00 --ntasks-per-node=24 --mem-per-cpu=2000 --pty bash
@@ -4788,7 +5193,6 @@ Test:
 
 #+RESULTS:
 #+begin_example
-  (base) [ye53nis@node146 drmed-git]$
 #+end_example
 
 ** Jupyter on Ara
@@ -4798,42 +5202,46 @@ Test:
 
 1. Request compute node via tmux
    #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session jpmux
-     srun -p s_standard --time=7-10:00:00 --ntasks-per-node=24 --mem-per-cpu=2000 --pty bash
+   cd /
+   srun -p s_standard --time=7-10:00:00 --ntasks-per-node=24 --mem-per-cpu=2000 --pty bash
    #+END_SRC
+
 2.
 #+CALL: jpt-tmux[:session jpmux]
 
+   #+RESULTS:
+   #+begin_example
+     (tf-nightly) [ye53nis@node142 /]$ jupyter lab --no-browser --port=$PORT
+     [I 09:41:06.801 LabApp] JupyterLab extension loaded from /home/ye53nis/.conda/envs/tf-nightly/lib/python3.8/site-packages/jupyterlab
+     [I 09:41:06.801 LabApp] JupyterLab application directory is /home/ye53nis/.conda/envs/tf-nightly/share/jupyter/lab
+     [I 09:41:06.803 LabApp] Serving notebooks from local directory: /
+     [I 09:41:06.803 LabApp] Jupyter Notebook 6.1.4 is running at:
+     [I 09:41:06.803 LabApp] http://localhost:8889/?token=5ffe7e295035105d12d4722c9a1bb2a0392a15c00d440425
+     [I 09:41:06.803 LabApp]  or http://127.0.0.1:8889/?token=5ffe7e295035105d12d4722c9a1bb2a0392a15c00d440425
+     [I 09:41:06.803 LabApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+     [C 09:41:06.808 LabApp]
+
+         To access the notebook, open this file in a browser:
+             file:///home/ye53nis/.local/share/jupyter/runtime/nbserver-332529-open.html
+         Or copy and paste one of these URLs:
+             http://localhost:8889/?token=5ffe7e295035105d12d4722c9a1bb2a0392a15c00d440425
+          or http://127.0.0.1:8889/?token=5ffe7e295035105d12d4722c9a1bb2a0392a15c00d440425
+   #+end_example
+
+
+#+CALL: ssh-tunnel(port="8889", node="node181")
+
 #+RESULTS:
-#+begin_example
-  (tensorflow_nightly) [ye53nis@node146 drmed-git]$ jupyter lab --no-browser --port=$PORT
-  [I 21:44:33.348 LabApp] JupyterLab extension loaded from /home/ye53nis/.conda/envs/tensorflow_nightly/lib/python3.8/site-packages/jupyterlab
-  [I 21:44:33.348 LabApp] JupyterLab application directory is /home/ye53nis/.conda/envs/tensorflow_nightly/share/jupyter/lab
-  [I 21:44:33.353 LabApp] Serving notebooks from local directory: /beegfs/ye53nis/drmed-git
-  [I 21:44:33.353 LabApp] The Jupyter Notebook is running at:
-  [I 21:44:33.353 LabApp] http://localhost:8889/?token=baceda81f9f1b1ef453aef855e00bc58c338ac8f2efcbf00
-  [I 21:44:33.353 LabApp]  or http://127.0.0.1:8889/?token=baceda81f9f1b1ef453aef855e00bc58c338ac8f2efcbf00
-  [I 21:44:33.353 LabApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
-  [C 21:44:33.668 LabApp]
-
-      To access the notebook, open this file in a browser:
-          file:///home/ye53nis/.local/share/jupyter/runtime/nbserver-442384-open.html
-      Or copy and paste one of these URLs:
-          http://localhost:8889/?token=baceda81f9f1b1ef453aef855e00bc58c338ac8f2efcbf00
-       or http://127.0.0.1:8889/?token=baceda81f9f1b1ef453aef855e00bc58c338ac8f2efcbf00
-#+end_example
-
-#+CALL: ssh-tunnel(port="8889", node="node146")
-
-#+RESULTS:
-| sh-5.0$           | ye53nis@ara-login01.rz.uni-jena.de's | password: |     |    |          |      |      |             |
-| ye53nis@node146's | password:                            |           |     |    |          |      |      |             |
-| Last              | login:                               | Mon       | May | 25 | 13:42:48 | 2020 | from | login01.ara |
+| Connection                           | to                                   | ara-login01.rz.uni-jena.de | closed.          |        |          |      |        |             |    |      |      |
+| sh-5.0$                              | ye53nis@ara-login01.rz.uni-jena.de's | password:                  |                  |        |          |      |        |             |    |      |      |
+| ye53nis@node181's                    | password:                            |                            |                  |        |          |      |        |             |    |      |      |
+| Last                                 | login:                               | Tue                        | Nov              | 3      | 11:14:09 | 2020 | from   | login01.ara |    |      |      |
 
 I started a Python3 kernel using =jupyter-server-list-kernels=. Then I added the
 kernel ID to the =:PROPERTIES:= drawer of this (and following) subtrees.
 
 #+begin_example
-python3           749074c4-797a-4e72-957c-f87331800ef8   a few seconds ago    starting   0
+python3           0fd6e99c-9857-450b-9e8d-7c726e8679e1   a few seconds ago    starting   0
 #+end_example
 
 Test:
@@ -4844,39 +5252,38 @@ Test:
 #+begin_example
   No of CPUs in system: 72
   No of CPUs the current process can use: 24
-  load average: (43.52, 43.44, 43.4)
-  os.uname():  posix.uname_result(sysname='Linux', nodename='node171', release='3.10.0-957.1.3.el7.x86_64', version='#1 SMP Thu Nov 29 14:49:43 UTC 2018', machine='x86_64')
-  PID of process: 143415
-  RAM total: 199G, RAM used: 37G, RAM free: 62G
+  load average: (29.93, 28.16, 27.88)
+  os.uname():  posix.uname_result(sysname='Linux', nodename='node237', release='3.10.0-957.1.3.el7.x86_64', version='#1 SMP Thu Nov 29 14:49:43 UTC 2018', machine='x86_64')
+  PID of process: 14865
+  RAM total: 199G, RAM used: 11G, RAM free: 164G
   the current directory: /home/ye53nis
   My disk usage:
   Filesystem           Size  Used Avail Use% Mounted on
   /dev/sda1             50G  3.2G   47G   7% /
   devtmpfs              94G     0   94G   0% /dev
-  tmpfs                 94G  751M   94G   1% /dev/shm
-  tmpfs                 94G  219M   94G   1% /run
+  tmpfs                 94G  586M   94G   1% /dev/shm
+  tmpfs                 94G  155M   94G   1% /run
   tmpfs                 94G     0   94G   0% /sys/fs/cgroup
-  nfs01-ib:/cluster    2.0T  316G  1.7T  16% /cluster
-  nfs02-ib:/data01      88T   60T   29T  68% /data01
-  nfs03-ib:/pool/work  100T   79T   22T  79% /nfsdata
-  nfs01-ib:/home        80T   59T   22T  74% /home
-  /dev/sda5            2.0G   83M  2.0G   5% /tmp
-  /dev/sda3            6.0G  402M  5.6G   7% /var
-  /dev/sda6            169G   57M  169G   1% /local
-  beegfs_nodev         524T  442T   83T  85% /beegfs
-  tmpfs                 19G     0   19G   0% /run/user/68191
+  nfs01-ib:/cluster    2.0T  469G  1.6T  23% /cluster
+  nfs01-ib:/home        80T   64T   17T  80% /home
+  nfs02-ib:/data01      88T   65T   23T  74% /data01
+  nfs03-ib:/pool/work  100T   70T   31T  70% /nfsdata
+  /dev/sda6            169G  6.3G  163G   4% /local
+  /dev/sda5            2.0G   34M  2.0G   2% /tmp
+  /dev/sda3            6.0G  416M  5.6G   7% /var
+  beegfs_nodev         524T  469T   56T  90% /beegfs
   tmpfs                 19G     0   19G   0% /run/user/67339
-  /bin/sh: conda: command not found
+  /bin/bash: conda: command not found
   {'SLURM_CHECKPOINT_IMAGE_DIR': '/var/slurm/checkpoint',
-   'SLURM_NODELIST': 'node171',
+   'SLURM_NODELIST': 'node237',
    'SLURM_JOB_NAME': 'bash',
-   'XDG_SESSION_ID': '8541',
-   'SLURMD_NODENAME': 'node171',
-   'SLURM_TOPOLOGY_ADDR': 'node171',
+   'XDG_SESSION_ID': '9639',
+   'SLURMD_NODENAME': 'node237',
+   'SLURM_TOPOLOGY_ADDR': 'node237',
    'SLURM_NTASKS_PER_NODE': '24',
    'HOSTNAME': 'login01',
    'SLURM_PRIO_PROCESS': '0',
-   'SLURM_SRUN_COMM_PORT': '45585',
+   'SLURM_SRUN_COMM_PORT': '35213',
    'SHELL': '/bin/bash',
    'TERM': 'xterm-color',
    'SLURM_JOB_QOS': 'qstand',
@@ -4884,14 +5291,14 @@ Test:
    'HISTSIZE': '1000',
    'TMPDIR': '/tmp',
    'SLURM_TOPOLOGY_ADDR_PATTERN': 'node',
-   'SSH_CLIENT': '10.231.190.186 48592 22',
+   'SSH_CLIENT': '10.231.210.198 43508 22',
    'CONDA_SHLVL': '2',
    'CONDA_PROMPT_MODIFIER': '(tensorflow_nightly) ',
    'GSETTINGS_SCHEMA_DIR_CONDA_BACKUP': '',
-   'WINDOWID': '0',
+   'WINDOWID': '46137351',
    'QTDIR': '/usr/lib64/qt-3.3',
    'QTINC': '/usr/lib64/qt-3.3/include',
-   'SSH_TTY': '/dev/pts/57',
+   'SSH_TTY': '/dev/pts/5',
    'QT_GRAPHICSSYSTEM_CHECKED': '1',
    'SLURM_NNODES': '1',
    'USER': 'ye53nis',
@@ -4899,21 +5306,21 @@ Test:
    'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=01;05;37;41:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.axv=01;35:*.anx=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=01;36:*.au=01;36:*.flac=01;36:*.mid=01;36:*.midi=01;36:*.mka=01;36:*.mp3=01;36:*.mpc=01;36:*.ogg=01;36:*.ra=01;36:*.wav=01;36:*.axa=01;36:*.oga=01;36:*.spx=01;36:*.xspf=01;36:',
    'CONDA_EXE': '/cluster/miniconda3/bin/conda',
    'SLURM_STEP_NUM_NODES': '1',
-   'SLURM_JOBID': '386457',
+   'SLURM_JOBID': '503029',
    'SRUN_DEBUG': '3',
    'SLURM_NTASKS': '24',
    'SLURM_LAUNCH_NODE_IPADDR': '192.168.192.5',
    'SLURM_STEP_ID': '0',
-   'TMUX': '/tmp/tmux-67339/default,47311,2',
+   'TMUX': '/tmp/tmux-67339/default,27827,4',
    '_CE_CONDA': '',
    'CONDA_PREFIX_1': '/cluster/miniconda3',
-   'SLURM_STEP_LAUNCHER_PORT': '45585',
+   'SLURM_STEP_LAUNCHER_PORT': '35213',
    'SLURM_TASKS_PER_NODE': '24',
    'MAIL': '/var/spool/mail/ye53nis',
-   'PATH': '/home/ye53nis/.conda/envs/tensorflow_nightly/bin:/home/lex/Programme/miniconda3/envs/tensorflow_env/bin:/home/lex/Programme/miniconda3/condabin:/home/lex/.local/bin:/bin:/usr/bin:/usr/local/bin:/usr/local/sbin:/usr/lib/jvm/default/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/var/lib/snapd/snap/bin:/home/lex/Programme/miniconda3/bin:/usr/sbin:/home/ye53nis/.local/bin:/home/ye53nis/bin',
+   'PATH': '/home/ye53nis/.conda/envs/tensorflow_nightly/bin:/home/lex/Programme/miniconda3/bin:/home/lex/Programme/miniconda3/condabin:/home/lex/.local/bin:/bin:/usr/bin:/usr/local/bin:/usr/local/sbin:/usr/lib/jvm/default/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/var/lib/snapd/snap/bin:/home/lex/Programme/miniconda3/bin:/usr/sbin:/home/ye53nis/.local/bin:/home/ye53nis/bin',
    'GSETTINGS_SCHEMA_DIR': '/home/ye53nis/.conda/envs/tensorflow_nightly/share/glib-2.0/schemas',
    'SLURM_WORKING_CLUSTER': 'hpc:192.168.192.1:6817:8448',
-   'SLURM_JOB_ID': '386457',
+   'SLURM_JOB_ID': '503029',
    'CONDA_PREFIX': '/home/ye53nis/.conda/envs/tensorflow_nightly',
    'SLURM_JOB_USER': 'ye53nis',
    'SLURM_STEPID': '0',
@@ -4926,18 +5333,18 @@ Test:
    'SLURM_JOB_UID': '67339',
    'LOADEDMODULES': '',
    'SLURM_NODEID': '0',
-   'TMUX_PANE': '%2',
+   'TMUX_PANE': '%4',
    'SLURM_SUBMIT_DIR': '/home/ye53nis',
-   'SLURM_TASK_PID': '416264',
+   'SLURM_TASK_PID': '9182',
    'SLURM_NPROCS': '24',
    'SLURM_CPUS_ON_NODE': '24',
    'SLURM_DISTRIBUTION': 'block',
-   'https_proxy': 'https://internet4nzm.rz.uni-jena.de:3128',
+   'https_proxy': 'http://internet4nzm.rz.uni-jena.de:3128',
    'SLURM_PROCID': '0',
    'HISTCONTROL': 'ignoredups',
    '_CE_M': '',
-   'SLURM_JOB_NODELIST': 'node171',
-   'SLURM_PTY_PORT': '37693',
+   'SLURM_JOB_NODELIST': 'node237',
+   'SLURM_PTY_PORT': '39515',
    'HOME': '/home/ye53nis',
    'SHLVL': '3',
    'SLURM_LOCALID': '0',
@@ -4959,22 +5366,20 @@ Test:
    'LESSOPEN': '||/usr/bin/lesspipe.sh %s',
    'SLURM_STEP_TASKS_PER_NODE': '24',
    'PORT': '8889',
-   'SLURM_STEP_NODELIST': 'node171',
+   'SLURM_STEP_NODELIST': 'node237',
    'DISPLAY': ':0',
    'XDG_RUNTIME_DIR': '',
-   'XAUTHORITY': '/tmp/xauth-1000-_0',
+   'XAUTHORITY': '/home/lex/.Xauthority',
    'BASH_FUNC_module()': '() {  eval `/usr/bin/modulecmd bash $*`\n}',
    '_': '/home/ye53nis/.conda/envs/tensorflow_nightly/bin/jupyter',
    'KERNEL_LAUNCH_TIMEOUT': '40',
-   'JPY_PARENT_PID': '417110',
+   'JPY_PARENT_PID': '10127',
    'CLICOLOR': '1',
    'PAGER': 'cat',
    'GIT_PAGER': 'cat',
    'MPLBACKEND': 'module://ipykernel.pylab.backend_inline'}
-
-  os.environ
-   None
 #+end_example
+
 ** Tensorboard tunnel, Mlflow ui tunnel
 #+CALL: ssh-tunnel[:session local](port="6006", node="node146")
 
@@ -4984,9 +5389,11 @@ Test:
 | Last              | login:                               | Mon       | May | 25 | 13:13:33 | 2020 | from | login01.ara |
 
 
-#+CALL: ssh-tunnel[:session local2](port="5000", node="node146")
+#+CALL: ssh-tunnel[:session local2](port="5000", node="node181")
 
 #+RESULTS:
-| sh-5.0$           | ye53nis@ara-login01.rz.uni-jena.de's | password: |     |    |          |      |      |             |
-| ye53nis@node146's | password:                            |           |     |    |          |      |      |             |
-| Last              | login:                               | Sat       | May | 23 | 23:59:20 | 2020 | from | login01.ara |
+| sh-5.0$           | sh-5.0$     | ye53nis@ara-login01.rz.uni-jena.de's | password:                 |         |    |     |      |    |       |        |   |
+| Warning:          | Permanently | added                                | 'node181,192.168.193.181' | (ECDSA) | to | the | list | of | known | hosts. |   |
+| ye53nis@node181's | password:   |                                      |                           |         |    |     |      |    |       |        |   |
+|                   |             |                                      |                           |         |    |     |      |    |       |        |   |
+|                   |             |                                      |                           |         |    |     |      |    |       |        |   |
