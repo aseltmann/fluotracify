@@ -28,7 +28,7 @@ def brownian_only_numpy(total_sim_time, time_step, num_of_mol, D, width,
 
     Returns
     -------
-    track_arr : dict
+    track_arr : dict of list of numpy arrays
         A dictionary where each track number (e.g. track_arr[0]) contains the
         track data with y-coordinates [0,:] and x-coordinates [1,:]
     """
@@ -48,12 +48,9 @@ def brownian_only_numpy(total_sim_time, time_step, num_of_mol, D, width,
     # This can be done as one big matrix, but can crash system if large so
     # I break it up by molecule.
     for b in range(0, num_of_mol):
-        print('processing tracks: ', (float(b) / float(num_of_mol)) * 100, '%')
-
-        sys.stdout.write('\r')
         per = int((float(b) / float(num_of_mol)) * 100)
-        sys.stdout.write("Processing tracks: [%-20s] %d%% complete" %
-                         ('=' * int(per / 5), per))
+        sys.stdout.write("\rProcessing tracks: [{:20}] {}% complete".format(
+            '=' * int(per / 5), per))
         sys.stdout.flush()
         track = np.zeros((2, num_of_steps))
         track[0, 0] = start_coord_y[b]
@@ -103,9 +100,16 @@ def calculate_psf(fwhms, distance):
     Returns
     -------
     psf : dict
-        'FWHMs' : list of ints, see above
+        'FWHMs' : list of ints
         'pixel_size' : 1.0
-        'ri' : length values of simulated PSF
+        'ri' : dict of lists of ints
+            Length values of simulated PSF
+        'number_FWHMs' : int
+        'V' : dict of lists of floats
+            Intensity values of simulated PSF at length 'ri'
+
+    Notes
+    -----
     # FWHM to sigma conversion
     FWHM = 2*np.sqrt(2*np.log(2))*sigma
     # Sigma from FWHM
@@ -122,7 +126,6 @@ def calculate_psf(fwhms, distance):
     G = np.exp((np.log(2.)))**(-x**2/((FWHM**2)/4.0))
     # e^(ln2) = 2 indentity.
     G = 2.**(-x**2/(FWHM/2.0)**2)
-
     """
 
     psf = {}
@@ -137,12 +140,52 @@ def calculate_psf(fwhms, distance):
 
 
 def integrate_over_psf(psf, track_arr, num_of_mol, psy, psx):
-    # Pass each molecule through the psf function.
+    """Pass an array of Brownian motion tracks through the PSF function
+
+    Parameters
+    ----------
+    psf : dict
+        'FWHMs' : list of ints
+        'pixel_size' : 1.0
+        'ri' : dict of lists of ints
+            Length values of simulated PSF
+        'number_FWHMs' : int
+        'V' : dict of lists of float
+            Intensity values of simulated PSF at length 'ri'
+    track_arr : dict of lists of numpy arrays
+        A dictionary where each track number (e.g. track_arr[0]) contains the
+        track data with y-coordinates [0,:] and x-coordinates [1,:]
+    num_of_mol : int
+        The number of molecules in the simulation.
+    psy, psx : int
+        The location of the focal volume in the simulated area.
+
+    Returns
+    -------
+    psf : dict
+        'FWHMs' : list of ints
+        'pixel_size' : 1.0
+        'ri' : dict of lists of ints
+            Length values of simulated PSF
+        'number_FWHMs' : int
+        'V' : dict of lists of float
+            Intensity values of simulated PSF at length 'ri'
+        'trace' : dict of lists of floats
+            Gives non-physical relative intensity values (= emitted photons)
+            for each molecule during its track through the simulated area.
+
+    Notes
+    -----
+    - basic algorithm for each molecule:
+      1. Get Euclidian distances from each position of the molecule to the
+         location of the focal volume
+      2. Choose relative intensity value for each position of the molecule
+         according to the simulated psf from `calculate_psf`
+    """
     psf['trace'] = {}
     sys.stdout.write('\n')
     for ki in range(0, psf['number_FWHMs']):
-        sys.stdout.write('\r')
-        sys.stdout.write("processing FWHM %d" % psf['FWHMs'][ki])
+        sys.stdout.write("\rProcessing FWHM {}".format(psf['FWHMs'][ki]))
         sys.stdout.flush()
         trace = 0
         for b in range(0, num_of_mol):
