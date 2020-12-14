@@ -2,13 +2,13 @@
 # current state of the project when fluotracify is released, I might
 # fork the functions I need from the package
 import copy
+import os
 import random
-import sys
 import uuid
+from pathlib import Path
 
 import numpy as np
 
-from pathlib import Path
 from fluotracify.simulations.simulation_methods import (
     brownian_only_numpy,
     calculate_psf,
@@ -340,7 +340,6 @@ def produce_training_data(folder,
                           traces_per_set,
                           total_sim_time,
                           artifact,
-                          nmol_arr,
                           d_mol_arr,
                           label_for=0):
     """Save multiple .csv files containing simulations of Fluorescence
@@ -362,9 +361,6 @@ def produce_training_data(folder,
     artifact : {0, 1, 2, 3}
         0 = no artifact, 1 = bright clusters, 2 = detector dropout,
         3 = photobleaching
-    nmol_arr : list or tuple
-        Number of fast molecules used for simulation. For each set, one will
-        be drawn using random.choice()
     d_mol_arr : list or tuple
         Diffusion coefficients in mm^2 / s used for simulation. For each set,
         one will be drawn using random.choice()
@@ -380,6 +376,19 @@ def produce_training_data(folder,
     Raises
     ------
     NotADirectoryError if folder is not a directory
+
+    Notes
+    -----
+    - The main underlying physical property of the diversity of the
+      fluorescence traces is the diffusion constant D of the molecules. This
+      means for the correction to work on as much data as possible, the model
+      has to be trained on diverse diffusion constants
+    - common diffusion constants in fluorescence correlation spectroscopy
+      range from 10^{-3} to 10^{2} um^2 / s
+    - this is why the dataset's sub-folders are stratified along the given
+      diffusion constants in `d_mol_arr`. `number_of_sets` gives the amount of
+      .csv files for each sub-folder - this way, an equal distribution of
+      diffusion constants is guaranteed
     """
     p = Path(folder)
     if not p.is_dir():
@@ -390,74 +399,83 @@ def produce_training_data(folder,
     time_step = 1.
     width = 3000.0
     height = 3000.0
+    for d_mol in d_mol_arr:
+        print('D = {} um^2 / s'.format(d_mol))
+        # define the name of the directory to be created
+        pdir = p / '{}'.format(d_mol)
 
-    for idx in range(number_of_sets):
-        print('Set {} ------------------------'.format(idx))
-        nmol = random.choice(nmol_arr)
-        d_mol = random.choice(d_mol_arr)
-
-        file_name_ext = '_set{:0>3}.csv'.format(idx + 1)
-        file = ''.join([file_name, file_name_ext])
-        f = Path(file)
-        path_and_file_name = p / f
-        col_per_example = 2
-
-        if artifact == 1:
-            # bright clusters
-            nclust = 10
-            d_clust = [0.01, 0.02]
-            d_clust = random.choice(d_clust)
-            traces = simulate_trace_array(artifact=artifact,
-                                          nsamples=traces_per_set,
-                                          foci_array=foci_array,
-                                          foci_distance=foci_distance,
-                                          total_sim_time=total_sim_time,
-                                          time_step=time_step,
-                                          nmol=nmol,
-                                          d_mol=d_mol,
-                                          width=width,
-                                          height=height,
-                                          nclust=nclust,
-                                          d_clust=d_clust,
-                                          label_for=label_for)
-            savetrace_csv(artifact=artifact,
-                          path_and_file_name=path_and_file_name,
-                          traces_array=traces,
-                          col_per_example=col_per_example,
-                          foci_array=foci_array,
-                          foci_distance=foci_distance,
-                          total_sim_time=total_sim_time,
-                          time_step=time_step,
-                          nmol=nmol,
-                          d_mol=d_mol,
-                          width=width,
-                          height=height,
-                          nclust=nclust,
-                          d_clust=d_clust)
-
-        elif artifact == 0 or 2 or 3:
-            traces = simulate_trace_array(artifact=artifact,
-                                          nsamples=traces_per_set,
-                                          foci_array=foci_array,
-                                          foci_distance=foci_distance,
-                                          total_sim_time=total_sim_time,
-                                          time_step=time_step,
-                                          nmol=nmol,
-                                          d_mol=d_mol,
-                                          width=width,
-                                          height=height,
-                                          label_for=label_for)
-            savetrace_csv(artifact=artifact,
-                          path_and_file_name=path_and_file_name,
-                          traces_array=traces,
-                          col_per_example=col_per_example,
-                          foci_array=foci_array,
-                          foci_distance=foci_distance,
-                          total_sim_time=total_sim_time,
-                          time_step=time_step,
-                          nmol=nmol,
-                          d_mol=d_mol,
-                          width=width,
-                          height=height)
+        try:
+            os.mkdir(pdir)
+        except OSError:
+            print("Creation of the directory {} failed".format(pdir))
         else:
-            raise ValueError('artifact must be 0, 1, 2 or 3')
+            print("Successfully created the directory {} ".format(pdir))
+        for idx in range(number_of_sets):
+            print('Set {} ------------------------'.format(idx))
+            nmol = random.choice([500, 1000, 1500, 2000, 2500, 3000, 3500])
+
+            file_name_ext = '_set{:0>3}.csv'.format(idx + 1)
+            file = ''.join([file_name, file_name_ext])
+            f = Path(file)
+            path_and_file_name = pdir / f
+            col_per_example = 2
+
+            if artifact == 1:
+                # bright clusters
+                nclust = 10
+                d_clust = [0.005, 0.01, 0.02]
+                d_clust = random.choice(d_clust)
+                traces = simulate_trace_array(artifact=artifact,
+                                              nsamples=traces_per_set,
+                                              foci_array=foci_array,
+                                              foci_distance=foci_distance,
+                                              total_sim_time=total_sim_time,
+                                              time_step=time_step,
+                                              nmol=nmol,
+                                              d_mol=d_mol,
+                                              width=width,
+                                              height=height,
+                                              nclust=nclust,
+                                              d_clust=d_clust,
+                                              label_for=label_for)
+                savetrace_csv(artifact=artifact,
+                              path_and_file_name=path_and_file_name,
+                              traces_array=traces,
+                              col_per_example=col_per_example,
+                              foci_array=foci_array,
+                              foci_distance=foci_distance,
+                              total_sim_time=total_sim_time,
+                              time_step=time_step,
+                              nmol=nmol,
+                              d_mol=d_mol,
+                              width=width,
+                              height=height,
+                              nclust=nclust,
+                              d_clust=d_clust)
+
+            elif artifact == 0 or 2 or 3:
+                traces = simulate_trace_array(artifact=artifact,
+                                              nsamples=traces_per_set,
+                                              foci_array=foci_array,
+                                              foci_distance=foci_distance,
+                                              total_sim_time=total_sim_time,
+                                              time_step=time_step,
+                                              nmol=nmol,
+                                              d_mol=d_mol,
+                                              width=width,
+                                              height=height,
+                                              label_for=label_for)
+                savetrace_csv(artifact=artifact,
+                              path_and_file_name=path_and_file_name,
+                              traces_array=traces,
+                              col_per_example=col_per_example,
+                              foci_array=foci_array,
+                              foci_distance=foci_distance,
+                              total_sim_time=total_sim_time,
+                              time_step=time_step,
+                              nmol=nmol,
+                              d_mol=d_mol,
+                              width=width,
+                              height=height)
+            else:
+                raise ValueError('artifact must be 0, 1, 2 or 3')
