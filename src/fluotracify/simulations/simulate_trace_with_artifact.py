@@ -198,7 +198,7 @@ def simulate_trace_array(artifact,
             out_array[:, i * 2 + 1] = np.full_like(clean_trace.shape,
                                                    np.nan,
                                                    dtype=np.double)
-            print('\nTrace {}: Nmol: {} d_mol: {}'.format(i, nmol, d_mol))
+            print('\nTrace {}: Nmol: {} d_mol: {}'.format(i + 1, nmol, d_mol))
         elif artifact == 1:
             # bright clusters / spikes
             clust_trace, cluster_brightness = _simulate_bright_clusters(
@@ -215,7 +215,7 @@ def simulate_trace_array(artifact,
             out_array[:, i * 2 + 1] = clust_trace
             print(
                 '\nTrace {}: Nmol: {} d_mol: {} Cluster multiplier: {}'.format(
-                    i, nmol, d_mol, cluster_brightness))
+                    i + 1, nmol, d_mol, cluster_brightness))
         elif artifact == 2:
             # detector dropout
             detdrop_trace, detdrop_mask = _simulate_detector_dropout(
@@ -227,7 +227,7 @@ def simulate_trace_array(artifact,
             # save labels
             out_array[:, i * 2 + 1] = detdrop_mask
             print('\nTrace {}: Nmol: {} d_mol: {} max. drop: {:.2f}'.format(
-                i, nmol, d_mol, -np.amin(detdrop_trace)))
+                i + 1, nmol, d_mol, -np.amin(detdrop_trace)))
         elif artifact == 3:
             # photobleaching
             ibleach_trace, mbleach_trace, exp_scale = _simulate_photobleaching(
@@ -240,7 +240,7 @@ def simulate_trace_array(artifact,
             # combine artefact traces for labels
             out_array[:, i * 2 + 1] = ibleach_trace + mbleach_trace
             print('\nTrace {}: Nmol: {} d_mol: {} scale parameter: {:.2f}'.
-                  format(i, nmol, d_mol, exp_scale))
+                  format(i + 1, nmol, d_mol, exp_scale))
         else:
             raise ValueError('artifact must be 0, 1, 2 or 3')
     return out_array
@@ -402,10 +402,10 @@ def produce_training_data(folder,
         else:
             print("Successfully created the directory {} ".format(pdir))
         for idx in range(number_of_sets):
-            print('Set {} ------------------------'.format(idx))
+            print('Set {} ------------------------'.format(idx + 1))
             nmol = random.choice([500, 1000, 1500, 2000, 2500, 3000, 3500])
 
-            file_name_ext = '_set{:0>3}.csv'.format(idx + 1)
+            file_name_ext = '_D{}_set{:0>3}.csv'.format(d_mol, idx + 1)
             file = ''.join([file_name, file_name_ext])
             f = Path(file)
             path_and_file_name = pdir / f
