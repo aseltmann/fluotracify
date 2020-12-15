@@ -48,8 +48,7 @@ def import_from_csv(folder,
     ValueError
         If pandas read_csv fails
     """
-    path = Path(folder)
-    files = [p.name for p in path.rglob('*.csv')]
+    files = list(Path(folder).rglob('*.csv'))
     files.sort()
     np.random.seed(0)  # for reproducible random state
     np.random.shuffle(files)
@@ -62,10 +61,8 @@ def import_from_csv(folder,
     experiment_params = pd.DataFrame()
 
     for idx, file in enumerate(files):
-        file = Path(file)
-        path_and_file = path / file
         try:
-            raw_dataset = pd.read_csv(path_and_file, sep=',', header=header)
+            raw_dataset = pd.read_csv(file, sep=',', header=header)
         except pd.errors.ParserError:
             raise ValueError('Probably the header parameter is too low '
                              'and points to the metadata. Try a higher value.')
@@ -84,7 +81,7 @@ def import_from_csv(folder,
         # save number of examples per file
         nsamples.append(round(len(converted_float.columns) / col_per_example))
         # save some parameters of the experiment from csv file
-        experiment_param = pd.read_csv(path_and_file,
+        experiment_param = pd.read_csv(file,
                                        sep=',',
                                        header=None,
                                        index_col=0,
@@ -99,10 +96,10 @@ def import_from_csv(folder,
 
         if idx < ntrainfiles:
             train = pd.concat([train, converted_float], axis=1)
-            print('train', idx, path_and_file)
+            print('train', idx, file)
         else:
             test = pd.concat([test, converted_float], axis=1)
-            print('test', idx, path_and_file)
+            print('test', idx, file)
 
     return train, test, nsamples, experiment_params
 
