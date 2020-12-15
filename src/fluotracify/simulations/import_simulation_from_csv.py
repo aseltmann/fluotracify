@@ -1,11 +1,10 @@
-import os
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
 
-def import_from_csv(path,
+def import_from_csv(folder,
                     header,
                     frac_train,
                     col_per_example,
@@ -19,7 +18,7 @@ def import_from_csv(path,
 
     Parameters
     ----------
-    path : str
+    folder : str
         Folder which contains .csv files with data
     header : int
         param for `pd.read_csv` = rows to skip at beginning
@@ -49,9 +48,8 @@ def import_from_csv(path,
     ValueError
         If pandas read_csv fails
     """
-    path = Path(path)
-    files = [f for f in os.listdir(path) if f.endswith('.csv')]
-    # sort the file names (os.listdir() returns them in arbitrary order)
+    path = Path(folder)
+    files = [p.name for p in path.rglob('*.csv')]
     files.sort()
     np.random.seed(0)  # for reproducible random state
     np.random.shuffle(files)
