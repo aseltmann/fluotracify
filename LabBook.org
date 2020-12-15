@@ -5168,18 +5168,18 @@ See here: https://github.com/timothycrosley/isort/issues/468#issuecomment-570899
   :LOGBOOK:
   CLOCK: [2020-05-04 Mo 14:59]--[2020-05-04 Mo 14:59] =>  0:00
   :END:
-** Tmux on Ara
+** Tmux on Ara, Login node for git pull
 #+CALL: setup-tmux[:session local]
 
 #+RESULTS:
-| ye53nis@ara-login01.rz.uni-jena.de's | password:                            |           |
-| /tmp/tmux-67339/default              |                                      |           |
-| >                                    | ye53nis@ara-login01.rz.uni-jena.de's | password: |
+| sh-5.0$ | ye53nis@ara-login01.rz.uni-jena.de's | password: |
+| >       | ye53nis@ara-login01.rz.uni-jena.de's | password: |
 
 Test:
 
-#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
-  pwd
+#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session local
+  cd /beegfs/ye53nis/drmed-git/
+  git pull
 #+END_SRC
 
 #+RESULTS:
@@ -5232,10 +5232,9 @@ Test:
 #+CALL: ssh-tunnel(port="8889", node="node181")
 
 #+RESULTS:
-| Connection                           | to                                   | ara-login01.rz.uni-jena.de | closed.          |        |          |      |        |             |    |      |      |
-| sh-5.0$                              | ye53nis@ara-login01.rz.uni-jena.de's | password:                  |                  |        |          |      |        |             |    |      |      |
-| ye53nis@node181's                    | password:                            |                            |                  |        |          |      |        |             |    |      |      |
-| Last                                 | login:                               | Tue                        | Nov              | 3      | 11:14:09 | 2020 | from   | login01.ara |    |      |      |
+| sh-5.0$           | sh-5.0$   | ye53nis@ara-login01.rz.uni-jena.de's | password: |    |          |      |      |             |
+| ye53nis@node181's | password: |                                      |           |    |          |      |      |             |
+| Last              | login:    | Mon                                  | Dec       | 14 | 12:42:30 | 2020 | from | login01.ara |
 
 I started a Python3 kernel using =jupyter-server-list-kernels=. Then I added the
 kernel ID to the =:PROPERTIES:= drawer of this (and following) subtrees.
