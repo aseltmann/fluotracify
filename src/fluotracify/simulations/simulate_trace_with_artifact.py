@@ -312,6 +312,7 @@ def savetrace_csv(artifact,
     -------
     Saves a .csv file
     """
+    path_and_file_name = Path(path_and_file_name)
     unique = uuid.uuid4()
 
     header = ''
@@ -323,8 +324,6 @@ def savetrace_csv(artifact,
     # Remove trailing comma
     header = header.strip(',')
 
-    # TODO: include path handling with pathlib to make code work independent
-    # of OS
     with open(path_and_file_name, 'w') as my_file:
         my_file.write('unique identifier,{}\n'.format(unique))
         my_file.write('path and file name,{}\n'.format(path_and_file_name))
@@ -373,8 +372,8 @@ def produce_training_data(folder,
     folder : str
         Folder used for saving
     file_name : str
-        Name of files. Extension of style '_setXXX.csv' will be automatically
-        created.
+        Name of files. Extension of style '_DXXX_setXXX.csv' will be
+        automatically created.
     number_of_sets : int
         Number of csv files to generate
     traces_per_set : int
