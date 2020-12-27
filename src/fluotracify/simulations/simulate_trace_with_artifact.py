@@ -1,9 +1,5 @@
-# at the moment, nanosimpy is not well maintained. Depending on the
-# current state of the project when fluotracify is released, I might
-# fork the functions I need from the package
 import copy
 import os
-import random
 import uuid
 from pathlib import Path
 
@@ -416,6 +412,7 @@ def produce_training_data(folder,
     if not p.is_dir():
         raise NotADirectoryError('Parameter folder should be a directory.')
 
+    rng = np.random.default_rng()
     foci_array = np.array([250])
     foci_distance = 4000
     time_step = 1.
@@ -434,7 +431,7 @@ def produce_training_data(folder,
             print("Successfully created the directory {} ".format(pdir))
         for idx in range(number_of_sets):
             print('Set {} ------------------------'.format(idx + 1))
-            nmol = random.choice([500, 1000, 1500, 2000, 2500, 3000, 3500])
+            nmol = rng.integers(500, 3500)
 
             file_name_ext = '_D{}_set{:0>3}.csv'.format(d_mol, idx + 1)
             file = ''.join([file_name, file_name_ext])
@@ -445,8 +442,7 @@ def produce_training_data(folder,
             if artifact == 1:
                 # bright clusters
                 nclust = 10
-                d_clust = [0.005, 0.01, 0.02]
-                d_clust = random.choice(d_clust)
+                d_clust = rng.choice([0.01, 0.02, 0.1, 1])
                 traces = simulate_trace_array(artifact=artifact,
                                               nsamples=traces_per_set,
                                               foci_array=foci_array,
