@@ -189,8 +189,10 @@ def integrate_over_psf(psf, track_arr, num_of_mol, psy, psx):
         sys.stdout.flush()
         trace = 0
         for b in range(0, num_of_mol):
-            trace += psf['V'][ki][np.round(
+            b_dist = np.round(
                 np.sqrt((track_arr[b][1] - psx)**2 +
-                        (track_arr[b][0] - psy)**2), 0).astype(np.int32)]
+                        (track_arr[b][0] - psy)**2), 0).astype(np.int32)
+            b_trace = psf['V'][ki][b_dist]
+            trace += b_trace
         psf['trace'][ki] = copy.deepcopy(trace)
     return psf
