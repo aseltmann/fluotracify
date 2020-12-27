@@ -104,9 +104,9 @@ def import_from_csv(folder,
     return train, test, nsamples, experiment_params
 
 
-def separate_data_and_labels(array, nsamples):
-    """Take pandas DataFrame containing feature and label data and output two
-    separate pandas DataFrames for features and labels.
+def separate_data_and_labels(array, nsamples, col_per_example):
+    """Take pandas DataFrame containing feature and label data output a
+    dictionary containing them separately
 
     Parameters
     ----------
@@ -115,31 +115,34 @@ def separate_data_and_labels(array, nsamples):
         label_1, feature_2, label_2, ...
     nsamples : list of int
         list containing no of examples per file
+    col_per_example : int
+        Number of columns per example, first column being a trace, and then
+        one or multiple labels
 
     Returns
     -------
-    array_features : pandas DataFrame
-        Contains features ordered columnwise in the manner: feature_1,
-        feature_2, ...
-    labels : pandas DataFrame
-        Contains labels ordered columnwise in the manner: label_1, label_2, ...
+    array_dict : dict of pandas DataFrames
+        Contains one key per column in each simulated example. E.g. if the
+        simulated features comes with two labels, the key '0' will be the
+        array with the features, '1' will be the array with label A and
+        '2' will be the array with label B
+
+    Raises
+    ------
+    Exception Error, if the number of examples in each file (nsamples) is not
+        the same in all of them
     """
     if not len(set(nsamples)) == 1:
         raise Exception(
             'Error: The number of examples in each file have to be the same')
 
-    nsamples_int = nsamples[0]
-    label_names = []
-    feature_names = []
+    array_dict = {}
 
-    for i in range(nsamples_int):
-        label_names.append(array.columns[i * 2 + 1])
-        feature_names.append(array.columns[i * 2])
+    for i in range(col_per_example):
+        array_dict['{}'.format(i)] = array.iloc[:, i::col_per_example]
 
-    array_labels = array[label_names].copy()
-    array_features = array[feature_names].copy()
+    array_dict_shapes = [a.shape for a in array_dict.values()]
+    print('The given DataFrame was split into {} parts with shapes:'
+          ' {}'.format(col_per_example, array_dict_shapes))
 
-    print('shapes of feature dataframe: {} and label dataframe: {}'.format(
-        array_features.shape, array_labels.shape))
-
-    return array_features, array_labels
+    return array_dict
