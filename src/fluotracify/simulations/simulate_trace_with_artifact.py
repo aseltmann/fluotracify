@@ -183,7 +183,7 @@ def simulate_trace_array(artifact,
                              'If you choose to simulate an artifact, you have'
                              'to set label_for to determine how the labels'
                              'are saved out.')
-    elif label_for == 'classification' or 'vae':
+    elif label_for == 'classification' or label_for == 'vae':
         nrows = 2
     elif label_for == 'both':
         nrows = 3
@@ -361,7 +361,7 @@ def produce_training_data(folder,
                           total_sim_time,
                           artifact,
                           d_mol_arr,
-                          label_for=0):
+                          label_for=None):
     """Save multiple .csv files containing simulations of Fluorescence
     Correlation Spectroscopy measurements including labelled artifacts.
 
@@ -470,7 +470,7 @@ def produce_training_data(folder,
                               nclust=nclust,
                               d_clust=d_clust)
 
-            elif artifact == 0 or 2 or 3:
+            elif artifact in (0, 2, 3):
                 traces = simulate_trace_array(artifact=artifact,
                                               nsamples=traces_per_set,
                                               foci_array=foci_array,
