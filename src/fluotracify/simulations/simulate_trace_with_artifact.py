@@ -183,7 +183,7 @@ def simulate_trace_array(artifact,
                              'If you choose to simulate an artifact, you have'
                              'to set label_for to determine how the labels'
                              'are saved out.')
-    elif label_for == 'classification' or label_for == 'vae':
+    elif label_for in ('classification', 'vae'):
         nrows = 2
     elif label_for == 'both':
         nrows = 3
@@ -299,8 +299,8 @@ def savetrace_csv(artifact,
     path_and_file_name : str
         Destination path and file name
     traces_array : np.array
-        fluorescence traces and labels as columns (trace A, label A1, label A2,
-        trace B, label B1, label B2, ...)
+        fluorescence traces and labels as columns (trace A, (label A1,
+        label A2,) trace B, (label B1, label B2,) ...)
     col_per_example : int
         Number of columns per example, first column being a trace, and then
         one or multiple labels
@@ -356,6 +356,7 @@ def savetrace_csv(artifact,
 
 def produce_training_data(folder,
                           file_name,
+                          col_per_example,
                           number_of_sets,
                           traces_per_set,
                           total_sim_time,
@@ -372,6 +373,9 @@ def produce_training_data(folder,
     file_name : str
         Name of files. Extension of style '_DXXX_setXXX.csv' will be
         automatically created.
+    col_per_example : int
+        Number of columns per example, first column being a trace, and then
+        one or multiple labels
     number_of_sets : int
         Number of csv files to generate
     traces_per_set : int
@@ -436,7 +440,6 @@ def produce_training_data(folder,
             file = ''.join([file_name, file_name_ext])
             f = Path(file)
             path_and_file_name = pdir / f
-            col_per_example = 2
 
             if artifact == 1:
                 # bright clusters

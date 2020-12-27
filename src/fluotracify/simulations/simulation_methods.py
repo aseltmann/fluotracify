@@ -185,7 +185,7 @@ def integrate_over_psf(psf, track_arr, num_of_mol, psy, psx):
     psf['trace'] = {}
     sys.stdout.write('\n')
     for ki in range(0, psf['number_FWHMs']):
-        sys.stdout.write("\rProcessing FWHM {}".format(psf['FWHMs'][ki]))
+        sys.stdout.write("\rProcessing FWHM {}, ".format(psf['FWHMs'][ki]))
         sys.stdout.flush()
         trace = 0
         for b in range(0, num_of_mol):
