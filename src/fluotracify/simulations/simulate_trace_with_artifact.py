@@ -83,7 +83,7 @@ def simulate_trace_array(artifact,
                                   d_clust=d_clust,
                                   width=width,
                                   height=height):
-        clust_brightness = rng.integers(5, 15) * 1000
+        clust_brightness = rng.integers(5, 10) * 1000
         # simulate brownian motion of slow clusters
         track_clust = brownian_only_numpy(
             total_sim_time=total_sim_time,
