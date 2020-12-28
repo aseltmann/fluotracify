@@ -360,6 +360,8 @@ def produce_training_data(folder,
                           total_sim_time,
                           artifact,
                           d_mol_arr,
+                          nclust=None,
+                          d_clust=None,
                           label_for=None):
     """Save multiple .csv files containing simulations of Fluorescence
     Correlation Spectroscopy measurements including labelled artifacts.
@@ -386,6 +388,10 @@ def produce_training_data(folder,
     d_mol_arr : list or tuple
         Diffusion coefficients in mm^2 / s used for simulation. For each set,
         one will be drawn using random.choice()
+    nclust : int, optional
+        Number of bright slowly diffusing clusters (only for artifact = 1)
+    d_clust float, optional
+        Diffusion rate of slowly diffusing clusters (only for artifact = 1)
     label_for : {0, 1}, optional
         0 = classification or segmentation (only artifact is label, standard)
         1 = variational autoencoder (only clean trace is label)
@@ -398,6 +404,8 @@ def produce_training_data(folder,
     Raises
     ------
     NotADirectoryError if folder is not a directory
+    ValueError, if artifact is not 0, 1, 2 or 3
+    ValueError, if artifact = 1 and nclust or d_clust is None
 
     Notes
     -----
@@ -415,6 +423,10 @@ def produce_training_data(folder,
     p = Path(folder)
     if not p.is_dir():
         raise NotADirectoryError('Parameter folder should be a directory.')
+    if artifact == 1:
+        if nclust is None or d_clust is None:
+            raise ValueError('If artifact is 1, nclust and d_clust have to '
+                             'be chosen')
 
     rng = np.random.default_rng()
     foci_array = np.array([250])
@@ -444,8 +456,6 @@ def produce_training_data(folder,
 
             if artifact == 1:
                 # bright clusters
-                nclust = 10
-                d_clust = rng.choice([0.01, 0.02, 0.1, 1])
                 traces = simulate_trace_array(artifact=artifact,
                                               nsamples=traces_per_set,
                                               foci_array=foci_array,
