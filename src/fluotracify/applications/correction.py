@@ -1,3 +1,6 @@
+"""This module contains functions to apply trained neural networks on
+fluorescence timetraces to correct artifacts in them"""
+
 import matplotlib.pyplot as plt
 import numpy as np
 

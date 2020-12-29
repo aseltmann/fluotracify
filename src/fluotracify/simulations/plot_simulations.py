@@ -1,4 +1,5 @@
-import sys
+"""This module contains functions to examine and plot simulated fluorescence
+timetraces with artifacts"""
 
 import matplotlib.pyplot as plt
 import numpy as np

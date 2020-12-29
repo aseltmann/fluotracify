@@ -1,3 +1,7 @@
+"""This module contains a script to streamline the training of a neural network
+on simulated fluroescence traces using mlflow. It is meant to be put into the
+`MLproject` file of a mlflow setup or executed via `mlflow run`."""
+
 import sys
 
 import matplotlib
@@ -28,26 +32,28 @@ if __name__ == "__main__":
     LENGTH_DELIMITER = int(sys.argv[4]) if len(sys.argv) > 4 else 16384
     LEARNING_RATE = sys.argv[5] if len(sys.argv) > 5 else 1e-5
     EPOCHS = int(sys.argv[6]) if len(sys.argv) > 6 else 10
-    CSV_PATH = sys.argv[7] if len(sys.argv) > 7 else '/home/lex/Programme/Jupyter/DOKTOR/saves/firstartefact/subsample_rand/'
+    CSV_PATH = sys.argv[7] if len(
+        sys.argv
+    ) > 7 else '/home/lex/Programme/Jupyter/DOKTOR/saves/firstartefact/subsample_rand/'
+    COL_PER_EXAMPLE = int(sys.argv[8]) if len(sys.argv) > 8 else 3
     LOG_DIR_TB = "/tmp/tb"
     # FIXME (PENDING): at some point, I want to plot metrics vs thresholds
     # from TF side, this is possible by providing the `thresholds`
     # argument as a list of thresholds
     # but currently, mlflow does not support logging lists
     METRICS_THRESHOLDS = 0.5
-
     train, test, nsamples, experiment_params = isfc.import_from_csv(
-        path=CSV_PATH,
+        folder=CSV_PATH,
         header=12,
         frac_train=0.8,
-        col_per_example=2,
+        col_per_example=COL_PER_EXAMPLE,
         dropindex=None,
         dropcolumns='Unnamed: 200')
 
-    train_data, train_labels = isfc.separate_data_and_labels(array=train,
-                                                             nsamples=nsamples)
-    test_data, test_labels = isfc.separate_data_and_labels(array=test,
-                                                           nsamples=nsamples)
+    train_data, train_labels = isfc.separate_data_and_labels(
+        array=train, nsamples=nsamples, col_per_example=COL_PER_EXAMPLE)
+    test_data, test_labels = isfc.separate_data_and_labels(
+        array=test, nsamples=nsamples, col_per_example=COL_PER_EXAMPLE)
 
     # get bool as ground truth
     train_labels_bool = train_labels > 0.04

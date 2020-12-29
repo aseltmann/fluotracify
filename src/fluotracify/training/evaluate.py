@@ -1,3 +1,6 @@
+"""This module contains functions to evaluate and plot results from training of
+neural networks."""
+
 import io
 
 import matplotlib.pyplot as plt
