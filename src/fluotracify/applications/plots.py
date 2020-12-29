@@ -6,16 +6,19 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
-from fluotracify.applications.correction import (
-    correct_correlation_by_label,
-    correct_correlation_by_prediction,
-)
+from fluotracify.applications.correction import correct_correlation_by_prediction
 from fluotracify.applications.correlate import correlation_of_arbitrary_trace
+from fluotracify.simulations.plot_simulations import correct_correlation_by_label
 
 
-def plot_distribution_of_correlations_by_label_thresholds(
-        diffrate_of_interest, thresh_arr, xunit, artifact, bins, diffrates,
-        features, labels):
+def plot_distribution_of_correlations_by_label_thresholds(diffrate_of_interest,
+                                                          thresh_arr,
+                                                          xunit,
+                                                          artifact,
+                                                          bins,
+                                                          diffrates,
+                                                          features,
+                                                          labels):
     """plot the distribution of correlations after correcting fluorescence
     traces corrupted by photobleaching applying different thresholds
 
