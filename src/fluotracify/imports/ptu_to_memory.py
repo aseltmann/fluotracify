@@ -1,3 +1,6 @@
+"""This module contains functions to import .ptu files containing fluorescence
+microscopy data by machines from PicoQuant"""
+
 import io
 import struct
 import sys
@@ -30,7 +33,11 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
     globRes : float
         resolution in seconds
 
-    Code is adopted from: https://github.com/PicoQuant/PicoQuant-Time-Tagged-File-Format-Demos/blob/master/PTU/Python/Read_PTU.py"""
+    Notes
+    -----
+    - Code is adopted from:
+    https://github.com/PicoQuant/PicoQuant-Time-Tagged-File-Format-Demos/blob/master/PTU/Python/Read_PTU.py
+    - original doc:
     # Read_PTU.py    Read PicoQuant Unified Histogram Files
     # This is demo code. Use at your own risk. No warranties.
     # Keno Goertz, PicoQUant GmbH, February 2018
@@ -45,7 +52,7 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
     # this would take in case of large files. Of course you can change this,
     # e.g. if your files are not too big. Otherwise it is best process the
     # data on the fly and keep only the results.
-
+    """
     # Tag Types
     tyEmpty8 = struct.unpack(">i", bytes.fromhex("FFFF0008"))[0]
     tyBool8 = struct.unpack(">i", bytes.fromhex("00000008"))[0]
@@ -97,8 +104,8 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
     if magic != "PQTTTR":
         print("ERROR: Magic invalid, this is not a PTU file.")
         inputfile.close()
-        outputfile.close()
-        exit(0)
+        # outputfile.close()  # commented out, since not necessary
+        sys.exit(0)
 
     version = inputfile.read(8).decode("utf-8").strip('\0')
     if outputfilepath is not None:
@@ -188,7 +195,7 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
             tagDataList.append((evalName, tagInt))
         else:
             print("ERROR: Unknown tag type")
-            exit(0)
+            sys.exit(0)
         if tagIdent == "Header_End":
             break
 
@@ -251,7 +258,7 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
                 print(
                     "The file ended earlier than expected, at record %d/%d." %
                     (recNum, numRecords))
-                exit(0)
+                sys.exit(0)
 
             channel = int(recordData[0:4], base=2)
             dtime = int(recordData[4:16], base=2)
@@ -287,7 +294,7 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
                 print(
                     "The file ended earlier than expected, at record %d/%d." %
                     (recNum, numRecords))
-                exit(0)
+                sys.exit(0)
 
             channel = int(recordData[0:4], base=2)
             dtime = int(recordData[4:32], base=2)
@@ -327,7 +334,7 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
                 print(
                     "The file ended earlier than expected, at record %d/%d." %
                     (recNum, numRecords))
-                exit(0)
+                sys.exit(0)
 
             special = int(recordData[0:1], base=2)
             channel = int(recordData[1:7], base=2)
@@ -366,7 +373,7 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
                 print(
                     "The file ended earlier than expected, at record %d/%d." %
                     (recNum, numRecords))
-                exit(0)
+                sys.exit(0)
 
             special = int(recordData[0:1], base=2)
             channel = int(recordData[1:7], base=2)
@@ -490,7 +497,7 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
         readHT2(2)
     else:
         print("ERROR: Unknown record type")
-        exit(0)
+        sys.exit(0)
 
     inputfile.close()
     if outputfilepath is not None:
@@ -499,9 +506,12 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
 
 
 def time2bin(time_arr, chan_arr, chan_num, win_int):
-    """bins tcspc data (either dtime or truetime). win_int gives the binning window.
+    """bins tcspc data (either dtime or truetime). win_int gives the binning window
 
-    code is adopted from: https://github.com/dwaithe/FCS_point_correlator/blob/master/focuspoint/correlation_methods/correlation_methods.py#L157"""
+    Notes
+    -----
+    - code is adopted from Dominic Waithe's Focuspoint package:
+    https://github.com/dwaithe/FCS_point_correlator/blob/master/focuspoint/correlation_methods/correlation_methods.py#L157"""
     # identify channel
     ch_idx = np.where(chan_arr == chan_num)[0]
     time_ch = time_arr[ch_idx]
@@ -532,7 +542,8 @@ def calc_coincidence_value(time_series1, time_series2):
 
     Notes
     -----
-    code is adopted from: https://github.com/dwaithe/FCS_point_correlator/blob/master/focuspoint/correlation_objects.py#L538"""
+    - code is adopted from Dominic Waithe's Focuspoint package:
+    https://github.com/dwaithe/FCS_point_correlator/blob/master/focuspoint/correlation_objects.py#L538"""
     N1 = np.bincount(np.array(time_series1).astype(np.int64))
     N2 = np.bincount(np.array(time_series2).astype(np.int64))
 
@@ -554,7 +565,8 @@ def process_tcspc_data(chan_arr, dtime_arr, true_time_arr):
 
     Notes
     -----
-    code is adopted from: https://github.com/dwaithe/FCS_point_correlator/blob/master/focuspoint/correlation_objects.py#L110"""
+    code is adopted from Dominic Waithe's Focuspoint package:
+    https://github.com/dwaithe/FCS_point_correlator/blob/master/focuspoint/correlation_objects.py#L110"""
     win_int = 10
     # see below: since true_time_arr is in ns and we divide by 1e6, we get a
     # binning in ms
