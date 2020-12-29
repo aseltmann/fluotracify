@@ -1,3 +1,6 @@
+"""This module contains functions to import fluorescence timetraces as training
+ data which are simulated in other parts of this package."""
+
 from pathlib import Path
 
 import numpy as np

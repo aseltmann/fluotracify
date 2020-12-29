@@ -1,3 +1,5 @@
+"""This module contains functions to build neural networks."""
+
 import tensorflow as tf
 
 

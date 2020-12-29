@@ -1,3 +1,6 @@
+"""This module contains functions to simulate fluorescence traces with certain
+artifacts at scale"""
+
 import copy
 import os
 import uuid

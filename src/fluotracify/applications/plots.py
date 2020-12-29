@@ -1,3 +1,6 @@
+"""This module contains functions which perform artifact correction on
+fluorescence timetraces at scale and plots statistics of the results"""
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
