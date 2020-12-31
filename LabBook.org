@@ -149,7 +149,7 @@
       !echo My disk usage:
       !df -h
       if _long:
-          !conda list
+          %conda list
           pprint.pprint(dict(os.environ), sort_dicts=False)
 
     #+END_SRC
@@ -301,7 +301,8 @@
     3. For each *individual block*, the following customizations might be useful
        1. jupyter kernels can return multiple kinds of rich output (images,
           html, ...) or scalar data (plain text, numbers, lists, ...). To force
-          a plain output, use =:results scalar=
+          a plain output, use =:results scalar=. To show the output in the
+          minibuffer only, use =:results silent=
        2. to change the priority of different rich outputs, use =:display=
           header argument, e.g. =:display text/plain text/html= prioritizes
           plain text over html. All supported mimetypes in default order:
