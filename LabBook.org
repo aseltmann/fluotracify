@@ -188,6 +188,13 @@
     ssh -t -t ara -L $port:localhost:$port ssh $node -L $port:Localhost:$port
     #+END_SRC
 
+    #+RESULTS: ssh-tunnel
+    | sh-5.0$           | sh-5.0$   | ye53nis@ara-login01.rz.uni-jena.de's | password:        |     |      |    |        |      |    |      |      |
+    | ye53nis@node001's | password: |                                      |                  |     |      |    |        |      |    |      |      |
+    | Access            | denied    | by                                   | pam_slurm_adopt: | you | have | no | active | jobs | on | this | node |
+    | Authentication    | failed.   |                                      |                  |     |      |    |        |      |    |      |      |
+    | Connection        | to        | ara-login01.rz.uni-jena.de           | closed.          |     |      |    |        |      |    |      |      |
+
     Apps I use that way:
     - Jupyter lab for running Python 3-Kernels
     - TensorBoard
@@ -204,7 +211,7 @@
     #+NAME: jpt-tmux
     #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine
     conda activate tf-nightly
-    export PORT=8889
+    export PORT=9999
     export XDG_RUNTIME_DIR=''
     export XDG_RUNTIME_DIR=""
     jupyter lab --no-browser --port=$PORT
@@ -4683,8 +4690,6 @@ Yippieeeeh, I don't need the complicated =OrgFormatter!=
      CLOSED: [2020-05-28 Do 01:21]
 **** DONE Add =os.environ=
      CLOSED: [2020-05-28 Do 14:12]
-** TODOs
-
 ** Coming back to the lab after STEX2 <2020-11-02 Mo>
    :LOGBOOK:
    CLOCK: [2020-12-06 So 23:53]--[2020-12-06 So 23:53] =>  0:00
@@ -4939,7 +4944,8 @@ Yippieeeeh, I don't need the complicated =OrgFormatter!=
     #+end_example
 
 *** planning next experiments
-**** TODO new simulations with different transit times
+**** DONE new simulations with different transit times
+     CLOSED: [2020-12-30 Mi 14:55]
 ***** some theoretical calculations
      - for now I've got:
      - $0.5 \frac{\mu m^2}{s} ~ 22.54ms$ → we need a trace length of 2-3 orders
@@ -5025,7 +5031,8 @@ Yippieeeeh, I don't need the complicated =OrgFormatter!=
          them where they are (at the =/beegfs= at the hpc)
       5. commit everything
       6. remove junk with =rm -rf .git/lfs=
-***** TODO Changes in Simulation
+***** DONE Changes in Simulation
+      CLOSED: [2020-12-30 Mi 14:51]
       - took nmol_arr out of =produce_training_data=:
         #+begin_example
         nmol_arr : list or tuple
@@ -5045,12 +5052,488 @@ Yippieeeeh, I don't need the complicated =OrgFormatter!=
               per = int((float(b) / float(num_of_mol)) * 100)
               sys.stdout.write("\rProcessing tracks: [{:20}] {}% complete".format('=' * int(per / 5), per))
         #+end_src
-
-
-***** TODO do scaling in =integrate_over_psf=
+***** DONE do scaling in =integrate_over_psf=
+      CLOSED: [2020-12-30 Mi 14:54]
+      - I chose now to ditch the random offset augmentation on the traces, since
+        the offset is only determined by the number of molecules.
+      - instead, I chose the number of molecules to be a random integer between
+        500 and 3500, that gives enough random trace heights while keeping the
+        fake intensity levels kind of realistic.
+      - it has to be stressed, that in this case, the number of molecules should
+        not matter really for the physical calculation, but is meant to make the
+        trained model more robust to different data it might get presented
+***** DONE Idea: save out trace + label 1 = brightclust + label 2 = trace without artifacts
+      CLOSED: [2020-12-30 Mi 14:53]
+      - like this there would always be an inbuilt control
+      - downside: bigger files, revamp almost all functions
 ***** DONE fork nanosimpy functions into my own package
      CLOSED: [2020-11-30 Mo 10:21]
      - always dealing with the unmaintained nanosimpy package is tedious
+**** now do the simulation from the emacs notebook
+     :PROPERTIES:
+     :header-args:jupyter-python: :session /jpy:localhost#9999:a37e524a-8134-4d8f-b24a-367acaf1bdd3
+     :END:
+     #+BEGIN_SRC  emacs-lisp
+       (setq org-babel-jupyter-resource-directory "./data/exp-test/plots")
+     #+END_SRC
+
+     #+BEGIN_SRC jupyter-python
+       %cd /beegfs/ye53nis/drmed-git/
+       !git log -1
+     #+END_SRC
+
+     #+RESULTS:
+     : /beegfs/ye53nis/drmed-git
+     : commit 387c3e9309caa203938d397218e27d4f01bdad84
+     : Author: Apoplex <oligolex@vivaldi.net>
+     : Date:   Tue Dec 29 19:11:34 2020 +0100
+     :
+     :     Add module docs; now use sys.exit instead exit
+
+     #+BEGIN_SRC jupyter-python
+       %conda list
+     #+END_SRC
+
+     #+RESULTS:
+     #+begin_example
+       #
+       # Name                    Version                   Build  Channel
+       _libgcc_mutex             0.1                        main
+       absl-py                   0.11.0                   pypi_0    pypi
+       alembic                   1.4.1                      py_0    conda-forge
+       appdirs                   1.4.4              pyh9f0ad1d_0    conda-forge
+       argon2-cffi               20.1.0           py38h7b6447c_1
+       asn1crypto                1.4.0              pyh9f0ad1d_0    conda-forge
+       asteval                   0.9.16             pyh5ca1d4c_0    conda-forge
+       astunparse                1.6.3                    pypi_0    pypi
+       async_generator           1.10                       py_0
+       attrs                     20.2.0                     py_0
+       azure-core                1.8.2              pyh9f0ad1d_0    conda-forge
+       azure-storage-blob        12.5.0             pyh9f0ad1d_0    conda-forge
+       backcall                  0.2.0                      py_0
+       blas                      1.0                         mkl
+       bleach                    3.2.1                      py_0
+       blinker                   1.4                        py_1    conda-forge
+       brotlipy                  0.7.0           py38h7b6447c_1000
+       ca-certificates           2020.12.5            ha878542_0    conda-forge
+       cachetools                4.1.1                    pypi_0    pypi
+       certifi                   2020.12.5        py38h578d9bd_0    conda-forge
+       cffi                      1.14.3           py38he30daa8_0
+       chardet                   3.0.4                 py38_1003
+       click                     7.1.2              pyh9f0ad1d_0    conda-forge
+       cloudpickle               1.6.0                      py_0    conda-forge
+       configparser              5.0.1                      py_0    conda-forge
+       cryptography              3.1.1            py38h1ba5d50_0
+       cycler                    0.10.0                   py38_0
+       databricks-cli            0.9.1                      py_0    conda-forge
+       dbus                      1.13.18              hb2f20db_0
+       decorator                 4.4.2                      py_0
+       defusedxml                0.6.0                      py_0
+       docker-py                 4.3.1            py38h32f6830_1    conda-forge
+       docker-pycreds            0.4.0                      py_0    conda-forge
+       entrypoints               0.3                      py38_0
+       expat                     2.2.10               he6710b0_2
+       fcsfiles                  2020.9.18                pypi_0    pypi
+       flask                     1.1.2              pyh9f0ad1d_0    conda-forge
+       flatbuffers               1.12                     pypi_0    pypi
+       fontconfig                2.13.0               h9420a91_0
+       freetype                  2.10.4               h5ab3b9f_0
+       future                    0.18.2           py38h578d9bd_2    conda-forge
+       gast                      0.3.3                    pypi_0    pypi
+       gitdb                     4.0.5                      py_0    conda-forge
+       gitpython                 3.1.11                     py_0    conda-forge
+       glib                      2.66.1               h92f7085_0
+       google-auth               1.23.0                   pypi_0    pypi
+       google-auth-oauthlib      0.4.2                    pypi_0    pypi
+       google-pasta              0.2.0                    pypi_0    pypi
+       gorilla                   0.3.0                      py_0    conda-forge
+       grpcio                    1.32.0                   pypi_0    pypi
+       gst-plugins-base          1.14.0               hbbd80ab_1
+       gstreamer                 1.14.0               hb31296c_0
+       gunicorn                  20.0.4           py38h32f6830_2    conda-forge
+       h5py                      2.10.0                   pypi_0    pypi
+       icu                       58.2                 he6710b0_3
+       idna                      2.10                       py_0
+       importlib-metadata        2.0.0                      py_1
+       importlib_metadata        2.0.0                         1
+       intel-openmp              2020.2                      254
+       ipykernel                 5.3.4            py38h5ca1d4c_0
+       ipython                   7.18.1           py38h5ca1d4c_0
+       ipython_genutils          0.2.0                    py38_0
+       isodate                   0.6.0                      py_1    conda-forge
+       itsdangerous              1.1.0                      py_0    conda-forge
+       jedi                      0.17.2                   py38_0
+       jinja2                    2.11.2                     py_0
+       jpeg                      9b                   h024ee3a_2
+       json5                     0.9.5                      py_0
+       jsonschema                3.2.0                      py_2
+       jupyter_client            6.1.7                      py_0
+       jupyter_core              4.6.3                    py38_0
+       jupyterlab                2.2.6                      py_0
+       jupyterlab_pygments       0.1.2                      py_0
+       jupyterlab_server         1.2.0                      py_0
+       keras-preprocessing       1.1.2                    pypi_0    pypi
+       kiwisolver                1.3.0            py38h2531618_0
+       lcms2                     2.11                 h396b838_0
+       ld_impl_linux-64          2.33.1               h53a641e_7
+       libedit                   3.1.20191231         h14c3975_1
+       libffi                    3.3                  he6710b0_2
+       libgcc-ng                 9.1.0                hdf63c60_0
+       libgfortran-ng            7.3.0                hdf63c60_0
+       libpng                    1.6.37               hbc83047_0
+       libprotobuf               3.13.0.1             h8b12597_0    conda-forge
+       libsodium                 1.0.18               h7b6447c_0
+       libstdcxx-ng              9.1.0                hdf63c60_0
+       libtiff                   4.1.0                h2733197_1
+       libuuid                   1.0.3                h1bed415_2
+       libxcb                    1.14                 h7b6447c_0
+       libxml2                   2.9.10               hb55368b_3
+       lmfit                     1.0.1                      py_1    conda-forge
+       lz4-c                     1.9.2                heb0550a_3
+       mako                      1.1.3              pyh9f0ad1d_0    conda-forge
+       markdown                  3.3.3                    pypi_0    pypi
+       markupsafe                1.1.1            py38h7b6447c_0
+       matplotlib                3.3.2                         0
+       matplotlib-base           3.3.2            py38h817c723_0
+       mistune                   0.8.4           py38h7b6447c_1000
+       mkl                       2020.2                      256
+       mkl-service               2.3.0            py38he904b0f_0
+       mkl_fft                   1.2.0            py38h23d657b_0
+       mkl_random                1.1.1            py38h0573a6f_0
+       mlflow                    1.11.0           py38h32f6830_1    conda-forge
+       msrest                    0.6.19             pyh9f0ad1d_0    conda-forge
+       multipletau               0.3.3                    pypi_0    pypi
+       nbclient                  0.5.1                      py_0
+       nbconvert                 6.0.7                    py38_0
+       nbformat                  5.0.8                      py_0
+       ncurses                   6.2                  he6710b0_1
+       nest-asyncio              1.4.1                      py_0
+       notebook                  6.1.4                    py38_0
+       numpy                     1.19.2           py38h54aff64_0
+       numpy-base                1.19.2           py38hfa32c7d_0
+       oauthlib                  3.0.1                      py_0    conda-forge
+       olefile                   0.46                       py_0
+       openssl                   1.1.1h               h516909a_0    conda-forge
+       opt-einsum                3.3.0                    pypi_0    pypi
+       packaging                 20.4                       py_0
+       pandas                    1.1.3            py38he6710b0_0
+       pandoc                    2.11                 hb0f4dca_0
+       pandocfilters             1.4.2                    py38_1
+       parso                     0.7.0                      py_0
+       pcre                      8.44                 he6710b0_0
+       pexpect                   4.8.0                    py38_0
+       pickleshare               0.7.5                 py38_1000
+       pillow                    8.0.1            py38he98fc37_0
+       pip                       20.2.4                   py38_0
+       prometheus_client         0.8.0                      py_0
+       prometheus_flask_exporter 0.18.1             pyh9f0ad1d_0    conda-forge
+       prompt-toolkit            3.0.8                      py_0
+       protobuf                  3.13.0.1         py38h950e882_1    conda-forge
+       ptyprocess                0.6.0                    py38_0
+       pyasn1                    0.4.8                    pypi_0    pypi
+       pyasn1-modules            0.2.8                    pypi_0    pypi
+       pycparser                 2.20                       py_2
+       pygments                  2.7.2              pyhd3eb1b0_0
+       pyjwt                     1.7.1                      py_0    conda-forge
+       pyopenssl                 19.1.0                     py_1
+       pyparsing                 2.4.7                      py_0
+       pyqt                      5.9.2            py38h05f1152_4
+       pyrsistent                0.17.3           py38h7b6447c_0
+       pysocks                   1.7.1                    py38_0
+       python                    3.8.5                h7579374_1
+       python-dateutil           2.8.1                      py_0
+       python-editor             1.0.4                      py_0    conda-forge
+       python_abi                3.8                      1_cp38    conda-forge
+       pytz                      2020.1                     py_0
+       pyyaml                    5.3.1            py38h8df0ef7_1    conda-forge
+       pyzmq                     19.0.2           py38he6710b0_1
+       qt                        5.9.7                h5867ecd_1
+       querystring_parser        1.2.4                      py_0    conda-forge
+       readline                  8.0                  h7b6447c_0
+       requests                  2.24.0                     py_0
+       requests-oauthlib         1.3.0              pyh9f0ad1d_0    conda-forge
+       rsa                       4.6                      pypi_0    pypi
+       scipy                     1.5.2            py38h0b6359f_0
+       seaborn                   0.11.0                     py_0
+       send2trash                1.5.0                    py38_0
+       setuptools                50.3.0           py38hb0f4dca_1
+       sip                       4.19.13          py38he6710b0_0
+       six                       1.15.0                     py_0
+       smmap                     3.0.4              pyh9f0ad1d_0    conda-forge
+       sqlalchemy                1.3.13           py38h516909a_0    conda-forge
+       sqlite                    3.33.0               h62c20be_0
+       sqlparse                  0.4.1              pyh9f0ad1d_0    conda-forge
+       tabulate                  0.8.7              pyh9f0ad1d_0    conda-forge
+       tb-nightly                2.4.0a20201102           pypi_0    pypi
+       tensorboard-plugin-wit    1.7.0                    pypi_0    pypi
+       termcolor                 1.1.0                    pypi_0    pypi
+       terminado                 0.9.1                    py38_0
+       testpath                  0.4.4                      py_0
+       tf-estimator-nightly      2.4.0.dev2020102301          pypi_0    pypi
+       tf-nightly                2.5.0.dev20201029          pypi_0    pypi
+       tifffile                  2020.10.1        py38hdd07704_2
+       tk                        8.6.10               hbc83047_0
+       tornado                   6.0.4            py38h7b6447c_1
+       traitlets                 5.0.5                      py_0
+       typing-extensions         3.7.4.3                  pypi_0    pypi
+       uncertainties             3.1.5              pyhd8ed1ab_0    conda-forge
+       urllib3                   1.25.11                    py_0
+       wcwidth                   0.2.5                      py_0
+       webencodings              0.5.1                    py38_1
+       websocket-client          0.57.0           py38h32f6830_3    conda-forge
+       werkzeug                  1.0.1              pyh9f0ad1d_0    conda-forge
+       wheel                     0.35.1                     py_0
+       wrapt                     1.12.1                   pypi_0    pypi
+       xz                        5.2.5                h7b6447c_0
+       yaml                      0.2.5                h516909a_0    conda-forge
+       zeromq                    4.3.3                he6710b0_3
+       zipp                      3.4.0              pyhd3eb1b0_0
+       zlib                      1.2.11               h7b6447c_3
+       zstd                      1.4.5                h9ceee32_0
+       Note: you may need to restart the kernel to use updated packages.
+       # packages in environment at /home/ye53nis/.conda/envs/tf-nightly:
+       #
+       # Name                    Version                   Build  Channel
+       _libgcc_mutex             0.1                        main
+       absl-py                   0.11.0                   pypi_0    pypi
+       alembic                   1.4.1                      py_0    conda-forge
+       appdirs                   1.4.4              pyh9f0ad1d_0    conda-forge
+       argon2-cffi               20.1.0           py38h7b6447c_1
+       asn1crypto                1.4.0              pyh9f0ad1d_0    conda-forge
+       asteval                   0.9.16             pyh5ca1d4c_0    conda-forge
+       astunparse                1.6.3                    pypi_0    pypi
+       async_generator           1.10                       py_0
+       attrs                     20.2.0                     py_0
+       azure-core                1.8.2              pyh9f0ad1d_0    conda-forge
+       azure-storage-blob        12.5.0             pyh9f0ad1d_0    conda-forge
+       backcall                  0.2.0                      py_0
+       blas                      1.0                         mkl
+       bleach                    3.2.1                      py_0
+       blinker                   1.4                        py_1    conda-forge
+       brotlipy                  0.7.0           py38h7b6447c_1000
+       ca-certificates           2020.12.5            ha878542_0    conda-forge
+       cachetools                4.1.1                    pypi_0    pypi
+       certifi                   2020.12.5        py38h578d9bd_0    conda-forge
+       cffi                      1.14.3           py38he30daa8_0
+       chardet                   3.0.4                 py38_1003
+       click                     7.1.2              pyh9f0ad1d_0    conda-forge
+       cloudpickle               1.6.0                      py_0    conda-forge
+       configparser              5.0.1                      py_0    conda-forge
+       cryptography              3.1.1            py38h1ba5d50_0
+       cycler                    0.10.0                   py38_0
+       databricks-cli            0.9.1                      py_0    conda-forge
+       dbus                      1.13.18              hb2f20db_0
+       decorator                 4.4.2                      py_0
+       defusedxml                0.6.0                      py_0
+       docker-py                 4.3.1            py38h32f6830_1    conda-forge
+       docker-pycreds            0.4.0                      py_0    conda-forge
+       entrypoints               0.3                      py38_0
+       expat                     2.2.10               he6710b0_2
+       fcsfiles                  2020.9.18                pypi_0    pypi
+       flask                     1.1.2              pyh9f0ad1d_0    conda-forge
+       flatbuffers               1.12                     pypi_0    pypi
+       fontconfig                2.13.0               h9420a91_0
+       freetype                  2.10.4               h5ab3b9f_0
+       future                    0.18.2           py38h578d9bd_2    conda-forge
+       gast                      0.3.3                    pypi_0    pypi
+       gitdb                     4.0.5                      py_0    conda-forge
+       gitpython                 3.1.11                     py_0    conda-forge
+       glib                      2.66.1               h92f7085_0
+       google-auth               1.23.0                   pypi_0    pypi
+       google-auth-oauthlib      0.4.2                    pypi_0    pypi
+       google-pasta              0.2.0                    pypi_0    pypi
+       gorilla                   0.3.0                      py_0    conda-forge
+       grpcio                    1.32.0                   pypi_0    pypi
+       gst-plugins-base          1.14.0               hbbd80ab_1
+       gstreamer                 1.14.0               hb31296c_0
+       gunicorn                  20.0.4           py38h32f6830_2    conda-forge
+       h5py                      2.10.0                   pypi_0    pypi
+       icu                       58.2                 he6710b0_3
+       idna                      2.10                       py_0
+       importlib-metadata        2.0.0                      py_1
+       importlib_metadata        2.0.0                         1
+       intel-openmp              2020.2                      254
+       ipykernel                 5.3.4            py38h5ca1d4c_0
+       ipython                   7.18.1           py38h5ca1d4c_0
+       ipython_genutils          0.2.0                    py38_0
+       isodate                   0.6.0                      py_1    conda-forge
+       itsdangerous              1.1.0                      py_0    conda-forge
+       jedi                      0.17.2                   py38_0
+       jinja2                    2.11.2                     py_0
+       jpeg                      9b                   h024ee3a_2
+       json5                     0.9.5                      py_0
+       jsonschema                3.2.0                      py_2
+       jupyter_client            6.1.7                      py_0
+       jupyter_core              4.6.3                    py38_0
+       jupyterlab                2.2.6                      py_0
+       jupyterlab_pygments       0.1.2                      py_0
+       jupyterlab_server         1.2.0                      py_0
+       keras-preprocessing       1.1.2                    pypi_0    pypi
+       kiwisolver                1.3.0            py38h2531618_0
+       lcms2                     2.11                 h396b838_0
+       ld_impl_linux-64          2.33.1               h53a641e_7
+       libedit                   3.1.20191231         h14c3975_1
+       libffi                    3.3                  he6710b0_2
+       libgcc-ng                 9.1.0                hdf63c60_0
+       libgfortran-ng            7.3.0                hdf63c60_0
+       libpng                    1.6.37               hbc83047_0
+       libprotobuf               3.13.0.1             h8b12597_0    conda-forge
+       libsodium                 1.0.18               h7b6447c_0
+       libstdcxx-ng              9.1.0                hdf63c60_0
+       libtiff                   4.1.0                h2733197_1
+       libuuid                   1.0.3                h1bed415_2
+       libxcb                    1.14                 h7b6447c_0
+       libxml2                   2.9.10               hb55368b_3
+       lmfit                     1.0.1                      py_1    conda-forge
+       lz4-c                     1.9.2                heb0550a_3
+       mako                      1.1.3              pyh9f0ad1d_0    conda-forge
+       markdown                  3.3.3                    pypi_0    pypi
+       markupsafe                1.1.1            py38h7b6447c_0
+       matplotlib                3.3.2                         0
+       matplotlib-base           3.3.2            py38h817c723_0
+       mistune                   0.8.4           py38h7b6447c_1000
+       mkl                       2020.2                      256
+       mkl-service               2.3.0            py38he904b0f_0
+       mkl_fft                   1.2.0            py38h23d657b_0
+       mkl_random                1.1.1            py38h0573a6f_0
+       mlflow                    1.11.0           py38h32f6830_1    conda-forge
+       msrest                    0.6.19             pyh9f0ad1d_0    conda-forge
+       multipletau               0.3.3                    pypi_0    pypi
+       nbclient                  0.5.1                      py_0
+       nbconvert                 6.0.7                    py38_0
+       nbformat                  5.0.8                      py_0
+       ncurses                   6.2                  he6710b0_1
+       nest-asyncio              1.4.1                      py_0
+       notebook                  6.1.4                    py38_0
+       numpy                     1.19.2           py38h54aff64_0
+       numpy-base                1.19.2           py38hfa32c7d_0
+       oauthlib                  3.0.1                      py_0    conda-forge
+       olefile                   0.46                       py_0
+       openssl                   1.1.1h               h516909a_0    conda-forge
+       opt-einsum                3.3.0                    pypi_0    pypi
+       packaging                 20.4                       py_0
+       pandas                    1.1.3            py38he6710b0_0
+       pandoc                    2.11                 hb0f4dca_0
+       pandocfilters             1.4.2                    py38_1
+       parso                     0.7.0                      py_0
+       pcre                      8.44                 he6710b0_0
+       pexpect                   4.8.0                    py38_0
+       pickleshare               0.7.5                 py38_1000
+       pillow                    8.0.1            py38he98fc37_0
+       pip                       20.2.4                   py38_0
+       prometheus_client         0.8.0                      py_0
+       prometheus_flask_exporter 0.18.1             pyh9f0ad1d_0    conda-forge
+       prompt-toolkit            3.0.8                      py_0
+       protobuf                  3.13.0.1         py38h950e882_1    conda-forge
+       ptyprocess                0.6.0                    py38_0
+       pyasn1                    0.4.8                    pypi_0    pypi
+       pyasn1-modules            0.2.8                    pypi_0    pypi
+       pycparser                 2.20                       py_2
+       pygments                  2.7.2              pyhd3eb1b0_0
+       pyjwt                     1.7.1                      py_0    conda-forge
+       pyopenssl                 19.1.0                     py_1
+       pyparsing                 2.4.7                      py_0
+       pyqt                      5.9.2            py38h05f1152_4
+       pyrsistent                0.17.3           py38h7b6447c_0
+       pysocks                   1.7.1                    py38_0
+       python                    3.8.5                h7579374_1
+       python-dateutil           2.8.1                      py_0
+       python-editor             1.0.4                      py_0    conda-forge
+       python_abi                3.8                      1_cp38    conda-forge
+       pytz                      2020.1                     py_0
+       pyyaml                    5.3.1            py38h8df0ef7_1    conda-forge
+       pyzmq                     19.0.2           py38he6710b0_1
+       qt                        5.9.7                h5867ecd_1
+       querystring_parser        1.2.4                      py_0    conda-forge
+       readline                  8.0                  h7b6447c_0
+       requests                  2.24.0                     py_0
+       requests-oauthlib         1.3.0              pyh9f0ad1d_0    conda-forge
+       rsa                       4.6                      pypi_0    pypi
+       scipy                     1.5.2            py38h0b6359f_0
+       seaborn                   0.11.0                     py_0
+       send2trash                1.5.0                    py38_0
+       setuptools                50.3.0           py38hb0f4dca_1
+       sip                       4.19.13          py38he6710b0_0
+       six                       1.15.0                     py_0
+       smmap                     3.0.4              pyh9f0ad1d_0    conda-forge
+       sqlalchemy                1.3.13           py38h516909a_0    conda-forge
+       sqlite                    3.33.0               h62c20be_0
+       sqlparse                  0.4.1              pyh9f0ad1d_0    conda-forge
+       tabulate                  0.8.7              pyh9f0ad1d_0    conda-forge
+       tb-nightly                2.4.0a20201102           pypi_0    pypi
+       tensorboard-plugin-wit    1.7.0                    pypi_0    pypi
+       termcolor                 1.1.0                    pypi_0    pypi
+       terminado                 0.9.1                    py38_0
+       testpath                  0.4.4                      py_0
+       tf-estimator-nightly      2.4.0.dev2020102301          pypi_0    pypi
+       tf-nightly                2.5.0.dev20201029          pypi_0    pypi
+       tifffile                  2020.10.1        py38hdd07704_2
+       tk                        8.6.10               hbc83047_0
+       tornado                   6.0.4            py38h7b6447c_1
+       traitlets                 5.0.5                      py_0
+       typing-extensions         3.7.4.3                  pypi_0    pypi
+       uncertainties             3.1.5              pyhd8ed1ab_0    conda-forge
+       urllib3                   1.25.11                    py_0
+       wcwidth                   0.2.5                      py_0
+       webencodings              0.5.1                    py38_1
+       websocket-client          0.57.0           py38h32f6830_3    conda-forge
+       werkzeug                  1.0.1              pyh9f0ad1d_0    conda-forge
+       wheel                     0.35.1                     py_0
+       wrapt                     1.12.1                   pypi_0    pypi
+       xz                        5.2.5                h7b6447c_0
+       yaml                      0.2.5                h516909a_0    conda-forge
+       zeromq                    4.3.3                he6710b0_3
+       zipp                      3.4.0              pyhd3eb1b0_0
+       zlib                      1.2.11               h7b6447c_3
+       zstd                      1.4.5                h9ceee32_0
+
+       Note: you may need to restart the kernel to use updated packages.
+     #+end_example
+
+     #+BEGIN_SRC jupyter-python
+       import sys
+       sys.path.append('/beegfs/ye53nis/drmed-git/src/')
+       from fluotracify.simulations import simulate_trace_with_artifact as stwa
+     #+END_SRC
+
+     #+RESULTS:
+
+     #+BEGIN_SRC jupyter-python
+       folder = '/beegfs/ye53nis/saves/firstartifact_Nov2020/'
+       file_name = 'traces_brightclust_Nov2020'
+       total_sim_time = 16384
+       d_mol_arr = [100]
+       col_per_example = 3
+       label_for = 'both'
+     #+END_SRC
+
+     #+RESULTS:
+
+     #+BEGIN_SRC jupyter-python
+       sys.stdout = open('/dev/stdout', 'w')
+     #+END_SRC
+
+     #+RESULTS:
+
+
+
+     #+BEGIN_SRC jupyter-python :results drawer
+       stwa.produce_training_data(folder=folder,
+                                  file_name=file_name,
+                                  col_per_example=col_per_example,
+                                  number_of_sets=2,
+                                  traces_per_set=2,
+                                  total_sim_time=total_sim_time,
+                                  artifact=1,
+                                  d_mol_arr=d_mol_arr,
+                                  label_for=label_for)
+     #+END_SRC
+
+     #+RESULTS:
+     :results:
+     : 188c4766-8d0a-4c1d-97ef-ab2d2e218d33
+     :end:
+
 *** Reading End-to-End Lung cancer screening (Ardila, Kiraly, Bharadwaj, Choi et al, 2019)
     - link: [[docview:~/Dokumente/Forschung/Literatur/ML-applications/Ardila, D.
       End-to-end lung cancer screening 3D DL on low-dose chest CT_PRINTED.pdf]]
@@ -5173,8 +5656,9 @@ See here: https://github.com/timothycrosley/isort/issues/468#issuecomment-570899
 #+CALL: setup-tmux[:session local]
 
 #+RESULTS:
-| sh-5.0$ | ye53nis@ara-login01.rz.uni-jena.de's | password: |
-| >       | ye53nis@ara-login01.rz.uni-jena.de's | password: |
+| ye53nis@ara-login01.rz.uni-jena.de's | password:                            |           |
+| /tmp/tmux-67339/default              |                                      |           |
+| >                                    | ye53nis@ara-login01.rz.uni-jena.de's | password: |
 
 Test:
 
@@ -5198,7 +5682,7 @@ Test:
 
 ** Jupyter on Ara
    :PROPERTIES:
-   :header-args:jupyter-python: :session /jpy:localhost#8889:749074c4-797a-4e72-957c-f87331800ef8
+   :header-args:jupyter-python: :session /jpy:localhost#9999:a37e524a-8134-4d8f-b24a-367acaf1bdd3
    :END:
 
 1. Request compute node via tmux
@@ -5212,36 +5696,35 @@ Test:
 
    #+RESULTS:
    #+begin_example
-     (tf-nightly) [ye53nis@node142 /]$ jupyter lab --no-browser --port=$PORT
-     [I 09:41:06.801 LabApp] JupyterLab extension loaded from /home/ye53nis/.conda/envs/tf-nightly/lib/python3.8/site-packages/jupyterlab
-     [I 09:41:06.801 LabApp] JupyterLab application directory is /home/ye53nis/.conda/envs/tf-nightly/share/jupyter/lab
-     [I 09:41:06.803 LabApp] Serving notebooks from local directory: /
-     [I 09:41:06.803 LabApp] Jupyter Notebook 6.1.4 is running at:
-     [I 09:41:06.803 LabApp] http://localhost:8889/?token=5ffe7e295035105d12d4722c9a1bb2a0392a15c00d440425
-     [I 09:41:06.803 LabApp]  or http://127.0.0.1:8889/?token=5ffe7e295035105d12d4722c9a1bb2a0392a15c00d440425
-     [I 09:41:06.803 LabApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
-     [C 09:41:06.808 LabApp]
+     (tf-nightly) [ye53nis@node146 /]$ jupyter lab --no-browser --port=$PORT
+     [I 00:02:39.372 LabApp] JupyterLab extension loaded from /home/ye53nis/.conda/envs/tf-nightly/lib/python3.8/site-packages/jupyterlab
+     [I 00:02:39.372 LabApp] JupyterLab application directory is /home/ye53nis/.conda/envs/tf-nightly/share/jupyter/lab
+     [I 00:02:39.375 LabApp] Serving notebooks from local directory: /
+     [I 00:02:39.375 LabApp] Jupyter Notebook 6.1.4 is running at:
+     [I 00:02:39.375 LabApp] http://localhost:9999/?token=93791464f12bacd92a8343c1a3be84117c0674d5703fd278
+     [I 00:02:39.375 LabApp]  or http://127.0.0.1:9999/?token=93791464f12bacd92a8343c1a3be84117c0674d5703fd278
+     [I 00:02:39.375 LabApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+     [C 00:02:39.380 LabApp]
 
          To access the notebook, open this file in a browser:
-             file:///home/ye53nis/.local/share/jupyter/runtime/nbserver-332529-open.html
+             file:///home/ye53nis/.local/share/jupyter/runtime/nbserver-54410-open.html
          Or copy and paste one of these URLs:
-             http://localhost:8889/?token=5ffe7e295035105d12d4722c9a1bb2a0392a15c00d440425
-          or http://127.0.0.1:8889/?token=5ffe7e295035105d12d4722c9a1bb2a0392a15c00d440425
+             http://localhost:9999/?token=93791464f12bacd92a8343c1a3be84117c0674d5703fd278
+          or http://127.0.0.1:9999/?token=93791464f12bacd92a8343c1a3be84117c0674d5703fd278
    #+end_example
 
-
-#+CALL: ssh-tunnel(port="8889", node="node181")
+#+CALL: ssh-tunnel(port="9999", node="node146")
 
 #+RESULTS:
 | sh-5.0$           | sh-5.0$   | ye53nis@ara-login01.rz.uni-jena.de's | password: |    |          |      |      |             |
-| ye53nis@node181's | password: |                                      |           |    |          |      |      |             |
-| Last              | login:    | Mon                                  | Dec       | 14 | 12:42:30 | 2020 | from | login01.ara |
+| ye53nis@node146's | password: |                                      |           |    |          |      |      |             |
+| Last              | login:    | Thu                                  | Dec       | 31 | 00:03:16 | 2020 | from | login01.ara |
 
 I started a Python3 kernel using =jupyter-server-list-kernels=. Then I added the
 kernel ID to the =:PROPERTIES:= drawer of this (and following) subtrees.
 
 #+begin_example
-python3           0fd6e99c-9857-450b-9e8d-7c726e8679e1   a few seconds ago    starting   0
+python3           a37e524a-8134-4d8f-b24a-367acaf1bdd3   a few seconds ago    starting   0
 #+end_example
 
 Test:
@@ -5252,38 +5735,38 @@ Test:
 #+begin_example
   No of CPUs in system: 72
   No of CPUs the current process can use: 24
-  load average: (29.93, 28.16, 27.88)
-  os.uname():  posix.uname_result(sysname='Linux', nodename='node237', release='3.10.0-957.1.3.el7.x86_64', version='#1 SMP Thu Nov 29 14:49:43 UTC 2018', machine='x86_64')
-  PID of process: 14865
-  RAM total: 199G, RAM used: 11G, RAM free: 164G
-  the current directory: /home/ye53nis
+  load average: (16.06, 15.99, 15.97)
+  os.uname():  posix.uname_result(sysname='Linux', nodename='node146', release='3.10.0-957.1.3.el7.x86_64', version='#1 SMP Thu Nov 29 14:49:43 UTC 2018', machine='x86_64')
+  PID of process: 56294
+  RAM total: 199G, RAM used: 6.1G, RAM free: 163G
+  the current directory: /
   My disk usage:
   Filesystem           Size  Used Avail Use% Mounted on
   /dev/sda1             50G  3.2G   47G   7% /
   devtmpfs              94G     0   94G   0% /dev
-  tmpfs                 94G  586M   94G   1% /dev/shm
-  tmpfs                 94G  155M   94G   1% /run
+  tmpfs                 94G  297M   94G   1% /dev/shm
+  tmpfs                 94G  195M   94G   1% /run
   tmpfs                 94G     0   94G   0% /sys/fs/cgroup
-  nfs01-ib:/cluster    2.0T  469G  1.6T  23% /cluster
-  nfs01-ib:/home        80T   64T   17T  80% /home
-  nfs02-ib:/data01      88T   65T   23T  74% /data01
+  nfs01-ib:/cluster    2.0T  473G  1.6T  24% /cluster
   nfs03-ib:/pool/work  100T   70T   31T  70% /nfsdata
-  /dev/sda6            169G  6.3G  163G   4% /local
+  nfs02-ib:/data01      88T   71T   17T  81% /data01
+  nfs01-ib:/home        80T   71T  9.8T  88% /home
+  /dev/sda3            6.0G  436M  5.6G   8% /var
   /dev/sda5            2.0G   34M  2.0G   2% /tmp
-  /dev/sda3            6.0G  416M  5.6G   7% /var
-  beegfs_nodev         524T  469T   56T  90% /beegfs
+  /dev/sda6            169G   12G  157G   7% /local
+  beegfs_nodev         524T  433T   92T  83% /beegfs
   tmpfs                 19G     0   19G   0% /run/user/67339
   /bin/bash: conda: command not found
   {'SLURM_CHECKPOINT_IMAGE_DIR': '/var/slurm/checkpoint',
-   'SLURM_NODELIST': 'node237',
+   'SLURM_NODELIST': 'node146',
    'SLURM_JOB_NAME': 'bash',
    'XDG_SESSION_ID': '9639',
-   'SLURMD_NODENAME': 'node237',
-   'SLURM_TOPOLOGY_ADDR': 'node237',
+   'SLURMD_NODENAME': 'node146',
+   'SLURM_TOPOLOGY_ADDR': 'node146',
    'SLURM_NTASKS_PER_NODE': '24',
    'HOSTNAME': 'login01',
    'SLURM_PRIO_PROCESS': '0',
-   'SLURM_SRUN_COMM_PORT': '35213',
+   'SLURM_SRUN_COMM_PORT': '43120',
    'SHELL': '/bin/bash',
    'TERM': 'xterm-color',
    'SLURM_JOB_QOS': 'qstand',
@@ -5293,9 +5776,8 @@ Test:
    'SLURM_TOPOLOGY_ADDR_PATTERN': 'node',
    'SSH_CLIENT': '10.231.210.198 43508 22',
    'CONDA_SHLVL': '2',
-   'CONDA_PROMPT_MODIFIER': '(tensorflow_nightly) ',
-   'GSETTINGS_SCHEMA_DIR_CONDA_BACKUP': '',
-   'WINDOWID': '46137351',
+   'CONDA_PROMPT_MODIFIER': '(tf-nightly) ',
+   'WINDOWID': '0',
    'QTDIR': '/usr/lib64/qt-3.3',
    'QTINC': '/usr/lib64/qt-3.3/include',
    'SSH_TTY': '/dev/pts/5',
@@ -5306,25 +5788,24 @@ Test:
    'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=01;05;37;41:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.axv=01;35:*.anx=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=01;36:*.au=01;36:*.flac=01;36:*.mid=01;36:*.midi=01;36:*.mka=01;36:*.mp3=01;36:*.mpc=01;36:*.ogg=01;36:*.ra=01;36:*.wav=01;36:*.axa=01;36:*.oga=01;36:*.spx=01;36:*.xspf=01;36:',
    'CONDA_EXE': '/cluster/miniconda3/bin/conda',
    'SLURM_STEP_NUM_NODES': '1',
-   'SLURM_JOBID': '503029',
+   'SLURM_JOBID': '534856',
    'SRUN_DEBUG': '3',
    'SLURM_NTASKS': '24',
    'SLURM_LAUNCH_NODE_IPADDR': '192.168.192.5',
    'SLURM_STEP_ID': '0',
-   'TMUX': '/tmp/tmux-67339/default,27827,4',
+   'TMUX': '/tmp/tmux-67339/default,27827,6',
    '_CE_CONDA': '',
    'CONDA_PREFIX_1': '/cluster/miniconda3',
-   'SLURM_STEP_LAUNCHER_PORT': '35213',
+   'SLURM_STEP_LAUNCHER_PORT': '43120',
    'SLURM_TASKS_PER_NODE': '24',
    'MAIL': '/var/spool/mail/ye53nis',
-   'PATH': '/home/ye53nis/.conda/envs/tensorflow_nightly/bin:/home/lex/Programme/miniconda3/bin:/home/lex/Programme/miniconda3/condabin:/home/lex/.local/bin:/bin:/usr/bin:/usr/local/bin:/usr/local/sbin:/usr/lib/jvm/default/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/var/lib/snapd/snap/bin:/home/lex/Programme/miniconda3/bin:/usr/sbin:/home/ye53nis/.local/bin:/home/ye53nis/bin',
-   'GSETTINGS_SCHEMA_DIR': '/home/ye53nis/.conda/envs/tensorflow_nightly/share/glib-2.0/schemas',
+   'PATH': '/home/ye53nis/.conda/envs/tf-nightly/bin:/home/lex/Programme/miniconda3/envs/tf-nightly-lab/bin:/home/lex/Programme/miniconda3/condabin:/home/lex/.local/bin:/bin:/usr/bin:/usr/local/bin:/usr/local/sbin:/usr/lib/jvm/default/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/var/lib/snapd/snap/bin:/home/lex/Programme/miniconda3/bin:/usr/sbin:/home/ye53nis/.local/bin:/home/ye53nis/bin',
    'SLURM_WORKING_CLUSTER': 'hpc:192.168.192.1:6817:8448',
-   'SLURM_JOB_ID': '503029',
-   'CONDA_PREFIX': '/home/ye53nis/.conda/envs/tensorflow_nightly',
+   'SLURM_JOB_ID': '534856',
+   'CONDA_PREFIX': '/home/ye53nis/.conda/envs/tf-nightly',
    'SLURM_JOB_USER': 'ye53nis',
    'SLURM_STEPID': '0',
-   'PWD': '/home/ye53nis',
+   'PWD': '/',
    'SLURM_SRUN_COMM_HOST': '192.168.192.5',
    'LANG': 'en_US.UTF-8',
    'SLURM_PTY_WIN_COL': '80',
@@ -5333,9 +5814,9 @@ Test:
    'SLURM_JOB_UID': '67339',
    'LOADEDMODULES': '',
    'SLURM_NODEID': '0',
-   'TMUX_PANE': '%4',
-   'SLURM_SUBMIT_DIR': '/home/ye53nis',
-   'SLURM_TASK_PID': '9182',
+   'TMUX_PANE': '%6',
+   'SLURM_SUBMIT_DIR': '/',
+   'SLURM_TASK_PID': '53476',
    'SLURM_NPROCS': '24',
    'SLURM_CPUS_ON_NODE': '24',
    'SLURM_DISTRIBUTION': 'block',
@@ -5343,8 +5824,8 @@ Test:
    'SLURM_PROCID': '0',
    'HISTCONTROL': 'ignoredups',
    '_CE_M': '',
-   'SLURM_JOB_NODELIST': 'node237',
-   'SLURM_PTY_PORT': '39515',
+   'SLURM_JOB_NODELIST': 'node146',
+   'SLURM_PTY_PORT': '46638',
    'HOME': '/home/ye53nis',
    'SHLVL': '3',
    'SLURM_LOCALID': '0',
@@ -5362,18 +5843,17 @@ Test:
    'SLURM_JOB_ACCOUNT': 'iaob',
    'SLURM_JOB_NUM_NODES': '1',
    'MODULESHOME': '/usr/share/Modules',
-   'CONDA_DEFAULT_ENV': 'tensorflow_nightly',
+   'CONDA_DEFAULT_ENV': 'tf-nightly',
    'LESSOPEN': '||/usr/bin/lesspipe.sh %s',
    'SLURM_STEP_TASKS_PER_NODE': '24',
-   'PORT': '8889',
-   'SLURM_STEP_NODELIST': 'node237',
+   'PORT': '9999',
+   'SLURM_STEP_NODELIST': 'node146',
    'DISPLAY': ':0',
    'XDG_RUNTIME_DIR': '',
    'XAUTHORITY': '/home/lex/.Xauthority',
    'BASH_FUNC_module()': '() {  eval `/usr/bin/modulecmd bash $*`\n}',
-   '_': '/home/ye53nis/.conda/envs/tensorflow_nightly/bin/jupyter',
-   'KERNEL_LAUNCH_TIMEOUT': '40',
-   'JPY_PARENT_PID': '10127',
+   '_': '/home/ye53nis/.conda/envs/tf-nightly/bin/jupyter',
+   'JPY_PARENT_PID': '54410',
    'CLICOLOR': '1',
    'PAGER': 'cat',
    'GIT_PAGER': 'cat',
