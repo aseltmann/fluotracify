@@ -200,12 +200,41 @@ def plot_distribution_of_correlations_by_label_thresholds(
     ax2.set_ylabel('Number of fluorescence traces', fontsize=16)
 
 
-def plot_traces_by_drate(ntraces, col_per_example, drate_of_interest,
-                         data_label_array, experiment_params, artifact):
+def plot_traces_by_diffrates(ntraces, col_per_example, diffrate_of_interest,
+                             data_label_array, experiment_params, artifact):
+    """A plot to examine simulated traces via
+       fluotracify.simulations.simulate_trace_with_artifacts
+
+    Parameters
+    ----------
+    ntraces : int
+        The number of traces you want to plot. It determines the size of the
+        plot as well, where columns are fixed at 6 and depending on ntraces
+        and col_per_example the number of rows is determined.
+    col_per_example : int
+        Number of columns per example, first column being a trace, and then
+        one or multiple labels
+    diffrate_of_interest : float
+        diffusion rate used to simulate the traces of interest
+    data_label_array : dict of pandas DataFrames
+        Contains one key per column in each simulated example. E.g. if the
+        simulated features comes with two labels, the key '0' will be the
+        array with the features, '1' will be the array with label A and
+        '2' will be the array with label B.
+    experiment_params : pandas DataFrame
+        Contains metadata of the files
+    artifact : {0, 1, 2, 3}
+        0 = no artifact, 1 = bright clusters, 2 = detector dropout,
+        3 = photobleaching
+
+    Returns
+    -------
+    Plot of fluorescence traces and labels from their simulations
+    """
     drates = experiment_params.loc[
         'diffusion rate of molecules in micrometer^2 / s']
     # get indices of diffusion rates of interest
-    dindices = drates.index.where(drates == str(drate_of_interest))
+    dindices = drates.index.where(drates == str(diffrate_of_interest))
     dindices = dindices.dropna().astype(int)
     # get indices of first of each of the 100 traces per file as an example
     tindices = dindices * 100
@@ -237,7 +266,7 @@ def plot_traces_by_drate(ntraces, col_per_example, drate_of_interest,
     plt.ylabel('fluorescence intensity in $a.u.$', labelpad=20, fontsize=20)
     suptitle_height = 1 - (fig.get_figheight() * 0.004)
     plt.suptitle(t='Simulated Fluorescence Traces With D = {} '
-                 '$\\frac{{\mu m^2}}{{s}}$'.format(drate_of_interest),
+                 '$\\frac{{\mu m^2}}{{s}}$'.format(diffrate_of_interest),
                  y=suptitle_height,
                  fontsize=20)
     traceid = 0
