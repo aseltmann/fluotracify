@@ -444,9 +444,9 @@
     #+CALL: ssh-tunnel(port="9999", node="node146")
 
     #+RESULTS:
-    | sh-5.0$           | sh-5.0$   | ye53nis@ara-login01.rz.uni-jena.de's | password: |    |          |      |      |             |
-    | ye53nis@node146's | password: |                                      |           |    |          |      |      |             |
-    | Last              | login:    | Thu                                  | Dec       | 31 | 02:11:35 | 2020 | from | login01.ara |
+    | sh-5.0$           | sh-5.0$   | ye53nis@ara-login01.rz.uni-jena.de's | password: |   |          |      |      |             |
+    | ye53nis@node146's | password: |                                      |           |   |          |      |      |             |
+    | Last              | login:    | Mon                                  | Jan       | 4 | 12:09:39 | 2021 | from | login01.ara |
     4. connect to Python 3 kernel using =jupyter-server-list-kernels=
        #+begin_example
        python3           f6f8ea4a-c473-459c-93b6-4984b0987ff8   a few seconds ago    starting   0
@@ -869,6 +869,10 @@
 
     #+RESULTS:
 *** Do the simulation
+    :PROPERTIES:
+    :header-args:jupyter-python: :session /jpy:localhost#9999:f6f8ea4a-c473-459c-93b6-4984b0987ff8
+    :END:
+
     #+BEGIN_SRC jupyter-python :results drawer
        stwa.produce_training_data(folder=folder,
                                   file_name=file_name,
@@ -958,6 +962,242 @@
        Processing tracks: [=================   ] 85% complete
        Processing FWHM 250,
        #+end_example
+
+*** preparing examplary plots of the results (new kernel, new code)
+    :PROPERTIES:
+    :header-args:jupyter-python: :session /jpy:localhost#9999:43e1342d-23dc-4275-bb9d-b98b5fc0a804
+    :END:
+    - I used a different jupyter kernel for loading (See properties drawer
+      above), thus libraries have to be imported again and parameters have to be
+      set again. On the plus side: the sequence of plotting here is independent
+      of the sequence of simulation above.
+      #+BEGIN_SRC jupyter-python
+        %cd /beegfs/ye53nis/drmed-git/
+      #+END_SRC
+
+      #+RESULTS:
+      : /beegfs/ye53nis/drmed-git
+
+#+RESULTS:
+: /beegfs/ye53nis/drmed-git
+
+    - I also used some additional code for plotting:
+      #+BEGIN_SRC jupyter-python
+        !git log -1
+
+        !git status
+      #+END_SRC
+
+      #+RESULTS:
+      #+begin_example
+        commit 47d02edd7313d1b172934a17a0aca0a8e47a8fff
+        Author: Apoplex <oligolex@vivaldi.net>
+        Date:   Tue Jan 5 21:41:11 2021 +0100
+
+            Add docs; rename to drate to diffrate
+        # On branch exp-201231-clustersim
+        # Changes not staged for commit:
+        #   (use "git add <file>..." to update what will be committed)
+        #   (use "git checkout -- <file>..." to discard changes in working directory)
+        #   (commit or discard the untracked or modified content in submodules)
+        #
+        #	modified:   src/nanosimpy (untracked content)
+        #
+        # Untracked files:
+        #   (use "git add <file>..." to include in what will be committed)
+        #
+        #	data/
+        #	experiment_params.csv
+        #	mlruns/
+        #	test.pdf
+        #	test.svg
+        #	tramp.YDPCnB
+        no changes added to commit (use "git add" and/or "git commit -a")
+      #+end_example
+    - again the file to save plots in - notice that this is on my local machine,
+      not the remote one, since I open this LabBook.org-file on my local machine.
+      #+BEGIN_SRC  emacs-lisp
+        (setq org-babel-jupyter-resource-directory "./data/exp-201231-clustsim")
+      #+END_SRC
+
+      #+RESULTS:
+      : ./data/exp-201231-clustsim
+
+    - then the necessary imports and variables
+      #+BEGIN_SRC jupyter-python
+        import sys
+        sys.path.append('/beegfs/ye53nis/drmed-git/src/')
+        from fluotracify.simulations import import_simulation_from_csv as isfc
+        from fluotracify.simulations import plot_simulations as ps
+      #+END_SRC
+
+      #+RESULTS:
+
+      #+BEGIN_SRC jupyter-python
+        folder = '/beegfs/ye53nis/saves/firstartifact_Nov2020/'
+        col_per_example = 3
+        d_mol_arr = [0.069, 0.08, 0.1, 0.2, 0.4, 0.6, 1.0, 3.0, 10, 50]
+        artifact = 1
+      #+END_SRC
+
+      #+RESULTS:
+
+    - let's load our data
+      #+BEGIN_SRC jupyter-python
+        dataset, _, nsamples, experiment_params = isfc.import_from_csv(
+            folder=folder,
+            header=12,
+            frac_train=1,
+            col_per_example=col_per_example,
+            dropindex=None,
+            dropcolumns=None)
+      #+END_SRC
+
+      #+RESULTS:
+      #+begin_example
+        train 0 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set007.csv
+        train 1 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set007.csv
+        train 2 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set003.csv
+        train 3 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set006.csv
+        train 4 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set006.csv
+        train 5 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set004.csv
+        train 6 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set007.csv
+        train 7 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set004.csv
+        train 8 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set005.csv
+        train 9 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set006.csvtrain 10 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set004.csv
+        train 11 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set003.csv
+        train 12 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set009.csv
+        train 13 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set004.csv
+        train 14 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set008.csv
+        train 15 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set001.csv
+        train 16 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set003.csv
+        train 17 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set005.csv
+        train 18 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set004.csv
+        train 19 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set009.csv
+        train 20 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set004.csv
+        train 21 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set003.csv
+        train 22 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set004.csv
+        train 23 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set002.csv
+        train 24 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set006.csv
+        train 25 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set009.csv
+        train 26 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set007.csv
+        train 27 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set010.csv
+        train 28 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set003.csv
+        train 29 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set007.csv
+        train 30 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set001.csv
+        train 31 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set001.csv
+        train 32 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set001.csv
+        train 33 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set009.csv
+        train 34 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set002.csv
+        train 35 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set008.csv
+        train 36 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set009.csv
+        train 37 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set007.csv
+        train 38 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set004.csv
+        train 39 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set005.csv
+        train 40 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set002.csv
+        train 41 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set002.csv
+        train 42 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set003.csv
+        train 43 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set002.csv
+        train 44 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set005.csv
+        train 45 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set006.csv
+        train 46 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set008.csv
+        train 47 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set001.csv
+        train 48 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set009.csv
+        train 49 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set006.csv
+        train 50 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set002.csv
+        train 51 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set010.csv
+        train 52 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set001.csv
+        train 53 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set005.csv
+        train 54 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set009.csv
+        train 55 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set001.csv
+        train 56 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set002.csv
+        train 57 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set006.csv
+        train 58 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set004.csv
+        train 59 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set003.csv
+        train 60 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set001.csv
+        train 61 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set002.csv
+        train 62 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set007.csv
+        train 63 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set008.csv
+        train 64 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set010.csv
+        train 65 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set006.csv
+        train 66 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set003.csv
+        train 67 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set005.csv
+        train 68 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set005.csv
+        train 69 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set010.csv
+        train 70 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set010.csv
+        train 71 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set010.csv
+        train 72 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set010.csv
+        train 73 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set008.csv
+        train 74 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set009.csv
+        train 75 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set010.csv
+        train 76 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set001.csv
+        train 77 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set005.csv
+        train 78 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set003.csv
+        train 79 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set008.csv
+        train 80 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set006.csv
+        train 81 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set008.csv
+        train 82 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set002.csv
+        train 83 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set007.csv
+        train 84 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set010.csv
+        train 85 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set006.csv
+        train 86 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set009.csv
+        train 87 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set003.csv
+        train 88 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set009.csv
+        train 89 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set001.csv
+        train 90 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set008.csv
+        train 91 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set007.csv
+        train 92 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set002.csv
+        train 93 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set004.csv
+        train 94 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set010.csv
+        train 95 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set007.csv
+        train 96 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set008.csv
+        train 97 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set005.csv
+        train 98 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set008.csv
+        train 99 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set005.csv
+      #+end_example
+
+      #+BEGIN_SRC jupyter-python
+        out = isfc.separate_data_and_labels(
+            array=dataset,
+            nsamples=nsamples,
+            col_per_example=col_per_example)
+      #+END_SRC
+
+      #+RESULTS:
+      : The given DataFrame was split into 3 parts with shapes: [(16384, 10000), (16384, 10000), (16384, 10000)]
+
+
+*** plots of the simulated traces by diffusion rate
+    :PROPERTIES:
+    :header-args:jupyter-python: :session /jpy:localhost#9999:43e1342d-23dc-4275-bb9d-b98b5fc0a804
+    :END:
+
+		- the actual plotting function:
+			#+BEGIN_SRC jupyter-python
+        for drate in d_mol_arr:
+            ps.plot_traces_by_diffrates(
+                ntraces=10,
+                col_per_example=col_per_example,
+                diffrate_of_interest=drate,
+                data_label_array=out,
+                experiment_params=experiment_params,
+                artifact=1)
+			#+END_SRC
+
+      #+RESULTS:
+      50:    [[file:./data/exp-201231-clustsim/4683d391bdba74b0c9460a5e968d1135995e4a81.png]]
+      10:    [[file:./data/exp-201231-clustsim/963615ec0ac613d53e4c4b11d9b6811c6e38a7f1.png]]
+      3:     [[file:./data/exp-201231-clustsim/f2667c8e27f421f2a47c7f307598b32a6cde5c5f.png]]
+      1:     [[file:./data/exp-201231-clustsim/6a89c85b30e41cbb67c477d10e7cc2239e02f081.png]]
+      0.6:   [[file:./data/exp-201231-clustsim/74f0fbc639df415b140d785e8bf3aa23213c31a4.png]]
+      0.4:   [[file:./data/exp-201231-clustsim/c5d18053e9befd64e8bfc71d4e5e260b2f5606e7.png]]
+      0.2:   [[file:./data/exp-201231-clustsim/ea43e8d0a7d8075efe27429c44e0ea99df1221ac.png]]
+      0.1:   [[file:./data/exp-201231-clustsim/727100134d52d8d8967e1cbb2efda097171f06f0.png]]
+      0.08:  [[file:./data/exp-201231-clustsim/89250a71f8711657f2b8138e2323802a1edea8af.png]]
+      0.069: [[file:./data/exp-201231-clustsim/17e9c4bfb65d91e8100cd9131cabbdb1f35e62e1.png]]
+
+    - open the plots with =C-c C-o= or toggle inline display with =C-c C-x C-v=
+      or view them by themselves in the folder
 
 *** Learnings
     - next time: save output of simulation function not to terminal, but to .txt
