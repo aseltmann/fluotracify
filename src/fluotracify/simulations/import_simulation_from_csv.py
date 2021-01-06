@@ -1,11 +1,13 @@
-import os
+"""This module contains functions to import fluorescence timetraces as training
+ data which are simulated in other parts of this package."""
+
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
 
-def import_from_csv(path,
+def import_from_csv(folder,
                     header,
                     frac_train,
                     col_per_example,
@@ -19,7 +21,7 @@ def import_from_csv(path,
 
     Parameters
     ----------
-    path : str
+    folder : str
         Folder which contains .csv files with data
     header : int
         param for `pd.read_csv` = rows to skip at beginning
@@ -49,9 +51,7 @@ def import_from_csv(path,
     ValueError
         If pandas read_csv fails
     """
-    path = Path(path)
-    files = [f for f in os.listdir(path) if f.endswith('.csv')]
-    # sort the file names (os.listdir() returns them in arbitrary order)
+    files = list(Path(folder).rglob('*.csv'))
     files.sort()
     np.random.seed(0)  # for reproducible random state
     np.random.shuffle(files)
@@ -64,10 +64,8 @@ def import_from_csv(path,
     experiment_params = pd.DataFrame()
 
     for idx, file in enumerate(files):
-        file = Path(file)
-        path_and_file = path / file
         try:
-            raw_dataset = pd.read_csv(path_and_file, sep=',', header=header)
+            raw_dataset = pd.read_csv(file, sep=',', header=header)
         except pd.errors.ParserError:
             raise ValueError('Probably the header parameter is too low '
                              'and points to the metadata. Try a higher value.')
@@ -86,7 +84,7 @@ def import_from_csv(path,
         # save number of examples per file
         nsamples.append(round(len(converted_float.columns) / col_per_example))
         # save some parameters of the experiment from csv file
-        experiment_param = pd.read_csv(path_and_file,
+        experiment_param = pd.read_csv(file,
                                        sep=',',
                                        header=None,
                                        index_col=0,
@@ -101,17 +99,17 @@ def import_from_csv(path,
 
         if idx < ntrainfiles:
             train = pd.concat([train, converted_float], axis=1)
-            print('train', idx, path_and_file)
+            print('train', idx, file)
         else:
             test = pd.concat([test, converted_float], axis=1)
-            print('test', idx, path_and_file)
+            print('test', idx, file)
 
     return train, test, nsamples, experiment_params
 
 
-def separate_data_and_labels(array, nsamples):
-    """Take pandas DataFrame containing feature and label data and output two
-    separate pandas DataFrames for features and labels.
+def separate_data_and_labels(array, nsamples, col_per_example):
+    """Take pandas DataFrame containing feature and label data output a
+    dictionary containing them separately
 
     Parameters
     ----------
@@ -120,31 +118,34 @@ def separate_data_and_labels(array, nsamples):
         label_1, feature_2, label_2, ...
     nsamples : list of int
         list containing no of examples per file
+    col_per_example : int
+        Number of columns per example, first column being a trace, and then
+        one or multiple labels
 
     Returns
     -------
-    array_features : pandas DataFrame
-        Contains features ordered columnwise in the manner: feature_1,
-        feature_2, ...
-    labels : pandas DataFrame
-        Contains labels ordered columnwise in the manner: label_1, label_2, ...
+    array_dict : dict of pandas DataFrames
+        Contains one key per column in each simulated example. E.g. if the
+        simulated features comes with two labels, the key '0' will be the
+        array with the features, '1' will be the array with label A and
+        '2' will be the array with label B
+
+    Raises
+    ------
+    Exception Error, if the number of examples in each file (nsamples) is not
+        the same in all of them
     """
     if not len(set(nsamples)) == 1:
         raise Exception(
             'Error: The number of examples in each file have to be the same')
 
-    nsamples_int = nsamples[0]
-    label_names = []
-    feature_names = []
+    array_dict = {}
 
-    for i in range(nsamples_int):
-        label_names.append(array.columns[i * 2 + 1])
-        feature_names.append(array.columns[i * 2])
+    for i in range(col_per_example):
+        array_dict['{}'.format(i)] = array.iloc[:, i::col_per_example]
 
-    array_labels = array[label_names].copy()
-    array_features = array[feature_names].copy()
+    array_dict_shapes = [a.shape for a in array_dict.values()]
+    print('The given DataFrame was split into {} parts with shapes:'
+          ' {}'.format(col_per_example, array_dict_shapes))
 
-    print('shapes of feature dataframe: {} and label dataframe: {}'.format(
-        array_features.shape, array_labels.shape))
-
-    return array_features, array_labels
+    return array_dict

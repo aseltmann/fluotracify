@@ -1,14 +1,19 @@
-import sys
+"""This module contains functions to perform autocorrelation analysis on one-
+dimensional fluorescence traces"""
 
 import matplotlib.pyplot as plt
 import numpy as np
 from lmfit import Parameters, fit_report, minimize
 from multipletau import autocorrelate
 
+<<<<<<< HEAD
 # from nanosimpy
 if True:  # isort workaround
     sys.path.append('../../../src/')
     import nanosimpy.nanosimpy.equations_to_fit as eq
+=======
+from fluotracify.applications import equations_to_fit as eq
+>>>>>>> exp-201231-clustersim
 
 
 def correlate(trace, fwhm, diffrate, time_step=1., verbose=True):
@@ -78,8 +83,8 @@ def correlate(trace, fwhm, diffrate, time_step=1., verbose=True):
         if diffrate is not None:
             print('simulated diffusion rate: {}'.format(diffrate))
         print('\n')
-    return diffrate_calc, transit_time, (out[:, 0], out[:, 1],
-                                         fit, residual_var)
+    return diffrate_calc, transit_time, (out[:, 0], out[:,
+                                                        1], fit, residual_var)
 
 
 def correlation_of_arbitrary_trace(ntraces,
@@ -110,7 +115,11 @@ def correlation_of_arbitrary_trace(ntraces,
         diff_arb, trans_arb, _ = correlate(trace=trace_arb,
                                            fwhm=fwhm,
                                            diffrate=None,
+<<<<<<< HEAD
                                            time_step=time_step,
+=======
+                                           time_step=1.,
+>>>>>>> exp-201231-clustersim
                                            verbose=False)
         diffrates_arb.append(diff_arb)
         transit_times_arb.append(trans_arb)

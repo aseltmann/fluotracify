@@ -1,3 +1,6 @@
+"""This module contains functions to import .ptu files containing fluorescence
+microscopy data by machines from PicoQuant"""
+
 import io
 import os
 import struct
@@ -35,7 +38,11 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None, verbose=True):
     globRes : float
         resolution in seconds
 
-    Code is adopted from: https://github.com/PicoQuant/PicoQuant-Time-Tagged-File-Format-Demos/blob/master/PTU/Python/Read_PTU.py"""
+    Notes
+    -----
+    - Code is adopted from:
+    https://github.com/PicoQuant/PicoQuant-Time-Tagged-File-Format-Demos/blob/master/PTU/Python/Read_PTU.py
+    - original doc:
     # Read_PTU.py    Read PicoQuant Unified Histogram Files
     # This is demo code. Use at your own risk. No warranties.
     # Keno Goertz, PicoQUant GmbH, February 2018
@@ -50,7 +57,7 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None, verbose=True):
     # this would take in case of large files. Of course you can change this,
     # e.g. if your files are not too big. Otherwise it is best process the
     # data on the fly and keep only the results.
-
+    """
     # Tag Types
     tyEmpty8 = struct.unpack(">i", bytes.fromhex("FFFF0008"))[0]
     tyBool8 = struct.unpack(">i", bytes.fromhex("00000008"))[0]
@@ -101,7 +108,12 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None, verbose=True):
     magic = inputfile.read(8).decode("utf-8").strip('\0')
     if magic != "PQTTTR":
         inputfile.close()
+<<<<<<< HEAD:src/fluotracify/imports/ptu_utils.py
         raise ValueError("ERROR: Magic invalid, this is not a PTU file.")
+=======
+        # outputfile.close()  # commented out, since not necessary
+        sys.exit(0)
+>>>>>>> exp-201231-clustersim:src/fluotracify/imports/ptu_to_memory.py
 
     version = inputfile.read(8).decode("utf-8").strip('\0')
     if outputfilepath is not None:
@@ -190,7 +202,12 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None, verbose=True):
                 outputfile.write("<Binary blob with %d bytes>" % tagInt)
             tagDataList.append((evalName, tagInt))
         else:
+<<<<<<< HEAD:src/fluotracify/imports/ptu_utils.py
             raise ValueError("ERROR: Unknown tag type")
+=======
+            print("ERROR: Unknown tag type")
+            sys.exit(0)
+>>>>>>> exp-201231-clustersim:src/fluotracify/imports/ptu_to_memory.py
         if tagIdent == "Header_End":
             break
 
@@ -251,8 +268,15 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None, verbose=True):
                 recordData = "{0:0{1}b}".format(
                     struct.unpack("<I", inputfile.read(4))[0], 32)
             except:
+<<<<<<< HEAD:src/fluotracify/imports/ptu_utils.py
                 raise ValueError('The file ended earlier than expected, at'
                                  'record %d/%d.' % (recNum, numRecords))
+=======
+                print(
+                    "The file ended earlier than expected, at record %d/%d." %
+                    (recNum, numRecords))
+                sys.exit(0)
+>>>>>>> exp-201231-clustersim:src/fluotracify/imports/ptu_to_memory.py
 
             channel = int(recordData[0:4], base=2)
             dtime = int(recordData[4:16], base=2)
@@ -286,8 +310,15 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None, verbose=True):
                 recordData = "{0:0{1}b}".format(
                     struct.unpack("<I", inputfile.read(4))[0], 32)
             except:
+<<<<<<< HEAD:src/fluotracify/imports/ptu_utils.py
                 raise ValueError('The file ended earlier than expected, at'
                                  'record %d/%d.' % (recNum, numRecords))
+=======
+                print(
+                    "The file ended earlier than expected, at record %d/%d." %
+                    (recNum, numRecords))
+                sys.exit(0)
+>>>>>>> exp-201231-clustersim:src/fluotracify/imports/ptu_to_memory.py
 
             channel = int(recordData[0:4], base=2)
             dtime = int(recordData[4:32], base=2)
@@ -325,8 +356,15 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None, verbose=True):
                 recordData = "{0:0{1}b}".format(
                     struct.unpack("<I", inputfile.read(4))[0], 32)
             except:
+<<<<<<< HEAD:src/fluotracify/imports/ptu_utils.py
                 raise ValueError('The file ended earlier than expected, at'
                                  'record %d/%d.' % (recNum, numRecords))
+=======
+                print(
+                    "The file ended earlier than expected, at record %d/%d." %
+                    (recNum, numRecords))
+                sys.exit(0)
+>>>>>>> exp-201231-clustersim:src/fluotracify/imports/ptu_to_memory.py
 
             special = int(recordData[0:1], base=2)
             channel = int(recordData[1:7], base=2)
@@ -363,8 +401,15 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None, verbose=True):
                 recordData = "{0:0{1}b}".format(
                     struct.unpack("<I", inputfile.read(4))[0], 32)
             except:
+<<<<<<< HEAD:src/fluotracify/imports/ptu_utils.py
                 raise ValueError('The file ended earlier than expected, at'
                                  'record %d/%d.' % (recNum, numRecords))
+=======
+                print(
+                    "The file ended earlier than expected, at record %d/%d." %
+                    (recNum, numRecords))
+                sys.exit(0)
+>>>>>>> exp-201231-clustersim:src/fluotracify/imports/ptu_to_memory.py
 
             special = int(recordData[0:1], base=2)
             channel = int(recordData[1:7], base=2)
@@ -500,7 +545,12 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None, verbose=True):
             outputfile.write("\nrecord# chan   nsync truetime/ps\n")
         readHT2(2)
     else:
+<<<<<<< HEAD:src/fluotracify/imports/ptu_utils.py
         raise ValueError('ERROR: Unknown record type')
+=======
+        print("ERROR: Unknown record type")
+        sys.exit(0)
+>>>>>>> exp-201231-clustersim:src/fluotracify/imports/ptu_to_memory.py
 
     inputfile.close()
     if outputfilepath is not None:
@@ -509,10 +559,17 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None, verbose=True):
 
 
 def time2bin(time_arr, chan_arr, chan_num, win_int):
+<<<<<<< HEAD:src/fluotracify/imports/ptu_utils.py
     """bins tcspc data (either dtime or truetime). win_int gives the binning
     window.
+=======
+    """bins tcspc data (either dtime or truetime). win_int gives the binning window
+>>>>>>> exp-201231-clustersim:src/fluotracify/imports/ptu_to_memory.py
 
-    code is adopted from: https://github.com/dwaithe/FCS_point_correlator/blob/master/focuspoint/correlation_methods/correlation_methods.py#L157"""
+    Notes
+    -----
+    - code is adopted from Dominic Waithe's Focuspoint package:
+    https://github.com/dwaithe/FCS_point_correlator/blob/master/focuspoint/correlation_methods/correlation_methods.py#L157"""
     # identify channel
     ch_idx = np.where(chan_arr == chan_num)[0]
     time_ch = time_arr[ch_idx]
@@ -543,7 +600,8 @@ def calc_coincidence_value(time_series1, time_series2):
 
     Notes
     -----
-    code is adopted from: https://github.com/dwaithe/FCS_point_correlator/blob/master/focuspoint/correlation_objects.py#L538"""
+    - code is adopted from Dominic Waithe's Focuspoint package:
+    https://github.com/dwaithe/FCS_point_correlator/blob/master/focuspoint/correlation_objects.py#L538"""
     N1 = np.bincount(np.array(time_series1).astype(np.int64))
     N2 = np.bincount(np.array(time_series2).astype(np.int64))
 
@@ -608,8 +666,13 @@ def process_tcspc_data(chan_arr,
 
     Notes
     -----
+<<<<<<< HEAD:src/fluotracify/imports/ptu_utils.py
     code is adopted from: https://github.com/dwaithe/FCS_point_correlator/blob/master/focuspoint/correlation_objects.py#L110"""
     # this is used for the photon decay curve
+=======
+    code is adopted from Dominic Waithe's Focuspoint package:
+    https://github.com/dwaithe/FCS_point_correlator/blob/master/focuspoint/correlation_objects.py#L110"""
+>>>>>>> exp-201231-clustersim:src/fluotracify/imports/ptu_to_memory.py
     win_int = 10
 
     tcspc = {}

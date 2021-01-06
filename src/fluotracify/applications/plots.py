@@ -1,8 +1,12 @@
+"""This module contains functions which perform artifact correction on
+fluorescence timetraces at scale and plots statistics of the results"""
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
 
+<<<<<<< HEAD
 from fluotracify.applications import correction, correlate
 from fluotracify.imports import ptu_utils as ptu
 from fluotracify.simulations.plot_simulations import correct_correlation_by_label
@@ -17,6 +21,21 @@ def plot_distribution_of_correlations_by_label_thresholds(
         diffrates,
         features,
         labels):
+=======
+from fluotracify.applications.correction import correct_correlation_by_prediction
+from fluotracify.applications.correlate import correlation_of_arbitrary_trace
+from fluotracify.simulations.plot_simulations import correct_correlation_by_label
+
+
+def plot_distribution_of_correlations_by_label_thresholds(diffrate_of_interest,
+                                                          thresh_arr,
+                                                          xunit,
+                                                          artifact,
+                                                          bins,
+                                                          diffrates,
+                                                          features,
+                                                          labels):
+>>>>>>> exp-201231-clustersim
     """plot the distribution of correlations after correcting fluorescence
     traces corrupted by photobleaching applying different thresholds
 
