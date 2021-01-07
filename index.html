@@ -1,23 +1,17 @@
 <html>
   <body>
     <h1>Fluotracify - doctoral research project done in a reproducible way</h1>
+
+
     <ul>
-	    <li><a href="./data/exp-201231-clustsim/LabBook-exp-201231-clustsim.html">LabBook-exp-201231-clustsim</a></li>
+	      <li><a href="./data/LabBook-all.html">The LabBook about the whole <code>data</code> branch</a></li>
     </ul>
-    <script>
-      (async () => {
-        const response = await octokit.request('GET /repos/{owner}/{repo}/contents/{path}', {
-          owner: 'aseltmann',
-          repo: 'fluotracify',
-          path: 'docs'})
-        const data = await response.json();
-        let htmlString = '<ul>';
-        for (let file of data) {
-          htmlString += `<li><a href="${file.path}">${file.name}</a></li>`;
-        }
-        htmlString += '</ul>';
-        document.getElementsByTagName('body')[0].innerHTML = htmlString;
-      })()
-    </script>
+    <ul>
+	      <li><a href="./data/exp-310520-unet/LabBook-exp310520-unet.html">LabBook-exp310520-unet</a></li>
+    </ul>
+    <ul>
+	      <li><a href="./data/exp-201231-clustsim/LabBook-exp-201231-clustsim.html">LabBook-exp-201231-clustsim</a></li>
+    </ul>
+
   <body>
 </html>
