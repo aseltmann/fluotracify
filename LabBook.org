@@ -227,7 +227,7 @@
     [[#ssh-tunneling]]). While the tmux session above keeps running, no matter if
     Emacs is running or not, this following ssh tunnel needs to be active
     locally to connect to the notebook. If you close Emacs, it would need to be
-    reestablished (see [[* Reconnect]])
+    reestablished
 
 ** Setup notes
 *** Setting up a tmux connection from using =ob-tmux= in =org-babel=
