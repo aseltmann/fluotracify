@@ -3491,10 +3491,10 @@ print(summary_path)
 #+end_example
 
 *** Reading out tensorboard logs from mlflow logs
-   :PROPERTIES:
-   :header-args:jupyter-python: :session /jpy:localhost#8888:83f7c448-cc36-44cd-81f9-749b3b4b2d0c
-   :END:
-#+BEGIN_SRC jupyter-python
+    :PROPERTIES:
+    :header-args:jupyter-python: :session /jpy:localhost#8888:83f7c448-cc36-44cd-81f9-749b3b4b2d0c
+    :END:
+    #+BEGIN_SRC jupyter-python
   !ls $tensorboard_path
 #+END_SRC
 
@@ -5569,6 +5569,2003 @@ Yippieeeeh, I don't need the complicated =OrgFormatter!=
           the resampled data
         - result: empirical p-value
 
+** doing mlflow runs with training on the new simulations<2021-01-18 Mo>
+*** upate tensorflow and mlflow in tensorflow_nightly environment on ara
+
+    - we need:
+    - numpy
+    - pandas
+    - matplotlib
+    - seaborn
+    - mlflow
+    - jupyterlab
+    - pip
+    - pip:
+      - tf-nightly
+      - fcsfiles
+      - multipletau
+
+    #+begin_example
+      conda env remove tf-nightly
+      conda create -n tf-nightly numpy pandas matplotlib seaborn tifffile jupyterlab pip
+      conda install -n tf-nightly -c conda-forge/label/main mlflow
+      conda activate tf-nightly
+      (tf-nightly) pip install fcsfiles multipletau tf-nightly
+      #+end_example
+
+    #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
+      conda list -n tf-nightly
+    #+END_SRC
+
+    #+RESULTS:
+    #+begin_example
+      (base) [ye53nis@login01 ~]$ conda list -n tf-nightly
+      # packages in environment at /home/ye53nis/.conda/envs/tf-nightly:
+      #
+      # Name                    Version                   Build  Channel
+      _libgcc_mutex             0.1                        main
+      absl-py                   0.11.0                   pypi_0    pypi
+      alembic                   1.4.1                      py_0    conda-forge/label/m
+      ain
+      appdirs                   1.4.4              pyh9f0ad1d_0    conda-forge/label/m
+      ain
+      argon2-cffi               20.1.0           py38h7b6447c_1
+      asn1crypto                1.4.0              pyh9f0ad1d_0    conda-forge/label/m
+      ain
+      astunparse                1.6.3                    pypi_0    pypi
+      async_generator           1.10                       py_0
+      attrs                     20.3.0             pyhd3eb1b0_0
+      azure-core                1.10.0             pyhd8ed1ab_0    conda-forge/label/m
+      ain
+      azure-storage-blob        12.7.0             pyh44b312d_0    conda-forge/label/m
+      ain
+      backcall                  0.2.0                      py_0
+      blas                      1.0                         mkl
+      bleach                    3.2.1                      py_0
+      blinker                   1.4                        py_1    conda-forge/label/m
+      ain
+      blosc                     1.20.1               hd408876_0
+      brotli                    1.0.9                he6710b0_2
+      brotlipy                  0.7.0           py38h27cfd23_1003
+      bzip2                     1.0.8                h7b6447c_0
+      ca-certificates           2020.12.5            ha878542_0    conda-forge/label/m
+      ain
+      cachetools                4.2.0                    pypi_0    pypi
+      certifi                   2020.12.5        py38h578d9bd_1    conda-forge/label/m
+      ain
+      cffi                      1.14.4           py38h261ae71_0
+      chardet                   4.0.0           py38h06a4308_1003
+      charls                    2.1.0                he6710b0_2
+      click                     7.1.2              pyh9f0ad1d_0    conda-forge/label/m
+      ain
+      cloudpickle               1.6.0                      py_0    conda-forge/label/m
+      ain
+      configparser              5.0.1                      py_0    conda-forge/label/m
+      ain
+      cryptography              3.3.1            py38h3c74f83_0
+      cycler                    0.10.0                   py38_0
+      databricks-cli            0.9.1                      py_0    conda-forge/label/m
+      ain
+      dbus                      1.13.18              hb2f20db_0
+      decorator                 4.4.2                      py_0
+      defusedxml                0.6.0                      py_0
+      docker-py                 4.4.1            py38h578d9bd_0    conda-forge/label/m
+      ain
+      docker-pycreds            0.4.0                      py_0    conda-forge/label/m
+      ain
+      entrypoints               0.3                      py38_0
+      expat                     2.2.10               he6710b0_2
+      fcsfiles                  2020.9.18                pypi_0    pypi
+      flask                     1.1.2              pyh9f0ad1d_0    conda-forge/label/m
+      ain
+      flatbuffers               1.12                     pypi_0    pypi
+      fontconfig                2.13.0               h9420a91_0
+      freetype                  2.10.4               h5ab3b9f_0
+      gast                      0.4.0                    pypi_0    pypi
+      giflib                    5.1.4                h14c3975_1
+      gitdb                     4.0.5                      py_0    conda-forge/label/m
+      ain
+      gitpython                 3.1.12             pyhd8ed1ab_0    conda-forge/label/m
+      ain
+      glib                      2.66.1               h92f7085_0
+      google-auth               1.24.0                   pypi_0    pypi
+      google-auth-oauthlib      0.4.2                    pypi_0    pypi
+      google-pasta              0.2.0                    pypi_0    pypi
+      gorilla                   0.3.0                      py_0    conda-forge/label/m
+      ain
+      grpcio                    1.34.1                   pypi_0    pypi
+      gst-plugins-base          1.14.0               h8213a91_2
+      gstreamer                 1.14.0               h28cd5cc_2
+      gunicorn                  20.0.4           py38h578d9bd_3    conda-forge/label/m
+      ain
+      h5py                      3.1.0                    pypi_0    pypi
+      icu                       58.2                 he6710b0_3
+      idna                      2.10                       py_0
+      imagecodecs               2020.5.30        py38hfa7d478_2
+      importlib-metadata        2.0.0                      py_1
+      importlib_metadata        2.0.0                         1
+      intel-openmp              2020.2                      254
+      ipykernel                 5.3.4            py38h5ca1d4c_0
+      ipython                   7.19.0           py38hb070fc8_0
+      ipython_genutils          0.2.0              pyhd3eb1b0_1
+      isodate                   0.6.0                      py_1    conda-forge/label/m
+      ain
+      itsdangerous              1.1.0                      py_0    conda-forge/label/m
+      ain
+      jedi                      0.18.0           py38h06a4308_0
+      jinja2                    2.11.2                     py_0
+      jpeg                      9b                   h024ee3a_2
+      json5                     0.9.5                      py_0
+      jsonschema                3.2.0                      py_2
+      jupyter_client            6.1.7                      py_0
+      jupyter_core              4.7.0            py38h06a4308_0
+      jupyterlab                2.2.6                      py_0
+      jupyterlab_pygments       0.1.2                      py_0
+      jupyterlab_server         1.2.0                      py_0
+      jxrlib                    1.1                  h7b6447c_2
+      keras-preprocessing       1.1.2                    pypi_0    pypi
+      kiwisolver                1.3.0            py38h2531618_0
+      lcms2                     2.11                 h396b838_0
+      ld_impl_linux-64          2.33.1               h53a641e_7
+      libaec                    1.0.4                he6710b0_1
+      libedit                   3.1.20191231         h14c3975_1
+      libffi                    3.3                  he6710b0_2
+      libgcc-ng                 9.1.0                hdf63c60_0
+      libgfortran-ng            7.3.0                hdf63c60_0
+      libpng                    1.6.37               hbc83047_0
+      libprotobuf               3.13.0.1             h8b12597_0    conda-forge/label/m
+      ain
+      libsodium                 1.0.18               h7b6447c_0
+      libstdcxx-ng              9.1.0                hdf63c60_0
+      libtiff                   4.1.0                h2733197_1
+      libuuid                   1.0.3                h1bed415_2
+      libwebp                   1.0.1                h8e7db2f_0
+      libxcb                    1.14                 h7b6447c_0
+      libxml2                   2.9.10               hb55368b_3
+      libzopfli                 1.0.3                he6710b0_0
+      lz4-c                     1.9.2                heb0550a_3
+      mako                      1.1.4              pyh44b312d_0    conda-forge/label/m
+      ain
+      markdown                  3.3.3                    pypi_0    pypi
+      markupsafe                1.1.1            py38h7b6447c_0
+      matplotlib                3.3.2                h06a4308_0
+      matplotlib-base           3.3.2            py38h817c723_0
+      mistune                   0.8.4           py38h7b6447c_1000
+      mkl                       2020.2                      256
+      mkl-service               2.3.0            py38he904b0f_0
+      mkl_fft                   1.2.0            py38h23d657b_0
+      mkl_random                1.1.1            py38h0573a6f_0
+      mlflow                    1.13.1           py38h578d9bd_0    conda-forge/label/m
+      ain
+      msrest                    0.6.19             pyh9f0ad1d_0    conda-forge/label/m
+      ain
+      multipletau               0.3.3                    pypi_0    pypi
+      nbclient                  0.5.1                      py_0
+      nbconvert                 6.0.7                    py38_0
+      nbformat                  5.1.2              pyhd3eb1b0_1
+      ncurses                   6.2                  he6710b0_1
+      nest-asyncio              1.4.3              pyhd3eb1b0_0
+      notebook                  6.1.6            py38h06a4308_0
+      numpy                     1.19.2           py38h54aff64_0
+      numpy-base                1.19.2           py38hfa32c7d_0
+      oauthlib                  3.0.1                      py_0    conda-forge/label/m
+      ain
+      olefile                   0.46                       py_0
+      openjpeg                  2.3.0                h05c96fa_1
+      openssl                   1.1.1i               h27cfd23_0
+      opt-einsum                3.3.0                    pypi_0    pypi
+      packaging                 20.8               pyhd3eb1b0_0
+      pandas                    1.2.0            py38ha9443f7_0
+      pandoc                    2.11                 hb0f4dca_0
+      pandocfilters             1.4.3            py38h06a4308_1
+      parso                     0.7.0                      py_0
+      pcre                      8.44                 he6710b0_0
+      pexpect                   4.8.0              pyhd3eb1b0_3
+      pickleshare               0.7.5           pyhd3eb1b0_1003
+      pillow                    8.1.0            py38he98fc37_0
+      pip                       20.3.3           py38h06a4308_0
+      prometheus_client         0.9.0              pyhd3eb1b0_0
+      prometheus_flask_exporter 0.18.1             pyh9f0ad1d_0    conda-forge/label/m
+      ain
+      prompt-toolkit            3.0.8                      py_0
+      protobuf                  3.13.0.1         py38hadf7658_1    conda-forge/label/m
+      ain
+      ptyprocess                0.7.0              pyhd3eb1b0_2
+      pyasn1                    0.4.8                    pypi_0    pypi
+      pyasn1-modules            0.2.8                    pypi_0    pypi
+      pycparser                 2.20                       py_2
+      pygments                  2.7.4              pyhd3eb1b0_0
+      pyjwt                     2.0.1              pyhd8ed1ab_0    conda-forge/label/m
+      ain
+      pyopenssl                 20.0.1             pyhd3eb1b0_1
+      pyparsing                 2.4.7                      py_0
+      pyqt                      5.9.2            py38h05f1152_4
+      pyrsistent                0.17.3           py38h7b6447c_0
+      pysocks                   1.7.1            py38h06a4308_0
+      python                    3.8.5                h7579374_1
+      python-dateutil           2.8.1                      py_0
+      python-editor             1.0.4                      py_0    conda-forge/label/m
+      ain
+      python_abi                3.8                      1_cp38    conda-forge/label/m
+      ain
+      pytz                      2020.5             pyhd3eb1b0_0
+      pyyaml                    5.3.1            py38h8df0ef7_1    conda-forge/label/m
+      ain
+      pyzmq                     20.0.0           py38h2531618_1
+      qt                        5.9.7                h5867ecd_1
+      querystring_parser        1.2.4                      py_0    conda-forge/label/m
+      ain
+      readline                  8.0                  h7b6447c_0
+      requests                  2.25.1             pyhd3eb1b0_0
+      requests-oauthlib         1.3.0              pyh9f0ad1d_0    conda-forge/label/m
+      ain
+      rsa                       4.7                      pypi_0    pypi
+      scipy                     1.5.2            py38h0b6359f_0
+      seaborn                   0.11.1             pyhd3eb1b0_0
+      send2trash                1.5.0              pyhd3eb1b0_1
+      setuptools                51.1.2           py38h06a4308_4
+      sip                       4.19.13          py38he6710b0_0
+      six                       1.15.0           py38h06a4308_0
+      smmap                     3.0.4              pyh9f0ad1d_0    conda-forge/label/m
+      ain
+      snappy                    1.1.8                he6710b0_0
+      sqlalchemy                1.3.20           py38h1e0a361_0    conda-forge/label/m
+      ain
+      sqlite                    3.33.0               h62c20be_0
+      sqlparse                  0.4.1              pyh9f0ad1d_0    conda-forge/label/m
+      ain
+      tabulate                  0.8.7              pyh9f0ad1d_0    conda-forge/label/m
+      ain
+      tb-nightly                2.5.0a20210118           pypi_0    pypi
+      tensorboard-plugin-wit    1.7.0                    pypi_0    pypi
+      termcolor                 1.1.0                    pypi_0    pypi
+      terminado                 0.9.2            py38h06a4308_0
+      testpath                  0.4.4                      py_0
+      tf-estimator-nightly      2.5.0.dev2021011801          pypi_0    pypi
+      tf-nightly                2.5.0.dev20210114          pypi_0    pypi
+      tifffile                  2021.1.14          pyhd3eb1b0_1
+      tk                        8.6.10               hbc83047_0
+      tornado                   6.1              py38h27cfd23_0
+      traitlets                 5.0.5                      py_0
+      typing-extensions         3.7.4.3                  pypi_0    pypi
+      urllib3                   1.26.2             pyhd3eb1b0_0
+      wcwidth                   0.2.5                      py_0
+      webencodings              0.5.1                    py38_1
+      websocket-client          0.57.0           py38h578d9bd_4    conda-forge/label/m
+      ain
+      werkzeug                  1.0.1              pyh9f0ad1d_0    conda-forge/label/m
+      ain
+      wheel                     0.36.2             pyhd3eb1b0_0
+      wrapt                     1.12.1                   pypi_0    pypi
+      xz                        5.2.5                h7b6447c_0
+      yaml                      0.2.5                h516909a_0    conda-forge/label/m
+      ain
+      zeromq                    4.3.3                he6710b0_3
+      zipp                      3.4.0              pyhd3eb1b0_0
+      zlib                      1.2.11               h7b6447c_3
+      zstd                      1.4.5                h9ceee32_0
+      (base) [ye53nis@login01 ~]$
+    #+end_example
+
+*** update =train.py=
+    :LOGBOOK:
+    CLOCK: [2021-01-24 So 23:40]--[2021-01-24 So 23:40] =>  0:00
+    CLOCK: [2021-01-24 So 16:59]--[2021-01-24 So 17:33] =>  0:34
+    CLOCK: [2021-01-24 So 15:20]--[2021-01-24 So 16:37] =>  1:17
+    CLOCK: [2021-01-24 So 13:20]--[2021-01-24 So 15:02] =>  1:42
+    :END:
+    - note: I thought about incorporating a =MODEL_TYPE= variable to either
+      train a unet or a vae, but probably it is wiser to make to training files
+      =train_unet.py= and =train_vae.py=, since they are pretty different.
+*** mlflow test
+**** connection
+    - using =ob-tmux= for script execution
+      #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
+        cd /beegfs/ye53nis/drmed-git/
+        git status
+      #+END_SRC
+
+      #+RESULTS:
+      #+begin_example
+        # On branch develop
+        # Changes not staged for commit:
+        #   (use "git add <file>..." to update what will be committed)
+        #   (use "git checkout -- <file>..." to discard changes in working directory)
+        #   (commit or discard the untracked or modified content in submodules)
+        #
+        #       modified:   src/nanosimpy (new commits, untracked content)
+        #
+        # Untracked files:
+        #   (use "git add <file>..." to include in what will be committed)
+        #
+        #       data/exp-devtest/
+        #       data/exp-test/
+        #       data/mlruns/0/037e1d9e4ad74784974f4aaac11138cc/
+        #       data/mlruns/0/19ccbacbf4334e5496aa8aca189b48f6/
+        #       data/mlruns/0/1d1a38b21990451582bf9b07a9487820/
+        #       data/mlruns/0/1e98b3ed2e1d421da9592058bd5587a8/
+        #       data/mlruns/0/265692a2dfa1437f99a847dd7fe0c8e4/
+        #       data/mlruns/0/306234c75c9c48058cbd694579eff31b/
+        #       data/mlruns/0/67f319f4d8f746ffa6af7c161bdd0a7b/
+        #       data/mlruns/0/7f23f6ba7a244914b3cbbebd731d50a1/
+        #       data/mlruns/0/83913f83a27245e7b16d9847de14e2ed/
+        #       data/mlruns/0/bf2ced34703e42eba1858a9515694a9e/
+        #       data/mlruns/0/d57baeff5b994289bf6ce4c842a87509/
+        #       data/mlruns/0/d9b44dc2e3d44ea1a71129808b642af6/
+        #       data/mlruns/0/e4ad17b5c0e3489f89194eff033a9279/
+        #       data/mlruns/0/f9da7fa18bcd4dd79eee13e35f4a5573/
+        #       data/mlruns/0/fce85613c2724819a168ba0d34cff11d/
+        #       data/mlruns/1/504c8c02948c498fa7485c044b956468/
+        #       data/mlruns/1/6444eabd24a7402a92f895804b01163c/
+        #       data/mlruns/mlruns/
+        #       data/tb/
+        #       experiment_params.csv
+        #       mlruns/
+        #       test.pdf
+        #       test.svg
+        #       tramp.YDPCnB
+        no changes added to commit (use "git add" and/or "git commit -a")
+        (base) [ye53nis@node144 drmed-git]$
+      #+end_example
+
+**** mlflow environment variables
+  #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
+    conda activate tf-nightly
+    cd /beegfs/ye53nis/drmed-git
+    export MLFLOW_EXPERIMENT_NAME=exp-210124-test
+    export MLFLOW_TRACKING_URI=file:./data/mlruns
+    mkdir data/exp-210124-test
+  #+END_SRC
+
+**** test run 1
+  #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
+    mlflow run . -P fluotracify_path=/beegfs/ye53nis/drmed-git/src/ -P epochs=2 -P learning_rate=None -P csv_path=/beegfs/ye53nis/saves/firstartifact_Nov2020 -P steps_per_epoch=400 -P validation_steps=200
+  #+END_SRC
+
+  #+RESULTS:
+  #+begin_example
+    (tf-nightly) [ye53nis@node144 drmed-git]$ mlflow run . -P fluotracify_path=/beegfs/ye53nis/drmed-git/src/ -P epochs=2 -P learning_rate=None -P csv_path=/beegfs/ye53nis/saves/firstartifact_
+    Nov2020 -P steps_per_epoch=400 -P validation_steps=200
+
+    WARNING:root:Malformed experiment 'mlruns'. Detailed error Yaml file './data/mlruns/mlruns/meta.yaml' does not exist.
+    Traceback (most recent call last):
+      File "/home/ye53nis/.conda/envs/tf-nightly/lib/python3.8/site-packages/mlflow/store/tracking/file_store.py", line 237, in list_experiments
+        experiment = self._get_experiment(exp_id, view_type)
+      File "/home/ye53nis/.conda/envs/tf-nightly/lib/python3.8/site-packages/mlflow/store/tracking/file_store.py", line 311, in _get_experiment
+        meta = read_yaml(experiment_dir, FileStore.META_DATA_FILE_NAME)
+      File "/home/ye53nis/.conda/envs/tf-nightly/lib/python3.8/site-packages/mlflow/utils/file_utils.py", line 170, in read_yaml
+        raise MissingConfigException("Yaml file '%s' does not exist." % file_path)
+    mlflow.exceptions.MissingConfigException: Yaml file './data/mlruns/mlruns/meta.yaml' does not exist.
+
+    2021/01/24 14:09:00 INFO mlflow.projects.utils: === Created directory /tmp/tmptk14etsx for downloading remote URIs passed to arguments of type 'path' ===
+
+    2021/01/24 14:09:00 INFO mlflow.projects.backend.local: === Running command 'source /cluster/miniconda3/bin/../etc/profile.d/conda.sh && conda activate mlflow-c61a56dd06e99e6740b7159c7af9d
+    54a736a4e4b 1>&2 && python src/fluotracify/training/train.py /beegfs/ye53nis/drmed-git/src 5 0.2 16384 None 2 /beegfs/ye53nis/saves/firstartifact_Nov2020 3 --steps_per_epoch 400 --validati
+    on_steps 200' in run with ID 'f5b912f975064cd89906212dc8cdc223' ===
+
+    2021-01-24 14:09:02.201110: W tensorflow/stream_executor/platform/default/dso_loader.cc:55] Could not load dynamic library 'libcudart.so.10.1'; dlerror: libcudart.so.10.1: cannot open shar
+    ed object file: No such file or directory
+
+    2021-01-24 14:09:02.201155: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+    /home/ye53nis/.conda/envs/mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b/lib/python3.8/site-packages/tensorflow/python/framework/load_library.py:23: DeprecationWarning: the imp module is
+    deprecated in favour of importlib; see the module's documentation for alternative uses
+      import imp
+    2.3.0-dev20200527
+
+    2021-01-24 14:09:04.694755: W tensorflow/stream_executor/platform/default/dso_loader.cc:55] Could not load dynamic library 'libcuda.so.1'; dlerror: libcuda.so.1: cannot open shared object
+    file: No such file or directory
+    2021-01-24 14:09:04.694795: E tensorflow/stream_executor/cuda/cuda_driver.cc:313] failed call to cuInit: UNKNOWN ERROR (303)
+    2021-01-24 14:09:04.694823: I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:156] kernel driver does not appear to be running on this host (node144): /proc/driver/nvidia/version does not exist
+    GPUs:  []
+
+    train 0 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set007.csv
+    train 1 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set007.csv
+    train 2 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set003.csv
+    train 3 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set006.csv
+    train 4 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set006.csv
+    train 5 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set004.csv
+    train 6 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set007.csv
+    train 7 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set004.csv
+    train 8 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set005.csv
+    train 9 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set006.csv
+    train 10 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set004.csv
+    train 11 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set003.csv
+    train 12 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set009.csv
+    train 13 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set004.csv
+    train 14 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set008.csv
+    train 15 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set001.csv
+    train 16 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set003.csv
+    train 17 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set005.csv
+    train 18 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set004.csv
+    train 19 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set009.csv
+    train 20 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set004.csv
+    train 21 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set003.csv
+    train 22 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set004.csv
+    train 23 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set002.csv
+    train 24 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set006.csv
+    train 25 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set009.csv
+    train 26 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set007.csv
+    train 27 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set010.csv
+    train 28 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set003.csv
+    train 29 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set007.csv
+    train 30 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set001.csv
+    train 31 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set001.csv
+    train 32 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set001.csv
+    train 33 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set009.csv
+    train 34 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set002.csv
+    train 35 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set008.csv
+    train 36 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set009.csv
+    train 37 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set007.csv
+    train 38 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set004.csv
+    train 39 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set005.csv
+    train 40 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set002.csv
+    train 41 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set002.csv
+    train 42 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set003.csv
+    train 43 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set002.csv
+    train 44 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set005.csv
+    train 45 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set006.csv
+    train 46 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set008.csv
+    train 47 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set001.csv
+    train 48 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set009.csv
+    train 49 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set006.csv
+    train 50 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set002.csv
+    train 51 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set010.csv
+    train 52 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set001.csv
+    train 53 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set005.csv
+    train 54 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set009.csv
+    train 55 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set001.csv
+    train 56 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set002.csv
+    train 57 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set006.csv
+    train 58 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set004.csv
+    train 59 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set003.csv
+    train 60 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set001.csv
+    train 61 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set002.csv
+    train 62 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set007.csv
+    train 63 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set008.csv
+    train 64 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set010.csv
+    train 65 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set006.csv
+    train 66 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set003.csv
+    train 67 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set005.csv
+    train 68 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set005.csv
+    train 69 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set010.csv
+    train 70 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set010.csv
+    train 71 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set010.csv
+    train 72 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set010.csv
+    train 73 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set008.csv
+    train 74 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set009.csv
+    train 75 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set010.csv
+    train 76 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set001.csv
+    train 77 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set005.csv
+    train 78 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set003.csv
+    train 79 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set008.csv
+    test 80 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set006.csv
+    test 81 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set008.csv
+    test 82 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set002.csv
+    test 83 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set007.csv
+    test 84 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set010.csv
+    test 85 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set006.csv
+    test 86 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set009.csv
+    test 87 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set003.csv
+    test 88 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set009.csv
+    test 89 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set001.csv
+    test 90 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set008.csv
+    test 91 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set007.csv
+    test 92 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set002.csv
+    test 93 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set004.csv
+    test 94 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set010.csv
+    test 95 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set007.csv
+    test 96 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set008.csv
+    test 97 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set005.csv
+    test 98 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set008.csv
+    test 99 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set005.csv
+    The given DataFrame was split into 3 parts with shapes: [(16384, 8000), (16384, 8000), (16384, 8000)]
+    The given DataFrame was split into 3 parts with shapes: [(16384, 2000), (16384, 2000), (16384, 2000)]
+
+    for each 16384 timestap trace there are the following numbers of corrupted timesteps:
+    label001_1    5916
+    label002_1    7367
+    label003_1     954
+    label004_1    2965
+    label005_1       0
+    dtype: int64
+
+    2021-01-24 14:16:01.823791: I tensorflow/core/platform/cpu_feature_guard.cc:142] This TensorFlow binary is optimized with Intel(R) MKL-DNN to use the following CPU instructions in performance-critical operations:  AVX2 AVX512F FMA
+    To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+    2021-01-24 14:16:01.837231: I tensorflow/core/platform/profile_utils/cpu_utils.cc:104] CPU Frequency: 2300000000 Hz
+    2021-01-24 14:16:01.838675: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x5629bfa11e70 initialized for platform Host (this does not guarantee that XLA will be used). Devices:
+    2021-01-24 14:16:01.838706: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): Host, Default Version
+
+    number of training examples: 6400, number of validation examples: 1600
+
+    ------------------------
+    number of test examples: 2000
+
+    input - shape:   (None, 16384, 1)
+    output - shape:  (None, 16384, 1)
+
+    2021-01-24 14:16:08.935544: I tensorflow/core/profiler/lib/profiler_session.cc:163] Profiler session started.
+    /home/ye53nis/.conda/envs/mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b/lib/python3.8/site-packages/tensorflow/python/training/tracking/data_structures.py:739: DeprecationWarning: Using
+    or importing the ABCs from 'collections' instead of from 'collections.abc' is deprecated since Python 3.3, and in 3.9 it will stop working
+      if not isinstance(wrapped_dict, collections.Mapping):
+
+    /home/ye53nis/.conda/envs/mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b/lib/python3.8/site-packages/mlflow/utils/autologging_utils.py:60: DeprecationWarning: inspect.getargspec() is depr
+    ecated since Python 3.0, use inspect.signature() or inspect.getfullargspec()
+      all_param_names, _, _, all_default_values = inspect.getargspec(fn)  # pylint: disable=W1505
+
+    /home/ye53nis/.conda/envs/mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b/lib/python3.8/site-packages/mlflow/utils/autologging_utils.py:82: UserWarning: Logging to MLflow failed: Changing
+    param values is not allowed. Param with key='steps_per_epoch' was already logged with value='400' for run ID='f5b912f975064cd89906212dc8cdc223'. Attempted logging new value '1280'.
+      try_mlflow_log(mlflow.log_param, param_name, kwargs[param_name])
+    /home/ye53nis/.conda/envs/mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b/lib/python3.8/site-packages/mlflow/utils/autologging_utils.py:82: UserWarning: Logging to MLflow failed: Changing
+    param values is not allowed. Param with key='validation_steps' was already logged with value='200' for run ID='f5b912f975064cd89906212dc8cdc223'. Attempted logging new value '320'.
+      try_mlflow_log(mlflow.log_param, param_name, kwargs[param_name])
+
+    Epoch 1/2
+    /home/ye53nis/.conda/envs/mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b/lib/python3.8/site-packages/tensorflow/python/framework/indexed_slices.py:347: DeprecationWarning: Using or import
+    ing the ABCs from 'collections' instead of from 'collections.abc' is deprecated since Python 3.3, and in 3.9 it will stop working
+      if not isinstance(values, collections.Sequence):
+       1/1280 [..............................] - ETA: 0s - loss: 1.6349 - tp: 7634.0000 - fp: 34786.0000 - tn: 37126.0000 - fn: 2374.0000 - precision: 0.1800 - recall: 0.7628 - accuracy: 0.546
+    4 - auc: 0.75242021-01-24 14:16:21.837468: I tensorflow/core/profiler/lib/profiler_session.cc:163] Profiler session started.
+    WARNING:tensorflow:From /home/ye53nis/.conda/envs/mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b/lib/python3.8/site-packages/tensorflow/python/ops/summary_ops_v2.py:1277: stop (from tenso
+    rflow.python.eager.profiler) is deprecated and will be removed after 2020-07-01.
+    Instructions for updating:
+    use `tf.profiler.experimental.stop` instead.
+    2021-01-24 14:16:23.801416: I tensorflow/core/profiler/rpc/client/save_profile.cc:176] Creating directory: /tmp/tb/train/plugins/profile/2021_01_24_14_16_23
+    2021-01-24 14:16:23.815974: I tensorflow/core/profiler/rpc/client/save_profile.cc:182] Dumped gzipped tool data for trace.json.gz to /tmp/tb/train/plugins/profile/2021_01_24_14_16_23/node1
+    44.trace.json.gz
+    2021-01-24 14:16:23.841986: I tensorflow/core/profiler/rpc/client/save_profile.cc:176] Creating directory: /tmp/tb/train/plugins/profile/2021_01_24_14_16_23
+    2021-01-24 14:16:23.842080: I tensorflow/core/profiler/rpc/client/save_profile.cc:182] Dumped gzipped tool data for memory_profile.json.gz to /tmp/tb/train/plugins/profile/2021_01_24_14_16
+    _23/node144.memory_profile.json.gz
+    2021-01-24 14:16:23.844155: I tensorflow/python/profiler/internal/profiler_wrapper.cc:111] Creating directory: /tmp/tb/train/plugins/profile/2021_01_24_14_16_23Dumped tool data for xplane.
+    pb to /tmp/tb/train/plugins/profile/2021_01_24_14_16_23/node144.xplane.pb
+    Dumped tool data for overview_page.pb to /tmp/tb/train/plugins/profile/2021_01_24_14_16_23/node144.overview_page.pb
+    Dumped tool data for input_pipeline.pb to /tmp/tb/train/plugins/profile/2021_01_24_14_16_23/node144.input_pipeline.pb
+    Dumped tool data for tensorflow_stats.pb to /tmp/tb/train/plugins/profile/2021_01_24_14_16_23/node144.tensorflow_stats.pb
+    Dumped tool data for kernel_stats.pb to /tmp/tb/train/plugins/profile/2021_01_24_14_16_23/node144.kernel_stats.pb
+
+    1280/1280 [==============================] - 2372s 2s/step - loss: 0.8691 - tp: 7587311.0000 - fp: 3861041.0000 - tn: 84008352.0000 - fn: 9400853.0000 - precision: 0.6627 - recall: 0.4466
+    - accuracy: 0.8735 - auc: 0.8641 - val_loss: 4.9131 - val_tp: 4314509.0000 - val_fp: 21883082.0000 - val_tn: 16088.0000 - val_fn: 729.0000 - val_precision: 0.1647 - val_recall: 0.9998 - va
+    l_accuracy: 0.1652 - val_auc: 0.6917
+    Epoch 2/2
+    1280/1280 [==============================] - 2362s 2s/step - loss: 0.6596 - tp: 10710472.0000 - fp: 4248825.0000 - tn: 83756520.0000 - fn: 6141762.0000 - precision: 0.7160 - recall: 0.6356
+     - accuracy: 0.9009 - auc: 0.9111 - val_loss: 1.7651 - val_tp: 4185983.0000 - val_fp: 17996990.0000 - val_tn: 4019617.0000 - val_fn: 11809.0000 - val_precision: 0.1887 - val_recall: 0.9972
+     - val_accuracy: 0.3130 - val_auc: 0.8461
+    400/400 [==============================] - 147s 366ms/step - loss: 1.7403 - tp: 4666119.0000 - fp: 21836326.0000 - tn: 6252103.0000 - fn: 13450.0000 - precision: 0.1761 - recall: 0.9971 -
+    accuracy: 0.3332 - auc: 0.8519^[[B
+    WARNING:root:Malformed experiment 'mlruns'. Detailed error Yaml file './data/mlruns/mlruns/meta.yaml' does not exist.
+    Traceback (most recent call last):
+      File "/home/ye53nis/.conda/envs/mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b/lib/python3.8/site-packages/mlflow/store/tracking/file_store.py", line 197, in list_experiments
+        experiment = self._get_experiment(exp_id, view_type)
+      File "/home/ye53nis/.conda/envs/mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b/lib/python3.8/site-packages/mlflow/store/tracking/file_store.py", line 260, in _get_experiment
+        meta = read_yaml(experiment_dir, FileStore.META_DATA_FILE_NAME)
+      File "/home/ye53nis/.conda/envs/mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b/lib/python3.8/site-packages/mlflow/utils/file_utils.py", line 167, in read_yaml
+        raise MissingConfigException("Yaml file '%s' does not exist." % file_path)
+    mlflow.exceptions.MissingConfigException: Yaml file './data/mlruns/mlruns/meta.yaml' does not exist.
+    2021/01/24 15:37:50 INFO mlflow.projects: === Run (ID 'f5b912f975064cd89906212dc8cdc223') succeeded ===
+    (tf-nightly) [ye53nis@node144 drmed-git]$ conda activate tf-nightly
+  #+end_example
+
+**** handling the mlflow run errors
+     - =WARNING:root:Malformed experiment 'mlruns'. Detailed error Yaml file
+       './data/mlruns/mlruns/meta.yaml' does not exist.=
+       - i deleted the directory =/beegfs/ye53nis/drmed-git/data/mlruns/mlruns=
+     - ~mlflow/utils/autologging_utils.py:82: UserWarning: Logging to MLflow
+       failed: Changing param values is not allowed. Param with
+       key='steps_per_epoch' was already logged with value='400' for run
+       ID='f5b912f975064cd89906212dc8cdc223'. Attempted logging new value
+       '1280'. try_mlflow_log(mlflow.log_param, param_name, kwargs[param_name])~
+       - noticed that =train.py= and MLproject in =develop= is older than
+         =exp-310520=, so I updated the files, the errors should be less now.
+      #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
+        cd /beegfs/ye53nis/drmed-git/
+        git log -5
+      #+END_SRC
+
+      #+RESULTS:
+      #+begin_example
+        (tf-nightly) [ye53nis@node144 drmed-git]$ git log -5
+        commit c0dde2ec15648b3b1164af6cc365b2c1884e946c
+        Author: Apoplex <oligolex@vivaldi.net>
+        Date:   Sun Jan 24 16:32:33 2021 +0100
+
+            Update train.py and MLproject to exp-3105.. state
+
+        commit 3a2ba43088a740b8657d31483fddd6e8ff754eb6
+        Author: Apoplex <oligolex@vivaldi.net>
+        Date:   Sun Jan 24 15:38:07 2021 +0100
+
+            fix mlproject parameter type
+
+        commit 41b6a8f8ea443563f91da48798e12ef32ec91d05
+        Author: Apoplex <oligolex@vivaldi.net>
+        Date:   Sun Jan 24 14:07:57 2021 +0100
+
+            update MLproject file for exp-210124-test
+
+        commit a5bfb292560d8a4a6c7530fda32aad06fb4424e0
+        Author: Apoplex <oligolex@vivaldi.net>
+        Date:   Sun Jan 24 14:02:48 2021 +0100
+
+            update train.py for exp-210124-test
+
+        commit 3130a58bbdfcd7c56c931c8dbe99e97e8eda6a2c
+        Author: Apoplex <oligolex@vivaldi.net>
+        Date:   Mon Jan 18 12:13:21 2021 +0100
+
+            Remove link to Reconnect, causes problems
+        (tf-nightly) [ye53nis@node144 drmed-git]$
+      #+end_example
+
+**** test run 2
+  #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
+    mlflow run . -P fluotracify_path=/beegfs/ye53nis/drmed-git/src/ -P epochs=2 -P learning_rate=None -P csv_path=/beegfs/ye53nis/saves/firstartifact_Nov2020 -P steps_per_epoch=400 -P validation_steps=200
+  #+END_SRC
+
+  #+RESULTS:
+  #+begin_example
+    (tf-nightly) [ye53nis@node144 drmed-git]$ mlflow run . -P fluotracify_path=/beegfs/ye53nis/drmed-git/src/ -P epochs=2 -P learning_rate=None -P csv_path=/beegfs/ye53nis/saves/firstartifact_
+    Nov2020 -P steps_per_epoch=400 -P validation_steps=200
+    2021/01/24 16:37:53 INFO mlflow.projects.utils: === Created directory /tmp/tmp6tjut7ba for downloading remote URIs passed to arguments of type 'path' ===
+    2021/01/24 16:37:53 INFO mlflow.projects.backend.local: === Running command 'source /cluster/miniconda3/bin/../etc/profile.d/conda.sh && conda activate mlflow-c61a56dd06e99e6740b7159c7af9d
+    54a736a4e4b 1>&2 && python src/fluotracify/training/train.py /beegfs/ye53nis/drmed-git/src 5 0.2 16384 None 2 /beegfs/ye53nis/saves/firstartifact_Nov2020 3 400 200' in run with ID '1e41386
+    11c01425ca20218eb04f3cfbe' ===
+    2021-01-24 16:38:11.462411: W tensorflow/stream_executor/platform/default/dso_loader.cc:55] Could not load dynamic library 'libcudart.so.10.1'; dlerror: libcudart.so.10.1: cannot open shar
+    ed object file: No such file or directory
+    2021-01-24 16:38:11.462457: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+    /home/ye53nis/.conda/envs/mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b/lib/python3.8/site-packages/tensorflow/python/framework/load_library.py:23: DeprecationWarning: the imp module is
+    deprecated in favour of importlib; see the module's documentation for alternative uses
+      import imp
+    2.3.0-dev20200527
+    2021-01-24 16:38:26.216174: W tensorflow/stream_executor/platform/default/dso_loader.cc:55] Could not load dynamic library 'libcuda.so.1'; dlerror: libcuda.so.1: cannot open shared object
+    file: No such file or directory
+    2021-01-24 16:38:26.216212: E tensorflow/stream_executor/cuda/cuda_driver.cc:313] failed call to cuInit: UNKNOWN ERROR (303)
+    2021-01-24 16:38:26.216236: I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:156] kernel driver does not appear to be running on this host (node144): /proc/driver/nvidia/version does
+    not exist
+    GPUs:  []
+    train 0 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set007.csv
+    train 1 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set007.csv
+    train 2 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set003.csv
+    train 3 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set006.csv
+    train 4 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set006.csv
+    train 5 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set004.csv
+    train 6 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set007.csv
+    train 7 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set004.csv
+    train 8 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set005.csv
+    train 9 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set006.csv
+    train 10 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set004.csv
+    train 11 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set003.csv
+    train 12 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set009.csv
+    train 13 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set004.csv
+    train 14 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set008.csv
+    train 15 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set001.csv
+    train 16 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set003.csv
+    train 17 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set005.csv
+    train 18 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set004.csv
+    train 19 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set009.csv
+    train 20 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set004.csv
+    train 21 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set003.csv
+    train 22 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set004.csv
+    train 23 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set002.csv
+    train 24 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set006.csv
+    train 25 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set009.csv
+    train 26 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set007.csv
+    train 27 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set010.csv
+    train 28 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set003.csv
+    train 29 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set007.csv
+    train 30 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set001.csv
+    train 31 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set001.csv
+    train 32 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set001.csv
+    train 33 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set009.csv
+    train 34 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set002.csv
+    train 35 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set008.csv
+    train 36 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set009.csv
+    train 37 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set007.csv
+    train 38 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set004.csv
+    train 39 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set005.csv
+    train 40 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set002.csv
+    train 41 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set002.csv
+    train 42 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set003.csv
+    train 43 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set002.csv
+    train 44 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set005.csv
+    train 45 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set006.csv
+    train 46 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set008.csv
+    train 47 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set001.csv
+    train 48 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set009.csv
+    train 49 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set006.csv
+    train 50 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set002.csv
+    train 51 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set010.csv
+    train 52 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set001.csv
+    train 53 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set005.csv
+    train 54 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set009.csv
+    train 55 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set001.csv
+    train 56 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set002.csv
+    train 57 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set006.csv
+    train 58 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set004.csv
+    train 59 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set003.csv
+    train 60 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set001.csv
+    train 61 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set002.csv
+    train 62 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set007.csv
+    train 63 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set008.csv
+    train 64 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set010.csv
+    train 65 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set006.csv
+    train 66 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set003.csv
+    train 67 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set005.csv
+    train 68 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set005.csv
+    train 69 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set010.csv
+    train 70 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set010.csv
+    train 71 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set010.csv
+    train 72 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set010.csv
+    train 73 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set008.csv
+    train 74 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set009.csv
+    train 75 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set010.csv
+    train 76 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set001.csv
+    train 77 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set005.csv
+    train 78 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set003.csv
+    train 79 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set008.csv
+    test 80 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set006.csv
+    test 81 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set008.csv
+    test 82 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set002.csv
+    test 83 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set007.csv
+    test 84 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set010.csv
+    test 85 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set006.csv
+    test 86 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set009.csv
+    test 87 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set003.csv
+    test 88 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set009.csv
+    test 89 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set001.csv
+    test 90 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set008.csv
+    test 91 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set007.csv
+    test 92 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set002.csv
+    test 93 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set004.csv
+    test 94 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set010.csv
+    test 95 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set007.csv
+    test 96 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set008.csv
+    test 97 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set005.csv
+    test 98 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set008.csv
+    test 99 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set005.csv
+    The given DataFrame was split into 3 parts with shapes: [(16384, 8000), (16384, 8000), (16384, 8000)]
+    The given DataFrame was split into 3 parts with shapes: [(16384, 2000), (16384, 2000), (16384, 2000)]
+
+    for each 16384 timestap trace there are the following numbers of corrupted timesteps:
+    label001_1    5916
+    label002_1    7367
+    label003_1     954
+    label004_1    2965
+    label005_1       0
+    dtype: int64
+    2021-01-24 16:44:08.463884: I tensorflow/core/platform/cpu_feature_guard.cc:142] This TensorFlow binary is optimized with Intel(R) MKL-DNN to use the following CPU instructions in performa
+    nce-critical operations:  AVX2 AVX512F FMA
+    To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+    2021-01-24 16:44:08.487375: I tensorflow/core/platform/profile_utils/cpu_utils.cc:104] CPU Frequency: 2300000000 Hz
+    2021-01-24 16:44:08.489752: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x55ede43a3150 initialized for platform Host (this does not guarantee that XLA will be used). Devi
+    ces:
+    2021-01-24 16:44:08.489814: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): Host, Default Version
+    number of training examples: 6400, number of validation examples: 1600
+
+    ------------------------
+    number of test examples: 2000
+
+    input - shape:   (None, 16384, 1)
+    output - shape:  (None, 16384, 1)
+    2021-01-24 16:44:15.606199: I tensorflow/core/profiler/lib/profiler_session.cc:163] Profiler session started.
+    /home/ye53nis/.conda/envs/mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b/lib/python3.8/site-packages/tensorflow/python/training/tracking/data_structures.py:739: DeprecationWarning: Using
+    or importing the ABCs from 'collections' instead of from 'collections.abc' is deprecated since Python 3.3, and in 3.9 it will stop working
+      if not isinstance(wrapped_dict, collections.Mapping):
+    /home/ye53nis/.conda/envs/mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b/lib/python3.8/site-packages/mlflow/utils/autologging_utils.py:60: DeprecationWarning: inspect.getargspec() is depr
+    ecated since Python 3.0, use inspect.signature() or inspect.getfullargspec()
+      all_param_names, _, _, all_default_values = inspect.getargspec(fn)  # pylint: disable=W1505
+    Epoch 1/2
+    /home/ye53nis/.conda/envs/mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b/lib/python3.8/site-packages/tensorflow/python/framework/indexed_slices.py:347: DeprecationWarning: Using or import
+    ing the ABCs from 'collections' instead of from 'collections.abc' is deprecated since Python 3.3, and in 3.9 it will stop working
+      if not isinstance(values, collections.Sequence):
+      1/400 [..............................] - ETA: 0s - loss: 1.6712 - tp: 5516.0000 - fp: 30470.0000 - tn: 34108.0000 - fn: 11826.0000 - precision: 0.1533 - recall: 0.3181 - accuracy: 0.4837
+     - auc: 0.36132021-01-24 16:44:27.774036: I tensorflow/core/profiler/lib/profiler_session.cc:163] Profiler session started.
+    WARNING:tensorflow:From /home/ye53nis/.conda/envs/mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b/lib/python3.8/site-packages/tensorflow/python/ops/summary_ops_v2.py:1277: stop (from tenso
+    rflow.python.eager.profiler) is deprecated and will be removed after 2020-07-01.
+    Instructions for updating:
+    use `tf.profiler.experimental.stop` instead.
+    2021-01-24 16:44:29.647304: I tensorflow/core/profiler/rpc/client/save_profile.cc:176] Creating directory: /tmp/tb/train/plugins/profile/2021_01_24_16_44_29
+    2021-01-24 16:44:29.661793: I tensorflow/core/profiler/rpc/client/save_profile.cc:182] Dumped gzipped tool data for trace.json.gz to /tmp/tb/train/plugins/profile/2021_01_24_16_44_29/node1
+    44.trace.json.gz
+    2021-01-24 16:44:29.687770: I tensorflow/core/profiler/rpc/client/save_profile.cc:176] Creating directory: /tmp/tb/train/plugins/profile/2021_01_24_16_44_29
+    2021-01-24 16:44:29.687890: I tensorflow/core/profiler/rpc/client/save_profile.cc:182] Dumped gzipped tool data for memory_profile.json.gz to /tmp/tb/train/plugins/profile/2021_01_24_16_44
+    _29/node144.memory_profile.json.gz
+    2021-01-24 16:44:29.689921: I tensorflow/python/profiler/internal/profiler_wrapper.cc:111] Creating directory: /tmp/tb/train/plugins/profile/2021_01_24_16_44_29Dumped tool data for xplane.
+    pb to /tmp/tb/train/plugins/profile/2021_01_24_16_44_29/node144.xplane.pb
+    Dumped tool data for overview_page.pb to /tmp/tb/train/plugins/profile/2021_01_24_16_44_29/node144.overview_page.pb
+    Dumped tool data for input_pipeline.pb to /tmp/tb/train/plugins/profile/2021_01_24_16_44_29/node144.input_pipeline.pb
+    Dumped tool data for tensorflow_stats.pb to /tmp/tb/train/plugins/profile/2021_01_24_16_44_29/node144.tensorflow_stats.pb
+    Dumped tool data for kernel_stats.pb to /tmp/tb/train/plugins/profile/2021_01_24_16_44_29/node144.kernel_stats.pb
+
+    400/400 [==============================] - 788s 2s/step - loss: 0.9524 - tp: 1873337.0000 - fp: 1211462.0000 - tn: 26397164.0000 - fn: 3286044.0000 - precision: 0.6073 - recall: 0.3631 - a
+    ccuracy: 0.8627 - auc: 0.8330 - val_loss: 2.2494 - val_tp: 0.0000e+00 - val_fp: 0.0000e+00 - val_tn: 13826395.0000 - val_fn: 2557605.0000 - val_precision: 0.0000e+00 - val_recall: 0.0000e+
+    00 - val_accuracy: 0.8439 - val_auc: 0.5519
+    Epoch 2/2
+    400/400 [==============================] - 775s 2s/step - loss: 0.8417 - tp: 2587744.0000 - fp: 1830158.0000 - tn: 25712094.0000 - fn: 2637997.0000 - precision: 0.5857 - recall: 0.4952 - a
+    ccuracy: 0.8636 - auc: 0.8632 - val_loss: 2.3885 - val_tp: 2729037.0000 - val_fp: 13653618.0000 - val_tn: 1228.0000 - val_fn: 117.0000 - val_precision: 0.1666 - val_recall: 1.0000 - val_ac
+    curacy: 0.1666 - val_auc: 0.5000
+    400/400 [==============================] - 146s 366ms/step - loss: 2.4490 - tp: 4679373.0000 - fp: 28085716.0000 - tn: 2715.0000 - fn: 196.0000 - precision: 0.1428 - recall: 1.0000 - accur
+    acy: 0.1429 - auc: 0.5000
+    2021/01/24 17:13:06 INFO mlflow.projects: === Run (ID '1e4138611c01425ca20218eb04f3cfbe') succeeded ===
+  #+end_example
+
+  - it worked
+
+**** test run 3
+     - now, I added different metrics thresholds
+      #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
+        git log -3
+      #+END_SRC
+
+      #+RESULTS:
+      #+begin_example
+        (tf-nightly) [ye53nis@node144 drmed-git]$ git log -3
+        commit 6d52eb9df66b689db47b0301a441eae3481b380a
+        Author: Apoplex <oligolex@vivaldi.net>
+        Date:   Sun Jan 24 17:30:22 2021 +0100
+
+            Add thresholds to metrics
+
+        commit c0dde2ec15648b3b1164af6cc365b2c1884e946c
+        Author: Apoplex <oligolex@vivaldi.net>
+        Date:   Sun Jan 24 16:32:33 2021 +0100
+
+            Update train.py and MLproject to exp-3105.. state
+
+        commit 3a2ba43088a740b8657d31483fddd6e8ff754eb6
+        Author: Apoplex <oligolex@vivaldi.net>
+        Date:   Sun Jan 24 15:38:07 2021 +0100
+
+            fix mlproject parameter type
+        (tf-nightly) [ye53nis@node144 drmed-git]$
+      #+end_example
+
+  #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
+    mlflow run . -P fluotracify_path=/beegfs/ye53nis/drmed-git/src/ -P epochs=2 -P learning_rate=None -P csv_path=/beegfs/ye53nis/saves/firstartifact_Nov2020 -P steps_per_epoch=400 -P validation_steps=200
+  #+END_SRC
+
+  #+RESULTS:
+  #+begin_example
+    (tf-nightly) [ye53nis@node144 drmed-git]$ mlflow run . -P fluotracify_path=/beegfs/ye53nis/drmed-git/src/ -P epochs=2 -P learning_rate=None -P csv_path=/beegfs/ye53nis/saves/firstartifact_Nov2020 -P steps_
+    per_epoch=400 -P validation_steps=200
+    2021/01/24 17:33:39 INFO mlflow.projects.utils: === Created directory /tmp/tmphi3w8uva for downloading remote URIs passed to arguments of type 'path' ===
+
+    2021/01/24 17:33:39 INFO mlflow.projects.backend.local: === Running command 'source /cluster/miniconda3/bin/../etc/profile.d/conda.sh && conda activate mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b 1>&2
+    && python src/fluotracify/training/train.py /beegfs/ye53nis/drmed-git/src 5 0.2 16384 None 2 /beegfs/ye53nis/saves/firstartifact_Nov2020 3 400 200' in run with ID 'd6553c4225df4f2a91a7698955ad879e' ===
+
+    2021-01-24 17:33:56.911698: W tensorflow/stream_executor/platform/default/dso_loader.cc:55]
+    Could not load dynamic library 'libcudart.so.10.1'; dlerror: libcudart.so.10.1: cannot open shared object file: No such file or directory
+
+    2021-01-24 17:33:56.911743: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+    /home/ye53nis/.conda/envs/mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b/lib/python3.8/site-packages/tensorflow/python/framework/load_library.py:23:
+    DeprecationWarning: the imp module is deprecated in favour of importlib; see the module's documentation for alternative uses
+      import imp
+    2.3.0-dev20200527
+
+    2021-01-24 17:34:13.490720: W tensorflow/stream_executor/platform/default/dso_loader.cc:55]
+    Could not load dynamic library 'libcuda.so.1'; dlerror: libcuda.so.1: cannot open shared object file: No such file or directory
+
+    2021-01-24 17:34:13.490761: E tensorflow/stream_executor/cuda/cuda_driver.cc:313]
+    failed call to cuInit: UNKNOWN ERROR (303)
+
+    2021-01-24 17:34:13.490789: I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:156]
+    kernel driver does not appear to be running on this host (node144): /proc/driver/nvidia/version does not exist
+    GPUs:  []
+    train 0 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set007.csv
+    train 1 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set007.csv
+    train 2 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set003.csv
+    train 3 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set006.csv
+    train 4 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set006.csv
+    train 5 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set004.csv
+    train 6 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set007.csv
+    train 7 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set004.csv
+    train 8 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set005.csv
+    train 9 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set006.csv
+    train 10 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set004.csv
+    train 11 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set003.csv
+    train 12 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set009.csv
+    train 13 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set004.csv
+    train 14 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set008.csv
+    train 15 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set001.csv
+    train 16 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set003.csv
+    train 17 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set005.csv
+    train 18 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set004.csv
+    train 19 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set009.csv
+    train 20 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set004.csv
+    train 21 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set003.csv
+    train 22 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set004.csv
+    train 23 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set002.csv
+    train 24 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set006.csv
+    train 25 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set009.csv
+    train 26 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set007.csv
+    train 27 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set010.csv
+    train 28 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set003.csv
+    train 29 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set007.csv
+    train 30 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set001.csv
+    train 31 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set001.csv
+    train 32 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set001.csv
+    train 33 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set009.csv
+    train 34 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set002.csv
+    train 35 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set008.csv
+    train 36 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set009.csv
+    train 37 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set007.csv
+    train 38 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set004.csv
+    train 39 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set005.csv
+    train 40 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set002.csv
+    train 41 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set002.csv
+    train 42 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set003.csv
+    train 43 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set002.csv
+    train 44 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set005.csv
+    train 45 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set006.csv
+    train 46 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set008.csv
+    train 47 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set001.csv
+    train 48 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set009.csv
+    train 49 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set006.csv
+    train 50 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set002.csv
+    train 51 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set010.csv
+    train 52 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set001.csv
+    train 53 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set005.csv
+    train 54 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set009.csv
+    train 55 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set001.csv
+    train 56 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set002.csv
+    train 57 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set006.csv
+    train 58 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set004.csv
+    train 59 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set003.csv
+    train 60 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set001.csv
+    train 61 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set002.csv
+    train 62 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set007.csv
+    train 63 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set008.csv
+    train 64 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set010.csv
+    train 65 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set006.csv
+    train 66 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set003.csv
+    train 67 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set005.csv
+    train 68 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set005.csv
+    train 69 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set010.csv
+    train 70 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set010.csv
+    train 71 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set010.csv
+    train 72 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set010.csv
+    train 73 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set008.csv
+    train 74 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set009.csv
+    train 75 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set010.csv
+    train 76 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set001.csv
+    train 77 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set005.csv
+    train 78 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set003.csv
+    train 79 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set008.csv
+    test 80 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set006.csv
+    test 81 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set008.csv
+    test 82 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set002.csv
+    test 83 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set007.csv
+    test 84 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set010.csv
+    test 85 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set006.csv
+    test 86 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set009.csv
+    test 87 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set003.csv
+    test 88 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set009.csv
+    test 89 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set001.csv
+    test 90 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set008.csv
+    test 91 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set007.csv
+    test 92 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set002.csv
+    test 93 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set004.csv
+    test 94 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set010.csv
+    test 95 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set007.csv
+    test 96 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set008.csv
+    test 97 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set005.csv
+    test 98 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set008.csv
+    test 99 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set005.csv
+    The given DataFrame was split into 3 parts with shapes: [(16384, 8000), (16384, 8000), (16384, 8000)]
+    The given DataFrame was split into 3 parts with shapes: [(16384, 2000), (16384, 2000), (16384, 2000)]
+
+    for each 16384 timestap trace there are the following numbers of corrupted timesteps:
+    label001_1    5916
+    label002_1    7367
+    label003_1     954
+    label004_1    2965
+    label005_1       0
+    dtype: int64
+
+    2021-01-24 17:39:46.169724: I tensorflow/core/platform/cpu_feature_guard.cc:142]
+    This TensorFlow binary is optimized with Intel(R) MKL-DNN to use the following CPU instructions in performance-critical operations:  AVX2 AVX512F FMA
+    To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+
+    2021-01-24 17:39:46.193704: I tensorflow/core/platform/profile_utils/cpu_utils.cc:104] CPU Frequency: 2300000000 Hz
+    2021-01-24 17:39:46.195281: I tensorflow/compiler/xla/service/service.cc:168]
+    XLA service 0x557dbec99910 initialized for platform Host (this does not guarantee that XLA will be used). Devices:
+    2021-01-24 17:39:46.195324: I tensorflow/compiler/xla/service/service.cc:176]
+    StreamExecutor device (0): Host, Default Version
+
+    number of training examples: 6400, number of validation examples: 1600
+
+    ------------------------
+    number of test examples: 2000
+
+    input - shape:   (None, 16384, 1)
+    output - shape:  (None, 16384, 1)
+
+    2021-01-24 17:39:53.134766: I tensorflow/core/profiler/lib/profiler_session.cc:163]
+    Profiler session started.
+
+    /home/ye53nis/.conda/envs/mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b/lib/python3.8/site-packages/tensorflow/python/training/tracking/data_structures.py:739:
+    DeprecationWarning: Using or importing the ABCs from 'collections' instead of from 'collections.abc' is deprecated since Python 3.3, and in 3.9 it will stop working
+      if not isinstance(wrapped_dict, collections.Mapping):
+
+    /home/ye53nis/.conda/envs/mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b/lib/python3.8/site-packages/mlflow/utils/autologging_utils.py:60:
+    DeprecationWarning: inspect.getargspec() is deprecated since Pyth on 3.0, use inspect.signature() or inspect.getfullargspec()
+      all_param_names, _, _, all_default_values = inspect.getargspec(fn)  # pylint: disable=W1505
+
+    Epoch 1/2
+    /home/ye53nis/.conda/envs/mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b/lib/python3.8/site-packages/tensorflow/python/framework/indexed_slices.py:347:
+    DeprecationWarning: Using or importing the ABCs from 'collections' instead of from 'collections.abc' is deprecated since Python 3.3, and in 3.9 it will stop working
+      if not isinstance(values, collections.Sequence):
+
+    1/400 [..............................] - ETA: 0s - loss: 1.7399 - tp0.1: 18220.0000 - fp0.1: 60980.0000 - tn0.1: 356.0000 - fn0.1: 2364.0000 - precision0.1: 0.2301 - recall0.1: 0.8852 - tp0.3: 14954.0000
+     - fp0.3: 58473.0000 - tn0.3: 2863.0000 - fn0.3: 5630.0000 - precision0.3: 0.2037 - recall0.3: 0.7265 - tp0.5: 10538.0000 - fp0.5: 40621.0000 - tn0.5: 20715.0000 - fn0.5: 10046.0000 - precision0.5: 0.2060
+    - recall0.5: 0.5120 - tp0.7: 3030.0000 - fp0.7: 5693.0000 - tn0.7: 55643.0000 - fn0.7: 17554.0000 - precision0.7: 0.3474 - recall0.7: 0.1472 - tp0.9: 239.0000 - fp0.9: 40.0000 - tn0.9: 61296.0000 - fn0.9:
+    20345.0000 - precision0.9: 0.8566 - recall0.9: 0.0116 - accuracy: 0.3815 - auc: 0.41952021-01-24 17:40:08.260612: I tensorflow/core/profiler/lib/profiler_session.cc:163] Profiler session started.
+
+    WARNING:tensorflow:From /home/ye53nis/.conda/envs/mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b/lib/python3.8/site-packages/tensorflow/python/ops/summary_ops_v2.py:1277:
+    stop (from tensorflow.python.eager.profiler) is deprecated and will be removed after 2020-07-01.
+    Instructions for updating:
+    use `tf.profiler.experimental.stop` instead.
+
+    2021-01-24 17:40:10.197977: I tensorflow/core/profiler/rpc/client/save_profile.cc:176] Creating directory: /tmp/tb/train/plugins/profile/2021_01_24_17_40_10
+    2021-01-24 17:40:10.213131: I tensorflow/core/profiler/rpc/client/save_profile.cc:182]
+    Dumped gzipped tool data for trace.json.gz to /tmp/tb/train/plugins/profile/2021_01_24_17_40_10/node144.trace.json.gz
+
+    2021-01-24 17:40:10.241238: I tensorflow/core/profiler/rpc/client/save_profile.cc:176] Creating directory: /tmp/tb/train/plugins/profile/2021_01_24_17_40_10
+    2021-01-24 17:40:10.241346: I tensorflow/core/profiler/rpc/client/save_profile.cc:182]
+    Dumped gzipped tool data for memory_profile.json.gz to /tmp/tb/train/plugins/profile/2021_01_24_17_40_10/node144.memory_profile.json.gz
+
+    2021-01-24 17:40:10.243564: I tensorflow/python/profiler/internal/profiler_wrapper.cc:111] Creating directory: /tmp/tb/train/plugins/profile/2021_01_24_17_40_10
+    Dumped tool data for xplane.pb to /tmp/tb/train/plugins/profile/2021_01_24_17_40_10/node144.xplane.pb
+    Dumped tool data for overview_page.pb to /tmp/tb/train/plugins/profile/2021_01_24_17_40_10/node144.overview_page.pb
+    Dumped tool data for input_pipeline.pb to /tmp/tb/train/plugins/profile/2021_01_24_17_40_10/node144.input_pipeline.pb
+    Dumped tool data for tensorflow_stats.pb to /tmp/tb/train/plugins/profile/2021_01_24_17_40_10/node144.tensorflow_stats.pb
+    Dumped tool data for kernel_stats.pb to /tmp/tb/train/plugins/profile/2021_01_24_17_40_10/node144.kernel_stats.pb
+
+    400/400 [==============================] - 792s 2s/step - loss: 0.9683 - tp0.1: 4671384.0000 - fp0.1: 9937972.0000 - tn0.1: 17502688.0000 - fn0.1: 655955.0000 - precision0.1: 0.3198 - recall0.1: 0.8769 - t
+    p0.3: 3404591.0000 - fp0.3: 4285173.0000 - tn0.3: 23155480.0000 - fn0.3: 1922748.0000 - precision0.3: 0.4427 - recall0.3: 0.6391 - tp0.5: 2027859.0000 - fp0.5: 1223185.0000 - tn0.5: 26217472.0000 - fn0.5:
+    3299480.0000 - precision0.5: 0.6238 - recall0.5: 0.3807 - tp0.7: 1313035.0000 - fp0.7: 459862.0000 - tn0.7: 26980796.0000 - fn0.7: 4014304.0000 - precision0.7: 0.7406 - recall0.7: 0.2465 - tp0.9: 736340.00
+    00 - fp0.9: 108655.0000 - tn0.9: 27332008.0000 - fn0.9: 4590999.0000 - precision0.9: 0.8714 - recall0.9: 0.1382 - accuracy: 0.8620 - auc: 0.8371 - val_loss: 2.0578 - val_tp0.1: 2786779.0000 - val_fp0.1: 13
+    596213.0000 - val_tn0.1: 975.0000 - val_fn0.1: 33.0000 - val_precision0.1: 0.1701 - val_recall0.1: 1.0000 - val_tp0.3: 2786330.0000 - val_fp0.3: 13593902.0000 - val_tn0.3: 3286.0000 - val_fn0.3: 482.0000 -
+     val_precision0.3: 0.1701 - val_recall0.3: 0.9998 - val_tp0.5: 2408678.0000 - val_fp0.5: 5401328.0000 - val_tn0.5: 8195860.0000 - val_fn0.5: 378134.0000 - val_precision0.5: 0.3084 - val_recall0.5: 0.8643 -
+     val_tp0.7: 1879361.0000 - val_fp0.7: 2374034.0000 - val_tn0.7: 11223154.0000 - val_fn0.7: 907451.0000 - val_precision0.7: 0.4418 - val_recall0.7: 0.6744 - val_tp0.9: 1471625.0000 - val_fp0.9: 1406943.0000
+     - val_tn0.9: 12190245.0000 - val_fn0.9: 1315187.0000 - val_precision0.9: 0.5112 - val_recall0.9: 0.5281 - val_accuracy: 0.6472 - val_auc: 0.8207
+    Epoch 2/2
+    400/400 [==============================] - 776s 2s/step - loss: 0.8824 - tp0.1: 4726115.0000 - fp0.1: 9077375.0000 - tn0.1: 18390350.0000 - fn0.1: 574156.0000 - precision0.1: 0.3424 - recall0.1: 0.8917 - t
+    p0.3: 3909726.0000 - fp0.3: 5346504.0000 - tn0.3: 22121232.0000 - fn0.3: 1390545.0000 - precision0.3: 0.4224 - recall0.3: 0.7376 - tp0.5: 2022515.0000 - fp0.5: 1073844.0000 - tn0.5: 26393872.0000 - fn0.5:
+    3277756.0000 - precision0.5: 0.6532 - recall0.5: 0.3816 - tp0.7: 1323051.0000 - fp0.7: 346151.0000 - tn0.7: 27121556.0000 - fn0.7: 3977220.0000 - precision0.7: 0.7926 - recall0.7: 0.2496 - tp0.9: 672639.00
+    00 - fp0.9: 41376.0000 - tn0.9: 27426336.0000 - fn0.9: 4627632.0000 - precision0.9: 0.9421 - recall0.9: 0.1269 - accuracy: 0.8672 - auc: 0.8494 - val_loss: 1.1392 - val_tp0.1: 2121043.0000 - val_fp0.1: 295
+    4319.0000 - val_tn0.1: 10807475.0000 - val_fn0.1: 501163.0000 - val_precision0.1: 0.4179 - val_recall0.1: 0.8089 - val_tp0.3: 1335232.0000 - val_fp0.3: 1482150.0000 - val_tn0.3: 12279644.0000 - val_fn0.3:
+    1286974.0000 - val_precision0.3: 0.4739 - val_recall0.3: 0.5092 - val_tp0.5: 861583.0000 - val_fp0.5: 875078.0000 - val_tn0.5: 12886716.0000 - val_fn0.5: 1760623.0000 - val_precision0.5: 0.4961 - val_recal
+    l0.5: 0.3286 - val_tp0.7: 639908.0000 - val_fp0.7: 477371.0000 - val_tn0.7: 13284423.0000 - val_fn0.7: 1982298.0000 - val_precision0.7: 0.5727 - val_recall0.7: 0.2440 - val_tp0.9: 379220.0000 - val_fp0.9:
+    140139.0000 - val_tn0.9: 13621655.0000 - val_fn0.9: 2242986.0000 - val_precision0.9: 0.7302 - val_recall0.9: 0.1446 - val_accuracy: 0.8391 - val_auc: 0.8195
+    400/400 [==============================] - 149s 372ms/step - loss: 1.0925 - tp0.1: 3741465.0000 - fp0.1: 6254385.0000 - tn0.1: 21834046.0000 - fn0.1: 938104.0000 - precision0.1: 0.3743 - recall0.1: 0.7995
+    - tp0.3: 2384684.0000 - fp0.3: 2773741.0000 - tn0.3: 25314694.0000 - fn0.3: 2294885.0000 - precision0.3: 0.4623 - recall0.3: 0.5096 - tp0.5: 1550871.0000 - fp0.5: 1694065.0000 - tn0.5: 26394368.0000 - fn0.
+    5: 3128698.0000 - precision0.5: 0.4779 - recall0.5: 0.3314 - tp0.7: 1148960.0000 - fp0.7: 978743.0000 - tn0.7: 27109692.0000 - fn0.7: 3530609.0000 - precision0.7: 0.5400 - recall0.7: 0.2455 - tp0.9: 685197
+    .0000 - fp0.9: 312582.0000 - tn0.9: 27775860.0000 - fn0.9: 3994372.0000 - precision0.9: 0.6867 - recall0.9: 0.1464 - accuracy: 0.8528 - auc: 0.8171
+
+    2021/01/24 18:08:52 INFO mlflow.projects: === Run (ID 'd6553c4225df4f2a91a7698955ad879e') succeeded ===
+    (tf-nightly) [ye53nis@node144 drmed-git]$
+  #+end_example
+
+**** test run 4
+    - now, I changed mlflow logging
+      #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
+        git log -3
+      #+END_SRC
+
+      #+RESULTS:
+      #+begin_example
+        (tf-nightly) [ye53nis@node144 drmed-git]$ git log -3
+        commit 03312de53a90d73c7cacea735890c566aae5dada
+        Author: Apoplex <oligolex@vivaldi.net>
+        Date:   Sun Jan 31 13:23:48 2021 +0100
+
+            Modify mlflow
+
+        commit 6d52eb9df66b689db47b0301a441eae3481b380a
+        Author: Apoplex <oligolex@vivaldi.net>
+        Date:   Sun Jan 24 17:30:22 2021 +0100
+
+            Add thresholds to metrics
+
+        commit c0dde2ec15648b3b1164af6cc365b2c1884e946c
+        Author: Apoplex <oligolex@vivaldi.net>
+        Date:   Sun Jan 24 16:32:33 2021 +0100
+
+            Update train.py and MLproject to exp-3105.. state
+        (tf-nightly) [ye53nis@node144 drmed-git]$
+      #+end_example
+
+  #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
+    mlflow run . -P fluotracify_path=/beegfs/ye53nis/drmed-git/src/ -P epochs=2 -P learning_rate=None -P csv_path=/beegfs/ye53nis/saves/firstartifact_Nov2020 -P steps_per_epoch=100 -P validation_steps=100
+  #+END_SRC
+
+  #+RESULTS:
+  #+begin_example
+    (tf-nightly) [ye53nis@node144 drmed-git]$ mlflow run . -P fluotracify_path=/beegfs/ye53nis/drmed-git/src/ -P epochs=2 -P learning_rate=None -P csv_path=/beegfs/ye53nis/saves/firstartifact_Nov2020 -P steps_
+    per_epoch=100 -P validation_steps=100
+    2021/01/31 13:27:51 INFO mlflow.projects.utils: === Created directory /tmp/tmpc9pfwpoh for downloading remote URIs passed to arguments of type 'path' ===
+    2021/01/31 13:27:51 INFO mlflow.projects.backend.local: === Running command 'source /cluster/miniconda3/bin/../etc/profile.d/conda.sh && conda activate mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b 1>&2
+    && python src/fluotracify/training/train.py /beegfs/ye53nis/drmed-git/src 5 0.2 16384 None 2 /beegfs/ye53nis/saves/firstartifact_Nov2020 3 100 100' in run with ID '8d797ea35f0547b0aa24b7a9a8c9b5a9' ===
+
+    2021-01-31 13:28:10.276412: W tensorflow/stream_executor/platform/default/dso_loader.cc:55] Could not load dynamic library 'libcudart.so.10.1'; dlerror: libcudart.so.10.1: cannot open shared object file: N
+    o such file or directory
+
+    2021-01-31 13:28:10.276466: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+    /home/ye53nis/.conda/envs/mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b/lib/python3.8/site-packages/tensorflow/python/framework/load_library.py:23: DeprecationWarning: the imp module is deprecated in fav
+    our of importlib; see the module's documentation for alternative uses
+      import imp
+    2.3.0-dev20200527
+
+    2021-01-31 13:28:23.599897: W tensorflow/stream_executor/platform/default/dso_loader.cc:55] Could not load dynamic library 'libcuda.so.1'; dlerror: libcuda.so.1: cannot open shared object file: No such fil
+    e or directory
+
+    2021-01-31 13:28:23.599937: E tensorflow/stream_executor/cuda/cuda_driver.cc:313] failed call to cuInit: UNKNOWN ERROR (303)
+
+    2021-01-31 13:28:23.599966: I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:156] kernel driver does not appear to be running on this host (node144): /proc/driver/nvidia/version does not exist
+    GPUs:  []
+
+    train 0 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set007.csv
+    train 1 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set007.csv
+    train 2 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set003.csv
+    train 3 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set006.csv
+    train 4 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set006.csv
+    train 5 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set004.csv
+    train 6 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set007.csv
+    train 7 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set004.csv
+    train 8 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set005.csv
+    train 9 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set006.csv
+    train 10 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set004.csv
+    train 11 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set003.csv
+    train 12 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set009.csv
+    train 13 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set004.csv
+    train 14 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set008.csv
+    train 15 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set001.csv
+    train 16 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set003.csv
+    train 17 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set005.csv
+    train 18 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set004.csv
+    train 19 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set009.csv
+    train 20 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set004.csv
+    train 21 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set003.csv
+    train 22 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set004.csv
+    train 23 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set002.csv
+    train 24 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set006.csv
+    train 25 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set009.csv
+    train 26 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set007.csv
+    train 27 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set010.csv
+    train 28 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set003.csv
+    train 29 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set007.csv
+    train 30 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set001.csv
+    train 31 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set001.csv
+    train 32 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set001.csv
+    train 33 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set009.csv
+    train 34 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set002.csv
+    train 35 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set008.csv
+    train 36 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set009.csv
+    train 37 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set007.csv
+    train 38 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set004.csv
+    train 39 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set005.csv
+    train 40 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set002.csv
+    train 41 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set002.csv
+    train 42 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set003.csv
+    train 43 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set002.csv
+    train 44 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set005.csv
+    train 45 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set006.csv
+    train 46 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set008.csv
+    train 47 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set001.csv
+    train 48 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set009.csv
+    train 49 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set006.csv
+    train 50 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set002.csv
+    train 51 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set010.csv
+    train 52 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set001.csv
+    train 53 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set005.csv
+    train 54 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set009.csv
+    train 55 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set001.csv
+    train 56 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set002.csv
+    train 57 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set006.csv
+    train 58 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set004.csv
+    train 59 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set003.csv
+    train 60 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set001.csv
+    train 61 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set002.csv
+    train 62 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set007.csv
+    train 63 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set008.csv
+    train 64 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set010.csv
+    train 65 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set006.csv
+    train 66 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set003.csv
+    train 67 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set005.csv
+    train 68 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set005.csv
+    train 69 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set010.csv
+    train 70 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set010.csv
+    train 71 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set010.csv
+    train 72 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set010.csv
+    train 73 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set008.csv
+    train 74 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set009.csv
+    train 75 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set010.csv
+    train 76 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set001.csv
+    train 77 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set005.csv
+    train 78 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set003.csv
+    train 79 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set008.csv
+    test 80 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set006.csv
+    test 81 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set008.csv
+    test 82 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set002.csv
+    test 83 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set007.csv
+    test 84 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set010.csv
+    test 85 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set006.csv
+    test 86 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set009.csv
+    test 87 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set003.csv
+    test 88 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set009.csv
+    test 89 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set001.csv
+    test 90 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set008.csv
+    test 91 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set007.csv
+    test 92 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set002.csv
+    test 93 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set004.csv
+    test 94 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set010.csv
+    test 95 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set007.csv
+    test 96 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set008.csv
+    test 97 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set005.csv
+    test 98 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set008.csv
+    test 99 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set005.csv
+    The given DataFrame was split into 3 parts with shapes: [(16384, 8000), (16384, 8000), (16384, 8000)]
+    The given DataFrame was split into 3 parts with shapes: [(16384, 2000), (16384, 2000), (16384, 2000)]
+
+    for each 16384 timestap trace there are the following numbers of corrupted timesteps:
+    label001_1    5916
+    label002_1    7367
+    label003_1     954
+    label004_1    2965
+    label005_1       0
+    dtype: int64
+
+    2021-01-31 13:36:14.764579: I tensorflow/core/platform/cpu_feature_guard.cc:142] This TensorFlow binary is optimized with Intel(R) MKL-DNN to use the following CPU instructions in performance-critical oper
+    ations:  AVX2 AVX512F FMA
+    To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+
+    2021-01-31 13:36:14.775626: I tensorflow/core/platform/profile_utils/cpu_utils.cc:104] CPU Frequency: 2300000000 Hz
+
+    2021-01-31 13:36:14.777680: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x561cb660a760 initialized for platform Host (this does not guarantee that XLA will be used). Devices:
+
+    2021-01-31 13:36:14.777727: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): Host, Default Version
+
+    number of training examples: 6400, number of validation examples: 1600
+
+    ------------------------
+    number of test examples: 2000
+
+    input - shape:   (None, 16384, 1)
+    output - shape:  (None, 16384, 1)
+
+    2021-01-31 13:36:22.960149: I tensorflow/core/profiler/lib/profiler_session.cc:163] Profiler session started.
+
+    /home/ye53nis/.conda/envs/mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b/lib/python3.8/site-packages/tensorflow/python/training/tracking/data_structures.py:739: DeprecationWarning: Using or importing the
+    ABCs from 'collections' instead of from 'collections.abc' is deprecated since Python 3.3, and in 3.9 it will stop working
+      if not isinstance(wrapped_dict, collections.Mapping):
+
+      /home/ye53nis/.conda/envs/mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b/lib/python3.8/site-packages/mlflow/utils/autologging_utils.py:60: DeprecationWarning: inspect.getargspec() is deprecated since Pyth
+    on 3.0, use inspect.signature() or inspect.getfullargspec()
+      all_param_names, _, _, all_default_values = inspect.getargspec(fn)  # pylint: disable=W1505
+    Epoch 1/2
+
+    /home/ye53nis/.conda/envs/mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b/lib/python3.8/site-packages/tensorflow/python/framework/indexed_slices.py:347: DeprecationWarning: Using or importing the ABCs from
+     'collections' instead of from 'collections.abc' is deprecated since Python 3.3, and in 3.9 it will stop working
+      if not isinstance(values, collections.Sequence):
+
+      1/100 [..............................] - ETA: 0s - loss: 1.6702 - tp0.1: 5491.0000 - fp0.1: 74812.0000 - tn0.1: 672.0000 - fn0.1: 945.0000 - precision0.1: 0.0684 - recall0.1: 0.8532 - tp0.3: 4049.0000 -
+    fp0.3: 63267.0000 - tn0.3: 12217.0000 - fn0.3: 2387.0000 - precision0.3: 0.0601 - recall0.3: 0.6291 - tp0.5: 2421.0000 - fp0.5: 32134.0000 - tn0.5: 43350.0000 - fn0.5: 4015.0000 - precision0.5: 0.0701 - re
+    call0.5: 0.3762 - tp0.7: 760.0000 - fp0.7: 3691.0000 - tn0.7: 71793.0000 - fn0.7: 5676.0000 - precision0.7: 0.1707 - recall0.7: 0.1181 - tp0.9: 90.0000 - fp0.9: 17.0000 - tn0.9: 75467.0000 - fn0.9: 6346.00
+    00 - precision0.9: 0.8411 - recall0.9: 0.0140 - accuracy: 0.5587 - auc: 0.4262
+
+    2021-01-31 13:36:41.474423: I tensorflow/core/profiler/lib/profiler_session.cc:163] Profiler session started.
+    WARNING:tensorflow:From /home/ye53nis/.conda/envs/mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b/lib/python3.8/site-packages/tensorflow/python/ops/summary_ops_v2.py:1277: stop (from tensorflow.python.eage
+    r.profiler) is deprecated and will be removed after 2020-07-01.
+    Instructions for updating:
+    use `tf.profiler.experimental.stop` instead.
+
+    2021-01-31 13:36:43.418255: I tensorflow/core/profiler/rpc/client/save_profile.cc:176] Creating directory: /tmp/tb/train/plugins/profile/2021_01_31_13_36_43
+    2021-01-31 13:36:43.436068: I tensorflow/core/profiler/rpc/client/save_profile.cc:182] Dumped gzipped tool data for trace.json.gz to /tmp/tb/train/plugins/profile/2021_01_31_13_36_43/node144.trace.json.gz
+    2021-01-31 13:36:43.477032: I tensorflow/core/profiler/rpc/client/save_profile.cc:176] Creating directory: /tmp/tb/train/plugins/profile/2021_01_31_13_36_43
+    2021-01-31 13:36:43.477197: I tensorflow/core/profiler/rpc/client/save_profile.cc:182] Dumped gzipped tool data for memory_profile.json.gz to /tmp/tb/train/plugins/profile/2021_01_31_13_36_43/node144.memor y_profile.json.gz
+    2021-01-31 13:36:43.479950: I tensorflow/python/profiler/internal/profiler_wrapper.cc:111] Creating directory: /tmp/tb/train/plugins/profile/2021_01_31_13_36_43Dumped tool data for xplane.pb to /tmp/tb/tra in/plugins/profile/2021_01_31_13_36_43/node144.xplane.pb
+    Dumped tool data for overview_page.pb to /tmp/tb/train/plugins/profile/2021_01_31_13_36_43/node144.overview_page.pb
+    Dumped tool data for input_pipeline.pb to /tmp/tb/train/plugins/profile/2021_01_31_13_36_43/node144.input_pipeline.pb
+    Dumped tool data for tensorflow_stats.pb to /tmp/tb/train/plugins/profile/2021_01_31_13_36_43/node144.tensorflow_stats.pb
+    Dumped tool data for kernel_stats.pb to /tmp/tb/train/plugins/profile/2021_01_31_13_36_43/node144.kernel_stats.pb
+
+    100/100 [==============================] - ETA: 0s - loss: 1.2287 - tp0.1: 1067775.0000 - fp0.1: 2602073.0000 - tn0.1: 4355671.0000 - fn0.1: 166481.0000 - precision0.1: 0.2910 - recall0.1: 0.8651 - tp0.3:
+    757473.0000 - fp0.3: 860916.0000 - tn0.3: 6096828.0000 - fn0.3: 476783.0000 - precision0.3: 0.4680 - recall0.3: 0.6137 - tp0.5: 495064.0000 - fp0.5: 354737.0000 - tn0.5: 6603007.0000 - fn0.5: 739192.0000 -
+     precision0.5: 0.5826 - recall0.5: 0.4011 - tp0.7: 320707.0000 - fp0.7: 115892.0000 - tn0.7: 6841852.0000 - fn0.7: 913549.0000 - precision0.7: 0.7346 - recall0.7: 0.2598 - tp0.9: 166012.0000 - fp0.9: 21459
+    .0000 - tn0.9: 6936285.0000 - fn0.9: 1068244.0000 - precision0.9: 0.8855 - recall0.9: 0.1345 - accuracy: 0.8665 - auc: 0.8384
+
+    Traceback (most recent call last):
+      File "src/fluotracify/training/train.py", line 200, in <module>
+        model.fit(x=dataset_train,
+      File "/home/ye53nis/.conda/envs/mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b/lib/python3.8/site-packages/mlflow/tensorflow.py", line 831, in fit
+        history = original(self, *args, **kwargs)
+      File "/home/ye53nis/.conda/envs/mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b/lib/python3.8/site-packages/tensorflow/python/keras/engine/training.py", line 108, in _method_wrapper
+        return method(self, *args, **kwargs)
+      File "/home/ye53nis/.conda/envs/mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b/lib/python3.8/site-packages/tensorflow/python/keras/engine/training.py", line 1116, in fit
+        callbacks.on_epoch_end(epoch, epoch_logs)
+      File "/home/ye53nis/.conda/envs/mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b/lib/python3.8/site-packages/tensorflow/python/keras/callbacks.py", line 411, in on_epoch_end
+        callback.on_epoch_end(epoch, numpy_logs)
+      File "src/fluotracify/training/train.py", line 147, in log_plots
+        mlflow.log_figure(figure=figure,
+    AttributeError: module 'mlflow' has no attribute 'log_figure'
+
+    2021/01/31 13:40:43 ERROR mlflow.cli: === Run (ID '8d797ea35f0547b0aa24b7a9a8c9b5a9') failed ===
+
+    (tf-nightly) [ye53nis@node144 drmed-git]$
+  #+end_example
+  looks like mlflow is not installed the right way
+**** test run 5
+     I updated conda.yaml to install mlflow with pip rather than conda-forge,
+     which installed an old version.
+     #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
+        git log -3
+      #+END_SRC
+
+      #+RESULTS:
+      #+begin_example
+        (tf-nightly) [ye53nis@node144 drmed-git]$ git log -3
+        commit 04e80c35264936d6804396af54ae2a68ca521a0a
+        Author: Apoplex <oligolex@vivaldi.net>
+        Date:   Sun Jan 31 14:22:47 2021 +0100
+
+            update conda.yaml
+
+        commit 03312de53a90d73c7cacea735890c566aae5dada
+        Author: Apoplex <oligolex@vivaldi.net>
+        Date:   Sun Jan 31 13:23:48 2021 +0100
+
+            Modify mlflow
+
+        commit 6d52eb9df66b689db47b0301a441eae3481b380a
+        Author: Apoplex <oligolex@vivaldi.net>
+        Date:   Sun Jan 24 17:30:22 2021 +0100
+
+            Add thresholds to metrics
+        (tf-nightly) [ye53nis@node144 drmed-git]$
+      #+end_example
+
+    #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
+      mlflow run . -P fluotracify_path=/beegfs/ye53nis/drmed-git/src/ -P epochs=2 -P learning_rate=None -P csv_path=/beegfs/ye53nis/saves/firstartifact_Nov2020 -P steps_per_epoch=100 -P validation_steps=100
+    #+END_SRC
+
+    #+RESULTS:
+    #+begin_example
+      (tf-nightly) [ye53nis@node144 drmed-git]$ mlflow run . -P fluotracify_path=/beegfs/ye53nis/drmed-git/src/ -P epochs=2 -P learning_rate=None -P csv_path=/beegfs/ye53nis/saves/firstartifact_Nov2020 -P steps_
+      per_epoch=100 -P validation_steps=100
+      2021/01/31 14:28:26 INFO mlflow.utils.conda: === Creating conda environment mlflow-fd9a200e5a24d4c79a0ff13be73ccb5141ed072c ===
+      Collecting package metadata (repodata.json): done
+      Solving environment: done
+
+      Downloading and Extracting Packages
+      ca-certificates-2021 | 121 KB    | ################################################################################################################################################################## | 100%
+      pyparsing-2.4.7      | 59 KB     | ################################################################################################################################################################## | 100%
+      pandas-1.2.1         | 8.9 MB    | ################################################################################################################################################################## | 100%
+      lz4-c-1.9.3          | 186 KB    | ################################################################################################################################################################## | 100%
+      python-dateutil-2.8. | 221 KB    | ################################################################################################################################################################## | 100%
+      readline-8.1         | 362 KB    | ################################################################################################################################################################## | 100%
+      setuptools-52.0.0    | 714 KB    | ################################################################################################################################################################## | 100%
+      Preparing transaction: done
+      Verifying transaction: done
+      Executing transaction: done
+      Installing pip dependencies: \ Ran pip subprocess with arguments:
+      ['/home/ye53nis/.conda/envs/mlflow-fd9a200e5a24d4c79a0ff13be73ccb5141ed072c/bin/python', '-m', 'pip', 'install', '-U', '-r', '/beegfs/ye53nis/drmed-git/condaenv.uitxoel_.requirements.txt']
+      Pip subprocess output:
+      Collecting mlflow
+        Downloading mlflow-1.13.1-py3-none-any.whl (14.1 MB)
+      Requirement already satisfied: python-dateutil in /home/ye53nis/.conda/envs/mlflow-fd9a200e5a24d4c79a0ff13be73ccb5141ed072c/lib/python3.8/site-packages (from mlflow->-r /beegfs/ye53nis/drmed-git/condaenv.u
+      itxoel_.requirements.txt (line 2)) (2.8.1)
+      Requirement already satisfied: pandas in /home/ye53nis/.conda/envs/mlflow-fd9a200e5a24d4c79a0ff13be73ccb5141ed072c/lib/python3.8/site-packages (from mlflow->-r /beegfs/ye53nis/drmed-git/condaenv.uitxoel_.r
+      equirements.txt (line 2)) (1.2.1)
+      Requirement already satisfied: six>=1.10.0 in /home/ye53nis/.conda/envs/mlflow-fd9a200e5a24d4c79a0ff13be73ccb5141ed072c/lib/python3.8/site-packages (from mlflow->-r /beegfs/ye53nis/drmed-git/condaenv.uitxo
+      el_.requirements.txt (line 2)) (1.15.0)
+      Requirement already satisfied: numpy in /home/ye53nis/.conda/envs/mlflow-fd9a200e5a24d4c79a0ff13be73ccb5141ed072c/lib/python3.8/site-packages (from mlflow->-r /beegfs/ye53nis/drmed-git/condaenv.uitxoel_.re
+      quirements.txt (line 2)) (1.19.2)
+      Collecting alembic<=1.4.1
+        Downloading alembic-1.4.1.tar.gz (1.1 MB)
+      Collecting azure-storage-blob>=12.0.0
+        Downloading azure_storage_blob-12.7.1-py2.py3-none-any.whl (339 kB)
+      Collecting azure-core<2.0.0,>=1.10.0
+        Downloading azure_core-1.10.0-py2.py3-none-any.whl (125 kB)
+      Collecting click>=7.0
+        Downloading click-7.1.2-py2.py3-none-any.whl (82 kB)
+      Collecting cryptography>=2.1.4
+        Downloading cryptography-3.3.1-cp36-abi3-manylinux2010_x86_64.whl (2.6 MB)
+      Collecting cffi>=1.12
+        Downloading cffi-1.14.4-cp38-cp38-manylinux1_x86_64.whl (411 kB)
+      Collecting databricks-cli>=0.8.7
+        Downloading databricks-cli-0.14.1.tar.gz (54 kB)
+      Collecting docker>=4.0.0
+        Downloading docker-4.4.1-py2.py3-none-any.whl (146 kB)
+      Collecting gitpython>=2.1.0
+        Downloading GitPython-3.1.12-py3-none-any.whl (159 kB)
+      Collecting gitdb<5,>=4.0.1
+        Downloading gitdb-4.0.5-py3-none-any.whl (63 kB)
+      Collecting msrest>=0.6.18
+        Downloading msrest-0.6.21-py2.py3-none-any.whl (85 kB)
+      Requirement already satisfied: certifi>=2017.4.17 in /home/ye53nis/.conda/envs/mlflow-fd9a200e5a24d4c79a0ff13be73ccb5141ed072c/lib/python3.8/site-packages (from msrest>=0.6.18->azure-storage-blob>=12.0.0->
+      mlflow->-r /beegfs/ye53nis/drmed-git/condaenv.uitxoel_.requirements.txt (line 2)) (2020.12.5)
+      Collecting isodate>=0.6.0
+        Downloading isodate-0.6.0-py2.py3-none-any.whl (45 kB)
+      Collecting protobuf>=3.6.0
+        Downloading protobuf-3.14.0-cp38-cp38-manylinux1_x86_64.whl (1.0 MB)
+      Collecting python-editor>=0.3
+        Downloading python_editor-1.0.4-py3-none-any.whl (4.9 kB)
+      Collecting requests>=2.17.3
+        Downloading requests-2.25.1-py2.py3-none-any.whl (61 kB)
+      Collecting chardet<5,>=3.0.2
+        Downloading chardet-4.0.0-py2.py3-none-any.whl (178 kB)
+      Collecting idna<3,>=2.5
+        Downloading idna-2.10-py2.py3-none-any.whl (58 kB)
+      Collecting requests-oauthlib>=0.5.0
+        Using cached requests_oauthlib-1.3.0-py2.py3-none-any.whl (23 kB)
+      Collecting oauthlib>=3.0.0
+        Using cached oauthlib-3.1.0-py2.py3-none-any.whl (147 kB)
+      Collecting smmap<4,>=3.0.1
+        Downloading smmap-3.0.5-py2.py3-none-any.whl (25 kB)
+      Collecting sqlalchemy
+        Downloading SQLAlchemy-1.3.22-cp38-cp38-manylinux2010_x86_64.whl (1.3 MB)
+      Collecting sqlparse>=0.3.1
+        Downloading sqlparse-0.4.1-py3-none-any.whl (42 kB)
+      Collecting tabulate>=0.7.7
+        Downloading tabulate-0.8.7-py3-none-any.whl (24 kB)
+      Collecting urllib3<1.27,>=1.21.1
+        Downloading urllib3-1.26.3-py2.py3-none-any.whl (137 kB)
+      Collecting websocket-client>=0.32.0
+        Downloading websocket_client-0.57.0-py2.py3-none-any.whl (200 kB)
+      Collecting tf-nightly
+        Downloading tf_nightly-2.5.0.dev20210130-cp38-cp38-manylinux2010_x86_64.whl (403.3 MB)
+      Requirement already satisfied: wheel~=0.35 in /home/ye53nis/.conda/envs/mlflow-fd9a200e5a24d4c79a0ff13be73ccb5141ed072c/lib/python3.8/site-packages (from tf-nightly->-r /beegfs/ye53nis/drmed-git/condaenv.u
+      itxoel_.requirements.txt (line 1)) (0.36.2)
+      Collecting gast==0.4.0
+        Using cached gast-0.4.0-py3-none-any.whl (9.8 kB)
+      Collecting absl-py~=0.10
+        Using cached absl_py-0.11.0-py3-none-any.whl (127 kB)
+      Collecting astunparse~=1.6.3
+        Using cached astunparse-1.6.3-py2.py3-none-any.whl (12 kB)
+      Collecting flatbuffers~=1.12.0
+        Using cached flatbuffers-1.12-py2.py3-none-any.whl (15 kB)
+      Collecting google-pasta~=0.2
+        Using cached google_pasta-0.2.0-py3-none-any.whl (57 kB)
+      Collecting grpcio~=1.34.0
+        Using cached grpcio-1.34.1-cp38-cp38-manylinux2014_x86_64.whl (4.0 MB)
+      Collecting h5py~=3.1.0
+        Using cached h5py-3.1.0-cp38-cp38-manylinux1_x86_64.whl (4.4 MB)
+      Collecting keras-preprocessing~=1.1.2
+        Using cached Keras_Preprocessing-1.1.2-py2.py3-none-any.whl (42 kB)
+      Collecting opt-einsum~=3.3.0
+        Using cached opt_einsum-3.3.0-py3-none-any.whl (65 kB)
+      Collecting tb-nightly~=2.5.0.a
+        Downloading tb_nightly-2.5.0a20210130-py3-none-any.whl (12.3 MB)
+      Requirement already satisfied: setuptools>=41.0.0 in /home/ye53nis/.conda/envs/mlflow-fd9a200e5a24d4c79a0ff13be73ccb5141ed072c/lib/python3.8/site-packages (from tb-nightly~=2.5.0.a->tf-nightly->-r /beegfs/
+      ye53nis/drmed-git/condaenv.uitxoel_.requirements.txt (line 1)) (52.0.0.post20210125)
+      Collecting google-auth<2,>=1.6.3
+        Using cached google_auth-1.24.0-py2.py3-none-any.whl (114 kB)
+      Collecting cachetools<5.0,>=2.0.0
+        Downloading cachetools-4.2.1-py3-none-any.whl (12 kB)
+      Collecting google-auth-oauthlib<0.5,>=0.4.1
+        Using cached google_auth_oauthlib-0.4.2-py2.py3-none-any.whl (18 kB)
+      Collecting markdown>=2.6.8
+        Using cached Markdown-3.3.3-py3-none-any.whl (96 kB)
+      Collecting pyasn1-modules>=0.2.1
+        Using cached pyasn1_modules-0.2.8-py2.py3-none-any.whl (155 kB)
+      Collecting pyasn1<0.5.0,>=0.4.6
+        Using cached pyasn1-0.4.8-py2.py3-none-any.whl (77 kB)
+      Collecting rsa<5,>=3.1.4
+        Using cached rsa-4.7-py3-none-any.whl (34 kB)
+      Collecting tensorboard-plugin-wit>=1.6.0
+        Downloading tensorboard_plugin_wit-1.8.0-py3-none-any.whl (781 kB)
+      Collecting termcolor~=1.1.0
+        Using cached termcolor-1.1.0-py3-none-any.whl
+      Collecting tf-estimator-nightly~=2.5.0.dev
+        Downloading tf_estimator_nightly-2.5.0.dev2021013101-py2.py3-none-any.whl (462 kB)
+      Collecting typing-extensions~=3.7.4
+        Using cached typing_extensions-3.7.4.3-py3-none-any.whl (22 kB)
+      Collecting werkzeug>=0.11.15
+        Downloading Werkzeug-1.0.1-py2.py3-none-any.whl (298 kB)
+      Collecting wrapt~=1.12.1
+        Using cached wrapt-1.12.1-cp38-cp38-linux_x86_64.whl
+      Collecting cloudpickle
+        Downloading cloudpickle-1.6.0-py3-none-any.whl (23 kB)
+      Collecting entrypoints
+        Downloading entrypoints-0.3-py2.py3-none-any.whl (11 kB)
+      Collecting Flask
+        Downloading Flask-1.1.2-py2.py3-none-any.whl (94 kB)
+      Collecting itsdangerous>=0.24
+        Downloading itsdangerous-1.1.0-py2.py3-none-any.whl (16 kB)
+      Collecting Jinja2>=2.10.1
+        Downloading Jinja2-2.11.2-py2.py3-none-any.whl (125 kB)
+      Collecting MarkupSafe>=0.23
+        Downloading MarkupSafe-1.1.1-cp38-cp38-manylinux2010_x86_64.whl (32 kB)
+      Collecting gunicorn
+        Downloading gunicorn-20.0.4-py2.py3-none-any.whl (77 kB)
+      Collecting Mako
+        Downloading Mako-1.1.4.tar.gz (479 kB)
+      Requirement already satisfied: pytz>=2017.3 in /home/ye53nis/.conda/envs/mlflow-fd9a200e5a24d4c79a0ff13be73ccb5141ed072c/lib/python3.8/site-packages (from pandas->mlflow->-r /beegfs/ye53nis/drmed-git/conda
+      env.uitxoel_.requirements.txt (line 2)) (2020.5)
+      Collecting prometheus-flask-exporter
+        Downloading prometheus_flask_exporter-0.18.1.tar.gz (21 kB)
+      Collecting prometheus_client
+        Downloading prometheus_client-0.9.0-py2.py3-none-any.whl (53 kB)
+      Collecting pycparser
+        Downloading pycparser-2.20-py2.py3-none-any.whl (112 kB)
+      Collecting pyyaml
+        Downloading PyYAML-5.4.1-cp38-cp38-manylinux1_x86_64.whl (662 kB)
+      Collecting querystring-parser
+        Downloading querystring_parser-1.2.4-py2.py3-none-any.whl (7.9 kB)
+      Building wheels for collected packages: alembic, databricks-cli, Mako, prometheus-flask-exporter
+        Building wheel for alembic (setup.py): started
+        Building wheel for alembic (setup.py): finished with status 'done'
+        Created wheel for alembic: filename=alembic-1.4.1-py2.py3-none-any.whl size=158155 sha256=04e9a03272dc193ae4beba21b23955b84993725bbcbb76f81f5ce18bf778b29a
+        Stored in directory: /home/ye53nis/.cache/pip/wheels/9d/de/6d/ca8d461ec29e010b1267d7353d0b058819770f7680bb9360e4
+        Building wheel for databricks-cli (setup.py): started
+        Building wheel for databricks-cli (setup.py): finished with status 'done'
+        Created wheel for databricks-cli: filename=databricks_cli-0.14.1-py3-none-any.whl size=100577 sha256=372cd434bffaf63c38e34c4b6e34370bfacfd5e56e49699f100b42355386f4a6
+        Stored in directory: /home/ye53nis/.cache/pip/wheels/f8/a7/7c/74d614edb0dea04c3bb450951ec35c8f62aa197302ad2c3baa
+        Building wheel for Mako (setup.py): started
+        Building wheel for Mako (setup.py): finished with status 'done'
+        Created wheel for Mako: filename=Mako-1.1.4-py2.py3-none-any.whl size=75675 sha256=f5300062dbcbc5518fd139004bc95be880779d80c8c75aa5b537a2abfe433434
+        Stored in directory: /home/ye53nis/.cache/pip/wheels/17/bc/50/621fe4100d907a7296cc00c21371402b068b648820f6ff5812
+        Building wheel for prometheus-flask-exporter (setup.py): started
+        Building wheel for prometheus-flask-exporter (setup.py): finished with status 'done'
+        Created wheel for prometheus-flask-exporter: filename=prometheus_flask_exporter-0.18.1-py3-none-any.whl size=17158 sha256=6d4619160207171ac7eff7b607655b9b1ad67b85d1a85a7cc61f1f6937ebaf35
+        Stored in directory: /home/ye53nis/.cache/pip/wheels/12/1a/8d/0c016e06370d07f82def661b6cb7d91d4e6b4ff7f2982e9f2c
+      Successfully built alembic databricks-cli Mako prometheus-flask-exporter
+      Installing collected packages: urllib3, pyasn1, idna, chardet, rsa, requests, pycparser, pyasn1-modules, oauthlib, MarkupSafe, cachetools, werkzeug, smmap, requests-oauthlib, Jinja2, itsdangerous, isodate,
+       google-auth, click, cffi, websocket-client, tensorboard-plugin-wit, tabulate, sqlalchemy, python-editor, protobuf, prometheus-client, msrest, markdown, Mako, grpcio, google-auth-oauthlib, gitdb, Flask, cr
+      yptography, azure-core, absl-py, wrapt, typing-extensions, tf-estimator-nightly, termcolor, tb-nightly, sqlparse, querystring-parser, pyyaml, prometheus-flask-exporter, opt-einsum, keras-preprocessing, h5p
+      y, gunicorn, google-pasta, gitpython, gast, flatbuffers, entrypoints, docker, databricks-cli, cloudpickle, azure-storage-blob, astunparse, alembic, tf-nightly, mlflow
+      Successfully installed Flask-1.1.2 Jinja2-2.11.2 Mako-1.1.4 MarkupSafe-1.1.1 absl-py-0.11.0 alembic-1.4.1 astunparse-1.6.3 azure-core-1.10.0 azure-storage-blob-12.7.1 cachetools-4.2.1 cffi-1.14.4 chardet-4
+      .0.0 click-7.1.2 cloudpickle-1.6.0 cryptography-3.3.1 databricks-cli-0.14.1 docker-4.4.1 entrypoints-0.3 flatbuffers-1.12 gast-0.4.0 gitdb-4.0.5 gitpython-3.1.12 google-auth-1.24.0 google-auth-oauthlib-0.4
+      .2 google-pasta-0.2.0 grpcio-1.34.1 gunicorn-20.0.4 h5py-3.1.0 idna-2.10 isodate-0.6.0 itsdangerous-1.1.0 keras-preprocessing-1.1.2 markdown-3.3.3 mlflow-1.13.1 msrest-0.6.21 oauthlib-3.1.0 opt-einsum-3.3.
+      0 prometheus-client-0.9.0 prometheus-flask-exporter-0.18.1 protobuf-3.14.0 pyasn1-0.4.8 pyasn1-modules-0.2.8 pycparser-2.20 python-editor-1.0.4 pyyaml-5.4.1 querystring-parser-1.2.4 requests-2.25.1 request
+      s-oauthlib-1.3.0 rsa-4.7 smmap-3.0.5 sqlalchemy-1.3.22 sqlparse-0.4.1 tabulate-0.8.7 tb-nightly-2.5.0a20210130 tensorboard-plugin-wit-1.8.0 termcolor-1.1.0 tf-estimator-nightly-2.5.0.dev2021013101 tf-night
+      ly-2.5.0.dev20210130 typing-extensions-3.7.4.3 urllib3-1.26.3 websocket-client-0.57.0 werkzeug-1.0.1 wrapt-1.12.1
+
+      done
+      #
+      # To activate this environment, use
+      #
+      #     $ conda activate mlflow-fd9a200e5a24d4c79a0ff13be73ccb5141ed072c
+      #
+      # To deactivate an active environment, use
+      #
+      #     $ conda deactivate
+
+      2021/01/31 14:35:51 INFO mlflow.projects.utils: === Created directory /tmp/tmp6qpfe4x0 for downloading remote URIs passed to arguments of type 'path' ===
+      2021/01/31 14:35:51 INFO mlflow.projects.backend.local: === Running command 'source /cluster/miniconda3/bin/../etc/profile.d/conda.sh && conda activate mlflow-fd9a200e5a24d4c79a0ff13be73ccb5141ed072c 1>&2
+      && python src/fluotracify/training/train.py /beegfs/ye53nis/drmed-git/src 5 0.2 16384 None 2 /beegfs/ye53nis/saves/firstartifact_Nov2020 3 100 100' in run with ID 'b8312cc3b85c40fcbdee0a66662e6485' ===
+      2021-01-31 14:36:00.461387: W tensorflow/stream_executor/platform/default/dso_loader.cc:60] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: N
+      o such file or directory
+      2021-01-31 14:36:00.461468: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+      2.5.0-dev20210130
+      2021-01-31 14:36:08.294105: W tensorflow/stream_executor/platform/default/dso_loader.cc:60] Could not load dynamic library 'libcuda.so.1'; dlerror: libcuda.so.1: cannot open shared object file: No such fil
+      e or directory
+      2021-01-31 14:36:08.294206: W tensorflow/stream_executor/cuda/cuda_driver.cc:326] failed call to cuInit: UNKNOWN ERROR (303)
+      2021-01-31 14:36:08.294258: I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:156] kernel driver does not appear to be running on this host (node144): /proc/driver/nvidia/version does not exist
+      GPUs:  []
+      train 0 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set007.csv
+      train 1 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set007.csv
+      train 2 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set003.csv
+      train 3 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set006.csv
+      train 4 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set006.csv
+      train 5 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set004.csv
+      train 6 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set007.csv
+      train 7 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set004.csv
+      train 8 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set005.csv
+      train 9 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set006.csv
+      train 10 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set004.csv
+      train 11 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set003.csv
+      train 12 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set009.csv
+      train 13 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set004.csv
+      train 14 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set008.csv
+      train 15 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set001.csv
+      train 16 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set003.csv
+      train 17 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set005.csv
+      train 18 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set004.csv
+      train 19 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set009.csv
+      train 20 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set004.csv
+      train 21 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set003.csv
+      train 22 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set004.csv
+      train 23 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set002.csv
+      train 24 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set006.csv
+      train 25 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set009.csv
+      train 26 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set007.csv
+      train 27 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set010.csv
+      train 28 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set003.csv
+      train 29 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set007.csv
+      train 30 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set001.csv
+      train 31 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set001.csv
+      train 32 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set001.csv
+      train 33 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set009.csv
+      train 34 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set002.csv
+      train 35 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set008.csv
+      train 36 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set009.csv
+      train 37 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set007.csv
+      train 38 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set004.csv
+      train 39 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set005.csv
+      train 40 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set002.csv
+      train 41 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set002.csv
+      train 42 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set003.csv
+      train 43 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set002.csv
+      train 44 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set005.csv
+      train 45 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set006.csv
+      train 46 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set008.csv
+      train 47 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set001.csv
+      train 48 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set009.csv
+      train 49 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set006.csv
+      train 50 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set002.csv
+      train 51 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set010.csv
+      train 52 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set001.csv
+      train 53 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set005.csv
+      train 54 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set009.csv
+      train 55 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set001.csv
+      train 56 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set002.csv
+      train 57 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set006.csv
+      train 58 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set004.csv
+      train 59 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set003.csv
+      train 60 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set001.csv
+      train 61 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set002.csv
+      train 62 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set007.csv
+      train 63 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set008.csv
+      train 64 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set010.csv
+      train 65 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set006.csv
+      train 66 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set003.csv
+      train 67 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set005.csv
+      train 68 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set005.csv
+      train 69 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set010.csv
+      train 70 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set010.csv
+      train 71 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set010.csv
+      train 72 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set010.csv
+      train 73 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set008.csv
+      train 74 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set009.csv
+      train 75 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set010.csv
+      train 76 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set001.csv
+      train 77 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set005.csv
+      train 78 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set003.csv
+      train 79 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set008.csv
+      test 80 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set006.csv
+      test 81 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set008.csv
+      test 82 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set002.csv
+      test 83 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set007.csv
+      test 84 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set010.csv
+      test 85 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set006.csv
+      test 86 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set009.csv
+      test 87 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set003.csv
+      test 88 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set009.csv
+      test 89 /beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set001.csv
+      test 90 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set008.csv
+      test 91 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set007.csv
+      test 92 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set002.csv
+      test 93 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set004.csv
+      test 94 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set010.csv
+      test 95 /beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set007.csv
+      test 96 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set008.csv
+      test 97 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set005.csv
+      test 98 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set008.csv
+      test 99 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set005.csv
+      The given DataFrame was split into 3 parts with shapes: [(16384, 8000), (16384, 8000), (16384, 8000)]
+      The given DataFrame was split into 3 parts with shapes: [(16384, 2000), (16384, 2000), (16384, 2000)]
+
+      for each 16384 timestap trace there are the following numbers of corrupted timesteps:
+      label001_1    5916
+      label002_1    7367
+      label003_1     954
+      label004_1    2965
+      label005_1       0
+      dtype: int64
+      2021-01-31 14:43:05.348089: I tensorflow/core/platform/cpu_feature_guard.cc:142] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions i
+      n performance-critical operations:  AVX2 AVX512F FMA
+      To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+      number of training examples: 6400, number of validation examples: 1600
+
+      ------------------------
+      number of test examples: 2000
+
+      input - shape:   (None, 16384, 1)
+      output - shape:  (None, 16384, 1)
+      2021-01-31 14:43:12.062974: I tensorflow/core/profiler/lib/profiler_session.cc:126] Profiler session initializing.
+      2021-01-31 14:43:12.063027: I tensorflow/core/profiler/lib/profiler_session.cc:141] Profiler session started.
+      2021-01-31 14:43:12.063091: I tensorflow/core/profiler/lib/profiler_session.cc:158] Profiler session tear down.
+      2021/01/31 14:43:12 INFO mlflow.utils.autologging_utils: tensorflow autologging will track hyperparameters, performance metrics, model artifacts, and lineage information for the current tensorflow workflow
+       to the MLflow run with ID 'b8312cc3b85c40fcbdee0a66662e6485'
+      2021/01/31 14:43:12 WARNING mlflow.utils.autologging_utils: MLflow issued a warning during tensorflow autologging: "/home/ye53nis/.conda/envs/mlflow-fd9a200e5a24d4c79a0ff13be73ccb5141ed072c/lib/python3.8/s
+      ite-packages/mlflow/utils/autologging_utils.py:86: UserWarning: Logging to MLflow failed: Changing param values is not allowed. Param with key='batch_size' was already logged with value='5' for run ID='b83
+      12cc3b85c40fcbdee0a66662e6485'. Attempted logging new value 'None'."
+      Epoch 1/2
+      2021-01-31 14:43:22.942539: I tensorflow/compiler/mlir/mlir_graph_optimization_pass.cc:145] None of the MLIR Optimization Passes are enabled (registered 2)
+      2021-01-31 14:43:23.148047: I tensorflow/core/platform/profile_utils/cpu_utils.cc:114] CPU Frequency: 2300000000 Hz
+        1/100 [..............................] - ETA: 27:41 - loss: 1.7655 - tp0.1: 6179.0000 - fp0.1: 74969.0000 - tn0.1: 583.0000 - fn0.1: 189.0000 - precision0.1: 0.0761 - recall0.1: 0.9703 - tp0.3: 5260.0000
+       - fp0.3: 66819.0000 - tn0.3: 8733.0000 - fn0.3: 1108.0000 - precision0.3: 0.0730 - recall0.3: 0.8260 - tp0.5: 3016.0000 - fp0.5: 46719.0000 - tn0.5: 28833.0000 - fn0.5: 3352.0000 - precision0.5: 0.0606 -
+      recall0.5: 0.4736 - tp0.7: 758.0000 - fp0.7: 10118.0000 - tn0.7: 65434.0000 - fn0.7: 5610.0000 - precision0.7: 0.0697 - recall0.7: 0.1190 - tp0.9: 61.0000 - fp0.9: 112.0000 - tn0.9: 75440.0000 - fn0.9: 630
+      7.0000 - precision0.9: 0.3526 - recall0.9: 0.0096 - accuracy: 0.3888 - auc: 0.41752021-01-31 14:43:29.924205: I tensorflow/core/profiler/lib/profiler_session.cc:126] Profiler session initializing.
+      2021-01-31 14:43:29.924303: I tensorflow/core/profiler/lib/profiler_session.cc:141] Profiler session started.
+        2/100 [..............................] - ETA: 3:10 - loss: 1.6614 - tp0.1: 6758.0000 - fp0.1: 77065.5000 - tn0.1: 36666.5000 - fn0.1: 2390.0000 - precision0.1: 0.0805 - recall0.1: 0.7927 - tp0.3: 5466.00
+      00 - fp0.3: 67437.0000 - tn0.3: 46295.0000 - fn0.3: 3682.0000 - precision0.3: 0.0750 - recall0.3: 0.6508 - tp0.5: 3016.0000 - fp0.5: 46719.0000 - tn0.5: 67013.0000 - fn0.5: 6132.0000 - precision0.5: 0.0606
+       - recall0.5: 0.3632 - tp0.7: 758.0000 - fp0.7: 10118.0000 - tn0.7: 103614.0000 - fn0.7: 8390.0000 - precision0.7: 0.0697 - recall0.7: 0.0913 - tp0.9: 61.0000 - fp0.9: 112.0000 - tn0.9: 113620.0000 - fn0.9
+      : 9087.0000 - precision0.9: 0.3526 - recall0.9: 0.0073 - accuracy: 0.5246 - auc: 0.47642021-01-31 14:43:31.866515: I tensorflow/core/profiler/lib/profiler_session.cc:66] Profiler session collecting data.
+      2021-01-31 14:43:31.914813: I tensorflow/core/profiler/lib/profiler_session.cc:158] Profiler session tear down.
+      2021-01-31 14:43:31.943892: I tensorflow/core/profiler/rpc/client/save_profile.cc:137] Creating directory: /tmp/tb/train/plugins/profile/2021_01_31_14_43_31
+      2021-01-31 14:43:31.959090: I tensorflow/core/profiler/rpc/client/save_profile.cc:143] Dumped gzipped tool data for trace.json.gz to /tmp/tb/train/plugins/profile/2021_01_31_14_43_31/node144.trace.json.gz
+      2021-01-31 14:43:31.986567: I tensorflow/core/profiler/rpc/client/save_profile.cc:137] Creating directory: /tmp/tb/train/plugins/profile/2021_01_31_14_43_31
+      2021-01-31 14:43:31.986925: I tensorflow/core/profiler/rpc/client/save_profile.cc:143] Dumped gzipped tool data for memory_profile.json.gz to /tmp/tb/train/plugins/profile/2021_01_31_14_43_31/node144.memor
+      y_profile.json.gz
+      2021-01-31 14:43:31.992443: I tensorflow/core/profiler/rpc/client/capture_profile.cc:251] Creating directory: /tmp/tb/train/plugins/profile/2021_01_31_14_43_31Dumped tool data for xplane.pb to /tmp/tb/trai
+      n/plugins/profile/2021_01_31_14_43_31/node144.xplane.pb
+      Dumped tool data for overview_page.pb to /tmp/tb/train/plugins/profile/2021_01_31_14_43_31/node144.overview_page.pb
+      Dumped tool data for input_pipeline.pb to /tmp/tb/train/plugins/profile/2021_01_31_14_43_31/node144.input_pipeline.pb
+      Dumped tool data for tensorflow_stats.pb to /tmp/tb/train/plugins/profile/2021_01_31_14_43_31/node144.tensorflow_stats.pb
+      Dumped tool data for kernel_stats.pb to /tmp/tb/train/plugins/profile/2021_01_31_14_43_31/node144.kernel_stats.pb
+
+      100/100 [==============================] - 259s 2s/step - loss: 1.1121 - tp0.1: 594667.6634 - fp0.1: 1262900.4257 - tn0.1: 2220267.4653 - fn0.1: 99273.3564 - precision0.1: 0.3034 - recall0.1: 0.8327 - tp0.
+      3: 454623.3762 - fp0.3: 625205.3762 - tn0.3: 2857962.5149 - fn0.3: 239317.6436 - precision0.3: 0.3888 - recall0.3: 0.6241 - tp0.5: 255692.1683 - fp0.5: 199128.0000 - tn0.5: 3284039.8911 - fn0.5: 438248.851
+      5 - precision0.5: 0.5176 - recall0.5: 0.3466 - tp0.7: 146031.6634 - fp0.7: 59820.5347 - tn0.7: 3423347.3564 - fn0.7: 547909.3564 - precision0.7: 0.6680 - recall0.7: 0.1989 - tp0.9: 86541.7129 - fp0.9: 1387
+      2.6337 - tn0.9: 3469295.2574 - fn0.9: 607399.3069 - precision0.9: 0.8457 - recall0.9: 0.1191 - accuracy: 0.8344 - auc: 0.7971 - val_loss: 457233.2500 - val_tp0.1: 1229162.0000 - val_fp0.1: 6962838.0000 - v
+      al_tn0.1: 0.0000e+00 - val_fn0.1: 0.0000e+00 - val_precision0.1: 0.1500 - val_recall0.1: 1.0000 - val_tp0.3: 1229162.0000 - val_fp0.3: 6962838.0000 - val_tn0.3: 0.0000e+00 - val_fn0.3: 0.0000e+00 - val_pre
+      cision0.3: 0.1500 - val_recall0.3: 1.0000 - val_tp0.5: 1229162.0000 - val_fp0.5: 6962838.0000 - val_tn0.5: 0.0000e+00 - val_fn0.5: 0.0000e+00 - val_precision0.5: 0.1500 - val_recall0.5: 1.0000 - val_tp0.7:
+       1229162.0000 - val_fp0.7: 6962838.0000 - val_tn0.7: 0.0000e+00 - val_fn0.7: 0.0000e+00 - val_precision0.7: 0.1500 - val_recall0.7: 1.0000 - val_tp0.9: 1229162.0000 - val_fp0.9: 6962838.0000 - val_tn0.9: 0
+      .0000e+00 - val_fn0.9: 0.0000e+00 - val_precision0.9: 0.1500 - val_recall0.9: 1.0000 - val_accuracy: 0.1500 - val_auc: 0.5000
+      Epoch 2/2
+      100/100 [==============================] - 229s 2s/step - loss: 0.9542 - tp0.1: 519521.3762 - fp0.1: 1185311.1188 - tn0.1: 2378417.4257 - fn0.1: 93858.9901 - precision0.1: 0.3034 - recall0.1: 0.8277 - tp0.
+      3: 403204.6733 - fp0.3: 663726.0693 - tn0.3: 2900002.4752 - fn0.3: 210175.6931 - precision0.3: 0.3862 - recall0.3: 0.6496 - tp0.5: 185345.9406 - fp0.5: 99511.1089 - tn0.5: 3464217.4356 - fn0.5: 428034.4257
+       - precision0.5: 0.6745 - recall0.5: 0.2955 - tp0.7: 107323.0693 - fp0.7: 27653.8218 - tn0.7: 3536074.7228 - fn0.7: 506057.2970 - precision0.7: 0.8370 - recall0.7: 0.1703 - tp0.9: 51201.7426 - fp0.9: 6938.
+      3465 - tn0.9: 3556790.1980 - fn0.9: 562178.6238 - precision0.9: 0.9170 - recall0.9: 0.0791 - accuracy: 0.8825 - auc: 0.8284 - val_loss: 1.2666 - val_tp0.1: 1040555.0000 - val_fp0.1: 1748377.0000 - val_tn0.
+      1: 5136502.0000 - val_fn0.1: 266566.0000 - val_precision0.1: 0.3731 - val_recall0.1: 0.7961 - val_tp0.3: 913529.0000 - val_fp0.3: 1294318.0000 - val_tn0.3: 5590561.0000 - val_fn0.3: 393592.0000 - val_preci
+      sion0.3: 0.4138 - val_recall0.3: 0.6989 - val_tp0.5: 785575.0000 - val_fp0.5: 1050462.0000 - val_tn0.5: 5834417.0000 - val_fn0.5: 521546.0000 - val_precision0.5: 0.4279 - val_recall0.5: 0.6010 - val_tp0.7:
+       687372.0000 - val_fp0.7: 910608.0000 - val_tn0.7: 5974271.0000 - val_fn0.7: 619749.0000 - val_precision0.7: 0.4302 - val_recall0.7: 0.5259 - val_tp0.9: 565560.0000 - val_fp0.9: 734195.0000 - val_tn0.9: 61
+      50684.0000 - val_fn0.9: 741561.0000 - val_precision0.9: 0.4351 - val_recall0.9: 0.4327 - val_accuracy: 0.8081 - val_auc: 0.8022
+      400/400 [==============================] - 151s 376ms/step - loss: 1.0873 - tp0.1: 3701509.0000 - fp0.1: 5630769.0000 - tn0.1: 22457664.0000 - fn0.1: 978060.0000 - precision0.1: 0.3966 - recall0.1: 0.7910
+      - tp0.3: 3254446.0000 - fp0.3: 4174340.0000 - tn0.3: 23914076.0000 - fn0.3: 1425123.0000 - precision0.3: 0.4381 - recall0.3: 0.6955 - tp0.5: 2807705.0000 - fp0.5: 3397379.0000 - tn0.5: 24691048.0000 - fn0.
+      5: 1871864.0000 - precision0.5: 0.4525 - recall0.5: 0.6000 - tp0.7: 2464880.0000 - fp0.7: 2961952.0000 - tn0.7: 25126486.0000 - fn0.7: 2214689.0000 - precision0.7: 0.4542 - recall0.7: 0.5267 - tp0.9: 20250
+      78.0000 - fp0.9: 2431750.0000 - tn0.9: 25656692.0000 - fn0.9: 2654491.0000 - precision0.9: 0.4544 - recall0.9: 0.4327 - accuracy: 0.8392 - auc: 0.8225
+      2021/01/31 14:54:05 INFO mlflow.projects: === Run (ID 'b8312cc3b85c40fcbdee0a66662e6485') succeeded ===
+      (base) [ye53nis@node144 ~]$
+    #+end_example
+
+*** checking if the trained model works with my workflow before
+**** update tf-nightly to include =lmfit=
+    - we need:
+    - numpy
+    - pandas
+    - matplotlib
+    - seaborn
+    - mlflow
+    - lmfit (needed by =fluotracify.applications.correlate=)
+    - jupyterlab
+    - pip
+    - pip:
+      - tf-nightly
+      - fcsfiles
+      - multipletau
+
+    #+begin_example
+      conda env remove -n tf-nightly
+      conda create -n tf-nightly numpy pandas matplotlib seaborn tifffile jupyterlab pip
+      conda install -n tf-nightly -c conda-forge/label/main mlflow lmfit
+      conda activate tf-nightly
+      (tf-nightly) pip install fcsfiles multipletau tf-nightly
+      #+end_example
+
+    #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session jpmux
+      conda list -n tf-nightly
+    #+END_SRC
+
+    #+RESULTS:
+    #+begin_example
+      (tf-nightly) [ye53nis@node160 /]$ conda list -n tf-nightly
+      # packages in environment at /home/ye53nis/.conda/envs/tf-nightly:
+      #
+      # Name                    Version                   Build  Channel
+      _libgcc_mutex             0.1                        main
+      absl-py                   0.11.0                   pypi_0    pypi
+      alembic                   1.4.1                      py_0    conda-forge/label/main
+      appdirs                   1.4.4              pyh9f0ad1d_0    conda-forge/label/main
+      argon2-cffi               20.1.0           py38h7b6447c_1
+      asn1crypto                1.4.0              pyh9f0ad1d_0    conda-forge/label/main
+      asteval                   0.9.16             pyh5ca1d4c_0    conda-forge/label/main
+      astunparse                1.6.3                    pypi_0    pypi
+      async_generator           1.10               pyhd3eb1b0_0
+      attrs                     20.3.0             pyhd3eb1b0_0
+      azure-core                1.10.0             pyhd8ed1ab_0    conda-forge/label/main
+      azure-storage-blob        12.7.1             pyh44b312d_0    conda-forge/label/main
+      backcall                  0.2.0              pyhd3eb1b0_0
+      blas                      1.0                         mkl
+      bleach                    3.2.3              pyhd3eb1b0_0
+      blinker                   1.4                        py_1    conda-forge/label/main
+      blosc                     1.20.1               hd408876_0
+      brotli                    1.0.9                he6710b0_2
+      brotlipy                  0.7.0           py38h27cfd23_1003
+      brunsli                   0.1                  h2531618_0
+      bzip2                     1.0.8                h7b6447c_0
+      ca-certificates           2020.12.5            ha878542_0    conda-forge/label/main
+      cachetools                4.2.1                    pypi_0    pypi
+      certifi                   2020.12.5        py38h578d9bd_1    conda-forge/label/main
+      cffi                      1.14.4           py38h261ae71_0
+      chardet                   4.0.0           py38h06a4308_1003
+      charls                    2.1.0                he6710b0_2
+      click                     7.1.2              pyh9f0ad1d_0    conda-forge/label/main
+      cloudpickle               1.6.0                      py_0    conda-forge/label/main
+      configparser              5.0.1                      py_0    conda-forge/label/main
+      cryptography              3.3.1            py38h3c74f83_0
+      cycler                    0.10.0                   py38_0
+      databricks-cli            0.9.1                      py_0    conda-forge/label/main
+      dbus                      1.13.18              hb2f20db_0
+      decorator                 4.4.2              pyhd3eb1b0_0
+      defusedxml                0.6.0                      py_0
+      docker-py                 4.4.1            py38h578d9bd_1    conda-forge/label/main
+      docker-pycreds            0.4.0                      py_0    conda-forge/label/main
+      entrypoints               0.3                      py38_0
+      expat                     2.2.10               he6710b0_2
+      fcsfiles                  2020.9.18                pypi_0    pypi
+      flask                     1.1.2              pyh9f0ad1d_0    conda-forge/label/main
+      flatbuffers               1.12                     pypi_0    pypi
+      fontconfig                2.13.0               h9420a91_0
+      freetype                  2.10.4               h5ab3b9f_0
+      future                    0.18.2           py38h578d9bd_3    conda-forge/label/main
+      gast                      0.4.0                    pypi_0    pypi
+      giflib                    5.1.4                h14c3975_1
+      gitdb                     4.0.5                      py_0    conda-forge/label/main
+      gitpython                 3.1.12             pyhd8ed1ab_0    conda-forge/label/main
+      glib                      2.66.1               h92f7085_0
+      google-auth               1.24.0                   pypi_0    pypi
+      google-auth-oauthlib      0.4.2                    pypi_0    pypi
+      google-pasta              0.2.0                    pypi_0    pypi
+      gorilla                   0.3.0                      py_0    conda-forge/label/main
+      grpcio                    1.34.1                   pypi_0    pypi
+      gst-plugins-base          1.14.0               h8213a91_2
+      gstreamer                 1.14.0               h28cd5cc_2
+      gunicorn                  20.0.4           py38h578d9bd_3    conda-forge/label/main
+      h5py                      3.1.0                    pypi_0    pypi
+      icu                       58.2                 he6710b0_3
+      idna                      2.10               pyhd3eb1b0_0
+      imagecodecs               2021.1.11        py38h581e88b_1
+      importlib-metadata        2.0.0                      py_1
+      importlib_metadata        2.0.0                         1
+      intel-openmp              2020.2                      254
+      ipykernel                 5.3.4            py38h5ca1d4c_0
+      ipython                   7.19.0           py38hb070fc8_1
+      ipython_genutils          0.2.0              pyhd3eb1b0_1
+      isodate                   0.6.0                      py_1    conda-forge/label/main
+      itsdangerous              1.1.0                      py_0    conda-forge/label/main
+      jedi                      0.17.0                   py38_0
+      jinja2                    2.11.2             pyhd3eb1b0_0
+      jpeg                      9b                   h024ee3a_2
+      json5                     0.9.5                      py_0
+      jsonschema                3.2.0                      py_2
+      jupyter_client            6.1.7                      py_0
+      jupyter_core              4.7.0            py38h06a4308_0
+      jupyterlab                2.2.6                      py_0
+      jupyterlab_pygments       0.1.2                      py_0
+      jupyterlab_server         1.2.0                      py_0
+      jxrlib                    1.1                  h7b6447c_2
+      keras-preprocessing       1.1.2                    pypi_0    pypi
+      kiwisolver                1.3.0            py38h2531618_0
+      lcms2                     2.11                 h396b838_0
+      ld_impl_linux-64          2.33.1               h53a641e_7
+      lerc                      2.2.1                h2531618_0
+      libaec                    1.0.4                he6710b0_1
+      libdeflate                1.7                  h27cfd23_5
+      libedit                   3.1.20191231         h14c3975_1
+      libffi                    3.3                  he6710b0_2
+      libgcc-ng                 9.1.0                hdf63c60_0
+      libgfortran-ng            7.3.0                hdf63c60_0
+      libpng                    1.6.37               hbc83047_0
+      libprotobuf               3.13.0.1             h8b12597_0    conda-forge/label/main
+      libsodium                 1.0.18               h7b6447c_0
+      libstdcxx-ng              9.1.0                hdf63c60_0
+      libtiff                   4.1.0                h2733197_1
+      libuuid                   1.0.3                h1bed415_2
+      libwebp                   1.0.1                h8e7db2f_0
+      libxcb                    1.14                 h7b6447c_0
+      libxml2                   2.9.10               hb55368b_3
+      libzopfli                 1.0.3                he6710b0_0
+      lmfit                     1.0.1                      py_1    conda-forge/label/main
+      lz4-c                     1.9.3                h2531618_0
+      mako                      1.1.4              pyh44b312d_0    conda-forge/label/main
+      markdown                  3.3.3                    pypi_0    pypi
+      markupsafe                1.1.1            py38h7b6447c_0
+      matplotlib                3.3.2                h06a4308_0
+      matplotlib-base           3.3.2            py38h817c723_0
+      mistune                   0.8.4           py38h7b6447c_1000
+      mkl                       2020.2                      256
+      mkl-service               2.3.0            py38he904b0f_0
+      mkl_fft                   1.2.0            py38h23d657b_0
+      mkl_random                1.1.1            py38h0573a6f_0
+      mlflow                    1.13.1           py38h578d9bd_2    conda-forge/label/main
+      msrest                    0.6.21             pyh44b312d_0    conda-forge/label/main
+      multipletau               0.3.3                    pypi_0    pypi
+      nbclient                  0.5.1                      py_0
+      nbconvert                 6.0.7                    py38_0
+      nbformat                  5.1.2              pyhd3eb1b0_1
+      ncurses                   6.2                  he6710b0_1
+      nest-asyncio              1.4.3              pyhd3eb1b0_0
+      notebook                  6.2.0            py38h06a4308_0
+      numpy                     1.19.2           py38h54aff64_0
+      numpy-base                1.19.2           py38hfa32c7d_0
+      oauthlib                  3.0.1                      py_0    conda-forge/label/main
+      olefile                   0.46                       py_0
+      openjpeg                  2.3.0                h05c96fa_1
+      openssl                   1.1.1i               h27cfd23_0
+      opt-einsum                3.3.0                    pypi_0    pypi
+      packaging                 20.9               pyhd3eb1b0_0
+      pandas                    1.2.1            py38ha9443f7_0
+      pandoc                    2.11                 hb0f4dca_0
+      pandocfilters             1.4.3            py38h06a4308_1
+      parso                     0.8.1              pyhd3eb1b0_0
+      pcre                      8.44                 he6710b0_0
+      pexpect                   4.8.0              pyhd3eb1b0_3
+      pickleshare               0.7.5           pyhd3eb1b0_1003
+      pillow                    8.1.0            py38he98fc37_0
+      pip                       20.3.3           py38h06a4308_0
+      prometheus_client         0.9.0              pyhd3eb1b0_0
+      prometheus_flask_exporter 0.18.1             pyh9f0ad1d_0    conda-forge/label/main
+      prompt-toolkit            3.0.8                      py_0
+      protobuf                  3.13.0.1         py38hadf7658_1    conda-forge/label/main
+      ptyprocess                0.7.0              pyhd3eb1b0_2
+      pyasn1                    0.4.8                    pypi_0    pypi
+      pyasn1-modules            0.2.8                    pypi_0    pypi
+      pycparser                 2.20                       py_2
+      pygments                  2.7.4              pyhd3eb1b0_0
+      pyjwt                     2.0.1              pyhd8ed1ab_0    conda-forge/label/main
+      pyopenssl                 20.0.1             pyhd3eb1b0_1
+      pyparsing                 2.4.7              pyhd3eb1b0_0
+      pyqt                      5.9.2            py38h05f1152_4
+      pyrsistent                0.17.3           py38h7b6447c_0
+      pysocks                   1.7.1            py38h06a4308_0
+      python                    3.8.5                h7579374_1
+      python-dateutil           2.8.1              pyhd3eb1b0_0
+      python-editor             1.0.4                      py_0    conda-forge/label/main
+      python_abi                3.8                      1_cp38    conda-forge/label/main
+      pytz                      2020.5             pyhd3eb1b0_0
+      pyyaml                    5.3.1            py38h8df0ef7_1    conda-forge/label/main
+      pyzmq                     20.0.0           py38h2531618_1
+      qt                        5.9.7                h5867ecd_1
+      querystring_parser        1.2.4                      py_0    conda-forge/label/main
+      readline                  8.1                  h27cfd23_0
+      requests                  2.25.1             pyhd3eb1b0_0
+      requests-oauthlib         1.3.0              pyh9f0ad1d_0    conda-forge/label/main
+      rsa                       4.7                      pypi_0    pypi
+      scipy                     1.5.2            py38h0b6359f_0
+      seaborn                   0.11.1             pyhd3eb1b0_0
+      send2trash                1.5.0              pyhd3eb1b0_1
+      setuptools                52.0.0           py38h06a4308_0
+      sip                       4.19.13          py38he6710b0_0
+      six                       1.15.0           py38h06a4308_0
+      smmap                     4.0.0              pyh44b312d_0    conda-forge/label/main
+      snappy                    1.1.8                he6710b0_0
+      sqlalchemy                1.3.20           py38h1e0a361_0    conda-forge/label/main
+      sqlite                    3.33.0               h62c20be_0
+      sqlparse                  0.4.1              pyh9f0ad1d_0    conda-forge/label/main
+      tabulate                  0.8.7              pyh9f0ad1d_0    conda-forge/label/main
+      tb-nightly                2.5.0a20210130           pypi_0    pypi
+      tensorboard-plugin-wit    1.8.0                    pypi_0    pypi
+      termcolor                 1.1.0                    pypi_0    pypi
+      terminado                 0.9.2            py38h06a4308_0
+      testpath                  0.4.4              pyhd3eb1b0_0
+      tf-estimator-nightly      2.5.0.dev2021020101          pypi_0    pypi
+      tf-nightly                2.5.0.dev20210130          pypi_0    pypi
+      tifffile                  2021.1.14          pyhd3eb1b0_1
+      tk                        8.6.10               hbc83047_0
+      tornado                   6.1              py38h27cfd23_0
+      traitlets                 5.0.5              pyhd3eb1b0_0
+      typing-extensions         3.7.4.3                  pypi_0    pypi
+      uncertainties             3.1.5              pyhd8ed1ab_0    conda-forge/label/main
+      urllib3                   1.26.3             pyhd3eb1b0_0
+      wcwidth                   0.2.5                      py_0
+      webencodings              0.5.1                    py38_1
+      websocket-client          0.57.0           py38h578d9bd_4    conda-forge/label/main
+      werkzeug                  1.0.1              pyh9f0ad1d_0    conda-forge/label/main
+      wheel                     0.36.2             pyhd3eb1b0_0
+      wrapt                     1.12.1                   pypi_0    pypi
+      xz                        5.2.5                h7b6447c_0
+      yaml                      0.2.5                h516909a_0    conda-forge/label/main
+      zeromq                    4.3.3                he6710b0_3
+      zfp                       0.5.5                h2531618_4
+      zipp                      3.4.0              pyhd3eb1b0_0
+      zlib                      1.2.11               h7b6447c_3
+      zstd                      1.4.5                h9ceee32_0
+      (tf-nightly) [ye53nis@node160 /]$
+    #+end_example
+
+
 ** TODOs
 *** TODO use =mlflow.keras.log_model()= instead of tf =model.save=
 #+BEGIN_SRC python
@@ -5623,7 +7620,7 @@ metrics = [tf.keras.metrics.TruePositives(name='tp', thresholds=thresholds),
            tf.keras.metrics.Recall(name='recall', thresholds=thresholds),
            tf.keras.metrics.AUC(num_thresholds=100, name='auc')]
 #+END_SRC
-*** TODO compute metrics vs threshold → there is a =thresholds= argument for =tf.keras.metrics= :)
+*** TODO compute metrics vs threshold → there is a =thresholds= argument for) =tf.keras.metrics= :
 *** TODO Investigate Error on GPU node
 - 2020-04-13 02:45:28.216446: W
   tensorflow/stream_executor/platform/default/dso_loader.cc:55] Could not load
@@ -5648,6 +7645,73 @@ See here: https://github.com/timothycrosley/isort/issues/468#issuecomment-570899
 *** TODO Implement talos 1.0 with mlflow, see [[file:~/Dokumente/org/04_Digital-und-Technik/programmieren.org::*Querying runs programmatically][here]] - or other Hyperparameter optimization
 - an implementation of hyperopt + unet training [[https://www.kaggle.com/yassinealouini/mlflow-hyperopt-u-net-workflo][here]]
 *** TODO [#C] Set up nice package using cookiecutter, poetry, See [[https://stackoverflow.com/questions/49474575/how-to-install-my-own-python-module-package-via-conda-and-watch-its-changes][here]]
+    - actually, I would love to merge the git-org-mode workflow with this data
+      science workflow: https://drivendata.github.io/cookiecutter-data-science/
+    - I would probably do the following structure:
+
+      #+begin_example t
+├── LICENSE
+├── Makefile           <- Makefile with commands like `make data` or `make train`
+├── README.md          <- The top-level README for developers using this project.
+├── data               <- NOT on git
+│   ├── external       <- Data from third party sources.
+│   ├── interim        <- Intermediate data that has been transformed.
+│   ├── processed      <- The final, canonical data sets for modeling.
+|   |-- simulated      <- my simulations would have to go here as well, since large files
+|   |                     can not be reasonably managed with git
+│   └── raw            <- The original, immutable data dump.
+│
+|-- experiments        <- folder for my exp-<date>-<description> folders.
+|-- LabBook.org
+|-- index.html         <- on data branch
+|-- conda.yaml
+|-- MLproject
+├── docs               <- A default Sphinx project; see sphinx-doc.org for details
+│
+├── *mlruns*           <- Trained and serialized models, model predictions, or model summaries
+|                         In my case: the mlflow folder.
+│
+├── notebooks          <- Jupyter notebooks. Naming convention is a number (for ordering),
+│                         the creator's initials, and a short `-` delimited description, e.g.
+│                         `1.0-jqp-initial-data-exploration`.
+│
+├── (references)       <- (Data dictionaries, manuals, and all other explanatory materials.)
+|                         Not really sure if needed, since most explanatory stuff is either in
+|                         ./experiments/ or in index.html
+│
+├── *reports*          <- Generated analysis as HTML, PDF, LaTeX, etc.
+│   └── (figures)      <- Generated graphics and figures to be used in reporting
+|                         Yes, but more precise: there are figures / the open notebook report in
+|                         form of index.html for each experiment. Here, there can be drafts of
+|                         publications. Figures should be produced in the scope of an experiment,
+|                         so that provenance is ensured.
+│
+├── requirements.txt   <- The requirements file for reproducing the analysis environment, e.g.
+│                         generated with `pip freeze > requirements.txt`
+│
+├── setup.py           <- Make this project pip installable with `pip install -e`
+├── src                <- Source code for use in this project.
+|   |                     Yes but: maybe have subfolder for the actual module, so that submodules
+|   |                     can go here as well.
+│   ├── __init__.py    <- Makes src a Python module
+│   │
+│   ├── data           <- Scripts to download or generate data
+│   │   └── make_dataset.py
+│   │
+│   ├── features       <- Scripts to turn raw data into features for modeling
+│   │   └── build_features.py
+│   │
+│   ├── models         <- Scripts to train models and then use trained models to make
+│   │   │                 predictions
+│   │   ├── predict_model.py
+│   │   └── train_model.py
+│   │
+│   └── visualization  <- Scripts to create exploratory and results oriented visualizations
+│       └── visualize.py
+│
+└── tox.ini            <- tox file with settings for running tox; see tox.readthedocs.io
+|                         Interesting! This is standardized testing!
+      #+end_example
 * Reconnect
   :LOGBOOK:
   CLOCK: [2020-05-04 Mo 14:59]--[2020-05-04 Mo 14:59] =>  0:00
@@ -5656,9 +7720,9 @@ See here: https://github.com/timothycrosley/isort/issues/468#issuecomment-570899
 #+CALL: setup-tmux[:session local]
 
 #+RESULTS:
-| ye53nis@ara-login01.rz.uni-jena.de's | password:                            |           |
-| /tmp/tmux-67339/default              |                                      |           |
-| >                                    | ye53nis@ara-login01.rz.uni-jena.de's | password: |
+|         |                                        |           |
+| sh-5.1$ | ye53nis@ara-login01.rz.uni-jena.de's | password: |
+| >       | ye53nis@ara-login01.rz.uni-jena.de's | password: |
 
 Test:
 
@@ -5669,6 +7733,38 @@ Test:
 
 #+RESULTS:
 #+begin_example
+  (base) [ye53nis@login01 drmed-git]$ git status
+  # On branch develop
+  # Untracked files:
+  #   (use "git add <file>..." to include in what will be committed)
+  #
+  #       data/exp-devtest/
+  #       data/exp-test/
+  #       data/mlruns/0/037e1d9e4ad74784974f4aaac11138cc/
+  #       data/mlruns/0/19ccbacbf4334e5496aa8aca189b48f6/
+  #       data/mlruns/0/1d1a38b21990451582bf9b07a9487820/
+  #       data/mlruns/0/1e98b3ed2e1d421da9592058bd5587a8/
+  #       data/mlruns/0/265692a2dfa1437f99a847dd7fe0c8e4/
+  #       data/mlruns/0/306234c75c9c48058cbd694579eff31b/
+  #       data/mlruns/0/67f319f4d8f746ffa6af7c161bdd0a7b/
+  #       data/mlruns/0/7f23f6ba7a244914b3cbbebd731d50a1/
+  #       data/mlruns/0/83913f83a27245e7b16d9847de14e2ed/
+  #       data/mlruns/0/bf2ced34703e42eba1858a9515694a9e/
+  #       data/mlruns/0/d57baeff5b994289bf6ce4c842a87509/
+  #       data/mlruns/0/d9b44dc2e3d44ea1a71129808b642af6/
+  #       data/mlruns/0/e4ad17b5c0e3489f89194eff033a9279/
+  #       data/mlruns/0/f9da7fa18bcd4dd79eee13e35f4a5573/
+  #       data/mlruns/0/fce85613c2724819a168ba0d34cff11d/
+  #       data/mlruns/1/504c8c02948c498fa7485c044b956468/
+  #       data/mlruns/1/6444eabd24a7402a92f895804b01163c/
+  #       data/mlruns/mlruns/
+  #       data/tb/
+  #       experiment_params.csv
+  #       mlruns/
+  #       test.pdf
+  #       test.svg
+  #       tramp.YDPCnB
+  no changes added to commit (use "git add" and/or "git commit -a")
 #+end_example
 
 ** Compute node for script execution
@@ -5678,6 +7774,7 @@ Test:
 
 #+RESULTS:
 #+begin_example
+  (base) [ye53nis@node144 ~]$
 #+end_example
 
 ** Jupyter on Ara
@@ -5691,40 +7788,48 @@ Test:
    srun -p s_standard --time=7-10:00:00 --ntasks-per-node=24 --mem-per-cpu=2000 --pty bash
    #+END_SRC
 
+
 2.
 #+CALL: jpt-tmux[:session jpmux]
 
    #+RESULTS:
    #+begin_example
-     (tf-nightly) [ye53nis@node146 /]$ jupyter lab --no-browser --port=$PORT
-     [I 00:02:39.372 LabApp] JupyterLab extension loaded from /home/ye53nis/.conda/envs/tf-nightly/lib/python3.8/site-packages/jupyterlab
-     [I 00:02:39.372 LabApp] JupyterLab application directory is /home/ye53nis/.conda/envs/tf-nightly/share/jupyter/lab
-     [I 00:02:39.375 LabApp] Serving notebooks from local directory: /
-     [I 00:02:39.375 LabApp] Jupyter Notebook 6.1.4 is running at:
-     [I 00:02:39.375 LabApp] http://localhost:9999/?token=93791464f12bacd92a8343c1a3be84117c0674d5703fd278
-     [I 00:02:39.375 LabApp]  or http://127.0.0.1:9999/?token=93791464f12bacd92a8343c1a3be84117c0674d5703fd278
-     [I 00:02:39.375 LabApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
-     [C 00:02:39.380 LabApp]
+     (tf-nightly) [ye53nis@node160 /]$ conda activate tf-nightly
+     export PORT=9999
+     export XDG_RUNTIME_DIR=''
+     (tf-nightly) [ye53nis@node160 /]$ export PORT=9999
+     (tf-nightly) [ye53nis@node160 /]$ export XDG_RUNTIME_DIR=''
+     (tf-nightly) [ye53nis@node160 /]$ export XDG_RUNTIME_DIR=""
+     (tf-nightly) [ye53nis@node160 /]$ jupyter lab --no-browser --port=$PORT
+     [I 14:11:58.051 LabApp] JupyterLab extension loaded from /home/ye53nis/.conda/envs/tf-nightly/lib/python3.8/site-packages/jupyterlab
+     [I 14:11:58.051 LabApp] JupyterLab application directory is /home/ye53nis/.conda/envs/tf-nightly/share/jupyter/lab
+     [I 14:11:58.058 LabApp] Serving notebooks from local directory: /
+     [I 14:11:58.058 LabApp] Jupyter Notebook 6.2.0 is running at:
+     [I 14:11:58.058 LabApp] http://localhost:9999/?token=d80118038b515848516d103188627079650b880978dd5d01
+     [I 14:11:58.058 LabApp]  or http://127.0.0.1:9999/?token=d80118038b515848516d103188627079650b880978dd5d01
+     [I 14:11:58.058 LabApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+     [C 14:11:58.069 LabApp]
 
          To access the notebook, open this file in a browser:
-             file:///home/ye53nis/.local/share/jupyter/runtime/nbserver-54410-open.html
+             file:///home/ye53nis/.local/share/jupyter/runtime/nbserver-46376-open.html
          Or copy and paste one of these URLs:
-             http://localhost:9999/?token=93791464f12bacd92a8343c1a3be84117c0674d5703fd278
-          or http://127.0.0.1:9999/?token=93791464f12bacd92a8343c1a3be84117c0674d5703fd278
+             http://localhost:9999/?token=d80118038b515848516d103188627079650b880978dd5d01
+          or http://127.0.0.1:9999/?token=d80118038b515848516d103188627079650b880978dd5d01
    #+end_example
 
-#+CALL: ssh-tunnel(port="9999", node="node146")
+#+CALL: ssh-tunnel(port="9999", node="node160")
 
 #+RESULTS:
-| sh-5.0$           | sh-5.0$   | ye53nis@ara-login01.rz.uni-jena.de's | password: |    |          |      |      |             |
-| ye53nis@node146's | password: |                                      |           |    |          |      |      |             |
-| Last              | login:    | Thu                                  | Dec       | 31 | 00:03:16 | 2020 | from | login01.ara |
+|                   |                                        |           |     |   |          |      |      |             |
+| sh-5.1$           | ye53nis@ara-login01.rz.uni-jena.de's | password: |     |   |          |      |      |             |
+| ye53nis@node160's | password:                              |           |     |   |          |      |      |             |
+| Last              | login:                                 | Mon       | Feb | 1 | 09:53:07 | 2021 | from | login01.ara |
 
 I started a Python3 kernel using =jupyter-server-list-kernels=. Then I added the
 kernel ID to the =:PROPERTIES:= drawer of this (and following) subtrees.
 
 #+begin_example
-python3           a37e524a-8134-4d8f-b24a-367acaf1bdd3   a few seconds ago    starting   0
+python3           03038b73-b2b5-49ce-a1dc-21afb6247d0f   a few seconds ago    starting   0
 #+end_example
 
 Test:
@@ -5735,42 +7840,238 @@ Test:
 #+begin_example
   No of CPUs in system: 72
   No of CPUs the current process can use: 24
-  load average: (16.06, 15.99, 15.97)
-  os.uname():  posix.uname_result(sysname='Linux', nodename='node146', release='3.10.0-957.1.3.el7.x86_64', version='#1 SMP Thu Nov 29 14:49:43 UTC 2018', machine='x86_64')
-  PID of process: 56294
-  RAM total: 199G, RAM used: 6.1G, RAM free: 163G
+  load average: (2.5, 9.22, 11.88)
+  os.uname():  posix.uname_result(sysname='Linux', nodename='node157', release='3.10.0-957.1.3.el7.x86_64', version='#1 SMP Thu Nov 29 14:49:43 UTC 2018', machine='x86_64')
+  PID of process: 323378
+  RAM total: 199G, RAM used: 2.6G, RAM free: 169G
   the current directory: /
   My disk usage:
   Filesystem           Size  Used Avail Use% Mounted on
   /dev/sda1             50G  3.2G   47G   7% /
   devtmpfs              94G     0   94G   0% /dev
-  tmpfs                 94G  297M   94G   1% /dev/shm
+  tmpfs                 94G  862M   93G   1% /dev/shm
   tmpfs                 94G  195M   94G   1% /run
   tmpfs                 94G     0   94G   0% /sys/fs/cgroup
-  nfs01-ib:/cluster    2.0T  473G  1.6T  24% /cluster
-  nfs03-ib:/pool/work  100T   70T   31T  70% /nfsdata
-  nfs02-ib:/data01      88T   71T   17T  81% /data01
-  nfs01-ib:/home        80T   71T  9.8T  88% /home
-  /dev/sda3            6.0G  436M  5.6G   8% /var
-  /dev/sda5            2.0G   34M  2.0G   2% /tmp
-  /dev/sda6            169G   12G  157G   7% /local
-  beegfs_nodev         524T  433T   92T  83% /beegfs
+  nfs01-ib:/home        80T   68T   13T  85% /home
+  nfs02-ib:/data01      88T   70T   19T  80% /data01
+  nfs01-ib:/cluster    2.0T  407G  1.7T  20% /cluster
+  nfs03-ib:/pool/work  100T   78T   23T  78% /nfsdata
+  /dev/sda6            169G  9.8G  159G   6% /local
+  /dev/sda3            6.0G  426M  5.6G   7% /var
+  /dev/sda5            2.0G   58M  2.0G   3% /tmp
+  beegfs_nodev         524T  279T  246T  54% /beegfs
   tmpfs                 19G     0   19G   0% /run/user/67339
-  /bin/bash: conda: command not found
+  # packages in environment at /home/ye53nis/.conda/envs/tf-nightly:
+  #
+  # Name                    Version                   Build  Channel
+  _libgcc_mutex             0.1                        main
+  absl-py                   0.11.0                   pypi_0    pypi
+  alembic                   1.4.1                      py_0    conda-forge
+  appdirs                   1.4.4              pyh9f0ad1d_0    conda-forge
+  argon2-cffi               20.1.0           py38h7b6447c_1
+  asn1crypto                1.4.0              pyh9f0ad1d_0    conda-forge
+  asteval                   0.9.16             pyh5ca1d4c_0    conda-forge
+  astunparse                1.6.3                    pypi_0    pypi
+  async_generator           1.10                       py_0
+  attrs                     20.2.0                     py_0
+  azure-core                1.8.2              pyh9f0ad1d_0    conda-forge
+  azure-storage-blob        12.5.0             pyh9f0ad1d_0    conda-forge
+  backcall                  0.2.0                      py_0
+  blas                      1.0                         mkl
+  bleach                    3.2.1                      py_0
+  blinker                   1.4                        py_1    conda-forge
+  brotlipy                  0.7.0           py38h7b6447c_1000
+  ca-certificates           2020.12.5            ha878542_0    conda-forge
+  cachetools                4.1.1                    pypi_0    pypi
+  certifi                   2020.12.5        py38h578d9bd_0    conda-forge
+  cffi                      1.14.3           py38he30daa8_0
+  chardet                   3.0.4                 py38_1003
+  click                     7.1.2              pyh9f0ad1d_0    conda-forge
+  cloudpickle               1.6.0                      py_0    conda-forge
+  configparser              5.0.1                      py_0    conda-forge
+  cryptography              3.1.1            py38h1ba5d50_0
+  cycler                    0.10.0                   py38_0
+  databricks-cli            0.9.1                      py_0    conda-forge
+  dbus                      1.13.18              hb2f20db_0
+  decorator                 4.4.2                      py_0
+  defusedxml                0.6.0                      py_0
+  docker-py                 4.3.1            py38h32f6830_1    conda-forge
+  docker-pycreds            0.4.0                      py_0    conda-forge
+  entrypoints               0.3                      py38_0
+  expat                     2.2.10               he6710b0_2
+  fcsfiles                  2020.9.18                pypi_0    pypi
+  flask                     1.1.2              pyh9f0ad1d_0    conda-forge
+  flatbuffers               1.12                     pypi_0    pypi
+  fontconfig                2.13.0               h9420a91_0
+  freetype                  2.10.4               h5ab3b9f_0
+  future                    0.18.2           py38h578d9bd_2    conda-forge
+  gast                      0.3.3                    pypi_0    pypi
+  gitdb                     4.0.5                      py_0    conda-forge
+  gitpython                 3.1.11                     py_0    conda-forge
+  glib                      2.66.1               h92f7085_0
+  google-auth               1.23.0                   pypi_0    pypi
+  google-auth-oauthlib      0.4.2                    pypi_0    pypi
+  google-pasta              0.2.0                    pypi_0    pypi
+  gorilla                   0.3.0                      py_0    conda-forge
+  grpcio                    1.32.0                   pypi_0    pypi
+  gst-plugins-base          1.14.0               hbbd80ab_1
+  gstreamer                 1.14.0               hb31296c_0
+  gunicorn                  20.0.4           py38h32f6830_2    conda-forge
+  h5py                      2.10.0                   pypi_0    pypi
+  icu                       58.2                 he6710b0_3
+  idna                      2.10                       py_0
+  importlib-metadata        2.0.0                      py_1
+  importlib_metadata        2.0.0                         1
+  intel-openmp              2020.2                      254
+  ipykernel                 5.3.4            py38h5ca1d4c_0
+  ipython                   7.18.1           py38h5ca1d4c_0
+  ipython_genutils          0.2.0                    py38_0
+  isodate                   0.6.0                      py_1    conda-forge
+  itsdangerous              1.1.0                      py_0    conda-forge
+  jedi                      0.17.2                   py38_0
+  jinja2                    2.11.2                     py_0
+  jpeg                      9b                   h024ee3a_2
+  json5                     0.9.5                      py_0
+  jsonschema                3.2.0                      py_2
+  jupyter_client            6.1.7                      py_0
+  jupyter_core              4.6.3                    py38_0
+  jupyterlab                2.2.6                      py_0
+  jupyterlab_pygments       0.1.2                      py_0
+  jupyterlab_server         1.2.0                      py_0
+  keras-preprocessing       1.1.2                    pypi_0    pypi
+  kiwisolver                1.3.0            py38h2531618_0
+  lcms2                     2.11                 h396b838_0
+  ld_impl_linux-64          2.33.1               h53a641e_7
+  libedit                   3.1.20191231         h14c3975_1
+  libffi                    3.3                  he6710b0_2
+  libgcc-ng                 9.1.0                hdf63c60_0
+  libgfortran-ng            7.3.0                hdf63c60_0
+  libpng                    1.6.37               hbc83047_0
+  libprotobuf               3.13.0.1             h8b12597_0    conda-forge
+  libsodium                 1.0.18               h7b6447c_0
+  libstdcxx-ng              9.1.0                hdf63c60_0
+  libtiff                   4.1.0                h2733197_1
+  libuuid                   1.0.3                h1bed415_2
+  libxcb                    1.14                 h7b6447c_0
+  libxml2                   2.9.10               hb55368b_3
+  lmfit                     1.0.1                      py_1    conda-forge
+  lz4-c                     1.9.2                heb0550a_3
+  mako                      1.1.3              pyh9f0ad1d_0    conda-forge
+  markdown                  3.3.3                    pypi_0    pypi
+  markupsafe                1.1.1            py38h7b6447c_0
+  matplotlib                3.3.2                         0
+  matplotlib-base           3.3.2            py38h817c723_0
+  mistune                   0.8.4           py38h7b6447c_1000
+  mkl                       2020.2                      256
+  mkl-service               2.3.0            py38he904b0f_0
+  mkl_fft                   1.2.0            py38h23d657b_0
+  mkl_random                1.1.1            py38h0573a6f_0
+  mlflow                    1.11.0           py38h32f6830_1    conda-forge
+  msrest                    0.6.19             pyh9f0ad1d_0    conda-forge
+  multipletau               0.3.3                    pypi_0    pypi
+  nbclient                  0.5.1                      py_0
+  nbconvert                 6.0.7                    py38_0
+  nbformat                  5.0.8                      py_0
+  ncurses                   6.2                  he6710b0_1
+  nest-asyncio              1.4.1                      py_0
+  notebook                  6.1.4                    py38_0
+  numpy                     1.19.2           py38h54aff64_0
+  numpy-base                1.19.2           py38hfa32c7d_0
+  oauthlib                  3.0.1                      py_0    conda-forge
+  olefile                   0.46                       py_0
+  openssl                   1.1.1h               h516909a_0    conda-forge
+  opt-einsum                3.3.0                    pypi_0    pypi
+  packaging                 20.4                       py_0
+  pandas                    1.1.3            py38he6710b0_0
+  pandoc                    2.11                 hb0f4dca_0
+  pandocfilters             1.4.2                    py38_1
+  parso                     0.7.0                      py_0
+  pcre                      8.44                 he6710b0_0
+  pexpect                   4.8.0                    py38_0
+  pickleshare               0.7.5                 py38_1000
+  pillow                    8.0.1            py38he98fc37_0
+  pip                       20.2.4                   py38_0
+  prometheus_client         0.8.0                      py_0
+  prometheus_flask_exporter 0.18.1             pyh9f0ad1d_0    conda-forge
+  prompt-toolkit            3.0.8                      py_0
+  protobuf                  3.13.0.1         py38h950e882_1    conda-forge
+  ptyprocess                0.6.0                    py38_0
+  pyasn1                    0.4.8                    pypi_0    pypi
+  pyasn1-modules            0.2.8                    pypi_0    pypi
+  pycparser                 2.20                       py_2
+  pygments                  2.7.2              pyhd3eb1b0_0
+  pyjwt                     1.7.1                      py_0    conda-forge
+  pyopenssl                 19.1.0                     py_1
+  pyparsing                 2.4.7                      py_0
+  pyqt                      5.9.2            py38h05f1152_4
+  pyrsistent                0.17.3           py38h7b6447c_0
+  pysocks                   1.7.1                    py38_0
+  python                    3.8.5                h7579374_1
+  python-dateutil           2.8.1                      py_0
+  python-editor             1.0.4                      py_0    conda-forge
+  python_abi                3.8                      1_cp38    conda-forge
+  pytz                      2020.1                     py_0
+  pyyaml                    5.3.1            py38h8df0ef7_1    conda-forge
+  pyzmq                     19.0.2           py38he6710b0_1
+  qt                        5.9.7                h5867ecd_1
+  querystring_parser        1.2.4                      py_0    conda-forge
+  readline                  8.0                  h7b6447c_0
+  requests                  2.24.0                     py_0
+  requests-oauthlib         1.3.0              pyh9f0ad1d_0    conda-forge
+  rsa                       4.6                      pypi_0    pypi
+  scipy                     1.5.2            py38h0b6359f_0
+  seaborn                   0.11.0                     py_0
+  send2trash                1.5.0                    py38_0
+  setuptools                50.3.0           py38hb0f4dca_1
+  sip                       4.19.13          py38he6710b0_0
+  six                       1.15.0                     py_0
+  smmap                     3.0.4              pyh9f0ad1d_0    conda-forge
+  sqlalchemy                1.3.13           py38h516909a_0    conda-forge
+  sqlite                    3.33.0               h62c20be_0
+  sqlparse                  0.4.1              pyh9f0ad1d_0    conda-forge
+  tabulate                  0.8.7              pyh9f0ad1d_0    conda-forge
+  tb-nightly                2.4.0a20201102           pypi_0    pypi
+  tensorboard-plugin-wit    1.7.0                    pypi_0    pypi
+  termcolor                 1.1.0                    pypi_0    pypi
+  terminado                 0.9.1                    py38_0
+  testpath                  0.4.4                      py_0
+  tf-estimator-nightly      2.4.0.dev2020102301          pypi_0    pypi
+  tf-nightly                2.5.0.dev20201029          pypi_0    pypi
+  tifffile                  2020.10.1        py38hdd07704_2
+  tk                        8.6.10               hbc83047_0
+  tornado                   6.0.4            py38h7b6447c_1
+  traitlets                 5.0.5                      py_0
+  typing-extensions         3.7.4.3                  pypi_0    pypi
+  uncertainties             3.1.5              pyhd8ed1ab_0    conda-forge
+  urllib3                   1.25.11                    py_0
+  wcwidth                   0.2.5                      py_0
+  webencodings              0.5.1                    py38_1
+  websocket-client          0.57.0           py38h32f6830_3    conda-forge
+  werkzeug                  1.0.1              pyh9f0ad1d_0    conda-forge
+  wheel                     0.35.1                     py_0
+  wrapt                     1.12.1                   pypi_0    pypi
+  xz                        5.2.5                h7b6447c_0
+  yaml                      0.2.5                h516909a_0    conda-forge
+  zeromq                    4.3.3                he6710b0_3
+  zipp                      3.4.0              pyhd3eb1b0_0
+  zlib                      1.2.11               h7b6447c_3
+  zstd                      1.4.5                h9ceee32_0
+
+  Note: you may need to restart the kernel to use updated packages.
   {'SLURM_CHECKPOINT_IMAGE_DIR': '/var/slurm/checkpoint',
-   'SLURM_NODELIST': 'node146',
+   'SLURM_NODELIST': 'node157',
    'SLURM_JOB_NAME': 'bash',
    'XDG_SESSION_ID': '9639',
-   'SLURMD_NODENAME': 'node146',
-   'SLURM_TOPOLOGY_ADDR': 'node146',
+   'SLURMD_NODENAME': 'node157',
+   'SLURM_TOPOLOGY_ADDR': 'node157',
    'SLURM_NTASKS_PER_NODE': '24',
    'HOSTNAME': 'login01',
    'SLURM_PRIO_PROCESS': '0',
-   'SLURM_SRUN_COMM_PORT': '43120',
+   'SLURM_SRUN_COMM_PORT': '44097',
    'SHELL': '/bin/bash',
    'TERM': 'xterm-color',
    'SLURM_JOB_QOS': 'qstand',
-   'SLURM_PTY_WIN_ROW': '24',
+   'SLURM_PTY_WIN_ROW': '33',
    'HISTSIZE': '1000',
    'TMPDIR': '/tmp',
    'SLURM_TOPOLOGY_ADDR_PATTERN': 'node',
@@ -5788,7 +8089,7 @@ Test:
    'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=01;05;37;41:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.axv=01;35:*.anx=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=01;36:*.au=01;36:*.flac=01;36:*.mid=01;36:*.midi=01;36:*.mka=01;36:*.mp3=01;36:*.mpc=01;36:*.ogg=01;36:*.ra=01;36:*.wav=01;36:*.axa=01;36:*.oga=01;36:*.spx=01;36:*.xspf=01;36:',
    'CONDA_EXE': '/cluster/miniconda3/bin/conda',
    'SLURM_STEP_NUM_NODES': '1',
-   'SLURM_JOBID': '534856',
+   'SLURM_JOBID': '564736',
    'SRUN_DEBUG': '3',
    'SLURM_NTASKS': '24',
    'SLURM_LAUNCH_NODE_IPADDR': '192.168.192.5',
@@ -5796,19 +8097,19 @@ Test:
    'TMUX': '/tmp/tmux-67339/default,27827,6',
    '_CE_CONDA': '',
    'CONDA_PREFIX_1': '/cluster/miniconda3',
-   'SLURM_STEP_LAUNCHER_PORT': '43120',
+   'SLURM_STEP_LAUNCHER_PORT': '44097',
    'SLURM_TASKS_PER_NODE': '24',
    'MAIL': '/var/spool/mail/ye53nis',
    'PATH': '/home/ye53nis/.conda/envs/tf-nightly/bin:/home/lex/Programme/miniconda3/envs/tf-nightly-lab/bin:/home/lex/Programme/miniconda3/condabin:/home/lex/.local/bin:/bin:/usr/bin:/usr/local/bin:/usr/local/sbin:/usr/lib/jvm/default/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/var/lib/snapd/snap/bin:/home/lex/Programme/miniconda3/bin:/usr/sbin:/home/ye53nis/.local/bin:/home/ye53nis/bin',
    'SLURM_WORKING_CLUSTER': 'hpc:192.168.192.1:6817:8448',
-   'SLURM_JOB_ID': '534856',
+   'SLURM_JOB_ID': '564736',
    'CONDA_PREFIX': '/home/ye53nis/.conda/envs/tf-nightly',
    'SLURM_JOB_USER': 'ye53nis',
    'SLURM_STEPID': '0',
    'PWD': '/',
    'SLURM_SRUN_COMM_HOST': '192.168.192.5',
    'LANG': 'en_US.UTF-8',
-   'SLURM_PTY_WIN_COL': '80',
+   'SLURM_PTY_WIN_COL': '205',
    'SLURM_UMASK': '0022',
    'MODULEPATH': '/usr/share/Modules/modulefiles:/etc/modulefiles:/cluster/modulefiles',
    'SLURM_JOB_UID': '67339',
@@ -5816,7 +8117,7 @@ Test:
    'SLURM_NODEID': '0',
    'TMUX_PANE': '%6',
    'SLURM_SUBMIT_DIR': '/',
-   'SLURM_TASK_PID': '53476',
+   'SLURM_TASK_PID': '318640',
    'SLURM_NPROCS': '24',
    'SLURM_CPUS_ON_NODE': '24',
    'SLURM_DISTRIBUTION': 'block',
@@ -5824,8 +8125,8 @@ Test:
    'SLURM_PROCID': '0',
    'HISTCONTROL': 'ignoredups',
    '_CE_M': '',
-   'SLURM_JOB_NODELIST': 'node146',
-   'SLURM_PTY_PORT': '46638',
+   'SLURM_JOB_NODELIST': 'node157',
+   'SLURM_PTY_PORT': '34941',
    'HOME': '/home/ye53nis',
    'SHLVL': '3',
    'SLURM_LOCALID': '0',
@@ -5847,13 +8148,13 @@ Test:
    'LESSOPEN': '||/usr/bin/lesspipe.sh %s',
    'SLURM_STEP_TASKS_PER_NODE': '24',
    'PORT': '9999',
-   'SLURM_STEP_NODELIST': 'node146',
+   'SLURM_STEP_NODELIST': 'node157',
    'DISPLAY': ':0',
    'XDG_RUNTIME_DIR': '',
    'XAUTHORITY': '/home/lex/.Xauthority',
    'BASH_FUNC_module()': '() {  eval `/usr/bin/modulecmd bash $*`\n}',
    '_': '/home/ye53nis/.conda/envs/tf-nightly/bin/jupyter',
-   'JPY_PARENT_PID': '54410',
+   'JPY_PARENT_PID': '318741',
    'CLICOLOR': '1',
    'PAGER': 'cat',
    'GIT_PAGER': 'cat',
@@ -5861,7 +8162,7 @@ Test:
 #+end_example
 
 ** Tensorboard tunnel, Mlflow ui tunnel
-#+CALL: ssh-tunnel[:session local](port="6006", node="node146")
+#+CALL: ssh-tunnel[:session local2](port="6006", node="node146")
 
 #+RESULTS:
 | sh-5.0$           | ye53nis@ara-login01.rz.uni-jena.de's | password: |     |    |          |      |      |             |
@@ -5869,11 +8170,26 @@ Test:
 | Last              | login:                               | Mon       | May | 25 | 13:13:33 | 2020 | from | login01.ara |
 
 
-#+CALL: ssh-tunnel[:session local2](port="5000", node="node181")
+#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session mlflowui
+  conda activate tf-nightly
+  mlflow ui --backend-store-uri file:///beegfs/ye53nis/drmed-git/data/mlruns
+#+END_SRC
 
 #+RESULTS:
-| sh-5.0$           | sh-5.0$     | ye53nis@ara-login01.rz.uni-jena.de's | password:                 |         |    |     |      |    |       |        |   |
-| Warning:          | Permanently | added                                | 'node181,192.168.193.181' | (ECDSA) | to | the | list | of | known | hosts. |   |
-| ye53nis@node181's | password:   |                                      |                           |         |    |     |      |    |       |        |   |
-|                   |             |                                      |                           |         |    |     |      |    |       |        |   |
-|                   |             |                                      |                           |         |    |     |      |    |       |        |   |
+#+begin_example
+  (tf-nightly) [ye53nis@login01 ~]$ mlflow ui --backend-store-uri file:///beegfs/ye53nis/drmed-git/data/mlruns
+  [2021-01-31 12:06:49 +0100] [46856] [INFO] Starting gunicorn 20.0.4
+  [2021-01-31 12:06:49 +0100] [46856] [INFO] Listening at: http://127.0.0.1:5000 (46856)
+  [2021-01-31 12:06:49 +0100] [46856] [INFO] Using worker: sync
+  [2021-01-31 12:06:49 +0100] [46862] [INFO] Booting worker with pid: 46862
+#+end_example
+
+#+CALL: ssh-tunnel[:session local3](port="5000", node="login01")
+
+#+RESULTS:
+|                   |             |                                        |                         |         |          |      |      |                |       |          |
+| sh-5.1$           | sh-5.1$     | ye53nis@ara-login01.rz.uni-jena.de's | password:               |         |          |      |      |                |       |          |
+| Warning:          | Permanently | added                                  | 'login01,192.168.192.5' | (ECDSA) |       to |  the | list |             of | known | hosts. |
+| ye53nis@login01's | password:   |                                        |                         |         |          |      |      |                |       |          |
+| bind:             | Address     | already                                | in                      | use   |          |      |      |                |       |          |
+| Last              | login:      | Sun                                    | Jan                     | 31      | 12:07:58 | 2021 | from | 10.231.178.189 |       |          |
