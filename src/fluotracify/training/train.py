@@ -33,8 +33,7 @@ if __name__ == "__main__":
     LEARNING_RATE = sys.argv[5] if len(sys.argv) > 5 else 1e-5
     EPOCHS = int(sys.argv[6]) if len(sys.argv) > 6 else 10
     CSV_PATH = sys.argv[7] if len(
-        sys.argv
-    ) > 7 else '/home/lex/Programme/Jupyter/DOKTOR/saves/firstartefact/subsample_rand/'
+        sys.argv) > 7 else '/home/lex/Programme/Jupyter/DOKTOR/saves/firstartefact/subsample_rand/'
     COL_PER_EXAMPLE = int(sys.argv[8]) if len(sys.argv) > 8 else 3
     LOG_DIR_TB = "/tmp/tb"
     # FIXME (PENDING): at some point, I want to plot metrics vs thresholds
@@ -48,22 +47,35 @@ if __name__ == "__main__":
         frac_train=0.8,
         col_per_example=COL_PER_EXAMPLE,
         dropindex=None,
-        dropcolumns='Unnamed: 200')
+        dropcolumns=None)
 
-    train_data, train_labels = isfc.separate_data_and_labels(
-        array=train, nsamples=nsamples, col_per_example=COL_PER_EXAMPLE)
-    test_data, test_labels = isfc.separate_data_and_labels(
-        array=test, nsamples=nsamples, col_per_example=COL_PER_EXAMPLE)
+    train_sep = isfc.separate_data_and_labels(array=train,
+                                              nsamples=nsamples,
+                                              col_per_example=COL_PER_EXAMPLE)
 
-    # get bool as ground truth
+    test_sep = isfc.separate_data_and_labels(array=test,
+                                             nsamples=nsamples,
+                                             col_per_example=COL_PER_EXAMPLE)
+
+    # '0': trace with artifact
+    # '1': just the simulated artifact (label for unet)
+    # '2': whole trace without artifact (label for vae)
+
+    train_data = train_sep['0']
+    train_labels = train_sep['1']
     train_labels_bool = train_labels > 0.04
 
+    test_data = test_sep['0']
+    test_labels = test_sep['1']
     test_labels_bool = test_labels > 0.04
-    print('\nfor each 20,000 timestap trace there are the following numbers '
-          'of corrupted timesteps:\n', test_labels_bool.sum(axis=0).head())
+
+    print('\nfor each {} timestap trace there are the following numbers '
+          'of corrupted timesteps:\n{}'.format(
+              LENGTH_DELIMITER,
+              test_labels_bool.sum(axis=0).head()))
 
     # Cleanup
-    del train, test
+    del train, test, train_sep, test_sep
 
     dataset_train, dataset_val, num_train_examples, num_val_examples = ppd.tfds_from_pddf_for_unet(
         features_df=train_data,
