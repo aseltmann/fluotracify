@@ -35,12 +35,17 @@ if __name__ == "__main__":
     CSV_PATH = sys.argv[7] if len(
         sys.argv) > 7 else '/home/lex/Programme/Jupyter/DOKTOR/saves/firstartefact/subsample_rand/'
     COL_PER_EXAMPLE = int(sys.argv[8]) if len(sys.argv) > 8 else 3
+    STEPS_PER_EPOCH = int(sys.argv[9]) if len(sys.argv) > 9 else 10
+    VALIDATION_STEPS = int(sys.argv[10]) if len(sys.argv) > 10 else 10
     LOG_DIR_TB = "/tmp/tb"
+    LABEL_THRESH = 0.04
     # FIXME (PENDING): at some point, I want to plot metrics vs thresholds
     # from TF side, this is possible by providing the `thresholds`
     # argument as a list of thresholds
     # but currently, mlflow does not support logging lists
     METRICS_THRESHOLDS = 0.5
+    EXP_PARAM_PATH = '/tmp/experiment_params.csv'
+
     train, test, nsamples, experiment_params = isfc.import_from_csv(
         folder=CSV_PATH,
         header=12,
@@ -48,6 +53,8 @@ if __name__ == "__main__":
         col_per_example=COL_PER_EXAMPLE,
         dropindex=None,
         dropcolumns=None)
+
+    experiment_params.to_csv(EXP_PARAM_PATH)
 
     train_sep = isfc.separate_data_and_labels(array=train,
                                               nsamples=nsamples,
@@ -63,11 +70,11 @@ if __name__ == "__main__":
 
     train_data = train_sep['0']
     train_labels = train_sep['1']
-    train_labels_bool = train_labels > 0.04
+    train_labels_bool = train_labels > LABEL_THRESH
 
     test_data = test_sep['0']
     test_labels = test_sep['1']
-    test_labels_bool = test_labels > 0.04
+    test_labels_bool = test_labels > LABEL_THRESH
 
     print('\nfor each {} timestap trace there are the following numbers '
           'of corrupted timesteps:\n{}'.format(
@@ -172,11 +179,9 @@ if __name__ == "__main__":
 
     model.fit(x=dataset_train,
               epochs=EPOCHS,
-              steps_per_epoch=int(
-                  tf.math.ceil(num_train_examples / BATCH_SIZE).numpy()),
+              steps_per_epoch=STEPS_PER_EPOCH,
               validation_data=dataset_val,
-              validation_steps=int(
-                  tf.math.ceil(num_val_examples / BATCH_SIZE).numpy()),
+              validation_steps=VALIDATION_STEPS,
               callbacks=[tensorboard_callback, image_callback, lr_callback])
 
     model.evaluate(dataset_test,
@@ -188,3 +193,8 @@ if __name__ == "__main__":
         conda_env=mlflow.keras.get_default_conda_env(keras_module=tf.keras),
         custom_objects={'binary_ce_dice': bm.binary_ce_dice_loss()},
         keras_module=tf.keras)
+
+    mlflow.log_artifact(EXP_PARAM_PATH)
+    mlflow.log_params({'num_train_examples': num_train_examples,
+                       'num_val_examples': num_val_examples,
+                       'num_test_examples': num_test_examples})

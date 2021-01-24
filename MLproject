@@ -13,4 +13,6 @@ entry_points:
       epochs: {type: float, default: 10}
       csv_path: {type: path, default: ~/Programme/Jupyter/DOKTOR/saves/firstartefact/subsample_rand/}
       col_per_example: {type: float, default: 3}
-    command: "python src/fluotracify/training/train.py {fluotracify_path} {batch_size} {frac_val} {length_delimiter} {learning_rate} {epochs} {csv_path} {col_per_example}"
+      steps_per_epoch: {type: float, default: 10}
+      validation_steps: {type: float, default: 10}
+    command: "python src/fluotracify/training/train.py {fluotracify_path} {batch_size} {frac_val} {length_delimiter} {learning_rate} {epochs} {csv_path} {col_per_example} {steps_per_epoch} {validation_steps}"
