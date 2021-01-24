@@ -43,7 +43,7 @@ if __name__ == "__main__":
     # from TF side, this is possible by providing the `thresholds`
     # argument as a list of thresholds
     # but currently, mlflow does not support logging lists
-    METRICS_THRESHOLDS = 0.5
+    METRICS_THRESHOLDS = [0.1, 0.3, 0.5, 0.7, 0.9]
     EXP_PARAM_PATH = '/tmp/experiment_params.csv'
 
     train, test, nsamples, experiment_params = isfc.import_from_csv(
@@ -159,21 +159,23 @@ if __name__ == "__main__":
     lr_callback = tf.keras.callbacks.LearningRateScheduler(lr_schedule)
     image_callback = tf.keras.callbacks.LambdaCallback(on_epoch_end=log_plots)
 
-    metrics = [
-        tf.keras.metrics.TruePositives(name='tp',
-                                       thresholds=METRICS_THRESHOLDS),
-        tf.keras.metrics.FalsePositives(name='fp',
-                                        thresholds=METRICS_THRESHOLDS),
-        tf.keras.metrics.TrueNegatives(name='tn',
-                                       thresholds=METRICS_THRESHOLDS),
-        tf.keras.metrics.FalseNegatives(name='fn',
-                                        thresholds=METRICS_THRESHOLDS),
-        tf.keras.metrics.Precision(name='precision',
-                                   thresholds=METRICS_THRESHOLDS),
-        tf.keras.metrics.Recall(name='recall', thresholds=METRICS_THRESHOLDS),
-        tf.keras.metrics.BinaryAccuracy(name='accuracy', threshold=0.5),
-        tf.keras.metrics.AUC(num_thresholds=100, name='auc')
-    ]
+    metrics = []
+    for thresh in METRICS_THRESHOLDS:
+        metrics.append(tf.keras.metrics.TruePositives(
+            name='tp{}'.format(thresh), thresholds=thresh))
+        metrics.append(tf.keras.metrics.FalsePositives(
+            name='fp{}'.format(thresh), thresholds=thresh))
+        metrics.append(tf.keras.metrics.TrueNegatives(
+            name='tn{}'.format(thresh), thresholds=thresh))
+        metrics.append(tf.keras.metrics.FalseNegatives(
+            name='fn{}'.format(thresh), thresholds=thresh))
+        metrics.append(tf.keras.metrics.Precision(
+            name='precision{}'.format(thresh), thresholds=thresh))
+        metrics.append(tf.keras.metrics.Recall(
+            name='recall{}'.format(thresh), thresholds=thresh))
+    metrics.append(tf.keras.metrics.BinaryAccuracy(
+        name='accuracy', threshold=0.5))
+    metrics.append(tf.keras.metrics.AUC(num_thresholds=100, name='auc'))
 
     model.compile(loss=loss, optimizer=optimizer, metrics=metrics)
 
