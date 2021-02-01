@@ -104,6 +104,7 @@ def plot_distribution_of_correlations_by_label_thresholds(
     labels : pandas DataFrame
         Contains ground truth information of the simulated artifacts for
         each time step
+
     Returns
     -------
     Plot with subplot of xunit on the left and subplot of trace lengths on the

@@ -222,19 +222,16 @@ def binary_ce_dice_loss(axis=-1, smooth=1e-5):
 
     Notes
     -----
-    this function was influenced by code from
+    - this function was influenced by code from
         - TensorLayer project
         https://tensorlayer.readthedocs.io/en/latest/modules/cost.html#tensorlayer.cost.dice_coe,
         - Lars Nieradzik
         https://lars76.github.io/neural-networks/object-detection/losses-for-segmentation/
         - Code by Stefan Hoffmann, Applied Systems Biology group,
         Hans-Knöll-Institute Jena
-    To be able to load the custom loss function in Keras, it must only take
-    (y_true, y_pred) as parameters - that is why this setup seems so
-    complicated.
-
-    Note
-    ----
+    - To be able to load the custom loss function in Keras, it must only take
+      (y_true, y_pred) as parameters - that is why this setup seems so
+      complicated.
     - binary crossentropy returns a tensor with loss for each 1D step of a
     trace, bringing local info
     - dice loss returns a scalar for each 1D trace, bringing global info
