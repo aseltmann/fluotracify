@@ -76,22 +76,38 @@ def correlate(trace, fwhm, diffrate, time_step=1., verbose=True):
         if diffrate is not None:
             print('simulated diffusion rate: {}'.format(diffrate))
         print('\n')
-    return diffrate_calc, transit_time, (out[:, 0], out[:,
-                                                        1], fit, residual_var)
+    return diffrate_calc, transit_time, (out[:, 0], out[:, 1],
+                                         fit, residual_var)
 
 
-def correlation_of_arbitrary_trace(ntraces, traces_of_interest, fwhm):
+def correlation_of_arbitrary_trace(ntraces,
+                                   traces_of_interest,
+                                   fwhm,
+                                   time_step,
+                                   length_delimiter=None):
+    """Takes pandas DataFrame of fluorescence traces ordered columnwise and
+    performs an autocorrelation analysis on each trace
+    Parameters
+    ----------
+    ntraces : int
+        Number of ntraces from given DataFrames to choose for correlation
+    traces_of_interest : Pandas DataFrame
+        Contains the traces columnwise
+    fwhm : float
+        The full width half maximum of the excitation beam in nm. Used for
+        Calculation of the diffusion coefficient.
+    """
     diffrates_arb = []
     transit_times_arb = []
     tracelen_arb = []
 
     for ntraces_index in range(ntraces):
-        trace_arb = traces_of_interest.iloc[:, ntraces_index]
+        trace_arb = traces_of_interest.iloc[:length_delimiter, ntraces_index]
 
         diff_arb, trans_arb, _ = correlate(trace=trace_arb,
                                            fwhm=fwhm,
                                            diffrate=None,
-                                           time_step=1.,
+                                           time_step=time_step,
                                            verbose=False)
         diffrates_arb.append(diff_arb)
         transit_times_arb.append(trans_arb)
