@@ -121,7 +121,6 @@ def tfds_from_pddf_for_vgg(features_df,
         use all traces
     zoomvector : tuple or list of uneven, positive integers
         Multiplier for each zoom level (zoom window = zoomvector * win_len)
-
     label_threshold : float
         Threshold defining when a trace is to be labelled as corrupted
     BATCH_SIZE : int
@@ -149,7 +148,6 @@ def tfds_from_pddf_for_vgg(features_df,
     _NUM_CLASSES : int
         Number of classes / labels for one-hot operation on y_tensor (not yet
         implemented)
-
     """
 
     features_df = features_df.iloc[:, ntraces_index:(ntraces_index +
@@ -194,7 +192,7 @@ def tfds_from_pddf_for_vgg(features_df,
             ntraces_delimiter=ntraces_delimiter,
             zoomvector=zoomvector)
         X_temp = tf.convert_to_tensor(value=X_window.values)
-        X_tensor = tf.concat([X_tensor, X_temp], axis=0)
+        X_tensor = tf.concat(values=[X_tensor, X_temp], axis=0)
 
         y_window = _get_windowed_y_labels_from_pandasdf(
             index=idx,
@@ -203,7 +201,7 @@ def tfds_from_pddf_for_vgg(features_df,
             ntraces_delimiter=ntraces_delimiter,
             label_threshold=label_threshold)
         y_temp = tf.convert_to_tensor(value=y_window.values)
-        y_tensor = tf.concat([y_tensor, y_temp], axis=0)
+        y_tensor = tf.concat(values=[y_tensor, y_temp], axis=0)
 
     if verbose:
         print('this is the shape, dtype and an example of the features after '
@@ -258,12 +256,49 @@ def tfds_from_pddf_for_vgg(features_df,
     return dataset_test, _NUM_EXAMPLES_total
 
 
-def pandasdf_preprocessing(features_df,
-                           win_len,
-                           ntraces_index,
-                           ntraces_delimiter,
-                           zoomvector,
-                           verbose=True):
+def unet_preprocessing(features_df, length_delimiter, ntraces_index):
+    """Preprocessing for UNET for application / deployment
+
+    This function preprocesses one trace from a pandas DataFrames containing
+    1D fluorescence traces and preprocesses it so that it can be fed for
+    prediction to the UNET trained in the fluotracfiy project
+
+    Parameters
+    ----------
+    features_df : pandas DataFrames
+        Contain features ordered columnwise in the manner: feature_1,
+        feature_2, ...
+    length_delimiter : int, optional
+        Length of the output traces in the returned dataset. If None, then the
+        whole length of the DataFrame is used
+    ntraces_index : int
+        Index of trace used (which column to pick out of features_df)
+
+    Returns
+    -------
+    X : numpy array
+        Contains input features with original input values
+    X_norm : numpy array
+        Contains features after preprocessing for model application
+    """
+    # handle different lengths of traces of experimental data
+    features_df = features_df.iloc[:length_delimiter,
+                                   ntraces_index:(ntraces_index + 1)]
+    features_df = features_df.dropna()
+
+    X = np.array(features_df).flatten()
+    X_norm = min_max_normalize_tensor(X, axis=0)
+    X_norm = np.reshape(X_norm, newshape=(1, -1, 1))
+
+    return X, X_norm
+
+
+def vgg_preprocessing(features_df,
+                      win_len,
+                      ntraces_index,
+                      ntraces_delimiter,
+                      zoomvector,
+                      verbose=True):
     """Does the preprocessing like in the training pipeline (zoom levels,
     window length) for arbitrary fluorescence traces
 

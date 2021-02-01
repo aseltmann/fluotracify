@@ -129,6 +129,7 @@ def predict_traces(dataset, model, num_rows, num_cols, batch_to_sample,
 
     plt.show()
 
+
 def plot_trace_and_pred_from_df(df, ntraces, model):
     fig, ax = plt.subplots(ntraces, figsize=(16, ntraces*2))
 
@@ -140,6 +141,7 @@ def plot_trace_and_pred_from_df(df, ntraces, model):
         ax[i].plot(pred_trace / np.max(pred_trace))
         ax[i].plot(prediction)
     return fig
+
 
 def plot_trace_and_pred_from_tfds(dataset, ntraces, model):
     fig, ax = plt.subplots(ntraces, figsize=(16, ntraces*2))
