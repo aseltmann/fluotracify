@@ -2,14 +2,17 @@
 microscopy data by machines from PicoQuant"""
 
 import io
+import os
 import struct
 import sys
 import time
+from pathlib import Path
 
 import numpy as np
+import pandas as pd
 
 
-def import_ptu_to_memory(inputfilepath, outputfilepath=None):
+def import_ptu_to_memory(inputfilepath, outputfilepath=None, verbose=True):
     """imports PicoQuant ptu files and returns the contents as numpy arrays.
 
     Parameters
@@ -18,6 +21,9 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
         Path to PTU file to read
     outputfilepath : str, optional
         If outputfilepath is given, the metadata is printed in the given file.
+    verbose : bool
+        if True, prints out information while processing
+
 
     Returns
     -------
@@ -102,10 +108,8 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
     # stripped
     magic = inputfile.read(8).decode("utf-8").strip('\0')
     if magic != "PQTTTR":
-        print("ERROR: Magic invalid, this is not a PTU file.")
         inputfile.close()
-        # outputfile.close()  # commented out, since not necessary
-        sys.exit(0)
+        raise ValueError("ERROR: Magic invalid, this is not a PTU file.")
 
     version = inputfile.read(8).decode("utf-8").strip('\0')
     if outputfilepath is not None:
@@ -194,8 +198,7 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
                 outputfile.write("<Binary blob with %d bytes>" % tagInt)
             tagDataList.append((evalName, tagInt))
         else:
-            print("ERROR: Unknown tag type")
-            sys.exit(0)
+            raise ValueError("ERROR: Unknown tag type")
         if tagIdent == "Header_End":
             break
 
@@ -206,7 +209,8 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
     # get important variables from headers
     numRecords = tagValues[tagNames.index("TTResult_NumberOfRecords")]
     globRes = tagValues[tagNames.index("MeasDesc_GlobalResolution")]
-    print("Writing %d records, this may take a while..." % numRecords)
+    if verbose:
+        print("Writing %d records, this may take a while..." % numRecords)
 
     # prepare dictionary as output of function
     out = {}  # contains np.arrays with photons, truetimes and dtimes
@@ -255,10 +259,8 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
                 recordData = "{0:0{1}b}".format(
                     struct.unpack("<I", inputfile.read(4))[0], 32)
             except:
-                print(
-                    "The file ended earlier than expected, at record %d/%d." %
-                    (recNum, numRecords))
-                sys.exit(0)
+                raise ValueError('The file ended earlier than expected, at'
+                                 'record %d/%d.' % (recNum, numRecords))
 
             channel = int(recordData[0:4], base=2)
             dtime = int(recordData[4:16], base=2)
@@ -279,9 +281,10 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
                 gotPhoton(truensync, channel, dtime)
                 dlen += 1
             if recNum % 100000 == 0:
-                sys.stdout.write("\rProgress: %.1f%%" %
-                                 (float(recNum) * 100 / float(numRecords)))
-                sys.stdout.flush()
+                if verbose:
+                    sys.stdout.write("\rProgress: %.1f%%" %
+                                     (float(recNum) * 100 / float(numRecords)))
+                    sys.stdout.flush()
 
     def readPT2():
         global inputfile, outputfile, recNum, oflcorrection, numRecords
@@ -291,10 +294,8 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
                 recordData = "{0:0{1}b}".format(
                     struct.unpack("<I", inputfile.read(4))[0], 32)
             except:
-                print(
-                    "The file ended earlier than expected, at record %d/%d." %
-                    (recNum, numRecords))
-                sys.exit(0)
+                raise ValueError('The file ended earlier than expected, at'
+                                 'record %d/%d.' % (recNum, numRecords))
 
             channel = int(recordData[0:4], base=2)
             dtime = int(recordData[4:32], base=2)
@@ -318,9 +319,10 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
                 truetime = oflcorrection + dtime
                 gotPhoton(truetime, channel, dtime)
             if recNum % 100000 == 0:
-                sys.stdout.write("\rProgress: %.1f%%" %
-                                 (float(recNum) * 100 / float(numRecords)))
-                sys.stdout.flush()
+                if verbose:
+                    sys.stdout.write("\rProgress: %.1f%%" %
+                                     (float(recNum) * 100 / float(numRecords)))
+                    sys.stdout.flush()
 
     def readHT3(version):
         global inputfile, outputfile, recNum, oflcorrection, numRecords
@@ -331,10 +333,8 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
                 recordData = "{0:0{1}b}".format(
                     struct.unpack("<I", inputfile.read(4))[0], 32)
             except:
-                print(
-                    "The file ended earlier than expected, at record %d/%d." %
-                    (recNum, numRecords))
-                sys.exit(0)
+                raise ValueError('The file ended earlier than expected, at'
+                                 'record %d/%d.' % (recNum, numRecords))
 
             special = int(recordData[0:1], base=2)
             channel = int(recordData[1:7], base=2)
@@ -357,9 +357,10 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
                 truensync = oflcorrection + nsync
                 gotPhoton(timeTag=truensync, channel=channel, dtime=dtime)
             if recNum % 100000 == 0:
-                sys.stdout.write("\rProgress: %.1f%%" %
-                                 (float(recNum) * 100 / float(numRecords)))
-                sys.stdout.flush()
+                if verbose:
+                    sys.stdout.write("\rProgress: %.1f%%" %
+                                     (float(recNum) * 100 / float(numRecords)))
+                    sys.stdout.flush()
 
     def readHT2(version):
         global inputfile, outputfile, recNum, oflcorrection, numRecords
@@ -370,10 +371,8 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
                 recordData = "{0:0{1}b}".format(
                     struct.unpack("<I", inputfile.read(4))[0], 32)
             except:
-                print(
-                    "The file ended earlier than expected, at record %d/%d." %
-                    (recNum, numRecords))
-                sys.exit(0)
+                raise ValueError('The file ended earlier than expected, at'
+                                 'record %d/%d.' % (recNum, numRecords))
 
             special = int(recordData[0:1], base=2)
             channel = int(recordData[1:7], base=2)
@@ -402,9 +401,10 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
                 truetime = oflcorrection + timetag
                 gotPhoton(truetime, channel + 1, 0)
             if recNum % 100000 == 0:
-                sys.stdout.write("\rProgress: %.1f%%" %
-                                 (float(recNum) * 100 / float(numRecords)))
-                sys.stdout.flush()
+                if verbose:
+                    sys.stdout.write("\rProgress: %.1f%%" %
+                                     (float(recNum) * 100 / float(numRecords)))
+                    sys.stdout.flush()
 
     oflcorrection = 0
     dlen = 0
@@ -413,91 +413,102 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None):
     recordType = tagValues[tagNames.index("TTResultFormat_TTTRRecType")]
     if recordType == rtPicoHarpT2:
         isT2 = True
-        print("PicoHarp T2 data")
+        if verbose:
+            print("PicoHarp T2 data")
         if outputfilepath is not None:
             outputfile.write("PicoHarp T2 data\n")
             outputfile.write("\nrecord# chan   nsync truetime/ps\n")
         readPT2()
     elif recordType == rtPicoHarpT3:
         isT2 = False
-        print("PicoHarp T3 data")
+        if verbose:
+            print("PicoHarp T3 data")
         if outputfilepath is not None:
             outputfile.write("PicoHarp T3 data\n")
             outputfile.write("\nrecord# chan   nsync truetime/ns dtime\n")
         readPT3()
     elif recordType == rtHydraHarpT2:
         isT2 = True
-        print("HydraHarp V1 T2 data")
+        if verbose:
+            print("HydraHarp V1 T2 data")
         if outputfilepath is not None:
             outputfile.write("HydraHarp V1 T2 data\n")
             outputfile.write("\nrecord# chan   nsync truetime/ps\n")
         readHT2(1)
     elif recordType == rtHydraHarpT3:
         isT2 = False
-        print("HydraHarp V1 T3 data")
+        if verbose:
+            print("HydraHarp V1 T3 data")
         if outputfilepath is not None:
             outputfile.write("HydraHarp V1 T3 data\n")
             outputfile.write("\nrecord# chan   nsync truetime/ns dtime\n")
         readHT3(1)
     elif recordType == rtHydraHarp2T2:
         isT2 = True
-        print("HydraHarp V2 T2 data")
+        if verbose:
+            print("HydraHarp V2 T2 data")
         if outputfilepath is not None:
             outputfile.write("HydraHarp V2 T2 data\n")
             outputfile.write("\nrecord# chan   nsync truetime/ps\n")
         readHT2(2)
     elif recordType == rtHydraHarp2T3:
         isT2 = False
-        print("HydraHarp V2 T3 data")
+        if verbose:
+            print("HydraHarp V2 T3 data")
         if outputfilepath is not None:
             outputfile.write("HydraHarp V2 T3 data\n")
             outputfile.write("\nrecord# chan   nsync truetime/ns dtime\n")
         readHT3(2)
     elif recordType == rtTimeHarp260NT3:
         isT2 = False
-        print("TimeHarp260N T3 data")
+        if verbose:
+            print("TimeHarp260N T3 data")
         if outputfilepath is not None:
             outputfile.write("TimeHarp260N T3 data\n")
             outputfile.write("\nrecord# chan   nsync truetime/ns dtime\n")
         readHT3(2)
     elif recordType == rtTimeHarp260NT2:
         isT2 = True
-        print("TimeHarp260N T2 data")
+        if verbose:
+            print("TimeHarp260N T2 data")
         if outputfilepath is not None:
             outputfile.write("TimeHarp260N T2 data\n")
             outputfile.write("\nrecord# chan   nsync truetime/ps\n")
         readHT2(2)
     elif recordType == rtTimeHarp260PT3:
         isT2 = False
-        print("TimeHarp260P T3 data")
+        if verbose:
+            print("TimeHarp260P T3 data")
         if outputfilepath is not None:
             outputfile.write("TimeHarp260P T3 data\n")
             outputfile.write("\nrecord# chan   nsync truetime/ns dtime\n")
         readHT3(2)
     elif recordType == rtTimeHarp260PT2:
         isT2 = True
-        print("TimeHarp260P T2 data")
+        if verbose:
+            print("TimeHarp260P T2 data")
         if outputfilepath is not None:
             outputfile.write("TimeHarp260P T2 data\n")
             outputfile.write("\nrecord# chan   nsync truetime/ps\n")
         readHT2(2)
     elif recordType == rtMultiHarpNT3:
         isT2 = False
-        print("MultiHarp150N T3 data")
+        if verbose:
+            print("MultiHarp150N T3 data")
         if outputfilepath is not None:
             outputfile.write("MultiHarp150N T3 data\n")
             outputfile.write("\nrecord# chan   nsync truetime/ns dtime\n")
         readHT3(2)
     elif recordType == rtMultiHarpNT2:
         isT2 = True
-        print("MultiHarp150N T2 data")
+        if verbose:
+            print("MultiHarp150N T2 data")
         if outputfilepath is not None:
             outputfile.write("MultiHarp150N T2 data\n")
             outputfile.write("\nrecord# chan   nsync truetime/ps\n")
         readHT2(2)
     else:
-        print("ERROR: Unknown record type")
-        sys.exit(0)
+        raise ValueError('ERROR: Unknown record type')
 
     inputfile.close()
     if outputfilepath is not None:
@@ -559,18 +570,59 @@ def calc_coincidence_value(time_series1, time_series2):
     return CV
 
 
-def process_tcspc_data(chan_arr, dtime_arr, true_time_arr):
-    """takes micro and macro times from tcspc data and processes photon decay
+def process_tcspc_data(chan_arr,
+                       dtime_arr,
+                       true_time_arr,
+                       photon_count_bin,
+                       verbose=True):
+    """Process tcspc data from .ptu files and return a timetrace
+    Takes micro and macro times from tcspc data and processes photon decay
     and time series data.
+
+    Parameters
+    ----------
+    chan_arr : np.ndarray of integers
+        Recording channel number for each recorded event
+    dtime_arr : np.ndarray of integers
+        Micro time of each event in ns (lifetime of each photon)
+    true_time_arr : np.ndarray of integers
+        Macro time of the whole recording in ns (absolute time when each
+        photon arrived)
+    photon_count_bin : integer
+        Size of bin in ns which shall be used to construct the time trace.
+        E.g. 1e6 gives a time trace binned to ms, 1e3 gives a time trace binned
+        to us
+    verbose : bool
+        if True, prints out information while processing
+
+    Returns
+    -------
+    tcspc : dict of np.arrays
+        if num_of_ch == 1 it contains
+            tcspc['photon_decay_ch1'] : photon decay function (y)
+            tcspc['decay_scale1'] : photon decay function (x)
+            tcspc['time_series1'] : time series of trace in ms (y)
+            tcspc['time_series_scale1'] : time series of trace in ms (x)
+        if num_of_ch == 2 it contains the above + additionally
+            tcspc['photon_decay_ch2'] : photon decay function channel 2 (y)
+            tcspc['decay_scale2'] : photon decay function channel 2 (x)
+            tcspc['time_series2'] : time series of trace in ms ch 2 (y)
+            tcspc['time_series_scale2'] : time series of trace ch 2 (x)
+    num_of_ch : integer
+        number of detected channels
+
+    Raises
+    ------
+    ValueError
+        if number of channels is not 1 or 2
 
     Notes
     -----
     code is adopted from Dominic Waithe's Focuspoint package:
     https://github.com/dwaithe/FCS_point_correlator/blob/master/focuspoint/correlation_objects.py#L110"""
+    # this is used for the photon decay curve
     win_int = 10
-    # see below: since true_time_arr is in ns and we divide by 1e6, we get a
-    # binning in ms
-    photon_count_bin = 1
+
     tcspc = {}
     # Number of channels there are in the files.
     ch_present = np.sort(np.unique(np.array(chan_arr)))
@@ -586,8 +638,9 @@ def process_tcspc_data(chan_arr, dtime_arr, true_time_arr):
         num_of_ch -= 1
         ch_present += 1
 
-    print('\nnumber of channels which recorded photon counts: {}\n'.format(
-        num_of_ch))
+    if verbose:
+        print('\nnumber of channels which recorded photon counts: {}\n'.format(
+            num_of_ch))
 
     # Calculates decay function for both channels.
     photon_decay_ch1, decay_scale1 = time2bin(time_arr=np.array(dtime_arr),
@@ -597,10 +650,10 @@ def process_tcspc_data(chan_arr, dtime_arr, true_time_arr):
     # Time series of photon counts. For visualisation.
     time_series1, time_series_scale1 = time2bin(
         # timeseries in ms (without conversion high computational cost)
-        time_arr=np.array(true_time_arr) / 1000000,
+        time_arr=np.array(true_time_arr) / photon_count_bin,
         chan_arr=np.array(chan_arr),
         chan_num=ch_present[0],
-        win_int=photon_count_bin)
+        win_int=1)
     #################################################
     # FUNCTIONAL, BUT OUTPUT NOT USED AT THE MOMENT #
     #################################################
@@ -635,10 +688,10 @@ def process_tcspc_data(chan_arr, dtime_arr, true_time_arr):
                                                   chan_num=ch_present[1],
                                                   win_int=win_int)
         time_series2, time_series_scale2 = time2bin(
-            time_arr=np.array(true_time_arr) / 1000000,
+            time_arr=np.array(true_time_arr) / photon_count_bin,
             chan_arr=np.array(chan_arr),
             chan_num=ch_present[1],
-            win_int=photon_count_bin)
+            win_int=1)
         #################################################
         # FUNCTIONAL, BUT OUTPUT NOT USED AT THE MOMENT #
         #################################################
@@ -665,7 +718,106 @@ def process_tcspc_data(chan_arr, dtime_arr, true_time_arr):
         tcspc['time_series2'] = time_series2
         tcspc['time_series_scale2'] = time_series_scale2
     else:
-        print('unsupported number of channels')
-        return
+        raise ValueError(
+            '{} is an unsupported number of channels'.format(num_of_ch))
 
     return tcspc, num_of_ch
+
+
+def import_from_ptu(path, photon_count_bin, file_delimiter=None, verbose=False):
+    """Import .ptu files containing TCSPC data
+    Import a directory of .ptu files containing TCSPC data, convert them to
+    time traces and output them in one pandas DataFrame orderd columnwise. This
+    pipeline is useful for feeding the data to a machine learning model for
+    prediction.
+    Parameters
+    ----------
+    path : str
+        Folder which contains .ptu files with data
+    photon_count_bin : integer
+        Size of bin in ns which shall be used to construct the time trace.
+        E.g. 1e6 gives a time trace binned to ms, 1e3 gives a time trace binned
+        to us
+    file_delimiter : int or None
+        If None, read in all files in path. If set to an integer, this is the
+        maximum number of .ptu files which will be read in. This is useful for
+        test purposes, since reading in even a single file takes quite some
+        time.
+    Returns
+    -------
+    ptu_exps_data : pandas DataFrame
+        Contains time traces ordered columnwise
+    ptu_exps_metadata : pandas DataFrame
+        Contains ptu header metadata + num_of_ch from process_tcspc_data
+    Raises
+    ------
+    ValueError
+        If import_ptu_to_memory fails (probably the .ptu file is not
+        compatible)
+    ValueError
+        If number of channels is greater 1 (see below)
+    Notes
+    -----
+    - At the moment, the ptu helper functions can read in traces with up to 2
+      channels, but I have not yet written a way to decide which photons to
+      take, if there are two channels, so only one channel
+      (tcspc['time_series1']) is supported.
+    - parameters which could be easily implemented:
+      + supply outputfilepath to import_ptu_to_memory() to export the header
+        metadata to  txt files
+    - functions which need some more thinking:
+      + how to deal with multiple channels
+      + implement different binning windows for the time traces (in function
+        process_tcspc_data())
+    """
+
+    path = Path(path)
+    files = [f for f in os.listdir(path) if f.endswith('.ptu')]
+
+    ptu_exps_metadata = pd.DataFrame()
+    ptu_exps_data = pd.DataFrame()
+
+    for idx, file in enumerate(files):
+        file = Path(file)
+        path_and_file = path / file
+        if verbose:
+            print('{} of {}: {}'.format(idx, len(files), path_and_file))
+
+        try:
+            out, tag_data_list, _, __ = import_ptu_to_memory(
+                inputfilepath=path_and_file, verbose=False)
+        except ValueError:
+            raise ValueError('A problem occurred while reading .ptu files')
+
+        processed_tcspc, num_of_ch = process_tcspc_data(
+            chan_arr=out['chanArr'],
+            dtime_arr=out['dTimeArr'],
+            true_time_arr=out['trueTimeArr'],
+            photon_count_bin=photon_count_bin,
+            verbose=False)
+
+        if num_of_ch > 1:
+            raise ValueError('Recordings with more than one input channel'
+                             'are currently not supported.')
+
+        ptu_exp_data = pd.DataFrame(processed_tcspc['time_series1'])
+        ptu_exp_data = ptu_exp_data.apply(pd.to_numeric, downcast='float')
+        ptu_exps_data = pd.concat([ptu_exps_data, ptu_exp_data],
+                                  axis=1,
+                                  ignore_index=True,
+                                  sort=False)
+
+        ptu_exp_numofch = pd.DataFrame([['Number of Channels', num_of_ch]])
+        ptu_exp_metadata = pd.DataFrame(tag_data_list)
+        ptu_exp_metadata = pd.concat([ptu_exp_metadata, ptu_exp_numofch],
+                                     axis=0,
+                                     ignore_index=True,
+                                     sort=False)
+        ptu_exps_metadata = pd.concat([ptu_exps_metadata, ptu_exp_metadata],
+                                      axis=1,
+                                      ignore_index=True,
+                                      sort=False)
+
+        if file_delimiter is not None and (idx + 1) > file_delimiter:
+            break
+    return ptu_exps_data, ptu_exps_metadata
