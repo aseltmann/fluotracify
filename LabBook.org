@@ -10,8 +10,9 @@
 #+HTML_HEAD_EXTRA: <style type="text/css">pre.src-python {background-color: #E6EDF4;}</style>
 #+HTML_HEAD_EXTRA: <style type="text/css">pre.src-jupyter-python {background-color: #FAEAE1;}</style>
 
-* README
-** General:
+* Technical Notes
+** README
+*** General:
    - This file corresponds to my lab book for my doctoral thesis tackling
      artifact correction in Fluorescence Correlation Spectroscopy (FCS)
      measurements using Deep Neural Networks. It also contains notes taken
@@ -36,7 +37,7 @@
      confidential meeting with a colleague), which might otherwise be noted in a
      normal Lab notebook: do not include them here. Only notes relevant to the
      current project should be taken
-** Code block languages used in this document
+*** Code block languages used in this document
 
    #+BEGIN_SRC sh
      # This is a sh block for shell / bash scripting. In the context of this file,
@@ -82,7 +83,7 @@
      yellow colour (#FBFBBF)
    #+end_example
 
-** Experiments workflow:
+*** Experiments workflow:
    1) Create a new branch from =master=
    2) Print out the git log from the latest commit and the metadata
    3) Call the analysis scripts, follow the principles outlined in
@@ -92,42 +93,42 @@
    5) Add a "** #experiment-name" section to this file under [[* Data]]
    6) Commit/push the results of this separate branch
    7) Merge this new branch with the remote =data= branch
-** Example for experimental setup procedure
+*** Example for experimental setup procedure
 
-*** Setting starting a jupyter kernel from a remote jupyter session using =emacs-jupyter= in =org babel=
+**** Setting starting a jupyter kernel from a remote jupyter session using =emacs-jupyter= in =org babel=
     :PROPERTIES:
     :CUSTOM_ID: sec-jupyter-setup
     :END:
 
-** tools used (notes)
-*** Emacs =magit=
+*** tools used (notes)
+**** Emacs =magit=
    - =gitflow-avh= (=magit-flow=) to follow the flow
    - possibly https://github.com/magit/magit-annex for large files. Follow this:
      https://git-annex.branchable.com/walkthrough/
    - maybe check out git-toolbelt at some point
      https://github.com/nvie/git-toolbelt#readme with
      https://nvie.com/posts/git-power-tools/
-*** jupyter
+**** jupyter
    - emacs jupyter for running and connecting to kernel on server:
      https://github.com/dzop/emacs-jupyter
    - if I actually still would use .ipynb files, these might come handy:
      + jupytext: https://github.com/mwouts/jupytext
      + nbstripout: https://github.com/kynan/nbstripout
-*** mlflow
+**** mlflow
    - https://docs.faculty.ai/user-guide/experiments/index.html and
      https://docs.microsoft.com/en-us/azure/databricks/_static/notebooks/hls-image-processing/02-image-segmentation-dl.html
-*** tensorflow
+**** tensorflow
    - https://www.tensorflow.org/tensorboard/image_summaries
 
-* Template for data entry and setup notes:
-** exp-#date-#title
-*** git:
+** Template for data entry and setup notes:
+*** exp-#date-#title
+**** git:
 
     #+begin_src sh
     git log -1
     #+end_src
 
-*** System Metadata:
+**** System Metadata:
 
     #+NAME: jp-metadata
     #+BEGIN_SRC jupyter-python :var _long="true"
@@ -154,7 +155,7 @@
 
     #+END_SRC
 
-*** Tmux setup and scripts
+**** Tmux setup and scripts
     :PROPERTIES:
     :CUSTOM_ID: scripts-tmux
     :END:
@@ -174,7 +175,7 @@
     | /tmp/tmux-67339/default              |                                      |           |                                                |    |      |      |    |           |
     | >                                    | ye53nis@ara-login01.rz.uni-jena.de's | password: |                                                |    |      |      |    |           |
 
-*** SSH tunneling
+**** SSH tunneling
     :PROPERTIES:
     :CUSTOM_ID: ssh-tunneling
     :END:
@@ -193,7 +194,7 @@
     - TensorBoard
     - Mlflow ui
 
-*** jupyter scripts
+**** jupyter scripts
     :PROPERTIES:
     :CUSTOM_ID: scripts-jp
     :END:
@@ -222,8 +223,8 @@
     locally to connect to the notebook. If you close Emacs, it would need to be
     reestablished
 
-** Setup notes
-*** Setting up a tmux connection from using =ob-tmux= in =org-babel=
+*** Setup notes
+**** Setting up a tmux connection from using =ob-tmux= in =org-babel=
     :PROPERTIES:
     :CUSTOM_ID: sec-tmux-setup
     :END:
@@ -274,7 +275,7 @@
       =#+begin_example=-Block below the tmux block by pressing =C-c C-o= or =C-c
       C-v C-o= when the pointer is inside the tmux block.
 
-*** =emacs-jupyter= Setup
+**** =emacs-jupyter= Setup
 
     =Emacs-jupyter= aims to be an API for a lot of functionalities of the
     =jupyter= project. The documentation can be found on [[https://github.com/dzop/emacs-jupyter][GitHub]].
@@ -319,15 +320,15 @@
             pressing =Shift-TAB= in Jupyter notebooks)
           - =C-c C-i= to interrupt the kernel, =C-c C-r= to restart the kernel
 
-* Organization of git
-** remote/origin/master branch:
+** Organization of git
+*** remote/origin/master branch:
   - contains all the source code in folder **src/** which is used for experiments.
   - contains the **LabBook.org** template
   - contains setup- and metadata files such as **MLproject** or **conda.yaml**
   - the log contains only lasting alterations on the folders and files mentioned
     above, which are e.g. used for conducting experiments or which introduce new
     features. Day-to-day changes in code
-** remote/origin/exp### branches:
+*** remote/origin/exp### branches:
   - if an experiment is done, the code and templates will be branched out from
     *master* in an *#experiment-name* branch, ### meaning some meaningful
     descriptor.
@@ -341,21 +342,21 @@
       scripts or calling the code from the **scr/** directory).
     - All other steps taken during an experiment are noted down, as well as
       conclusions or my thought process while conducting the experiment
-    - Provenance data, such as metadata about the environment the code was
-      executed in, the command line output of the code, and some plots
-** remote/origin/develop branch:
+    - Provenance data, such as Metadata about the environment the code was
+      executed in, the command line output of the code, and some
+*** remote/origin/develop branch:
   - this is the branch I use for day to day work on features and exploration.
     All of my current activity can be followed here.
-** remote/origin/data branch:
+*** remote/origin/data branch:
   - contains a full cronicle of the whole research process
   - all *#experiment-name* branches are merged here. Afterwards the original
     branch is deleted and on the data branch there is a *Git tag* which shows
     the merge commit to make accessing single experiments easy.
   - the *develop* branch is merged here as well.
 
-** Git TAGs
-*** Stable versions:
-*** All tags from git:
+*** Git TAGs
+**** Stable versions:
+**** All tags from git:
    #+begin_src sh :results output
     git push origin --tags
     git tag -n1
@@ -363,15 +364,15 @@
 
    #+RESULTS:
    : exp-200402-test Merge branch 'exp-200402-test' into data
-* Organization of code
-** scripts:
-** src/
-*** fluotracify/
-**** imports/
-**** simulations/
-**** training/
-**** applications/
-**** doc/
+** Organization of code
+*** scripts:
+*** src/
+**** fluotracify/
+***** imports/
+***** simulations/
+***** training/
+***** applications/
+***** doc/
     - use Sphinx
       - follow this: https://daler.github.io/sphinxdoc-test/includeme.html
       - evtl export org-mode Readme to rst via https://github.com/msnoigrs/ox-rst
@@ -380,7 +381,7 @@
     - for examples sphinx-galleries could be useful
       https://sphinx-gallery.github.io/stable/getting_started.html
 
-*** nanosimpy/
+**** nanosimpy/
     - cloned from dwaithe with refactoring for Python 3-compatibility
 
 * Changes in this repository (without "* Data" in this file)
