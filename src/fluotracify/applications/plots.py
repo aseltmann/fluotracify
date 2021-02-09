@@ -76,7 +76,8 @@ def plot_distribution_of_correlations_by_label_thresholds(
         elif artifact == 2:  # photobleaching
             labels_of_interest = labels_of_interest > thresh
         else:
-            raise ValueError('value for artifact has to be 0, 1 or 2')
+            raise ValueError('value for artifact has to be 0 (bright clusters)'
+                             ', 1 (detector dropout) or 2 (photobleaching)')
 
         out = correct_correlation_by_label(
             ntraces=ntraces,
@@ -111,7 +112,8 @@ def plot_distribution_of_correlations_by_label_thresholds(
                     color='r',
                     label='simulated transit time')
     else:
-        raise ValueError('value for xunit has to be 0 or 1')
+        raise ValueError('value for xunit has to be 0 (diffusion rates) or 1'
+                         ' (transit times)')
     ax1.set_ylabel('Number of fluorescence traces', fontsize=16)
     ax1.legend(fontsize=16)
     ax2.set_title('Length of traces for correlation', fontsize=20)
@@ -130,7 +132,8 @@ def plot_distribution_of_correlations_corrected_by_prediction(
         xunit_bins,
         diffrates,
         features,
-        labels,
+        labels_artifact,
+        labels_puretrace,
         plotperfect=True,
         number_of_traces=None):
     """plot the distribution of correlations after correcting fluorescence
@@ -163,10 +166,6 @@ def plot_distribution_of_correlations_corrected_by_prediction(
     xunit_bins : int or sequence of scalars or str, optional
         Binning of the histogram of xunit, see
         https://docs.scipy.org/doc/numpy/reference/generated/numpy.histogram.html
-    plotperfect : bool, optional
-        If True, the 'perfect' traces (which have no time step with corruption
-        above lab_thresh) will be plotted as well. If this parameter is chosen,
-        number_of_traces should be 'None'
     number_of_traces : int, None, optional
         Number of traces which shall be chosen. If 'None', the number of
         traces is determined of the number of perfect traces and they will be
@@ -180,19 +179,29 @@ def plot_distribution_of_correlations_corrected_by_prediction(
     pred_out : tuple
         Contains diffusion rates, transit times and trace lengths corrected by
         prediciton
-    perfect_out : tuple, optional
-        Contains diffusion rates, transit times and trace lengths of 'perfect
-        traces' which have no time step with corruption above lab_thresh. Only
-        returned, if plotperfect=True
+    corrupt_out : tuple
+        Contains diffusion rates, transit times and trace lengths of corrupted
+        traces without correction
+    pure_out : tuple
+        Contains diffusion rates, transit times and trace lengths of 'pure
+        traces' before the artifacts were added in the simulations
 
     Notes
     -----
-    To be implemented
+    To be implemented:
     lognormfit : bool, optional - ,
         lognormfit=False
         If True, use scipy.stats.lognorm.fit routine to display a probability
         density function of a lognorm distribution fitted on the transit time
         histograms and display the mean of the fit as a vertical line.
+
+    Commented out:
+    - plotperfect : bool
+        If True, the 'perfect' traces (which have no time step with corruption
+        above lab_thresh) will be plotted as well. If this parameter is chosen,
+        number_of_traces should be 'None'. (Removed because with newer
+        simulations I save out the traces without any artifact influence which
+        I can now use directly)
     """
 
     # PART 1: Calculation
@@ -214,61 +223,64 @@ def plot_distribution_of_correlations_corrected_by_prediction(
 
     # get traces and labels according to the desired diffrate
     traces_of_interest = pd.DataFrame()
-    labels_of_interest = pd.DataFrame()
+    lab_art_of_interest = pd.DataFrame()
+    lab_pure_of_interest = pd.DataFrame()
     for diff_idx in diff.index:
         traces_tmp = features.iloc[:, diff_idx::nfiles]
-        labels_tmp = labels.iloc[:, diff_idx::nfiles]
+        labels_tmp = labels_artifact.iloc[:, diff_idx::nfiles]
+        pure_tmp = labels_puretrace.iloc[:, diff_idx::nfiles]
         traces_of_interest = pd.concat([traces_of_interest, traces_tmp],
                                        axis=1)
-        labels_of_interest = pd.concat([labels_of_interest, labels_tmp],
-                                       axis=1)
+        lab_art_of_interest = pd.concat([lab_art_of_interest, labels_tmp],
+                                        axis=1)
+        lab_pure_of_interest = pd.concat([lab_pure_of_interest, pure_tmp],
+                                         axis=1)
 
-    if artifact == 0:
-        labels_of_interest = labels_of_interest > lab_thresh
-        # get symbol for legend in plot below
-        label_operation = '<'
+    if artifact in (0, 2):
+        lab_art_of_interest = lab_art_of_interest > lab_thresh
     elif artifact == 1:
-        labels_of_interest = labels_of_interest < lab_thresh
-        label_operation = '>'
-    elif artifact == 2:
-        labels_of_interest = labels_of_interest > lab_thresh
-        label_operation = '<'
+        lab_art_of_interest = lab_art_of_interest < lab_thresh
     else:
-        raise ValueError('value for artifact has to be 0, 1 or 2')
+        raise ValueError('value for artifact has to be 0 (bright clusters), 1'
+                         ' (detector dropout) or 2 (photobleaching)')
 
     traces_of_interest = np.array(traces_of_interest).astype(np.float64)
-    labels_of_interest = np.array(labels_of_interest)
+    lab_art_of_interest = np.array(lab_art_of_interest)
+    lab_pure_of_interest = np.array(lab_pure_of_interest).astype(np.float64)
 
-    if plotperfect:
-        labsum = labels_of_interest.sum(axis=0)
+    # if plotperfect:
+    #     labsum = lab_art_of_interest.sum(axis=0)
 
-        idx_perfect_traces = []
-        for idx, lab in enumerate(labsum):
-            if lab == 0:
-                idx_perfect_traces.append(idx)
+    #     idx_perfect_traces = []
+    #     for idx, lab in enumerate(labsum):
+    #         if lab == 0:
+    #             idx_perfect_traces.append(idx)
 
-        print('number of perfect traces (corruption threshold: {}): {}'.format(
-            lab_thresh, len(idx_perfect_traces)))
+    #     print('number of perfect traces (corruption threshold: {}): {}'.format(
+    #         lab_thresh, len(idx_perfect_traces)))
 
-        traces_perfect = traces_of_interest[:, idx_perfect_traces]
-        traces_perfect = pd.DataFrame(traces_perfect)
-        traces_corrupted = np.delete(traces_of_interest,
-                                     idx_perfect_traces,
-                                     axis=1)
-        labels_corrupted = np.delete(labels_of_interest,
-                                     idx_perfect_traces,
-                                     axis=1)
-        # has to be DataFrame for prediction preprocessing
-        traces_corrupted = pd.DataFrame(traces_corrupted)
-        labels_corrupted = pd.DataFrame(labels_corrupted)
-    else:
-        print('number of traces to plot: {}'.format(number_of_traces))
-        traces_corrupted = pd.DataFrame(
-            traces_of_interest[:, :number_of_traces])
-        labels_corrupted = pd.DataFrame(
-            labels_of_interest[:, :number_of_traces])
+    #     traces_perfect = traces_of_interest[:, idx_perfect_traces]
+    #     traces_perfect = pd.DataFrame(traces_perfect)
+    #     traces_corrupted = np.delete(traces_of_interest,
+    #                                  idx_perfect_traces,
+    #                                  axis=1)
+    #     labels_corrupted = np.delete(lab_art_of_interest,
+    #                                  idx_perfect_traces,
+    #                                  axis=1)
+    #     # has to be DataFrame for prediction preprocessing
+    #     traces_corrupted = pd.DataFrame(traces_corrupted)
+    #     labels_corrupted = pd.DataFrame(labels_corrupted)
+
+    print('number of traces to plot: {}'.format(number_of_traces))
+    traces_corrupted = pd.DataFrame(
+        traces_of_interest[:, :number_of_traces])
+    labels_corrupted = pd.DataFrame(
+        lab_art_of_interest[:, :number_of_traces])
+    traces_pure = pd.DataFrame(
+        lab_pure_of_interest[:, :number_of_traces])
 
     ntraces = len(traces_corrupted.columns)
+
     lab_out = correct_correlation_by_label(ntraces=ntraces,
                                            traces_of_interest=traces_corrupted,
                                            labels_of_interest=labels_corrupted,
@@ -292,15 +304,21 @@ def plot_distribution_of_correlations_corrected_by_prediction(
             length_delimiter=length_delimiter,
             fwhm=fwhm)
     else:
-        raise ValueError('value for model_type has to be 0 or 1')
+        raise ValueError('value for model_type has to be 0 (vgg) or 1 (unet)')
     print('processed correlation with correction by prediction')
 
     corrupt_out = correlate.correlation_of_arbitrary_trace(
-        ntraces=ntraces, traces_of_interest=traces_corrupted, fwhm=fwhm)
+        ntraces=ntraces,
+        traces_of_interest=traces_corrupted,
+        fwhm=fwhm,
+        time_step=1.)
     print('processed correlation without correction')
-    if plotperfect:
-        perfect_out = correlate.correlation_of_arbitrary_trace(
-            ntraces=ntraces, traces_of_interest=traces_perfect, fwhm=fwhm)
+
+    pure_out = correlate.correlation_of_arbitrary_trace(
+        ntraces=ntraces,
+        traces_of_interest=traces_pure,
+        fwhm=fwhm,
+        time_step=1.)
 
     # PART 2: Plotting
     fig = plt.figure(figsize=(16, 12), constrained_layout=True)
@@ -309,10 +327,16 @@ def plot_distribution_of_correlations_corrected_by_prediction(
     plt.rcParams['ytick.labelsize'] = 16
     plt.rcParams['xtick.labelsize'] = 16
     ax1 = fig.add_subplot(gs[0, :-1])
+    ax1.hist(pure_out[xunit],
+             bins=xunit_bins,
+             alpha=0.3,
+             label='pure traces before simulation of artifact (control)',
+             color='C3')
     ax1.hist(lab_out[xunit],
              bins=xunit_bins,
              alpha=0.3,
-             label='corrected by label with threshold: {}'.format(lab_thresh),
+             label='corrected by label with threshold: {} (control)'.format(
+                 lab_thresh),
              color='C2')
     ax1.hist(
         pred_out[xunit],
@@ -327,45 +351,34 @@ def plot_distribution_of_correlations_corrected_by_prediction(
              color='C0')
 
     ax2 = fig.add_subplot(gs[0, -1])
+    ax2.hist(pure_out[2],
+             bins=np.arange(0, length_delimiter, 1000),
+             alpha=0.3,
+             label='length of pure traces (control)',
+             color='C3')
     ax2.hist(lab_out[2],
-             bins=np.arange(0, 20001, 1000),
+             bins=np.arange(0, length_delimiter, 1000),
              alpha=0.3,
              label='trace length after correction by label',
              color='C2')
     ax2.hist(pred_out[2],
-             bins=np.arange(0, 20001, 1000),
+             bins=np.arange(0, length_delimiter, 1000),
              alpha=0.5,
              label='trace length after correction by prediction',
              color='C1')
     ax2.hist(corrupt_out[2],
-             bins=np.arange(0, 20001, 1000),
+             bins=np.arange(0, length_delimiter, 1000),
              alpha=0.3,
              label='length of corrupted traces without correction',
              color='C0')
-    if plotperfect:
-        ax1.hist(perfect_out[xunit],
-                 bins=xunit_bins,
-                 alpha=0.3,
-                 label='"perfect traces" (corruption {} {})'.format(
-                     label_operation, lab_thresh))
-        ax2.hist(perfect_out[2],
-                 bins=np.arange(0, 20001, 1000),
-                 alpha=0.3,
-                 label='length of "perfect traces" without correction')
-        datadf = pd.DataFrame(data=[corrupt_out[xunit], pred_out[xunit],
-                                    lab_out[xunit], perfect_out[xunit]],
-                              index=['corrupted\nwithout\ncorrection',
-                                     'corrected\nby predictions',
-                                     'corrected\nby labels',
-                                     'perfect\ntrace']).T
-        boxplotcols = 4
-    else:
-        datadf = pd.DataFrame(data=[corrupt_out[xunit], pred_out[xunit],
-                                    lab_out[xunit]],
-                              index=['corrupted\nwithout\ncorrection',
-                                     'corrected\nby predictions',
-                                     'corrected\nby labels']).T
-        boxplotcols = 3
+
+    datadf = pd.DataFrame(data=[corrupt_out[xunit], pred_out[xunit],
+                                lab_out[xunit], pure_out[xunit]],
+                          index=['corrupted\nwithout\ncorrection',
+                                 'corrected\nby predictions',
+                                 'corrected\nby labels\n(control)',
+                                 'pure traces\n(control)']).T
+    boxplotcols = 4
 
     ax3 = fig.add_subplot(gs[1, :-1])
     box = sns.boxplot(data=datadf, showfliers=False, orient='h')
@@ -401,7 +414,8 @@ def plot_distribution_of_correlations_corrected_by_prediction(
                     label=r'simulated transit time: {:.2f}$ms$'.format(
                         transit_time_expected))
     else:
-        raise ValueError('value for xunit has to be 0 or 1')
+        raise ValueError('value for xunit has to be 0 (diffusion coefficients)'
+                         'or 1 (transit times)')
 
     for i in range(boxplotcols):
         median_index = 4 + (i * 4 + i)
@@ -432,9 +446,7 @@ def plot_distribution_of_correlations_corrected_by_prediction(
     # ax3.spines['right'].set_visible(False)
     # ax3.spines['bottom'].set_visible(False)
 
-    if plotperfect:
-        return lab_out, pred_out, perfect_out, corrupt_out
-    return lab_out, pred_out, corrupt_out
+    return lab_out, pred_out, corrupt_out, pure_out
 
 
 def plot_experimental_traces_from_ptu_corrected_by_unet_prediction(
