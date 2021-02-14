@@ -178,6 +178,11 @@ def extract_traces_by_diffrates(diffrate_of_interest, traces,
         All traces simulated with the given Diffusion rate of interest,
         ordered columnwise
     """
+    if not len(set(nsamples)) == 1:
+        raise Exception(
+            'Error: The number of examples in each file have to be the same')
+
+    nsamples = next(iter(set(nsamples)))
     diffrates = experiment_params.loc[
         'diffusion rate of molecules in micrometer^2 / s'].astype(np.float32)
     diff = diffrates.where(diffrates == diffrate_of_interest).dropna()
