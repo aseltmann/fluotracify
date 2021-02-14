@@ -146,6 +146,7 @@ def correct_correlation_by_unet_prediction(ntraces,
     """Given corrupted traces, this function will apply a trained
     convolutional neural network on the data to correct the traces and return
     the diffusion rates, transit times and length of traces after correlation
+
     Parameters
     ----------
     ntraces : Int
@@ -166,7 +167,7 @@ def correct_correlation_by_unet_prediction(ntraces,
         If None, traces_of_interest is used for prediction and correlation. If
         an extra pd DataFrame is supplied, the artifacts will be predicted
         using traces_of_interest, and the correction and correlation will be
-        done no traces_for_correlation. This makes sense, if the diffusion
+        done on traces_for_correlation. This makes sense, if the diffusion
         processes are too fast for a binning window of 1ms, so the same traces
         with a smaller binning window can be supplied in traces_for_correlation
     bin_for_correlation : integer, optional
@@ -175,6 +176,7 @@ def correct_correlation_by_unet_prediction(ntraces,
         to us. It is assumed that the bin for the prediction traces is 1e6 and
         that the bin_for_correlation is smaller. If the bin_for_correlation is
         1e6 or higher, the traces_for_correlation are not used.
+
     Returns
     -------
     out : tuple of lists
