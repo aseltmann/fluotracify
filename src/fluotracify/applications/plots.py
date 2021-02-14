@@ -505,10 +505,6 @@ def plot_distribution_of_correlations_corrected_by_prediction(
     # ax3.spines['right'].set_visible(False)
     # ax3.spines['bottom'].set_visible(False)
 
-    fig.savefig('artifact{}_xunit{}_diffrate{}_ntraces{}.svg'.format(
-        artifact, xunit, diffrate_of_interest, number_of_traces),
-                format='svg')
-
     return lab_out, pred_out, corrupt_out, pure_out
 
 
