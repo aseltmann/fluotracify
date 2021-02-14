@@ -505,7 +505,7 @@ def plot_distribution_of_correlations_corrected_by_prediction(
     # ax3.spines['right'].set_visible(False)
     # ax3.spines['bottom'].set_visible(False)
 
-    return lab_out, pred_out, corrupt_out, pure_out
+    return lab_out, pred_out, corrupt_out, pure_out, fig
 
 
 def plot_experimental_traces_from_ptu_corrected_by_unet_prediction(
