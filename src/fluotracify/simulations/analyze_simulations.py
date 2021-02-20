@@ -79,6 +79,13 @@ def correlate_simulations_corrected_by_prediction(model,
     win_len = 128  # only for model_type 0 (vgg)
     zoomvector = (5, 21)  # only for model_type 0 (vgg)
     length_delimiter = 16384
+
+    if not len(set(nsamples)) == 1:
+        raise Exception(
+            'Error: The number of examples in each file have to be the same')
+
+    nsamples = next(iter(set(nsamples)))
+
     try:
         diffrates = experiment_params.loc[
             'diffusion rate of molecules in micrometer^2 / s'].astype(
@@ -111,6 +118,7 @@ def correlate_simulations_corrected_by_prediction(model,
         traces_of_interest=features,
         labels_of_interest=labels_artifact,
         fwhm=fwhm)
+    print('processed correlation with correction by label')
 
     if model_type == 0:
         pred_out = correction.correct_correlation_by_vgg_prediction(
