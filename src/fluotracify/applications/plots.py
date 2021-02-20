@@ -375,6 +375,7 @@ def plot_distribution_of_correlations_corrected_by_prediction(
         traces_of_interest=traces_pure,
         fwhm=fwhm,
         time_step=1.)
+    print('processed correlation of pure traces')
 
     # PART 2: Plotting
     fig = plt.figure(figsize=(16, 12), constrained_layout=True)
