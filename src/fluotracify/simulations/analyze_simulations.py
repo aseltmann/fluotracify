@@ -77,6 +77,7 @@ def correlate_simulations_corrected_by_prediction(model,
         'corrected by predictions', 'corrected by labels (control)', 'pure
             traces (control)'
     """
+
     fwhm = 250
     win_len = 128  # only for model_type 0 (vgg)
     zoomvector = (5, 21)  # only for model_type 0 (vgg)
@@ -103,7 +104,6 @@ def correlate_simulations_corrected_by_prediction(model,
         print('Make sure that experiment_params is a pandas DataFrame created'
               ' while using the import_simulation_from_csv module')
     ntraces = np.size(features, axis=1)
-    nfiles = ntraces // nsamples
 
     if artifact in (0, 2):
         labels_artifact = labels_artifact > lab_thresh
@@ -120,7 +120,8 @@ def correlate_simulations_corrected_by_prediction(model,
         traces_of_interest=features,
         labels_of_interest=labels_artifact,
         fwhm=fwhm)
-    print('processed correlation with correction by label')
+    print('processed correlation of {} traces with correction by'
+          ' label'.format(len(lab_out[0])))
 
     if model_type == 0:
         pred_out = correction.correct_correlation_by_vgg_prediction(
@@ -141,18 +142,20 @@ def correlate_simulations_corrected_by_prediction(model,
             fwhm=fwhm)
     else:
         raise ValueError('value for model_type has to be 0 (vgg) or 1 (unet)')
-    print('processed correlation with correction by prediction')
+    print('processed correlation of {} traces with correction by'
+          ' prediction'.format(len(pred_out[0])))
 
     corrupt_out = correlate.correlation_of_arbitrary_trace(
         ntraces=ntraces, traces_of_interest=features, fwhm=fwhm, time_step=1.)
-    print('processed correlation without correction')
+    print('processed correlation of {} traces without correction'.format(
+        len(corrupt_out[0])))
 
     pure_out = correlate.correlation_of_arbitrary_trace(
         ntraces=ntraces,
         traces_of_interest=labels_puretrace,
         fwhm=fwhm,
         time_step=1.)
-    print('processed correlation of pure traces')
+    print('processed correlation of pure {} traces'.format(len(pure_out[0])))
 
     data_diffrates = np.concatenate(
         (lab_out[0], pred_out[0], corrupt_out[0], pure_out[0]), axis=0)
@@ -164,9 +167,9 @@ def correlate_simulations_corrected_by_prediction(model,
         np.array(('corrupted without correction', 'corrected by prediction',
                   'corrected by labels (control)', 'pure traces (control)')),
         ntraces)
-    data_simdiffrates = np.tile(np.repeat(diffrates.values, nsamples), nfiles)
-    data_simclusters = np.tile(np.repeat(clusters.values, nsamples), nfiles)
-    data_nmols = np.tile(np.repeat(nmols.values, nsamples), nfiles)
+    data_simdiffrates = np.tile(np.repeat(diffrates.values, nsamples), 4)
+    data_simclusters = np.tile(np.repeat(clusters.values, nsamples), 4)
+    data_nmols = np.tile(np.repeat(nmols.values, nsamples), 4)
     data_out = pd.DataFrame(data=[
         data_simdiffrates, data_simclusters, data_nmols, data_diffrates,
         data_transittimes, data_tracelengths, data_tracesused
