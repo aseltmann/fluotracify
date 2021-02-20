@@ -73,11 +73,24 @@ def correlate_simulations_corrected_by_prediction(model,
         '$\tau_{{D}}$ in $ms$': transit times
         'Trace lengths': lengths of the fluorescence trace at the time they
             were correlated.
-        'Traces used': 4 possible values: 'corrupted without correction',
-        'corrected by predictions', 'corrected by labels (control)', 'pure
-            traces (control)'
-    """
+        'Traces used': 4 possible values: 'corrupted without correction', 'pure
+            traces (control)', 'corrected by labels (control)', 'corrected by
+            predictions'
 
+    Notes
+    -----
+    - during one of the correction algorithms (correction by label, correction
+    by unet, correction by vgg), it could happen that less than 32 time steps
+    of the trace remain. Then the trace will get discarded, since it can't be
+    correlated using multipletau. This can be spotted looking at the print
+    statement after each of the 4 correlations. At the moment, this function
+    does not check this before concatenating the traces for the output
+    DataFrame / csv file, thus there can be a mismatch between the 3 columns
+    coming from the correlations (D, tau_D, trace lengths) and the rest. It is
+    most likely to happen during the predictions, so they are concatenated
+    last. If it happens then, there will be lines with NaNs, but at least the
+    rest of the traces is not affected.
+    """
     fwhm = 250
     win_len = 128  # only for model_type 0 (vgg)
     zoomvector = (5, 21)  # only for model_type 0 (vgg)
@@ -158,14 +171,14 @@ def correlate_simulations_corrected_by_prediction(model,
     print('processed correlation of pure {} traces'.format(len(pure_out[0])))
 
     data_diffrates = np.concatenate(
-        (lab_out[0], pred_out[0], corrupt_out[0], pure_out[0]), axis=0)
+        (corrupt_out[0], pure_out[0], lab_out[0], pred_out[0]), axis=0)
     data_transittimes = np.concatenate(
-        (lab_out[1], pred_out[1], corrupt_out[1], pure_out[1]), axis=0)
+        (corrupt_out[1], pure_out[1], lab_out[1], pred_out[1]), axis=0)
     data_tracelengths = np.concatenate(
-        (lab_out[2], pred_out[2], corrupt_out[2], pure_out[2]), axis=0)
+        (corrupt_out[2], pure_out[2], lab_out[2], pred_out[2]), axis=0)
     data_tracesused = np.repeat(
-        np.array(('corrupted without correction', 'corrected by prediction',
-                  'corrected by labels (control)', 'pure traces (control)')),
+        np.array(('corrupted without correction', 'pure traces (control)',
+                  'corrected by labels (control)', 'corrected by prediction')),
         ntraces)
     data_simdiffrates = np.tile(np.repeat(diffrates.values, nsamples), 4)
     data_simclusters = np.tile(np.repeat(clusters.values, nsamples), 4)
