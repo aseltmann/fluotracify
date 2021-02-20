@@ -1,5 +1,7 @@
 """This module contains functions which are used to analyze the simulated fluorescence traces"""
 
+import datetime
+
 import numpy as np
 import pandas as pd
 
@@ -176,6 +178,8 @@ def correlate_simulations_corrected_by_prediction(model,
                                 'Traces used'
                             ]).T
     if save_as_csv:
-        data_out.to_csv(path_or_buf='.', na_rep='NaN', index=False)
-
+        data_out.to_csv(path_or_buf='{}_correlations.csv'.format(
+            datetime.date.today()),
+                        na_rep='NaN',
+                        index=False)
     return data_out
