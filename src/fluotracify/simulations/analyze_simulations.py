@@ -101,7 +101,7 @@ def correlate_simulations_corrected_by_prediction(model,
         print('Make sure that experiment_params is a pandas DataFrame created'
               ' while using the import_simulation_from_csv module')
     ntraces = np.size(features, axis=1)
-    nfiles = ntraces / nsamples
+    nfiles = ntraces // nsamples
 
     if artifact in (0, 2):
         labels_artifact = labels_artifact > lab_thresh
