@@ -97,6 +97,9 @@ def correlation_of_arbitrary_trace(ntraces,
         The full width half maximum of the excitation beam in nm. Used for
         Calculation of the diffusion coefficient.
     """
+    if ntraces is None:
+        ntraces = len(traces_of_interest.columns)
+
     diffrates_arb = []
     transit_times_arb = []
     tracelen_arb = []
