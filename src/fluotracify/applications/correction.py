@@ -360,6 +360,13 @@ def correct_experimental_traces_from_ptu_by_unet_prediction(
         - a label giving the folder_id and info if the trace was computed
           from the original trace or after correction by unet prediction
         - photon count bin in ns which was used for the trace
+
+    Raises
+    ------
+    ValueError
+        If there was an error in loading .ptu files
+    ValueError
+        If photon_count_bin is not a positive integer
     """
     # fix constants (could be introduced as variables)
     fwhm = 250
@@ -381,7 +388,7 @@ def correct_experimental_traces_from_ptu_by_unet_prediction(
                 file_delimiter=ntraces,
                 photon_count_bin=1e6,
                 verbose=True)
-        except ValueError:
+        except (ValueError, FileNotFoundError):
             raise ValueError('There was an error in loading .ptu files'
                              'from folder {}'.format(path))
 
