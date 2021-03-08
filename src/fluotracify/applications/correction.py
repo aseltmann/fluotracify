@@ -200,6 +200,9 @@ def correct_correlation_by_unet_prediction(ntraces,
                              'have to have the same column number, since they'
                              'have to come from the same tcspc data')
 
+    if ntraces is None:
+        ntraces = len(traces_of_interest.columns)
+
     diffrates_corrected_bypred = []
     transit_times_corrected_bypred = []
     tracelen_corrected_bypred = []
@@ -323,8 +326,7 @@ def correct_experimental_traces_from_ptu_by_unet_prediction(
         model,
         pred_thresh,
         photon_count_bin=1e6,
-        additional_path=None,
-        number_of_traces=None,
+        ntraces=None,
         save_as_csv=False):
     """plot the distribution of correlations after correcting fluorescence
     traces corrupted by the given artifact applying different thresholds
@@ -342,10 +344,9 @@ def correct_experimental_traces_from_ptu_by_unet_prediction(
         the prediction to be applied to a photon trace with *smaller* binning,
         you can choose this here (e.g. 1e5 means binning of 100us, 1e4 means
         binning of 10us etc). *Larger* binning will be ignored.
-    number_of_traces : int, None, optional
-        Number of traces which shall be chosen. If 'None', the number of
-        traces is determined of the number of perfect traces and they will be
-        plotted as well.
+    ntraces : int, None, optional
+        Number of traces which shall be chosen. If 'None', all available traces
+        will be used.
     save_as_csv : bool, optional
         If True, saves a .csv of 'out' in the default directory
 
@@ -377,7 +378,7 @@ def correct_experimental_traces_from_ptu_by_unet_prediction(
         try:
             ptu_1ms, ptu_metadata['{}'.format(i)] = ptu.import_from_ptu(
                 path=path,
-                file_delimiter=number_of_traces,
+                file_delimiter=ntraces,
                 photon_count_bin=1e6,
                 verbose=True)
         except ValueError:
@@ -389,7 +390,7 @@ def correct_experimental_traces_from_ptu_by_unet_prediction(
                                                                             1))
             data['{}-orig'.format(
                 i)] = correlate.correlation_of_arbitrary_trace(
-                    ntraces=number_of_traces,
+                    ntraces=ntraces,
                     traces_of_interest=ptu_1ms.astype(np.float64),
                     fwhm=fwhm,
                     time_step=1.,
@@ -397,7 +398,7 @@ def correct_experimental_traces_from_ptu_by_unet_prediction(
             print('Processing correlation with correction by prediction '
                   'of dataset {}'.format(i + 1))
             data['{}-pred'.format(i)] = correct_correlation_by_unet_prediction(
-                ntraces=number_of_traces,
+                ntraces=ntraces,
                 traces_of_interest=ptu_1ms.astype(np.float64),
                 model=model,
                 pred_thresh=pred_thresh,
@@ -413,14 +414,14 @@ def correct_experimental_traces_from_ptu_by_unet_prediction(
                   'dataset {} with bin={}. This can take a while...'.format(
                       i + 1, photon_count_bin))
             ptu_cor, _ = ptu.import_from_ptu(path=path,
-                                             file_delimiter=number_of_traces,
+                                             file_delimiter=ntraces,
                                              photon_count_bin=photon_count_bin,
                                              verbose=False)
             print('Processing correlation of unprocessed dataset {}'.format(i +
                                                                             1))
             data['{}-orig'.format(
                 i)] = correlate.correlation_of_arbitrary_trace(
-                    ntraces=number_of_traces,
+                    ntraces=ntraces,
                     traces_of_interest=ptu_cor.astype(np.float64),
                     fwhm=fwhm,
                     time_step=time_step_for_correlation,
@@ -428,7 +429,7 @@ def correct_experimental_traces_from_ptu_by_unet_prediction(
             print('Processing correlation with correction by prediction '
                   'of dataset {}'.format(i + 1))
             data['{}-pred'.format(i)] = correct_correlation_by_unet_prediction(
-                ntraces=number_of_traces,
+                ntraces=ntraces,
                 traces_of_interest=ptu_1ms,
                 model=model,
                 pred_thresh=pred_thresh,
