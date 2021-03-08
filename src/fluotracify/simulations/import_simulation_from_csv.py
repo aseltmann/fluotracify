@@ -48,10 +48,17 @@ def import_from_csv(folder,
 
     Raises
     ------
+    FileNotFoundError
+        If the path provided does not include any .csv files
     ValueError
         If pandas read_csv fails
     """
     files = list(Path(folder).rglob('*.csv'))
+
+    if len(files) == 0:
+        raise FileNotFoundError('The path provided does not include any'
+                                ' .csv files.')
+
     files.sort()
     np.random.seed(0)  # for reproducible random state
     np.random.shuffle(files)

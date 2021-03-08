@@ -730,6 +730,7 @@ def import_from_ptu(path, photon_count_bin, file_delimiter=None, verbose=False):
     time traces and output them in one pandas DataFrame orderd columnwise. This
     pipeline is useful for feeding the data to a machine learning model for
     prediction.
+
     Parameters
     ----------
     path : str
@@ -743,19 +744,24 @@ def import_from_ptu(path, photon_count_bin, file_delimiter=None, verbose=False):
         maximum number of .ptu files which will be read in. This is useful for
         test purposes, since reading in even a single file takes quite some
         time.
+
     Returns
     -------
     ptu_exps_data : pandas DataFrame
         Contains time traces ordered columnwise
     ptu_exps_metadata : pandas DataFrame
         Contains ptu header metadata + num_of_ch from process_tcspc_data
+
     Raises
     ------
+    FileNotFoundError
+        If the path provided does not include any .ptu files.
     ValueError
         If import_ptu_to_memory fails (probably the .ptu file is not
         compatible)
     ValueError
         If number of channels is greater 1 (see below)
+
     Notes
     -----
     - At the moment, the ptu helper functions can read in traces with up to 2
@@ -773,6 +779,9 @@ def import_from_ptu(path, photon_count_bin, file_delimiter=None, verbose=False):
 
     path = Path(path)
     files = [f for f in os.listdir(path) if f.endswith('.ptu')]
+    if len(files) == 0:
+        raise FileNotFoundError('The path provided does not include any'
+                                ' .ptu files.')
 
     ptu_exps_metadata = pd.DataFrame()
     ptu_exps_data = pd.DataFrame()

@@ -21,9 +21,17 @@ def import_dat_to_memory(path, droplastindex=None, dropindex=None, dropcolumns=N
     -------
     dat : pandas DataFrame
         Contains timetraces and histograms from FCS files
+
+    Raises
+    ------
+    FileNotFoundError
+        If the path provided does not include .dat files.
     """
     path = Path(path)
     files = list(path.glob('**/*.dat'))
+    if len(files) == 0:
+        raise FileNotFoundError('The path provided does not include any'
+                                ' .dat files.')
     dat = pd.DataFrame()
     for file in files:
         dat_tmp = pd.read_table(file, sep='\t', header=1)
