@@ -495,7 +495,7 @@ def correct_experimental_traces_from_ptu_by_unet_prediction(
         # Since we saved it only once, but we compute the correlation 2 times
         # (orig vs pred), we have to append the metadata here two times as well
         ptum = ptum_df.iloc[:, 1::2].T
-        for _ in range(len(pred_thresh)):
+        for _ in range(len(pred_thresh)+1):
             data_metadata = pd.concat((data_metadata, ptum), axis=0)
     data_metadata = data_metadata.reset_index(drop=True)
     data_metadata.columns = ptum_list[0].iloc[:, 0].values
