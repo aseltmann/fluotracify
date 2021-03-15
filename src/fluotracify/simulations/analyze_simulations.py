@@ -190,7 +190,7 @@ def correlate_simulations_corrected_by_prediction(model,
                             index=[
                                 'Simulated $D$', 'Simulated $D_{{clust}}$',
                                 'nmol', '$D$ in $\\frac{{\mu m^2}}{{s}}$',
-                                '$\tau_{{D}}$ in $ms$', 'Trace lengths',
+                                '$\\tau_{{D}}$ in $ms$', 'Trace lengths',
                                 'Traces used'
                             ]).T
     if save_as_csv:
