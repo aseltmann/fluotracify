@@ -471,7 +471,7 @@ def correct_experimental_traces_from_ptu_by_unet_prediction(
     ],
                             index=[
                                 '$D$ in $\\frac{{\mu m^2}}{{s}}$',
-                                '$\tau_{{D}}$ in $ms$', 'Trace lengths',
+                                '$\\tau_{{D}}$ in $ms$', 'Trace lengths',
                                 'folder_id-traces_used',
                                 'Photon count bin in $ns$'
                             ]).T
