@@ -374,6 +374,11 @@ def correct_experimental_traces_from_ptu_by_unet_prediction(
     # unet can at the moment only take powers of 2 as input size
     length_delimiter = 8192
 
+    if not isinstance(path_list, list):
+        path_list = [path_list]
+    if not isinstance(pred_thresh, list):
+        pred_thresh = [pred_thresh]
+
     ptu_metadata = {}
     data = {}
 
@@ -404,13 +409,18 @@ def correct_experimental_traces_from_ptu_by_unet_prediction(
                     length_delimiter=length_delimiter)
             print('Processing correlation with correction by prediction '
                   'of dataset {}'.format(i + 1))
-            data['{}-pred'.format(i)] = correct_correlation_by_unet_prediction(
-                ntraces=ntraces,
-                traces_of_interest=ptu_1ms.astype(np.float64),
-                model=model,
-                pred_thresh=pred_thresh,
-                length_delimiter=length_delimiter,
-                fwhm=fwhm)
+            for thr in pred_thresh:
+                data['{}-pred-{}'.format(
+                    i, thr)] = correct_correlation_by_unet_prediction(
+                        ntraces=ntraces,
+                        traces_of_interest=ptu_1ms.astype(np.float64),
+                        model=model,
+                        pred_thresh=thr,
+                        length_delimiter=length_delimiter,
+                        fwhm=fwhm)
+                data['{}-pred-{}'.format(i, thr)] += (1e6, )
+                data['{}-pred-{}'.format(i, thr)] += (len(
+                    data['{}-pred-{}'.format(i, thr)][0]), )
         elif photon_count_bin < 1e6:
             # correlate function expects time_step for shifting x-axis
             # time_step_for_correlation = float(photon_count_bin / 1e6)
@@ -435,24 +445,27 @@ def correct_experimental_traces_from_ptu_by_unet_prediction(
                     length_delimiter=length_delimiter)
             print('Processing correlation with correction by prediction '
                   'of dataset {}'.format(i + 1))
-            data['{}-pred'.format(i)] = correct_correlation_by_unet_prediction(
-                ntraces=ntraces,
-                traces_of_interest=ptu_1ms,
-                model=model,
-                pred_thresh=pred_thresh,
-                length_delimiter=length_delimiter,
-                fwhm=fwhm,
-                traces_for_correlation=ptu_cor.astype(np.float64),
-                bin_for_correlation=photon_count_bin)
+            for thr in pred_thresh:
+                data['{}-pred-{}'.format(
+                    i, thr)] = correct_correlation_by_unet_prediction(
+                        ntraces=ntraces,
+                        traces_of_interest=ptu_1ms,
+                        model=model,
+                        pred_thresh=thr,
+                        length_delimiter=length_delimiter,
+                        fwhm=fwhm,
+                        traces_for_correlation=ptu_cor.astype(np.float64),
+                        bin_for_correlation=photon_count_bin)
+                data['{}-pred-{}'.format(i, thr)] += (1e6, )
+                data['{}-pred-{}'.format(i, thr)] += (len(
+                    data['{}-pred-{}'.format(i, thr)][0]), )
         else:
             raise ValueError('photon_count_bin has to be a positive integer')
         data['{}-orig'.format(i)] += (photon_count_bin, )
         data['{}-orig'.format(i)] += (len(data['{}-orig'.format(i)][0]), )
-        data['{}-pred'.format(i)] += (1e6, )
-        data['{}-pred'.format(i)] += (len(data['{}-pred'.format(i)][0]), )
 
     data_ntraces = [data[key][4] for key in data]
-    data_keys = [key for key in data]
+    data_keys = list(data.keys())
     data_keys = list(map(lambda x, y: (x, ) * y, data_keys, data_ntraces))
     data_keys = np.concatenate((data_keys), axis=None)
     data_diffrates = [data[key][0] for key in data]
@@ -482,7 +495,8 @@ def correct_experimental_traces_from_ptu_by_unet_prediction(
         # Since we saved it only once, but we compute the correlation 2 times
         # (orig vs pred), we have to append the metadata here two times as well
         ptum = ptum_df.iloc[:, 1::2].T
-        data_metadata = pd.concat((data_metadata, ptum, ptum), axis=0)
+        for _ in range(len(pred_thresh)):
+            data_metadata = pd.concat((data_metadata, ptum), axis=0)
     data_metadata = data_metadata.reset_index(drop=True)
     data_metadata.columns = ptum_list[0].iloc[:, 0].values
 
@@ -491,10 +505,10 @@ def correct_experimental_traces_from_ptu_by_unet_prediction(
     else:
         warnings.warn('Metadata is not saved with data. Reason: the '
                       'correlation algorithm failed for one or more traces '
-                      ' shorter than 32 time steps after correction. Since '
-                      'metadata is loaded in the beginning, it is not sure, '
-                      'which correlation is missing to ensure proper joining '
-                      'of data and metadata.')
+                      'which were shorter than 32 time steps after correction.'
+                      'Since metadata is loaded in the beginning, it is not '
+                      'sure, which correlation is missing to ensure proper '
+                      'joining of data and metadata.')
 
     if save_as_csv:
         data_out.to_csv(path_or_buf='{}_correlations.csv'.format(
