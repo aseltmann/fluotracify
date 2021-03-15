@@ -790,7 +790,7 @@ def import_from_ptu(path, photon_count_bin, file_delimiter=None, verbose=False):
         file = Path(file)
         path_and_file = path / file
         if verbose:
-            print('{} of {}: {}'.format(idx, len(files), path_and_file))
+            print('{} of {}: {}'.format(idx+1, len(files), path_and_file))
 
         try:
             out, tag_data_list, _, __ = import_ptu_to_memory(
