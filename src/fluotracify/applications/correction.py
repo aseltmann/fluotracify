@@ -407,6 +407,7 @@ def correct_experimental_traces_from_ptu_by_unet_prediction(
                     fwhm=fwhm,
                     time_step=1.,
                     length_delimiter=length_delimiter)
+            data['{}-orig'.format(i)] += (1e6, )
             print('Processing correlation with correction by prediction '
                   'of dataset {}'.format(i + 1))
             for thr in pred_thresh:
@@ -418,7 +419,6 @@ def correct_experimental_traces_from_ptu_by_unet_prediction(
                         pred_thresh=thr,
                         length_delimiter=length_delimiter,
                         fwhm=fwhm)
-                data['{}-orig'.format(i)] += (1e6, )
                 data['{}-pred-{}'.format(i, thr)] += (1e6, )
                 data['{}-pred-{}'.format(i, thr)] += (len(
                     data['{}-pred-{}'.format(i, thr)][0]), )
@@ -444,6 +444,7 @@ def correct_experimental_traces_from_ptu_by_unet_prediction(
                     fwhm=fwhm,
                     time_step=time_step_for_correlation,
                     length_delimiter=length_delimiter)
+            data['{}-orig'.format(i)] += (photon_count_bin, )
             print('Processing correlation with correction by prediction '
                   'of dataset {}'.format(i + 1))
             for thr in pred_thresh:
@@ -457,10 +458,10 @@ def correct_experimental_traces_from_ptu_by_unet_prediction(
                         fwhm=fwhm,
                         traces_for_correlation=ptu_cor.astype(np.float64),
                         bin_for_correlation=photon_count_bin)
-                data['{}-orig'.format(i)] += (photon_count_bin, )
                 data['{}-pred-{}'.format(i, thr)] += (photon_count_bin, )
                 data['{}-pred-{}'.format(i, thr)] += (len(
                     data['{}-pred-{}'.format(i, thr)][0]), )
+
         else:
             raise ValueError('photon_count_bin has to be a positive integer')
         data['{}-orig'.format(i)] += (len(data['{}-orig'.format(i)][0]), )
