@@ -37,11 +37,15 @@ if __name__ == "__main__":
         LENGTH_DELIMITER = int(sys.argv[4]) if len(sys.argv) > 4 else 16384
         LEARNING_RATE = sys.argv[5] if len(sys.argv) > 5 else 1e-5
         EPOCHS = int(sys.argv[6]) if len(sys.argv) > 6 else 10
-        CSV_PATH = sys.argv[7] if len(
-            sys.argv) > 7 else '/home/lex/Programme/Jupyter/DOKTOR/saves/firstartefact/subsample_rand/'
-        COL_PER_EXAMPLE = int(sys.argv[8]) if len(sys.argv) > 8 else 3
-        STEPS_PER_EPOCH = int(sys.argv[9]) if len(sys.argv) > 9 else 10
-        VALIDATION_STEPS = int(sys.argv[10]) if len(sys.argv) > 10 else 10
+        CSV_PATH_TRAIN = sys.argv[7] if len(
+            sys.argv
+        ) > 7 else '/home/lex/Programme/Jupyter/DOKTOR/saves/firstartefact/subsample_rand/'
+        CSV_PATH_TEST = sys.argv[8] if len(
+            sys.argv
+        ) > 8 else 'home/lex/Programme/Jupyter/DOKTOR/saves/firstartifact/subsample_rand/'
+        COL_PER_EXAMPLE = int(sys.argv[9]) if len(sys.argv) > 9 else 3
+        STEPS_PER_EPOCH = int(sys.argv[10]) if len(sys.argv) > 10 else 10
+        VALIDATION_STEPS = int(sys.argv[11]) if len(sys.argv) > 11 else 10
         LOG_DIR_TB = "/tmp/tb"
         LABEL_THRESH = 0.04
         # FIXME (PENDING): at some point, I want to plot metrics vs thresholds
@@ -50,26 +54,39 @@ if __name__ == "__main__":
         # but currently, mlflow does not support logging lists, so I log the
         # elements of the list one by one
         METRICS_THRESHOLDS = [0.1, 0.3, 0.5, 0.7, 0.9]
-        EXP_PARAM_PATH = '/tmp/experiment_params.csv'
+        EXP_PARAM_PATH_TRAIN = '/tmp/experiment_params_train.csv'
+        EXP_PARAM_PATH_TEST = '/tmp/experiment_params_test.csv'
 
-        train, test, nsamples, experiment_params = isfc.import_from_csv(
-            folder=CSV_PATH,
+        train, _, nsamples_train, experiment_params_train = isfc.import_from_csv(
+            folder=CSV_PATH_TRAIN,
             header=12,
-            frac_train=0.8,
+            frac_train=1,
             col_per_example=COL_PER_EXAMPLE,
             dropindex=None,
             dropcolumns=None)
 
-        experiment_params.to_csv(EXP_PARAM_PATH)
-        mlflow.log_artifact(EXP_PARAM_PATH)
+        test, _, nsamples_test, experiment_params_test = isfc.import_from_csv(
+            folder=CSV_PATH_TEST,
+            header=12,
+            frac_train=1,
+            col_per_example=COL_PER_EXAMPLE,
+            dropindex=None,
+            dropcolumns=None)
 
-        train_sep = isfc.separate_data_and_labels(array=train,
-                                                  nsamples=nsamples,
-                                                  col_per_example=COL_PER_EXAMPLE)
+        experiment_params_train.to_csv(EXP_PARAM_PATH_TRAIN)
+        experiment_params_test.to_csv(EXP_PARAM_PATH_TEST)
+        mlflow.log_artifact(EXP_PARAM_PATH_TRAIN)
+        mlflow.log_artifact(EXP_PARAM_PATH_TEST)
 
-        test_sep = isfc.separate_data_and_labels(array=test,
-                                                 nsamples=nsamples,
-                                                 col_per_example=COL_PER_EXAMPLE)
+        train_sep = isfc.separate_data_and_labels(
+            array=train,
+            nsamples=nsamples_train,
+            col_per_example=COL_PER_EXAMPLE)
+
+        test_sep = isfc.separate_data_and_labels(
+            array=test,
+            nsamples=nsamples_test,
+            col_per_example=COL_PER_EXAMPLE)
 
         # '0': trace with artifact
         # '1': just the simulated artifact (label for unet)
@@ -106,9 +123,11 @@ if __name__ == "__main__":
             batch_size=BATCH_SIZE,
             length_delimiter=LENGTH_DELIMITER)
 
-        mlflow.log_params({'num_train_examples': num_train_examples,
-                           'num_val_examples': num_val_examples,
-                           'num_test_examples': num_test_examples})
+        mlflow.log_params({
+            'num_train_examples': num_train_examples,
+            'num_val_examples': num_val_examples,
+            'num_test_examples': num_test_examples
+        })
 
         model = bm.unet_1d_alt(input_size=LENGTH_DELIMITER)
         optimizer = tf.keras.optimizers.Adam()
@@ -121,8 +140,8 @@ if __name__ == "__main__":
             write_images=True,
             update_freq='epoch')
 
-        file_writer_image = tf.summary.create_file_writer(
-            LOG_DIR_TB + '/image')
+        file_writer_image = tf.summary.create_file_writer(LOG_DIR_TB +
+                                                          '/image')
         file_writer_lr = tf.summary.create_file_writer(LOG_DIR_TB + "/metrics")
         file_writer_lr.set_as_default()
 
@@ -136,16 +155,15 @@ if __name__ == "__main__":
             - see https://www.tensorflow.org/api_docs/python/tf/keras/callbacks/LambdaCallback
             """
             figure = evaluate.plot_trace_and_pred_from_tfds(
-                dataset=dataset_test,
-                ntraces=5,
-                model=model)
+                dataset=dataset_test, ntraces=5, model=model)
             # Convert matplotlib figure to image
             image = evaluate.plot_to_image(figure)
             # Log the image as an image summary
             with file_writer_image.as_default():
                 tf.summary.image('Prediction plots', image, step=epoch)
-            mlflow.log_figure(figure=figure,
-                              artifact_file='predplots/plot{}.png'.format(epoch))
+            mlflow.log_figure(
+                figure=figure,
+                artifact_file='predplots/plot{}.png'.format(epoch))
 
         def lr_schedule(epoch):
             """
@@ -178,31 +196,37 @@ if __name__ == "__main__":
 
         metrics = []
         for thresh in METRICS_THRESHOLDS:
-            metrics.append(tf.keras.metrics.TruePositives(
-                name='tp{}'.format(thresh), thresholds=thresh))
-            metrics.append(tf.keras.metrics.FalsePositives(
-                name='fp{}'.format(thresh), thresholds=thresh))
-            metrics.append(tf.keras.metrics.TrueNegatives(
-                name='tn{}'.format(thresh), thresholds=thresh))
-            metrics.append(tf.keras.metrics.FalseNegatives(
-                name='fn{}'.format(thresh), thresholds=thresh))
-            metrics.append(tf.keras.metrics.Precision(
-                name='precision{}'.format(thresh), thresholds=thresh))
-            metrics.append(tf.keras.metrics.Recall(
-                name='recall{}'.format(thresh), thresholds=thresh))
-        metrics.append(tf.keras.metrics.BinaryAccuracy(
-            name='accuracy', threshold=0.5))
-        metrics.append(tf.keras.metrics.AUC(
-            name='auc', num_thresholds=100))
+            metrics.append(
+                tf.keras.metrics.TruePositives(name='tp{}'.format(thresh),
+                                               thresholds=thresh))
+            metrics.append(
+                tf.keras.metrics.FalsePositives(name='fp{}'.format(thresh),
+                                                thresholds=thresh))
+            metrics.append(
+                tf.keras.metrics.TrueNegatives(name='tn{}'.format(thresh),
+                                               thresholds=thresh))
+            metrics.append(
+                tf.keras.metrics.FalseNegatives(name='fn{}'.format(thresh),
+                                                thresholds=thresh))
+            metrics.append(
+                tf.keras.metrics.Precision(name='precision{}'.format(thresh),
+                                           thresholds=thresh))
+            metrics.append(
+                tf.keras.metrics.Recall(name='recall{}'.format(thresh),
+                                        thresholds=thresh))
+        metrics.append(
+            tf.keras.metrics.BinaryAccuracy(name='accuracy', threshold=0.5))
+        metrics.append(tf.keras.metrics.AUC(name='auc', num_thresholds=100))
 
         model.compile(loss=loss, optimizer=optimizer, metrics=metrics)
 
-        model.fit(x=dataset_train,
-                  epochs=EPOCHS,
-                  steps_per_epoch=STEPS_PER_EPOCH,
-                  validation_data=dataset_val,
-                  validation_steps=VALIDATION_STEPS,
-                  callbacks=[tensorboard_callback, image_callback, lr_callback])
+        model.fit(
+            x=dataset_train,
+            epochs=EPOCHS,
+            steps_per_epoch=STEPS_PER_EPOCH,
+            validation_data=dataset_val,
+            validation_steps=VALIDATION_STEPS,
+            callbacks=[tensorboard_callback, image_callback, lr_callback])
 
         model.evaluate(dataset_test,
                        steps=tf.math.ceil(num_test_examples / BATCH_SIZE))
