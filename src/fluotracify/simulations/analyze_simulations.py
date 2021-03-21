@@ -231,7 +231,7 @@ def correlate_simulations_corrected_by_prediction(model,
             trace
         'nmol': number of small molecules we wanted to examine with FCS
         '$D$ in $\\frac{{\mu m^2}}{{s}}$': diffusion coefficients
-        '$\tau_{{D}}$ in $ms$': transit times
+        '$\\tau_{{D}}$ in $ms$': transit times
         'Trace lengths': lengths of the fluorescence trace at the time they
             were correlated.
         'Traces used': 4 possible values: 'corrupted without correction', 'pure
@@ -242,15 +242,9 @@ def correlate_simulations_corrected_by_prediction(model,
     -----
     - during one of the correction algorithms (correction by label, correction
     by unet, correction by vgg), it could happen that less than 32 time steps
-    of the trace remain. Then the trace will get discarded, since it can't be
-    correlated using multipletau. This can be spotted looking at the print
-    statement after each of the 4 correlations. At the moment, this function
-    does not check this before concatenating the traces for the output
-    DataFrame / csv file, thus there can be a mismatch between the 3 columns
-    coming from the correlations (D, tau_D, trace lengths) and the rest. It is
-    most likely to happen during the predictions, so they are concatenated
-    last. If it happens then, there will be lines with NaNs, but at least the
-    rest of the traces is not affected.
+    of the trace remain. Then the diffusion rates and transit times will be
+    given as np.nan values, since the trace can not be correlated using
+    multipletau.
     """
     fwhm = 250
     win_len = 128  # only for model_type 0 (vgg)
