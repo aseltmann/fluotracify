@@ -41,7 +41,7 @@ def correlate(trace, fwhm, diffrate, time_step=1., verbose=True):
     out : numpy arrays
         - out[0] gives tau in ms
         - out[1] gives G(tau)
-        - out[2] gives residuals from fit
+        - out[2] gives correlation (x, y), fit, and residuals
     """
     # otherwise alpha1-variation does not seem to work
     assert trace.dtype == np.float64, 'Error: The datatype should be float64'
@@ -49,13 +49,16 @@ def correlate(trace, fwhm, diffrate, time_step=1., verbose=True):
     param = Parameters()
     param.add('offset', value=0.01, min=-0.5, max=1.5, vary=True)
     param.add('GN0', value=1.000, min=-0.0001, max=3000.0, vary=True)
-    param.add('offset', value=0.01, min=-0.5, max=1.5, vary=True)
     param.add('A1', value=1.000, min=0.0001, max=1.0000, vary=False)
     param.add('txy1', value=0.10, min=0.001, max=2000.0, vary=True)
     param.add('alpha1', value=0.75, min=0.600, max=2.0, vary=True)
     options = {'Dimen': 1, 'Diff_eq': 1, 'Triplet_eq': 1, 'Diff_species': 1}
     # Correlation
-    out = autocorrelate(trace, normalize=True, deltat=time_step)
+    try:
+        out = autocorrelate(trace, m=16, normalize=True, deltat=time_step)
+    except ValueError:
+        # if correlation fails, e.g. because len(trace) < 2*m
+        return np.nan, np.nan, np.nan
     # Fit
     res = minimize(eq.residual, param, args=(out[:, 0], out[:, 1], options))
     fit = eq.equation_(res.params, out[:, 0], options)
