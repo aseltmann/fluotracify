@@ -63,6 +63,10 @@ def correct_correlation_by_vgg_prediction(ntraces,
         trace_corrected_bypred = trace_corrected_bypred.take(
             idx_corrected_bypred, axis=0).reshape(-1)
 
+        # multipletau does not accept traces which are too short
+        # if len(trace_corrected_bypred) < 32:
+        #     continue
+
         diff_corrected_bypred, trans_corrected_bypred, _ = correlate.correlate(
             trace=trace_corrected_bypred,
             fwhm=fwhm,
@@ -239,8 +243,8 @@ def correct_correlation_by_unet_prediction(ntraces,
                                                     axis=0).astype(np.float64)
 
         # multipletau does not accept traces which are too short
-        if len(trace_corrected_bypred) < 32:
-            continue
+        # if len(trace_corrected_bypred) < 32:
+        #     continue
 
         diff_corrected_bypred, trans_corrected_bypred, _ = correlate.correlate(
             trace=trace_corrected_bypred,
