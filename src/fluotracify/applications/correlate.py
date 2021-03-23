@@ -56,8 +56,9 @@ def correlate(trace, fwhm, diffrate, time_step=1., verbose=True):
     # Correlation
     try:
         out = autocorrelate(trace, m=16, normalize=True, deltat=time_step)
-    except ValueError:
-        # if correlation fails, e.g. because len(trace) < 2*m
+    except (ValueError, IndexError):
+        # if correlation fails, e.g. because len(trace) < 2*m (ValueError)
+        # or because a trace of length 0 is given (IndexError)
         return np.nan, np.nan, np.nan
     # Fit
     res = minimize(eq.residual, param, args=(out[:, 0], out[:, 1], options))
