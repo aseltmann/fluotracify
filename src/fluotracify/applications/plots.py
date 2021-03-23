@@ -9,8 +9,8 @@ import seaborn as sns
 from fluotracify.applications import correction, correlate
 from fluotracify.imports import ptu_utils as ptu
 from fluotracify.simulations import (
+    analyze_simulations as ans,
     import_simulation_from_csv as isfc,
-    plot_simulations as ps,
 )
 
 
@@ -127,7 +127,7 @@ def plot_distribution_of_correlations_by_label_thresholds(
                              'clusters), 1 (for detector dropout) or 2 (for'
                              ' photobleaching)')
 
-        correlations_corrected_by_label = ps.correct_correlation_by_label(
+        correlations_corrected_by_label = ans.correct_correlation_by_label(
             ntraces=ntraces,
             traces_of_interest=traces_of_interest,
             labels_of_interest=labart_bool,
@@ -336,7 +336,7 @@ def plot_distribution_of_correlations_corrected_by_prediction(
 
     ntraces = len(traces_corrupted.columns)
 
-    lab_out = ps.correct_correlation_by_label(
+    lab_out = ans.correct_correlation_by_label(
         ntraces=ntraces,
         traces_of_interest=traces_corrupted,
         labels_of_interest=labels_corrupted,
