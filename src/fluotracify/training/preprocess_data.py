@@ -121,7 +121,6 @@ def tfds_from_pddf_for_vgg(features_df,
         use all traces
     zoomvector : tuple or list of uneven, positive integers
         Multiplier for each zoom level (zoom window = zoomvector * win_len)
-
     label_threshold : float
         Threshold defining when a trace is to be labelled as corrupted
     BATCH_SIZE : int
@@ -149,7 +148,6 @@ def tfds_from_pddf_for_vgg(features_df,
     _NUM_CLASSES : int
         Number of classes / labels for one-hot operation on y_tensor (not yet
         implemented)
-
     """
 
     features_df = features_df.iloc[:, ntraces_index:(ntraces_index +

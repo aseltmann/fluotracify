@@ -108,12 +108,7 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None, verbose=True):
     magic = inputfile.read(8).decode("utf-8").strip('\0')
     if magic != "PQTTTR":
         inputfile.close()
-<<<<<<< HEAD:src/fluotracify/imports/ptu_utils.py
         raise ValueError("ERROR: Magic invalid, this is not a PTU file.")
-=======
-        # outputfile.close()  # commented out, since not necessary
-        sys.exit(0)
->>>>>>> exp-201231-clustersim:src/fluotracify/imports/ptu_to_memory.py
 
     version = inputfile.read(8).decode("utf-8").strip('\0')
     if outputfilepath is not None:
@@ -202,12 +197,7 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None, verbose=True):
                 outputfile.write("<Binary blob with %d bytes>" % tagInt)
             tagDataList.append((evalName, tagInt))
         else:
-<<<<<<< HEAD:src/fluotracify/imports/ptu_utils.py
             raise ValueError("ERROR: Unknown tag type")
-=======
-            print("ERROR: Unknown tag type")
-            sys.exit(0)
->>>>>>> exp-201231-clustersim:src/fluotracify/imports/ptu_to_memory.py
         if tagIdent == "Header_End":
             break
 
@@ -268,15 +258,8 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None, verbose=True):
                 recordData = "{0:0{1}b}".format(
                     struct.unpack("<I", inputfile.read(4))[0], 32)
             except:
-<<<<<<< HEAD:src/fluotracify/imports/ptu_utils.py
                 raise ValueError('The file ended earlier than expected, at'
                                  'record %d/%d.' % (recNum, numRecords))
-=======
-                print(
-                    "The file ended earlier than expected, at record %d/%d." %
-                    (recNum, numRecords))
-                sys.exit(0)
->>>>>>> exp-201231-clustersim:src/fluotracify/imports/ptu_to_memory.py
 
             channel = int(recordData[0:4], base=2)
             dtime = int(recordData[4:16], base=2)
@@ -310,15 +293,8 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None, verbose=True):
                 recordData = "{0:0{1}b}".format(
                     struct.unpack("<I", inputfile.read(4))[0], 32)
             except:
-<<<<<<< HEAD:src/fluotracify/imports/ptu_utils.py
                 raise ValueError('The file ended earlier than expected, at'
                                  'record %d/%d.' % (recNum, numRecords))
-=======
-                print(
-                    "The file ended earlier than expected, at record %d/%d." %
-                    (recNum, numRecords))
-                sys.exit(0)
->>>>>>> exp-201231-clustersim:src/fluotracify/imports/ptu_to_memory.py
 
             channel = int(recordData[0:4], base=2)
             dtime = int(recordData[4:32], base=2)
@@ -356,15 +332,8 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None, verbose=True):
                 recordData = "{0:0{1}b}".format(
                     struct.unpack("<I", inputfile.read(4))[0], 32)
             except:
-<<<<<<< HEAD:src/fluotracify/imports/ptu_utils.py
                 raise ValueError('The file ended earlier than expected, at'
                                  'record %d/%d.' % (recNum, numRecords))
-=======
-                print(
-                    "The file ended earlier than expected, at record %d/%d." %
-                    (recNum, numRecords))
-                sys.exit(0)
->>>>>>> exp-201231-clustersim:src/fluotracify/imports/ptu_to_memory.py
 
             special = int(recordData[0:1], base=2)
             channel = int(recordData[1:7], base=2)
@@ -401,15 +370,8 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None, verbose=True):
                 recordData = "{0:0{1}b}".format(
                     struct.unpack("<I", inputfile.read(4))[0], 32)
             except:
-<<<<<<< HEAD:src/fluotracify/imports/ptu_utils.py
                 raise ValueError('The file ended earlier than expected, at'
                                  'record %d/%d.' % (recNum, numRecords))
-=======
-                print(
-                    "The file ended earlier than expected, at record %d/%d." %
-                    (recNum, numRecords))
-                sys.exit(0)
->>>>>>> exp-201231-clustersim:src/fluotracify/imports/ptu_to_memory.py
 
             special = int(recordData[0:1], base=2)
             channel = int(recordData[1:7], base=2)
@@ -545,12 +507,7 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None, verbose=True):
             outputfile.write("\nrecord# chan   nsync truetime/ps\n")
         readHT2(2)
     else:
-<<<<<<< HEAD:src/fluotracify/imports/ptu_utils.py
         raise ValueError('ERROR: Unknown record type')
-=======
-        print("ERROR: Unknown record type")
-        sys.exit(0)
->>>>>>> exp-201231-clustersim:src/fluotracify/imports/ptu_to_memory.py
 
     inputfile.close()
     if outputfilepath is not None:
@@ -559,12 +516,8 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None, verbose=True):
 
 
 def time2bin(time_arr, chan_arr, chan_num, win_int):
-<<<<<<< HEAD:src/fluotracify/imports/ptu_utils.py
     """bins tcspc data (either dtime or truetime). win_int gives the binning
     window.
-=======
-    """bins tcspc data (either dtime or truetime). win_int gives the binning window
->>>>>>> exp-201231-clustersim:src/fluotracify/imports/ptu_to_memory.py
 
     Notes
     -----
@@ -666,13 +619,9 @@ def process_tcspc_data(chan_arr,
 
     Notes
     -----
-<<<<<<< HEAD:src/fluotracify/imports/ptu_utils.py
-    code is adopted from: https://github.com/dwaithe/FCS_point_correlator/blob/master/focuspoint/correlation_objects.py#L110"""
-    # this is used for the photon decay curve
-=======
     code is adopted from Dominic Waithe's Focuspoint package:
     https://github.com/dwaithe/FCS_point_correlator/blob/master/focuspoint/correlation_objects.py#L110"""
->>>>>>> exp-201231-clustersim:src/fluotracify/imports/ptu_to_memory.py
+    # this is used for the photon decay curve
     win_int = 10
 
     tcspc = {}
@@ -807,6 +756,8 @@ def import_from_ptu(path, photon_count_bin, file_delimiter=None, verbose=False):
 
     Raises
     ------
+    FileNotFoundError
+        If the path provided does not include any .ptu files.
     ValueError
         If import_ptu_to_memory fails (probably the .ptu file is not
         compatible)
@@ -830,6 +781,9 @@ def import_from_ptu(path, photon_count_bin, file_delimiter=None, verbose=False):
 
     path = Path(path)
     files = [f for f in os.listdir(path) if f.endswith('.ptu')]
+    if len(files) == 0:
+        raise FileNotFoundError('The path provided does not include any'
+                                ' .ptu files.')
 
     ptu_exps_metadata = pd.DataFrame()
     ptu_exps_data = pd.DataFrame()
@@ -838,7 +792,7 @@ def import_from_ptu(path, photon_count_bin, file_delimiter=None, verbose=False):
         file = Path(file)
         path_and_file = path / file
         if verbose:
-            print('{} of {}: {}'.format(idx, len(files), path_and_file))
+            print('{} of {}: {}'.format(idx+1, len(files), path_and_file))
 
         try:
             out, tag_data_list, _, __ = import_ptu_to_memory(

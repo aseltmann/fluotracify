@@ -48,10 +48,17 @@ def import_from_csv(folder,
 
     Raises
     ------
+    FileNotFoundError
+        If the path provided does not include any .csv files
     ValueError
         If pandas read_csv fails
     """
     files = list(Path(folder).rglob('*.csv'))
+
+    if len(files) == 0:
+        raise FileNotFoundError('The path provided does not include any'
+                                ' .csv files.')
+
     files.sort()
     np.random.seed(0)  # for reproducible random state
     np.random.shuffle(files)
@@ -149,3 +156,46 @@ def separate_data_and_labels(array, nsamples, col_per_example):
           ' {}'.format(col_per_example, array_dict_shapes))
 
     return array_dict
+
+
+def extract_traces_by_diffrates(diffrate_of_interest, traces,
+                                experiment_params, nsamples):
+    """Get traces only of a certain simulated diffusion rate
+
+    Parameters
+    ----------
+    diffrate_of_interest : float
+        diffusion rate used to simulate the traces of interest
+    traces : pandas DataFrame
+        Contains one type of traces (e.g. traces with artifacts OR traces
+        without artifacts), ordered columnwise, where traces were loaded in
+        batches of nsamples (e.g. 100) and concatenated
+    experiment_params : pandas DataFrame
+        Contains metadata of the files (is obtained while loading the
+        simulated data with the `import_from_csv` function from the
+        fluotracify.simulations.import_simulation_from_csv module)
+    nsamples : int
+        Number of traces per .csv file (is obtained while loading the
+        simulated data with the `import_from_csv` function from the
+        fluotracify.simulations.import_simulation_from_csv module)
+
+    Returns
+    -------
+    traces of interest : pandas DataFrame
+        All traces simulated with the given Diffusion rate of interest,
+        ordered columnwise
+    """
+    if not len(set(nsamples)) == 1:
+        raise Exception(
+            'Error: The number of examples in each file have to be the same')
+
+    nsamples = next(iter(set(nsamples)))
+    diffrates = experiment_params.loc[
+        'diffusion rate of molecules in micrometer^2 / s'].astype(np.float32)
+    diff = diffrates.where(diffrates == diffrate_of_interest).dropna()
+    traces_of_interest = pd.DataFrame()
+    for diff_idx in (diff.index * nsamples):
+        traces_tmp = traces.iloc[:, diff_idx:diff_idx + nsamples]
+        traces_of_interest = pd.concat([traces_of_interest, traces_tmp],
+                                       axis=1)
+    return traces_of_interest

@@ -126,9 +126,17 @@ def import_fcsfiles_countrates_to_memory(path):
     -------
     fcs : pandas DataFrame
         Contains timetraces ('CountRateArray') from FCS files
+
+    Raises
+    ------
+    FileNotFoundError
+        if the path provided does not include any .fcs files
     """
     path = Path(path)
     files = list(path.glob('**/*.fcs'))
+    if len(files) == 0:
+        raise FileNotFoundError('The path provided does not include any'
+                                ' .fcs files.')
     fcs = pd.DataFrame()
     for file in files:
         fcs_tmp = fcsfiles.ConfoCor3Fcs(file)
