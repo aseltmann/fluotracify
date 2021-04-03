@@ -1,4 +1,4 @@
-#+TITLE: Lab Book Fluotracify
+#+TITLE: Lab book Fluotracify
 #+AUTHOR: Alexander Seltmann
 #+LANGUAGE: en
 # If exporting the existing code and execution to html or pdf etc, the
@@ -209,7 +209,7 @@
     #+NAME: jpt-tmux
     #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine
     conda activate tf-nightly
-    export PORT=8889
+    export PORT=9999
     export XDG_RUNTIME_DIR=''
     export XDG_RUNTIME_DIR=""
     jupyter lab --no-browser --port=$PORT
@@ -325,25 +325,6 @@
           - =C-c C-i= to interrupt the kernel, =C-c C-r= to restart the kernel
 
 ** Organization of git
-*** tools used (notes)
-**** - Emacs =magit=
-- =gitflow-avh= (=magit-flow=) to follow the flow
-- possibly https://github.com/magit/magit-annex for large files. Follow this:
-  https://git-annex.branchable.com/walkthrough/
-- maybe check out git-toolbelt at some point
-  https://github.com/nvie/git-toolbelt#readme with
-  https://nvie.com/posts/git-power-tools/
-**** jupyter
-- emacs jupyter for running and connecting to kernel on server:
-  https://github.com/dzop/emacs-jupyter
-- if I actually still would use .ipynb files, these might come handy:
-  + jupytext: https://github.com/mwouts/jupytext
-  + nbstripout: https://github.com/kynan/nbstripout
-**** mlflow
-- https://docs.faculty.ai/user-guide/experiments/index.html and
-  https://docs.microsoft.com/en-us/azure/databricks/_static/notebooks/hls-image-processing/02-image-segmentation-dl.html
-**** tensorflow
-https://www.tensorflow.org/tensorboard/image_summaries
 *** remote/origin/master branch:
   - contains all the source code in folder **src/** which is used for experiments.
   - contains the **LabBook.org** template
