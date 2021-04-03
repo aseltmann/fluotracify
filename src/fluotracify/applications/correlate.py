@@ -9,7 +9,7 @@ from multipletau import autocorrelate
 from fluotracify.applications import equations_to_fit as eq
 
 
-def correlate(trace, fwhm, diffrate, time_step=1., verbose=True):
+def correlate(trace, fwhm, diffrate=None, time_step=1., verbose=True):
     """autocorrelate an FCS trace and return the calculated diffusion rate and
     transit_time. If verbose=True, plot the correlation curve and fit, and
     print out the derived values for transit time and diffusion constant.
