@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <title>Lab book Fluotracify</title>
-<!-- 2021-04-04 So 18:08 -->
+<!-- 2021-04-04 So 19:11 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="generator" content="Org-mode">
@@ -233,14 +233,38 @@ MathJax.Hub.Config({
 <li><a href="#sec-1-1-1">1.1.1. General:</a></li>
 <li><a href="#sec-1-1-2">1.1.2. Code block languages used in this document</a></li>
 <li><a href="#sec-1-1-3">1.1.3. Experiments workflow:</a></li>
-<li><a href="#sec-1-1-4">1.1.4. Example for experimental setup procedure</a></li>
-<li><a href="#sec-1-1-5">1.1.5. tools used (notes)</a></li>
+<li><a href="#sec-1-1-4">1.1.4. Example for experimental setup procedure</a>
+<ul class="nav">
+<li><a href="#sec-jupyter-setup">1.1.4.1. Setting starting a jupyter kernel from a remote jupyter session using <code>emacs-jupyter</code> in <code>org babel</code></a></li>
+</ul>
+</li>
+<li><a href="#sec-1-1-5">1.1.5. tools used (notes)</a>
+<ul class="nav">
+<li><a href="#sec-1-1-5-1">1.1.5.1. Emacs <code>magit</code></a></li>
+<li><a href="#sec-1-1-5-2">1.1.5.2. jupyter</a></li>
+<li><a href="#sec-1-1-5-3">1.1.5.3. mlflow</a></li>
+<li><a href="#sec-1-1-5-4">1.1.5.4. tensorflow</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a href="#sec-1-2">1.2. Template for data entry and setup notes:</a>
 <ul class="nav">
-<li><a href="#sec-1-2-1">1.2.1. exp-#date-#title</a></li>
-<li><a href="#sec-1-2-2">1.2.2. Setup notes</a></li>
+<li><a href="#sec-1-2-1">1.2.1. exp-#date-#title</a>
+<ul class="nav">
+<li><a href="#sec-1-2-1-1">1.2.1.1. git:</a></li>
+<li><a href="#sec-1-2-1-2">1.2.1.2. System Metadata:</a></li>
+<li><a href="#scripts-tmux">1.2.1.3. Tmux setup and scripts</a></li>
+<li><a href="#ssh-tunneling">1.2.1.4. SSH tunneling</a></li>
+<li><a href="#scripts-jp">1.2.1.5. jupyter scripts</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-2-2">1.2.2. Setup notes</a>
+<ul class="nav">
+<li><a href="#sec-tmux-setup">1.2.2.1. Setting up a tmux connection from using <code>ob-tmux</code> in <code>org-babel</code></a></li>
+<li><a href="#sec-1-2-2-2">1.2.2.2. <code>emacs-jupyter</code> Setup</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a href="#sec-1-3">1.3. Organization of git</a>
@@ -249,18 +273,36 @@ MathJax.Hub.Config({
 <li><a href="#sec-1-3-2">1.3.2. remote/origin/exp### branches:</a></li>
 <li><a href="#sec-1-3-3">1.3.3. remote/origin/develop branch:</a></li>
 <li><a href="#sec-1-3-4">1.3.4. remote/origin/data branch:</a></li>
-<li><a href="#sec-1-3-5">1.3.5. Git TAGs</a></li>
+<li><a href="#sec-1-3-5">1.3.5. Git TAGs</a>
+<ul class="nav">
+<li><a href="#sec-1-3-5-1">1.3.5.1. Stable versions:</a></li>
+<li><a href="#sec-1-3-5-2">1.3.5.2. All tags from git:</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a href="#sec-1-4">1.4. Organization of code</a>
 <ul class="nav">
 <li><a href="#sec-1-4-1">1.4.1. scripts:</a></li>
-<li><a href="#sec-1-4-2">1.4.2. src/</a></li>
+<li><a href="#sec-1-4-2">1.4.2. src/</a>
+<ul class="nav">
+<li><a href="#sec-1-4-2-1">1.4.2.1. fluotracify/</a></li>
+<li><a href="#sec-1-4-2-2">1.4.2.2. nanosimpy/</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a href="#sec-1-5">1.5. Changes in this repository (without "* Data" in this file)</a>
 <ul class="nav">
-<li><a href="#sec-1-5-1">1.5.1. Changes in LabBook.org (without "* Data")</a></li>
+<li><a href="#sec-1-5-1">1.5.1. Changes in LabBook.org (without "* Data")</a>
+<ul class="nav">
+<li><a href="#sec-1-5-1-1">1.5.1.1. 2020-11-04</a></li>
+<li><a href="#sec-1-5-1-2">1.5.1.2. 2020-05-31</a></li>
+<li><a href="#sec-1-5-1-3">1.5.1.3. 2020-05-07</a></li>
+<li><a href="#sec-1-5-1-4">1.5.1.4. 2020-04-22</a></li>
+<li><a href="#sec-1-5-1-5">1.5.1.5. 2020-03-30</a></li>
+</ul>
+</li>
 <li><a href="#sec-1-5-2">1.5.2. Changes in src/fluotracify</a></li>
 </ul>
 </li>
@@ -271,24 +313,44 @@ MathJax.Hub.Config({
 <li><a href="#sec-2-1">2.1. exp-200330-test</a>
 <ul class="nav">
 <li><a href="#sec-2-1-1">2.1.1. git</a></li>
-<li><a href="#sec-2-1-2">2.1.2. Experimentation diary</a></li>
+<li><a href="#sec-2-1-2">2.1.2. Experimentation diary</a>
+<ul class="nav">
+<li><a href="#sec-2-1-2-1">2.1.2.1. Learn about hard vs soft links</a></li>
+<li><a href="#sec-2-1-2-2">2.1.2.2. Learn about Org-mode's column view</a></li>
+<li><a href="#sec-2-1-2-3">2.1.2.3. Learning about org-mode's clocking</a></li>
+<li><a href="#sec-2-1-2-4">2.1.2.4. Configure Emacs setup (neotree)</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a href="#sec-2-2">2.2. exp-200331-test</a>
 <ul class="nav">
-<li><a href="#sec-2-2-1">2.2.1. Technical Setup diary</a></li>
+<li><a href="#sec-2-2-1">2.2.1. Technical Setup diary</a>
+<ul class="nav">
+<li><a href="#sec-2-2-1-1">2.2.1.1. Test if remote HPC is accessible via org-mode</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a href="#sec-2-3">2.3. exp-200402-test</a>
 <ul class="nav">
 <li><a href="#sec-2-3-1">2.3.1. git</a></li>
-<li><a href="#sec-2-3-2">2.3.2. Technical and conceptional setup</a></li>
+<li><a href="#sec-2-3-2">2.3.2. Technical and conceptional setup</a>
+<ul class="nav">
+<li><a href="#sec-2-3-2-1">2.3.2.1. Execute a script on Ara cluster with literate programming</a></li>
+<li><a href="#sec-2-3-2-2">2.3.2.2. Setup of literate programming OR jupytex or the like</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a href="#sec-2-4">2.4. exp-200410-test</a>
 <ul class="nav">
 <li><a href="#sec-2-4-1">2.4.1. git</a></li>
-<li><a href="#sec-2-4-2">2.4.2. Technical and conceptional setup</a></li>
+<li><a href="#sec-2-4-2">2.4.2. Technical and conceptional setup</a>
+<ul class="nav">
+<li><a href="#sec-2-4-2-1">2.4.2.1. Connect to jupyter kernels via <code>org-babel</code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a href="#sec-2-5">2.5. exp-200412-test</a>
@@ -297,14 +359,40 @@ MathJax.Hub.Config({
 <li><a href="#sec-2-5-2">2.5.2. Update files on ara cluster</a></li>
 <li><a href="#sec-2-5-3">2.5.3. SSH into ara cluster and start tmux and jupyter</a></li>
 <li><a href="#sec-2-5-4">2.5.4. start ara cluster jupyter Python 3 kernel and get metadata</a></li>
-<li><a href="#sec-2-5-5">2.5.5. Technical and conceptional setup</a></li>
+<li><a href="#sec-2-5-5">2.5.5. Technical and conceptional setup</a>
+<ul class="nav">
+<li><a href="#sec-2-5-5-1">2.5.5.1. Do a UNET Training</a></li>
+<li><a href="#sec-2-5-5-2">2.5.5.2. Investigate Error on GPU node</a></li>
+<li><a href="#sec-2-5-5-3">2.5.5.3. Export pandas DataFrames as org tables instead of html</a></li>
+<li><a href="#sec-2-5-5-4">2.5.5.4. Inline-display of plots</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a href="#sec-2-6">2.6. exp-200413-test</a>
 <ul class="nav">
 <li><a href="#sec-2-6-1">2.6.1. git</a></li>
-<li><a href="#sec-2-6-2">2.6.2. ssh-org, tmux</a></li>
-<li><a href="#sec-2-6-3">2.6.3. jupyter session</a></li>
+<li><a href="#sec-2-6-2">2.6.2. ssh-org, tmux</a>
+<ul class="nav">
+<li><a href="#sec-2-6-2-1">2.6.2.1. ob-tmux version bug</a></li>
+<li><a href="#sec-2-6-2-2">2.6.2.2. ob-tmux output feature</a></li>
+<li><a href="#sec-2-6-2-3">2.6.2.3. ob-tmux :var feature</a></li>
+</ul>
+</li>
+<li><a href="#sec-2-6-3">2.6.3. jupyter session</a>
+<ul class="nav">
+<li><a href="#sec-2-6-3-1">2.6.3.1. jupyter-python-metadata</a></li>
+<li><a href="#sec-2-6-3-2">2.6.3.2. set output folder for jupyter-python to <code>data/exp-tests</code></a></li>
+<li><a href="#sec-2-6-3-3">2.6.3.3. Set up mlflow for reproducible ml experiments</a></li>
+<li><a href="#sec-2-6-3-4">2.6.3.4. Investigate Error on GPU node</a></li>
+<li><a href="#sec-2-6-3-5">2.6.3.5. Export pandas DataFrames as org tables instead of html</a></li>
+<li><a href="#sec-2-6-3-6">2.6.3.6. Inline-display of plots</a></li>
+<li><a href="#sec-2-6-3-7">2.6.3.7. fix pydot and graphviz to make model plotting work</a></li>
+<li><a href="#sec-2-6-3-8">2.6.3.8. transform ML training ipynb to py files as used here</a></li>
+<li><a href="#sec-2-6-3-9">2.6.3.9. check out python module <code>argparser</code> as used here</a></li>
+<li><a href="#sec-2-6-3-10">2.6.3.10. check out Talos 1.0 with MLflow for Hyperparameter optimization</a></li>
+</ul>
+</li>
 <li><a href="#sec-2-6-4">2.6.4. Take a look into <code>org-ref</code> for reference management and citing inside this labbook</a></li>
 <li><a href="#sec-2-6-5">2.6.5. Further setup of git branching model</a></li>
 <li><a href="#sec-2-6-6">2.6.6. Set up Dropbox or git annex</a></li>
@@ -312,18 +400,47 @@ MathJax.Hub.Config({
 </li>
 <li><a href="#sec-2-7">2.7. exp-310520-unet</a>
 <ul class="nav">
-<li><a href="#sec-2-7-1">2.7.1. Connect</a></li>
+<li><a href="#sec-2-7-1">2.7.1. Connect</a>
+<ul class="nav">
+<li><a href="#sec-2-7-1-1">2.7.1.1. Tmux on Ara</a></li>
+<li><a href="#sec-2-7-1-2">2.7.1.2. Compute node for script execution</a></li>
+<li><a href="#sec-2-7-1-3">2.7.1.3. Jupyter on Ara</a></li>
+<li><a href="#sec-2-7-1-4">2.7.1.4. Tensorboard tunnel, Mlflow ui tunnel</a></li>
+</ul>
+</li>
 <li><a href="#sec-2-7-2">2.7.2. git exp 1</a></li>
 <li><a href="#sec-2-7-3">2.7.3. mlflow environment variables</a></li>
 <li><a href="#sec-2-7-4">2.7.4. Learning rate schedule</a></li>
-<li><a href="#sec-2-7-5">2.7.5. test runs</a></li>
+<li><a href="#sec-2-7-5">2.7.5. test runs</a>
+<ul class="nav">
+<li><a href="#sec-2-7-5-1">2.7.5.1. no 1 - experiment creation failed</a></li>
+<li><a href="#sec-2-7-5-2">2.7.5.2. no 2</a></li>
+</ul>
+</li>
 <li><a href="#sec-2-7-6">2.7.6. experimental run</a></li>
-<li><a href="#sec-2-7-7">2.7.7. read out logs</a></li>
+<li><a href="#sec-2-7-7">2.7.7. read out logs</a>
+<ul class="nav">
+<li><a href="#sec-2-7-7-1">2.7.7.1. read out mlflow logs using CLI</a></li>
+<li><a href="#sec-2-7-7-2">2.7.7.2. Reading out mlflow logs with Python API</a></li>
+</ul>
+</li>
 <li><a href="#sec-2-7-8">2.7.8. Load model from mlflow logs and predict separately loaded data</a></li>
 <li><a href="#sec-2-7-9">2.7.9. git exp 2</a></li>
 <li><a href="#sec-2-7-10">2.7.10. experimental run 2 - full dataset</a></li>
-<li><a href="#sec-2-7-11">2.7.11. read out logs experiment 2</a></li>
-<li><a href="#sec-2-7-12">2.7.12. use model from run 2 to correct data</a></li>
+<li><a href="#sec-2-7-11">2.7.11. read out logs experiment 2</a>
+<ul class="nav">
+<li><a href="#sec-2-7-11-1">2.7.11.1. read out mlflow logs using CLI</a></li>
+<li><a href="#sec-2-7-11-2">2.7.11.2. plots via mlflow ui, comparing run 1 and 2</a></li>
+<li><a href="#sec-2-7-11-3">2.7.11.3. plots via tensorboard ui</a></li>
+<li><a href="#sec-2-7-11-4">2.7.11.4. for next runs</a></li>
+</ul>
+</li>
+<li><a href="#sec-2-7-12">2.7.12. use model from run 2 to correct data</a>
+<ul class="nav">
+<li><a href="#sec-2-7-12-1">2.7.12.1. simulated data from the test set</a></li>
+<li><a href="#sec-2-7-12-2">2.7.12.2. experimental data from Pablo (structured experiment)</a></li>
+</ul>
+</li>
 <li><a href="#sec-2-7-13">2.7.13. git exp 3</a></li>
 <li><a href="#sec-2-7-14">2.7.14. experimental run 3 - bs=3</a></li>
 <li><a href="#sec-2-7-15">2.7.15. git exp 4</a></li>
@@ -345,12 +462,47 @@ MathJax.Hub.Config({
 </li>
 <li><a href="#sec-2-9">2.9. exp-210204-unet</a>
 <ul class="nav">
-<li><a href="#sec-2-9-1">2.9.1. Connect</a></li>
-<li><a href="#sec-2-9-2">2.9.2. Run 1 - full dataset</a></li>
-<li><a href="#sec-2-9-3">2.9.3. Read out logs of Run 1</a></li>
+<li><a href="#sec-2-9-1">2.9.1. Connect</a>
+<ul class="nav">
+<li><a href="#sec-2-9-1-1">2.9.1.1. Node for script execution</a></li>
+<li><a href="#sec-2-9-1-2">2.9.1.2. Node for running Jupyter</a></li>
+<li><a href="#sec-2-9-1-3">2.9.1.3. Node for running Mlflow UI</a></li>
+</ul>
+</li>
+<li><a href="#sec-2-9-2">2.9.2. Run 1 - full dataset</a>
+<ul class="nav">
+<li><a href="#sec-2-9-2-1">2.9.2.1. Record metadata</a></li>
+<li><a href="#sec-2-9-2-2">2.9.2.2. Set mlflow variables</a></li>
+<li><a href="#sec-2-9-2-3">2.9.2.3. run mlflow</a></li>
+</ul>
+</li>
+<li><a href="#sec-2-9-3">2.9.3. Read out logs of Run 1</a>
+<ul class="nav">
+<li><a href="#sec-2-9-3-1">2.9.3.1. test dataset statistics</a></li>
+<li><a href="#sec-2-9-3-2">2.9.3.2. prediction plots after each epoch</a></li>
+<li><a href="#sec-2-9-3-3">2.9.3.3. Git log after some code additions</a></li>
+<li><a href="#sec-2-9-3-4">2.9.3.4. Application 1 - load modules, set parameters</a></li>
+<li><a href="#sec-2-9-3-5">2.9.3.5. Application 2 - test data</a></li>
+<li><a href="#sec-2-9-3-6">2.9.3.6. Application 3 - experimental data</a></li>
+</ul>
+</li>
 <li><a href="#sec-2-9-4">2.9.4. learnings from run 1</a></li>
-<li><a href="#sec-2-9-5">2.9.5. Run 2 - full dataset</a></li>
-<li><a href="#sec-2-9-6">2.9.6. Read out logs of Run 2</a></li>
+<li><a href="#sec-2-9-5">2.9.5. Run 2 - full dataset</a>
+<ul class="nav">
+<li><a href="#sec-2-9-5-1">2.9.5.1. Record metadata, git log</a></li>
+<li><a href="#sec-2-9-5-2">2.9.5.2. Set mlflow variables</a></li>
+<li><a href="#sec-2-9-5-3">2.9.5.3. run mlflow</a></li>
+</ul>
+</li>
+<li><a href="#sec-2-9-6">2.9.6. Read out logs of Run 2</a>
+<ul class="nav">
+<li><a href="#sec-2-9-6-1">2.9.6.1. test dataset statistics</a></li>
+<li><a href="#sec-2-9-6-2">2.9.6.2. prediction plots after each epoch</a></li>
+<li><a href="#sec-2-9-6-3">2.9.6.3. Application 1 - git log, load modules, set parameters</a></li>
+<li><a href="#sec-2-9-6-4">2.9.6.4. Application 2 - test data</a></li>
+<li><a href="#sec-2-9-6-5">2.9.6.5. Application 3 - experimental data</a></li>
+</ul>
+</li>
 <li><a href="#sec-2-9-7">2.9.7. use MLFLOW to compare run 1 and run 2</a></li>
 </ul>
 </li>
@@ -490,15 +642,19 @@ yellow colour (#FBFBBF)
 <div id="outline-container-sec-1-1-4" class="outline-4">
 <h4 id="sec-1-1-4"><span class="section-number-4">1.1.4</span> Example for experimental setup procedure</h4>
 <div class="outline-text-4" id="text-1-1-4">
-</div><ol class="org-ol"><li><a id="sec-jupyter-setup" name="sec-jupyter-setup"></a><a id="sec-1-1-4-1" name="sec-1-1-4-1"></a>Setting starting a jupyter kernel from a remote jupyter session using <code>emacs-jupyter</code> in <code>org babel</code><br ><div class="outline-text-5" id="text-sec-jupyter-setup">
+</div><div id="outline-container-sec-jupyter-setup" class="outline-5">
+<h5 id="sec-jupyter-setup"><a id="sec-1-1-4-1" name="sec-1-1-4-1"></a><span class="section-number-5">1.1.4.1</span> Setting starting a jupyter kernel from a remote jupyter session using <code>emacs-jupyter</code> in <code>org babel</code></h5>
+<div class="outline-text-5" id="text-sec-jupyter-setup">
 </div>
-</li></ol>
+</div>
 </div>
 
 <div id="outline-container-sec-1-1-5" class="outline-4">
 <h4 id="sec-1-1-5"><span class="section-number-4">1.1.5</span> tools used (notes)</h4>
 <div class="outline-text-4" id="text-1-1-5">
-</div><ol class="org-ol"><li><a id="sec-1-1-5-1" name="sec-1-1-5-1"></a>Emacs <code>magit</code><br ><div class="outline-text-5" id="text-1-1-5-1">
+</div><div id="outline-container-sec-1-1-5-1" class="outline-5">
+<h5 id="sec-1-1-5-1"><span class="section-number-5">1.1.5.1</span> Emacs <code>magit</code></h5>
+<div class="outline-text-5" id="text-1-1-5-1">
 <ul class="org-ul">
 <li><code>gitflow-avh</code> (<code>magit-flow</code>) to follow the flow
 </li>
@@ -511,8 +667,10 @@ yellow colour (#FBFBBF)
 </li>
 </ul>
 </div>
-</li>
-<li><a id="sec-1-1-5-2" name="sec-1-1-5-2"></a>jupyter<br ><div class="outline-text-5" id="text-1-1-5-2">
+</div>
+<div id="outline-container-sec-1-1-5-2" class="outline-5">
+<h5 id="sec-1-1-5-2"><span class="section-number-5">1.1.5.2</span> jupyter</h5>
+<div class="outline-text-5" id="text-1-1-5-2">
 <ul class="org-ul">
 <li>emacs jupyter for running and connecting to kernel on server:
 <a href="https://github.com/dzop/emacs-jupyter">https://github.com/dzop/emacs-jupyter</a>
@@ -527,22 +685,26 @@ yellow colour (#FBFBBF)
 </li>
 </ul>
 </div>
-</li>
-<li><a id="sec-1-1-5-3" name="sec-1-1-5-3"></a>mlflow<br ><div class="outline-text-5" id="text-1-1-5-3">
+</div>
+<div id="outline-container-sec-1-1-5-3" class="outline-5">
+<h5 id="sec-1-1-5-3"><span class="section-number-5">1.1.5.3</span> mlflow</h5>
+<div class="outline-text-5" id="text-1-1-5-3">
 <ul class="org-ul">
 <li><a href="https://docs.faculty.ai/user-guide/experiments/index.html">https://docs.faculty.ai/user-guide/experiments/index.html</a> and
 <a href="https://docs.microsoft.com/en-us/azure/databricks/_static/notebooks/hls-image-processing/02-image-segmentation-dl.html">https://docs.microsoft.com/en-us/azure/databricks/_static/notebooks/hls-image-processing/02-image-segmentation-dl.html</a>
 </li>
 </ul>
 </div>
-</li>
-<li><a id="sec-1-1-5-4" name="sec-1-1-5-4"></a>tensorflow<br ><div class="outline-text-5" id="text-1-1-5-4">
+</div>
+<div id="outline-container-sec-1-1-5-4" class="outline-5">
+<h5 id="sec-1-1-5-4"><span class="section-number-5">1.1.5.4</span> tensorflow</h5>
+<div class="outline-text-5" id="text-1-1-5-4">
 <ul class="org-ul">
 <li><a href="https://www.tensorflow.org/tensorboard/image_summaries">https://www.tensorflow.org/tensorboard/image_summaries</a>
 </li>
 </ul>
 </div>
-</li></ol>
+</div>
 </div>
 </div>
 
@@ -552,16 +714,20 @@ yellow colour (#FBFBBF)
 </div><div id="outline-container-sec-1-2-1" class="outline-4">
 <h4 id="sec-1-2-1"><span class="section-number-4">1.2.1</span> exp-#date-#title</h4>
 <div class="outline-text-4" id="text-1-2-1">
-</div><ol class="org-ol"><li><a id="sec-1-2-1-1" name="sec-1-2-1-1"></a>git:<br ><div class="outline-text-5" id="text-1-2-1-1">
+</div><div id="outline-container-sec-1-2-1-1" class="outline-5">
+<h5 id="sec-1-2-1-1"><span class="section-number-5">1.2.1.1</span> git:</h5>
+<div class="outline-text-5" id="text-1-2-1-1">
 <div class="org-src-container">
 
 <pre class="src src-sh">git log -1
 </pre>
 </div>
 </div>
-</li>
+</div>
 
-<li><a id="sec-1-2-1-2" name="sec-1-2-1-2"></a>System Metadata:<br ><div class="outline-text-5" id="text-1-2-1-2">
+<div id="outline-container-sec-1-2-1-2" class="outline-5">
+<h5 id="sec-1-2-1-2"><span class="section-number-5">1.2.1.2</span> System Metadata:</h5>
+<div class="outline-text-5" id="text-1-2-1-2">
 <div class="org-src-container">
 
 <pre class="src src-jupyter-python" id="jp-metadata"><span style="color: #859900; font-weight: bold;">import</span> os
@@ -588,9 +754,11 @@ yellow colour (#FBFBBF)
 </pre>
 </div>
 </div>
-</li>
+</div>
 
-<li><a id="scripts-tmux" name="scripts-tmux"></a><a id="sec-1-2-1-3" name="sec-1-2-1-3"></a>Tmux setup and scripts<br ><div class="outline-text-5" id="text-scripts-tmux">
+<div id="outline-container-scripts-tmux" class="outline-5">
+<h5 id="scripts-tmux"><a id="sec-1-2-1-3" name="sec-1-2-1-3"></a><span class="section-number-5">1.2.1.3</span> Tmux setup and scripts</h5>
+<div class="outline-text-5" id="text-scripts-tmux">
 <div class="org-src-container">
 
 <pre class="src src-sh" id="setup-tmux">rm ~/.tmux-local-socket-remote-machine
@@ -674,9 +842,11 @@ ssh ara -tfN <span style="color: #b58900; font-weight: bold;">\</span>
 </tbody>
 </table>
 </div>
-</li>
+</div>
 
-<li><a id="ssh-tunneling" name="ssh-tunneling"></a><a id="sec-1-2-1-4" name="sec-1-2-1-4"></a>SSH tunneling<br ><div class="outline-text-5" id="text-ssh-tunneling">
+<div id="outline-container-ssh-tunneling" class="outline-5">
+<h5 id="ssh-tunneling"><a id="sec-1-2-1-4" name="sec-1-2-1-4"></a><span class="section-number-5">1.2.1.4</span> SSH tunneling</h5>
+<div class="outline-text-5" id="text-ssh-tunneling">
 <p>
 Different applications can be run on the remote compute node. If I want to
 access them at the local machine, and open them with the browser, I use this
@@ -701,9 +871,11 @@ Apps I use that way:
 </li>
 </ul>
 </div>
-</li>
+</div>
 
-<li><a id="scripts-jp" name="scripts-jp"></a><a id="sec-1-2-1-5" name="sec-1-2-1-5"></a>jupyter scripts<br ><div class="outline-text-5" id="text-scripts-jp">
+<div id="outline-container-scripts-jp" class="outline-5">
+<h5 id="scripts-jp"><a id="sec-1-2-1-5" name="sec-1-2-1-5"></a><span class="section-number-5">1.2.1.5</span> jupyter scripts</h5>
+<div class="outline-text-5" id="text-scripts-jp">
 <p>
 Starting a jupyter instance on a server where the necessary libraries are
 installed is easy using this script:
@@ -735,13 +907,15 @@ locally to connect to the notebook. If you close Emacs, it would need to be
 reestablished
 </p>
 </div>
-</li></ol>
+</div>
 </div>
 
 <div id="outline-container-sec-1-2-2" class="outline-4">
 <h4 id="sec-1-2-2"><span class="section-number-4">1.2.2</span> Setup notes</h4>
 <div class="outline-text-4" id="text-1-2-2">
-</div><ol class="org-ol"><li><a id="sec-tmux-setup" name="sec-tmux-setup"></a><a id="sec-1-2-2-1" name="sec-1-2-2-1"></a>Setting up a tmux connection from using <code>ob-tmux</code> in <code>org-babel</code><br ><div class="outline-text-5" id="text-sec-tmux-setup">
+</div><div id="outline-container-sec-tmux-setup" class="outline-5">
+<h5 id="sec-tmux-setup"><a id="sec-1-2-2-1" name="sec-1-2-2-1"></a><span class="section-number-5">1.2.2.1</span> Setting up a tmux connection from using <code>ob-tmux</code> in <code>org-babel</code></h5>
+<div class="outline-text-5" id="text-sec-tmux-setup">
 <ul class="org-ul">
 <li>prerequisite: tmux versions need to be the same locally and on the server.
 Let's verify that now.
@@ -850,9 +1024,11 @@ which allows to print the output from the tmux session in an
 </li>
 </ul>
 </div>
-</li>
+</div>
 
-<li><a id="sec-1-2-2-2" name="sec-1-2-2-2"></a><code>emacs-jupyter</code> Setup<br ><div class="outline-text-5" id="text-1-2-2-2">
+<div id="outline-container-sec-1-2-2-2" class="outline-5">
+<h5 id="sec-1-2-2-2"><span class="section-number-5">1.2.2.2</span> <code>emacs-jupyter</code> Setup</h5>
+<div class="outline-text-5" id="text-1-2-2-2">
 <p>
 <code>Emacs-jupyter</code> aims to be an API for a lot of functionalities of the
 <code>jupyter</code> project. The documentation can be found on <a href="https://github.com/dzop/emacs-jupyter">GitHub</a>.
@@ -940,7 +1116,7 @@ pressing <code>Shift-TAB</code> in Jupyter notebooks)
 </li>
 </ol>
 </div>
-</li></ol>
+</div>
 </div>
 </div>
 
@@ -1023,8 +1199,12 @@ the merge commit to make accessing single experiments easy.
 <div id="outline-container-sec-1-3-5" class="outline-4">
 <h4 id="sec-1-3-5"><span class="section-number-4">1.3.5</span> Git TAGs</h4>
 <div class="outline-text-4" id="text-1-3-5">
-</div><ol class="org-ol"><li><a id="sec-1-3-5-1" name="sec-1-3-5-1"></a>Stable versions:<br ></li>
-<li><a id="sec-1-3-5-2" name="sec-1-3-5-2"></a>All tags from git:<br ><div class="outline-text-5" id="text-1-3-5-2">
+</div><div id="outline-container-sec-1-3-5-1" class="outline-5">
+<h5 id="sec-1-3-5-1"><span class="section-number-5">1.3.5.1</span> Stable versions:</h5>
+</div>
+<div id="outline-container-sec-1-3-5-2" class="outline-5">
+<h5 id="sec-1-3-5-2"><span class="section-number-5">1.3.5.2</span> All tags from git:</h5>
+<div class="outline-text-5" id="text-1-3-5-2">
 <div class="org-src-container">
 
 <pre class="src src-sh">git push origin --tags
@@ -1036,7 +1216,7 @@ git tag -n1
 exp-200402-test Merge branch 'exp-200402-test' into data
 </pre>
 </div>
-</li></ol>
+</div>
 </div>
 </div>
 <div id="outline-container-sec-1-4" class="outline-3">
@@ -1048,7 +1228,10 @@ exp-200402-test Merge branch 'exp-200402-test' into data
 <div id="outline-container-sec-1-4-2" class="outline-4">
 <h4 id="sec-1-4-2"><span class="section-number-4">1.4.2</span> src/</h4>
 <div class="outline-text-4" id="text-1-4-2">
-</div><ol class="org-ol"><li><a id="sec-1-4-2-1" name="sec-1-4-2-1"></a>fluotracify/<br ><ol class="org-ol"><li><a id="sec-1-4-2-1-1" name="sec-1-4-2-1-1"></a>imports/<br ></li>
+</div><div id="outline-container-sec-1-4-2-1" class="outline-5">
+<h5 id="sec-1-4-2-1"><span class="section-number-5">1.4.2.1</span> fluotracify/</h5>
+<div class="outline-text-5" id="text-1-4-2-1">
+</div><ol class="org-ol"><li><a id="sec-1-4-2-1-1" name="sec-1-4-2-1-1"></a>imports/<br ></li>
 <li><a id="sec-1-4-2-1-2" name="sec-1-4-2-1-2"></a>simulations/<br ></li>
 <li><a id="sec-1-4-2-1-3" name="sec-1-4-2-1-3"></a>training/<br ></li>
 <li><a id="sec-1-4-2-1-4" name="sec-1-4-2-1-4"></a>applications/<br ></li>
@@ -1071,15 +1254,17 @@ exp-200402-test Merge branch 'exp-200402-test' into data
 </ul>
 </div>
 </li></ol>
-</li>
+</div>
 
-<li><a id="sec-1-4-2-2" name="sec-1-4-2-2"></a>nanosimpy/<br ><div class="outline-text-5" id="text-1-4-2-2">
+<div id="outline-container-sec-1-4-2-2" class="outline-5">
+<h5 id="sec-1-4-2-2"><span class="section-number-5">1.4.2.2</span> nanosimpy/</h5>
+<div class="outline-text-5" id="text-1-4-2-2">
 <ul class="org-ul">
 <li>cloned from dwaithe with refactoring for Python 3-compatibility
 </li>
 </ul>
 </div>
-</li></ol>
+</div>
 </div>
 </div>
 
@@ -1089,15 +1274,19 @@ exp-200402-test Merge branch 'exp-200402-test' into data
 </div><div id="outline-container-sec-1-5-1" class="outline-4">
 <h4 id="sec-1-5-1"><span class="section-number-4">1.5.1</span> Changes in LabBook.org (without "* Data")</h4>
 <div class="outline-text-4" id="text-1-5-1">
-</div><ol class="org-ol"><li><a id="sec-1-5-1-1" name="sec-1-5-1-1"></a>2020-11-04<br ><div class="outline-text-5" id="text-1-5-1-1">
+</div><div id="outline-container-sec-1-5-1-1" class="outline-5">
+<h5 id="sec-1-5-1-1"><span class="section-number-5">1.5.1.1</span> 2020-11-04</h5>
+<div class="outline-text-5" id="text-1-5-1-1">
 <ul class="org-ul">
 <li>update "jupyter scripts" in  <a href="#sec-1-2">Template for data entry and setup notes:</a>
 for new conda environment on server (now <code>conda activate tf-nightly</code>)
 </li>
 </ul>
 </div>
-</li>
-<li><a id="sec-1-5-1-2" name="sec-1-5-1-2"></a>2020-05-31<br ><div class="outline-text-5" id="text-1-5-1-2">
+</div>
+<div id="outline-container-sec-1-5-1-2" class="outline-5">
+<h5 id="sec-1-5-1-2"><span class="section-number-5">1.5.1.2</span> 2020-05-31</h5>
+<div class="outline-text-5" id="text-1-5-1-2">
 <ul class="org-ul">
 <li>extend general documentation in README
 </li>
@@ -1116,8 +1305,10 @@ jupyter lab. Load a conda environment instead of using Lmod's <code>module
 </li>
 </ul>
 </div>
-</li>
-<li><a id="sec-1-5-1-3" name="sec-1-5-1-3"></a>2020-05-07<br ><div class="outline-text-5" id="text-1-5-1-3">
+</div>
+<div id="outline-container-sec-1-5-1-3" class="outline-5">
+<h5 id="sec-1-5-1-3"><span class="section-number-5">1.5.1.3</span> 2020-05-07</h5>
+<div class="outline-text-5" id="text-1-5-1-3">
 <ul class="org-ul">
 <li>extend documentation on git model
 </li>
@@ -1125,8 +1316,10 @@ jupyter lab. Load a conda environment instead of using Lmod's <code>module
 </li>
 </ul>
 </div>
-</li>
-<li><a id="sec-1-5-1-4" name="sec-1-5-1-4"></a>2020-04-22<br ><div class="outline-text-5" id="text-1-5-1-4">
+</div>
+<div id="outline-container-sec-1-5-1-4" class="outline-5">
+<h5 id="sec-1-5-1-4"><span class="section-number-5">1.5.1.4</span> 2020-04-22</h5>
+<div class="outline-text-5" id="text-1-5-1-4">
 <ul class="org-ul">
 <li>added parts of README which describe the experimental process
 </li>
@@ -1136,14 +1329,16 @@ jupyter lab. Load a conda environment instead of using Lmod's <code>module
 </li>
 </ul>
 </div>
-</li>
-<li><a id="sec-1-5-1-5" name="sec-1-5-1-5"></a>2020-03-30<br ><div class="outline-text-5" id="text-1-5-1-5">
+</div>
+<div id="outline-container-sec-1-5-1-5" class="outline-5">
+<h5 id="sec-1-5-1-5"><span class="section-number-5">1.5.1.5</span> 2020-03-30</h5>
+<div class="outline-text-5" id="text-1-5-1-5">
 <ul class="org-ul">
 <li>set up lab book and form git repo accoring to setup by Luka Stanisic et al
 </li>
 </ul>
 </div>
-</li></ol>
+</div>
 </div>
 <div id="outline-container-sec-1-5-2" class="outline-4">
 <h4 id="sec-1-5-2"><span class="section-number-4">1.5.2</span> Changes in src/fluotracify</h4>
@@ -1343,10 +1538,14 @@ jupyter lab. Load a conda environment instead of using Lmod's <code>module
 <h4 id="sec-2-1-2"><span class="section-number-4">2.1.2</span> <span class="label label-default DONE">DONE</span> Experimentation diary</h4>
 <div class="outline-text-4" id="text-2-1-2">
 </div>
-<ol class="org-ol"><li><a id="sec-2-1-2-1" name="sec-2-1-2-1"></a><span class="label label-default DONE">DONE</span> Learn about hard vs soft links<br ><div class="outline-text-5" id="text-2-1-2-1">
+<div id="outline-container-sec-2-1-2-1" class="outline-5">
+<h5 id="sec-2-1-2-1"><span class="section-number-5">2.1.2.1</span> <span class="label label-default DONE">DONE</span> Learn about hard vs soft links</h5>
+<div class="outline-text-5" id="text-2-1-2-1">
 </div>
-</li>
-<li><a id="sec-2-1-2-2" name="sec-2-1-2-2"></a><span class="label label-default DONE">DONE</span> Learn about Org-mode's column view<br ><div class="outline-text-5" id="text-2-1-2-2">
+</div>
+<div id="outline-container-sec-2-1-2-2" class="outline-5">
+<h5 id="sec-2-1-2-2"><span class="section-number-5">2.1.2.2</span> <span class="label label-default DONE">DONE</span> Learn about Org-mode's column view</h5>
+<div class="outline-text-5" id="text-2-1-2-2">
 <ul class="org-ul">
 <li>on: <code>C-c C-x C-c</code>
 </li>
@@ -1354,8 +1553,10 @@ jupyter lab. Load a conda environment instead of using Lmod's <code>module
 </li>
 </ul>
 </div>
-</li>
-<li><a id="sec-2-1-2-3" name="sec-2-1-2-3"></a><span class="label label-default DONE">DONE</span> Learning about org-mode's clocking<br ><div class="outline-text-5" id="text-2-1-2-3">
+</div>
+<div id="outline-container-sec-2-1-2-3" class="outline-5">
+<h5 id="sec-2-1-2-3"><span class="section-number-5">2.1.2.3</span> <span class="label label-default DONE">DONE</span> Learning about org-mode's clocking</h5>
+<div class="outline-text-5" id="text-2-1-2-3">
 <ul class="org-ul">
 <li><a href="https://writequit.org/denver-emacs/presentations/2017-04-11-time-clocking-with-org.html">https://writequit.org/denver-emacs/presentations/2017-04-11-time-clocking-with-org.html</a>
 tipps and tricks
@@ -1371,10 +1572,12 @@ clock in at the last task with <code>C-c C-x C-x</code>
 </li>
 </ul>
 </div>
-</li>
-<li><a id="sec-2-1-2-4" name="sec-2-1-2-4"></a><span class="label label-default DONE">DONE</span> Configure Emacs setup (neotree)<br ><div class="outline-text-5" id="text-2-1-2-4">
 </div>
-</li></ol>
+<div id="outline-container-sec-2-1-2-4" class="outline-5">
+<h5 id="sec-2-1-2-4"><span class="section-number-5">2.1.2.4</span> <span class="label label-default DONE">DONE</span> Configure Emacs setup (neotree)</h5>
+<div class="outline-text-5" id="text-2-1-2-4">
+</div>
+</div>
 </div>
 </div>
 <div id="outline-container-sec-2-2" class="outline-3">
@@ -1444,7 +1647,9 @@ clock in at the last task with <code>C-c C-x C-x</code>
 <h4 id="sec-2-2-1"><span class="section-number-4">2.2.1</span> <span class="label label-default DONE">DONE</span> Technical Setup diary</h4>
 <div class="outline-text-4" id="text-2-2-1">
 </div>
-<ol class="org-ol"><li><a id="sec-2-2-1-1" name="sec-2-2-1-1"></a><span class="label label-default DONE">DONE</span> Test if remote HPC is accessible via org-mode<br ><div class="outline-text-5" id="text-2-2-1-1">
+<div id="outline-container-sec-2-2-1-1" class="outline-5">
+<h5 id="sec-2-2-1-1"><span class="section-number-5">2.2.1.1</span> <span class="label label-default DONE">DONE</span> Test if remote HPC is accessible via org-mode</h5>
+<div class="outline-text-5" id="text-2-2-1-1">
 </div>
 <ol class="org-ol"><li><a id="sec-2-2-1-1-1" name="sec-2-2-1-1-1"></a>emacs commands for <code>org-babel</code><br ><div class="outline-text-6" id="text-2-2-1-1-1">
 <ul class="org-ul">
@@ -1516,7 +1721,7 @@ This naive approach seems not to work. Some research showed this as promising:
 </p>
 </div>
 </li></ol>
-</li></ol>
+</div>
 </div>
 </div>
 
@@ -1547,7 +1752,9 @@ Date:   Thu Apr 2 12:03:48 2020 +0200
 <h4 id="sec-2-3-2"><span class="section-number-4">2.3.2</span> Technical and conceptional setup</h4>
 <div class="outline-text-4" id="text-2-3-2">
 </div>
-<ol class="org-ol"><li><a id="sec-2-3-2-1" name="sec-2-3-2-1"></a>Execute a script on Ara cluster with literate programming<br ><div class="outline-text-5" id="text-2-3-2-1">
+<div id="outline-container-sec-2-3-2-1" class="outline-5">
+<h5 id="sec-2-3-2-1"><span class="section-number-5">2.3.2.1</span> Execute a script on Ara cluster with literate programming</h5>
+<div class="outline-text-5" id="text-2-3-2-1">
 <ol class="org-ol">
 <li>connect to FSU VPN (still via normal terminal)
 </li>
@@ -1734,10 +1941,12 @@ port" errors:
 </ul>
 </div>
 </li></ol>
-</li>
-<li><a id="sec-2-3-2-2" name="sec-2-3-2-2"></a><span class="label label-default DONE">DONE</span> Setup of literate programming OR jupytex or the like<br ><div class="outline-text-5" id="text-2-3-2-2">
 </div>
-</li></ol>
+<div id="outline-container-sec-2-3-2-2" class="outline-5">
+<h5 id="sec-2-3-2-2"><span class="section-number-5">2.3.2.2</span> <span class="label label-default DONE">DONE</span> Setup of literate programming OR jupytex or the like</h5>
+<div class="outline-text-5" id="text-2-3-2-2">
+</div>
+</div>
 </div>
 </div>
 <div id="outline-container-sec-2-4" class="outline-3">
@@ -1766,7 +1975,9 @@ Date:   Fri Apr 3 01:07:16 2020 +0200
 <div id="outline-container-sec-2-4-2" class="outline-4">
 <h4 id="sec-2-4-2"><span class="section-number-4">2.4.2</span> Technical and conceptional setup</h4>
 <div class="outline-text-4" id="text-2-4-2">
-</div><ol class="org-ol"><li><a id="sec-2-4-2-1" name="sec-2-4-2-1"></a>Connect to jupyter kernels via <code>org-babel</code><br ><div class="outline-text-5" id="text-2-4-2-1">
+</div><div id="outline-container-sec-2-4-2-1" class="outline-5">
+<h5 id="sec-2-4-2-1"><span class="section-number-5">2.4.2.1</span> Connect to jupyter kernels via <code>org-babel</code></h5>
+<div class="outline-text-5" id="text-2-4-2-1">
 <ol class="org-ol">
 <li>Locally start a jupyter-python session, executed asynchro
 
@@ -2105,7 +2316,7 @@ yaml                      0.1.7                had09818_2
 zlib                      1.2.11               h7b6447c_3
 </pre>
 </div>
-</li></ol>
+</div>
 </div>
 </div>
 
@@ -3104,7 +3315,9 @@ zlib                      1.2.11               h7b6447c_3
 <h4 id="sec-2-5-5"><span class="section-number-4">2.5.5</span> Technical and conceptional setup</h4>
 <div class="outline-text-4" id="text-2-5-5">
 </div>
-<ol class="org-ol"><li><a id="sec-2-5-5-1" name="sec-2-5-5-1"></a>Do a UNET Training<br ><div class="outline-text-5" id="text-2-5-5-1">
+<div id="outline-container-sec-2-5-5-1" class="outline-5">
+<h5 id="sec-2-5-5-1"><span class="section-number-5">2.5.5.1</span> Do a UNET Training</h5>
+<div class="outline-text-5" id="text-2-5-5-1">
 <ol class="org-ol">
 <li>Import modules
 <div class="org-src-container">
@@ -3928,8 +4141,10 @@ KeyboardInterrupt                         Traceback (most recent call last)
 TOO SLOW! Investigate Errors&#x2026;
 </p>
 </div>
-</li>
-<li><a id="sec-2-5-5-2" name="sec-2-5-5-2"></a><span class="label label-primary TODO">TODO</span> Investigate Error on GPU node<br ><div class="outline-text-5" id="text-2-5-5-2">
+</div>
+<div id="outline-container-sec-2-5-5-2" class="outline-5">
+<h5 id="sec-2-5-5-2"><span class="section-number-5">2.5.5.2</span> <span class="label label-primary TODO">TODO</span> Investigate Error on GPU node</h5>
+<div class="outline-text-5" id="text-2-5-5-2">
 <ul class="org-ul">
 <li>2020-04-13 02:45:28.216446: W
 tensorflow/stream<sub>executor</sub>/platform/default/dso<sub>loader.cc</sub>:55] Could not load
@@ -3950,8 +4165,10 @@ make sure the missing libraries mentioned above are installed properly
 </li>
 </ul>
 </div>
-</li>
-<li><a id="sec-2-5-5-3" name="sec-2-5-5-3"></a><span class="label label-primary TODO">TODO</span> Export pandas DataFrames as org tables instead of html<br ><div class="outline-text-5" id="text-2-5-5-3">
+</div>
+<div id="outline-container-sec-2-5-5-3" class="outline-5">
+<h5 id="sec-2-5-5-3"><span class="section-number-5">2.5.5.3</span> <span class="label label-primary TODO">TODO</span> Export pandas DataFrames as org tables instead of html</h5>
+<div class="outline-text-5" id="text-2-5-5-3">
 <ul class="org-ul">
 <li>see <a href="https://github.com/dzop/emacs-jupyter/issues/88">https://github.com/dzop/emacs-jupyter/issues/88</a>
 </li>
@@ -3960,8 +4177,10 @@ make sure the missing libraries mentioned above are installed properly
 </li>
 </ul>
 </div>
-</li>
-<li><a id="sec-2-5-5-4" name="sec-2-5-5-4"></a><span class="label label-primary TODO">TODO</span> Inline-display of plots<br ></li></ol>
+</div>
+<div id="outline-container-sec-2-5-5-4" class="outline-5">
+<h5 id="sec-2-5-5-4"><span class="section-number-5">2.5.5.4</span> <span class="label label-primary TODO">TODO</span> Inline-display of plots</h5>
+</div>
 </div>
 </div>
 
@@ -4095,7 +4314,9 @@ jupyter notebook --no-browser --port=8889
 </div>
 </div>
 
-<ol class="org-ol"><li><a id="sec-2-6-2-1" name="sec-2-6-2-1"></a>ob-tmux version bug<br ><div class="outline-text-5" id="text-2-6-2-1">
+<div id="outline-container-sec-2-6-2-1" class="outline-5">
+<h5 id="sec-2-6-2-1"><span class="section-number-5">2.6.2.1</span> ob-tmux version bug</h5>
+<div class="outline-text-5" id="text-2-6-2-1">
 <p>
 To check the output of my tmux session, I have to attach to the session in a
 terminal (output directly to org is not yet supported). I noticed that I can not
@@ -4189,9 +4410,11 @@ So I am trying now to set the value of <code>org-babel-tmux-location</code> to
 <a href="https://github.com/ahendriksen/ob-tmux/issues/10">I opened an issue here.</a>
 </p>
 </div>
-</li>
+</div>
 
-<li><a id="sec-2-6-2-2" name="sec-2-6-2-2"></a>ob-tmux output feature<br ><div class="outline-text-5" id="text-2-6-2-2">
+<div id="outline-container-sec-2-6-2-2" class="outline-5">
+<h5 id="sec-2-6-2-2"><span class="section-number-5">2.6.2.2</span> ob-tmux output feature</h5>
+<div class="outline-text-5" id="text-2-6-2-2">
 <p>
 Package maintainer ahendriksen <a href="https://github.com/ahendriksen/ob-tmux/issues/6#issuecomment-612921097">wrote a script</a>, which overrides <code>org-babels</code> <code>C-c
 C-o</code> feature to get output from the tmux session.
@@ -4291,8 +4514,10 @@ test
 </pre>
 </div>
 </li></ol>
-</li>
-<li><a id="sec-2-6-2-3" name="sec-2-6-2-3"></a>ob-tmux :var feature<br ><div class="outline-text-5" id="text-2-6-2-3">
+</div>
+<div id="outline-container-sec-2-6-2-3" class="outline-5">
+<h5 id="sec-2-6-2-3"><span class="section-number-5">2.6.2.3</span> ob-tmux :var feature</h5>
+<div class="outline-text-5" id="text-2-6-2-3">
 <p>
 I opened another issue about having a <code>:var</code> feature in ob-tmux
 </p>
@@ -4306,7 +4531,7 @@ I opened another issue about having a <code>:var</code> feature in ob-tmux
 8889
 </pre>
 </div>
-</li></ol>
+</div>
 </div>
 <div id="outline-container-sec-2-6-3" class="outline-4">
 <h4 id="sec-2-6-3"><span class="section-number-4">2.6.3</span> jupyter session</h4>
@@ -4385,9 +4610,11 @@ I opened another issue about having a <code>:var</code> feature in ob-tmux
 </table>
 </div>
 
-<ol class="org-ol"><li><a id="sec-2-6-3-1" name="sec-2-6-3-1"></a>jupyter-python-metadata<br ><div class="outline-text-5" id="text-2-6-3-1">
+<div id="outline-container-sec-2-6-3-1" class="outline-5">
+<h5 id="sec-2-6-3-1"><span class="section-number-5">2.6.3.1</span> jupyter-python-metadata</h5>
+<div class="outline-text-5" id="text-2-6-3-1">
 <p>
-I used old <code>#+CALL: jupyter-python-metadata[:cache no]</code>
+;; #+CALL: jupyter-python-metadata[:cache no]
 </p>
 
 <pre class="example">
@@ -4621,9 +4848,11 @@ yaml                      0.1.7                had09818_2
 zlib                      1.2.11               h7b6447c_3
 </pre>
 </div>
-</li>
+</div>
 
-<li><a id="sec-2-6-3-2" name="sec-2-6-3-2"></a>set output folder for jupyter-python to <code>data/exp-tests</code><br ><div class="outline-text-5" id="text-2-6-3-2">
+<div id="outline-container-sec-2-6-3-2" class="outline-5">
+<h5 id="sec-2-6-3-2"><span class="section-number-5">2.6.3.2</span> set output folder for jupyter-python to <code>data/exp-tests</code></h5>
+<div class="outline-text-5" id="text-2-6-3-2">
 <p>
 According to the git and org-mode based worflow for reproducible research
 proposed by Stanisic et al files which are created in an experimental branch are
@@ -4688,8 +4917,10 @@ plt.plot(x, y)
 works!
 </p>
 </div>
-</li>
-<li><a id="sec-2-6-3-3" name="sec-2-6-3-3"></a><span class="label label-primary TODO">TODO</span> Set up mlflow for reproducible ml experiments<br ><div class="outline-text-5" id="text-2-6-3-3">
+</div>
+<div id="outline-container-sec-2-6-3-3" class="outline-5">
+<h5 id="sec-2-6-3-3"><span class="section-number-5">2.6.3.3</span> <span class="label label-primary TODO">TODO</span> Set up mlflow for reproducible ml experiments</h5>
+<div class="outline-text-5" id="text-2-6-3-3">
 </div>
 <ol class="org-ol"><li><a id="sec-2-6-3-3-1" name="sec-2-6-3-3-1"></a>Reading the docs<br ><div class="outline-text-6" id="text-2-6-3-3-1">
 <ul class="org-ul">
@@ -4713,11 +4944,13 @@ inside org documents.
 </li>
 
 <li><a id="sec-2-6-3-3-2" name="sec-2-6-3-3-2"></a>Reading Barredo Arrieta et al: Explainable Artificial Intelligence (XIA)<br ></li></ol>
-</li>
+</div>
 
 
 
-<li><a id="sec-2-6-3-4" name="sec-2-6-3-4"></a><span class="label label-primary TODO">TODO</span> Investigate Error on GPU node<br ><div class="outline-text-5" id="text-2-6-3-4">
+<div id="outline-container-sec-2-6-3-4" class="outline-5">
+<h5 id="sec-2-6-3-4"><span class="section-number-5">2.6.3.4</span> <span class="label label-primary TODO">TODO</span> Investigate Error on GPU node</h5>
+<div class="outline-text-5" id="text-2-6-3-4">
 <ul class="org-ul">
 <li>2020-04-13 02:45:28.216446: W
 tensorflow/stream<sub>executor</sub>/platform/default/dso<sub>loader.cc</sub>:55] Could not load
@@ -4738,8 +4971,10 @@ make sure the missing libraries mentioned above are installed properly
 </li>
 </ul>
 </div>
-</li>
-<li><a id="sec-2-6-3-5" name="sec-2-6-3-5"></a><span class="label label-primary TODO">TODO</span> Export pandas DataFrames as org tables instead of html<br ><div class="outline-text-5" id="text-2-6-3-5">
+</div>
+<div id="outline-container-sec-2-6-3-5" class="outline-5">
+<h5 id="sec-2-6-3-5"><span class="section-number-5">2.6.3.5</span> <span class="label label-primary TODO">TODO</span> Export pandas DataFrames as org tables instead of html</h5>
+<div class="outline-text-5" id="text-2-6-3-5">
 <ul class="org-ul">
 <li>see <a href="https://github.com/dzop/emacs-jupyter/issues/88">https://github.com/dzop/emacs-jupyter/issues/88</a>
 </li>
@@ -4748,12 +4983,22 @@ make sure the missing libraries mentioned above are installed properly
 </li>
 </ul>
 </div>
-</li>
-<li><a id="sec-2-6-3-6" name="sec-2-6-3-6"></a><span class="label label-primary TODO">TODO</span> Inline-display of plots<br ></li>
-<li><a id="sec-2-6-3-7" name="sec-2-6-3-7"></a><span class="label label-primary TODO">TODO</span> fix pydot and graphviz to make model plotting work<br ></li>
-<li><a id="sec-2-6-3-8" name="sec-2-6-3-8"></a><span class="label label-primary TODO">TODO</span> transform ML training ipynb to py files as used <a href="https://github.com/mlflow/mlflow/blob/master/examples/tensorflow/tf2/train_predict_2.py">here</a><br ></li>
-<li><a id="sec-2-6-3-9" name="sec-2-6-3-9"></a><span class="label label-primary TODO">TODO</span> check out python module <code>argparser</code> as used <a href="https://github.com/mlflow/mlflow/blob/master/examples/tensorflow/tf2/train_predict_2.py">here</a><br ></li>
-<li><a id="sec-2-6-3-10" name="sec-2-6-3-10"></a><span class="label label-primary TODO">TODO</span> check out Talos 1.0 with MLflow for Hyperparameter optimization<br ></li></ol>
+</div>
+<div id="outline-container-sec-2-6-3-6" class="outline-5">
+<h5 id="sec-2-6-3-6"><span class="section-number-5">2.6.3.6</span> <span class="label label-primary TODO">TODO</span> Inline-display of plots</h5>
+</div>
+<div id="outline-container-sec-2-6-3-7" class="outline-5">
+<h5 id="sec-2-6-3-7"><span class="section-number-5">2.6.3.7</span> <span class="label label-primary TODO">TODO</span> fix pydot and graphviz to make model plotting work</h5>
+</div>
+<div id="outline-container-sec-2-6-3-8" class="outline-5">
+<h5 id="sec-2-6-3-8"><span class="section-number-5">2.6.3.8</span> <span class="label label-primary TODO">TODO</span> transform ML training ipynb to py files as used <a href="https://github.com/mlflow/mlflow/blob/master/examples/tensorflow/tf2/train_predict_2.py">here</a></h5>
+</div>
+<div id="outline-container-sec-2-6-3-9" class="outline-5">
+<h5 id="sec-2-6-3-9"><span class="section-number-5">2.6.3.9</span> <span class="label label-primary TODO">TODO</span> check out python module <code>argparser</code> as used <a href="https://github.com/mlflow/mlflow/blob/master/examples/tensorflow/tf2/train_predict_2.py">here</a></h5>
+</div>
+<div id="outline-container-sec-2-6-3-10" class="outline-5">
+<h5 id="sec-2-6-3-10"><span class="section-number-5">2.6.3.10</span> <span class="label label-primary TODO">TODO</span> check out Talos 1.0 with MLflow for Hyperparameter optimization</h5>
+</div>
 </div>
 <div id="outline-container-sec-2-6-4" class="outline-4">
 <h4 id="sec-2-6-4"><span class="section-number-4">2.6.4</span> <span class="label label-primary TODO">TODO</span> Take a look into <code>org-ref</code> for reference management and citing inside this labbook</h4>
@@ -4772,7 +5017,9 @@ make sure the missing libraries mentioned above are installed properly
 </div><div id="outline-container-sec-2-7-1" class="outline-4">
 <h4 id="sec-2-7-1"><span class="section-number-4">2.7.1</span> Connect</h4>
 <div class="outline-text-4" id="text-2-7-1">
-</div><ol class="org-ol"><li><a id="sec-2-7-1-1" name="sec-2-7-1-1"></a>Tmux on Ara<br ><div class="outline-text-5" id="text-2-7-1-1">
+</div><div id="outline-container-sec-2-7-1-1" class="outline-5">
+<h5 id="sec-2-7-1-1"><span class="section-number-5">2.7.1.1</span> Tmux on Ara</h5>
+<div class="outline-text-5" id="text-2-7-1-1">
 <table class="table table-striped table-bordered table-hover table-condensed">
 
 
@@ -4825,9 +5072,11 @@ Test:
 </pre>
 </div>
 </div>
-</li>
+</div>
 
-<li><a id="sec-2-7-1-2" name="sec-2-7-1-2"></a>Compute node for script execution<br ><div class="outline-text-5" id="text-2-7-1-2">
+<div id="outline-container-sec-2-7-1-2" class="outline-5">
+<h5 id="sec-2-7-1-2"><span class="section-number-5">2.7.1.2</span> Compute node for script execution</h5>
+<div class="outline-text-5" id="text-2-7-1-2">
 <div class="org-src-container">
 
 <pre class="src src-tmux">srun -p s_standard --time=7-10:00:00 --ntasks-per-node=24 --mem-per-cpu=2000 --pty bash
@@ -4838,9 +5087,11 @@ Test:
 (base) [ye53nis@node151 drmed-git]$
 </pre>
 </div>
-</li>
+</div>
 
-<li><a id="sec-2-7-1-3" name="sec-2-7-1-3"></a>Jupyter on Ara<br ><div class="outline-text-5" id="text-2-7-1-3">
+<div id="outline-container-sec-2-7-1-3" class="outline-5">
+<h5 id="sec-2-7-1-3"><span class="section-number-5">2.7.1.3</span> Jupyter on Ara</h5>
+<div class="outline-text-5" id="text-2-7-1-3">
 <ol class="org-ol">
 <li>Request compute node via tmux
 <div class="org-src-container">
@@ -5107,8 +5358,10 @@ tmpfs                 19G     0   19G   0% /run/user/67339
  'MPLBACKEND': 'module://ipykernel.pylab.backend_inline'}
 </pre>
 </div>
-</li>
-<li><a id="sec-2-7-1-4" name="sec-2-7-1-4"></a>Tensorboard tunnel, Mlflow ui tunnel<br ><div class="outline-text-5" id="text-2-7-1-4">
+</div>
+<div id="outline-container-sec-2-7-1-4" class="outline-5">
+<h5 id="sec-2-7-1-4"><span class="section-number-5">2.7.1.4</span> Tensorboard tunnel, Mlflow ui tunnel</h5>
+<div class="outline-text-5" id="text-2-7-1-4">
 <table class="table table-striped table-bordered table-hover table-condensed">
 
 
@@ -5170,7 +5423,7 @@ tmpfs                 19G     0   19G   0% /run/user/67339
 </tbody>
 </table>
 </div>
-</li></ol>
+</div>
 </div>
 <div id="outline-container-sec-2-7-2" class="outline-4">
 <h4 id="sec-2-7-2"><span class="section-number-4">2.7.2</span> git exp 1</h4>
@@ -5248,7 +5501,9 @@ mkdir data/exp-310520-unet
 <div id="outline-container-sec-2-7-5" class="outline-4">
 <h4 id="sec-2-7-5"><span class="section-number-4">2.7.5</span> test runs</h4>
 <div class="outline-text-4" id="text-2-7-5">
-</div><ol class="org-ol"><li><a id="sec-2-7-5-1" name="sec-2-7-5-1"></a>no 1 - experiment creation failed<br ><div class="outline-text-5" id="text-2-7-5-1">
+</div><div id="outline-container-sec-2-7-5-1" class="outline-5">
+<h5 id="sec-2-7-5-1"><span class="section-number-5">2.7.5.1</span> no 1 - experiment creation failed</h5>
+<div class="outline-text-5" id="text-2-7-5-1">
 <div class="org-src-container">
 
 <pre class="src src-tmux">mlflow run . -P <span style="color: #268bd2;">fluotracify_path</span>=/beegfs/ye53nis/drmed-git/src/ -P <span style="color: #268bd2;">epochs</span>=2 -P <span style="color: #268bd2;">learning_rate</span>=None -P <span style="color: #268bd2;">csv_path</span>=/beegfs/ye53nis/saves/firstartifact_Mar2020 -P <span style="color: #268bd2;">steps_per_epoch</span>=400 -P <span style="color: #268bd2;">validation_steps</span>=200
@@ -5480,8 +5735,10 @@ mkdir data/exp-310520-unet
 [2020-05-31 15:27:54 +0200] [200871] [INFO] Booting worker with pid: 200871
 </pre>
 </div>
-</li>
-<li><a id="sec-2-7-5-2" name="sec-2-7-5-2"></a>no 2<br ><div class="outline-text-5" id="text-2-7-5-2">
+</div>
+<div id="outline-container-sec-2-7-5-2" class="outline-5">
+<h5 id="sec-2-7-5-2"><span class="section-number-5">2.7.5.2</span> no 2</h5>
+<div class="outline-text-5" id="text-2-7-5-2">
 <div class="org-src-container">
 
 <pre class="src src-tmux">mlflow run . -P <span style="color: #268bd2;">fluotracify_path</span>=/beegfs/ye53nis/drmed-git/src/ -P <span style="color: #268bd2;">epochs</span>=2 -P <span style="color: #268bd2;">learning_rate</span>=None -P <span style="color: #268bd2;">csv_path</span>=/beegfs/ye53nis/saves/firstartifact_Mar2020 -P <span style="color: #268bd2;">steps_per_epoch</span>=10 -P <span style="color: #268bd2;">validation_steps</span>=10
@@ -5676,7 +5933,7 @@ artifact information. This dataset is meant for a Variational
 Autoencoder-Training.
 </p>
 </div>
-</li></ol>
+</div>
 </div>
 <div id="outline-container-sec-2-7-6" class="outline-4">
 <h4 id="sec-2-7-6"><span class="section-number-4">2.7.6</span> experimental run</h4>
@@ -6096,7 +6353,9 @@ c: 0.9786 - val_loss: 0.3505 - val_tp: 3050870.0000 - val_fp: 101786.0000 - val_
 <div id="outline-container-sec-2-7-7" class="outline-4">
 <h4 id="sec-2-7-7"><span class="section-number-4">2.7.7</span> read out logs</h4>
 <div class="outline-text-4" id="text-2-7-7">
-</div><ol class="org-ol"><li><a id="sec-2-7-7-1" name="sec-2-7-7-1"></a>read out mlflow logs using CLI<br ><div class="outline-text-5" id="text-2-7-7-1">
+</div><div id="outline-container-sec-2-7-7-1" class="outline-5">
+<h5 id="sec-2-7-7-1"><span class="section-number-5">2.7.7.1</span> read out mlflow logs using CLI</h5>
+<div class="outline-text-5" id="text-2-7-7-1">
 <div class="org-src-container">
 
 <pre class="src src-tmux">conda activate tensorflow_env
@@ -6154,9 +6413,11 @@ mlflow artifacts download -r 47b870b8fdcb4445956635c6758caff3 -a tensorboard_log
 </pre>
 </div>
 </div>
-</li>
+</div>
 
-<li><a id="sec-2-7-7-2" name="sec-2-7-7-2"></a>Reading out mlflow logs with Python API<br ><div class="outline-text-5" id="text-2-7-7-2">
+<div id="outline-container-sec-2-7-7-2" class="outline-5">
+<h5 id="sec-2-7-7-2"><span class="section-number-5">2.7.7.2</span> Reading out mlflow logs with Python API</h5>
+<div class="outline-text-5" id="text-2-7-7-2">
 <p>
 I started local machine:
 </p>
@@ -7551,7 +7812,7 @@ image  metrics	train  validation
 </pre>
 </div>
 </div>
-</li></ol>
+</div>
 </div>
 
 <div id="outline-container-sec-2-7-8" class="outline-4">
@@ -8598,7 +8859,9 @@ Epoch 100/100
 <div id="outline-container-sec-2-7-11" class="outline-4">
 <h4 id="sec-2-7-11"><span class="section-number-4">2.7.11</span> read out logs experiment 2</h4>
 <div class="outline-text-4" id="text-2-7-11">
-</div><ol class="org-ol"><li><a id="sec-2-7-11-1" name="sec-2-7-11-1"></a>read out mlflow logs using CLI<br ><div class="outline-text-5" id="text-2-7-11-1">
+</div><div id="outline-container-sec-2-7-11-1" class="outline-5">
+<h5 id="sec-2-7-11-1"><span class="section-number-5">2.7.11.1</span> read out mlflow logs using CLI</h5>
+<div class="outline-text-5" id="text-2-7-11-1">
 <div class="org-src-container">
 
 <pre class="src src-tmux">conda activate tensorflow_env
@@ -8821,8 +9084,10 @@ mlflow artifacts download -r $<span style="color: #268bd2;">EXP2</span> -a tenso
 </pre>
 </div>
 </div>
-</li>
-<li><a id="sec-2-7-11-2" name="sec-2-7-11-2"></a>plots via mlflow ui, comparing run 1 and 2<br ><div class="outline-text-5" id="text-2-7-11-2">
+</div>
+<div id="outline-container-sec-2-7-11-2" class="outline-5">
+<h5 id="sec-2-7-11-2"><span class="section-number-5">2.7.11.2</span> plots via mlflow ui, comparing run 1 and 2</h5>
+<div class="outline-text-5" id="text-2-7-11-2">
 <p>
 AUC:
 <img src="exp-310520-unet/mlflow_plots/run2_auc.png" class="img-responsive" alt="run2_auc.png">
@@ -8832,9 +9097,11 @@ Precision / Recall:
 <img src="exp-310520-unet/mlflow_plots/run2_prec_recall.png" class="img-responsive" alt="run2_prec_recall.png">
 </p>
 </div>
-</li>
+</div>
 
-<li><a id="sec-2-7-11-3" name="sec-2-7-11-3"></a>plots via tensorboard ui<br ><div class="outline-text-5" id="text-2-7-11-3">
+<div id="outline-container-sec-2-7-11-3" class="outline-5">
+<h5 id="sec-2-7-11-3"><span class="section-number-5">2.7.11.3</span> plots via tensorboard ui</h5>
+<div class="outline-text-5" id="text-2-7-11-3">
 <p>
 Prediction 03
 <img src="exp-310520-unet/mlflow_plots/run2_image_plots/prediction_03.png" class="img-responsive" alt="prediction_03.png">
@@ -8852,9 +9119,11 @@ Histograms of Conv1D-Kernel (final layer)
 <img src="exp-310520-unet/mlflow_plots/run2_image_plots/histograms_conv1d-kernel_finallayer.png" class="img-responsive" alt="histograms_conv1d-kernel_finallayer.png">
 </p>
 </div>
-</li>
+</div>
 
-<li><a id="sec-2-7-11-4" name="sec-2-7-11-4"></a>for next runs<br ><div class="outline-text-5" id="text-2-7-11-4">
+<div id="outline-container-sec-2-7-11-4" class="outline-5">
+<h5 id="sec-2-7-11-4"><span class="section-number-5">2.7.11.4</span> for next runs</h5>
+<div class="outline-text-5" id="text-2-7-11-4">
 <ul class="org-ul">
 <li>more steps = good: better recall
 </li>
@@ -9073,21 +9342,25 @@ overfitting → they use 0.7 prob for conv dropout and 0.5 for FC
 </ul>
 </div>
 </li></ol>
-</li></ol>
+</div>
 </div>
 
 <div id="outline-container-sec-2-7-12" class="outline-4">
 <h4 id="sec-2-7-12"><span class="section-number-4">2.7.12</span> use model from run 2 to correct data</h4>
 <div class="outline-text-4" id="text-2-7-12">
-</div><ol class="org-ol"><li><a id="sec-2-7-12-1" name="sec-2-7-12-1"></a>simulated data from the test set<br ><div class="outline-text-5" id="text-2-7-12-1">
+</div><div id="outline-container-sec-2-7-12-1" class="outline-5">
+<h5 id="sec-2-7-12-1"><span class="section-number-5">2.7.12.1</span> simulated data from the test set</h5>
+<div class="outline-text-5" id="text-2-7-12-1">
 
 <figure>
 <p><img src="exp-310520-unet/correction_plots/brightbursts_correction_by_unet_histogram_050_tt_200702.svg" class="img-responsive" alt="brightbursts_correction_by_unet_histogram_050_tt_200702.svg">
 </p>
 </figure>
 </div>
-</li>
-<li><a id="sec-2-7-12-2" name="sec-2-7-12-2"></a>experimental data from Pablo (structured experiment)<br ><div class="outline-text-5" id="text-2-7-12-2">
+</div>
+<div id="outline-container-sec-2-7-12-2" class="outline-5">
+<h5 id="sec-2-7-12-2"><span class="section-number-5">2.7.12.2</span> experimental data from Pablo (structured experiment)</h5>
+<div class="outline-text-5" id="text-2-7-12-2">
 
 <figure>
 <p><img src="exp-310520-unet/correction_plots/ptu_brightbursts_correction_by_unet_histogram_010_tt_200704_400traces.svg" class="img-responsive" alt="ptu_brightbursts_correction_by_unet_histogram_010_tt_200704_400traces.svg">
@@ -9281,7 +9554,7 @@ even though the values are bad.
 </ul>
 </div>
 </li></ol>
-</li></ol>
+</div>
 </div>
 
 <div id="outline-container-sec-2-7-13" class="outline-4">
@@ -10279,6 +10552,7 @@ Epoch 40/40
 </div>
 </div>
 
+
 <div id="outline-container-sec-2-8" class="outline-3">
 <h3 id="sec-2-8"><span class="section-number-3">2.8</span> exp-201231-clustersim</h3>
 <div class="outline-text-3" id="text-2-8">
@@ -11205,13 +11479,16 @@ file.
 </div>
 
 
+
 <div id="outline-container-sec-2-9" class="outline-3">
 <h3 id="sec-2-9"><span class="section-number-3">2.9</span> exp-210204-unet</h3>
 <div class="outline-text-3" id="text-2-9">
 </div><div id="outline-container-sec-2-9-1" class="outline-4">
 <h4 id="sec-2-9-1"><span class="section-number-4">2.9.1</span> Connect</h4>
 <div class="outline-text-4" id="text-2-9-1">
-</div><ol class="org-ol"><li><a id="sec-2-9-1-1" name="sec-2-9-1-1"></a>Node for script execution<br ><div class="outline-text-5" id="text-2-9-1-1">
+</div><div id="outline-container-sec-2-9-1-1" class="outline-5">
+<h5 id="sec-2-9-1-1"><span class="section-number-5">2.9.1.1</span> Node for script execution</h5>
+<div class="outline-text-5" id="text-2-9-1-1">
 <ol class="org-ol">
 <li>Setup Tmux
 </li>
@@ -11323,9 +11600,11 @@ no changes added to commit (use "git add" and/or "git commit -a")
 (base) [ye53nis@node221 drmed-git]$
 </pre>
 </div>
-</li>
+</div>
 
-<li><a id="sec-2-9-1-2" name="sec-2-9-1-2"></a>Node for running Jupyter<br ><div class="outline-text-5" id="text-2-9-1-2">
+<div id="outline-container-sec-2-9-1-2" class="outline-5">
+<h5 id="sec-2-9-1-2"><span class="section-number-5">2.9.1.2</span> Node for running Jupyter</h5>
+<div class="outline-text-5" id="text-2-9-1-2">
 <ol class="org-ol">
 <li>Setup Tmux (if we haven't done it before)
 </li>
@@ -11503,8 +11782,10 @@ will be saved here
 </li>
 </ol>
 </div>
-</li>
-<li><a id="sec-2-9-1-3" name="sec-2-9-1-3"></a>Node for running Mlflow UI<br ><div class="outline-text-5" id="text-2-9-1-3">
+</div>
+<div id="outline-container-sec-2-9-1-3" class="outline-5">
+<h5 id="sec-2-9-1-3"><span class="section-number-5">2.9.1.3</span> Node for running Mlflow UI</h5>
+<div class="outline-text-5" id="text-2-9-1-3">
 <div class="org-src-container">
 
 <pre class="src src-tmux">conda activate tf-nightly
@@ -11605,13 +11886,15 @@ mlflow ui --backend-store-uri file:///beegfs/ye53nis/drmed-git/data/mlruns
 </tbody>
 </table>
 </div>
-</li></ol>
+</div>
 </div>
 
 <div id="outline-container-sec-2-9-2" class="outline-4">
 <h4 id="sec-2-9-2"><span class="section-number-4">2.9.2</span> Run 1 - full dataset</h4>
 <div class="outline-text-4" id="text-2-9-2">
-</div><ol class="org-ol"><li><a id="sec-2-9-2-1" name="sec-2-9-2-1"></a>Record metadata<br ><div class="outline-text-5" id="text-2-9-2-1">
+</div><div id="outline-container-sec-2-9-2-1" class="outline-5">
+<h5 id="sec-2-9-2-1"><span class="section-number-5">2.9.2.1</span> Record metadata</h5>
+<div class="outline-text-5" id="text-2-9-2-1">
 <ol class="org-ol">
 <li>current directory
 </li>
@@ -12003,9 +12286,11 @@ Note: you may need to restart the kernel to use updated packages.
 'MPLBACKEND': 'module://ipykernel.pylab.backend_inline'}
 </pre>
 </div>
-</li>
+</div>
 
-<li><a id="sec-2-9-2-2" name="sec-2-9-2-2"></a>Set mlflow variables<br ><div class="outline-text-5" id="text-2-9-2-2">
+<div id="outline-container-sec-2-9-2-2" class="outline-5">
+<h5 id="sec-2-9-2-2"><span class="section-number-5">2.9.2.2</span> Set mlflow variables</h5>
+<div class="outline-text-5" id="text-2-9-2-2">
 <ul class="org-ul">
 <li>mlflow environment variables
 </li>
@@ -12024,9 +12309,11 @@ mkdir data/exp-210204-unet
 (tf-nightly) [ye53nis@node221 drmed-git]$
 </pre>
 </div>
-</li>
+</div>
 
-<li><a id="sec-2-9-2-3" name="sec-2-9-2-3"></a>run mlflow<br ><div class="outline-text-5" id="text-2-9-2-3">
+<div id="outline-container-sec-2-9-2-3" class="outline-5">
+<h5 id="sec-2-9-2-3"><span class="section-number-5">2.9.2.3</span> run mlflow</h5>
+<div class="outline-text-5" id="text-2-9-2-3">
 <ul class="org-ul">
 <li>Use whole dataset (6400 training, 1600 validation, 2000 test), but during
 training, use only 1/5th of it per epoch
@@ -12617,13 +12904,15 @@ p0.7: 3892738.0000 - fp0.7: 2409415.0000 - tn0.7: 26887552.0000 - fn0.7: 1216693
 (tf-nightly) [ye53nis@node221 drmed-git]$
 </pre>
 </div>
-</li></ol>
+</div>
 </div>
 
 <div id="outline-container-sec-2-9-3" class="outline-4">
 <h4 id="sec-2-9-3"><span class="section-number-4">2.9.3</span> Read out logs of Run 1</h4>
 <div class="outline-text-4" id="text-2-9-3">
-</div><ol class="org-ol"><li><a id="sec-2-9-3-1" name="sec-2-9-3-1"></a>test dataset statistics<br ><div class="outline-text-5" id="text-2-9-3-1">
+</div><div id="outline-container-sec-2-9-3-1" class="outline-5">
+<h5 id="sec-2-9-3-1"><span class="section-number-5">2.9.3.1</span> test dataset statistics</h5>
+<div class="outline-text-5" id="text-2-9-3-1">
 <ul class="org-ul">
 <li>test data is not saved out automatically, but can be copied from the log
 above
@@ -12983,9 +13272,11 @@ auc: 0.9306
 </tbody>
 </table>
 </div>
-</li>
+</div>
 
-<li><a id="sec-2-9-3-2" name="sec-2-9-3-2"></a>prediction plots after each epoch<br ><div class="outline-text-5" id="text-2-9-3-2">
+<div id="outline-container-sec-2-9-3-2" class="outline-5">
+<h5 id="sec-2-9-3-2"><span class="section-number-5">2.9.3.2</span> prediction plots after each epoch</h5>
+<div class="outline-text-5" id="text-2-9-3-2">
 <p>
 after epoch 1:
 <img src="exp-210204-unet/run1_predplot/plot0.png" class="img-responsive" alt="plot0.png">
@@ -13009,9 +13300,11 @@ epoch 50:
 <img src="exp-210204-unet/run1_predplot/plot49.png" class="img-responsive" alt="plot49.png">
 </p>
 </div>
-</li>
+</div>
 
-<li><a id="sec-2-9-3-3" name="sec-2-9-3-3"></a>Git log after some code additions<br ><div class="outline-text-5" id="text-2-9-3-3">
+<div id="outline-container-sec-2-9-3-3" class="outline-5">
+<h5 id="sec-2-9-3-3"><span class="section-number-5">2.9.3.3</span> Git log after some code additions</h5>
+<div class="outline-text-5" id="text-2-9-3-3">
 <div class="org-src-container">
 
 <pre class="src src-jupyter-python">!git log -10
@@ -13079,9 +13372,11 @@ Date:   Sat Feb 20 22:35:14 2021 +0100
     Fix np.repeat, remove nfiles, print no of traces
 </pre>
 </div>
-</li>
+</div>
 
-<li><a id="sec-2-9-3-4" name="sec-2-9-3-4"></a>Application 1 - load modules, set parameters<br ><div class="outline-text-5" id="text-2-9-3-4">
+<div id="outline-container-sec-2-9-3-4" class="outline-5">
+<h5 id="sec-2-9-3-4"><span class="section-number-5">2.9.3.4</span> Application 1 - load modules, set parameters</h5>
+<div class="outline-text-5" id="text-2-9-3-4">
 <ol class="org-ol">
 <li>Load the required modules
 </li>
@@ -13178,9 +13473,11 @@ importlib.reload(correction)
  &lt;tensorflow.python.keras.engine.functional.Functional object at 0x2ae3e21c2d60&gt;
 </pre>
 </div>
-</li>
+</div>
 
-<li><a id="sec-2-9-3-5" name="sec-2-9-3-5"></a>Application 2 - test data<br ><div class="outline-text-5" id="text-2-9-3-5">
+<div id="outline-container-sec-2-9-3-5" class="outline-5">
+<h5 id="sec-2-9-3-5"><span class="section-number-5">2.9.3.5</span> Application 2 - test data</h5>
+<div class="outline-text-5" id="text-2-9-3-5">
 <ul class="org-ul">
 <li>I copied the test data which was randomly sampled in the mlflow run (See
 docs above) in an extra directory. Next time, train and test data will be
@@ -14267,10 +14564,13 @@ speeds involed, so please refer to these plots or repeat the above code if
 needed later.
 </p>
 </div>
-</li>
+</div>
 
 
-<li><a id="sec-2-9-3-6" name="sec-2-9-3-6"></a>Application 3 - experimental data<br ><div class="outline-text-5" id="text-2-9-3-6">
+
+<div id="outline-container-sec-2-9-3-6" class="outline-5">
+<h5 id="sec-2-9-3-6"><span class="section-number-5">2.9.3.6</span> Application 3 - experimental data</h5>
+<div class="outline-text-5" id="text-2-9-3-6">
 <p>
 Here I used the code in a jupyter notebook to produce this plot:
 <img src="exp-210204-unet/run1_experimental/ptu_brightbursts_correction_by_unet_histogram_010_tt_210303_400traces.svg" class="img-responsive" alt="ptu_brightbursts_correction_by_unet_histogram_010_tt_210303_400traces.svg">
@@ -15806,16 +16106,8 @@ src/fluotracify/applications/correction.py:508: UserWarning: Metadata is not sav
 <p>
 4702 rows × 5 columns
 </p>
-
-<p>
-Note from future: here my handling of failed correlations was not that good
-(I just omitted the whole datapoint instead of printing out NaN values in
-the table). Because of that, the above correlation file has only 4702 rows
-instead of 4800 traces. Please check out Run 2 for better handling of this
-problem.
-</p>
 </div>
-</li></ol>
+</div>
 </div>
 
 <div id="outline-container-sec-2-9-4" class="outline-4">
@@ -16012,7 +16304,9 @@ molecules (sad!), because there was only one simulated one.</b>
 <div id="outline-container-sec-2-9-5" class="outline-4">
 <h4 id="sec-2-9-5"><span class="section-number-4">2.9.5</span> Run 2 - full dataset</h4>
 <div class="outline-text-4" id="text-2-9-5">
-</div><ol class="org-ol"><li><a id="sec-2-9-5-1" name="sec-2-9-5-1"></a>Record metadata, git log<br ><div class="outline-text-5" id="text-2-9-5-1">
+</div><div id="outline-container-sec-2-9-5-1" class="outline-5">
+<h5 id="sec-2-9-5-1"><span class="section-number-5">2.9.5.1</span> Record metadata, git log</h5>
+<div class="outline-text-5" id="text-2-9-5-1">
 <ol class="org-ol">
 <li>current directory
 </li>
@@ -16405,9 +16699,11 @@ Note: you may need to restart the kernel to use updated packages.
 'MPLBACKEND': 'module://ipykernel.pylab.backend_inline'}
 </pre>
 </div>
-</li>
+</div>
 
-<li><a id="sec-2-9-5-2" name="sec-2-9-5-2"></a>Set mlflow variables<br ><div class="outline-text-5" id="text-2-9-5-2">
+<div id="outline-container-sec-2-9-5-2" class="outline-5">
+<h5 id="sec-2-9-5-2"><span class="section-number-5">2.9.5.2</span> Set mlflow variables</h5>
+<div class="outline-text-5" id="text-2-9-5-2">
 <ul class="org-ul">
 <li>mlflow environment variables
 </li>
@@ -16426,9 +16722,11 @@ mkdir data/exp-210204-unet
 (tf-nightly) [ye53nis@node117 drmed-git]$
 </pre>
 </div>
-</li>
+</div>
 
-<li><a id="sec-2-9-5-3" name="sec-2-9-5-3"></a>run mlflow<br ><div class="outline-text-5" id="text-2-9-5-3">
+<div id="outline-container-sec-2-9-5-3" class="outline-5">
+<h5 id="sec-2-9-5-3"><span class="section-number-5">2.9.5.3</span> run mlflow</h5>
+<div class="outline-text-5" id="text-2-9-5-3">
 <ul class="org-ul">
 <li>Use whole dataset (6400 training, 1600 validation, 2000 test), but during
 training, use only 1/5th of it per epoch - but this time with more
@@ -17030,13 +17328,15 @@ _fn0.5: 2041673.0000 - val_precision0.5: 0.6299 - val_recall0.5: 0.4811 - val_tp
 (tf-nightly) [ye53nis@node117 drmed-git]$
 </pre>
 </div>
-</li></ol>
+</div>
 </div>
 
 <div id="outline-container-sec-2-9-6" class="outline-4">
 <h4 id="sec-2-9-6"><span class="section-number-4">2.9.6</span> Read out logs of Run 2</h4>
 <div class="outline-text-4" id="text-2-9-6">
-</div><ol class="org-ol"><li><a id="sec-2-9-6-1" name="sec-2-9-6-1"></a>test dataset statistics<br ><div class="outline-text-5" id="text-2-9-6-1">
+</div><div id="outline-container-sec-2-9-6-1" class="outline-5">
+<h5 id="sec-2-9-6-1"><span class="section-number-5">2.9.6.1</span> test dataset statistics</h5>
+<div class="outline-text-5" id="text-2-9-6-1">
 <ul class="org-ul">
 <li>test data is not saved out automatically, but can be copied from the log
 </li>
@@ -17403,8 +17703,10 @@ auc: 0.8217
 </li>
 </ul>
 </div>
-</li>
-<li><a id="sec-2-9-6-2" name="sec-2-9-6-2"></a>prediction plots after each epoch<br ><div class="outline-text-5" id="text-2-9-6-2">
+</div>
+<div id="outline-container-sec-2-9-6-2" class="outline-5">
+<h5 id="sec-2-9-6-2"><span class="section-number-5">2.9.6.2</span> prediction plots after each epoch</h5>
+<div class="outline-text-5" id="text-2-9-6-2">
 <p>
 sadly, the random sample traces were not very useful, since the spikes were
 quite small&#x2026;
@@ -17422,8 +17724,10 @@ plot after 50 epochs:
 </div>
 </li>
 
-
-<li><a id="sec-2-9-6-3" name="sec-2-9-6-3"></a>Application 1 - git log, load modules, set parameters<br ><div class="outline-text-5" id="text-2-9-6-3">
+</div>
+<div id="outline-container-sec-2-9-6-3" class="outline-5">
+<h5 id="sec-2-9-6-3"><span class="section-number-5">2.9.6.3</span> Application 1 - git log, load modules, set parameters</h5>
+<div class="outline-text-5" id="text-2-9-6-3">
 <div class="org-src-container">
 
 <pre class="src src-jupyter-python">!pwd
@@ -17570,9 +17874,11 @@ importlib.reload(correction)
  &lt;tensorflow.python.keras.engine.functional.Functional object at 0x2acdc9893190&gt;
 </pre>
 </div>
-</li>
+</div>
 
-<li><a id="sec-2-9-6-4" name="sec-2-9-6-4"></a>Application 2 - test data<br ><div class="outline-text-5" id="text-2-9-6-4">
+<div id="outline-container-sec-2-9-6-4" class="outline-5">
+<h5 id="sec-2-9-6-4"><span class="section-number-5">2.9.6.4</span> Application 2 - test data</h5>
+<div class="outline-text-5" id="text-2-9-6-4">
 <ul class="org-ul">
 <li>test and train data were separated beforehand. Now, I only load test data.
 </li>
@@ -18374,9 +18680,11 @@ representations of the same dynamic phenomenon.
 <img src="exp-210204-unet/run2_sim_csv_analysis/2021-03-21_correlations_tt-diffrate-tracelength-scatterplot.png" class="img-responsive" alt="2021-03-21_correlations_tt-diffrate-tracelength-scatterplot.png">
 </p>
 </div>
-</li>
+</div>
 
-<li><a id="sec-2-9-6-5" name="sec-2-9-6-5"></a>Application 3 - experimental data<br ><div class="outline-text-5" id="text-2-9-6-5">
+<div id="outline-container-sec-2-9-6-5" class="outline-5">
+<h5 id="sec-2-9-6-5"><span class="section-number-5">2.9.6.5</span> Application 3 - experimental data</h5>
+<div class="outline-text-5" id="text-2-9-6-5">
 <ol class="org-ol">
 <li>Workaround for the model prediction problem.
 </li>
@@ -19803,7 +20111,7 @@ Scatterplot on full dataset, but categorical:
 <img src="exp-210204-unet/run2_exp_csv_analysis/2021-03-24_correlations_scatter-full.png" class="img-responsive" alt="2021-03-24_correlations_scatter-full.png">
 </p>
 </div>
-</li></ol>
+</div>
 </div>
 
 <div id="outline-container-sec-2-9-7" class="outline-4">
@@ -19983,7 +20291,7 @@ run 2 distribution and histogram of final layer
 </div></div></div>
 <footer id="postamble" class="">
 <div><p class="author">Author: Alexander Seltmann</p>
-<p class="date">Created: 2021-04-04 So 18:08</p>
+<p class="date">Created: 2021-04-04 So 19:11</p>
 <p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 27.1 (<a href="http://orgmode.org">Org-mode</a> 9.4.4)</p>
 </div>
 </footer>
