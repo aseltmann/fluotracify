@@ -6,7 +6,8 @@
 # both code AND results will be exported
 
 #+PROPERTY: header-args :eval never-export :exports both
-#+OPTIONS: toc:3
+#+OPTIONS: toc:4
+#+OPTIONS: H:4
 #+HTML_HEAD_EXTRA: <style type="text/css">.example {background-color: #FBFBBF;}</style>
 #+HTML_HEAD_EXTRA: <style type="text/css">pre.src-emacs-lisp {background-color: #F7ECFB;}</style>
 #+HTML_HEAD_EXTRA: <style type="text/css">pre.src-sh {background-color: #F0FBE9;}</style>
@@ -1179,7 +1180,7 @@ tmux new -dP
 : 0:
 
 Socket forwarding:
-#+CALL: setup-tmux
+#+CALL: setup-tmux()
 
 Now create actual tmux session:
 #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
@@ -1232,7 +1233,7 @@ tunnel needs to be active locally to connect to the notebook. If Emacs crashes,
 it would need to be reestablished.
 
 #+NAME: jpt-tunnel
-#+BEGIN_SRC sh :session org-tunnel :var port :var node
+#+BEGIN_SRC sh :session org-tunnel :var port=8889 :var node="node128"
 ssh -t -t ara -L $port:localhost:$port ssh $node -L $port:Localhost:$port
 #+END_SRC
 
@@ -1254,7 +1255,7 @@ ssh -t -t ara -L $port:localhost:$port ssh $node -L $port:Localhost:$port
 
 Start kernel according to [[#sec-jupyter-setup][this recipe]].
 
-#+CALL: jupyter-python-metadata[:cache no]
+;; #+CALL: jupyter-python-metadata[:cache no]
 
 #+RESULTS:
 #+BEGIN_EXAMPLE
@@ -2401,7 +2402,7 @@ s_standard     up 8-08:00:00      1   idle node308
 s_fat          up 8-08:00:00      4  alloc node[269-272]
 #+end_example
 
-#+CALL: setup-tmux[:results output]
+#+CALL: setup-tmux[:results output]()
 
 #+RESULTS:
 :
@@ -2588,7 +2589,7 @@ echo $x
 | Last              | login:                               | Wed       | Apr | 15 | 12:25:25 | 2020 | from | login01.ara |
 
 **** jupyter-python-metadata
-#+CALL: jupyter-python-metadata[:cache no]
+;; #+CALL: jupyter-python-metadata[:cache no]
 
 #+RESULTS:
 #+BEGIN_EXAMPLE
@@ -2912,7 +2913,7 @@ works!
 *** Connect
 
 **** Tmux on Ara
-#+CALL: setup-tmux[:session local]
+#+CALL: setup-tmux[:session local]()
 
 #+RESULTS:
 | ye53nis@ara-login01.rz.uni-jena.de's | password:                            |           |
@@ -2966,7 +2967,7 @@ Test:
 
 
 2. Start Jupyter Lab
-   #+CALL: jpt-tmux[:session jpmux]
+   #+CALL: jpt-tmux[:session jpmux]()
 
    #+RESULTS:
    #+begin_example
@@ -6459,27 +6460,27 @@ can change the experiment. I will do it later with
 #+END_SRC
 **** plots via mlflow ui, comparing run 1 and 2
 AUC:
-[[data/exp-310520-unet/mlflow_plots/run2_auc.png]]
+[[file:./data/exp-310520-unet/mlflow_plots/run2_auc.png]]
 Loss:
-[[data/exp-310520-unet/mlflow_plots/run2_loss.png]]
+[[file:./data/exp-310520-unet/mlflow_plots/run2_loss.png]]
 Precision / Recall:
-[[data/exp-310520-unet/mlflow_plots/run2_prec_recall.png]]
+[[file:./data/exp-310520-unet/mlflow_plots/run2_prec_recall.png]]
 
 **** plots via tensorboard ui
 Prediction 03
-[[data/exp-310520-unet/mlflow_plots/run2_image_plots/prediction_03.png]]
+[[file:./data/exp-310520-unet/mlflow_plots/run2_image_plots/prediction_03.png]]
 Prediction 20
-[[data/exp-310520-unet/mlflow_plots/run2_image_plots/prediction_20.png]]
+[[file:./data/exp-310520-unet/mlflow_plots/run2_image_plots/prediction_20.png]]
 Prediction 24
-[[data/exp-310520-unet/mlflow_plots/run2_image_plots/prediction_24.png]]
+[[file:./data/exp-310520-unet/mlflow_plots/run2_image_plots/prediction_24.png]]
 Prediction 32
-[[data/exp-310520-unet/mlflow_plots/run2_image_plots/prediction_32.png]]
+[[file:./data/exp-310520-unet/mlflow_plots/run2_image_plots/prediction_32.png]]
 Prediction 99
-[[data/exp-310520-unet/mlflow_plots/run2_image_plots/prediction_99.png]]
+[[file:./data/exp-310520-unet/mlflow_plots/run2_image_plots/prediction_99.png]]
 Distribution of Conv1D-Kernel (final layer)
-[[data/exp-310520-unet/mlflow_plots/run2_image_plots/distribution_conv1d-kernel_finallayer.png]]
+[[file:./data/exp-310520-unet/mlflow_plots/run2_image_plots/distribution_conv1d-kernel_finallayer.png]]
 Histograms of Conv1D-Kernel (final layer)
-[[data/exp-310520-unet/mlflow_plots/run2_image_plots/histograms_conv1d-kernel_finallayer.png]]
+[[file:./data/exp-310520-unet/mlflow_plots/run2_image_plots/histograms_conv1d-kernel_finallayer.png]]
 
 **** for next runs
      - more steps = good: better recall
@@ -6608,9 +6609,9 @@ Histograms of Conv1D-Kernel (final layer)
 
 *** use model from run 2 to correct data
 **** simulated data from the test set
-[[data/exp-310520-unet/correction_plots/brightbursts_correction_by_unet_histogram_050_tt_200702.svg]]
+[[file:./data/exp-310520-unet/correction_plots/brightbursts_correction_by_unet_histogram_050_tt_200702.svg]]
 **** experimental data from Pablo (structured experiment)
-[[data/exp-310520-unet/correction_plots/ptu_brightbursts_correction_by_unet_histogram_010_tt_200704_400traces.svg]]
+[[file:./data/exp-310520-unet/correction_plots/ptu_brightbursts_correction_by_unet_histogram_010_tt_200704_400traces.svg]]
 ***** biological metadata
 
       - Who took the data: Pablo Carravilla in November 2019 in Oxford
@@ -6637,19 +6638,19 @@ Histograms of Conv1D-Kernel (final layer)
         - for correlation at $1ms$ binning window:
           - transit time ~$0.25...0.5ms$
           - diffusion coefficient ~$22.5...45 \mu m^2 / s$
-	  - [[data/exp-310520-unet/correction_plots/run2_hs-pex5-egfp_1mscorr_1.png]]
+	  - [[file:./data/exp-310520-unet/correction_plots/run2_hs-pex5-egfp_1mscorr_1.png]]
         - *for correlation at $100\mu s$ binning window:*
           - *transit time* ~$0.4...0.53ms$
           - *diffusion coefficient* ~$21...29 \mu m^2 / s$
           - *This is probably the most accurate!*
-	  - [[data/exp-310520-unet/correction_plots/run2_hs-pex5-egfp_100uscorr_1.png]]
+	  - [[file:./data/exp-310520-unet/correction_plots/run2_hs-pex5-egfp_100uscorr_1.png]]
         - for correlation at $10\mu s$ and at 1us binning window:
           - transit time ~$0.09ms$
           - diffusion coefficient ~$120...133\mu m^2 / s$
           - fit didn't look too good - probably something is not working
             correctly here with multipletau. Looks like the start of the
             correlation curve is flattening, but multipletau fits an increase
-	  - [[data/exp-310520-unet/correction_plots/run2_hs-pex5-egfp_10uscorr_1.png]]
+	  - [[file:./data/exp-310520-unet/correction_plots/run2_hs-pex5-egfp_10uscorr_1.png]]
 
       - second: "dirty" data of Tb-PEX5-eGFP
       - from plotting 10 traces with the respective binning windows using
@@ -6661,7 +6662,7 @@ Histograms of Conv1D-Kernel (final layer)
           - diffusion coefficients:
             - without correction: ~$0.6...1.9\mu m^2 / s$
             - with correction: ~$2...6.3 \mu m^2 / s$
-	  - [[data/exp-310520-unet/correction_plots/run2_tb-pex5-egfp_1mscorr_2.png]]
+	  - [[file:./data/exp-310520-unet/correction_plots/run2_tb-pex5-egfp_1mscorr_2.png]]
         - for correlation at $100 \mu s$ binninw window:
           - transit time
             - without correction: ~$43...149ms$
@@ -6669,7 +6670,7 @@ Histograms of Conv1D-Kernel (final layer)
           - diffusion coefficients:
             - without correction: ~$0.08...0.26\mu m^2/s$
             - with correction: ~$0.3...7\mu m^2 / s$
-	  - [[data/exp-310520-unet/correction_plots/run2_tb-pex5-egfp_100uscorr_1.png]]
+	  - [[file:./data/exp-310520-unet/correction_plots/run2_tb-pex5-egfp_100uscorr_1.png]]
         - for correlation at $10\mu s$ binning window:
           - fitting looks HORRIBLE for the traces corrected by
             prediction, while looking "okayish" for traces without correction -
@@ -6680,10 +6681,10 @@ Histograms of Conv1D-Kernel (final layer)
           - diffusion coefficients:
             - without correction: ~$0.008...0.07 \mu m^2 / s$
             - with correction: ~$0.03...52\mu m^2 / s$
-	  - [[data/exp-310520-unet/correction_plots/run2_tb-pex5-egfp_10uscorr_3.png]]
+	  - [[file:./data/exp-310520-unet/correction_plots/run2_tb-pex5-egfp_10uscorr_3.png]]
         - for correlation at $1\mu s$ binning window (only 3 traces, because ):
           - fits have to be better!
-	  - [[data/exp-310520-unet/correction_plots/run2_tb-pex5-egfp_1uscorr_1.png]]
+	  - [[file:./data/exp-310520-unet/correction_plots/run2_tb-pex5-egfp_1uscorr_1.png]]
 
 *** git exp 3
 
@@ -7665,7 +7666,7 @@ Histograms of Conv1D-Kernel (final layer)
     srun -p s_standard --time=7-10:00:00 --ntasks-per-node=24 --mem-per-cpu=2000 --pty bash
     #+END_SRC
     2.
-    #+CALL: jpt-tmux[:session jpmux]
+    #+CALL: jpt-tmux[:session jpmux]()
 
     #+RESULTS:
     #+begin_example
@@ -8431,16 +8432,16 @@ Histograms of Conv1D-Kernel (final layer)
 			#+END_SRC
 
       #+RESULTS:
-      50:    [[data/exp-201231-clustsim/4683d391bdba74b0c9460a5e968d1135995e4a81.png]]
-      10:    [[data/exp-201231-clustsim/963615ec0ac613d53e4c4b11d9b6811c6e38a7f1.png]]
-      3:     [[data/exp-201231-clustsim/f2667c8e27f421f2a47c7f307598b32a6cde5c5f.png]]
-      1:     [[data/exp-201231-clustsim/6a89c85b30e41cbb67c477d10e7cc2239e02f081.png]]
-      0.6:   [[data/exp-201231-clustsim/74f0fbc639df415b140d785e8bf3aa23213c31a4.png]]
-      0.4:   [[data/exp-201231-clustsim/c5d18053e9befd64e8bfc71d4e5e260b2f5606e7.png]]
-      0.2:   [[data/exp-201231-clustsim/ea43e8d0a7d8075efe27429c44e0ea99df1221ac.png]]
-      0.1:   [[data/exp-201231-clustsim/727100134d52d8d8967e1cbb2efda097171f06f0.png]]
-      0.08:  [[data/exp-201231-clustsim/89250a71f8711657f2b8138e2323802a1edea8af.png]]
-      0.069: [[data/exp-201231-clustsim/17e9c4bfb65d91e8100cd9131cabbdb1f35e62e1.png]]
+      50:    [[file:./data/exp-201231-clustsim/4683d391bdba74b0c9460a5e968d1135995e4a81.png]]
+      10:    [[file:./data/exp-201231-clustsim/963615ec0ac613d53e4c4b11d9b6811c6e38a7f1.png]]
+      3:     [[file:./data/exp-201231-clustsim/f2667c8e27f421f2a47c7f307598b32a6cde5c5f.png]]
+      1:     [[file:./data/exp-201231-clustsim/6a89c85b30e41cbb67c477d10e7cc2239e02f081.png]]
+      0.6:   [[file:./data/exp-201231-clustsim/74f0fbc639df415b140d785e8bf3aa23213c31a4.png]]
+      0.4:   [[file:./data/exp-201231-clustsim/c5d18053e9befd64e8bfc71d4e5e260b2f5606e7.png]]
+      0.2:   [[file:./data/exp-201231-clustsim/ea43e8d0a7d8075efe27429c44e0ea99df1221ac.png]]
+      0.1:   [[file:./data/exp-201231-clustsim/727100134d52d8d8967e1cbb2efda097171f06f0.png]]
+      0.08:  [[file:./data/exp-201231-clustsim/89250a71f8711657f2b8138e2323802a1edea8af.png]]
+      0.069: [[file:./data/exp-201231-clustsim/17e9c4bfb65d91e8100cd9131cabbdb1f35e62e1.png]]
 
     - open the plots with =C-c C-o= or toggle inline display with =C-c C-x C-v=
       or view them by themselves in the folder
@@ -8455,7 +8456,7 @@ Histograms of Conv1D-Kernel (final layer)
 *** Connect
 **** Node for script execution
     1. Setup Tmux
-    #+CALL: setup-tmux[:session local2]
+    #+CALL: setup-tmux[:session local2]()
 
     #+RESULTS:
     | rm:                                  | cannot                                 | remove    | '/home/lex/.tmux-local-socket-remote-machine': | No | such | file | or | directory |
@@ -8491,7 +8492,7 @@ Histograms of Conv1D-Kernel (final layer)
 
 **** Node for running Jupyter
      0. Setup Tmux (if we haven't done it before)
-    #+CALL: setup-tmux[:session local2]
+    #+CALL: setup-tmux[:session local2]()
 
     #+RESULTS:
     |         |                                        |           |
@@ -8508,7 +8509,7 @@ Histograms of Conv1D-Kernel (final layer)
 
 
      2. Start Jupyter Lab
-     #+CALL: jpt-tmux[:session jpmux]
+     #+CALL: jpt-tmux[:session jpmux]()
 
      #+RESULTS:
      #+begin_example
