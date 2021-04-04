@@ -391,12 +391,12 @@
 **** nanosimpy/
     - cloned from dwaithe with refactoring for Python 3-compatibility
 
-* Changes in this repository (without "* Data" in this file)
-** Changes in LabBook.org (without "* Data")
-*** 2020-11-04
+** Changes in this repository (without "* Data" in this file)
+*** Changes in LabBook.org (without "* Data")
+**** 2020-11-04
     - update "jupyter scripts" in  [[* Template for data entry and setup notes:]]
       for new conda environment on server (now =conda activate tf-nightly=)
-*** 2020-05-31
+**** 2020-05-31
     - extend general documentation in README
     - Add code block examples
     - extend documentation on experiment workflow
@@ -406,16 +406,16 @@
     - change named "jpt-tmux" from starting a jupyter notebook to starting
       jupyter lab. Load a conda environment instead of using Lmod's =module
       load=
-*** 2020-05-07
+**** 2020-05-07
     - extend documentation on git model
     - extend documentation on jupyter setup
-*** 2020-04-22
+**** 2020-04-22
     - added parts of README which describe the experimental process
     - added templates for system metadata, tmux, jupyter setup
     - added organization of code
-*** 2020-03-30
+**** 2020-03-30
     - set up lab book and form git repo accoring to setup by Luka Stanisic et al
-** Changes in src/fluotracify
+*** Changes in src/fluotracify
 
 * DEVELOPMENT TESTING (don't merge in master)
   :LOGBOOK:
