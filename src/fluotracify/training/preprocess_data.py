@@ -42,10 +42,10 @@ def tfds_from_pddf(features_df,
         Number of examples in the dataset (2 numbers (training, validiation)
         if is_training = True, 1 number (for test) if is_training = False)
     """
-    X_tensor = tf.convert_to_tensor(value=features_cropped.values)
+    X_tensor = tf.convert_to_tensor(value=features_df.values)
     X_tensor = tf.transpose(a=X_tensor, perm=[1, 0])
 
-    y_tensor = tf.convert_to_tensor(value=labels_cropped.values)
+    y_tensor = tf.convert_to_tensor(value=labels_df.values)
     y_tensor = tf.transpose(a=y_tensor, perm=[1, 0])
     y_tensor = tf.cast(y_tensor, tf.float32)
 
@@ -578,3 +578,94 @@ def min_max_normalize_tensor(tensor, axis):
                                     axis=axis,
                                     keepdims=True)
     return (tensor - tensor_min) / (tensor_max - tensor_min)
+
+
+def make_distributions(X, transpose=False):
+    """Given a pandas DataFrame or pandas Series, this function returns many
+    preprocessed / normalized versions of the data.
+
+    Parameters
+    ----------
+        X : pandas DataFrame or pandas Series
+            Your Data. Notice that normalizations are applied along the
+            columns (each column is assumed as one feature, while one example
+            is one row).
+        transpose: bool, optional
+            Normalizations are applied along columns. If your features are
+            oriented along rows, you can choose this option to transpose your
+            DataFrame.
+
+    Returns:
+    --------
+        distributions : list of tuples
+            each tuple includes
+            first, a string describing the normalization,
+            second, the transformed Data in form of a pandas DataFrame with Data 
+            ordered row-wise. The first tuple is the unscaled data (ordered
+                row-wise).
+            third, the scaler (if there is any)
+    """
+
+    if isinstance(X, pd.Series):
+        X_ind = [X.name]
+        X = np.array(X).reshape(1, -1)
+        X_col = X.columns
+    elif transpose:
+        X_ind = X.columns
+        X_col = X.index
+        X = X.T
+    else:
+        X_ind = X.index
+        X_col = X.columns
+
+    scaler_stand = StandardScaler().fit(X)
+    scaler_minmax = MinMaxScaler().fit(X)
+    scaler_maxabs = MaxAbsScaler().fit(X)
+    scaler_robust = RobustScaler(quantile_range=(25, 75)).fit(X)
+    scaler_powerb = PowerTransformer(method='box-cox').fit(X)
+    scaler_powery = PowerTransformer(method='yeo-johnson').fit(X)
+    scaler_powery.lambdas_ = scaler_powerb.lambdas_
+    scaler_quantu = QuantileTransformer(output_distribution='uniform').fit(X)
+    scaler_quantn = QuantileTransformer(output_distribution='normal').fit(X)
+
+    distributions = [
+        ('Unscaled data', pd.DataFrame(X, columns=X_col, index=X_ind), np.nan),
+        ('Data after standard scaling (z-score)',
+         pd.DataFrame(scaler_stand.transform(X), columns=X_col,
+                      index=X_ind), scaler_stand),
+        ('Data after min-max scaling',
+         pd.DataFrame(scaler_minmax.transform(X), columns=X_col,
+                      index=X_ind), scaler_minmax),
+        ('Data after max-abs scaling',
+         pd.DataFrame(scaler_maxabs.transform(X), columns=X_col,
+                      index=X_ind), scaler_maxabs),
+        ('Data after robust scaling',
+         pd.DataFrame(scaler_robust.transform(X), columns=X_col,
+                      index=X_ind), scaler_robust),
+        ('Data after standard scaling + power transformation (Yeo-Johnson)',
+         pd.DataFrame(scaler_powery.transform(scaler_stand.transform(X)),
+                      columns=X_col,
+                      index=X_ind), scaler_powery),
+        ('Data after power transformation (Box-Cox)',
+         pd.DataFrame(scaler_powerb.transform(X), columns=X_col,
+                      index=X_ind), scaler_powerb),
+        ('Data after quantile transformation (uniform pdf)',
+         pd.DataFrame(scaler_quantu.transform(X), columns=X_col,
+                      index=X_ind), scaler_quantu),
+        ('Data after quantile transformation (gaussian pdf)',
+         pd.DataFrame(scaler_quantn.transform(X), columns=X_col,
+                      index=X_ind), scaler_quantn),
+        ('Data after sample-wise L2 normalizing',
+         pd.DataFrame(Normalizer(norm='l2').transform(X.T),
+                      columns=X_ind,
+                      index=X_col).T, np.nan),
+        ('Data after sample-wise L1 normalizing',
+         pd.DataFrame(Normalizer(norm='l1').transform(X.T),
+                      columns=X_ind,
+                      index=X_col).T, np.nan),
+        ('Data after maximum rescaling',
+         pd.DataFrame(Normalizer(norm='max').transform(X.T),
+                      columns=X_ind,
+                      index=X_col).T, np.nan)
+    ]
+    return distributions
