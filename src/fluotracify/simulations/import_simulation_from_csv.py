@@ -106,7 +106,10 @@ def import_from_csv(folder,
 
         if idx < ntrainfiles:
             train = pd.concat([train, converted_float], axis=1)
-            print('train', idx, file)
+            if frac_train == 1:
+                print(idx, file)
+            else:
+                print('train', idx, file)
         else:
             test = pd.concat([test, converted_float], axis=1)
             print('test', idx, file)
