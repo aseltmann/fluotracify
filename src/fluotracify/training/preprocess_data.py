@@ -6,6 +6,80 @@ import pandas as pd
 import tensorflow as tf
 
 
+def tfds_from_pddf(features_df,
+                   labels_df,
+                   is_training,
+                   batch_size,
+                   frac_val=0.2):
+    """TensorFlow Dataset from pandas DataFrame for UNET
+
+    This function was created to take pandas DataFrames containing simulated
+    fluorescence traces with artifacts (features) and the ground truth about
+    the artifacts (labels) as an input and to prepare the data for the training
+    pipeline (batch, shuffle, repeat, split in train + validation dataset).
+
+    Parameters
+    ----------
+    features_df, labels_df : pandas DataFrames
+        Contain features / labels ordered columnwise in the manner: feature_1,
+        feature_2, ... / label_1, label_2, ...
+    batch_size : int
+        Batch size for dataset creation (machine learning terminology)
+    is_training : bool
+        if True: Dataset will be repeated, shuffled and batched + a validation
+        dataset will be created (see frac_val).
+        If False: Dataset will only be batched, since it is for testing.
+    frac_val : float, optional
+        Fraction of training data used for validation (default 0.2). Only
+        relevant if is_training = True.
+
+    Returns
+    -------
+    dataset : TensorFlow Dataset
+        Contains features and labels, already batched according to BATCH_SIZE
+        (2 datasets (training, validation) if is_training = True)
+    num_train_examples / num_val_examples / num_total_examples : int
+        Number of examples in the dataset (2 numbers (training, validiation)
+        if is_training = True, 1 number (for test) if is_training = False)
+    """
+    X_tensor = tf.convert_to_tensor(value=features_cropped.values)
+    X_tensor = tf.transpose(a=X_tensor, perm=[1, 0])
+
+    y_tensor = tf.convert_to_tensor(value=labels_cropped.values)
+    y_tensor = tf.transpose(a=y_tensor, perm=[1, 0])
+    y_tensor = tf.cast(y_tensor, tf.float32)
+
+    num_total_examples = X_tensor.shape[0]
+    X_tensor = tf.reshape(tensor=X_tensor, shape=(num_total_examples, -1, 1))
+    y_tensor = tf.reshape(tensor=y_tensor, shape=(num_total_examples, -1, 1))
+
+    if is_training:
+        # for training: split dataset in training and validation set
+        num_val_examples = round(frac_val * num_total_examples)
+        num_train_examples = num_total_examples - num_val_examples
+
+        dataset = tf.data.Dataset.from_tensor_slices((X_tensor, y_tensor))
+        dataset = dataset.shuffle(buffer_size=num_total_examples)
+        dataset_train = dataset.take(num_train_examples).repeat().batch(
+            batch_size)
+        dataset_val = dataset.skip(num_train_examples).repeat().batch(
+            batch_size)
+
+        print('number of training examples: {}, number of validation '
+              'examples: {}\n\n------------------------'.format(
+                  num_train_examples, num_val_examples))
+        out = (dataset_train, dataset_val, num_train_examples,
+               num_val_examples)
+    else:
+        # if we create a test dataset: no validation set, no shuffling
+        dataset_test = tf.data.Dataset.from_tensor_slices(
+            (X_tensor, y_tensor)).batch(batch_size)
+
+        print('number of test examples: {}\n'.format(num_total_examples))
+        out = (dataset_test, num_total_examples)
+    return out
+
+
 def tfds_from_pddf_for_unet(features_df,
                             labels_df,
                             is_training,
