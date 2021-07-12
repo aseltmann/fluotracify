@@ -6,42 +6,36 @@ import pandas as pd
 import tensorflow as tf
 
 
-def tfds_from_pddf(features_df,
-                   labels_df,
-                   is_training,
-                   batch_size,
-                   frac_val=0.2):
+def tfds_from_pddf(features_df, labels_df, is_training, frac_val=0.2):
     """TensorFlow Dataset from pandas DataFrame for UNET
 
     This function was created to take pandas DataFrames containing simulated
     fluorescence traces with artifacts (features) and the ground truth about
-    the artifacts (labels) as an input and to prepare the data for the training
-    pipeline (batch, shuffle, repeat, split in train + validation dataset).
+    the artifacts (labels) as an input and split in train + validation dataset).
 
     Parameters
     ----------
     features_df, labels_df : pandas DataFrames
         Contain features / labels ordered columnwise in the manner: feature_1,
         feature_2, ... / label_1, label_2, ...
-    batch_size : int
-        Batch size for dataset creation (machine learning terminology)
-    is_training : bool
-        if True: Dataset will be repeated, shuffled and batched + a validation
-        dataset will be created (see frac_val).
-        If False: Dataset will only be batched, since it is for testing.
-    frac_val : float, optional
-        Fraction of training data used for validation (default 0.2). Only
-        relevant if is_training = True.
-
+    frac_val : float between 0 and 1, optional
+        Fraction of training data used for validation (default 0.2). 
+        If set to 0, 1, True or False, the function does not split the dataset
+        further (used for creating test Datasets)
     Returns
     -------
-    dataset : TensorFlow Dataset
-        Contains features and labels, already batched according to BATCH_SIZE
-        (2 datasets (training, validation) if is_training = True)
-    num_train_examples / num_val_examples / num_total_examples : int
-        Number of examples in the dataset (2 numbers (training, validiation)
-        if is_training = True, 1 number (for test) if is_training = False)
+    if frac_val between 0 and 1:
+        dataset_train, dataset_val : TensorFlow Datasets
+            Contains features and labels
+        num_train_examples, num_val_examples : int
+            Number of training and validation examples respectively
+    if frac_val == 0 or 1 or True or False:
+        dataset_test : TensorFlow Dataset
+            Contains features and labels
+        num_total_examples : int
+            Number of test examples
     """
+
     X_tensor = tf.convert_to_tensor(value=features_df.values)
     X_tensor = tf.transpose(a=X_tensor, perm=[1, 0])
 
@@ -53,31 +47,113 @@ def tfds_from_pddf(features_df,
     X_tensor = tf.reshape(tensor=X_tensor, shape=(num_total_examples, -1, 1))
     y_tensor = tf.reshape(tensor=y_tensor, shape=(num_total_examples, -1, 1))
 
-    if is_training:
+    if 0 < frac_val < 1:
         # for training: split dataset in training and validation set
         num_val_examples = round(frac_val * num_total_examples)
         num_train_examples = num_total_examples - num_val_examples
 
         dataset = tf.data.Dataset.from_tensor_slices((X_tensor, y_tensor))
-        dataset = dataset.shuffle(buffer_size=num_total_examples)
-        dataset_train = dataset.take(num_train_examples).repeat().batch(
-            batch_size)
-        dataset_val = dataset.skip(num_train_examples).repeat().batch(
-            batch_size)
+        #        dataset = dataset.shuffle(buffer_size=num_total_examples)
+        dataset_train = dataset.take(
+            num_train_examples)  # .repeat().batch(batch_size)
+        dataset_val = dataset.skip(
+            num_train_examples)  # .repeat().batch(batch_size)
 
         print('number of training examples: {}, number of validation '
               'examples: {}\n\n------------------------'.format(
                   num_train_examples, num_val_examples))
         out = (dataset_train, dataset_val, num_train_examples,
                num_val_examples)
-    else:
+    elif frac_val in (0, 1, True, False):
         # if we create a test dataset: no validation set, no shuffling
         dataset_test = tf.data.Dataset.from_tensor_slices(
-            (X_tensor, y_tensor)).batch(batch_size)
+            (X_tensor, y_tensor))  # .batch(batch_size)
 
         print('number of test examples: {}\n'.format(num_total_examples))
         out = (dataset_test, num_total_examples)
+    else:
+        raise ValueError(
+            'frac_val has to be a float between 0 and 1 or in (0, 1, True, False)'
+        )
     return out
+
+
+def parse_dataset(dataset):
+    """Part of tf.data pipeline, takes a dataset (traces, labels) and returns each
+    """
+    trace = dataset[0]
+    label = dataset[1]
+    return trace, label
+
+
+def replacenan(t):
+    """Replaces nan values in a Tensor t with zeros"""
+    return tf.where(tf.math.is_nan(t), tf.zeros_like(t), t)
+
+
+def crop_trace(trace, label, length_delimiter):
+    """Part of tf.data pipeline. Crop trace and label to a maximum length of length_delimiter"""
+    trace = trace[:length_delimiter, :]
+    label = label[:length_delimiter, :]
+    return trace, label
+
+
+def tf_scale_trace(trace, label, scaler):
+    """Part of tf.data pipeline. Wrapper function to be able to .map() scale_trace()"""
+    trace_shape = trace.shape
+    [trace,] = tf.py_function(func=scale_trace,
+                              inp=[trace, scaler],
+                              Tout=[tf.float32])
+    trace.set_shape(trace_shape)
+    return trace, label
+
+
+def scale_trace(trace, scaler):
+    """Part of tf.data pipeline. Scale / normalize the input trace.
+
+    Parameters:
+    -----------
+    trace : np.array, pd.DataFrame or tf.Tensor
+        1D-Trace (1 example with 1 feature of length n along axis=0)
+    scaler : ('standard', 'robust', 'maxabs', 'quant_g', 'l1', 'l2')
+        Selected scalers from sklearn.preprocessing
+
+    Returns:
+    --------
+    trace : np.array
+        Scaled / normalized trace.
+
+    Raises:
+    -------
+    ValueError
+        If the value for scaler is not in ('standard', 'robust', 'maxabs',
+        'quant_g', 'l1', 'l2')
+    """
+    if scaler == 'standard':
+        trace = StandardScaler().fit_transform(trace)
+    elif scaler == 'robust':
+        trace = RobustScaler(quantile_range=(25, 75)).fit_transform(trace)
+    elif scaler == 'maxabs':
+        trace = MaxAbsScaler().fit_transform(trace)
+    elif scaler == 'quant_g':
+        trace = QuantileTransformer(
+            output_distribution='normal').fit_transform(trace)
+    elif scaler in ('l1', 'l2'):
+        trace = normalize(X=trace, norm=scaler, axis=0)
+    else:
+        raise ValueError(
+            'scaler has to be a string. currently supported are:'
+            '"standard", "robust", "maxabs", "quant_g", "l1", "l2"')
+    return trace
+
+
+def show_trace(trace, label):
+    """Part of tf.data pipeline. Plot a trace with it's label"""
+    fig, ax1 = plt.subplots()
+    ax1.plot(trace, color='C0', alpha=0.75, label='trace')
+    ax1.twinx().plot(label, color='C1', alpha=0.75, label='label')
+    fig.legend()
+    plt.show()
 
 
 def tfds_from_pddf_for_unet(features_df,
