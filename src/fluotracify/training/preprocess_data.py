@@ -9,12 +9,12 @@ import matplotlib.pyplot as plt
 from sklearn.preprocessing import (MinMaxScaler, MaxAbsScaler, StandardScaler, RobustScaler, Normalizer, QuantileTransformer, PowerTransformer, normalize) 
 
 
-def tfds_from_pddf(features_df, labels_df, is_training, frac_val=0.2):
-    """TensorFlow Dataset from pandas DataFrame for UNET
+def tfds_from_pddf(features_df, labels_df, frac_val=None):
+    """TensorFlow Dataset from pandas DataFrame
 
     This function was created to take pandas DataFrames containing simulated
     fluorescence traces with artifacts (features) and the ground truth about
-    the artifacts (labels) as an input and split in train + validation dataset).
+    the artifacts (labels) as an input and create a tf Dataset
 
     Parameters
     ----------
@@ -22,9 +22,9 @@ def tfds_from_pddf(features_df, labels_df, is_training, frac_val=0.2):
         Contain features / labels ordered columnwise in the manner: feature_1,
         feature_2, ... / label_1, label_2, ...
     frac_val : float between 0 and 1, optional
-        Fraction of training data used for validation (default 0.2). 
-        If set to 0, 1, True or False, the function does not split the dataset
-        further (used for creating test Datasets)
+        If set to 0, 1, True, False, or None, the function does not split the
+        dataset further (used for creating test Datasets, default)
+        If between 0 and 1, this fraction of training data is used for validation.
     Returns
     -------
     if frac_val between 0 and 1:
@@ -32,7 +32,7 @@ def tfds_from_pddf(features_df, labels_df, is_training, frac_val=0.2):
             Contains features and labels
         num_train_examples, num_val_examples : int
             Number of training and validation examples respectively
-    if frac_val == 0 or 1 or True or False:
+    if frac_val in (0, 1, True, False, None):
         dataset_test : TensorFlow Dataset
             Contains features and labels
         num_total_examples : int
@@ -67,7 +67,7 @@ def tfds_from_pddf(features_df, labels_df, is_training, frac_val=0.2):
                   num_train_examples, num_val_examples))
         out = (dataset_train, dataset_val, num_train_examples,
                num_val_examples)
-    elif frac_val in (0, 1, True, False):
+    elif frac_val in (0, 1, True, False, None):
         # if we create a test dataset: no validation set, no shuffling
         dataset_test = tf.data.Dataset.from_tensor_slices(
             (X_tensor, y_tensor))  # .batch(batch_size)
