@@ -4,6 +4,9 @@ networks."""
 import numpy as np
 import pandas as pd
 import tensorflow as tf
+import matplotlib.pyplot as plt
+
+from sklearn.preprocessing import (MinMaxScaler, MaxAbsScaler, StandardScaler, RobustScaler, Normalizer, QuantileTransformer, PowerTransformer, normalize) 
 
 
 def tfds_from_pddf(features_df, labels_df, is_training, frac_val=0.2):
