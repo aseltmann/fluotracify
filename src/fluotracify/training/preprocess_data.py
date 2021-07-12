@@ -81,18 +81,28 @@ def tfds_from_pddf(features_df, labels_df, frac_val=None):
     return out
 
 
-def parse_dataset(dataset):
-    """Part of tf.data pipeline, takes a dataset (traces, labels) and returns each
-    """
-    trace = dataset[0]
-    label = dataset[1]
-    return trace, label
+# def parse_dataset(dataset):
+#     """Part of tf.data pipeline, takes a dataset (traces, labels) and returns each
+#     """
+#     trace = dataset[0]
+#     label = dataset[1]
+#     return trace, label
 
 
 def replacenan(t):
     """Replaces nan values in a Tensor t with zeros"""
     return tf.where(tf.math.is_nan(t), tf.zeros_like(t), t)
 
+
+def tf_crop_trace(trace, label, length_delimiter):
+    trace_shape = trace.shape
+    label_shape = label.shape
+    [trace,label] = tf.py_function(func=crop_trace,
+                                   inp=[trace, label, length_delimiter],
+                                   Tout=[tf.float32])
+    trace.set_shape(trace_shape)
+    label.set_shape(label_shape)
+    return trace, label
 
 def crop_trace(trace, label, length_delimiter):
     """Part of tf.data pipeline. Crop trace and label to a maximum length of length_delimiter"""
