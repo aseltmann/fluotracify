@@ -66,11 +66,9 @@ def tfds_from_pddf(features_df, labels_df, frac_val=None):
         num_train_examples = num_total_examples - num_val_examples
 
         dataset = tf.data.Dataset.from_tensor_slices((X_tensor, y_tensor))
-        #        dataset = dataset.shuffle(buffer_size=num_total_examples)
-        dataset_train = dataset.take(
-            num_train_examples)  # .repeat().batch(batch_size)
-        dataset_val = dataset.skip(
-            num_train_examples)  # .repeat().batch(batch_size)
+        dataset = dataset.map(replace_nan)
+        dataset_train = dataset.take(num_train_examples)
+        dataset_val = dataset.skip(num_train_examples)
 
         print('number of training examples: {}, number of validation '
               'examples: {}\n\n------------------------'.format(
@@ -79,8 +77,8 @@ def tfds_from_pddf(features_df, labels_df, frac_val=None):
                num_val_examples)
     elif frac_val in (0, 1, True, False, None):
         # if we create a test dataset: no validation set, no shuffling
-        dataset_test = tf.data.Dataset.from_tensor_slices(
-            (X_tensor, y_tensor))  # .batch(batch_size)
+        dataset_test = tf.data.Dataset.from_tensor_slices((X_tensor, y_tensor))
+        dataset_test = dataset_test.map(replace_nan)
 
         print('number of test examples: {}\n'.format(num_total_examples))
         out = (dataset_test, num_total_examples)
