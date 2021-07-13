@@ -1,12 +1,21 @@
 """This module contains preprocessing functions for the training of neural
 networks."""
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import tensorflow as tf
-import matplotlib.pyplot as plt
 
-from sklearn.preprocessing import (MinMaxScaler, MaxAbsScaler, StandardScaler, RobustScaler, Normalizer, QuantileTransformer, PowerTransformer, normalize) 
+from sklearn.preprocessing import (
+    MaxAbsScaler,
+    MinMaxScaler,
+    Normalizer,
+    PowerTransformer,
+    QuantileTransformer,
+    RobustScaler,
+    StandardScaler,
+    normalize,
+)
 
 
 def tfds_from_pddf(features_df, labels_df, frac_val=None):
@@ -24,7 +33,8 @@ def tfds_from_pddf(features_df, labels_df, frac_val=None):
     frac_val : float between 0 and 1, optional
         If set to 0, 1, True, False, or None, the function does not split the
         dataset further (used for creating test Datasets, default)
-        If between 0 and 1, this fraction of training data is used for validation.
+        If between 0 and 1, this fraction of training data is used for
+        validation.
     Returns
     -------
     if frac_val between 0 and 1:
@@ -75,48 +85,39 @@ def tfds_from_pddf(features_df, labels_df, frac_val=None):
         print('number of test examples: {}\n'.format(num_total_examples))
         out = (dataset_test, num_total_examples)
     else:
-        raise ValueError(
-            'frac_val has to be a float between 0 and 1 or in (0, 1, True, False)'
-        )
+        raise ValueError('frac_val has to be a float between 0 and 1 or '
+                         'in (0, 1, True, False')
     return out
 
 
-# def parse_dataset(dataset):
-#     """Part of tf.data pipeline, takes a dataset (traces, labels) and returns each
-#     """
-#     trace = dataset[0]
-#     label = dataset[1]
-#     return trace, label
-
-
-def replacenan(t):
-    """Replaces nan values in a Tensor t with zeros"""
-    return tf.where(tf.math.is_nan(t), tf.zeros_like(t), t)
+def replace_nan(trace, label):
+    """Part of tf.data pipeline. Replaces nan values with zeros"""
+    trace = tf.where(tf.math.is_nan(trace), tf.zeros_like(trace), trace)
+    label = tf.where(tf.math.is_nan(label), tf.zeros_like(label), label)
+    return trace, label
 
 
 def tf_crop_trace(trace, label, length_delimiter):
+    """Part of tf.data pipeline. Crop trace and label to a maximum length of
+    length_delimiter
+    """
+    trace = trace[:length_delimiter]
+    label = label[:length_delimiter]
     trace_shape = trace.shape
     label_shape = label.shape
-    [trace,label] = tf.py_function(func=crop_trace,
-                                   inp=[trace, label, length_delimiter],
-                                   Tout=[tf.float32])
     trace.set_shape(trace_shape)
     label.set_shape(label_shape)
     return trace, label
 
-def crop_trace(trace, label, length_delimiter):
-    """Part of tf.data pipeline. Crop trace and label to a maximum length of length_delimiter"""
-    trace = trace[:length_delimiter, :]
-    label = label[:length_delimiter, :]
-    return trace, label
-
 
 def tf_scale_trace(trace, label, scaler):
-    """Part of tf.data pipeline. Wrapper function to be able to .map() scale_trace()"""
+    """Part of tf.data pipeline. Wrapper function to be able to .map()
+    scale_trace()
+    """
     trace_shape = trace.shape
-    [trace,] = tf.py_function(func=scale_trace,
-                              inp=[trace, scaler],
-                              Tout=[tf.float32])
+    [trace, ] = tf.py_function(func=scale_trace,
+                               inp=[trace, scaler],
+                               Tout=[tf.float32])
     trace.set_shape(trace_shape)
     return trace, label
 
