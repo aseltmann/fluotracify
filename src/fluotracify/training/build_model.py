@@ -242,6 +242,9 @@ def binary_ce_dice_loss(axis=-1, smooth=1e-5):
     return binary_ce_dice
 
 
+# notes
+# - Dropout could be added
+
 # Alternative U-Net definition
 def convtrans_old(filters, name):
     """Sequential API: Conv1DTranspose, BatchNorm"""
@@ -252,13 +255,13 @@ def convtrans_old(filters, name):
     return upsamp
 
 
-def convtrans(filters, name):
+def convtrans(filters, name, kernel_size, strides):
     """Sequential API: Conv1DTranspose, BatchNorm"""
     upsamp = tf.keras.Sequential(name=name)
     upsamp.add(
         tf.keras.layers.Conv1DTranspose(filters=filters,
-                                        kernel_size=2,
-                                        strides=2))
+                                        kernel_size=kernel_size,
+                                        strides=strides))
     upsamp.add(tf.keras.layers.BatchNormalization())
     upsamp.add(tf.keras.layers.Activation('relu'))
     return upsamp
@@ -279,19 +282,26 @@ def twoconv(filters, name):
     return conv
 
 
-def encoder(input_tensor, filters, name):
+def encoder(input_tensor, filters, name, pool_size=2):
     """Functional API: Two Conv1D incl BatchNorm, MaxPool1D"""
     encode = twoconv(filters=filters, name=name)(input_tensor)
-    encode_pool = tf.keras.layers.MaxPool1D(pool_size=2,
+    encode_pool = tf.keras.layers.MaxPool1D(pool_size=pool_size,
                                             name='mp_{}'.format(name))(encode)
     return encode_pool, encode
 
 
-def decoder(input_tensor, concat_tensor, filters, name):
+def decoder(input_tensor,
+            concat_tensor,
+            filters,
+            name,
+            kernel_size=2,
+            strides=2):
     """Functional API: Conv1DTrans, BatchNorm, Concat, Two Conv incl BatchNorm
     """
     decode = convtrans(filters=filters,
-                       name='conv_transpose_{}'.format(name))(input_tensor)
+                       name='conv_transpose_{}'.format(name),
+                       kernel_size=kernel_size,
+                       strides=strides)(input_tensor)
     decode = tf.keras.layers.concatenate([concat_tensor, decode],
                                          axis=-1,
                                          name=name)
@@ -362,4 +372,95 @@ def unet_1d_alt(input_size):
     print('output - shape:\t', outputs.shape)
 
     unet = tf.keras.Model(inputs=inputs, outputs=outputs)
+    return unet
+
+
+def unet_1d_alt2(input_size, n_levels, filters_ls, pool_size):
+    """U-Net as described by Ronneberger et al.
+
+    Parameters
+    ----------
+    input_size : int
+        Input vector size
+    n_levelsb : int
+        Number of levels or steps in the Unet
+    filters_ls : list of int
+        A list of the number of filters in each level. Typically
+        the number increases with depth. The central convolutions
+        will have double the number of filters than the last in
+        this list.
+    pool_size : int, Optional. Default: 2
+        Pool size of the MaxPool1D layer, as well as kernel size and
+        strides of the Conv1DTranspose layer
+
+    Returns
+    -------
+    Model as described by the tensorflow.keras Functional API
+
+    Raises
+    ------
+    - ValueError: the number of filters in filters_ls has to be equal
+    to n_levels
+
+    Notes
+    -----
+    - Paper: https://arxiv.org/pdf/1505.04597.pdf
+    - conceptually different approach than in the paper is the use of
+    transposed convolution opposed to a "up-convolution" consisting of
+    bed-of-nails upsampling and a 2x2 convolution
+    - this implementation was influenced by:
+    https://www.tensorflow.org/tutorials/generative/pix2pix
+    """
+    if len(filters_ls) != n_levels:
+        raise ValueError('The number of chosen filters has to match'
+                         ' the total number of steps.')
+    ldict = {}
+
+    inputs = tf.keras.layers.Input(shape=(input_size, 1))
+
+    # Downsampling through model
+    ldict['x0_pool'], ldict['x0'] = encoder(inputs,
+                                            filters_ls[0],
+                                            name='encode0',
+                                            pool_size=pool_size)
+    for i in range(1, n_levels):
+        ldict['x{}_pool'.format(i)], ldict['x{}'.format(i)] = encoder(
+            input_tensor=ldict['x{}_pool'.format(i - 1)],
+            filters=filters_ls[i],
+            name='encode{}'.format(i),
+            pool_size=pool_size)
+
+    # Center
+    center = twoconv(2 * filters_ls[n_levels - 1], name='two_conv_center')(
+        ldict['x{}_pool'.format(n_levels)])
+
+    # Upsampling through model
+    ldict['y{}'.format(n_levels - 1)] = decoder(
+        input_tensor=center,
+        concat_tensor=ldict['x{}'.format(n_levels - 1)],
+        filters=filters_ls[-1],
+        name='decoder{}'.format(n_levels - 1),
+        kernel_size=pool_size,
+        strides=pool_size)
+
+    for j in range(1, n_levels):
+        ldict['y{}'.format(n_levels - 1 - j)] = decoder(
+            input_tensor=ldict['y{}'.format(n_levels - j)],
+            concat_tensor=ldict['x{}'.format(n_levels - 1 - j)],
+            filters=filters_ls[-1 - j],
+            name='decoder{}'.format(n_levels - 1 - j),
+            kernel_size=pool_size,
+            strides=pool_size)
+
+    # create 'binary' output vector
+    outputs = tf.keras.layers.Conv1D(filters=1,
+                                     kernel_size=1,
+                                     activation='sigmoid')(ldict['y0'])
+
+    print('input - shape:\t', inputs.shape)
+    print('output - shape:\t', outputs.shape)
+
+    unet = tf.keras.Model(inputs=inputs,
+                          outputs=outputs,
+                          name='unet_depth{}'.format(n_levels))
     return unet

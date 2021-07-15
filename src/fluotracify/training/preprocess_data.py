@@ -127,7 +127,7 @@ def scale_trace(trace, scaler):
     -----------
     trace : np.array, pd.DataFrame or tf.Tensor
         1D-Trace (1 example with 1 feature of length n along axis=0)
-    scaler : ('standard', 'robust', 'maxabs', 'quant_g', 'l1', 'l2')
+    scaler : ('standard', 'robust', 'maxabs', 'quant_g', 'minmax', l1', 'l2')
         Selected scalers from sklearn.preprocessing
 
     Returns:
@@ -139,7 +139,7 @@ def scale_trace(trace, scaler):
     -------
     ValueError
         If the value for scaler is not in ('standard', 'robust', 'maxabs',
-        'quant_g', 'l1', 'l2')
+        'quant_g', 'minmax', 'l1', 'l2')
     """
     if scaler == 'standard':
         trace = StandardScaler().fit_transform(trace)
@@ -150,12 +150,14 @@ def scale_trace(trace, scaler):
     elif scaler == 'quant_g':
         trace = QuantileTransformer(
             output_distribution='normal').fit_transform(trace)
+    elif scaler == 'minmax':
+        trace = MinMaxScaler().fit_transform(trace)
     elif scaler in ('l1', 'l2'):
         trace = normalize(X=trace, norm=scaler, axis=0)
     else:
         raise ValueError(
             'scaler has to be a string. currently supported are:'
-            '"standard", "robust", "maxabs", "quant_g", "l1", "l2"')
+            '"standard", "robust", "maxabs", "quant_g", "minmax", "l1", "l2"')
     return trace
 
 
