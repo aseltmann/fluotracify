@@ -60,7 +60,14 @@ def tfds_from_pddf(features_df, labels_df, frac_val=None):
     X_tensor = tf.reshape(tensor=X_tensor, shape=(num_total_examples, -1, 1))
     y_tensor = tf.reshape(tensor=y_tensor, shape=(num_total_examples, -1, 1))
 
-    if 0 < frac_val < 1:
+    if frac_val in (0, 1, True, False, None):
+        # if we create a test dataset: no validation set, no shuffling
+        dataset_test = tf.data.Dataset.from_tensor_slices((X_tensor, y_tensor))
+        dataset_test = dataset_test.map(replace_nan)
+
+        print('number of test examples: {}\n'.format(num_total_examples))
+        out = (dataset_test, num_total_examples)
+    elif 0 < frac_val < 1:
         # for training: split dataset in training and validation set
         num_val_examples = round(frac_val * num_total_examples)
         num_train_examples = num_total_examples - num_val_examples
@@ -75,13 +82,7 @@ def tfds_from_pddf(features_df, labels_df, frac_val=None):
                   num_train_examples, num_val_examples))
         out = (dataset_train, dataset_val, num_train_examples,
                num_val_examples)
-    elif frac_val in (0, 1, True, False, None):
-        # if we create a test dataset: no validation set, no shuffling
-        dataset_test = tf.data.Dataset.from_tensor_slices((X_tensor, y_tensor))
-        dataset_test = dataset_test.map(replace_nan)
 
-        print('number of test examples: {}\n'.format(num_total_examples))
-        out = (dataset_test, num_total_examples)
     else:
         raise ValueError('frac_val has to be a float between 0 and 1 or '
                          'in (0, 1, True, False')
