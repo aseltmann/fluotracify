@@ -4,11 +4,11 @@ channels:
   - conda-forge
 #   - file:///home/lex/Programme/drmed-git/src/
 dependencies:
-  - numpy
-  - pandas
-  - matplotlib
-  - scikit-learn
   - pip
   - pip:
+    - numpy=1.19.5
     - tf-nightly
     - mlflow
+    - pandas
+    - matplotlib
+    - scikit-learn
