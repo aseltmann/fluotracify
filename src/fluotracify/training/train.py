@@ -10,15 +10,6 @@ import mlflow
 import mlflow.tensorflow
 import tensorflow as tf
 
-FLUOTRACIFY_PATH = sys.argv[1] if len(
-    sys.argv) > 1 else '~/Programme/drmed-git/src/'
-sys.path.append(FLUOTRACIFY_PATH)
-
-if True:  # isort workaround
-    from fluotracify.simulations import import_simulation_from_csv as isfc
-    from fluotracify.training import build_model as bm, preprocess_data as ppd
-    from fluotracify.training import evaluate
-
 # fixes a problem when calling plotting functions on the server
 matplotlib.use('agg')
 
@@ -56,10 +47,21 @@ print('GPUs: ', tf.config.list_physical_devices('GPU'))
 @click.option('--n_levels', type=int, default=9)
 @click.option('--first_filters', type=int, default=64)
 @click.option('--pool_size', type=int, default=2)
+@click.option('--fluotracify_path',
+              type=str,
+              default='~/Programme/drmed-git/src/')
 def mlflow_run(batch_size, frac_val, length_delimiter, learning_rate, epochs,
                csv_path_train, csv_path_test, col_per_example, steps_per_epoch,
-               validation_steps, scaler, n_levels, first_filters, pool_size):
+               validation_steps, scaler, n_levels, first_filters, pool_size,
+               fluotracify_path):
     with mlflow.start_run() as _:
+
+        sys.path.append(fluotracify_path)
+
+        if True:  # isort workaround
+            from fluotracify.simulations import import_simulation_from_csv as isfc
+            from fluotracify.training import build_model as bm, preprocess_data as ppd
+            from fluotracify.training import evaluate
         mlflow.tensorflow.autolog(every_n_iter=1)
 
         LOG_DIR_TB = "/tmp/tb"
@@ -72,7 +74,6 @@ def mlflow_run(batch_size, frac_val, length_delimiter, learning_rate, epochs,
         METRICS_THRESHOLDS = [0.1, 0.3, 0.5, 0.7, 0.9]
         EXP_PARAM_PATH_TRAIN = '/tmp/experiment_params_train.csv'
         EXP_PARAM_PATH_TEST = '/tmp/experiment_params_test.csv'
-
 
         train, _, nsamples_train, experiment_params_train = isfc.import_from_csv(
             folder=csv_path_train,
