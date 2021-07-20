@@ -416,7 +416,7 @@ def unet_1d_alt2(input_size, n_levels, first_filters, pool_size):
     for _ in range(1, n_levels + 1):
         nextfilters *= 2
         filters.append(nextfilters)
-    filters = tf.experimental.numpy.clip(filters, a_min=1, a_max=512)
+    filters = tf.experimental.numpy.clip(filters, a_min=1, a_max=512).numpy()
     filters = tf.cast(filters, tf.int32).numpy()
 
     ldict = {}
