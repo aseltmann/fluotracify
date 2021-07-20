@@ -436,7 +436,7 @@ def unet_1d_alt2(input_size, n_levels, first_filters, pool_size):
 
     # Center
     center = twoconv(2 * filters[n_levels - 1], name='two_conv_center')(
-        ldict['x{}_pool'.format(n_levels)])
+        ldict['x{}_pool'.format(n_levels - 1)])
 
     # Upsampling through model
     ldict['y{}'.format(n_levels - 1)] = decoder(
