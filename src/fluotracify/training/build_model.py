@@ -245,6 +245,7 @@ def binary_ce_dice_loss(axis=-1, smooth=1e-5):
 # notes
 # - Dropout could be added
 
+
 # Alternative U-Net definition
 def convtrans_old(filters, name):
     """Sequential API: Conv1DTranspose, BatchNorm"""
@@ -375,7 +376,7 @@ def unet_1d_alt(input_size):
     return unet
 
 
-def unet_1d_alt2(input_size, n_levels, filters_ls, pool_size):
+def unet_1d_alt2(input_size, n_levels, first_filters, pool_size):
     """U-Net as described by Ronneberger et al.
 
     Parameters
@@ -384,11 +385,10 @@ def unet_1d_alt2(input_size, n_levels, filters_ls, pool_size):
         Input vector size
     n_levelsb : int
         Number of levels or steps in the Unet
-    filters_ls : list of int
-        A list of the number of filters in each level. Typically
-        the number increases with depth. The central convolutions
-        will have double the number of filters than the last in
-        this list.
+    first_filters : int
+        The number of filters in the first level. Every deeper level
+        will be twice as many filters till a maximum of 512 is reached.
+        Filters will be clipped if smaller than 1 or bigger than 512
     pool_size : int, Optional. Default: 2
         Pool size of the MaxPool1D layer, as well as kernel size and
         strides of the Conv1DTranspose layer
@@ -406,39 +406,43 @@ def unet_1d_alt2(input_size, n_levels, filters_ls, pool_size):
     -----
     - Paper: https://arxiv.org/pdf/1505.04597.pdf
     - conceptually different approach than in the paper is the use of
-    transposed convolution opposed to a "up-convolution" consisting of
+    transposed convolution opposed to a up"-convolution" consisting of
     bed-of-nails upsampling and a 2x2 convolution
     - this implementation was influenced by:
     https://www.tensorflow.org/tutorials/generative/pix2pix
     """
-    if len(filters_ls) != n_levels:
-        raise ValueError('The number of chosen filters has to match'
-                         ' the total number of steps.')
+    filters = [first_filters]
+    nextfilters = first_filters
+    for _ in range(1, n_levels + 1):
+        nextfilters *= 2
+        filters.append(nextfilters)
+    filters = tf.experimental.numpy.clip(filters, a_min=1, a_max=512)
+
     ldict = {}
 
     inputs = tf.keras.layers.Input(shape=(input_size, 1))
 
     # Downsampling through model
     ldict['x0_pool'], ldict['x0'] = encoder(inputs,
-                                            filters_ls[0],
+                                            filters[0],
                                             name='encode0',
                                             pool_size=pool_size)
     for i in range(1, n_levels):
         ldict['x{}_pool'.format(i)], ldict['x{}'.format(i)] = encoder(
             input_tensor=ldict['x{}_pool'.format(i - 1)],
-            filters=filters_ls[i],
+            filters=filters[i],
             name='encode{}'.format(i),
             pool_size=pool_size)
 
     # Center
-    center = twoconv(2 * filters_ls[n_levels - 1], name='two_conv_center')(
+    center = twoconv(2 * filters[n_levels - 1], name='two_conv_center')(
         ldict['x{}_pool'.format(n_levels)])
 
     # Upsampling through model
     ldict['y{}'.format(n_levels - 1)] = decoder(
         input_tensor=center,
         concat_tensor=ldict['x{}'.format(n_levels - 1)],
-        filters=filters_ls[-1],
+        filters=filters[-1],
         name='decoder{}'.format(n_levels - 1),
         kernel_size=pool_size,
         strides=pool_size)
@@ -447,7 +451,7 @@ def unet_1d_alt2(input_size, n_levels, filters_ls, pool_size):
         ldict['y{}'.format(n_levels - 1 - j)] = decoder(
             input_tensor=ldict['y{}'.format(n_levels - j)],
             concat_tensor=ldict['x{}'.format(n_levels - 1 - j)],
-            filters=filters_ls[-1 - j],
+            filters=filters[-1 - j],
             name='decoder{}'.format(n_levels - 1 - j),
             kernel_size=pool_size,
             strides=pool_size)
@@ -464,3 +468,43 @@ def unet_1d_alt2(input_size, n_levels, filters_ls, pool_size):
                           outputs=outputs,
                           name='unet_depth{}'.format(n_levels))
     return unet
+
+
+def unet_metrics(metrics_thresholds):
+    """Returns a selection of metrics for model training
+
+    Currently these metrics are True Positives, False Positives, True
+    Negatives, False Negatives, Preciesion, Recall, Accuracy, AUC
+
+    Parameters
+    ----------
+    metrics_thresholds: list of float between 0 and 1
+
+    Returns
+    -------
+    list of metrics
+    """
+    metrics = []
+    for thresh in metrics_thresholds:
+        metrics.append(
+            tf.keras.metrics.TruePositives(name='tp{}'.format(thresh),
+                                           thresholds=thresh))
+        metrics.append(
+            tf.keras.metrics.FalsePositives(name='fp{}'.format(thresh),
+                                            thresholds=thresh))
+        metrics.append(
+            tf.keras.metrics.TrueNegatives(name='tn{}'.format(thresh),
+                                           thresholds=thresh))
+        metrics.append(
+            tf.keras.metrics.FalseNegatives(name='fn{}'.format(thresh),
+                                            thresholds=thresh))
+        metrics.append(
+            tf.keras.metrics.Precision(name='precision{}'.format(thresh),
+                                       thresholds=thresh))
+        metrics.append(
+            tf.keras.metrics.Recall(name='recall{}'.format(thresh),
+                                    thresholds=thresh))
+    metrics.append(
+        tf.keras.metrics.BinaryAccuracy(name='accuracy', threshold=0.5))
+    metrics.append(tf.keras.metrics.AUC(name='auc', num_thresholds=100))
+    return metrics
