@@ -46,22 +46,14 @@ print('GPUs: ', tf.config.list_physical_devices('GPU'))
               type=str,
               default='~/Programme/drmed-git/src/')
 @click.option('--col_per_example', type=int, default=3)
-@click.option('--epochs', '-e', type=int, default=[10], multiple=True)
-@click.option('--batch_size', '-bs', type=int, default=[5], multiple=True)
-@click.option('--steps_per_epoch',
-              '-spe',
-              type=int,
-              default=[10],
-              multiple=True)
-@click.option('--validation_steps',
-              '-vs',
-              type=int,
-              default=[10],
-              multiple=True)
-@click.option('--scaler', '-s', type=str, default=['robust'], multiple=True)
-@click.option('--n_levels', '-nl', type=int, default=[9], multiple=True)
-@click.option('--first_filters', '-ff', type=int, default=[64], multiple=True)
-@click.option('--pool_size', '-ps', type=int, default=[2], multiple=True)
+@click.option('--epochs', type=int, default=[10])
+@click.option('--batch_size', type=int, default=[5])
+@click.option('--steps_per_epoch', type=int, default=[10])
+@click.option('--validation_steps', type=int, default=[10])
+@click.option('--scaler', type=str, default=['robust'])
+@click.option('--n_levels', type=int, default=[9])
+@click.option('--first_filters', type=int, default=[64])
+@click.option('--pool_size', type=int, default=[2])
 def hparams_run(batch_size, frac_val, length_delimiter, learning_rate,
                 num_session_groups, epochs, csv_path_train, csv_path_test,
                 col_per_example, steps_per_epoch, validation_steps, scaler,
@@ -82,17 +74,17 @@ def hparams_run(batch_size, frac_val, length_delimiter, learning_rate,
     # but currently, mlflow does not support logging lists, so I log the
     # elements of the list one by one
     METRICS_THRESHOLDS = [0.1, 0.3, 0.5, 0.7, 0.9]
-    HP_EPOCHS = hp.HParam('epochs', hp.Discrete(epochs, dtype=int))
-    HP_BATCH_SIZE = hp.HParam('batch_size', hp.Discrete(batch_size, dtype=int))
+    HP_EPOCHS = hp.HParam('epochs', hp.Discrete([20], dtype=int))
+    HP_BATCH_SIZE = hp.HParam('batch_size', hp.Discrete([5], dtype=int))
     HP_STEPS_PER_EPOCH = hp.HParam('steps_per_epoch',
-                                   hp.Discrete(steps_per_epoch, dtype=int))
+                                   hp.Discrete([1020], dtype=int))
     HP_VALIDATION_STEPS = hp.HParam('validation_steps',
-                                    hp.Discrete(validation_steps, dtype=int))
-    HP_SCALER = hp.HParam('scaler', hp.Discrete(scaler, dtype=str))
-    HP_N_LEVELS = hp.HParam('n_levels', hp.Discrete(n_levels, dtype=int))
+                                    hp.Discrete([500], dtype=int))
+    HP_SCALER = hp.HParam('scaler', hp.Discrete(['robust', 'minmax'], dtype=str))
+    HP_N_LEVELS = hp.HParam('n_levels', hp.Discrete([3, 9], dtype=int))
     HP_FIRST_FILTERS = hp.HParam('first_filteres',
-                                 hp.Discrete(first_filters, dtype=int))
-    HP_POOL_SIZE = hp.HParam('pool_size', hp.Discrete(pool_size, dtype=int))
+                                 hp.Discrete([32, 64], dtype=int))
+    HP_POOL_SIZE = hp.HParam('pool_size', hp.Discrete([2], dtype=int))
 
     HPARAMS = [
         HP_EPOCHS, HP_BATCH_SIZE, HP_STEPS_PER_EPOCH, HP_VALIDATION_STEPS,
