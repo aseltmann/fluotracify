@@ -37,4 +37,19 @@ entry_points:
                  --first_filters {first_filters}
                  --pool_size {pool_size}"
   search_hparams:
+    parameters:
+      fluotracify_path
+      batch_size
+      frac_val
+      length_delimiter
+      learning_rate
+      epochs
+      csv_path_train
+      col_per_example
+      spe
+      vs
+      s
+      nl
+      ff
+      ps
     command: "python src/fluotracify/training/search_hparams.py"
