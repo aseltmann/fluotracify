@@ -20,4 +20,21 @@ entry_points:
       n_levels: {type: float, default: 5}
       first_filters: {type: float, default: 64}
       pool_size: {type: float, default: 2}
-    command: "python src/fluotracify/training/train.py --fluotracify_path {fluotracify_path} --batch_size {batch_size} --frac_val {frac_val} --length_delimiter {length_delimiter} --learning_rate {learning_rate} --epochs {epochs} --csv_path_train {csv_path_train} --csv_path_test {csv_path_test} --col_per_example {col_per_example} --steps_per_epoch {steps_per_epoch} --validation_steps {validation_steps} --scaler {scaler} --n_levels {n_levels} --first_filters {first_filters} --pool_size {pool_size}"
+    command: "python src/fluotracify/training/train.py
+                 --fluotracify_path {fluotracify_path}
+                 --batch_size {batch_size}
+                 --frac_val {frac_val}
+                 --length_delimiter {length_delimiter}
+                 --learning_rate {learning_rate}
+                 --epochs {epochs}
+                 --csv_path_train {csv_path_train}
+                 --csv_path_test {csv_path_test}
+                 --col_per_example {col_per_example}
+                 --steps_per_epoch {steps_per_epoch}
+                 --validation_steps {validation_steps}
+                 --scaler {scaler}
+                 --n_levels {n_levels}
+                 --first_filters {first_filters}
+                 --pool_size {pool_size}"
+  search_hparams:
+    command: "python src/fluotracify/training/search_hparams.py"
