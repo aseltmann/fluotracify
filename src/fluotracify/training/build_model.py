@@ -1,6 +1,7 @@
 """This module contains functions to build neural networks."""
 
 import tensorflow as tf
+from tensorboard.plugins.hparams import api as hp
 
 
 def vgg10_1d(win_len, col_no):
@@ -508,4 +509,19 @@ def unet_metrics(metrics_thresholds):
     metrics.append(
         tf.keras.metrics.BinaryAccuracy(name='accuracy', threshold=0.5))
     metrics.append(tf.keras.metrics.AUC(name='auc', num_thresholds=100))
+    return metrics
+
+
+def unet_hp_metrics(metrics_thresholds):
+    """Returns unet metrics Tensorboard HParams objects for logging"""
+    metrics = []
+    for thresh in metrics_thresholds:
+        metrics.append(hp.Metric("tp{}".format(thresh)))
+        metrics.append(hp.Metric("fp{}".format(thresh)))
+        metrics.append(hp.Metric("tn{}".format(thresh)))
+        metrics.append(hp.Metric("fn{}".format(thresh)))
+        metrics.append(hp.Metric("precision{}".format(thresh)))
+        metrics.append(hp.Metric("recall{}".format(thresh)))
+    metrics.append(hp.Metric("accuracy{}".format(0.5)))
+    metrics.append(hp.Metric("auc"))
     return metrics
