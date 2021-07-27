@@ -52,4 +52,12 @@ entry_points:
       nl
       ff
       ps
-    command: "python src/fluotracify/training/search_hparams.py"
+    command: "python src/fluotracify/training/search_hparams.py
+                 --fluotracify_path {fluotracify_path}
+                 --batch_size {batch_size}
+                 --frace_val {frac_val}
+                 --length_delimiter {length_delimiter}
+                 --learning_rate {learning_rate}
+                 --epochs {epochs}
+                 --csv_path_train {csv_path_train}
+                 --col_per_example {col_per_example}"
