@@ -38,20 +38,14 @@ entry_points:
                  --pool_size {pool_size}"
   search_hparams:
     parameters:
-      fluotracify_path
-      batch_size
-      frac_val
-      length_delimiter
-      learning_rate
-      epochs
-      csv_path_train
-      col_per_example
-      spe
-      vs
-      s
-      nl
-      ff
-      ps
+      fluotracify_path: {type: path}
+      batch_size: {type: float}
+      frac_val: {type: float}
+      length_delimiter: {type: float}
+      learning_rate: {type: float}
+      epochs: {type: float}
+      csv_path_train: {type: path}
+      col_per_example: {type: path}
     command: "python src/fluotracify/training/search_hparams.py
                  --fluotracify_path {fluotracify_path}
                  --batch_size {batch_size}
