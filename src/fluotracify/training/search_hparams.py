@@ -74,16 +74,16 @@ def hparams_run(batch_size, frac_val, length_delimiter, learning_rate,
     # but currently, mlflow does not support logging lists, so I log the
     # elements of the list one by one
     METRICS_THRESHOLDS = [0.1, 0.3, 0.5, 0.7, 0.9]
-    HP_EPOCHS = hp.HParam('epochs', hp.Discrete([20], dtype=int))
+    HP_EPOCHS = hp.HParam('epochs', hp.Discrete([2], dtype=int))
     HP_BATCH_SIZE = hp.HParam('batch_size', hp.Discrete([5], dtype=int))
     HP_STEPS_PER_EPOCH = hp.HParam('steps_per_epoch',
-                                   hp.Discrete([1020], dtype=int))
+                                   hp.Discrete([650], dtype=int))
     HP_VALIDATION_STEPS = hp.HParam('validation_steps',
-                                    hp.Discrete([500], dtype=int))
+                                    hp.Discrete([100], dtype=int))
     HP_SCALER = hp.HParam('scaler', hp.Discrete(['robust', 'minmax'], dtype=str))
     HP_N_LEVELS = hp.HParam('n_levels', hp.Discrete([3, 9], dtype=int))
     HP_FIRST_FILTERS = hp.HParam('first_filteres',
-                                 hp.Discrete([32, 64], dtype=int))
+                                 hp.Discrete([64], dtype=int))
     HP_POOL_SIZE = hp.HParam('pool_size', hp.Discrete([2], dtype=int))
 
     HPARAMS = [
