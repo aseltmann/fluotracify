@@ -374,9 +374,9 @@ def hparams_run(batch_size, frac_val, length_delimiter, learning_rate,
                             num_val_examples=num_val_examples)
 
         # Search all child runs with a parent id
-        query = "tags.mlflow.parentRunId = '{}'".format(parent_run.info.run_id)
-        results = mlflow.search_runs(filter_string=query)
-        print(results[["run_id", "params.child", "tags.mlflow.runName"]])
+#       query = "tags.mlflow.parentRunId = '{}'".format(parent_run.info.run_id)
+#       results = mlflow.search_runs(filter_string=query)
+#       print(results[["run_id", "params.child", "tags.mlflow.runName"]])
 
 
 #        # find the best run, log its metrics as the final metrics of this run.
