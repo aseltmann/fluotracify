@@ -38,14 +38,14 @@ entry_points:
                  --pool_size {pool_size}"
   search_hparams:
     parameters:
-      fluotracify_path: {type: path}
-      batch_size: {type: float}
-      frac_val: {type: float}
-      length_delimiter: {type: float}
-      learning_rate: {type: float}
-      epochs: {type: float}
-      csv_path_train: {type: path}
-      col_per_example: {type: path}
+      fluotracify_path: {type: path, default: ~/Programme/drmed-git/src/}
+      batch_size: {type: float, default: 5}
+      frac_val: {type: float, default: 0.2}
+      length_delimiter: {type: float, default: 16384}
+      learning_rate: {type: float, default: 1e-5}
+      epochs: {type: float, default: 10}
+      csv_path_train: {type: path, default: ~/Programme/Jupyter/DOKTOR/saves/firstartefact/subsample_rand/}
+      col_per_example: {type: float, default: 3}
     command: "python src/fluotracify/training/search_hparams.py
                  --fluotracify_path {fluotracify_path}
                  --batch_size {batch_size}
