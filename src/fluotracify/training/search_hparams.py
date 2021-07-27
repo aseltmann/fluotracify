@@ -46,14 +46,14 @@ print('GPUs: ', tf.config.list_physical_devices('GPU'))
               type=str,
               default='~/Programme/drmed-git/src/')
 @click.option('--col_per_example', type=int, default=3)
-@click.option('--epochs', type=int, default=[10])
-@click.option('--batch_size', type=int, default=[5])
-@click.option('--steps_per_epoch', type=int, default=[10])
-@click.option('--validation_steps', type=int, default=[10])
-@click.option('--scaler', type=str, default=['robust'])
-@click.option('--n_levels', type=int, default=[9])
-@click.option('--first_filters', type=int, default=[64])
-@click.option('--pool_size', type=int, default=[2])
+@click.option('--epochs', type=int, default=10)
+@click.option('--batch_size', type=int, default=5)
+@click.option('--steps_per_epoch', type=int, default=10)
+@click.option('--validation_steps', type=int, default=10)
+@click.option('--scaler', type=str, default='robust')
+@click.option('--n_levels', type=int, default=9)
+@click.option('--first_filters', type=int, default=64)
+@click.option('--pool_size', type=int, default=2)
 def hparams_run(batch_size, frac_val, length_delimiter, learning_rate,
                 num_session_groups, epochs, csv_path_train, csv_path_test,
                 col_per_example, steps_per_epoch, validation_steps, scaler,
