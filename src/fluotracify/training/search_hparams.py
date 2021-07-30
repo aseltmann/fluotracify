@@ -2,6 +2,7 @@
 on simulated fluroescence traces using mlflow. It is meant to be put into the
 `MLproject` file of a mlflow setup or executed via `mlflow run`."""
 
+import datetime
 import os
 import random
 import sys
@@ -65,7 +66,7 @@ def hparams_run(batch_size, frac_val, length_delimiter, learning_rate,
         from fluotracify.training import build_model as bm, preprocess_data as ppd
         from fluotracify.training import evaluate
 
-    LOG_DIR_HP = "/tmp/tb/hparams"
+    LOG_DIR_HP = "../tmp/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     EXP_PARAM_PATH_TRAIN = '/tmp/experiment_params_train.csv'
     LABEL_THRESH = 0.04
     # FIXME (PENDING): at some point, I want to plot metrics vs thresholds
@@ -80,10 +81,11 @@ def hparams_run(batch_size, frac_val, length_delimiter, learning_rate,
                                    hp.Discrete([650], dtype=int))
     HP_VALIDATION_STEPS = hp.HParam('validation_steps',
                                     hp.Discrete([100], dtype=int))
-    HP_SCALER = hp.HParam('scaler', hp.Discrete(['robust', 'minmax'], dtype=str))
+    HP_SCALER = hp.HParam('scaler', hp.Discrete(['robust', 'minmax'],
+                                                dtype=str))
     HP_N_LEVELS = hp.HParam('n_levels', hp.Discrete([3, 9], dtype=int))
-    HP_FIRST_FILTERS = hp.HParam('first_filteres',
-                                 hp.Discrete([64], dtype=int))
+    HP_FIRST_FILTERS = hp.HParam('first_filteres', hp.Discrete([64],
+                                                               dtype=int))
     HP_POOL_SIZE = hp.HParam('pool_size', hp.Discrete([2], dtype=int))
 
     HPARAMS = [
@@ -374,10 +376,11 @@ def hparams_run(batch_size, frac_val, length_delimiter, learning_rate,
                             num_val_examples=num_val_examples)
 
         # Search all child runs with a parent id
+
+
 #       query = "tags.mlflow.parentRunId = '{}'".format(parent_run.info.run_id)
 #       results = mlflow.search_runs(filter_string=query)
 #       print(results[["run_id", "params.child", "tags.mlflow.runName"]])
-
 
 #        # find the best run, log its metrics as the final metrics of this run.
 #        client = mlflow.tracking.client.MlflowClient()
