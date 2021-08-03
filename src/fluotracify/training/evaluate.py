@@ -131,7 +131,9 @@ def predict_traces(dataset, model, num_rows, num_cols, batch_to_sample,
 
 
 def plot_trace_and_pred_from_df(df, ntraces, model):
-    fig, ax = plt.subplots(ntraces, figsize=(16, ntraces*2))
+    fig, ax = plt.subplots(ntraces,
+                           figsize=(16, ntraces * 2),
+                           facecolor='white')
 
     for i in range(ntraces):
         pred_trace = df.iloc[:16384, i].to_numpy().reshape(1, -1, 1)
@@ -144,7 +146,9 @@ def plot_trace_and_pred_from_df(df, ntraces, model):
 
 
 def plot_trace_and_pred_from_tfds(dataset, ntraces, model):
-    fig, ax = plt.subplots(ntraces, figsize=(16, ntraces*2))
+    fig, ax = plt.subplots(ntraces,
+                           figsize=(16, ntraces * 2),
+                           facecolor='white')
     pred_iterator = dataset.unbatch().take(ntraces).as_numpy_iterator()
 
     for i in range(ntraces):
@@ -159,6 +163,7 @@ def plot_trace_and_pred_from_tfds(dataset, ntraces, model):
         ax[i].plot(pred_label)
     plt.tight_layout()
     return fig
+
 
 def plot_to_image(figure):
     """Converts the matplotlib plot specified by 'figure' to a PNG image and

@@ -472,6 +472,26 @@ def unet_1d_alt2(input_size, n_levels, first_filters, pool_size):
     return unet
 
 
+class F1Score(tf.keras.metrics.Metric):
+    def __init__(self, name="f1", from_logits=False, **kwargs):
+        super(F1Score, self).__init__(name=name, **kwargs)
+        self.precision = tf.keras.metrics.Precision(from_logits)
+        self.recall = tf.keras.metrics.Recall(from_logits)
+
+    def update_state(self, y_true, y_pred, sample_weight=None):
+        self.precision.update_state(y_true, y_pred, sample_weight)
+        self.recall.update_state(y_true, y_pred, sample_weight)
+
+    def result(self):
+        p = self.precision.result()
+        r = self.recall.result()
+        return (2 * p * r) / (p + r + tf.keras.backend.epsilon())
+
+    def reset_states(self):
+        self.precision.reset_states()
+        self.recall.reset_states()
+
+
 def unet_metrics(metrics_thresholds):
     """Returns a selection of metrics for model training
 
@@ -509,6 +529,7 @@ def unet_metrics(metrics_thresholds):
     metrics.append(
         tf.keras.metrics.BinaryAccuracy(name='accuracy', threshold=0.5))
     metrics.append(tf.keras.metrics.AUC(name='auc', num_thresholds=100))
+    metrics.append(F1Score(name='f1'))
     return metrics
 
 
@@ -524,4 +545,5 @@ def unet_hp_metrics(metrics_thresholds):
         metrics.append(hp.Metric("recall{}".format(thresh)))
     metrics.append(hp.Metric("accuracy{}".format(0.5)))
     metrics.append(hp.Metric("auc"))
+    metrics.append(hp.Metric("f1"))
     return metrics
