@@ -487,9 +487,9 @@ class F1Score(tf.keras.metrics.Metric):
         r = self.recall.result()
         return (2 * p * r) / (p + r + tf.keras.backend.epsilon())
 
-    def reset_states(self):
-        self.precision.reset_states()
-        self.recall.reset_states()
+    def reset_state(self):
+        self.precision.reset_state()
+        self.recall.reset_state()
 
 
 def unet_metrics(metrics_thresholds):
