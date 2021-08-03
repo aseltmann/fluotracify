@@ -26,20 +26,17 @@ print('GPUs: ', tf.config.list_physical_devices('GPU'))
 
 
 @click.command()
-@click.option('--frac_val', type=click.FloatRange(0, 1), default=0.2)
-@click.option('--length_delimiter', type=int, default=16384)
-@click.option('--learning_rate', type=float, default=1e-5)
 @click.option('--num_session_groups',
               type=int,
               default=2,
-              help='number of sessions for grid search')
+              help='number of sessions for random search')
 @click.option(
     '--csv_path_train',
     type=str,
     default=
     '/home/lex/Programme/Jupyter/DOKTOR/saves/firstartefact/subsample_rand/')
 @click.option(
-    '--csv_path_test',
+    '--csv_path_val',
     type=str,
     default=
     '/home/lex/Programme/Jupyter/DOKTOR/saves/firstartefact/subsample_rand/')
@@ -47,38 +44,24 @@ print('GPUs: ', tf.config.list_physical_devices('GPU'))
               type=str,
               default='~/Programme/drmed-git/src/')
 @click.option('--col_per_example', type=int, default=3)
-@click.option('--epochs', type=int, default=10)
-@click.option('--batch_size', type=int, default=5)
-@click.option('--steps_per_epoch', type=int, default=10)
-@click.option('--validation_steps', type=int, default=10)
-@click.option('--scaler', type=str, default='robust')
-@click.option('--n_levels', type=int, default=9)
-@click.option('--first_filters', type=int, default=64)
-@click.option('--pool_size', type=int, default=2)
-def hparams_run(batch_size, frac_val, length_delimiter, learning_rate,
-                num_session_groups, epochs, csv_path_train, csv_path_test,
-                col_per_example, steps_per_epoch, validation_steps, scaler,
-                n_levels, first_filters, pool_size, fluotracify_path):
+def hparams_run(num_session_groups, csv_path_train, csv_path_val,
+                col_per_example, fluotracify_path):
     sys.path.append(fluotracify_path)
 
-    if True:  # isort workaround
+    if True:  # FIXME (PENDING): isort workaround
         from fluotracify.simulations import import_simulation_from_csv as isfc
         from fluotracify.training import build_model as bm, preprocess_data as ppd
         from fluotracify.training import evaluate
 
-    LOG_DIR_HP = "../tmp/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-    EXP_PARAM_PATH_TRAIN = '/tmp/experiment_params_train.csv'
-    LABEL_THRESH = 0.04
     # FIXME (PENDING): at some point, I want to plot metrics vs thresholds
     # from TF side, this is possible by providing the `thresholds`
     # argument as a list of thresholds
     # but currently, mlflow does not support logging lists, so I log the
     # elements of the list one by one
-    METRICS_THRESHOLDS = [0.1, 0.3, 0.5, 0.7, 0.9]
-    HP_EPOCHS = hp.HParam('epochs', hp.Discrete([2], dtype=int))
+    HP_EPOCHS = hp.HParam('epochs', hp.Discrete([3], dtype=int))
     HP_BATCH_SIZE = hp.HParam('batch_size', hp.Discrete([5], dtype=int))
     HP_STEPS_PER_EPOCH = hp.HParam('steps_per_epoch',
-                                   hp.Discrete([650], dtype=int))
+                                   hp.Discrete([500], dtype=int))
     HP_VALIDATION_STEPS = hp.HParam('validation_steps',
                                     hp.Discrete([100], dtype=int))
     HP_SCALER = hp.HParam('scaler', hp.Discrete(['robust', 'minmax'],
@@ -87,13 +70,26 @@ def hparams_run(batch_size, frac_val, length_delimiter, learning_rate,
     HP_FIRST_FILTERS = hp.HParam('first_filteres', hp.Discrete([64],
                                                                dtype=int))
     HP_POOL_SIZE = hp.HParam('pool_size', hp.Discrete([2], dtype=int))
+    HP_INPUT_SIZE = hp.HParam('input_size',
+                              hp.Discrete([2**13, 2**14], dtype=int))
+    HP_LR_START = hp.HParam('lr_start', hp.RealInterval(1e-5, 1e-1))
+    HP_LR_POWER = hp.HParam('lr_power', hp.Discrete([1.0], dtype=float))
 
     HPARAMS = [
         HP_EPOCHS, HP_BATCH_SIZE, HP_STEPS_PER_EPOCH, HP_VALIDATION_STEPS,
-        HP_SCALER, HP_N_LEVELS, HP_FIRST_FILTERS, HP_POOL_SIZE
+        HP_SCALER, HP_N_LEVELS, HP_FIRST_FILTERS, HP_POOL_SIZE, HP_INPUT_SIZE,
+        HP_LR_START, HP_LR_POWER
     ]
 
-    def unet_1d_hparams(hparams, input_size):
+    LOG_DIR = "../tmp/tb-" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+    EXP_PARAM_PATH_TRAIN = '../tmp/experiment_params_train.csv'
+    EXP_PARAM_PATH_VAL = '../tmp/experiment_params_val.csv'
+
+    SESSIONS_PER_GROUP = 2
+    LABEL_THRESH = 0.04
+    METRICS_THRESHOLDS = [0.1, 0.3, 0.5, 0.7, 0.9]
+
+    def unet_1d_hparams(hparams):
         """U-Net as described by Ronneberger et al.
 
         Parameters
@@ -132,7 +128,7 @@ def hparams_run(batch_size, frac_val, length_delimiter, learning_rate,
 
         ldict = {}
 
-        inputs = tf.keras.layers.Input(shape=(input_size, 1))
+        inputs = tf.keras.layers.Input(shape=(hparams[HP_INPUT_SIZE], 1))
 
         # Downsampling through model
         ldict['x0_pool'], ldict['x0'] = bm.encoder(
@@ -191,24 +187,35 @@ def hparams_run(batch_size, frac_val, length_delimiter, learning_rate,
         return unet
 
     def run_one(dataset_train, dataset_val, hp_logdir, session_id, hparams,
-                input_size, num_train_examples, num_val_examples):
+                num_train_examples, num_val_examples, best_auc_val):
         """Run a training/validation session.
 
-        Returns:
-        --------
+        Parameters:
+        -----------
         train_ds, val_ds : tf.Dataset
             Train and validation data as tf.Datasets.
         hp_logdir : str
             The top-level logdir to which to write summary data.
-        session_id : str
-            A unique string ID for this session.
+        session_id : float, int, str
+            A unique ID for this session.
         hparams : dict
             A dict mapping hyperparameters in `HPARAMS` to values.
+        num_train_examples, num_val_examples : int
+            number of train and validation examples
+        best_auc_val : float
+            Best validation AUC. If the trained model is currently the best,
+            it is saved.
+
+        Returns:
+        --------
+        best_auc_val : float
+            Best validation AUC (currently)
         """
-        logdir = os.path.join(hp_logdir, session_id)
+        logdir = os.path.join(hp_logdir, str(session_id))
 
         ds_train_prep = dataset_train.map(
-            lambda trace, label: ppd.tf_crop_trace(trace, label, input_size),
+            lambda trace, label: ppd.tf_crop_trace(trace, label, hparams[
+                HP_INPUT_SIZE]),
             num_parallel_calls=tf.data.AUTOTUNE)
         ds_train_prep = ds_train_prep.map(
             lambda trace, label: ppd.tf_scale_trace(trace, label, hparams[
@@ -218,9 +225,9 @@ def hparams_run(batch_size, frac_val, length_delimiter, learning_rate,
             buffer_size=num_train_examples).repeat().batch(
                 hparams[HP_BATCH_SIZE]).prefetch(tf.data.AUTOTUNE)
 
-        ds_val_prep = dataset_val.map(
-            lambda trace, label: ppd.tf_crop_trace(trace, label, input_size),
-            num_parallel_calls=tf.data.AUTOTUNE)
+        ds_val_prep = dataset_val.map(lambda trace, label: ppd.tf_crop_trace(
+            trace, label, hparams[HP_INPUT_SIZE]),
+                                      num_parallel_calls=tf.data.AUTOTUNE)
         ds_val_prep = ds_val_prep.map(lambda trace, label: ppd.tf_scale_trace(
             trace, label, hparams[HP_SCALER]),
                                       num_parallel_calls=tf.data.AUTOTUNE)
@@ -228,10 +235,7 @@ def hparams_run(batch_size, frac_val, length_delimiter, learning_rate,
             buffer_size=num_val_examples).repeat().batch(
                 hparams[HP_BATCH_SIZE]).prefetch(tf.data.AUTOTUNE)
 
-        file_writer_image = tf.summary.create_file_writer(logdir + '/image')
-        file_writer_lr = tf.summary.create_file_writer(logdir + "/lr")
-
-        model = unet_1d_hparams(hparams=hparams, input_size=input_size)
+        model = unet_1d_hparams(hparams=hparams)
 
         def log_plots(epoch, logs):
             """Image logging function for tf.keras.callbacks.LambdaCallback
@@ -245,10 +249,6 @@ def hparams_run(batch_size, frac_val, length_delimiter, learning_rate,
             figure = evaluate.plot_trace_and_pred_from_tfds(
                 dataset=ds_val_prep, ntraces=5, model=model)
             # Convert matplotlib figure to image
-            image = evaluate.plot_to_image(figure)
-            # Log the image as an image summary
-            with file_writer_image.as_default():
-                tf.summary.image('Prediction plots', image, step=epoch)
             mlflow.log_figure(
                 figure=figure,
                 artifact_file='predplots/plot{}.png'.format(epoch))
@@ -256,7 +256,7 @@ def hparams_run(batch_size, frac_val, length_delimiter, learning_rate,
         def lr_schedule(epoch):
             """
             Returns a custom learning rate that decreases as epochs progress.
-     
+
             Notes
             -----
             - function is supposed to be used with
@@ -264,30 +264,24 @@ def hparams_run(batch_size, frac_val, length_delimiter, learning_rate,
               index as input (integer, indexed from 0) and returns a new
               learning rate as output (float)
             """
-            learning_rate = 0.2
-            if epoch > 1:
-                learning_rate = 0.02
-            if epoch > 3:
-                learning_rate = 0.01
-            if epoch > 5:
-                learning_rate = 0.001
-            if epoch > 10:
-                learning_rate = 1e-5
-            with file_writer_lr.as_default():
-                # log in tensorflow
-                tf.summary.scalar('learning rate',
-                                  data=learning_rate,
-                                  step=epoch)
+            # power: 1 == linear decay, higher, e.g. 5 == polynomial decay
+            lr_list = [
+                hparams[HP_LR_START] *
+                (1 - i / hparams[HP_EPOCHS])**hparams[HP_LR_POWER]
+                for i in range(hparams[HP_EPOCHS])
+            ]
+
             # log in mlflow
-            mlflow.log_metric('learning rate', value=learning_rate, step=epoch)
-            return learning_rate
+            if epoch == 0:
+                mlflow.log_param('lr schedule', value=str(lr_list))
+            return lr_list[epoch]
 
         tensorboard_callback = tf.keras.callbacks.TensorBoard(  # logs metrics
             log_dir=logdir,
             histogram_freq=5,
             write_graph=False,
-            write_images=True,
-            update_freq=600,
+            write_images=False,
+            update_freq='epoch',
             profile_batch=0,  # workaround for issue #2084
         )
         hparams_callback = hp.KerasCallback(logdir, hparams)  # logs hparams
@@ -307,8 +301,28 @@ def hparams_run(batch_size, frac_val, length_delimiter, learning_rate,
             ],
         )
 
+        if result.history['val_auc'][-1] > best_auc_val:
+            mlflow.keras.log_model(
+                keras_model=model,
+                artifact_path='model',
+                conda_env=mlflow.keras.get_default_conda_env(
+                    keras_module=tf.keras),
+                custom_objects={'binary_ce_dice': bm.binary_ce_dice_loss()},
+                keras_module=tf.keras)
+            best_auc_val = result.history['val_auc'][-1]
+
+        return best_auc_val
+
     train, _, nsamples_train, experiment_params_train = isfc.import_from_csv(
         folder=csv_path_train,
+        header=12,
+        frac_train=1,
+        col_per_example=col_per_example,
+        dropindex=None,
+        dropcolumns=None)
+
+    val, _, nsamples_val, experiment_params_val = isfc.import_from_csv(
+        folder=csv_path_val,
         header=12,
         frac_train=1,
         col_per_example=col_per_example,
@@ -319,6 +333,9 @@ def hparams_run(batch_size, frac_val, length_delimiter, learning_rate,
                                               nsamples=nsamples_train,
                                               col_per_example=col_per_example)
 
+    val_sep = isfc.separate_data_and_labels(array=val,
+                                            nsamples=nsamples_val,
+                                            col_per_example=col_per_example)
     # '0': trace with artifact
     # '1': just the simulated artifact (label for unet)
     # '2': whole trace without artifact (label for vae)
@@ -327,84 +344,80 @@ def hparams_run(batch_size, frac_val, length_delimiter, learning_rate,
     train_labels = train_sep['1']
     train_labels_bool = train_labels > LABEL_THRESH
 
+    val_data = val_sep['0']
+    val_labels = val_sep['1']
+    val_labels_bool = val_labels > LABEL_THRESH
+
     # Cleanup
     del train, train_sep
 
-    dataset_train, dataset_val, num_train_examples, num_val_examples = ppd.tfds_from_pddf(
-        features_df=train_data, labels_df=train_labels_bool, frac_val=frac_val)
+    dataset_train, num_train_examples = ppd.tfds_from_pddf(
+        features_df=train_data, labels_df=train_labels_bool, frac_val=False)
+
+    dataset_val, num_val_examples = ppd.tfds_from_pddf(
+        features_df=val_data, labels_df=val_labels_bool, frac_val=False)
 
     with mlflow.start_run() as parent_run:
-        mlflow.tensorflow.autolog(every_n_iter=1)
+        mlflow.tensorflow.autolog(every_n_iter=1, log_models=False)
         rng = random.Random(0)
-        experiment_id = parent_run.info.experiment_id
+        best_auc_val = tf.experimental.numpy.finfo(
+            tf.experimental.numpy.float64).min
+
+        num_sessions = num_session_groups * SESSIONS_PER_GROUP
 
         experiment_params_train.to_csv(EXP_PARAM_PATH_TRAIN)
-        mlflow.log_artifact(EXP_PARAM_PATH_TRAIN)
+        experiment_params_val.to_csv(EXP_PARAM_PATH_VAL)
 
-        mlflow.log_params({
-            'num_train_examples': num_train_examples,
-            'num_val_examples': num_val_examples
+        session_index = 0  # across all session groups
+        for _ in range(num_session_groups):
+            hparams = {h: h.domain.sample_uniform(rng) for h in HPARAMS}
+            hparams_mlflow = {
+                h.name: h.domain.sample_uniform(rng)
+                for h in HPARAMS
+            }
+            for repeat_index in range(SESSIONS_PER_GROUP):
+                print("--- Running training session {}/{}".format(
+                    session_index + 1, num_sessions))
+                print(hparams_mlflow)
+                print("--- repeat #: {}".format(repeat_index + 1))
+                with mlflow.start_run(nested=True) as _:
+                    mlflow.log_artifact(EXP_PARAM_PATH_TRAIN)
+                    mlflow.log_artifact(EXP_PARAM_PATH_VAL)
+                    mlflow.log_params(hparams_mlflow)
+                    mlflow.log_params({
+                        'num_train_examples': num_train_examples,
+                        'num_val_examples': num_val_examples
+                    })
+                    best_auc_val = run_one(
+                        dataset_train=dataset_train,
+                        dataset_val=dataset_val,
+                        hp_logdir=LOG_DIR,
+                        session_id=session_index,
+                        hparams=hparams,
+                        num_train_examples=num_train_examples,
+                        num_val_examples=num_val_examples,
+                        best_auc_val=best_auc_val)
+                session_index += 1
+
+        # Now log best values in parent run
+        client = mlflow.tracking.client.MlflowClient()
+        runs = client.search_runs(
+            [client.get_experiment_by_name('Default').experiment_id],
+            "tags.mlflow.parentRunId = '{run_id}' ".format(
+                run_id=parent_run.info.run_id))
+        best_auc_val = tf.experimental.numpy.finfo(
+            tf.experimental.numpy.float64).min
+        for r in runs:
+            if r.data.metrics["val_auc"] > best_auc_val:
+                best_run = r
+                best_auc_train = r.data.metrics["auc"]
+                best_auc_val = r.data.metrics["val_auc"]
+        mlflow.set_tag("best_run", best_run.info.run_id)
+        mlflow.log_metrics({
+            "best_auc": best_auc_train,
+            "best_auc_val": best_auc_val
         })
 
-        file_writer_hparams = tf.summary.create_file_writer(LOG_DIR_HP)
-
-        with file_writer_hparams.as_default():
-            hp.hparams_config(hparams=HPARAMS,
-                              metrics=bm.unet_hp_metrics(METRICS_THRESHOLDS))
-
-        sessions_per_group = 2
-        num_sessions = num_session_groups * sessions_per_group
-        session_index = 0  # across all session groups
-        for group_index in range(num_session_groups):
-            hparams = {h: h.domain.sample_uniform(rng) for h in HPARAMS}
-            hparams_string = str(hparams)
-            for repeat_index in range(sessions_per_group):
-                session_id = str(session_index)
-                session_index += 1
-                print("--- Running training session {}/{}".format(
-                    session_index, num_sessions))
-                print(hparams_string)
-                print("--- repeat #: {}".format(repeat_index + 1))
-                with mlflow.start_run(nested=True) as child_run:
-                    run_one(dataset_train=dataset_train,
-                            dataset_val=dataset_val,
-                            hp_logdir=LOG_DIR_HP,
-                            session_id=session_id,
-                            hparams=hparams,
-                            input_size=length_delimiter,
-                            num_train_examples=num_train_examples,
-                            num_val_examples=num_val_examples)
-
-        # Search all child runs with a parent id
-
-
-#       query = "tags.mlflow.parentRunId = '{}'".format(parent_run.info.run_id)
-#       results = mlflow.search_runs(filter_string=query)
-#       print(results[["run_id", "params.child", "tags.mlflow.runName"]])
-
-#        # find the best run, log its metrics as the final metrics of this run.
-#        client = mlflow.tracking.client.MlflowClient()
-#        runs = client.search_runs(
-#            [experiment_id], "tags.mlflow.parentRunId = '{run_id}' ".format(run_id=parent_run.info.run_id)
-#        )
-#        best_val_train = _inf
-#        best_val_valid = _inf
-#        best_val_test = _inf
-#        best_run = None
-#        for r in runs:
-#            if r.data.metrics["val_rmse"] < best_val_valid:
-#                best_run = r
-#                best_val_train = r.data.metrics["train_rmse"]
-#                best_val_valid = r.data.metrics["val_rmse"]
-#                best_val_test = r.data.metrics["test_rmse"]
-#        mlflow.set_tag("best_run", best_run.info.run_id)
-#        mlflow.log_metrics(
-#            {
-#                "train_{}".format(metric): best_val_train,
-#                "val_{}".format(metric): best_val_valid,
-#                "test_{}".format(metric): best_val_test,
-#            }
-#        )
 
 if __name__ == "__main__":
     hparams_run()
