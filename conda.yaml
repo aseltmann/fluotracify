@@ -1,4 +1,4 @@
-name: fluotracify-tf-nightly
+name: fluotracify-tf
 channels:
   - defaults
   - conda-forge
@@ -7,7 +7,7 @@ dependencies:
   - pip
   - pip:
     - numpy==1.19.5
-    - tf-nightly
+    - tensorflow
     - mlflow
     - pandas
     - matplotlib

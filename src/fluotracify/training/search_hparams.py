@@ -58,22 +58,22 @@ def hparams_run(num_session_groups, csv_path_train, csv_path_val,
     # argument as a list of thresholds
     # but currently, mlflow does not support logging lists, so I log the
     # elements of the list one by one
-    HP_EPOCHS = hp.HParam('epochs', hp.Discrete([3], dtype=int))
-    HP_BATCH_SIZE = hp.HParam('batch_size', hp.Discrete([5], dtype=int))
-    HP_STEPS_PER_EPOCH = hp.HParam('steps_per_epoch',
+    HP_EPOCHS = hp.HParam('hp_epochs', hp.Discrete([3], dtype=int))
+    HP_BATCH_SIZE = hp.HParam('hp_batch_size', hp.Discrete([5], dtype=int))
+    HP_STEPS_PER_EPOCH = hp.HParam('hp_steps_per_epoch',
                                    hp.Discrete([500], dtype=int))
-    HP_VALIDATION_STEPS = hp.HParam('validation_steps',
+    HP_VALIDATION_STEPS = hp.HParam('hp_validation_steps',
                                     hp.Discrete([100], dtype=int))
-    HP_SCALER = hp.HParam('scaler', hp.Discrete(['robust', 'minmax'],
-                                                dtype=str))
-    HP_N_LEVELS = hp.HParam('n_levels', hp.Discrete([3, 9], dtype=int))
-    HP_FIRST_FILTERS = hp.HParam('first_filteres', hp.Discrete([64],
-                                                               dtype=int))
-    HP_POOL_SIZE = hp.HParam('pool_size', hp.Discrete([2], dtype=int))
-    HP_INPUT_SIZE = hp.HParam('input_size',
+    HP_SCALER = hp.HParam('hp_scaler',
+                          hp.Discrete(['robust', 'minmax'], dtype=str))
+    HP_N_LEVELS = hp.HParam('hp_n_levels', hp.Discrete([3, 9], dtype=int))
+    HP_FIRST_FILTERS = hp.HParam('hp_first_filteres',
+                                 hp.Discrete([64], dtype=int))
+    HP_POOL_SIZE = hp.HParam('hp_pool_size', hp.Discrete([2], dtype=int))
+    HP_INPUT_SIZE = hp.HParam('hp_input_size',
                               hp.Discrete([2**13, 2**14], dtype=int))
-    HP_LR_START = hp.HParam('lr_start', hp.RealInterval(1e-5, 1e-1))
-    HP_LR_POWER = hp.HParam('lr_power', hp.Discrete([1.0], dtype=float))
+    HP_LR_START = hp.HParam('hp_lr_start', hp.RealInterval(1e-5, 1e-1))
+    HP_LR_POWER = hp.HParam('hp_lr_power', hp.Discrete([1.0], dtype=float))
 
     HPARAMS = [
         HP_EPOCHS, HP_BATCH_SIZE, HP_STEPS_PER_EPOCH, HP_VALIDATION_STEPS,
