@@ -18,7 +18,15 @@ from tensorboard.plugins.hparams import api as hp
 matplotlib.use('agg')
 
 print(tf.version.VERSION)
-print('GPUs: ', tf.config.list_physical_devices('GPU'))
+# Workaround for a "No algorithm worked" bug on GPUs
+# see https://github.com/tensorflow/tensorflow/issues/45044
+physical_devices = tf.config.list_physical_devices('GPU')
+print('GPUs: {}. Trying to set memory growth to "True"...'.format(
+    physical_devices))
+try:
+    tf.config.experimental.set_memory_growth(physical_devices[0], True)
+except IndexError:
+    print('No GPU was found on this machine.')
 
 # logging with mlflow: most of the logging happens with the autolog feature,
 # which is already quite powerful. Since I want to add custom logs, I have to
