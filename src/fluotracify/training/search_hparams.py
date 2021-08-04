@@ -410,7 +410,7 @@ def hparams_run(num_session_groups, csv_path_train, csv_path_val,
         # Now log best values in parent run
         client = mlflow.tracking.client.MlflowClient()
         runs = client.search_runs(
-            [client.get_experiment_by_name('Default').experiment_id],
+            [parent_run.info.experiment_id],
             "tags.mlflow.parentRunId = '{run_id}' ".format(
                 run_id=parent_run.info.run_id))
         best_auc_val = tf.experimental.numpy.finfo(
@@ -421,7 +421,12 @@ def hparams_run(num_session_groups, csv_path_train, csv_path_val,
                 best_run = r
                 best_auc_train = r.data.metrics["auc"]
                 best_auc_val = r.data.metrics["val_auc"]
-        mlflow.set_tag("best_run", best_run.info.run_id)
+        try:
+            mlflow.set_tag("best_run", best_run.info.run_id)
+        except AttributeError:
+            print('Logging the best run failed. Maybe check if MlflowClient'
+                  ' is set up correctly'
+                  )
         mlflow.log_metrics({
             "best_auc": best_auc_train,
             "best_auc_val": best_auc_val
