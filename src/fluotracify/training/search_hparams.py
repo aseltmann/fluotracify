@@ -415,6 +415,7 @@ def hparams_run(num_session_groups, csv_path_train, csv_path_val,
                 run_id=parent_run.info.run_id))
         best_auc_val = tf.experimental.numpy.finfo(
             tf.experimental.numpy.float64).min
+        best_run = None
         for r in runs:
             if r.data.metrics["val_auc"] > best_auc_val:
                 best_run = r
