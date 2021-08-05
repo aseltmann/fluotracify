@@ -23,7 +23,7 @@
      behavior in the "* Data" section.
    - The branching model used is described in [[http://starpu-simgrid.gforge.inria.fr/misc/SIGOPS_paper.pdf][this paper]]. Therefore: if you
      are interested in the "* Data" section, you have to =git clone= the /data/
-     branch of the repository. The /master/ branch is clean from any results, it
+     branch of the repository. The /main/ branch is clean from any results, it
      contains only source code and the analysis.
    - This project is my take on [[https://en.wikipedia.org/wiki/Open-notebook_science][Open-notebook science]]. The idea was postulated in
      a blog post in 2006:
@@ -85,7 +85,7 @@
    #+end_example
 
 *** Experiments workflow:
-   1) Create a new branch from =master=
+   1) Create a new branch from =main=
    2) Print out the git log from the latest commit and the metadata
    3) Call the analysis scripts, follow the principles outlined in
       [[* Organization of code]]
@@ -281,7 +281,7 @@
     =Emacs-jupyter= aims to be an API for a lot of functionalities of the
     =jupyter= project. The documentation can be found on [[https://github.com/dzop/emacs-jupyter][GitHub]].
 
-    1. For the *whole document*: connect ot a running jupyter instance
+    1. For the *whole document*: connect to a running jupyter instance
        1. =M-x jupyter-server-list-kernels=
           1. set server URL, e.g. =http://localhost:8889=
           2. set websocket URL, e.g. =http://localhost:8889=
@@ -366,7 +366,7 @@
          =[[file:./data/= and replace: =[[=
 ** Organization of git
 
-*** remote/origin/master branch:
+*** remote/origin/main branch:
   - contains all the source code in folder **src/** which is used for experiments.
   - contains the **LabBook.org** template
   - contains setup- and metadata files such as **MLproject** or **conda.yaml**
@@ -375,7 +375,7 @@
     features. Day-to-day changes in code
 *** remote/origin/exp### branches:
   - if an experiment is done, the code and templates will be branched out from
-    *master* in an *#experiment-name* branch, ### meaning some meaningful
+    *main* in an *#experiment-name* branch, ### meaning some meaningful
     descriptor.
   - all data generated during the experiment (e.g. .csv files, plots, images,
     etc), is stored in a folder with the name **data/#experiment-name**, except
@@ -436,6 +436,8 @@
 
 ** Changes in this repository (without "* Data" in this file)
 *** Changes in LabBook.org (without "* Data")
+**** 2021-08-05
+     - Rename =master= branch to =main= branch
 **** 2021-04-04
      - Add =#+OPTIONS: H:4= and =#+OPTIONS: toc:4= to show up to 4 levels of
        depth in the html (twbs) export of this LabBook in the table of contents
