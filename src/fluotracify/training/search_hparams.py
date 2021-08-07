@@ -12,12 +12,17 @@ import matplotlib
 import mlflow
 import mlflow.tensorflow
 import tensorflow as tf
+import tensorflow.python.platform.build_info as build
 from tensorboard.plugins.hparams import api as hp
 
 # fixes a problem when calling plotting functions on the server
 matplotlib.use('agg')
 
-print(tf.version.VERSION)
+print("Python version: ", sys.version)
+print("Tensorflow version: ", tf.__version__)
+print("tf.keras version:", tf.keras.__version__)
+print('Cudnn version: ', build.build_info['cudnn_version'])
+print('Cuda version: ', build.build_info['cuda_version'])
 # Workaround for a "No algorithm worked" bug on GPUs
 # see https://github.com/tensorflow/tensorflow/issues/45044
 physical_devices = tf.config.list_physical_devices('GPU')
@@ -75,7 +80,7 @@ def hparams_run(num_session_groups, csv_path_train, csv_path_val,
             dtype=str))
     HP_N_LEVELS = hp.HParam('hp_n_levels', hp.Discrete([3, 5, 7, 9],
                                                        dtype=int))
-    HP_FIRST_FILTERS = hp.HParam('hp_first_filteres',
+    HP_FIRST_FILTERS = hp.HParam('hp_first_filters',
                                  hp.Discrete([16, 32, 64, 128], dtype=int))
     HP_POOL_SIZE = hp.HParam('hp_pool_size', hp.Discrete([2, 4], dtype=int))
     HP_INPUT_SIZE = hp.HParam('hp_input_size',
@@ -383,10 +388,7 @@ def hparams_run(num_session_groups, csv_path_train, csv_path_val,
         session_index = 0  # across all session groups
         for _ in range(num_session_groups):
             hparams = {h: h.domain.sample_uniform(rng) for h in HPARAMS}
-            hparams_mlflow = {
-                h.name: h.domain.sample_uniform(rng)
-                for h in HPARAMS
-            }
+            hparams_mlflow = {h.name: hparams[h] for h in hparams.keys()}
             for repeat_index in range(SESSIONS_PER_GROUP):
                 print("--- Running training session {}/{}".format(
                     session_index + 1, num_sessions))
@@ -400,15 +402,23 @@ def hparams_run(num_session_groups, csv_path_train, csv_path_val,
                         'num_train_examples': num_train_examples,
                         'num_val_examples': num_val_examples
                     })
-                    best_auc_val = run_one(
-                        dataset_train=dataset_train,
-                        dataset_val=dataset_val,
-                        hp_logdir=LOG_DIR,
-                        session_id=session_index,
-                        hparams=hparams,
-                        num_train_examples=num_train_examples,
-                        num_val_examples=num_val_examples,
-                        best_auc_val=best_auc_val)
+                    critical_hparam_combi = 2 * hparams_mlflow[
+                        'hp_pool_size']**hparams_mlflow['hp_n_levels']
+                    if critical_hparam_combi <= hparams_mlflow['hp_input_size']:
+                        best_auc_val = run_one(
+                            dataset_train=dataset_train,
+                            dataset_val=dataset_val,
+                            hp_logdir=LOG_DIR,
+                            session_id=session_index,
+                            hparams=hparams,
+                            num_train_examples=num_train_examples,
+                            num_val_examples=num_val_examples,
+                            best_auc_val=best_auc_val)
+                    else:
+                        print(
+                            'This run is skipped, because the following'
+                            'condition (needed to build the model) was given:'
+                            '2 * pool_size**n_levels <= input_size')
                 session_index += 1
 
         # Now log best values in parent run
