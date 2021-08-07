@@ -66,27 +66,27 @@ def hparams_run(num_session_groups, csv_path_train, csv_path_val,
     # argument as a list of thresholds
     # but currently, mlflow does not support logging lists, so I log the
     # elements of the list one by one
-    HP_EPOCHS = hp.HParam('hp_epochs', hp.Discrete([3], dtype=int))
-    HP_BATCH_SIZE = hp.HParam('hp_batch_size', hp.Discrete([5], dtype=int))
-    HP_STEPS_PER_EPOCH = hp.HParam('hp_steps_per_epoch',
-                                   hp.Discrete([500], dtype=int))
-    HP_VALIDATION_STEPS = hp.HParam('hp_validation_steps',
-                                    hp.Discrete([100], dtype=int))
-    HP_SCALER = hp.HParam('hp_scaler',
-                          hp.Discrete(['robust', 'minmax'], dtype=str))
-    HP_N_LEVELS = hp.HParam('hp_n_levels', hp.Discrete([3, 9], dtype=int))
+    HP_EPOCHS = hp.HParam('hp_epochs', hp.Discrete([20], dtype=int))
+    HP_BATCH_SIZE = hp.HParam('hp_batch_size', hp.IntInterval(2, 20))
+    HP_SCALER = hp.HParam(
+        'hp_scaler',
+        hp.Discrete(
+            ['robust', 'minmax', 'maxabs', 'quant_g', 'standard', 'l1', 'l2'],
+            dtype=str))
+    HP_N_LEVELS = hp.HParam('hp_n_levels', hp.Discrete([3, 5, 7, 9],
+                                                       dtype=int))
     HP_FIRST_FILTERS = hp.HParam('hp_first_filteres',
-                                 hp.Discrete([64], dtype=int))
-    HP_POOL_SIZE = hp.HParam('hp_pool_size', hp.Discrete([2], dtype=int))
+                                 hp.Discrete([16, 32, 64, 128], dtype=int))
+    HP_POOL_SIZE = hp.HParam('hp_pool_size', hp.Discrete([2, 4], dtype=int))
     HP_INPUT_SIZE = hp.HParam('hp_input_size',
-                              hp.Discrete([2**13, 2**14], dtype=int))
+                              hp.Discrete([2**12, 2**13, 2**14], dtype=int))
     HP_LR_START = hp.HParam('hp_lr_start', hp.RealInterval(1e-5, 1e-1))
-    HP_LR_POWER = hp.HParam('hp_lr_power', hp.Discrete([1.0], dtype=float))
+    HP_LR_POWER = hp.HParam('hp_lr_power', hp.Discrete([1.0, 5.0],
+                                                       dtype=float))
 
     HPARAMS = [
-        HP_EPOCHS, HP_BATCH_SIZE, HP_STEPS_PER_EPOCH, HP_VALIDATION_STEPS,
-        HP_SCALER, HP_N_LEVELS, HP_FIRST_FILTERS, HP_POOL_SIZE, HP_INPUT_SIZE,
-        HP_LR_START, HP_LR_POWER
+        HP_EPOCHS, HP_BATCH_SIZE, HP_SCALER, HP_N_LEVELS, HP_FIRST_FILTERS,
+        HP_POOL_SIZE, HP_INPUT_SIZE, HP_LR_START, HP_LR_POWER
     ]
 
     LOG_DIR = "../tmp/tb-" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
@@ -231,7 +231,8 @@ def hparams_run(num_session_groups, csv_path_train, csv_path_val,
             num_parallel_calls=tf.data.AUTOTUNE)
         ds_train_prep = ds_train_prep.shuffle(
             buffer_size=num_train_examples).repeat().batch(
-                hparams[HP_BATCH_SIZE]).prefetch(tf.data.AUTOTUNE)
+                hparams[HP_BATCH_SIZE],
+                drop_remainder=True).prefetch(tf.data.AUTOTUNE)
 
         ds_val_prep = dataset_val.map(lambda trace, label: ppd.tf_crop_trace(
             trace, label, hparams[HP_INPUT_SIZE]),
@@ -241,7 +242,8 @@ def hparams_run(num_session_groups, csv_path_train, csv_path_val,
                                       num_parallel_calls=tf.data.AUTOTUNE)
         ds_val_prep = ds_val_prep.shuffle(
             buffer_size=num_val_examples).repeat().batch(
-                hparams[HP_BATCH_SIZE]).prefetch(tf.data.AUTOTUNE)
+                hparams[HP_BATCH_SIZE],
+                drop_remainder=True).prefetch(tf.data.AUTOTUNE)
 
         model = unet_1d_hparams(hparams=hparams)
 
@@ -296,13 +298,15 @@ def hparams_run(num_session_groups, csv_path_train, csv_path_val,
         lr_callback = tf.keras.callbacks.LearningRateScheduler(lr_schedule)
         image_callback = tf.keras.callbacks.LambdaCallback(
             on_epoch_end=log_plots)
+        steps_train = num_train_examples // hparams[HP_BATCH_SIZE]
+        steps_val = num_val_examples // hparams[HP_BATCH_SIZE]
 
         result = model.fit(
             x=ds_train_prep,
             epochs=hparams[HP_EPOCHS],
-            steps_per_epoch=hparams[HP_STEPS_PER_EPOCH],
+            steps_per_epoch=steps_train,
             validation_data=ds_val_prep,
-            validation_steps=hparams[HP_VALIDATION_STEPS],
+            validation_steps=steps_val,
             callbacks=[
                 tensorboard_callback, hparams_callback, lr_callback,
                 image_callback
@@ -425,8 +429,7 @@ def hparams_run(num_session_groups, csv_path_train, csv_path_val,
             mlflow.set_tag("best_run", best_run.info.run_id)
         except AttributeError:
             print('Logging the best run failed. Maybe check if MlflowClient'
-                  ' is set up correctly'
-                  )
+                  ' is set up correctly')
         mlflow.log_metrics({
             "best_auc": best_auc_train,
             "best_auc_val": best_auc_val
