@@ -205,7 +205,7 @@
 
     #+NAME: jpt-tmux
     #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine
-    conda activate tf-nightly
+    conda activate tf
     export PORT=8889
     export XDG_RUNTIME_DIR=''
     export XDG_RUNTIME_DIR=""
