@@ -72,22 +72,19 @@ def hparams_run(num_session_groups, csv_path_train, csv_path_val,
     # but currently, mlflow does not support logging lists, so I log the
     # elements of the list one by one
     HP_EPOCHS = hp.HParam('hp_epochs', hp.Discrete([20], dtype=int))
-    HP_BATCH_SIZE = hp.HParam('hp_batch_size', hp.IntInterval(2, 20))
+    HP_BATCH_SIZE = hp.HParam('hp_batch_size', hp.IntInterval(4, 20))
     HP_SCALER = hp.HParam(
         'hp_scaler',
         hp.Discrete(
             ['robust', 'minmax', 'maxabs', 'quant_g', 'standard', 'l1', 'l2'],
             dtype=str))
-    HP_N_LEVELS = hp.HParam('hp_n_levels', hp.Discrete([3, 5, 7, 9],
-                                                       dtype=int))
-    HP_FIRST_FILTERS = hp.HParam('hp_first_filters',
-                                 hp.Discrete([16, 32, 64, 128], dtype=int))
-    HP_POOL_SIZE = hp.HParam('hp_pool_size', hp.Discrete([2, 4], dtype=int))
+    HP_N_LEVELS = hp.HParam('hp_n_levels', hp.IntInterval(1, 9)
+    HP_FIRST_FILTERS = hp.HParam('hp_first_filters', hp.IntInterval(1, 128)
+    HP_POOL_SIZE = hp.HParam('hp_pool_size', hp.Discrete([2, 4, 8], dtype=int))
     HP_INPUT_SIZE = hp.HParam('hp_input_size',
                               hp.Discrete([2**12, 2**13, 2**14], dtype=int))
-    HP_LR_START = hp.HParam('hp_lr_start', hp.RealInterval(1e-5, 1e-1))
-    HP_LR_POWER = hp.HParam('hp_lr_power', hp.Discrete([1.0, 5.0],
-                                                       dtype=float))
+    HP_LR_START = hp.HParam('hp_lr_start', hp.RealInterval(1e-6, 0.06))
+    HP_LR_POWER = hp.HParam('hp_lr_power', hp.IntInterval(1, 7))
 
     HPARAMS = [
         HP_EPOCHS, HP_BATCH_SIZE, HP_SCALER, HP_N_LEVELS, HP_FIRST_FILTERS,
