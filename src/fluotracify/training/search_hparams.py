@@ -72,7 +72,7 @@ def hparams_run(num_session_groups, csv_path_train, csv_path_val,
     # but currently, mlflow does not support logging lists, so I log the
     # elements of the list one by one
     HP_EPOCHS = hp.HParam('hp_epochs', hp.Discrete([20], dtype=int))
-    HP_BATCH_SIZE = hp.HParam('hp_batch_size', hp.IntInterval(4, 20))
+    HP_BATCH_SIZE = hp.HParam('hp_batch_size', hp.IntInterval(4, 30))
     HP_SCALER = hp.HParam(
         'hp_scaler',
         hp.Discrete(
