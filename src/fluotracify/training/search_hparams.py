@@ -78,8 +78,8 @@ def hparams_run(num_session_groups, csv_path_train, csv_path_val,
         hp.Discrete(
             ['robust', 'minmax', 'maxabs', 'quant_g', 'standard', 'l1', 'l2'],
             dtype=str))
-    HP_N_LEVELS = hp.HParam('hp_n_levels', hp.IntInterval(1, 9)
-    HP_FIRST_FILTERS = hp.HParam('hp_first_filters', hp.IntInterval(1, 128)
+    HP_N_LEVELS = hp.HParam('hp_n_levels', hp.IntInterval(1, 9))
+    HP_FIRST_FILTERS = hp.HParam('hp_first_filters', hp.IntInterval(1, 128))
     HP_POOL_SIZE = hp.HParam('hp_pool_size', hp.Discrete([2, 4, 8], dtype=int))
     HP_INPUT_SIZE = hp.HParam('hp_input_size',
                               hp.Discrete([2**12, 2**13, 2**14], dtype=int))
