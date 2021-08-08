@@ -376,7 +376,7 @@ def hparams_run(num_session_groups, csv_path_train, csv_path_val,
 
     with mlflow.start_run() as parent_run:
         mlflow.tensorflow.autolog(every_n_iter=1, log_models=False)
-        rng = random.Random(0)
+        rng = random.Random(1)
         best_auc_val = tf.experimental.numpy.finfo(
             tf.experimental.numpy.float64).min
 
@@ -415,10 +415,9 @@ def hparams_run(num_session_groups, csv_path_train, csv_path_val,
                             num_val_examples=num_val_examples,
                             best_auc_val=best_auc_val)
                     else:
-                        print(
-                            'This run is skipped, because the following'
-                            'condition (needed to build the model) was given:'
-                            '2 * pool_size**n_levels <= input_size')
+                        print('This run is skipped, because the following '
+                              'condition (needed to build the model) was not '
+                              'given: 2 * pool_size**n_levels <= input_size')
                 session_index += 1
 
         # Now log best values in parent run
