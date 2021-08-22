@@ -1,0 +1,14 @@
+,0,1,2,3,4,5,6,7,8,9,10,11
+unique identifier,922f4d3b-72eb-4662-a0e7-f588dd2e5355,37863427-7dec-4a61-9056-9b6a3f9f7d30,bec912b2-c76a-4618-b5af-00b5cda67e1b,340ad302-cf12-4224-addf-9455009bc9b3,d826c855-7535-4970-a24f-a29fca21f21b,77a668b3-fb2d-4a51-8362-77db9e3c86a7,24c18813-c30c-451f-916c-27233b66aff2,b5d1537c-4113-4f13-a1ca-65664181f8cc,90ec2bbf-d308-4895-b5fd-1974c0b3390d,836a0581-af05-47f7-8890-456b58d4938e,4b0e24b5-a675-4f1d-980c-32bf3c1547e8,3b87ff61-d94c-43a0-a827-b450205c2622
+path and file name,/beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set009.csv,/beegfs/ye53nis/saves/firstartifact_Nov2020/50/traces_brightclust_Nov2020_D50_set007.csv,/beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set009.csv,/beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set009.csv,/beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set008.csv,/beegfs/ye53nis/saves/firstartifact_Nov2020/10/traces_brightclust_Nov2020_D10_set008.csv,/beegfs/ye53nis/saves/firstartifact_Nov2020/0.08/traces_brightclust_Nov2020_D0.08_set008.csv,/beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2020_D1.0_set008.csv,/beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set008.csv,/beegfs/ye53nis/saves/firstartifact_Nov2020/0.2/traces_brightclust_Nov2020_D0.2_set006.csv,/beegfs/ye53nis/saves/firstartifact_Nov2020/0.069/traces_brightclust_Nov2020_D0.069_set006.csv,/beegfs/ye53nis/saves/firstartifact_Nov2020/0.6/traces_brightclust_Nov2020_D0.6_set006.csv
+FWHMs of excitation PSFs used in nm,[250],[250],[250],[250],[250],[250],[250],[250],[250],[250],[250],[250]
+Extent of simulated PSF (distance to center of Gaussian) in nm,4000,4000,4000,4000,4000,4000,4000,4000,4000,4000,4000,4000
+total simulation time in ms,16384,16384,16384,16384,16384,16384,16384,16384,16384,16384,16384,16384
+time step in ms,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0
+number of fast molecules,1857,1745,2966,2422,887,620,2379,3300,766,2918,1647,665
+diffusion rate of molecules in micrometer^2 / s,1.0,50,0.4,3.0,0.1,10,0.08,1.0,3.0,0.2,0.069,0.6
+width of the simulation in nm,3000.0,3000.0,3000.0,3000.0,3000.0,3000.0,3000.0,3000.0,3000.0,3000.0,3000.0,3000.0
+height of the simulation in nm,3000.0,3000.0,3000.0,3000.0,3000.0,3000.0,3000.0,3000.0,3000.0,3000.0,3000.0,3000.0
+number of slow clusters,7,3,7,3,10,10,7,3,10,7,7,7
+diffusion rate of clusters in micrometer^2 / s,0.1,1.0,0.1,1.0,0.01,0.01,0.1,1.0,0.01,0.1,0.1,0.1
+trace001,label001_1,label001_1,label001_1,label001_1,label001_1,label001_1,label001_1,label001_1,label001_1,label001_1,label001_1,label001_1

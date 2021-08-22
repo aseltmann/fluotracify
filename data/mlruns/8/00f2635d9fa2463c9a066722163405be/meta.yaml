@@ -1,0 +1,15 @@
+artifact_uri: file:///beegfs/ye53nis/drmed-git/data/mlruns/8/00f2635d9fa2463c9a066722163405be/artifacts
+end_time: 1628442867701
+entry_point_name: ''
+experiment_id: '8'
+lifecycle_stage: active
+name: ''
+run_id: 00f2635d9fa2463c9a066722163405be
+run_uuid: 00f2635d9fa2463c9a066722163405be
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1628442479915
+status: 3
+tags: []
+user_id: ye53nis
