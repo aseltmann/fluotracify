@@ -10,6 +10,9 @@
 #+HTML_HEAD_EXTRA: <style type="text/css">pre.src-tmux {background-color: #E1EED8;}</style>
 #+HTML_HEAD_EXTRA: <style type="text/css">pre.src-python {background-color: #E6EDF4;}</style>
 #+HTML_HEAD_EXTRA: <style type="text/css">pre.src-jupyter-python {background-color: #FAEAE1;}</style>
+#+HTML_HEAD_EXTRA: <style type="text/css">details {padding: 1em; background-color: #f0f0f0; border-radius: 15px; color: hsl(157 75% 20%); font-size: 0.9em; box-shadow: 0.05em 0.1em 5px 0.01em  #00000057;}</style>
+#+HTML_HEAD_EXTRA: <style type="text/css">details:hover {background:pink;}</style>
+
 
 * Technical Notes
 ** README
@@ -84,6 +87,15 @@
      yellow colour (#FBFBBF)
    #+end_example
 
+   #+begin_details
+   #+begin_example
+     This is a literal example block enclosed in a details block. This is useful to
+     make the page more readable by collapsing large amounts of output.
+     In the Labbook.html rendering of this document, the details block will have a
+     light grey colour (#f0f0f0) and a pink color when hovering above it.
+   #+end_example
+   #+end_details
+
 *** Experiments workflow:
    1) Create a new branch from =main=
    2) Print out the git log from the latest commit and the metadata
@@ -91,7 +103,7 @@
       [[* Organization of code]]
    4) All machine learning runs are saved in =data/mlruns=, all other data in
       =data/#experiment-name=
-   5) Add a "** #experiment-name" section to this file under [[* Data]]
+   5) Add a ~** exp-<date>-<name>~" section to this file under [[* Data]]
    6) Commit/push the results of this separate branch
    7) Merge this new branch with the remote =data= branch
 *** Example for experimental setup procedure
@@ -354,7 +366,8 @@
      - _Things to do before exporting / Troubleshooting while exporting:_
        - when using a dark theme for you emacs, the export of the code blocks
          might show some ugly dark backgrounds from the theme. If this becomes
-         an issue, change to a light theme for the export
+         an issue, change to a light theme for the export with =M-x
+         (load-theme)= and choose =solarized-light=
        - only in the =data= branch you set the git tags after merging. If you
          want to show them here, execute the corresponding function in [[Git TAGs]]
        - make sure your file links work properly! I recommend referencing your
@@ -366,6 +379,16 @@
            your functions
          - if you call a function via the =#+CALL= mechanism, it wants you to
            include two parentheses for the function, e.g. =#+CALL: test()=
+       - check indentation of code blocks inside lists
+       - add a =details= block around large output cells. This makes them
+         expandable. I added some =#+HTML_HEAD_EXTRA: <style...= inspired by
+         [[https://alhassy.github.io/org-special-block-extras/#Folded-Details][alhassy]]. That's how the =details= block looks like:
+         #+begin_example
+         #+begin_details
+
+         #+end_details
+         #+end_example
+         If you want an
      - _Things to do after exporting:_
        - In my workflow, I put the exported =LabBook.html= into the =data=
          folder. If you move the file, you will have to fix the file links for
@@ -443,6 +466,9 @@
 
 ** Changes in this repository (without "* Data" in this file)
 *** Changes in LabBook.org (without "* Data")
+**** 2021-12-16
+     - Add =details= blocks, corresponding =#+HTML_HEAD_EXTRA: <style...= and
+       documentation in  [[Notes on archiving]]
 **** 2021-08-05
      - Rename =master= branch to =main= branch
 **** 2021-04-04
