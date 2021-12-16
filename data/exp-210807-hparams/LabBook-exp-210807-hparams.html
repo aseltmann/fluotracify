@@ -9620,13 +9620,13 @@ again with the same settings.
 <p>
 Lets look at some plots of successful runs as well:
 High validation AUC:
-<img src="./data/exp-210807-hparams/mlflow/run1-2_highvalauc.png" class="img-responsive" alt="run1-2_highvalauc.png">
+<img src="./mlflow/run1-2_highvalauc.png" class="img-responsive" alt="run1-2_highvalauc.png">
 High validation AUC, high validation precision:
-<img src="./data/exp-210807-hparams/mlflow/run1-2_highvalauc-highvalprecision.png" class="img-responsive" alt="run1-2_highvalauc-highvalprecision.png">
+<img src="./mlflow/run1-2_highvalauc-highvalprecision.png" class="img-responsive" alt="run1-2_highvalauc-highvalprecision.png">
 High validation AUC, high validation recall:
-<img src="./data/exp-210807-hparams/mlflow/run1-2_highvalauc-highvalrecall.png" class="img-responsive" alt="run1-2_highvalauc-highvalrecall.png">
+<img src="./mlflow/run1-2_highvalauc-highvalrecall.png" class="img-responsive" alt="run1-2_highvalauc-highvalrecall.png">
 High validation AUC, high validation recall, high validation precision:
-<img src="./data/exp-210807-hparams/mlflow/run1-2_highvalauc-highvalrecall-highvalprecision.png" class="img-responsive" alt="run1-2_highvalauc-highvalrecall-highvalprecision.png">
+<img src="./mlflow/run1-2_highvalauc-highvalrecall-highvalprecision.png" class="img-responsive" alt="run1-2_highvalauc-highvalrecall-highvalprecision.png">
 </p>
 </li>
 
@@ -9634,23 +9634,23 @@ High validation AUC, high validation recall, high validation precision:
 High training AUC, low validation AUC (these models overfitted). Here a
 clear predictor seems to be <code>lr_power=1</code>, a small batch size, and a small
 pool size.
-<img src="./data/exp-210807-hparams/mlflow/run1-2_highauc-lowvalauc.png" class="img-responsive" alt="run1-2_highauc-lowvalauc.png">
+<img src="./mlflow/run1-2_highauc-lowvalauc.png" class="img-responsive" alt="run1-2_highauc-lowvalauc.png">
 Low validation AUC, low validation recall:
-<img src="./data/exp-210807-hparams/mlflow/run1-2_lowvalrecall-lowvalauc.png" class="img-responsive" alt="run1-2_lowvalrecall-lowvalauc.png">
+<img src="./mlflow/run1-2_lowvalrecall-lowvalauc.png" class="img-responsive" alt="run1-2_lowvalrecall-lowvalauc.png">
 Low validation precision, but still reasonably high validation AUC:
-<img src="./data/exp-210807-hparams/mlflow/run1-2_lowvalprecision-highvalauc.png" class="img-responsive" alt="run1-2_lowvalprecision-highvalauc.png">
+<img src="./mlflow/run1-2_lowvalprecision-highvalauc.png" class="img-responsive" alt="run1-2_lowvalprecision-highvalauc.png">
 Low validation recall, but still reasonably high validation AUC:
-<img src="./data/exp-210807-hparams/mlflow/run1-2_lowvalrecall-highvalauc.png" class="img-responsive" alt="run1-2_lowvalrecall-highvalauc.png">
+<img src="./mlflow/run1-2_lowvalrecall-highvalauc.png" class="img-responsive" alt="run1-2_lowvalrecall-highvalauc.png">
 </li>
 
 <li>Lets inspect input sizes. Their might be a slight preference for 2**14
 length of traces, but it could also be negligible.
 Input size of 4096 time steps
-<img src="./data/exp-210807-hparams/mlflow/run1-2_input-size_4096.png" class="img-responsive" alt="run1-2_input-size_4096.png">
+<img src="./mlflow/run1-2_input-size_4096.png" class="img-responsive" alt="run1-2_input-size_4096.png">
 Input size of 8192 time steps
-<img src="./data/exp-210807-hparams/mlflow/run1-2_input-size_8192.png" class="img-responsive" alt="run1-2_input-size_8192.png">
+<img src="./mlflow/run1-2_input-size_8192.png" class="img-responsive" alt="run1-2_input-size_8192.png">
 Input size of 16384 time steps
-<img src="./data/exp-210807-hparams/mlflow/run1-2_input-size_16384.png" class="img-responsive" alt="run1-2_input-size_16384.png">
+<img src="./mlflow/run1-2_input-size_16384.png" class="img-responsive" alt="run1-2_input-size_16384.png">
 </li>
 
 <li>Next lets inspect a complicated hyperparameter, which adjusts the pool
@@ -9661,11 +9661,11 @@ building, as well. The following condition has to hold: <code>input_size &gt;=
 possible with smaller n<sub>levels</sub>. Still, a higher pool<sub>size</sub> seems to be
 useful in this project.
 pool size, kernel size and strides of 2:
-<img src="./data/exp-210807-hparams/mlflow/run1-2_poolsize-strides-kernelsize_2.png" class="img-responsive" alt="run1-2_poolsize-strides-kernelsize_2.png">
+<img src="./mlflow/run1-2_poolsize-strides-kernelsize_2.png" class="img-responsive" alt="run1-2_poolsize-strides-kernelsize_2.png">
 pool size, kernel size and strides of 4:
-<img src="./data/exp-210807-hparams/mlflow/run1-2_poolsize-strides-kernelsize_4.png" class="img-responsive" alt="run1-2_poolsize-strides-kernelsize_4.png">
+<img src="./mlflow/run1-2_poolsize-strides-kernelsize_4.png" class="img-responsive" alt="run1-2_poolsize-strides-kernelsize_4.png">
 pool size, kernel size and strides of 8:
-<img src="./data/exp-210807-hparams/mlflow/run1-2_poolsize-strides-kernelsize_8.png" class="img-responsive" alt="run1-2_poolsize-strides-kernelsize_8.png">
+<img src="./mlflow/run1-2_poolsize-strides-kernelsize_8.png" class="img-responsive" alt="run1-2_poolsize-strides-kernelsize_8.png">
 </li>
 
 <li>Another complicated hyperparameter is n<sub>levels</sub>. It refers to the "depth"
@@ -9676,11 +9676,11 @@ model parameters and smaller values make the model much more portable and
 value raises the learning capacity of the network, but also raises the
 possibility of overfitting.
 Number of unet levels 1 to 3
-<img src="./data/exp-210807-hparams/mlflow/run1-2_n-levels_1-3.png" class="img-responsive" alt="run1-2_n-levels_1-3.png">
+<img src="./mlflow/run1-2_n-levels_1-3.png" class="img-responsive" alt="run1-2_n-levels_1-3.png">
 Number of unet levels 4 to 6
-<img src="./data/exp-210807-hparams/mlflow/run1-2_n-levels_4-6.png" class="img-responsive" alt="run1-2_n-levels_4-6.png">
+<img src="./mlflow/run1-2_n-levels_4-6.png" class="img-responsive" alt="run1-2_n-levels_4-6.png">
 Number of unet levels 7 to 9
-<img src="./data/exp-210807-hparams/mlflow/run1-2_n-levels_7-9.png" class="img-responsive" alt="run1-2_n-levels_7-9.png">
+<img src="./mlflow/run1-2_n-levels_7-9.png" class="img-responsive" alt="run1-2_n-levels_7-9.png">
 </li>
 
 <li>Lets take a look at the different first filters (starting from this
@@ -9689,11 +9689,11 @@ maximum of 512 filters was reached). More filters mean more capacity for
 learning, but also more risk of overfitting and model size. Here, no real
 trend is visible, so a lower number of filters should be sufficient.
 from 6 to 45 first filters
-<img src="./data/exp-210807-hparams/mlflow/run1-2_first-filters_6-45.png" class="img-responsive" alt="run1-2_first-filters_6-45.png">
+<img src="./mlflow/run1-2_first-filters_6-45.png" class="img-responsive" alt="run1-2_first-filters_6-45.png">
 from 57 to 77 first filters
-<img src="./data/exp-210807-hparams/mlflow/run1-2_first-filters_57-77.png" class="img-responsive" alt="run1-2_first-filters_57-77.png">
+<img src="./mlflow/run1-2_first-filters_57-77.png" class="img-responsive" alt="run1-2_first-filters_57-77.png">
 from 100 to 128 first filters
-<img src="./data/exp-210807-hparams/mlflow/run1-2_first-filters_100-128.png" class="img-responsive" alt="run1-2_first-filters_100-128.png">
+<img src="./mlflow/run1-2_first-filters_100-128.png" class="img-responsive" alt="run1-2_first-filters_100-128.png">
 </li>
 
 <li>Now lets take a look at the starting learning rates and the learning rate
@@ -9702,15 +9702,15 @@ the learning rate starting value, the lower category seemed to perform
 better than the upper category. The power of 1 is simpler than the values
 between 4 and 7.
 Start learning rate between 0.0065 and 0.035:
-<img src="./data/exp-210807-hparams/mlflow/run1-2_lr-start_0.0065-0.035.png" class="img-responsive" alt="run1-2_lr-start_0.0065-0.035.png">
+<img src="./mlflow/run1-2_lr-start_0.0065-0.035.png" class="img-responsive" alt="run1-2_lr-start_0.0065-0.035.png">
 Start learning rate between 0.045 and 0.065:
-<img src="./data/exp-210807-hparams/mlflow/run1-2_lr-start_0.045-0.065.png" class="img-responsive" alt="run1-2_lr-start_0.045-0.065.png">
+<img src="./mlflow/run1-2_lr-start_0.045-0.065.png" class="img-responsive" alt="run1-2_lr-start_0.045-0.065.png">
 Start learning rate between 0.065 and 0.1:
-<img src="./data/exp-210807-hparams/mlflow/run1-2_lr-start_0.065-0.1.png" class="img-responsive" alt="run1-2_lr-start_0.065-0.1.png">
+<img src="./mlflow/run1-2_lr-start_0.065-0.1.png" class="img-responsive" alt="run1-2_lr-start_0.065-0.1.png">
 Power of learning rate equation = 1, meaning a linear decay:
-<img src="./data/exp-210807-hparams/mlflow/run1-2_lr-power_1.png" class="img-responsive" alt="run1-2_lr-power_1.png">
+<img src="./mlflow/run1-2_lr-power_1.png" class="img-responsive" alt="run1-2_lr-power_1.png">
 Power of learning rate equation = 4 to 7, meaning a polynomial decay:
-<img src="./data/exp-210807-hparams/mlflow/run1-2_lr-power_2-7.png" class="img-responsive" alt="run1-2_lr-power_2-7.png">
+<img src="./mlflow/run1-2_lr-power_2-7.png" class="img-responsive" alt="run1-2_lr-power_2-7.png">
 </li>
 
 <li>The next parameter is the batch size, which is directly coupled to the
@@ -9719,9 +9719,9 @@ the total number of examples divided by the batch size). A larger batch
 size pools more training examples for decisions. We see that batch size
 &gt;7 seem to be benefitial.
 Batch size of 2 to 8, with steps per epoch between 600 and 2400
-<img src="./data/exp-210807-hparams/mlflow/run1-2_batch-size_2-8_higher-steps-per-epoch.png" class="img-responsive" alt="run1-2_batch-size_2-8_higher-steps-per-epoch.png">
+<img src="./mlflow/run1-2_batch-size_2-8_higher-steps-per-epoch.png" class="img-responsive" alt="run1-2_batch-size_2-8_higher-steps-per-epoch.png">
 Batch size of 8 to 20, with steps per epoch between 165 and 550
-<img src="./data/exp-210807-hparams/mlflow/run1-2_batch-size_8-20_lower-steps-per-epoch.png" class="img-responsive" alt="run1-2_batch-size_8-20_lower-steps-per-epoch.png">
+<img src="./mlflow/run1-2_batch-size_8-20_lower-steps-per-epoch.png" class="img-responsive" alt="run1-2_batch-size_8-20_lower-steps-per-epoch.png">
 </li>
 
 <li>Lastly, lets take a look at the different scalers. I used a scaler from
@@ -9731,7 +9731,7 @@ scaler. After evaluating the first training approaches I noticed that
 there might be problems with this scaler, if the trace has no artifacts
 in it, see this example plot, where  I plotted a variety of scalers from
 <code>sklearn</code> on some simulated data:
-<img src="./data/exp-210807-hparams/jupyter/scalers_simulations.png" class="img-responsive" alt="scalers_simulations.png">
+<img src="./jupyter/scalers_simulations.png" class="img-responsive" alt="scalers_simulations.png">
 From these I chose Standard, Robust, Max-Abs, Quantile (Gaussian),
 Min-Max, L1 and L2, because they looked most promising. Now, let's load
 some of the experimental data and see how these scalers look on this
@@ -9794,7 +9794,7 @@ plt.tight_layout()
 
 <p>
 with <code>reshape(-1, 1)</code> to say that <b>data has a single feature</b>
-<img src="./data/exp-210807-hparams/jupyter/scalers_experimental.png" class="img-responsive" alt="scalers_experimental.png"> . We
+<img src="./jupyter/scalers_experimental.png" class="img-responsive" alt="scalers_experimental.png"> . We
 already see that the quantile transformation might not be so useful
 here. In the simulated data with slower cluster speeds it made the peaks
 clearly distinct, here this is not the case.
@@ -9811,8 +9811,8 @@ more often. In runs with the highest <code>val_auc</code>, this norm especially
 seems to lead to a high recall (which is a problem with minmax). But we
 also see that depending on the other parameters there is a wide
 variation of results, including very bad ones
-<img src="./data/exp-210807-hparams/mlflow/run1-2_scaler_l1.png" class="img-responsive" alt="run1-2_scaler_l1.png">
-<img src="./data/exp-210807-hparams/mlflow/run1-2_scaler_l2.png" class="img-responsive" alt="run1-2_scaler_l2.png">
+<img src="./mlflow/run1-2_scaler_l1.png" class="img-responsive" alt="run1-2_scaler_l1.png">
+<img src="./mlflow/run1-2_scaler_l2.png" class="img-responsive" alt="run1-2_scaler_l2.png">
 </p>
 
 <p>
@@ -9821,8 +9821,8 @@ Second, let's look at Max-Abs (from 0 to the maximum value) and Min-Max
 similar, although Max-Abs keeps the distance from 0 to the minimal
 value, and Min-Max does not. We see that both lead to good results, with
 some variation. In Max-Abs, the spread seems to be wider.
-<img src="./data/exp-210807-hparams/mlflow/run1-2_scaler_maxabs.png" class="img-responsive" alt="run1-2_scaler_maxabs.png">
-<img src="./data/exp-210807-hparams/mlflow/run1-2_scaler_minmax.png" class="img-responsive" alt="run1-2_scaler_minmax.png">
+<img src="./mlflow/run1-2_scaler_maxabs.png" class="img-responsive" alt="run1-2_scaler_maxabs.png">
+<img src="./mlflow/run1-2_scaler_minmax.png" class="img-responsive" alt="run1-2_scaler_minmax.png">
 </p>
 
 <p>
@@ -9830,19 +9830,19 @@ Third, Quantile Transformation (Gaussian distribution). We see that this
 transformation suffers from bad val<sub>precision</sub> values. Higher recall
 values can be reached with other transformations. Thus, I think I can
 neglect this transformation in the future.
-<img src="./data/exp-210807-hparams/mlflow/run1-2_scaler_quant-g.png" class="img-responsive" alt="run1-2_scaler_quant-g.png">
+<img src="./mlflow/run1-2_scaler_quant-g.png" class="img-responsive" alt="run1-2_scaler_quant-g.png">
 </p>
 
 <p>
 Fourth, the Robust Scaler. It robustly (haha) achieves good precision
 and recall values
-<img src="./data/exp-210807-hparams/mlflow/run1-2_scaler_robust.png" class="img-responsive" alt="run1-2_scaler_robust.png">
+<img src="./mlflow/run1-2_scaler_robust.png" class="img-responsive" alt="run1-2_scaler_robust.png">
 </p>
 
 <p>
 Fifth, the Standard Scaler. It achieves some of the best results, even
 though there is some variation, both in precision and recall.
-<img src="./data/exp-210807-hparams/mlflow/run1-2_scaler_standard.png" class="img-responsive" alt="run1-2_scaler_standard.png">
+<img src="./mlflow/run1-2_scaler_standard.png" class="img-responsive" alt="run1-2_scaler_standard.png">
 </p>
 </li>
 </ol>
@@ -9858,15 +9858,15 @@ This run is one of the few very good runs where the model got saved out.
 <ol class="org-ol">
 <li>Let's look at some prediction plots
 after 1 epoch:
-<img src="./data/mlruns/8/00f2635d9fa2463c9a066722163405be/artifacts/predplots/plot0.png" class="img-responsive" alt="plot0.png">
+<img src="../mlruns/8/00f2635d9fa2463c9a066722163405be/artifacts/predplots/plot0.png" class="img-responsive" alt="plot0.png">
 after 5 epochs:
-<img src="./data/mlruns/8/00f2635d9fa2463c9a066722163405be/artifacts/predplots/plot4.png" class="img-responsive" alt="plot4.png">
+<img src="../mlruns/8/00f2635d9fa2463c9a066722163405be/artifacts/predplots/plot4.png" class="img-responsive" alt="plot4.png">
 after 10 epochs:
-<img src="./data/mlruns/8/00f2635d9fa2463c9a066722163405be/artifacts/predplots/plot9.png" class="img-responsive" alt="plot9.png">
+<img src="../mlruns/8/00f2635d9fa2463c9a066722163405be/artifacts/predplots/plot9.png" class="img-responsive" alt="plot9.png">
 after 15 epochs:
-<img src="./data/mlruns/8/00f2635d9fa2463c9a066722163405be/artifacts/predplots/plot14.png" class="img-responsive" alt="plot14.png">
+<img src="../mlruns/8/00f2635d9fa2463c9a066722163405be/artifacts/predplots/plot14.png" class="img-responsive" alt="plot14.png">
 after 20 epochs:
-<img src="./data/mlruns/8/00f2635d9fa2463c9a066722163405be/artifacts/predplots/plot19.png" class="img-responsive" alt="plot19.png">
+<img src="../mlruns/8/00f2635d9fa2463c9a066722163405be/artifacts/predplots/plot19.png" class="img-responsive" alt="plot19.png">
 </li>
 <li>Now let's print out the model architecture. <code>-n</code> prints out line numbers.
 <div class="org-src-container">
@@ -12857,7 +12857,7 @@ plt.show()
 
 <p>
 Trace lengths:
-<img src="./data/exp-210807-hparams/jupyter/2021-08-26_correlations_tracelength.png" class="img-responsive" alt="2021-08-26_correlations_tracelength.png">
+<img src="./jupyter/2021-08-26_correlations_tracelength.png" class="img-responsive" alt="2021-08-26_correlations_tracelength.png">
 </p>
 
 <p>
@@ -12907,9 +12907,9 @@ plt.show()
 
 <p>
 tau:
-<img src="./data/exp-210807-hparams/jupyter/2021-08-26_correlations_tau.png" class="img-responsive" alt="2021-08-26_correlations_tau.png">
+<img src="./jupyter/2021-08-26_correlations_tau.png" class="img-responsive" alt="2021-08-26_correlations_tau.png">
 D:
-<img src="./data/exp-210807-hparams/jupyter/2021-08-26_correlations_diffrate.png" class="img-responsive" alt="2021-08-26_correlations_diffrate.png">
+<img src="./jupyter/2021-08-26_correlations_diffrate.png" class="img-responsive" alt="2021-08-26_correlations_diffrate.png">
 </p>
 </li>
 
@@ -12946,7 +12946,7 @@ plt.show()
 
 
 <figure>
-<p><img src="./data/exp-210807-hparams/jupyter/2021-08-26_correlations_tlvstau.png" class="img-responsive" alt="2021-08-26_correlations_tlvstau.png">
+<p><img src="./jupyter/2021-08-26_correlations_tlvstau.png" class="img-responsive" alt="2021-08-26_correlations_tlvstau.png">
 </p>
 </figure>
 
@@ -12980,7 +12980,7 @@ plt.show()
 
 
 <figure>
-<p><img src="./data/exp-210807-hparams/jupyter/2021-08-26_correlations_tlvstau2.png" class="img-responsive" alt="2021-08-26_correlations_tlvstau2.png">
+<p><img src="./jupyter/2021-08-26_correlations_tlvstau2.png" class="img-responsive" alt="2021-08-26_correlations_tlvstau2.png">
 </p>
 </figure>
 
@@ -13989,7 +13989,7 @@ Check out the trace lengths. The reduction seems similar over all simulated
 data. This speaks to a good generalization. Compared to <code>exp-210204-unet</code>,
 there is especially an improvement in the Simulated D of 0.1, and 0.4 to 50 and
 Simulated \(D_{clust}\) of 0.01.
-<img src="./data/exp-210807-hparams/jupyter/2021-12-15_correlations_trace-lengths.png" class="img-responsive" alt="2021-12-15_correlations_trace-lengths.png">
+<img src="./jupyter/2021-12-15_correlations_trace-lengths.png" class="img-responsive" alt="2021-12-15_correlations_trace-lengths.png">
 </p>
 </li>
 
@@ -14033,7 +14033,7 @@ plt.show()
 
 <p>
 D:
-<img src="./data/exp-210807-hparams/jupyter/2021-12-15_correlations_diffrates.png" class="img-responsive" alt="2021-12-15_correlations_diffrates.png">
+<img src="./jupyter/2021-12-15_correlations_diffrates.png" class="img-responsive" alt="2021-12-15_correlations_diffrates.png">
 </p>
 
 <p>
@@ -14245,7 +14245,7 @@ plt.show()
 We see that the distribution for \(D\) starts to spread out after rougly 10% of a
 trace has been deleted. The traces which had the most artifacts in them
 and thus were corrected most, were with a \(D_{clust}\) of 0.01.
-<img src="./data/exp-210807-hparams/jupyter/2021-12-15_correlations_tracelengths-vs-diffrate-scatterplot.png" class="img-responsive" alt="2021-12-15_correlations_tracelengths-vs-diffrate-scatterplot.png">
+<img src="./jupyter/2021-12-15_correlations_tracelengths-vs-diffrate-scatterplot.png" class="img-responsive" alt="2021-12-15_correlations_tracelengths-vs-diffrate-scatterplot.png">
 </p>
 </li>
 </ol>
