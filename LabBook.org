@@ -27,7 +27,7 @@
      behavior in the "* Data" section.
    - The branching model used is described in [[http://starpu-simgrid.gforge.inria.fr/misc/SIGOPS_paper.pdf][this paper]]. Therefore: if you
      are interested in the "* Data" section, you have to =git clone= the /data/
-     branch of the repository. The /master/ branch is clean from any results, it
+     branch of the repository. The /main/ branch is clean from any results, it
      contains only source code and the analysis.
    - This project is my take on [[https://en.wikipedia.org/wiki/Open-notebook_science][Open-notebook science]]. The idea was postulated in
      a blog post in 2006:
@@ -89,7 +89,7 @@
    #+end_example
 
 *** Experiments workflow:
-   1) Create a new branch from =master=
+   1) Create a new branch from =main=
    2) Print out the git log from the latest commit and the metadata
    3) Call the analysis scripts, follow the principles outlined in
       [[* Organization of code]]
@@ -209,7 +209,7 @@
 
     #+NAME: jpt-tmux
     #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine
-    conda activate tf-nightly
+    conda activate tf
     export PORT=9999
     export XDG_RUNTIME_DIR=''
     export XDG_RUNTIME_DIR=""
@@ -285,7 +285,7 @@
     =Emacs-jupyter= aims to be an API for a lot of functionalities of the
     =jupyter= project. The documentation can be found on [[https://github.com/dzop/emacs-jupyter][GitHub]].
 
-    1. For the *whole document*: connect ot a running jupyter instance
+    1. For the *whole document*: connect to a running jupyter instance
        1. =M-x jupyter-server-list-kernels=
           1. set server URL, e.g. =http://localhost:8889=
           2. set websocket URL, e.g. =http://localhost:8889=
@@ -325,8 +325,52 @@
             pressing =Shift-TAB= in Jupyter notebooks)
           - =C-c C-i= to interrupt the kernel, =C-c C-r= to restart the kernel
 
+*** Notes on archiving
+**** Exporting the LabBook.org to html in a twbs style
+     - I am partial to the twitter bootstrap theme of html, since I like it's
+       simple design, but clear structure with a nice table of contents at the
+       side → the following org mode extension supports a seemless export to
+       twitter bootstrap html: https://github.com/marsmining/ox-twbs
+     - when installed, the export can be triggered via the command
+       =(org-twbs-export-as-html)= or via the keyboard shortcut for export =C-c
+       C-e= followed by =w= for Twitter bootstrap and =h= for saving the .html
+     - _Things to configure:_
+       - in general, there are multiple export options:
+         https://orgmode.org/manual/Export-Settings.html
+       - E.g. I set 2 =#+OPTIONS= keywords at the begin of the file: =toc:4= and
+         =H:4= which make sure that in my export my sidebar table of contents
+         will show numbered headings till a depth of 4.
+       - I configured my code blocks so that they will not be evaluated when
+         exporting (I would recommend this especially if you only export for
+         archiving) and that both the code block and the output will be exported
+         with the keyword: =#+PROPERTY: header-args :eval never-export :exports
+         both=
+       - To discriminate between code blocks for different languages I gave each
+         of them a distinct colour using =#+HTML_HEAD_EXTRA: <style...= (see
+         above)
+     - _Things to do before exporting / Troubleshooting while exporting:_
+       - when using a dark theme for you emacs, the export of the code blocks
+         might show some ugly dark backgrounds from the theme. If this becomes
+         an issue, change to a light theme for the export
+       - only in the =data= branch you set the git tags after merging. If you
+         want to show them here, execute the corresponding function in [[Git TAGs]]
+       - make sure your file links work properly! I recommend referencing your
+         files relatively (e.g. [ [ f ile:./data/exp-XXXXXX-test/test.png]]
+         without spaces). Otherwise there will be errors in your /*Messages*/
+         buffer
+       - There might be errors with your code blocks
+         - e.g. the export function expects you to assign a default variable to
+           your functions
+         - if you call a function via the =#+CALL= mechanism, it wants you to
+           include two parentheses for the function, e.g. =#+CALL: test()=
+     - _Things to do after exporting:_
+       - In my workflow, I put the exported =LabBook.html= into the =data=
+         folder. If you move the file, you will have to fix the file links for
+         the new location, e.g. via "Find and replace" =M-%= with find:
+         =[[file:./data/= and replace: =[[=
 ** Organization of git
-*** remote/origin/master branch:
+
+*** remote/origin/main branch:
   - contains all the source code in folder **src/** which is used for experiments.
   - contains the **LabBook.org** template
   - contains setup- and metadata files such as **MLproject** or **conda.yaml**
@@ -335,7 +379,7 @@
     features. Day-to-day changes in code
 *** remote/origin/exp### branches:
   - if an experiment is done, the code and templates will be branched out from
-    *master* in an *#experiment-name* branch, ### meaning some meaningful
+    *main* in an *#experiment-name* branch, ### meaning some meaningful
     descriptor.
   - all data generated during the experiment (e.g. .csv files, plots, images,
     etc), is stored in a folder with the name **data/#experiment-name**, except
@@ -369,6 +413,11 @@
 
    #+RESULTS:
    : exp-200402-test Merge branch 'exp-200402-test' into data
+   : exp-200520-unet Merge branch 'exp-310520-unet' into data
+   : exp-200531-unet Merge branch 'heads/exp-310520-unet' into data
+   : exp-201231-clustsim exp-201231-clustsim
+   : exp-210204-unet Add exp-210204-unet LabBook part 3
+   : exp-310520-unet move exp-310520-unet to data branch manually
 ** Organization of code
 *** scripts:
 *** src/
@@ -391,8 +440,15 @@
 
 ** Changes in this repository (without "* Data" in this file)
 *** Changes in LabBook.org (without "* Data")
+**** 2021-08-05
+     - Rename =master= branch to =main= branch
+**** 2021-04-04
+     - Add =#+OPTIONS: H:4= and =#+OPTIONS: toc:4= to show up to 4 levels of
+       depth in the html (twbs) export of this LabBook in the table of contents
+       at the side
+     - I added [[Notes on archiving]]
 **** 2020-11-04
-    - update "jupyter scripts" in  [[* Template for data entry and setup notes:]]
+    - update "jupyter scripts" in [[Template for data entry and setup notes:]]
       for new conda environment on server (now =conda activate tf-nightly=)
 **** 2020-05-31
     - extend general documentation in README
@@ -414,6 +470,7 @@
 **** 2020-03-30
     - set up lab book and form git repo accoring to setup by Luka Stanisic et al
 *** Changes in src/fluotracify
+<<<<<<< HEAD
 
 * Data
 ** exp-200330-test
@@ -5476,7 +5533,6 @@ future. See [[https://lwn.net/Articles/774125/][here.]]
 : train 2 /home/lex/Programme/Jupyter/DOKTOR/saves/firstartefact/subsample_rand/traces_brightclust_rand_Sep2019_set001.csv
 
 
-<<<<<<< Updated upstream
 =======
 #+RESULTS:
 #+BEGIN_EXAMPLE
@@ -5597,28 +5653,6 @@ Non-trainable params: 39,296
 __________________________________________________________________________________________________
 None
 #+END_EXAMPLE
-=======
-  import mlflow.keras
-  import mlflow.tensorflow
-  import sys
-  import numpy as np
-  import tensorflow as tf
-
-  project_path = '/home/lex/Programme/drmed-git'
-  fluotracify_path = '{}/src/'.format(project_path)
-  sys.path.append(fluotracify_path)
-
-  from fluotracify.simulations import import_simulation_from_csv as isfc
-  from fluotracify.training import build_model as bm, preprocess_data as ppd
-
-  %cd /home/lex/Programme/drmed-git
-  print(tf.__version__)
-#+END_SRC
-
-#+RESULTS:
-: /home/lex/Programme/drmed-git
-: 2.3.0-dev20200519
->>>>>>> Stashed changes
 >>>>>>> Stashed changes
 
 #+BEGIN_SRC jupyter-python :results scalar
@@ -5649,7 +5683,6 @@ Basically, no matter if I choosnpe the =:results= header argument, it always get
 printed with =:display org= like this.
 =======
 #+BEGIN_SRC jupyter-python
-<<<<<<< Updated upstream
 log_dir="logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 tensorboard_callback = tf.keras.callbacks.TensorBoard(
     log_dir=log_dir,
@@ -5680,23 +5713,6 @@ history = model.fit(x=dataset_train,
 KeyboardInterrupt                         Traceback (most recent call last)
 #+END_EXAMPLE
 :END:
-=======
-  bm.binary_ce_dice_loss()
-#+END_SRC
-
-#+RESULTS:
-: <function fluotracify.training.build_model.binary_ce_dice_loss.<locals>.binary_ce_dice(y_true, y_pred)>
-
-#+BEGIN_SRC jupyter-python
-  # mlflow.keras module
-  model_keras = mlflow.keras.load_model(model_uri=model_path,
-                                        custom_objects={'binary_ce_dice': bm.binary_ce_dice_loss()})
-  model_keras
-#+END_SRC
-
-#+RESULTS:
-: <tensorflow.python.keras.engine.functional.Functional at 0x7f3afa29d0a0>
->>>>>>> Stashed changes
 >>>>>>> Stashed changes
 
 #+BEGIN_SRC jupyter-python :display org
@@ -13613,6 +13629,9 @@ Histograms of Conv1D-Kernel (final layer)
     file:./data/exp-210204-unet/mlflow_tb_analysis_run1_and_run2/run2_histogram_final-layer.png
 
 
+=======
+* Data
+>>>>>>> exp-210807-hparams
 ** exp-210807-hparams
 *** Connect
 **** GPU node for script execution

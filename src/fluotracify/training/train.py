@@ -4,19 +4,11 @@ on simulated fluroescence traces using mlflow. It is meant to be put into the
 
 import sys
 
+import click
 import matplotlib
 import mlflow
 import mlflow.tensorflow
 import tensorflow as tf
-
-FLUOTRACIFY_PATH = sys.argv[1] if len(
-    sys.argv) > 1 else '~/Programme/drmed-git/src/'
-sys.path.append(FLUOTRACIFY_PATH)
-
-if True:  # isort workaround
-    from fluotracify.simulations import import_simulation_from_csv as isfc
-    from fluotracify.training import build_model as bm, preprocess_data as ppd
-    from fluotracify.training import evaluate
 
 # fixes a problem when calling plotting functions on the server
 matplotlib.use('agg')
@@ -28,24 +20,50 @@ print('GPUs: ', tf.config.list_physical_devices('GPU'))
 # which is already quite powerful. Since I want to add custom logs, I have to
 # start and end the log manually with mlflow.start_run() and mlflow.end_run()
 
-if __name__ == "__main__":
-    with mlflow.start_run() as run:
+
+@click.command()
+@click.option('--batch_size', type=int, default=5)
+@click.option('--frac_val', type=click.FloatRange(0, 1), default=0.2)
+@click.option('--length_delimiter',
+              type=int,
+              default=16384,
+              help='number of time steps after which to crop your trace')
+@click.option('--learning_rate', type=float, default=1e-5)
+@click.option('--epochs', type=int, default=10)
+@click.option(
+    '--csv_path_train',
+    type=str,
+    default=
+    '/home/lex/Programme/Jupyter/DOKTOR/saves/firstartefact/subsample_rand/')
+@click.option(
+    '--csv_path_test',
+    type=str,
+    default=
+    '/home/lex/Programme/Jupyter/DOKTOR/saves/firstartefact/subsample_rand/')
+@click.option('--col_per_example', type=int, default=3)
+@click.option('--steps_per_epoch', type=int, default=10)
+@click.option('--validation_steps', type=int, default=10)
+@click.option('--scaler', type=str, default='robust')
+@click.option('--n_levels', type=int, default=9)
+@click.option('--first_filters', type=int, default=64)
+@click.option('--pool_size', type=int, default=2)
+@click.option('--fluotracify_path',
+              type=str,
+              default='~/Programme/drmed-git/src/')
+def mlflow_run(batch_size, frac_val, length_delimiter, learning_rate, epochs,
+               csv_path_train, csv_path_test, col_per_example, steps_per_epoch,
+               validation_steps, scaler, n_levels, first_filters, pool_size,
+               fluotracify_path):
+    with mlflow.start_run() as _:
+
+        sys.path.append(fluotracify_path)
+
+        if True:  # isort workaround
+            from fluotracify.simulations import import_simulation_from_csv as isfc
+            from fluotracify.training import build_model as bm, preprocess_data as ppd
+            from fluotracify.training import evaluate
         mlflow.tensorflow.autolog(every_n_iter=1)
 
-        BATCH_SIZE = int(sys.argv[2]) if len(sys.argv) > 2 else 5
-        FRAC_VAL = float(sys.argv[3]) if len(sys.argv) > 3 else 0.2
-        LENGTH_DELIMITER = int(sys.argv[4]) if len(sys.argv) > 4 else 16384
-        LEARNING_RATE = sys.argv[5] if len(sys.argv) > 5 else 1e-5
-        EPOCHS = int(sys.argv[6]) if len(sys.argv) > 6 else 10
-        CSV_PATH_TRAIN = sys.argv[7] if len(
-            sys.argv
-        ) > 7 else '/home/lex/Programme/Jupyter/DOKTOR/saves/firstartefact/subsample_rand/'
-        CSV_PATH_TEST = sys.argv[8] if len(
-            sys.argv
-        ) > 8 else 'home/lex/Programme/Jupyter/DOKTOR/saves/firstartifact/subsample_rand/'
-        COL_PER_EXAMPLE = int(sys.argv[9]) if len(sys.argv) > 9 else 3
-        STEPS_PER_EPOCH = int(sys.argv[10]) if len(sys.argv) > 10 else 10
-        VALIDATION_STEPS = int(sys.argv[11]) if len(sys.argv) > 11 else 10
         LOG_DIR_TB = "/tmp/tb"
         LABEL_THRESH = 0.04
         # FIXME (PENDING): at some point, I want to plot metrics vs thresholds
@@ -58,18 +76,18 @@ if __name__ == "__main__":
         EXP_PARAM_PATH_TEST = '/tmp/experiment_params_test.csv'
 
         train, _, nsamples_train, experiment_params_train = isfc.import_from_csv(
-            folder=CSV_PATH_TRAIN,
+            folder=csv_path_train,
             header=12,
             frac_train=1,
-            col_per_example=COL_PER_EXAMPLE,
+            col_per_example=col_per_example,
             dropindex=None,
             dropcolumns=None)
 
         test, _, nsamples_test, experiment_params_test = isfc.import_from_csv(
-            folder=CSV_PATH_TEST,
+            folder=csv_path_test,
             header=12,
             frac_train=1,
-            col_per_example=COL_PER_EXAMPLE,
+            col_per_example=col_per_example,
             dropindex=None,
             dropcolumns=None)
 
@@ -81,12 +99,12 @@ if __name__ == "__main__":
         train_sep = isfc.separate_data_and_labels(
             array=train,
             nsamples=nsamples_train,
-            col_per_example=COL_PER_EXAMPLE)
+            col_per_example=col_per_example)
 
         test_sep = isfc.separate_data_and_labels(
             array=test,
             nsamples=nsamples_test,
-            col_per_example=COL_PER_EXAMPLE)
+            col_per_example=col_per_example)
 
         # '0': trace with artifact
         # '1': just the simulated artifact (label for unet)
@@ -102,26 +120,48 @@ if __name__ == "__main__":
 
         print('\nfor each {} timestap trace there are the following numbers '
               'of corrupted timesteps:\n{}'.format(
-                  LENGTH_DELIMITER,
+                  length_delimiter,
                   test_labels_bool.sum(axis=0).head()))
 
         # Cleanup
         del train, test, train_sep, test_sep
 
-        dataset_train, dataset_val, num_train_examples, num_val_examples = ppd.tfds_from_pddf_for_unet(
+        dataset_train, dataset_val, num_train_examples, num_val_examples = ppd.tfds_from_pddf(
             features_df=train_data,
             labels_df=train_labels_bool,
-            is_training=True,
-            batch_size=BATCH_SIZE,
-            length_delimiter=LENGTH_DELIMITER,
-            frac_val=FRAC_VAL)
+            frac_val=frac_val)
 
-        dataset_test, num_test_examples = ppd.tfds_from_pddf_for_unet(
-            features_df=test_data,
-            labels_df=test_labels_bool,
-            is_training=False,
-            batch_size=BATCH_SIZE,
-            length_delimiter=LENGTH_DELIMITER)
+        dataset_test, num_test_examples = ppd.tfds_from_pddf(
+            features_df=test_data, labels_df=test_labels_bool)
+
+        ds_train_prep = dataset_train.map(
+            lambda trace, label: ppd.tf_crop_trace(trace, label,
+                                                   length_delimiter),
+            num_parallel_calls=tf.data.AUTOTUNE)
+        ds_train_prep = ds_train_prep.map(
+            lambda trace, label: ppd.tf_scale_trace(trace, label, scaler),
+            num_parallel_calls=tf.data.AUTOTUNE)
+        ds_train_prep = ds_train_prep.shuffle(
+            buffer_size=num_train_examples).repeat().batch(
+                batch_size).prefetch(tf.data.AUTOTUNE)
+
+        ds_val_prep = dataset_val.map(lambda trace, label: ppd.tf_crop_trace(
+            trace, label, length_delimiter),
+                                      num_parallel_calls=tf.data.AUTOTUNE)
+        ds_val_prep = ds_val_prep.map(
+            lambda trace, label: ppd.tf_scale_trace(trace, label, scaler),
+            num_parallel_calls=tf.data.AUTOTUNE)
+        ds_val_prep = ds_val_prep.shuffle(
+            buffer_size=num_val_examples).repeat().batch(batch_size).prefetch(
+                tf.data.AUTOTUNE)
+
+        ds_test_prep = dataset_test.map(lambda trace, label: ppd.tf_crop_trace(
+            trace, label, length_delimiter),
+                                        num_parallel_calls=tf.data.AUTOTUNE)
+        ds_test_prep = ds_test_prep.map(
+            lambda trace, label: ppd.tf_scale_trace(trace, label, scaler),
+            num_parallel_calls=tf.data.AUTOTUNE)
+        ds_test_prep = ds_test_prep.batch(batch_size)
 
         mlflow.log_params({
             'num_train_examples': num_train_examples,
@@ -129,16 +169,12 @@ if __name__ == "__main__":
             'num_test_examples': num_test_examples
         })
 
-        model = bm.unet_1d_alt(input_size=LENGTH_DELIMITER)
+        model = bm.unet_1d_alt2(input_size=length_delimiter,
+                                n_levels=n_levels,
+                                first_filters=first_filters,
+                                pool_size=pool_size)
         optimizer = tf.keras.optimizers.Adam()
         loss = bm.binary_ce_dice_loss()
-
-        tensorboard_callback = tf.keras.callbacks.TensorBoard(
-            log_dir=LOG_DIR_TB,
-            histogram_freq=5,
-            write_graph=False,
-            write_images=True,
-            update_freq='epoch')
 
         file_writer_image = tf.summary.create_file_writer(LOG_DIR_TB +
                                                           '/image')
@@ -155,7 +191,7 @@ if __name__ == "__main__":
             - see https://www.tensorflow.org/api_docs/python/tf/keras/callbacks/LambdaCallback
             """
             figure = evaluate.plot_trace_and_pred_from_tfds(
-                dataset=dataset_test, ntraces=5, model=model)
+                dataset=ds_test_prep, ntraces=5, model=model)
             # Convert matplotlib figure to image
             image = evaluate.plot_to_image(figure)
             # Log the image as an image summary
@@ -190,46 +226,29 @@ if __name__ == "__main__":
             mlflow.log_metric('learning rate', value=learning_rate, step=epoch)
             return learning_rate
 
+        tensorboard_callback = tf.keras.callbacks.TensorBoard(
+            log_dir=LOG_DIR_TB,
+            histogram_freq=5,
+            write_graph=False,
+            write_images=True,
+            update_freq='epoch')
         lr_callback = tf.keras.callbacks.LearningRateScheduler(lr_schedule)
         image_callback = tf.keras.callbacks.LambdaCallback(
             on_epoch_end=log_plots)
 
-        metrics = []
-        for thresh in METRICS_THRESHOLDS:
-            metrics.append(
-                tf.keras.metrics.TruePositives(name='tp{}'.format(thresh),
-                                               thresholds=thresh))
-            metrics.append(
-                tf.keras.metrics.FalsePositives(name='fp{}'.format(thresh),
-                                                thresholds=thresh))
-            metrics.append(
-                tf.keras.metrics.TrueNegatives(name='tn{}'.format(thresh),
-                                               thresholds=thresh))
-            metrics.append(
-                tf.keras.metrics.FalseNegatives(name='fn{}'.format(thresh),
-                                                thresholds=thresh))
-            metrics.append(
-                tf.keras.metrics.Precision(name='precision{}'.format(thresh),
-                                           thresholds=thresh))
-            metrics.append(
-                tf.keras.metrics.Recall(name='recall{}'.format(thresh),
-                                        thresholds=thresh))
-        metrics.append(
-            tf.keras.metrics.BinaryAccuracy(name='accuracy', threshold=0.5))
-        metrics.append(tf.keras.metrics.AUC(name='auc', num_thresholds=100))
-
+        metrics = bm.unet_metrics(METRICS_THRESHOLDS)
         model.compile(loss=loss, optimizer=optimizer, metrics=metrics)
 
         model.fit(
-            x=dataset_train,
-            epochs=EPOCHS,
-            steps_per_epoch=STEPS_PER_EPOCH,
-            validation_data=dataset_val,
-            validation_steps=VALIDATION_STEPS,
+            x=ds_train_prep,
+            epochs=epochs,
+            steps_per_epoch=steps_per_epoch,
+            validation_data=ds_val_prep,
+            validation_steps=validation_steps,
             callbacks=[tensorboard_callback, image_callback, lr_callback])
 
-        model.evaluate(dataset_test,
-                       steps=tf.math.ceil(num_test_examples / BATCH_SIZE))
+        model.evaluate(ds_test_prep,
+                       steps=tf.math.ceil(num_test_examples / batch_size))
 
         mlflow.keras.log_model(
             keras_model=model,
@@ -238,3 +257,7 @@ if __name__ == "__main__":
                 keras_module=tf.keras),
             custom_objects={'binary_ce_dice': bm.binary_ce_dice_loss()},
             keras_module=tf.keras)
+
+
+if __name__ == "__main__":
+    mlflow_run()

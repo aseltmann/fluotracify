@@ -16,4 +16,36 @@ entry_points:
       col_per_example: {type: float, default: 3}
       steps_per_epoch: {type: float, default: 10}
       validation_steps: {type: float, default: 10}
-    command: "python src/fluotracify/training/train.py {fluotracify_path} {batch_size} {frac_val} {length_delimiter} {learning_rate} {epochs} {csv_path_train} {csv_path_test} {col_per_example} {steps_per_epoch} {validation_steps}"
+      scaler: {type: string, default: 'robust'}
+      n_levels: {type: float, default: 5}
+      first_filters: {type: float, default: 64}
+      pool_size: {type: float, default: 2}
+    command: "python src/fluotracify/training/train.py
+                 --fluotracify_path {fluotracify_path}
+                 --batch_size {batch_size}
+                 --frac_val {frac_val}
+                 --length_delimiter {length_delimiter}
+                 --learning_rate {learning_rate}
+                 --epochs {epochs}
+                 --csv_path_train {csv_path_train}
+                 --csv_path_test {csv_path_test}
+                 --col_per_example {col_per_example}
+                 --steps_per_epoch {steps_per_epoch}
+                 --validation_steps {validation_steps}
+                 --scaler {scaler}
+                 --n_levels {n_levels}
+                 --first_filters {first_filters}
+                 --pool_size {pool_size}"
+  search_hparams:
+    parameters:
+      num_session_groups: {type: float, default: 2}
+      fluotracify_path: {type: path, default: ~/Programme/drmed-git/src/}
+      csv_path_train: {type: path, default: ~/Programme/Jupyter/DOKTOR/saves/firstartefact/subsample_rand/}
+      csv_path_val: {type: path, default: ~/Programme/Jupyter/DOKTOR/saves/firstartefact/subsample_rand/}
+      col_per_example: {type: float, default: 3}
+    command: "python src/fluotracify/training/search_hparams.py
+                 --num_session_groups {num_session_groups}
+                 --fluotracify_path {fluotracify_path}
+                 --csv_path_train {csv_path_train}
+                 --csv_path_val {csv_path_val}
+                 --col_per_example {col_per_example}"

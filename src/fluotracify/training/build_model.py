@@ -1,6 +1,7 @@
 """This module contains functions to build neural networks."""
 
 import tensorflow as tf
+from tensorboard.plugins.hparams import api as hp
 
 
 def vgg10_1d(win_len, col_no):
@@ -242,6 +243,10 @@ def binary_ce_dice_loss(axis=-1, smooth=1e-5):
     return binary_ce_dice
 
 
+# notes
+# - Dropout could be added
+
+
 # Alternative U-Net definition
 def convtrans_old(filters, name):
     """Sequential API: Conv1DTranspose, BatchNorm"""
@@ -252,13 +257,13 @@ def convtrans_old(filters, name):
     return upsamp
 
 
-def convtrans(filters, name):
+def convtrans(filters, name, kernel_size, strides):
     """Sequential API: Conv1DTranspose, BatchNorm"""
     upsamp = tf.keras.Sequential(name=name)
     upsamp.add(
         tf.keras.layers.Conv1DTranspose(filters=filters,
-                                        kernel_size=2,
-                                        strides=2))
+                                        kernel_size=kernel_size,
+                                        strides=strides))
     upsamp.add(tf.keras.layers.BatchNormalization())
     upsamp.add(tf.keras.layers.Activation('relu'))
     return upsamp
@@ -279,19 +284,26 @@ def twoconv(filters, name):
     return conv
 
 
-def encoder(input_tensor, filters, name):
+def encoder(input_tensor, filters, name, pool_size=2):
     """Functional API: Two Conv1D incl BatchNorm, MaxPool1D"""
     encode = twoconv(filters=filters, name=name)(input_tensor)
-    encode_pool = tf.keras.layers.MaxPool1D(pool_size=2,
+    encode_pool = tf.keras.layers.MaxPool1D(pool_size=pool_size,
                                             name='mp_{}'.format(name))(encode)
     return encode_pool, encode
 
 
-def decoder(input_tensor, concat_tensor, filters, name):
+def decoder(input_tensor,
+            concat_tensor,
+            filters,
+            name,
+            kernel_size=2,
+            strides=2):
     """Functional API: Conv1DTrans, BatchNorm, Concat, Two Conv incl BatchNorm
     """
     decode = convtrans(filters=filters,
-                       name='conv_transpose_{}'.format(name))(input_tensor)
+                       name='conv_transpose_{}'.format(name),
+                       kernel_size=kernel_size,
+                       strides=strides)(input_tensor)
     decode = tf.keras.layers.concatenate([concat_tensor, decode],
                                          axis=-1,
                                          name=name)
@@ -363,3 +375,175 @@ def unet_1d_alt(input_size):
 
     unet = tf.keras.Model(inputs=inputs, outputs=outputs)
     return unet
+
+
+def unet_1d_alt2(input_size, n_levels, first_filters, pool_size):
+    """U-Net as described by Ronneberger et al.
+
+    Parameters
+    ----------
+    input_size : int
+        Input vector size
+    n_levelsb : int
+        Number of levels or steps in the Unet
+    first_filters : int
+        The number of filters in the first level. Every deeper level
+        will be twice as many filters till a maximum of 512 is reached.
+        Filters will be clipped if smaller than 1 or bigger than 512
+    pool_size : int, Optional. Default: 2
+        Pool size of the MaxPool1D layer, as well as kernel size and
+        strides of the Conv1DTranspose layer
+
+    Returns
+    -------
+    Model as described by the tensorflow.keras Functional API
+
+    Raises
+    ------
+    - ValueError: the number of filters in filters_ls has to be equal
+    to n_levels
+
+    Notes
+    -----
+    - Paper: https://arxiv.org/pdf/1505.04597.pdf
+    - conceptually different approach than in the paper is the use of
+    transposed convolution opposed to a up"-convolution" consisting of
+    bed-of-nails upsampling and a 2x2 convolution
+    - this implementation was influenced by:
+    https://www.tensorflow.org/tutorials/generative/pix2pix
+    """
+    filters = [first_filters]
+    nextfilters = first_filters
+    for _ in range(1, n_levels + 1):
+        nextfilters *= 2
+        filters.append(nextfilters)
+    filters = tf.experimental.numpy.clip(filters, a_min=1, a_max=512).numpy()
+    filters = tf.cast(filters, tf.int32).numpy()
+
+    ldict = {}
+
+    inputs = tf.keras.layers.Input(shape=(input_size, 1))
+
+    # Downsampling through model
+    ldict['x0_pool'], ldict['x0'] = encoder(inputs,
+                                            filters[0],
+                                            name='encode0',
+                                            pool_size=pool_size)
+    for i in range(1, n_levels):
+        ldict['x{}_pool'.format(i)], ldict['x{}'.format(i)] = encoder(
+            input_tensor=ldict['x{}_pool'.format(i - 1)],
+            filters=filters[i],
+            name='encode{}'.format(i),
+            pool_size=pool_size)
+
+    # Center
+    center = twoconv(2 * filters[n_levels - 1], name='two_conv_center')(
+        ldict['x{}_pool'.format(n_levels - 1)])
+
+    # Upsampling through model
+    ldict['y{}'.format(n_levels - 1)] = decoder(
+        input_tensor=center,
+        concat_tensor=ldict['x{}'.format(n_levels - 1)],
+        filters=filters[-1],
+        name='decoder{}'.format(n_levels - 1),
+        kernel_size=pool_size,
+        strides=pool_size)
+
+    for j in range(1, n_levels):
+        ldict['y{}'.format(n_levels - 1 - j)] = decoder(
+            input_tensor=ldict['y{}'.format(n_levels - j)],
+            concat_tensor=ldict['x{}'.format(n_levels - 1 - j)],
+            filters=filters[-1 - j],
+            name='decoder{}'.format(n_levels - 1 - j),
+            kernel_size=pool_size,
+            strides=pool_size)
+
+    # create 'binary' output vector
+    outputs = tf.keras.layers.Conv1D(filters=1,
+                                     kernel_size=1,
+                                     activation='sigmoid')(ldict['y0'])
+
+    print('input - shape:\t', inputs.shape)
+    print('output - shape:\t', outputs.shape)
+
+    unet = tf.keras.Model(inputs=inputs,
+                          outputs=outputs,
+                          name='unet_depth{}'.format(n_levels))
+    return unet
+
+
+class F1Score(tf.keras.metrics.Metric):
+    def __init__(self, name="f1", from_logits=False, **kwargs):
+        super(F1Score, self).__init__(name=name, **kwargs)
+        self.precision = tf.keras.metrics.Precision(from_logits)
+        self.recall = tf.keras.metrics.Recall(from_logits)
+
+    def update_state(self, y_true, y_pred, sample_weight=None):
+        self.precision.update_state(y_true, y_pred, sample_weight)
+        self.recall.update_state(y_true, y_pred, sample_weight)
+
+    def result(self):
+        p = self.precision.result()
+        r = self.recall.result()
+        return (2 * p * r) / (p + r + tf.keras.backend.epsilon())
+
+    def reset_state(self):
+        self.precision.reset_state()
+        self.recall.reset_state()
+
+
+def unet_metrics(metrics_thresholds):
+    """Returns a selection of metrics for model training
+
+    Currently these metrics are True Positives, False Positives, True
+    Negatives, False Negatives, Preciesion, Recall, Accuracy, AUC
+
+    Parameters
+    ----------
+    metrics_thresholds: list of float between 0 and 1
+
+    Returns
+    -------
+    list of metrics
+    """
+    metrics = []
+    for thresh in metrics_thresholds:
+        metrics.append(
+            tf.keras.metrics.TruePositives(name='tp{}'.format(thresh),
+                                           thresholds=thresh))
+        metrics.append(
+            tf.keras.metrics.FalsePositives(name='fp{}'.format(thresh),
+                                            thresholds=thresh))
+        metrics.append(
+            tf.keras.metrics.TrueNegatives(name='tn{}'.format(thresh),
+                                           thresholds=thresh))
+        metrics.append(
+            tf.keras.metrics.FalseNegatives(name='fn{}'.format(thresh),
+                                            thresholds=thresh))
+        metrics.append(
+            tf.keras.metrics.Precision(name='precision{}'.format(thresh),
+                                       thresholds=thresh))
+        metrics.append(
+            tf.keras.metrics.Recall(name='recall{}'.format(thresh),
+                                    thresholds=thresh))
+    metrics.append(
+        tf.keras.metrics.BinaryAccuracy(name='accuracy', threshold=0.5))
+    metrics.append(tf.keras.metrics.AUC(name='auc', num_thresholds=100))
+    metrics.append(F1Score(name='f1'))
+    return metrics
+
+
+def unet_hp_metrics(metrics_thresholds):
+    """Returns unet metrics Tensorboard HParams objects for logging"""
+    metrics = []
+    for thresh in metrics_thresholds:
+        metrics.append(hp.Metric("tp{}".format(thresh)))
+        metrics.append(hp.Metric("fp{}".format(thresh)))
+        metrics.append(hp.Metric("tn{}".format(thresh)))
+        metrics.append(hp.Metric("fn{}".format(thresh)))
+        metrics.append(hp.Metric("precision{}".format(thresh)))
+        metrics.append(hp.Metric("recall{}".format(thresh)))
+    metrics.append(hp.Metric("accuracy{}".format(0.5)))
+    metrics.append(hp.Metric("auc"))
+    metrics.append(hp.Metric("f1"))
+    return metrics

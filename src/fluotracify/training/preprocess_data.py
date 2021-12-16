@@ -1,9 +1,174 @@
 """This module contains preprocessing functions for the training of neural
 networks."""
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import tensorflow as tf
+
+from sklearn.preprocessing import (
+    MaxAbsScaler,
+    MinMaxScaler,
+    Normalizer,
+    PowerTransformer,
+    QuantileTransformer,
+    RobustScaler,
+    StandardScaler,
+    normalize,
+)
+
+
+def tfds_from_pddf(features_df, labels_df, frac_val=None):
+    """TensorFlow Dataset from pandas DataFrame
+
+    This function was created to take pandas DataFrames containing simulated
+    fluorescence traces with artifacts (features) and the ground truth about
+    the artifacts (labels) as an input and create a tf Dataset
+
+    Parameters
+    ----------
+    features_df, labels_df : pandas DataFrames
+        Contain features / labels ordered columnwise in the manner: feature_1,
+        feature_2, ... / label_1, label_2, ...
+    frac_val : float between 0 and 1, optional
+        If set to 0, 1, True, False, or None, the function does not split the
+        dataset further (used for creating test Datasets, default)
+        If between 0 and 1, this fraction of training data is used for
+        validation.
+    Returns
+    -------
+    if frac_val between 0 and 1:
+        dataset_train, dataset_val : TensorFlow Datasets
+            Contains features and labels
+        num_train_examples, num_val_examples : int
+            Number of training and validation examples respectively
+    if frac_val in (0, 1, True, False, None):
+        dataset : TensorFlow Dataset
+            Contains features and labels
+        num_total_examples : int
+            Number of test examples
+    """
+
+    X_tensor = tf.convert_to_tensor(value=features_df.values)
+    X_tensor = tf.transpose(a=X_tensor, perm=[1, 0])
+
+    y_tensor = tf.convert_to_tensor(value=labels_df.values)
+    y_tensor = tf.transpose(a=y_tensor, perm=[1, 0])
+    y_tensor = tf.cast(y_tensor, tf.float32)
+
+    num_total_examples = X_tensor.shape[0]
+    X_tensor = tf.reshape(tensor=X_tensor, shape=(num_total_examples, -1, 1))
+    y_tensor = tf.reshape(tensor=y_tensor, shape=(num_total_examples, -1, 1))
+
+    if frac_val in (0, 1, True, False, None):
+        # if we create a test dataset: no validation set, no shuffling
+        dataset = tf.data.Dataset.from_tensor_slices((X_tensor, y_tensor))
+        dataset = dataset.map(replace_nan)
+
+        print('number of examples: {}\n'.format(num_total_examples))
+        out = (dataset, num_total_examples)
+    elif 0 < frac_val < 1:
+        # for training: split dataset in training and validation set
+        num_val_examples = round(frac_val * num_total_examples)
+        num_train_examples = num_total_examples - num_val_examples
+
+        dataset = tf.data.Dataset.from_tensor_slices((X_tensor, y_tensor))
+        dataset = dataset.map(replace_nan)
+        dataset_train = dataset.take(num_train_examples)
+        dataset_val = dataset.skip(num_train_examples)
+
+        print('number of training examples: {}, number of validation '
+              'examples: {}\n\n------------------------'.format(
+                  num_train_examples, num_val_examples))
+        out = (dataset_train, dataset_val, num_train_examples,
+               num_val_examples)
+
+    else:
+        raise ValueError('frac_val has to be a float between 0 and 1 or '
+                         'in (0, 1, True, False')
+    return out
+
+
+def replace_nan(trace, label):
+    """Part of tf.data pipeline. Replaces nan values with zeros"""
+    trace = tf.where(tf.math.is_nan(trace), tf.zeros_like(trace), trace)
+    label = tf.where(tf.math.is_nan(label), tf.zeros_like(label), label)
+    return trace, label
+
+
+def tf_crop_trace(trace, label, length_delimiter):
+    """Part of tf.data pipeline. Crop trace and label to a maximum length of
+    length_delimiter
+    """
+    trace = trace[:length_delimiter]
+    label = label[:length_delimiter]
+    trace_shape = trace.shape
+    label_shape = label.shape
+    trace.set_shape(trace_shape)
+    label.set_shape(label_shape)
+    return trace, label
+
+
+def tf_scale_trace(trace, label, scaler):
+    """Part of tf.data pipeline. Wrapper function to be able to .map()
+    scale_trace()
+    """
+    trace_shape = trace.shape
+    [trace, ] = tf.py_function(func=scale_trace,
+                               inp=[trace, scaler],
+                               Tout=[tf.float32])
+    trace.set_shape(trace_shape)
+    return trace, label
+
+
+def scale_trace(trace, scaler):
+    """Part of tf.data pipeline. Scale / normalize the input trace.
+
+    Parameters:
+    -----------
+    trace : np.array, pd.DataFrame or tf.Tensor
+        1D-Trace (1 example with 1 feature of length n along axis=0)
+    scaler : ('standard', 'robust', 'maxabs', 'quant_g', 'minmax', l1', 'l2')
+        Selected scalers from sklearn.preprocessing
+
+    Returns:
+    --------
+    trace : np.array
+        Scaled / normalized trace.
+
+    Raises:
+    -------
+    ValueError
+        If the value for scaler is not in ('standard', 'robust', 'maxabs',
+        'quant_g', 'minmax', 'l1', 'l2')
+    """
+    if scaler == 'standard':
+        trace = StandardScaler().fit_transform(trace)
+    elif scaler == 'robust':
+        trace = RobustScaler(quantile_range=(25, 75)).fit_transform(trace)
+    elif scaler == 'maxabs':
+        trace = MaxAbsScaler().fit_transform(trace)
+    elif scaler == 'quant_g':
+        trace = QuantileTransformer(
+            output_distribution='normal').fit_transform(trace)
+    elif scaler == 'minmax':
+        trace = MinMaxScaler().fit_transform(trace)
+    elif scaler in ('l1', 'l2'):
+        trace = normalize(X=trace, norm=scaler, axis=0)
+    else:
+        raise ValueError(
+            'scaler has to be a string. currently supported are:'
+            '"standard", "robust", "maxabs", "quant_g", "minmax", "l1", "l2"')
+    return trace
+
+
+def show_trace(trace, label):
+    """Part of tf.data pipeline. Plot a trace with it's label"""
+    fig, ax1 = plt.subplots()
+    ax1.plot(trace, color='C0', alpha=0.75, label='trace')
+    ax1.twinx().plot(label, color='C1', alpha=0.75, label='label')
+    fig.legend()
+    plt.show()
 
 
 def tfds_from_pddf_for_unet(features_df,
@@ -504,3 +669,94 @@ def min_max_normalize_tensor(tensor, axis):
                                     axis=axis,
                                     keepdims=True)
     return (tensor - tensor_min) / (tensor_max - tensor_min)
+
+
+def make_distributions(X, transpose=False):
+    """Given a pandas DataFrame or pandas Series, this function returns many
+    preprocessed / normalized versions of the data.
+
+    Parameters
+    ----------
+        X : pandas DataFrame or pandas Series
+            Your Data. Notice that normalizations are applied along the
+            columns (each column is assumed as one feature, while one example
+            is one row).
+        transpose: bool, optional
+            Normalizations are applied along columns. If your features are
+            oriented along rows, you can choose this option to transpose your
+            DataFrame.
+
+    Returns:
+    --------
+        distributions : list of tuples
+            each tuple includes
+            first, a string describing the normalization,
+            second, the transformed Data in form of a pandas DataFrame with Data 
+            ordered row-wise. The first tuple is the unscaled data (ordered
+                row-wise).
+            third, the scaler (if there is any)
+    """
+
+    if isinstance(X, pd.Series):
+        X_ind = [X.name]
+        X = np.array(X).reshape(1, -1)
+        X_col = X.columns
+    elif transpose:
+        X_ind = X.columns
+        X_col = X.index
+        X = X.T
+    else:
+        X_ind = X.index
+        X_col = X.columns
+
+    scaler_stand = StandardScaler().fit(X)
+    scaler_minmax = MinMaxScaler().fit(X)
+    scaler_maxabs = MaxAbsScaler().fit(X)
+    scaler_robust = RobustScaler(quantile_range=(25, 75)).fit(X)
+    scaler_powerb = PowerTransformer(method='box-cox').fit(X)
+    scaler_powery = PowerTransformer(method='yeo-johnson').fit(X)
+    scaler_powery.lambdas_ = scaler_powerb.lambdas_
+    scaler_quantu = QuantileTransformer(output_distribution='uniform').fit(X)
+    scaler_quantn = QuantileTransformer(output_distribution='normal').fit(X)
+
+    distributions = [
+        ('Unscaled data', pd.DataFrame(X, columns=X_col, index=X_ind), np.nan),
+        ('Data after standard scaling (z-score)',
+         pd.DataFrame(scaler_stand.transform(X), columns=X_col,
+                      index=X_ind), scaler_stand),
+        ('Data after min-max scaling',
+         pd.DataFrame(scaler_minmax.transform(X), columns=X_col,
+                      index=X_ind), scaler_minmax),
+        ('Data after max-abs scaling',
+         pd.DataFrame(scaler_maxabs.transform(X), columns=X_col,
+                      index=X_ind), scaler_maxabs),
+        ('Data after robust scaling',
+         pd.DataFrame(scaler_robust.transform(X), columns=X_col,
+                      index=X_ind), scaler_robust),
+        ('Data after standard scaling + power transformation (Yeo-Johnson)',
+         pd.DataFrame(scaler_powery.transform(scaler_stand.transform(X)),
+                      columns=X_col,
+                      index=X_ind), scaler_powery),
+        ('Data after power transformation (Box-Cox)',
+         pd.DataFrame(scaler_powerb.transform(X), columns=X_col,
+                      index=X_ind), scaler_powerb),
+        ('Data after quantile transformation (uniform pdf)',
+         pd.DataFrame(scaler_quantu.transform(X), columns=X_col,
+                      index=X_ind), scaler_quantu),
+        ('Data after quantile transformation (gaussian pdf)',
+         pd.DataFrame(scaler_quantn.transform(X), columns=X_col,
+                      index=X_ind), scaler_quantn),
+        ('Data after sample-wise L2 normalizing',
+         pd.DataFrame(Normalizer(norm='l2').transform(X.T),
+                      columns=X_ind,
+                      index=X_col).T, np.nan),
+        ('Data after sample-wise L1 normalizing',
+         pd.DataFrame(Normalizer(norm='l1').transform(X.T),
+                      columns=X_ind,
+                      index=X_col).T, np.nan),
+        ('Data after maximum rescaling',
+         pd.DataFrame(Normalizer(norm='max').transform(X.T),
+                      columns=X_ind,
+                      index=X_col).T, np.nan)
+    ]
+    return distributions
