@@ -386,7 +386,8 @@
        - In my workflow, I put the exported =LabBook.html= into the =data=
          folder. If you move the file, you will have to fix the file links for
          the new location, e.g. via "Find and replace" =M-%= with find:
-         =[[file:./data/= and replace: =[[=
+         - in the org file e.g. find =[[file:./data/= and replace with =[[=
+         - in the html file e.g. find =./data= and replace with =.=
 ** Organization of git
 
 *** remote/origin/main branch:
