@@ -388,7 +388,10 @@
 
          #+end_details
          #+end_example
-         If you want an
+       - If you reference a parameter with an underscore in the name, use the
+         org markdown tricks to style them like code (~==~ or =~~=), otherwise
+         the part after the underscore will be rendered like a subscript:
+         =under_score= vs under_score
      - _Things to do after exporting:_
        - In my workflow, I put the exported =LabBook.html= into the =data=
          folder. If you move the file, you will have to fix the file links for
