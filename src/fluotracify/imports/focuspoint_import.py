@@ -808,7 +808,8 @@ def ptuimport(filepath):
 
     elif TTResultFormat_TTTRRecType == rtPicoHarpT2:
         # ReadPT2
-        return readPT2(inputfile, numRecords, MeasDesc_GlobalResolution)
+        return readPT2(f, file_type['TTResult_NumberOfRecords'],
+                       file_type['MeasDesc_GlobalResolution'])
     elif TTResultFormat_TTTRRecType == rtHydraHarpT3:
         # ReadHT3(1)
         return (ReadHT3(1, f, file_type['TTResult_NumberOfRecords'],
