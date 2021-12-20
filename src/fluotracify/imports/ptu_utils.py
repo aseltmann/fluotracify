@@ -258,7 +258,7 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None, verbose=True):
             try:
                 recordData = "{0:0{1}b}".format(
                     struct.unpack("<I", inputfile.read(4))[0], 32)
-            except:
+            except Exception:
                 raise ValueError('The file ended earlier than expected, at'
                                  'record %d/%d.' % (recNum, numRecords))
 
@@ -293,7 +293,7 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None, verbose=True):
             try:
                 recordData = "{0:0{1}b}".format(
                     struct.unpack("<I", inputfile.read(4))[0], 32)
-            except:
+            except Exception:
                 raise ValueError('The file ended earlier than expected, at'
                                  'record %d/%d.' % (recNum, numRecords))
 
@@ -332,7 +332,7 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None, verbose=True):
             try:
                 recordData = "{0:0{1}b}".format(
                     struct.unpack("<I", inputfile.read(4))[0], 32)
-            except:
+            except Exception:
                 raise ValueError('The file ended earlier than expected, at'
                                  'record %d/%d.' % (recNum, numRecords))
 
@@ -370,7 +370,7 @@ def import_ptu_to_memory(inputfilepath, outputfilepath=None, verbose=True):
             try:
                 recordData = "{0:0{1}b}".format(
                     struct.unpack("<I", inputfile.read(4))[0], 32)
-            except:
+            except Exception:
                 raise ValueError('The file ended earlier than expected, at'
                                  'record %d/%d.' % (recNum, numRecords))
 
@@ -724,7 +724,10 @@ def process_tcspc_data(chan_arr,
     return tcspc, num_of_ch
 
 
-def import_from_ptu(path, photon_count_bin, file_delimiter=None, verbose=False):
+def import_from_ptu(path,
+                    photon_count_bin,
+                    file_delimiter=None,
+                    verbose=False):
     """Import .ptu files containing TCSPC data
     Import a directory of .ptu files containing TCSPC data, convert them to
     time traces and output them in one pandas DataFrame orderd columnwise. This
