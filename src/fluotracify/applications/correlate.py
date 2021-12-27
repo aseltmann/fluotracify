@@ -2,19 +2,12 @@
 dimensional fluorescence traces. Largely based on Dominic Waithe's FOCUSpoint
 """
 
-import cython
 import matplotlib.pyplot as plt
 import numpy as np
 from lmfit import Parameters, fit_report, minimize
 from multipletau import autocorrelate
 
 from fluotracify.applications import equations_to_fit as eq
-
-cimport cython
-cimport numpy as np
-
-DTYPE = np.float64
-ctypedef np.float64_t DTYPE_t
 
 
 def correlate_and_fit(trace, fwhm, diffrate=None, time_step=1., verbose=True):
@@ -88,8 +81,8 @@ def correlate_and_fit(trace, fwhm, diffrate=None, time_step=1., verbose=True):
         if diffrate is not None:
             print('simulated diffusion rate: {}'.format(diffrate))
         print('\n')
-    return diffrate_calc, transit_time, (out[:, 0], out[:, 1],
-                                         fit, residual_var)
+    return diffrate_calc, transit_time, (out[:, 0], out[:,
+                                                        1], fit, residual_var)
 
 
 def correlation_of_arbitrary_trace(ntraces,
@@ -119,11 +112,11 @@ def correlation_of_arbitrary_trace(ntraces,
     for ntraces_index in range(ntraces):
         trace_arb = traces_of_interest.iloc[:length_delimiter, ntraces_index]
 
-        diff_arb, trans_arb, _ = correlate(trace=trace_arb,
-                                           fwhm=fwhm,
-                                           diffrate=None,
-                                           time_step=time_step,
-                                           verbose=False)
+        diff_arb, trans_arb, _ = correlate_and_fit(trace=trace_arb,
+                                                   fwhm=fwhm,
+                                                   diffrate=None,
+                                                   time_step=time_step,
+                                                   verbose=False)
         diffrates_arb.append(diff_arb)
         transit_times_arb.append(trans_arb)
         tracelen_arb.append(len(trace_arb))
@@ -199,12 +192,12 @@ def tttr2xfcs(y, num, NcascStart, NcascEnd, Nsub):
     autotime:
         This is the associated tau time range.
     """
-    dt = np.max(y)-np.min(y)
+    dt = np.max(y) - np.min(y)
     y = np.round(y[:], 0)
     # numshape = num.shape[0]
-    autotime = np.zeros(((NcascEnd+1)*(Nsub+1), 1))
-    auto = np.zeros(
-        ((NcascEnd+1)*(Nsub+1), num.shape[1], num.shape[1])).astype(np.float64)
+    autotime = np.zeros(((NcascEnd + 1) * (Nsub + 1), 1))
+    auto = np.zeros(((NcascEnd + 1) * (Nsub + 1), num.shape[1],
+                     num.shape[1])).astype(np.float64)
     shift = float(0)
     delta = float(1)
 
@@ -218,8 +211,8 @@ def tttr2xfcs(y, num, NcascStart, NcascEnd, Nsub):
         cs = np.cumsum(num, 0).T
 
         # Prepares difference array so starts with zero.
-        diffArr1 = np.zeros((k1shape+1))
-        diffArr2 = np.zeros((k1shape+1))
+        diffArr1 = np.zeros((k1shape + 1))
+        diffArr2 = np.zeros((k1shape + 1))
 
         # Takes the cumulative sum of the unique photon arrivals
         diffArr1[1:] = cs[0, k1].reshape(-1)
@@ -238,14 +231,14 @@ def tttr2xfcs(y, num, NcascStart, NcascEnd, Nsub):
         # diffArr2 = []
         for k in range(0, Nsub):
             shift = shift + delta
-            lag = np.round(shift/delta, 0)
+            lag = np.round(shift / delta, 0)
             # Allows the script to be sped up.
             if j >= NcascStart:
                 # Old method
                 # i1= np.in1d(y,y+lag,assume_unique=True)
                 # i2= np.in1d(y+lag,y,assume_unique=True)
                 # New method, cython
-                i1, i2 = dividAndConquer(y, y+lag, y.shape[0]+1)
+                i1, i2 = dividAndConquer(y, y + lag, y.shape[0] + 1)
                 # If the weights (num) are one as in the first Ncasc round,
                 # then the correlation is equal to np.sum(i1)
                 i1 = np.where(i1.astype(np.bool))[0]
@@ -254,11 +247,11 @@ def tttr2xfcs(y, num, NcascStart, NcascEnd, Nsub):
                 # Faster dot product method, faster than converting to matrix.
                 if i1.size and i2.size:
                     jin = np.dot((num[i1, :]).T, num[i2, :]) / delta
-                    auto[(k+(j)*Nsub), :, :] = jin
-            autotime[k+(j)*Nsub] = shift
+                    auto[(k + (j) * Nsub), :, :] = jin
+            autotime[k + (j) * Nsub] = shift
 
         # Equivalent to matlab round when numbers are %.5
-        y = np.ceil(np.array(0.5*y))
+        y = np.ceil(np.array(0.5 * y))
         delta = 2 * delta
 
     for j in range(0, auto.shape[0]):
@@ -281,9 +274,9 @@ def delayTime2bin(dTimeArr, chanArr, chanNum, winInt):
     tempLastDecayTime = np.max(decayTimeCh).astype(np.int32)
     # We floor this as the last bin is always incomplete and so we discard
     # photons.
-    numBins = np.floor((tempLastDecayTime-firstDecayTime)/winInt)
+    numBins = np.floor((tempLastDecayTime - firstDecayTime) / winInt)
     lastDecayTime = numBins * winInt
-    bins = np.linspace(firstDecayTime, lastDecayTime, int(numBins)+1)
+    bins = np.linspace(firstDecayTime, lastDecayTime, int(numBins) + 1)
     photonsInBin, jnk = np.histogram(decayTimeCh, bins)
     # bins are valued as half their span.
     decayScale = bins[:-1] + (winInt / 2)
@@ -291,23 +284,16 @@ def delayTime2bin(dTimeArr, chanArr, chanNum, winInt):
     return list(photonsInBin), list(decayScale)
 
 
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
 def dividAndConquer(arr1b, arr2b, arrLength):
     """divide and conquer fast intersection algorithm. Waithe D 2014"""
-    cdef np.ndarray[DTYPE_t, ndim=1] arr1bool = np.zeros((arrLength-1))
-    cdef np.ndarray[DTYPE_t, ndim=1] arr2bool = np.zeros((arrLength-1))
-    cdef np.ndarray[DTYPE_t, ndim=1] arr1 = arr1b
-    cdef np.ndarray[DTYPE_t, ndim=1] arr2 = arr2b
-    cdef int arrLen
+    arr1bool = np.zeros((arrLength - 1))
+    arr2bool = np.zeros((arrLength - 1))
+    arr1 = arr1b
+    arr2 = arr2b
     arrLen = arrLength
-    cdef int i
     i = 0
-    cdef int j
     j = 0
-
-    while(i < arrLen - 1 and j < arrLen - 1):
+    while (i < arrLen - 1 and j < arrLen - 1):
         if (arr1[i] < arr2[j]):
             i += 1
         elif (arr2[j] < arr1[i]):
@@ -317,3 +303,43 @@ def dividAndConquer(arr1b, arr2b, arrLength):
             arr2bool[j] = 1
             i += 1
     return arr1bool, arr2bool
+
+
+def photonCountingStats(timeSeries, timeSeriesScale):
+    """returns counting statistics
+
+    Notes
+    -----
+    - code is adopted from Dominic Waithe's Focuspoint package:
+    https://github.com/dwaithe/FCS_point_correlator/blob/master/focuspoint/correlation_objects.py"""
+    unit = timeSeriesScale[-1] / timeSeriesScale.__len__()
+    # Converts to counts per
+    kcount_CH = np.average(timeSeries)
+    # This is the unnormalised intensity count for int_time duration (the first
+    # moment)
+    raw_count = np.average(timeSeries)
+    var_count = np.var(timeSeries)
+
+    brightnessNandBCH = (((var_count - raw_count) / (raw_count)) /
+                         (float(unit)))
+    if (var_count - raw_count) == 0:
+        numberNandBCH = 0
+    else:
+        numberNandBCH = (raw_count**2 / (var_count - raw_count))
+    return kcount_CH, brightnessNandBCH, numberNandBCH
+
+
+def calc_coincidence_value(timeSeries1, timeSeries2):
+    N1 = np.bincount((np.array(timeSeries1)).astype(np.int64))
+    N2 = np.bincount((np.array(timeSeries2)).astype(np.int64))
+
+    n = max(N1.shape[0], N2.shape[0])
+    NN1 = np.zeros(n)
+    NN2 = np.zeros(n)
+    NN1[:N1.shape[0]] = N1
+    NN2[:N2.shape[0]] = N2
+    N1 = NN1
+    N2 = NN2
+
+    CV = (np.sum(N1 * N2) / (np.sum(N1) * np.sum(N2))) * n
+    return CV
