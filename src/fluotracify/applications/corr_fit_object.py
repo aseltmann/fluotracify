@@ -97,18 +97,12 @@ class picoObject():
                                      out["dTimeArr"], out["resolution"])
                 # Remove Overflow and Markers, they are not handled at their
                 # moment.
-                self.subChanArr = np.array([
-                    i for i in self.subChanArr
-                    if isinstance(i, tuple) is not tuple
-                ])
-                self.trueTimeArr = np.array([
-                    i for i in self.trueTimeArr
-                    if isinstance(i, tuple) is not tuple
-                ])
-                self.dTimeArr = np.array([
-                    i for i in self.dTimeArr
-                    if isinstance(i, tuple) is not tuple
-                ])
+                self.subChanArr = np.array(
+                    [i for i in self.subChanArr if not isinstance(i, tuple)])
+                self.trueTimeArr = np.array(
+                    [i for i in self.trueTimeArr if not isinstance(i, tuple)])
+                self.dTimeArr = np.array(
+                    [i for i in self.dTimeArr if not isinstance(i, tuple)])
             # out = ptuimport(self.filepath)
             # if out is not False:
             #     (self.subChanArr, self.trueTimeArr, self.dTimeArr,
