@@ -18,6 +18,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 import copy
 import lmfit
+import logging
 import os
 import time
 from fluotracify.applications import correlate
@@ -30,6 +31,8 @@ from fluotracify.imports import (asc_utils as asc, csv_utils as csvu, pt2_utils
                                  spc_utils as spc)
 
 import numpy as np
+
+logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.DEBUG)
 
 
 class picoObject():
@@ -49,7 +52,8 @@ class picoObject():
 
         """
     def __init__(self, filepath, par_obj, fit_obj):
-        # parameter object and fit object. If
+        # parameter object and fit object.
+        logging.debug('Start CorrObj creation.')
         self.par_obj = par_obj
         self.fit_obj = fit_obj
         self.type = 'mainObject'
@@ -67,15 +71,22 @@ class picoObject():
         self.unqID = self.par_obj.numOfLoaded
         self.objId = []
         self.plotOn = True
-        self.importData()
 
-    def importData(self):
         self.NcascStart = self.par_obj.NcascStart
         self.NcascEnd = self.par_obj.NcascEnd
         self.Nsub = self.par_obj.Nsub
         self.winInt = self.par_obj.winInt
         self.photonCountBin = 25  # self.par_obj.photonCountBin
 
+        self.importData()
+        self.prepareChannels()
+        self.getPhotonDecay()
+        self.getTimeSeries()
+        self.getPhotonCountingStats()
+        # self.getCrossAndAutoCorrelation()
+        self.dTimeInfo()
+
+    def importData(self):
         # file import
         if self.ext == 'spc':
             (self.subChanArr, self.trueTimeArr, self.dTimeArr,
@@ -111,8 +122,6 @@ class picoObject():
                 self.par_obj.data.pop(-1)
                 self.par_obj.objectRef.pop(-1)
                 self.exit = True
-                return
-
         elif self.ext == 'csv':
             (self.subChanArr, self.trueTimeArr, self.dTimeArr,
              self.resolution) = csvu.csvimport(self.filepath)
@@ -122,12 +131,12 @@ class picoObject():
                 self.par_obj.data.pop(-1)
                 self.par_obj.objectRef.pop(-1)
                 self.exit = True
-                return
-
         else:
             self.exit = True
-            return
+        logging.debug('Finished import.')
+        return
 
+    def prepareChannels(self):
         if self.type == 'subObject':
             self.subArrayGeneration(self.xmin, self.xmax)
 
@@ -145,21 +154,14 @@ class picoObject():
         else:
             self.numOfCH = self.ch_present.__len__()
 
-        # Finds the numbers which address the channels.
         print('numOfCH', self.numOfCH, self.ch_present)
+        logging.debug('Finished prepareChannels()')
+
+    def getPhotonDecay(self):
         self.photonDecay = []
         self.decayScale = []
-        self.timeSeries = []
-        self.timeSeriesScale = []
-        self.kcount = []
-        self.brightnessNandB = []
-        self.numberNandB = []
         self.photonDecayMin = []
         self.photonDecayNorm = []
-
-        print(
-            np.array(self.trueTimeArr) / 1000000, np.array(self.subChanArr),
-            self.ch_present[i], self.photonCountBin)
         for i in range(0, self.numOfCH):
             photonDecay, decayScale = correlate.delayTime2bin(
                 np.array(self.dTimeArr), np.array(self.subChanArr),
@@ -176,21 +178,34 @@ class picoObject():
             else:
                 self.photonDecayMin.append(0)
                 self.photonDecayNorm.append(0)
+        logging.debug('Finished getPhotonDecay()')
 
+    def getTimeSeries(self):
+        self.timeSeries = []
+        self.timeSeriesScale = []
+        for i in range(0, self.numOfCH):
             timeSeries, timeSeriesScale = correlate.delayTime2bin(
                 np.array(self.trueTimeArr) / 1000000,
                 np.array(self.subChanArr), self.ch_present[i],
                 self.photonCountBin)
             self.timeSeries.append(timeSeries)
             self.timeSeriesScale.append(timeSeriesScale)
+        logging.debug('Finished getTimeSeries()')
 
+    def getPhotonCountingStats(self):
+        self.kcount = []
+        self.brightnessNandB = []
+        self.numberNandB = []
+        for i in range(0, self.numOfCH):
             (kcount, brightnessNandB,
              numberNandB) = correlate.photonCountingStats(
                  self.timeSeries[i], self.timeSeriesScale[i])
             self.kcount.append(kcount)
             self.brightnessNandB.append(brightnessNandB)
             self.numberNandB.append(numberNandB)
+        logging.debug('Finished getPhotonCountingStats()')
 
+    def getCrossAndAutoCorrelation(self):
         # Correlation combinations.
         # Provides ordering of files and reduces repetition.
         corr_array = []
@@ -203,6 +218,9 @@ class picoObject():
                 corr_array[i].append([])
 
         for i, j in corr_comb:
+            logging.debug('Starting first crossAndAuto() with ch_present[i]'
+                          ' {} and ch_present[j] {}'.format(
+                              self.ch_present[i], self.ch_present[j]))
             corr_fn = self.crossAndAuto(
                 np.array(self.trueTimeArr), np.array(self.subChanArr),
                 [self.ch_present[i], self.ch_present[j]])
@@ -214,6 +232,10 @@ class picoObject():
             corr_array[j][i] = corr_fn[:, 1, 0].reshape(-1)
 
         if self.numOfCH == 1:
+            logging.debug('Starting second crossAndAuto() with ch_present[i]'
+                          ' {} and ch_present[j] {}'.format(
+                              self.ch_present[i], self.ch_present[j]))
+            # FIXME: What is i and j here??
             corr_fn = self.crossAndAuto(
                 np.array(self.trueTimeArr), np.array(self.subChanArr),
                 [self.ch_present[i], self.ch_present[j]])
@@ -226,7 +248,9 @@ class picoObject():
         # Calculates the Auto and Cross-correlation functions.
         # self.crossAndAuto(np.array(self.trueTimeArr), np.array(
         # self.subChanArr), np.array(self.ch_present)[0:2])
+        logging.debug('Finished crossAndAuto()')
 
+    def getFitObj(self):
         if self.fit_obj is not None:
             self.indx_arr = []
             # I order them this way, for systematic ordering in the plotting.
@@ -273,7 +297,7 @@ class picoObject():
                     else:
                         self.objId[c].name += '_Cross_Corr'
 
-                self.objId[c].autoNorm = corr_array[i][j]
+                self.objId[c].autoNorm = self.autoNorm[i][j]
                 self.objId[c].autotime = np.array(self.autotime).reshape(-1)
                 self.objId[c].param = copy.deepcopy(self.fit_obj.def_param)
                 self.objId[c].max = np.max(self.objId[c].autoNorm)
@@ -289,6 +313,7 @@ class picoObject():
                 self.CV.append(self.objId[c].CV)
             self.fit_obj.fill_series_list()
 
+    def dTimeInfo(self):
         self.dTimeMin = 0
         self.dTimeMax = np.max(self.dTimeArr)
         self.subDTimeMin = self.dTimeMin
@@ -297,6 +322,7 @@ class picoObject():
         # del self.subChanArr
         # del self.trueTimeArr
         del self.dTimeArr
+        logging.debug('Processed dTimeInfo()')
 
     def crossAndAuto(self, trueTimeArr, subChanArr, channelsToUse):
         # For each channel we loop through and find only those in the correct
@@ -323,9 +349,11 @@ class picoObject():
 
         self.count0 = np.sum(num[:, 0])
         self.count1 = np.sum(num[:, 1])
+        logging.debug('Finished crossAndAuto - preparation')
         t1 = time.time()
         auto, self.autotime = correlate.tttr2xfcs(y, num, self.NcascStart,
                                                   self.NcascEnd, self.Nsub)
+        logging.debug('Finished crossAndAuto - tttr2xfcs().')
         t2 = time.time()
 
         # Normalisation of the TCSPC data:
@@ -341,6 +369,7 @@ class picoObject():
                                  (self.count1 * self.count0)) - 1
             autoNorm[:, 0, 1] = ((auto[:, 0, 1] * maxY) /
                                  (self.count0 * self.count1)) - 1
+        logging.debug('Finished crossAndAuto()')
         return autoNorm
 
     def subArrayGeneration(self, xmin, xmax):
@@ -495,7 +524,7 @@ class corrObject():
                 if self.param[art]['to_show'] is True and (
                         self.param[art]['calc'] is False):
                     aver_data[art] = []
-            for i in range(0, num_of_straps):
+            for _ in range(num_of_straps):
                 # Bootstrap our sample, but remove duplicates.
                 boot_ind = np.random.choice(np.arange(0, lim_data.shape[0]),
                                             size=lim_data.shape[0],
