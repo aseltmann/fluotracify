@@ -17,10 +17,14 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 """
 
 import copy
+import datetime
 import lmfit
 import logging
+import multipletau
 import os
 import time
+
+from pathlib import Path
 from fluotracify.applications import correlate
 from fluotracify.applications import (fitting_methods_SE as SE,
                                       fitting_methods_GS as GS,
@@ -29,13 +33,16 @@ from fluotracify.applications import (fitting_methods_SE as SE,
 from fluotracify.imports import (asc_utils as asc, csv_utils as csvu, pt2_utils
                                  as pt2, pt3_utils as pt3, ptu_utils as ptu,
                                  spc_utils as spc)
+from fluotracify.training import preprocess_data as ppd
 
 import numpy as np
 
-logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.DEBUG)
+logging.basicConfig(format='%(asctime)s - %(message)s')
+log = logging.getLogger(__name__)
+log.setLevel(logging.DEBUG)
 
 
-class picoObject():
+class PicoObject():
     """This is the class which holds the .pt3 data and parameters
 
         Returns
@@ -51,20 +58,18 @@ class picoObject():
             Time resolution in seconds? (e.g. 1.6e-5 means 160 ms(???))
 
         """
-    def __init__(self, filepath, par_obj, fit_obj):
+    def __init__(self, input_file, par_obj):
         # parameter object and fit object.
-        logging.debug('Start CorrObj creation.')
+        log.debug('Start CorrObj creation.')
         self.par_obj = par_obj
-        self.fit_obj = fit_obj
         self.type = 'mainObject'
 
         # self.PIE = 0
-        self.filepath = str(filepath)
+        self.filepath = Path(input_file)
         self.nameAndExt = os.path.basename(self.filepath).split('.')
         self.name = self.nameAndExt[0]
         self.ext = self.nameAndExt[-1]
-
-        self.par_obj.data.append(filepath)
+        self.par_obj.data.append(input_file)
         self.par_obj.objectRef.append(self)
 
         # Imports pt3 file format to object.
@@ -75,8 +80,23 @@ class picoObject():
         self.NcascStart = self.par_obj.NcascStart
         self.NcascEnd = self.par_obj.NcascEnd
         self.Nsub = self.par_obj.Nsub
-        self.winInt = self.par_obj.winInt
-        self.photonCountBin = 25  # self.par_obj.photonCountBin
+        # 1000 gives microseconds, 1000000 gives ms
+        self.timeSeriesDividend = 1000
+        self.CV = []
+
+        # used for photon decay
+        self.photonLifetimeBin = self.par_obj.photonLifetimeBin
+        # used for time series (25)
+        self.photonCountBin = self.par_obj.photonCountBin
+
+        # define dictionary variables for methods
+        (self.photonDecay, self.decayScale, self.photonDecayMin,
+         self.photonDecayNorm, self.kcount, self.brightnessNandB,
+         self.numberNandB, self.timeSeries, self.autoNorm, self.autotime,
+         self.timeSeriesScale, self.timeSeriesSize, self.predictions,
+         self.subChanArr, self.trueTimeArr,
+         self.trueTimeWeights) = ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {},
+                                  {}, {}, {}, {}, {})
 
         self.importData()
         self.prepareChannels()
@@ -88,30 +108,32 @@ class picoObject():
 
     def importData(self):
         # file import
+        key = f'{self.name}'
         if self.ext == 'spc':
-            (self.subChanArr, self.trueTimeArr, self.dTimeArr,
+            (self.subChanArr[key], self.trueTimeArr[key], self.dTimeArr,
              self.resolution) = spc.spc_file_import(self.filepath)
         elif self.ext == 'asc':
-            (self.subChanArr, self.trueTimeArr, self.dTimeArr,
+            (self.subChanArr[key], self.trueTimeArr[key], self.dTimeArr,
              self.resolution) = asc.asc_file_import(self.filepath)
         elif self.ext == 'pt2':
-            (self.subChanArr, self.trueTimeArr, self.dTimeArr,
+            (self.subChanArr[key], self.trueTimeArr[key], self.dTimeArr,
              self.resolution) = pt2.pt2import(self.filepath)
         elif self.ext == 'pt3':
-            (self.subChanArr, self.trueTimeArr, self.dTimeArr,
+            (self.subChanArr[key], self.trueTimeArr[key], self.dTimeArr,
              self.resolution) = pt3.pt3import(self.filepath)
         elif self.ext == 'ptu':
-            out, _, _, _ = ptu.import_ptu(self.filepath)
+            (out, self.ptu_tags, self.ptu_num_records,
+             self.glob_res) = ptu.import_ptu(self.filepath)
             if out is not False:
-                (self.subChanArr, self.trueTimeArr, self.dTimeArr,
+                (self.subChanArr[key], self.trueTimeArr[key], self.dTimeArr,
                  self.resolution) = (out["chanArr"], out["trueTimeArr"],
                                      out["dTimeArr"], out["resolution"])
-                # Remove Overflow and Markers, they are not handled at their
+                # Remove Overflow and Markers; they are not handled at the
                 # moment.
-                self.subChanArr = np.array(
-                    [i for i in self.subChanArr if not isinstance(i, tuple)])
-                self.trueTimeArr = np.array(
-                    [i for i in self.trueTimeArr if not isinstance(i, tuple)])
+                self.subChanArr[key] = np.array([i for i in self.subChanArr[
+                    key] if not isinstance(i, tuple)])
+                self.trueTimeArr[key] = np.array([i for i in self.trueTimeArr[
+                    key] if not isinstance(i, tuple)])
                 self.dTimeArr = np.array(
                     [i for i in self.dTimeArr if not isinstance(i, tuple)])
             # out = ptuimport(self.filepath)
@@ -123,18 +145,17 @@ class picoObject():
                 self.par_obj.objectRef.pop(-1)
                 self.exit = True
         elif self.ext == 'csv':
-            (self.subChanArr, self.trueTimeArr, self.dTimeArr,
+            (self.subChanArr[key], self.trueTimeArr[key], self.dTimeArr,
              self.resolution) = csvu.csvimport(self.filepath)
             # If the file is empty.
-            if self.subChanArr is None:
+            if self.subChanArr[key] is None:
                 # Undoes any preparation of resource.
                 self.par_obj.data.pop(-1)
                 self.par_obj.objectRef.pop(-1)
                 self.exit = True
         else:
             self.exit = True
-        logging.debug('Finished import.')
-        return
+        log.debug('Finished import.')
 
     def prepareChannels(self):
         if self.type == 'subObject':
@@ -144,174 +165,194 @@ class picoObject():
         self.color = self.par_obj.colors[self.unqID % len(self.par_obj.colors)]
 
         # How many channels there are in the files.
-        self.ch_present = np.sort(np.unique(np.array(self.subChanArr)))
+        self.ch_present = np.sort(np.unique(np.array(
+            self.subChanArr[f'{self.name}'])))
         for i in range(self.ch_present.__len__() - 1, -1, -1):
             if self.ch_present[i] > 8:
                 self.ch_present = np.delete(self.ch_present, i)
 
-        if self.ext == 'pt3' or self.ext == 'ptu' or self.ext == 'pt2':
+        if self.ext in ('pt3', 'ptu', 'pt2'):
             self.numOfCH = self.ch_present.__len__()
         else:
             self.numOfCH = self.ch_present.__len__()
 
         print('numOfCH', self.numOfCH, self.ch_present)
-        logging.debug('Finished prepareChannels()')
 
-    def getPhotonDecay(self):
-        self.photonDecay = []
-        self.decayScale = []
-        self.photonDecayMin = []
-        self.photonDecayNorm = []
-        for i in range(0, self.numOfCH):
-            photonDecay, decayScale = correlate.delayTime2bin(
-                np.array(self.dTimeArr), np.array(self.subChanArr),
-                self.ch_present[i], self.winInt)
-            self.photonDecay.append(photonDecay)
-            self.decayScale.append(decayScale)
+        self.indx_arr = []
+        # I order them this way, for systematic ordering in the plotting.
+        # All the plots are included. First the auto, then the cross.
+        for i in range(self.numOfCH):
+            self.indx_arr.append([i, i])
+            for j in range(self.numOfCH):
+                if i != j:
+                    self.indx_arr.append([i, j])
+
+        log.debug('Finished prepareChannels()')
+
+    def getPhotonDecay(self, photonLifetimeBin=None, name=None):
+        """Gets photon decay curve from TCSPC data, specifically lifetimes
+
+        Parameters
+        ----------
+        photonLifetimeBin : int
+            bin for calculation of photon decay. Photon lifetimes in the
+            time interval x to x+photonLifetimeBin are aggregated
+        name : optional, str
+            The photon decay and scale are added to self via a dictionary with
+            the key "name". If None, the current time is taken as a key.
+
+        Returns
+        -------
+        Nothing, but assigns to self:
+            self.photonDecay : dict of dict of list
+                - 1st dict a wrapper from name
+                - 2nd dict for each given channel:
+                    - the original list of binned lifetimes
+                    - the list of binned lifetimes, substracted by the minimum
+                      lifetime
+                    - the list of binned lifetimes, minmax-normalized
+            self.decayScale : dict of dict of list
+                - 1st dict a wrapper from name
+                - 2nd dict for each given channel:
+                    - the list of the centered value for each bin
+        """
+        if photonLifetimeBin is not None:
+            self.photonLifetimeBin = int(photonLifetimeBin)
+        name = f'{self.name}' if name is None else f'{name}'
+        self.photonDecay[name] = phd = {}
+        self.decayScale[name] = dsc = {}
+
+        for i in range(self.numOfCH):
+            key = f'CH{i}_BIN{self.photonLifetimeBin}'
+            photonDecay, decayScale = self.time2bin(
+                np.array(self.dTimeArr), np.array(self.subChanArr[name]),
+                self.ch_present[i], self.photonLifetimeBin)
+            phd[f'Orig_{key}'] = np.array(photonDecay)
+            dsc[key] = decayScale
 
             # Normalisation of the decay functions.
-            if np.sum(self.photonDecay[i]) > 0:
-                self.photonDecayMin.append(self.photonDecay[i] -
-                                           np.min(self.photonDecay[i]))
-                self.photonDecayNorm.append(self.photonDecayMin[i] /
-                                            np.max(self.photonDecayMin[i]))
+            if np.sum(photonDecay) > 0:
+                phd[f'Min_{key}'] = (
+                    photonDecay - np.min(photonDecay))
+                phd[f'Norm_{key}'] = (
+                    phd[f'Min_{key}'] / np.max(phd[f'Min_{key}']))
             else:
-                self.photonDecayMin.append(0)
-                self.photonDecayNorm.append(0)
-        logging.debug('Finished getPhotonDecay()')
+                (phd[f'Min_{key}'], phd[f'Norm_{key}']) = 0, 0
+        log.debug('Finished getPhotonDecay() with name %s', name)
 
-    def getTimeSeries(self):
-        self.timeSeries = []
-        self.timeSeriesScale = []
-        for i in range(0, self.numOfCH):
-            timeSeries, timeSeriesScale = correlate.delayTime2bin(
-                np.array(self.trueTimeArr) / 1000000,
-                np.array(self.subChanArr), self.ch_present[i],
+    def getTimeSeries(self,
+                      photonCountBin=None,
+                      truetime_name=None,
+                      timeseries_name=None):
+        """Gets time series from TCSPC data, specifically photon arrival times
+
+        Parameters
+        ----------
+        photonCountBin : optional, int
+            bin for calculation of time series. Photons arriving in the
+            time interval x to x+photonCountBin are aggregated
+        name : optional, str
+            The time series and time series scale are added to self via a
+            dictionary with the key "name". If None, the current time is taken
+            as a key.
+        """
+        # update if method is called again with new parameters
+        name = f'{self.name}' if truetime_name is None else f'{truetime_name}'
+        ts_name = f'{self.name}' if timeseries_name is None else (
+            f'{timeseries_name}')
+        if name not in self.trueTimeArr:
+            raise ValueError(f'key={name} is no valid key to dictionary'
+                             ' self.trueTimeArr.')
+        self.timeSeries[ts_name] = tser = {}
+        self.timeSeriesScale[ts_name] = tss = {}
+        if photonCountBin is not None:
+            self.photonCountBin = int(photonCountBin)
+
+        for i in range(self.numOfCH):
+            key = f'CH{self.ch_present[i]}_BIN{self.photonCountBin}'
+            timeSeries, timeSeriesScale = self.time2bin(
+                np.array(self.trueTimeArr[name]) / self.timeSeriesDividend,
+                np.array(self.subChanArr[name]), self.ch_present[i],
                 self.photonCountBin)
-            self.timeSeries.append(timeSeries)
-            self.timeSeriesScale.append(timeSeriesScale)
-        logging.debug('Finished getTimeSeries()')
+            tser[key] = timeSeries
+            tss[key] = timeSeriesScale
+        log.debug('Finished getTimeSeries() with truetime_name %s'
+                  ', timeseries_name %s', name, ts_name)
 
-    def getPhotonCountingStats(self):
-        self.kcount = []
-        self.brightnessNandB = []
-        self.numberNandB = []
-        for i in range(0, self.numOfCH):
+    def getPhotonCountingStats(self, name=None):
+        """Gets photon counting statistics from time series
+
+        Parameters
+        ----------
+        name : str
+            Key to get time series and time series scale from dictionary
+        """
+        name = f'{self.name}' if name is None else f'{name}'
+        if name not in self.timeSeries:
+            raise ValueError(f'key={name} is not a valid key for the'
+                             'dictionary self.timeSeries')
+        (self.kcount[f'{name}'], self.brightnessNandB[f'{name}'],
+         self.numberNandB[f'{name}']) = {}, {}, {}
+
+        for i in range(self.numOfCH):
+            key = f'CH{self.ch_present[i]}_BIN{self.photonCountBin}'
+
             (kcount, brightnessNandB,
              numberNandB) = correlate.photonCountingStats(
-                 self.timeSeries[i], self.timeSeriesScale[i])
-            self.kcount.append(kcount)
-            self.brightnessNandB.append(brightnessNandB)
-            self.numberNandB.append(numberNandB)
-        logging.debug('Finished getPhotonCountingStats()')
+                 self.timeSeries[f'{name}'][key],
+                 self.timeSeriesScale[f'{name}'][key])
+            self.kcount[f'{name}'][key] = kcount
+            self.brightnessNandB[f'{name}'][key] = brightnessNandB
+            self.numberNandB[f'{name}'][key] = numberNandB
+        log.debug('Finished getPhotonCountingStats() with name: %s', name)
 
-    def getCrossAndAutoCorrelation(self):
+    def getCrossAndAutoCorrelation(self, name=None):
+        """Gets autocorrelation of photons and crosscorrelation if there are
+        more than 1 Channel
+
+        Parameters
+        ----------
+        name : str
+        """
+        name = f'{self.name}' if name is None else f'{name}'
+        self.autoNorm[name] = an = {}
         # Correlation combinations.
         # Provides ordering of files and reduces repetition.
         corr_array = []
         corr_comb = []
-        for i in range(0, self.numOfCH):
+        for i in range(self.numOfCH):
             corr_array.append([])
-            for j in range(0, self.numOfCH):
+            for j in range(self.numOfCH):
                 if i < j:
                     corr_comb.append([i, j])
                 corr_array[i].append([])
 
         for i, j in corr_comb:
-            logging.debug('Starting first crossAndAuto() with ch_present[i]'
-                          ' {} and ch_present[j] {}'.format(
-                              self.ch_present[i], self.ch_present[j]))
-            corr_fn = self.crossAndAuto(
-                np.array(self.trueTimeArr), np.array(self.subChanArr),
+            log.debug('Starting first crossAndAuto() with ch_present[i] %s '
+                      'and ch_present[j] %s', self.ch_present[i],
+                      self.ch_present[j])
+            corr_fn, autotime = self.crossAndAuto(
+                np.array(self.trueTimeArr[name]), np.array(self.subChanArr[name]),
                 [self.ch_present[i], self.ch_present[j]])
             if corr_array[i][i] == []:
-                corr_array[i][i] = corr_fn[:, 0, 0].reshape(-1)
+                an[f'CH{i}_CH{i}'] = corr_fn[:, 0, 0].reshape(-1)
             if corr_array[j][j] == []:
-                corr_array[j][j] = corr_fn[:, 1, 1].reshape(-1)
-            corr_array[i][j] = corr_fn[:, 0, 1].reshape(-1)
-            corr_array[j][i] = corr_fn[:, 1, 0].reshape(-1)
+                an[f'CH{j}_CH{j}'] = corr_fn[:, 1, 1].reshape(-1)
+            an[f'CH{i}_CH{j}'] = corr_fn[:, 0, 1].reshape(-1)
+            an[f'CH{j}_CH{i}'] = corr_fn[:, 1, 0].reshape(-1)
 
         if self.numOfCH == 1:
-            logging.debug('Starting second crossAndAuto() with ch_present[i]'
-                          ' {} and ch_present[j] {}'.format(
-                              self.ch_present[i], self.ch_present[j]))
+            log.debug('Starting first crossAndAuto() with ch_present[i] %s '
+                      'and ch_present[j] %s', self.ch_present[i],
+                      self.ch_present[j])
             # FIXME: What is i and j here??
-            corr_fn = self.crossAndAuto(
-                np.array(self.trueTimeArr), np.array(self.subChanArr),
+            corr_fn, autotime = self.crossAndAuto(
+                np.array(self.trueTimeArr[name]), np.array(self.subChanArr[name]),
                 [self.ch_present[i], self.ch_present[j]])
-            corr_array[0][0] = corr_fn[:, 0, 0].reshape(-1)
+            an['CH0_CH0'] = corr_fn[:, 0, 0].reshape(-1)
 
-        self.autoNorm = corr_array
-        self.autotime = self.autotime.reshape(-1)
-        self.CV = []
-
-        # Calculates the Auto and Cross-correlation functions.
-        # self.crossAndAuto(np.array(self.trueTimeArr), np.array(
-        # self.subChanArr), np.array(self.ch_present)[0:2])
-        logging.debug('Finished crossAndAuto()')
-
-    def getFitObj(self):
-        if self.fit_obj is not None:
-            self.indx_arr = []
-            # I order them this way, for systematic ordering in the plotting.
-            # All the plots are included. First the auto, then the cross.
-            for i in range(0, self.numOfCH):
-                self.indx_arr.append([i, i])
-            for i in range(0, self.numOfCH):
-                for j in range(0, self.numOfCH):
-                    if i != j:
-                        self.indx_arr.append([i, j])
-
-            # If fit object provided then creates fit objects.
-            traces = self.indx_arr.__len__()
-            for c in range(0, traces):
-                i, j = self.indx_arr[c]
-
-                if self.objId.__len__() == c:
-                    corrObj = corrObject(self.filepath, self.fit_obj)
-                    self.objId.append(corrObj.objId)
-                    if self.type == "subObject":
-                        self.objId[
-                            c].parent_name = 'pt FCS tgated -tg0: ' + str(
-                                np.round(self.xmin, 0)) + ' -tg1: ' + str(
-                                    np.round(self.xmax, 0))
-                        self.objId[
-                            c].parent_uqid = 'pt FCS tgated -tg0: ' + str(
-                                np.round(self.xmin, 0)) + ' -tg1: ' + str(
-                                    np.round(self.xmax, 0))
-                    else:
-                        self.objId[c].parent_name = 'point FCS'
-                        self.objId[c].parent_uqid = 'point FCS'
-                    self.fit_obj.objIdArr.append(corrObj.objId)
-                    self.objId[c].param = copy.deepcopy(self.fit_obj.def_param)
-                    self.objId[c].ch_type = str(i + 1) + "_" + str(j + 1)
-                    self.objId[c].prepare_for_fit()
-                    self.objId[c].siblings = None
-                    self.objId[c].item_in_list = False
-                    self.objId[c].name = self.name + '_CH' + str(
-                        self.indx_arr[c][0] +
-                        1) + '_CH' + str(self.indx_arr[c][1] + 1)
-                    if i == j:
-                        self.objId[c].name += '_Auto_Corr'
-                        self.objId[c].kcount = self.kcount[i]
-                    else:
-                        self.objId[c].name += '_Cross_Corr'
-
-                self.objId[c].autoNorm = self.autoNorm[i][j]
-                self.objId[c].autotime = np.array(self.autotime).reshape(-1)
-                self.objId[c].param = copy.deepcopy(self.fit_obj.def_param)
-                self.objId[c].max = np.max(self.objId[c].autoNorm)
-                self.objId[c].min = np.min(self.objId[c].autoNorm)
-                self.objId[c].tmax = np.max(self.objId[c].autotime)
-                self.objId[c].tmin = np.min(self.objId[c].autotime)
-
-                if i != j:
-                    self.objId[c].CV = correlate.calc_coincidence_value(
-                        self.timeSeries[i], self.timeSeries[j])
-                else:
-                    self.objId[c].CV = None
-                self.CV.append(self.objId[c].CV)
-            self.fit_obj.fill_series_list()
+        self.autotime[name] = autotime
+        log.debug('Finished crossAndAuto()')
 
     def dTimeInfo(self):
         self.dTimeMin = 0
@@ -322,7 +363,48 @@ class picoObject():
         # del self.subChanArr
         # del self.trueTimeArr
         del self.dTimeArr
-        logging.debug('Processed dTimeInfo()')
+        log.debug('Processed dTimeInfo()')
+
+    def time2bin(self, time_arr, chan_arr, chan_num, win_int):
+        """A binning method for arrival times (=photon time trace) or for
+        lifetimes (=decay scale)
+
+        Parameters
+        ----------
+        time_arr : np.array or list
+            arrival times or lifetimes to bin
+        chan_arr : np.array or list
+            the channel for each photon arrival time or lifetime in time_arr
+        chan_num : int
+            which channel to choose in chan_arr
+        win_int : int
+            binning window
+
+        Returns
+        -------
+        photons_in_bin : list
+            list of amount of photons in arrival time / lifetime bin
+        bins_scale : list
+            the centers of the bins corresponding to photons_in_bin
+        """
+        time_arr = np.array(time_arr)
+        # This is the point and which each channel is identified.
+        time_ch = time_arr[chan_arr == chan_num]
+        # Find the first and last entry
+        first_time = 0  # np.min(time_ch).astype(np.int32)
+        tmp_last_time = np.max(time_ch).astype(np.int32)
+        # We floor this as the last bin is always incomplete and so we discard
+        # photons.
+        num_bins = np.floor((tmp_last_time - first_time) / win_int)
+        last_time = num_bins * win_int
+        bins = np.linspace(first_time, last_time, int(num_bins) + 1)
+        photons_in_bin, _ = np.histogram(time_ch, bins)
+        # bins are valued as half their span.
+        bins_scale = bins[:-1] + (win_int / 2)
+        # bins_scale =  np.arange(0,decayTimeCh.shape[0])
+        log.debug('Finished time2bin. last_time=%s, num_bins=%s',
+                  last_time, num_bins)
+        return list(photons_in_bin), list(bins_scale)
 
     def crossAndAuto(self, trueTimeArr, subChanArr, channelsToUse):
         # For each channel we loop through and find only those in the correct
@@ -339,6 +421,8 @@ class picoObject():
             y = trueTimeArr[indices]
             validPhotons = subChanArr[indices]
 
+        log.debug('crossAndAuto: sum(indeces)=%s', sum(indices))
+
         # Creates boolean for photon events in either channel.
         num = np.zeros((validPhotons.shape[0], 2))
         num[:, 0] = (np.array([np.array(validPhotons) == channelsToUse[0]
@@ -349,15 +433,14 @@ class picoObject():
 
         self.count0 = np.sum(num[:, 0])
         self.count1 = np.sum(num[:, 1])
-        logging.debug('Finished crossAndAuto - preparation')
-        t1 = time.time()
-        auto, self.autotime = correlate.tttr2xfcs(y, num, self.NcascStart,
-                                                  self.NcascEnd, self.Nsub)
-        logging.debug('Finished crossAndAuto - tttr2xfcs().')
-        t2 = time.time()
+        log.debug('crossAndAuto: finished preparation')
+
+        auto, autotime = correlate.tttr2xfcs(y, num, self.NcascStart,
+                                             self.NcascEnd, self.Nsub)
+        log.debug('Finished crossAndAuto - tttr2xfcs().')
 
         # Normalisation of the TCSPC data:
-        maxY = np.ceil(max(self.trueTimeArr))
+        maxY = np.ceil(max(trueTimeArr))
         autoNorm = np.zeros((auto.shape))
         autoNorm[:, 0, 0] = ((auto[:, 0, 0] * maxY) /
                              (self.count0 * self.count0)) - 1
@@ -369,8 +452,8 @@ class picoObject():
                                  (self.count1 * self.count0)) - 1
             autoNorm[:, 0, 1] = ((auto[:, 0, 1] * maxY) /
                                  (self.count0 * self.count1)) - 1
-        logging.debug('Finished crossAndAuto()')
-        return autoNorm
+        log.debug('Finished crossAndAuto()')
+        return autoNorm, autotime
 
     def subArrayGeneration(self, xmin, xmax):
         if (xmax < xmin):
@@ -382,245 +465,354 @@ class picoObject():
         # time
         photonInd = np.logical_and(self.dTimeArr >= xmin,
                                    self.dTimeArr <= xmax).astype(np.bool)
-        self.subChanArr[np.invert(photonInd).astype(np.bool)] = 16
-        return
+        self.subChanArr[f'{self.name}'][
+            np.invert(photonInd).astype(np.bool)] = 16
 
+    def predictTimeSeries(self, model, scaler, name=None):
+        """Takes a timetrace, performs preprocessing, and applies a compiled
+        unet for artifact detection
 
-class corrObject():
-    def __init__(self, filepath, parentFn):
-        # the container for the object.
-        self.parentFn = parentFn
-        self.type = 'corrObject'
-        self.filepath = str(filepath)
-        self.nameAndExt = os.path.basename(self.filepath).split('.')
-        self.name = self.nameAndExt[0]
-        self.ext = self.nameAndExt[-1]
-        self.autoNorm = []
-        self.autotime = []
-        self.model_autoNorm = []
-        self.model_autotime = []
-        self.parent_name = 'Not known'
-        self.file_name = 'Not known'
-        self.datalen = []
-        self.objId = self
-        self.param = []
-        self.goodFit = True
-        self.fitted = False
-        self.checked = False
-        self.clicked = False
-        self.toFit = False
-        self.kcount = None
-        self.filter = False
-        self.series_list_id = None
+        Parameters
+        ----------
+        model : tf.keras.Functional model
+        scaler : ('standard', 'robust', 'maxabs', 'quant_g', 'minmax', l1',
+                  'l2')
+            Scales / normalizes the input trace. Check with which scaler the
+            training data of the model was scaled and use the same one.
 
-    def prepare_for_fit(self):
-        if self.parentFn.ch_check_ch1.isChecked() is True and (
-                self.ch_type == '1_1' or self.ch_type == 0):
-            self.toFit = True
-        elif self.parentFn.ch_check_ch2.isChecked() is True and (
-                self.ch_type == '2_2' or self.ch_type == 1):
-            self.toFit = True
-        elif self.parentFn.ch_check_ch3.isChecked() is True and (self.ch_type
-                                                                 == '3_3'):
-            self.toFit = True
-        elif self.parentFn.ch_check_ch4.isChecked() is True and (self.ch_type
-                                                                 == '4_4'):
-            self.toFit = True
-        elif self.parentFn.ch_check_ch12.isChecked() is True and (
-                self.ch_type == '1_2' or self.ch_type == 2):
-            self.toFit = True
-        elif self.parentFn.ch_check_ch13.isChecked() is True and (self.ch_type
-                                                                  == '1_3'):
-            self.toFit = True
-        elif self.parentFn.ch_check_ch14.isChecked() is True and (self.ch_type
-                                                                  == '1_4'):
-            self.toFit = True
-        elif self.parentFn.ch_check_ch23.isChecked() is True and (self.ch_type
-                                                                  == '2_3'):
-            self.toFit = True
-        elif self.parentFn.ch_check_ch24.isChecked() is True and (self.ch_type
-                                                                  == '2_4'):
-            self.toFit = True
-        elif self.parentFn.ch_check_ch34.isChecked() is True and (self.ch_type
-                                                                  == '3_4'):
-            self.toFit = True
-        elif self.parentFn.ch_check_ch21.isChecked() is True and (
-                self.ch_type == '2_1' or self.ch_type == 3):
-            self.toFit = True
-        elif self.parentFn.ch_check_ch31.isChecked() is True and (self.ch_type
-                                                                  == '3_1'):
-            self.toFit = True
-        elif self.parentFn.ch_check_ch41.isChecked() is True and (self.ch_type
-                                                                  == '4_1'):
-            self.toFit = True
-        elif self.parentFn.ch_check_ch32.isChecked() is True and (self.ch_type
-                                                                  == '3_2'):
-            self.toFit = True
-        elif self.parentFn.ch_check_ch42.isChecked() is True and (self.ch_type
-                                                                  == '4_2'):
-            self.toFit = True
-        elif self.parentFn.ch_check_ch43.isChecked() is True and (self.ch_type
-                                                                  == '4_3'):
-            self.toFit = True
+        Returns
+        -------
+        Nothing, but assigns two new variables to self
+        self.predictions : numpy ndarray, dtype=float32, shape=(input_size,)
+            Predictions between 0 and 1, 0 = no artifact, 1 = artifact
+        self.timeSeriesPrepro : numpy ndarray, dtype=float32,
+                                shape=(input_size,)
+            The preprocessed time trace scaled according to scaler, and
+            cropped according to input_size.
+
+        Note
+        ----
+        - The input size of the model:
+            The prediction is made with the trace padded with the median to an
+            input size of at least 1024, or if bigger to the size of the next
+            biggest power of 2, e.g. 2**13 (8192), 2**14 (16384), ...
+            This is necessary to avoid tensorflow throwing a size mismatch
+            error. The algorithm was trained on traces with lenghts of 2**14,
+            the experimental test data had a length of 2**13, so these sizes
+            are known to work well.
+        - At the moment we assume one trace (timeSeries[0])
+        """
+        name = f'{self.name}' if name is None else f'{name}'
+        if name not in self.timeSeries:
+            raise ValueError(f'name={name} is not a valid key for the'
+                             'dictionary self.timeSeries')
+        self.predictions[name], self.timeSeriesSize[name] = {}, {}
+
+        for key, trace in self.timeSeries[name].copy().items():
+            trace = np.array(trace).astype(float)
+            trace_size = trace.size
+            if trace_size < 1024:
+                input_size = 1024
+            else:
+                input_size = 2**(np.ceil(np.log2(trace_size))).astype(int)
+            pad_size = input_size - trace_size
+
+            # pad trace for unet input
+            trace = np.pad(trace, pad_width=(0, pad_size), mode='median')
+
+            # scale trace
+            trace = np.reshape(trace, newshape=(-1, 1))
+            try:
+                trace = ppd.scale_trace(trace, scaler)
+            except Exception as ex:
+                raise ValueError('Scaling failed.') from ex
+
+            # predict trace
+            trace = np.reshape(trace, newshape=(1, -1, 1))
+            try:
+                predictions = model.predict(trace, verbose=0).flatten()
+            except Exception as ex:
+                raise ValueError('The prediction failed. Double-check correct'
+                                 ' input model, input size..') from ex
+
+            self.predictions[name][f'{key}'] = predictions
+            self.timeSeries[name][f'{key}_PREPRO'] = trace.flatten().astype(
+                np.float32)
+            self.timeSeriesSize[name][f'{key}'] = trace_size
+        log.debug('Finished predictTimeSeries() with name=%s', name)
+
+    def correctTCSPC(self,
+                     pred_thresh=0.5,
+                     method='weights',
+                     weight=None,
+                     truetime_name=None,
+                     timeseries_name=None):
+        """Takes the artifact prediction from the time series and removes
+        the artifacts in the TCSPC data
+
+        Parameters
+        ----------
+        pred_thresh : float between 0 and 1
+            If prediction is lower than pred_thresh, the time step is assumed
+            to show 'no corruption'
+        method : ['weights', 'delete', 'delete_and_shift']
+            'weights' : give a weight to photons which are classified as
+            artifacts, see argument =weight=.
+            'delete' : photons classified as artifacts are deleted and a new
+            dict in self.trueTimeArr is constructed with the remaining photons)
+            The time series constructed from this trueTimeArr will have drops
+            to 0 where photons were deleted
+            'delete_and_shift' : Like 'delete', but additionally adjust the
+            photon arrival times of all photons by shifting each photon by
+            the bin size which was deleted before. The time series constructed
+            from this trueTimeArr will have no drops, all ends are annealed to
+            each other.
+        weight = optional, float or None
+            Only used if method='weights'. Photons classified as artifacts are
+            given this weight. If None (or explicitly set to 0), the weight
+            will be set to 0, meaning the photons will not be correlated
+
+        Returns
+        -------
+        """
+        name = f'{self.name}' if truetime_name is None else f'{truetime_name}'
+        ts_name = f'{self.name}' if timeseries_name is None else (
+            f'{timeseries_name}')
+        if name not in self.trueTimeArr:
+            raise ValueError(f'key={name} is no valid key to dictionary'
+                             ' self.trueTimeArr.')
+        if ts_name not in self.timeSeries:
+            raise ValueError(f'key={ts_name} is not a valid key for the'
+                             'dictionary self.timeSeries. Run method'
+                             'getTimeSeries first.')
+        if ts_name not in self.predictions:
+            raise ValueError(f'key={ts_name} is not a valid key for the'
+                             'dictionary self.predictions. Run method'
+                             'predictTimeSeries() first.')
+        methods = ['weights', 'delete', 'delete_and_shift']
+        if method not in methods:
+            raise ValueError(f'method has to be in {methods}.')
+        if method == 'weight' and (not isinstance(weight, float)
+                                   and weight not in [None, 0, 1]):
+            raise ValueError('if method == "weight", the argument weight'
+                             ' has to be a float, 0, 1 or None')
+
+        for key, trace in self.timeSeries[ts_name].copy().items():
+            if 'PREPRO' in key or 'CORRECTED' in key:
+                continue
+            metadata = key.split('_')
+            chan = int(metadata[0].strip('CH'))
+            trace = np.array(trace)
+            trace_scale = np.array(self.timeSeriesScale[ts_name][f'{key}'])
+            predictions = self.predictions[ts_name][f'{key}']
+            timeSeriesSize = self.timeSeriesSize[ts_name][f'{key}']
+            subChanCorrected = np.array(self.subChanArr[name])
+            channelMask = subChanCorrected == chan
+            subChanCorrected = subChanCorrected[channelMask]
+            trueTimeCorrected = np.array(self.trueTimeArr[name] /
+                                         self.timeSeriesDividend)
+            trueTimeCorrected = trueTimeCorrected[channelMask]
+
+            # get prediction as time series mask and photon arrival time mask
+            timeSeriesMask = predictions[:timeSeriesSize] > pred_thresh
+            photonMask = np.repeat(timeSeriesMask, trace)
+            # match trueTimeArr and subChanArr shape to prediction
+            subChanCorrected = subChanCorrected[:photonMask.size]
+            trueTimeCorrected = trueTimeCorrected[:photonMask.size]
+            log.debug('correctTCSPC: some samples: subChan %s, truetime %s,'
+                      'photonMask %s, channelMask %s',
+                      subChanCorrected.size, trueTimeCorrected.size,
+                      photonMask.size, np.size(channelMask))
+
+            if method in ['delete', 'delete_and_shift']:
+                photon_count_bin = int(metadata[1].strip('BIN'))
+                # delete photons classified as artifactual
+                trueTimeCorrected = np.delete(trueTimeCorrected, photonMask)
+                subChanCorrected = np.delete(subChanCorrected, photonMask)
+                log.debug('correctTCSPC: deleted %s photons of %s photons.',
+                          len(self.trueTimeArr[name]) - len(trueTimeCorrected),
+                          len(self.trueTimeArr[name]))
+
+                if method == 'delete_and_shift':
+                    # moves the photons as if the deleted bins never existed
+                    idxphot = 0
+                    for nphot, artifact in zip(trace, timeSeriesMask):
+                        if artifact:
+                            trueTimeCorrected[idxphot:] -= photon_count_bin
+                        else:
+                            idxphot += nphot
+                    log.debug('correctTCSPC: shifted non-deleted photon '
+                              'arrival times by photonCountBin=%s',
+                              photon_count_bin)
+                    tsCorrected = np.delete(trace, timeSeriesMask)
+                    tsScaleCorrected = np.delete(trace_scale, timeSeriesMask)
+                else:
+                    tsCorrected = np.where(timeSeriesMask == 1, 0, trace)
+                    tsScaleCorrected = trace_scale
+                self.timeSeries[ts_name][f'{key}_CORRECTED'] = tsCorrected
+                self.timeSeriesScale[ts_name][f'{key}_CORRECTED'] = (
+                     tsScaleCorrected)
+                self.trueTimeArr[f'{metadata[0]}_{name}_CORRECTED'] = (
+                    trueTimeCorrected)
+                self.subChanArr[f'{metadata[0]}_{name}_CORRECTED'] = (
+                    subChanCorrected)
+
+            elif method == 'weights':
+                weight = float(0) if weight is None else float(weight)
+                photon_weights = np.zeros((subChanCorrected.shape[0], 2))
+                # for autocorrelation, only channel [:, 0] is relevant
+                photon_weights[:, 0] = np.where(photonMask == 1, weight,
+                                                float(1))
+                self.trueTimeWeights[f'{metadata[0]}_{name}'] = photon_weights
+                self.trueTimeArr[f'{metadata[0]}_{name}_FORWEIGHTS'] = (
+                    trueTimeCorrected)
+
+        log.debug('Finished correctTCSPC() with name %s, timeseries_name %s',
+                  name, ts_name)
+
+    def get_autocorrelation(self, method='tttr2xfcs', name=None):
+        """Get Autocorrelation of either TCSPC data or time series data
+
+        Parameters
+        ----------
+        method : ['tttr2xfcs', 'tttr2xfcs_with_weights', 'multipletau']
+        name : string or tuple of strings
+            if method='tttr2xfcs', name should be a key for the dictionaries
+            self.trueTimeArr and self.subChanArr. If None, self.name is chosen
+            as a key
+            if method='tttr2xfcs_with_weights', additionally to above there
+            should be a dict self.trueTimeWeights from correctTCSPC(
+            method='weights')
+            if method='multipletau', name should be a tuple with 2 strings:
+                the first key to the dictionary self.timeSeries,
+                the second key to the dictionary self.timeSeries['first key']
+        """
+        methods = ['tttr2xfcs', 'tttr2xfcs_with_weights', 'multipletau']
+        if method not in methods:
+            raise ValueError(f'{method} is not a valid method from {methods}.')
+
+        if method == 'tttr2xfcs_with_weights':
+            name_weights = f'{name}'.strip('_FORWEIGHTS')
+            if name_weights not in self.trueTimeWeights:
+                raise ValueError(f'key={name_weights} is no valid key for the'
+                                 'dict self.trueTimeWeights. Run correctTCSPC('
+                                 'method=\'weights\') first.')
+
+        if method in ['tttr2xfcs', 'tttr2xfcs_with_weights']:
+            if 'tttr2xfcs' not in self.autoNorm:
+                self.autoNorm['tttr2xfcs'] = {}
+                self.autotime['tttr2xfcs'] = {}
+            name = f'{self.name}' if name is None else f'{name}'
+            if name not in self.trueTimeArr:
+                raise ValueError(f'key={name} is no valid key for the dict '
+                                 'self.trueTimeArr or self.subChanArr.')
+            if name in self.autoNorm['tttr2xfcs']:
+                raise ValueError('self.autoNorm[\'tttr2xfcs\'] already has a'
+                                 f' key={name} Check if your desired '
+                                 'autocorrelation already happened.')
+            metadata = name.split('_')
+            chan = metadata[0].strip('CH')
+
+            log.debug('get_autocorrelation: Starting tttr2xfcs correlation.')
+
+            for i in range(self.numOfCH):
+                try:
+                    chan = int(chan)
+                    if chan != self.ch_present[i]:
+                        log.debug('Skipping because key %s of trueTimeArr does'
+                                  ' give a hint on which channel was used and '
+                                  'it does not match channel %s', name, chan)
+                        continue
+                    # just so that I avoid having two CHx_CHx in front
+                    name = '_'.join(metadata[1:])
+                except ValueError:
+                    # if int(chan) fails
+                    log.debug('Given key %s of trueTimeArr does not include a '
+                              'hint on which channel was used. Assume all '
+                              'channels shall be used and continue', name)
+                if method == 'tttr2xfcs':
+                    key = f'CH{self.ch_present[i]}_{name}_NOTWEIGHTED'
+                    autonorm, autotime = self.crossAndAuto(
+                        self.trueTimeArr[name], self.subChanArr[name],
+                        [self.ch_present[i], self.ch_present[i]])
+
+                elif method == 'tttr2xfcs_with_weights':
+                    key = f'CH{chan}_{name}_WEIGHTED'
+                    tt_arr = self.trueTimeArr[f'CH{chan}_{name}']
+                    tt_weights = self.trueTimeWeights[name_weights]
+                    auto, autotime = correlate.tttr2xfcs(
+                        y=tt_arr, num=tt_weights, NcascStart=self.NcascStart,
+                        NcascEnd=self.NcascEnd, Nsub=self.Nsub)
+                    # Normalisation of the TCSPC data
+                    maxY = np.ceil(max(tt_arr))
+                    count_normal_phot = np.where(tt_weights == 1, 1, 0)
+                    count_normal_phot = np.sum(count_normal_phot)
+                    autonorm = np.zeros((auto.shape))
+                    autonorm[:, 0, 0] = ((auto[:, 0, 0] * maxY) /
+                                         (count_normal_phot**2)) - 1
+                self.autoNorm['tttr2xfcs'][key] = autonorm[:, i, i].reshape(
+                    1, 1, -1)
+                self.autotime['tttr2xfcs'][key] = autotime.reshape(-1, 1)
+        elif method == 'multipletau':
+            if not isinstance(name, tuple) or len(name) != 2:
+                raise ValueError(f'For method={method}, name={name} has to be'
+                                 ' a tuple of length 2.')
+            if name[1] not in self.timeSeries[name[0]]:
+                raise ValueError('self.timeSeries[name[0]][name[1]] does not'
+                                 'exist')
+            if 'multipletau' not in self.autoNorm:
+                self.autoNorm['multipletau'] = {}
+                self.autotime['multipletau'] = {}
+            corr_fn = multipletau.autocorrelate(
+                a=self.timeSeries[f'{name[0]}'][f'{name[1]}'],
+                m=16, deltat=1, normalize=True)
+            self.autotime['multipletau'][f'{name[0]}_{name[1]}'] = corr_fn[:, 0]
+            self.autoNorm['multipletau'][f'{name[0]}_{name[1]}'] = corr_fn[:, 1]
+
+        log.debug('finished get_autocorrelation() with method=%s, name=%s',
+                  method, name)
+
+    def save_autocorrelation(self, name, method, output_path='pwd'):
+        """Save files as .csv"""
+        name = (f'{self.name}', 'CH2_BIN1000')
+        if not isinstance(name, tuple) or len(name) != 2:
+            raise ValueError(f'For method={method}, name={name} has to be'
+                             ' a tuple of length 2.')
+        if name[1] not in self.timeSeries[name[0]]:
+            raise ValueError('self.timeSeries[name[0]][name[1]] does not'
+                             'exist.')
+        if output_path == 'pwd':
+            output_path = Path().parent.resolve()
         else:
-            self.toFit = False
-
-        # self.parentFn.modelFitSel.clear()
-        # for objId in self.parentFn.objIdArr:
-        #    if objId.toFit == True:
-        #        self.parentFn.modelFitSel.addItem(objId.name)
-        # self.parentFn.updateFitList()
-
-    def calculate_suitability(self):
-        size_of_sequence = float(self.autoNorm.__len__())
-        sum_below_origin = float(np.sum(self.autoNorm < 0))
-        self.above_zero = (size_of_sequence -
-                           sum_below_origin) / size_of_sequence
-
-    def residual(self, param, x, data, options):
-        if self.parentFn.def_options['Diff_eq'] == 5:
-            A = PB.equation_(param, x, options)
-        elif self.parentFn.def_options['Diff_eq'] == 4:
-            A = VD.equation_(param, x, options)
-        elif self.parentFn.def_options['Diff_eq'] == 3:
-            A = GS.equation_(param, x, options)
-        else:
-            A = SE.equation_(param, x, options)
-        residuals = np.array(data) - np.array(A)
-        return np.array(residuals).astype(np.float64)
-
-    def fitToParameters(self):
-        # Populate param for lmfit.
-        param = lmfit.Parameters()
-        # self.def_param.add('A1', value=1.0, min=0,max=1.0, vary=False)
-        for art in self.param:
-            if self.param[art]['to_show'] is True and (self.param[art]['calc']
-                                                       is False):
-                param.add(art,
-                          value=float(self.param[art]['value']),
-                          min=float(self.param[art]['minv']),
-                          max=float(self.param[art]['maxv']),
-                          vary=self.param[art]['vary'])
-
-        # Find the index of the nearest point in the scale.
-        data = np.array(self.autoNorm).astype(np.float64).reshape(-1)
-        scale = np.array(self.autotime).astype(np.float64).reshape(-1)
-        if self.parentFn.dr is None or self.parentFn.dr1 is None:
-            self.indx_L = 0
-            self.indx_R = -2
-        else:
-            self.indx_L = int(np.argmin(np.abs(scale - self.parentFn.dr.xpos)))
-            self.indx_R = int(np.argmin(np.abs(scale -
-                                               self.parentFn.dr1.xpos)))
-        if self.parentFn.bootstrap_enable_toggle is True:
-            num_of_straps = self.parentFn.bootstrap_samples.value()
-            aver_data = {}
-            lim_scale = scale[self.indx_L:self.indx_R + 1].astype(np.float64)
-            lim_data = data[self.indx_L:self.indx_R + 1].astype(np.float64)
-
-            # Populate a container which will store our output variables from
-            # the bootstrap.
-            for art in self.param:
-                if self.param[art]['to_show'] is True and (
-                        self.param[art]['calc'] is False):
-                    aver_data[art] = []
-            for _ in range(num_of_straps):
-                # Bootstrap our sample, but remove duplicates.
-                boot_ind = np.random.choice(np.arange(0, lim_data.shape[0]),
-                                            size=lim_data.shape[0],
-                                            replace=True)
-                # boot_ind = np.arange(0,lim_data.shape[0])
-                # np.sort(boot_ind)
-                boot_scale = lim_scale[boot_ind]
-                boot_data = lim_data[boot_ind]
-                res = lmfit.minimize(self.residual,
-                                     param,
-                                     args=(boot_scale, boot_data,
-                                           self.parentFn.def_options))
-                for art in self.param:
-                    if self.param[art]['to_show'] is True and (
-                            self.param[art]['calc'] is False):
-                        aver_data[art].append(res.params[art].value)
-            for art in self.param:
-                if self.param[art]['to_show'] is True and (
-                        self.param[art]['calc'] is False):
-                    self.param[art]['value'] = np.average(aver_data[art])
-                    self.param[art]['stderr'] = np.std(aver_data[art])
-
-        # Run the fitting.
-        if self.parentFn.bootstrap_enable_toggle is False:
-            res = lmfit.minimize(self.residual,
-                                 param,
-                                 args=(scale[self.indx_L:self.indx_R + 1],
-                                       data[self.indx_L:self.indx_R + 1],
-                                       self.parentFn.def_options))
-            # Repopulate the parameter object.
-            for art in self.param:
-                if self.param[art]['to_show'] is True and (
-                        self.param[art]['calc'] is False):
-                    self.param[art]['value'] = res.params[art].value
-                    self.param[art]['stderr'] = res.params[art].stderr
-
-        # Extra parameters, which are not fit or inherited.
-        # self.param['N_FCS']['value'] = np.round(1/self.param['GN0']['value'],
-        #                                         4)
-
-        # Populate param for the plotting. Would like to use same method as
-        plot_param = lmfit.Parameters()
-        # self.def_param.add('A1', value=1.0, min=0,max=1.0, vary=False)
-        for art in self.param:
-            if self.param[art]['to_show'] is True and (self.param[art]['calc']
-                                                       is False):
-                plot_param.add(art,
-                               value=float(self.param[art]['value']),
-                               min=float(self.param[art]['minv']),
-                               max=float(self.param[art]['maxv']),
-                               vary=self.param[art]['vary'])
-
-        # Display fitted equation.
-        if self.parentFn.def_options['Diff_eq'] == 5:
-            self.model_autoNorm = PB.equation_(
-                plot_param, scale[self.indx_L:self.indx_R + 1],
-                self.parentFn.def_options)
-        elif self.parentFn.def_options['Diff_eq'] == 4:
-            self.model_autoNorm = VD.equation_(
-                plot_param, scale[self.indx_L:self.indx_R + 1],
-                self.parentFn.def_options)
-        elif self.parentFn.def_options['Diff_eq'] == 3:
-            self.model_autoNorm = GS.equation_(
-                plot_param, scale[self.indx_L:self.indx_R + 1],
-                self.parentFn.def_options)
-        else:
-            self.model_autoNorm = SE.equation_(
-                plot_param, scale[self.indx_L:self.indx_R + 1],
-                self.parentFn.def_options)
-        self.model_autotime = scale[self.indx_L:self.indx_R + 1]
-
-        if self.parentFn.bootstrap_enable_toggle is False:
-            self.residualVar = res.residual
-        else:
-            self.residualVar = (
-                self.model_autoNorm -
-                data[self.indx_L:self.indx_R + 1].astype(np.float64))
-
-        output = lmfit.fit_report(res.params)
-
-        if (res.chisqr > self.parentFn.chisqr):
-            print('CAUTION DATA DID NOT FIT WELL CHI^2 >',
-                  self.parentFn.chisqr, ' ', res.chisqr)
-            self.goodFit = False
-        else:
-            self.goodFit = True
-        self.fitted = True
-        self.chisqr = res.chisqr
-        self.localTime = time.asctime(time.localtime(time.time()))
-
-        # Update the displayed options.
-        if self.parentFn.def_options['Diff_eq'] == 5:
-            PB.calc_param_fcs(self.parentFn, self)
-        elif self.parentFn.def_options['Diff_eq'] == 4:
-            VD.calc_param_fcs(self.parentFn, self)
-        elif self.parentFn.def_options['Diff_eq'] == 3:
-            GS.calc_param_fcs(self.parentFn, self)
-        else:
-            SE.calc_param_fcs(self.parentFn, self)
+            output_path = Path(output_path)
+            if not output_path.is_dir():
+                raise NotADirectoryError('output_path should be a directory or'
+                                         ' "pwd"')
+        output_file = (f'{name[0]}_{name[1]}_{datetime.date.today()}'
+                       '_correlation.csv')
+        output_file = output_path / output_file
+        chan = name[1].split('_')
+        chan = chan[0].strip('CH')
+        autotime = self.autotime[f'{method}'][f'{name[0]}_{name[1]}']
+        autonorm = self.autoNorm[f'{method}'][f'{name[0]}_{name[1]}']
+        # encodings tried:
+        # with 'w': utf-16le (doesn't work), utf-8 (error in d3.min.js)
+        # with 'wb': no encoding (saving doesn't work),
+        # no encoding and .encode() behind strings (error in d3.min.js)
+        with open(output_file, 'w+b') as out:
+            out.write('version,3.0\n'.encode())
+            out.write(f'numOfCH,{self.numOfCH}\n'.encode())
+            out.write('type,point\n'.encode())
+            out.write(f'parent_name,{name[0]}\n'.encode())
+            out.write(f'ch_type,{chan}_{chan}\n'.encode())
+            out.write(f'kcount,{self.kcount[name[0]][name[1]]}\n'.encode())
+            out.write('numberNandB,'
+                      f'{self.numberNandB[name[0]][name[1]]}\n'.encode())
+            out.write('brightnessNandB,'
+                      f'{self.brightnessNandB[name[0]][name[1]]}\n'.encode())
+            out.write('carpet pos,0\n'.encode())
+            out.write('pc,0\n'.encode())
+            out.write(f'Time (mus),CH{chan} Auto-Correlation\n'.encode())
+            for i in range(autotime.shape[0]):
+                out.write(f'{autotime[i]},{autonorm[i]}\n'.encode())
+            out.write('end\n'.encode())
