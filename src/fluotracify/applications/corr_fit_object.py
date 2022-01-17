@@ -81,7 +81,7 @@ class PicoObject():
         self.NcascEnd = self.par_obj.NcascEnd
         self.Nsub = self.par_obj.Nsub
         # 1000 gives microseconds, 1000000 gives ms
-        self.timeSeriesDividend = 1000
+        self.timeSeriesDividend = 1000000
         self.CV = []
 
         # used for photon decay
@@ -758,8 +758,8 @@ class PicoObject():
                 raise ValueError(f'For method={method}, name={name} has to be'
                                  ' a tuple of length 2.')
             if name[1] not in self.timeSeries[name[0]]:
-                raise ValueError('self.timeSeries[name[0]][name[1]] does not'
-                                 'exist')
+                raise ValueError(f'self.timeSeries[{name[0]}][{name[1]}] does'
+                                 ' not exist')
             if 'multipletau' not in self.autoNorm:
                 self.autoNorm['multipletau'] = {}
                 self.autotime['multipletau'] = {}
@@ -774,12 +774,11 @@ class PicoObject():
 
     def save_autocorrelation(self, name, method, output_path='pwd'):
         """Save files as .csv"""
-        name = (f'{self.name}', 'CH2_BIN1000')
         if not isinstance(name, tuple) or len(name) != 2:
             raise ValueError(f'For method={method}, name={name} has to be'
                              ' a tuple of length 2.')
         if name[1] not in self.timeSeries[name[0]]:
-            raise ValueError('self.timeSeries[name[0]][name[1]] does not'
+            raise ValueError(f'self.timeSeries[{name[0]}][{name[1]}] does not'
                              'exist.')
         if output_path == 'pwd':
             output_path = Path().parent.resolve()
