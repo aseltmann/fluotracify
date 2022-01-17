@@ -576,7 +576,7 @@ def readHT3(version,
             truensync = oflcorrection + nsync
             gotPhoton(truensync, channel + 1, dtime, isT2, recNum, globRes,
                       outdict, outputfile)
-        if recNum % 100000 == 0:
+        if recNum % 1000000 == 0:
             if verbose:
                 print("Progress: {:.1f}%, {} {} {}]\n".format(
                     float(recNum) * 100 / float(numRecords),

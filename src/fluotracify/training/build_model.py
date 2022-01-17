@@ -547,3 +547,25 @@ def unet_hp_metrics(metrics_thresholds):
     metrics.append(hp.Metric("auc"))
     metrics.append(hp.Metric("f1"))
     return metrics
+
+
+def prepare_model(model):
+    """Iterate through multiple input sizes to make tensorflow accept them
+
+    Notes
+    -----
+    Conceptually, the UNET is a fully convolutional model and should accept
+    different input sizes. But after calling the model on an input size it was
+    not trained on the first time, it will throw an error. After iterating
+    through more different input sizes, the error will be gone.
+    """
+    for ldelim in [2**14, 2**13, 2**12, 2**13]:
+        test_features = tf.experimental.numpy.zeros((ldelim))
+        test_features = tf.experimental.numpy.reshape(a=test_features,
+                                                      newshape=(1, -1, 1))
+        try:
+            predictions = model.predict(test_features, verbose=0).flatten()
+            print('test shape:', test_features.shape, predictions)
+        except Exception:
+            print(f'test shape: {test_features.shape}. prediction failed')
+    print('UNET ready for different trace lengths')
