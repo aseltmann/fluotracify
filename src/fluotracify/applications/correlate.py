@@ -2,12 +2,17 @@
 dimensional fluorescence traces. Largely based on Dominic Waithe's FOCUSpoint
 """
 
+import logging
 import matplotlib.pyplot as plt
 import numpy as np
 from lmfit import Parameters, fit_report, minimize
 from multipletau import autocorrelate
 
 from fluotracify.applications import equations_to_fit as eq
+
+logging.basicConfig(format='%(asctime)s - %(message)s')
+log = logging.getLogger(__name__)
+log.setLevel(logging.DEBUG)
 
 
 def correlate_and_fit(trace, fwhm, diffrate=None, time_step=1., verbose=True):
@@ -171,7 +176,7 @@ def tttr2xfcs(y, num, NcascStart, NcascEnd, Nsub):
         channel (col)
     Ncasc:
         in general refers to the number of logarithmic ranges to calculate the
-        correaltion function.
+        correlation function.
     NcascStart:
         This is a feature I added whereby you can start the correlation at a
         later stage.
@@ -180,7 +185,7 @@ def tttr2xfcs(y, num, NcascStart, NcascEnd, Nsub):
     Nsub:
         This is the number of sub-levels correlated at each casc level. You
         can think of this as the level of detail. The higher the value the more
-        noisey
+        noisy
 
     --- outputs ---
     auto:
@@ -243,19 +248,22 @@ def tttr2xfcs(y, num, NcascStart, NcascEnd, Nsub):
                 # then the correlation is equal to np.sum(i1)
                 i1 = np.where(i1.astype(np.bool))[0]
                 i2 = np.where(i2.astype(np.bool))[0]
-                # Now we want to weight each photon corectly.
+                # Now we want to weight each photon correctly.
                 # Faster dot product method, faster than converting to matrix.
                 if i1.size and i2.size:
                     jin = np.dot((num[i1, :]).T, num[i2, :]) / delta
                     auto[(k + (j) * Nsub), :, :] = jin
+                # log.debug(f'tttr2xfcs: finished Nsub {k} of Ncasc {j}')
             autotime[k + (j) * Nsub] = shift
 
         # Equivalent to matlab round when numbers are %.5
         y = np.ceil(np.array(0.5 * y))
         delta = 2 * delta
+        log.debug(f'tttr2xfcs: finished Ncasc {j}')
 
     for j in range(0, auto.shape[0]):
         auto[j, :, :] = auto[j, :, :] * dt / (dt - autotime[j])
+    # FIXME: why divided by 1000000, is this related to self.timeSeriesDividend?
     autotime = autotime / 1000000
 
     # Removes the trailing zeros.
@@ -281,6 +289,7 @@ def delayTime2bin(dTimeArr, chanArr, chanNum, winInt):
     # bins are valued as half their span.
     decayScale = bins[:-1] + (winInt / 2)
     # decayScale =  np.arange(0,decayTimeCh.shape[0])
+    log.debug(f'lastDecayTime={lastDecayTime}, numBins={numBins}, bins[:5]={bins[:5]}')
     return list(photonsInBin), list(decayScale)
 
 
