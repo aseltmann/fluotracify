@@ -712,7 +712,8 @@ class PicoObject():
             metadata = name.split('_')
             chan = metadata[0].strip('CH')
 
-            log.debug('get_autocorrelation: Starting tttr2xfcs correlation.')
+            log.debug('get_autocorrelation: Starting tttr2xfcs correlation.'
+                      'with name %s', name)
 
             for i in range(self.numOfCH):
                 try:
@@ -723,13 +724,11 @@ class PicoObject():
                                   'it does not match channel %s', name, chan)
                         continue
                     # just so that I avoid having two CHx_CHx in front
-                    if "_CORRECTED" in name:
-                        name = '_'.join(metadata[1:])
-                        tt_key = f'{self.ch_present[i]}_{name}'
-                    else:
-                        tt_key = name
+                    name = '_'.join(metadata[1:])
+                    tt_key = f'{self.ch_present[i]}_{name}'
                 except ValueError:
                     # if int(chan) fails
+                    tt_key = name
                     log.debug('Given key %s of trueTimeArr does not include a '
                               'hint on which channel was used. Assume all '
                               'channels shall be used and continue', name)
