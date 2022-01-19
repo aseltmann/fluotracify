@@ -1,7 +1,12 @@
 """This module contains functions to build neural networks."""
 
+import logging
 import tensorflow as tf
 from tensorboard.plugins.hparams import api as hp
+
+logging.basicConfig(format='%(asctime)s - %(message)s')
+log = logging.getLogger(__name__)
+log.setLevel(logging.DEBUG)
 
 
 def vgg10_1d(win_len, col_no):
@@ -565,7 +570,9 @@ def prepare_model(model):
                                                       newshape=(1, -1, 1))
         try:
             predictions = model.predict(test_features, verbose=0).flatten()
-            print('test shape:', test_features.shape, predictions)
-        except Exception:
-            print(f'test shape: {test_features.shape}. prediction failed')
-    print('UNET ready for different trace lengths')
+            log.debug('prepare_model: test shape %s, e.g. %s',
+                      test_features.shape, predictions[:5])
+        except ValueError:
+            log.debug('prepare_model: test shape %s. prediction failed '
+                      'as expected. Retry...', test_features.shape)
+    log.debug('prepare_model: UNET ready for different trace lengths')
