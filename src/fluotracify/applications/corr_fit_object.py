@@ -801,9 +801,8 @@ class PicoObject():
                 raise NotADirectoryError('output_path should be a directory or'
                                          ' "pwd"')
         output_file = (f'{datetime.date.today()}_{method}_{name}_'
-                       '_correlation.csv')
+                       'correlation.csv')
         output_file = output_path / output_file
-        log.debug('save_autocorrelation: saving file %s', output_file)
         autotime = self.autotime[f'{method}'][f'{name}'].flatten()
         autonorm = self.autoNorm[f'{method}'][f'{name}'].flatten()
         kcount = self.kcount[parent_name][timeseries_name]
@@ -828,3 +827,4 @@ class PicoObject():
             for i in range(autotime.shape[0]):
                 out.write(f'{autotime[i]},{autonorm[i]}\n')
             out.write('end\n')
+        log.debug('Finished save_autocorrelation of file %s', output_file)
