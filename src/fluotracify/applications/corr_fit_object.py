@@ -362,7 +362,7 @@ class PicoObject():
         # del self.subChanArr
         # del self.trueTimeArr
         del self.dTimeArr
-        log.debug('Processed dTimeInfo()')
+        log.debug('Finished dTimeInfo()')
 
     def time2bin(self, time_arr, chan_arr, chan_num, win_int):
         """A binning method for arrival times (=photon time trace) or for
