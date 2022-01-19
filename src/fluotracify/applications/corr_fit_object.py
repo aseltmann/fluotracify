@@ -725,7 +725,7 @@ class PicoObject():
                         continue
                     # just so that I avoid having two CHx_CHx in front
                     name = '_'.join(metadata[1:])
-                    tt_key = f'{self.ch_present[i]}_{name}'
+                    tt_key = f'CH{self.ch_present[i]}_{name}'
                 except ValueError:
                     # if int(chan) fails
                     tt_key = name
