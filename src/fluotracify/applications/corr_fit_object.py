@@ -731,8 +731,9 @@ class PicoObject():
                 if method == 'tttr2xfcs':
                     key = (f'CH{self.ch_present[i]}_BIN{self.photonCountBin}'
                            f'_{name.removesuffix("_CORRECTED")}')
+                    tt_key = f'CH{self.ch_present[i]}_{name}'
                     autonorm, autotime = self.crossAndAuto(
-                        self.trueTimeArr[name], self.subChanArr[name],
+                        self.trueTimeArr[tt_key], self.subChanArr[tt_key],
                         [self.ch_present[i], self.ch_present[i]])
 
                 elif method == 'tttr2xfcs_with_weights':
@@ -771,7 +772,7 @@ class PicoObject():
             self.autotime['multipletau'][f'{name[1]}_{name[0]}'] = corr_fn[1:, 0]
             self.autoNorm['multipletau'][f'{name[1]}_{name[0]}'] = corr_fn[1:, 1]
 
-        log.debug('finished get_autocorrelation() with method=%s, name=%s',
+        log.debug('Finished get_autocorrelation() with method=%s, name=%s',
                   method, name)
 
     def save_autocorrelation(self, name, method, output_path='pwd'):
