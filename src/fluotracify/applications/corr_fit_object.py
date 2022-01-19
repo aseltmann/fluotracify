@@ -791,7 +791,11 @@ class PicoObject():
         parent_name = '_'.join(metadata[2:])
         chan = metadata[0].strip('CH')
 
-        if timeseries_name not in self.kcount[parent_name]:
+        if parent_name not in self.kcount:
+            raise ValueError(f'self.kcount[{parent_name}][{timeseries_name}]'
+                             'does not exist. Run getTimeSeries and '
+                             'getPhotonCountingStats first.')
+        elif timeseries_name not in self.kcount[parent_name]:
             raise ValueError(f'self.kcount[{parent_name}][{timeseries_name}]'
                              'does not exist. Run getTimeSeries and '
                              'getPhotonCountingStats first.')
