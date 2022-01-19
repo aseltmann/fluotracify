@@ -609,8 +609,7 @@ class PicoObject():
             subChanCorrected = np.array(self.subChanArr[name])
             channelMask = subChanCorrected == chan
             subChanCorrected = subChanCorrected[channelMask]
-            trueTimeCorrected = np.array(self.trueTimeArr[name] /
-                                         self.timeSeriesDividend)
+            trueTimeCorrected = np.array(self.trueTimeArr[name])
             trueTimeCorrected = trueTimeCorrected[channelMask]
 
             # get prediction as time series mask and photon arrival time mask
@@ -692,21 +691,21 @@ class PicoObject():
             raise ValueError(f'{method} is not a valid method from {methods}.')
 
         if method == 'tttr2xfcs_with_weights':
-            name_weights = f'{name}'.strip('_FORWEIGHTS')
+            name_weights = f'{name}'.removesuffix('_FORWEIGHTS')
             if name_weights not in self.trueTimeWeights:
                 raise ValueError(f'key={name_weights} is no valid key for the'
                                  'dict self.trueTimeWeights. Run correctTCSPC('
                                  'method=\'weights\') first.')
 
         if method in ['tttr2xfcs', 'tttr2xfcs_with_weights']:
-            if 'tttr2xfcs' not in self.autoNorm:
-                self.autoNorm['tttr2xfcs'] = {}
-                self.autotime['tttr2xfcs'] = {}
+            if method not in self.autoNorm:
+                self.autoNorm[f'{method}'] = {}
+                self.autotime[f'{method}'] = {}
             name = f'{self.name}' if name is None else f'{name}'
             if name not in self.trueTimeArr:
                 raise ValueError(f'key={name} is no valid key for the dict '
                                  'self.trueTimeArr or self.subChanArr.')
-            if name in self.autoNorm['tttr2xfcs']:
+            if name in self.autoNorm[f'{method}']:
                 raise ValueError('self.autoNorm[\'tttr2xfcs\'] already has a'
                                  f' key={name} Check if your desired '
                                  'autocorrelation already happened.')
@@ -731,13 +730,15 @@ class PicoObject():
                               'hint on which channel was used. Assume all '
                               'channels shall be used and continue', name)
                 if method == 'tttr2xfcs':
-                    key = f'CH{self.ch_present[i]}_{name}_NOTWEIGHTED'
+                    key = (f'CH{self.ch_present[i]}_BIN{self.photonCountBin}'
+                           f'_{name.removesuffix("_CORRECTED")}')
                     autonorm, autotime = self.crossAndAuto(
                         self.trueTimeArr[name], self.subChanArr[name],
                         [self.ch_present[i], self.ch_present[i]])
 
                 elif method == 'tttr2xfcs_with_weights':
-                    key = f'CH{chan}_{name}_WEIGHTED'
+                    key = (f'CH{chan}_BIN{self.photonCountBin}_'
+                           f'{name.removesuffix("_FORWEIGHTS")}')
                     tt_arr = self.trueTimeArr[f'CH{chan}_{name}']
                     tt_weights = self.trueTimeWeights[name_weights]
                     auto, autotime = correlate.tttr2xfcs(
@@ -745,14 +746,13 @@ class PicoObject():
                         NcascEnd=self.NcascEnd, Nsub=self.Nsub)
                     # Normalisation of the TCSPC data
                     maxY = np.ceil(max(tt_arr))
-                    count_normal_phot = np.where(tt_weights == 1, 1, 0)
-                    count_normal_phot = np.sum(count_normal_phot)
+                    count = np.sum(tt_weights)
                     autonorm = np.zeros((auto.shape))
                     autonorm[:, 0, 0] = ((auto[:, 0, 0] * maxY) /
-                                         (count_normal_phot**2)) - 1
-                self.autoNorm['tttr2xfcs'][key] = autonorm[:, i, i].reshape(
+                                         (count**2)) - 1
+                self.autoNorm[f'{method}'][key] = autonorm[:, i, i].reshape(
                     1, 1, -1)
-                self.autotime['tttr2xfcs'][key] = autotime.reshape(-1, 1)
+                self.autotime[f'{method}'][key] = autotime.reshape(-1, 1)
         elif method == 'multipletau':
             if not isinstance(name, tuple) or len(name) != 2:
                 raise ValueError(f'For method={method}, name={name} has to be'
@@ -763,23 +763,36 @@ class PicoObject():
             if 'multipletau' not in self.autoNorm:
                 self.autoNorm['multipletau'] = {}
                 self.autotime['multipletau'] = {}
+
             corr_fn = multipletau.autocorrelate(
                 a=self.timeSeries[f'{name[0]}'][f'{name[1]}'],
                 m=16, deltat=1, normalize=True)
-            self.autotime['multipletau'][f'{name[0]}_{name[1]}'] = corr_fn[:, 0]
-            self.autoNorm['multipletau'][f'{name[0]}_{name[1]}'] = corr_fn[:, 1]
+            # multipletau outputs autotime=0 as first correlation step, which
+            # leads to problems with focus-fit-js
+            self.autotime['multipletau'][f'{name[1]}_{name[0]}'] = corr_fn[1:, 0]
+            self.autoNorm['multipletau'][f'{name[1]}_{name[0]}'] = corr_fn[1:, 1]
 
         log.debug('finished get_autocorrelation() with method=%s, name=%s',
                   method, name)
 
     def save_autocorrelation(self, name, method, output_path='pwd'):
         """Save files as .csv"""
-        if not isinstance(name, tuple) or len(name) != 2:
-            raise ValueError(f'For method={method}, name={name} has to be'
-                             ' a tuple of length 2.')
-        if name[1] not in self.timeSeries[name[0]]:
-            raise ValueError(f'self.timeSeries[{name[0]}][{name[1]}] does not'
-                             'exist.')
+        if f'{method}' not in self.autoNorm:
+            raise ValueError(f'method={method} is not a valid key for dict '
+                             'self.autoNorm. Run get_autocorrelation first.')
+        if f'{name}' not in self.autoNorm[f'{method}']:
+            raise ValueError(f'name={name} is not a valid key for dict '
+                             f'self.autoNorm[{method}].')
+        metadata = f'{name}'.split('_')
+        timeseries_name = '_'.join(metadata[:2])
+        parent_name = '_'.join(metadata[2:])
+        chan = metadata[0].strip('CH')
+
+        if timeseries_name not in self.kcount[parent_name]:
+            raise ValueError(f'self.kcount[{parent_name}][{timeseries_name}]'
+                             'does not exist. Run getTimeSeries and '
+                             'getPhotonCountingStats first.')
+
         if output_path == 'pwd':
             output_path = Path().parent.resolve()
         else:
@@ -787,31 +800,31 @@ class PicoObject():
             if not output_path.is_dir():
                 raise NotADirectoryError('output_path should be a directory or'
                                          ' "pwd"')
-        output_file = (f'{name[0]}_{name[1]}_{datetime.date.today()}'
+        output_file = (f'{datetime.date.today()}_{method}_{name}_'
                        '_correlation.csv')
         output_file = output_path / output_file
-        chan = name[1].split('_')
-        chan = chan[0].strip('CH')
-        autotime = self.autotime[f'{method}'][f'{name[0]}_{name[1]}']
-        autonorm = self.autoNorm[f'{method}'][f'{name[0]}_{name[1]}']
-        # encodings tried:
-        # with 'w': utf-16le (doesn't work), utf-8 (error in d3.min.js)
-        # with 'wb': no encoding (saving doesn't work),
-        # no encoding and .encode() behind strings (error in d3.min.js)
-        with open(output_file, 'w+b') as out:
-            out.write('version,3.0\n'.encode())
-            out.write(f'numOfCH,{self.numOfCH}\n'.encode())
-            out.write('type,point\n'.encode())
-            out.write(f'parent_name,{name[0]}\n'.encode())
-            out.write(f'ch_type,{chan}_{chan}\n'.encode())
-            out.write(f'kcount,{self.kcount[name[0]][name[1]]}\n'.encode())
-            out.write('numberNandB,'
-                      f'{self.numberNandB[name[0]][name[1]]}\n'.encode())
-            out.write('brightnessNandB,'
-                      f'{self.brightnessNandB[name[0]][name[1]]}\n'.encode())
-            out.write('carpet pos,0\n'.encode())
-            out.write('pc,0\n'.encode())
-            out.write(f'Time (mus),CH{chan} Auto-Correlation\n'.encode())
+
+        autotime = self.autotime[f'{method}'][f'{name}'].flatten()
+        autonorm = self.autoNorm[f'{method}'][f'{name}'].flatten()
+        kcount = self.kcount[parent_name][timeseries_name]
+        numberNandB = self.numberNandB[parent_name][timeseries_name]
+        brightnessNandB = self.brightnessNandB[parent_name][timeseries_name]
+
+        # compatibility with FoCuS-fit-JS:
+        # with 'w': utf-16le (doesn't work), utf-8 (works)
+        # with 'wb': works with .encode() behind strings
+        with open(output_file, 'w', encoding='utf-8') as out:
+            out.write('version,3.0\n')
+            out.write(f'numOfCH,{self.numOfCH}\n')
+            out.write('type,point\n')
+            out.write(f'parent_name,{parent_name}\n')
+            out.write(f'ch_type,{chan}_{chan}\n')
+            out.write(f'kcount,{kcount}\n')
+            out.write(f'numberNandB,{numberNandB}\n')
+            out.write(f'brightnessNandB,{brightnessNandB}\n')
+            out.write('carpet pos,0\n')
+            out.write('pc,0\n')
+            out.write(f'Time (mus),CH{chan} Auto-Correlation\n')
             for i in range(autotime.shape[0]):
-                out.write(f'{autotime[i]},{autonorm[i]}\n'.encode())
-            out.write('end\n'.encode())
+                out.write(f'{autotime[i]},{autonorm[i]}\n')
+            out.write('end\n')
