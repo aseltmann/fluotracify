@@ -2,6 +2,7 @@
 microscopy data by machines from PicoQuant"""
 
 import io
+import logging
 import os
 import struct
 import sys
@@ -10,6 +11,10 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+
+logging.basicConfig(format='%(asctime)s - %(message)s')
+log = logging.getLogger(__name__)
+log.setLevel(logging.DEBUG)
 
 
 def import_ptu(inputfilepath, outputfilepath=None, verbose=True):
@@ -211,7 +216,8 @@ def import_ptu(inputfilepath, outputfilepath=None, verbose=True):
         resolution = tagValues[tagNames.index("MeasDesc_Resolution")]
 
         if verbose:
-            print("Writing %d records, this may take a while..." % numRecords)
+            log.debug("import_ptu: Writing %d records, this may take a while.",
+                      numRecords)
 
         # prepare dictionary as output of function, if no outputfile is given
         if outputfilepath is None:
@@ -229,7 +235,7 @@ def import_ptu(inputfilepath, outputfilepath=None, verbose=True):
         recordType = tagValues[tagNames.index("TTResultFormat_TTTRRecType")]
         if recordType == rtPicoHarpT2:
             if verbose:
-                print("PicoHarp T2 data")
+                log.debug("import_ptu: PicoHarp T2 data")
             if outputfilepath is not None:
                 outputfile.write("PicoHarp T2 data\n")
                 outputfile.write("\nrecord# chan   nsync truetime/ps\n")
@@ -240,7 +246,7 @@ def import_ptu(inputfilepath, outputfilepath=None, verbose=True):
                         outdict=outdict)
         elif recordType == rtPicoHarpT3:
             if verbose:
-                print("PicoHarp T3 data")
+                log.debug("import_ptu: PicoHarp T3 data")
             if outputfilepath is not None:
                 outputfile.write("PicoHarp T3 data\n")
                 outputfile.write("\nrecord# chan   nsync truetime/ns dtime\n")
@@ -251,7 +257,7 @@ def import_ptu(inputfilepath, outputfilepath=None, verbose=True):
                         verbose=verbose, outdict=outdict)
         elif recordType == rtHydraHarpT2:
             if verbose:
-                print("HydraHarp V1 T2 data")
+                log.debug("import_ptu: HydraHarp V1 T2 data")
             if outputfilepath is not None:
                 outputfile.write("HydraHarp V1 T2 data\n")
                 outputfile.write("\nrecord# chan   nsync truetime/ps\n")
@@ -262,7 +268,7 @@ def import_ptu(inputfilepath, outputfilepath=None, verbose=True):
                         outdict=outdict)
         elif recordType == rtHydraHarpT3:
             if verbose:
-                print("HydraHarp V1 T3 data")
+                log.debug("import_ptu: HydraHarp V1 T3 data")
             if outputfilepath is not None:
                 outputfile.write("HydraHarp V1 T3 data\n")
                 outputfile.write("\nrecord# chan   nsync truetime/ns dtime\n")
@@ -278,7 +284,7 @@ def import_ptu(inputfilepath, outputfilepath=None, verbose=True):
                          rtTimeHarp260PT2: "TimeHarp260P T2 data",
                          rtMultiHarpT2: "MultiHarp T2 data"}
             if verbose:
-                print(printdict[recordType])
+                log.debug("import_ptu: %s", printdict[recordType])
             if outputfilepath is not None:
                 outputfile.write("{}\n".format(printdict[recordType]))
                 outputfile.write("\nrecord# chan   nsync truetime/ps\n")
@@ -294,7 +300,7 @@ def import_ptu(inputfilepath, outputfilepath=None, verbose=True):
                          rtTimeHarp260PT3: "TimeHarp260P T3 data",
                          rtMultiHarpT3: "MultiHarp T3 data"}
             if verbose:
-                print(printdict[recordType])
+                log.debug("import_ptu: %s", printdict[recordType])
             if outputfilepath is not None:
                 outputfile.write("{}\n".format(printdict[recordType]))
                 outputfile.write("\nrecord# chan   nsync truetime/ns dtime\n")
@@ -345,7 +351,7 @@ def gotPhoton(timeTag,
         else:
             outdict['trueTimeArr'][recNum] = truetime
             # picoquant demo code does not save out dtime
-            # - but for timetrace coversion, it is needed
+            # - but for lifetime analysis, it is needed
             outdict['dTimeArr'][recNum] = dtime
             outdict['chanArr'][recNum] = channel
     else:
@@ -372,9 +378,9 @@ def readPT2(f,
         try:
             recordData = "{0:0{1}b}".format(
                 struct.unpack("<I", f.read(4))[0], 32)
-        except Exception as e:
+        except Exception as exc:
             raise ValueError('The file ended earlier than expected, at'
-                             'record %d/%d.' % (recNum, numRecords)) from e
+                             f'record {recNum}/{numRecords}.') from exc
 
         channel = int(recordData[0:4], base=2)
         dtime = int(recordData[4:32], base=2)
@@ -396,17 +402,18 @@ def readPT2(f,
                           outputfile=outputfile)
         else:
             if channel > 4:  # Should not occur
-                print("Illegal Channel: #%1d %1u" % (recNum, channel))
+                log.debug("import_ptu: Illegal Channel: #%1d %1u",
+                          recNum, channel)
                 if outputfile is not None:
                     outputfile.write("\nIllegal channel ")
             truetime = oflcorrection + dtime
             gotPhoton(truetime, channel, dtime, isT2, recNum, globRes, outdict,
                       outputfile)
-        if recNum % 100000 == 0:
+        if recNum % 1_000_000 == 0:
             if verbose:
-                sys.stdout.write("\rProgress: %.1f%%" %
-                                 (float(recNum) * 100 / float(numRecords)))
-                sys.stdout.flush()
+                log.debug("import_ptu: Progress: %.1f%%",
+                          float(recNum) * 100 / float(numRecords))
+
     # FIXME: Not sure why globRes is the output here, and resolution in other
     # functions. Should be double-checked later.
     outdict["resolution"] = globRes * 1e6
@@ -433,9 +440,9 @@ def readPT3(f,
         try:
             recordData = "{0:0{1}b}".format(
                 struct.unpack("<I", f.read(4))[0], 32)
-        except Exception as e:
+        except Exception as exc:
             raise ValueError('The file ended earlier than expected, at'
-                             'record %d/%d.' % (recNum, numRecords)) from e
+                             'record %d/%d.' % (recNum, numRecords)) from exc
 
         channel = int(recordData[0:4], base=2)
         dtime = int(recordData[4:16], base=2)
@@ -453,18 +460,18 @@ def readPT3(f,
                           outputfile=outputfile)
         else:
             if channel == 0 or channel > 4:  # Should not occur
-                print("Illegal Channel: #%1d %1u" % (dlen, channel))
+                log.debug("import_ptu: Illegal Channel: #%1d %1u",
+                          dlen, channel)
                 if outputfile is not None:
                     outputfile.write("\nIllegal channel ")
             truensync = oflcorrection + nsync
             gotPhoton(truensync, channel, dtime, isT2, recNum, globRes,
                       outdict, outputfile)
             dlen += 1
-        if recNum % 100000 == 0:
+        if recNum % 1_000_000 == 0:
             if verbose:
-                sys.stdout.write("\rProgress: %.1f%%" %
-                                 (float(recNum) * 100 / float(numRecords)))
-                sys.stdout.flush()
+                log.debug("import_ptu: Progress: %.1f%%",
+                          float(recNum) * 100 / float(numRecords))
     outdict["resolution"] = resolution * 1e9
 
 
@@ -519,11 +526,10 @@ def readHT2(version,
             truetime = oflcorrection + timetag
             gotPhoton(truetime, channel + 1, 0, isT2, recNum, globRes, outdict,
                       outputfile)
-        if recNum % 100000 == 0:
+        if recNum % 1_000_000 == 0:
             if verbose:
-                sys.stdout.write("\rProgress: %.1f%%" %
-                                 (float(recNum) * 100 / float(numRecords)))
-                sys.stdout.flush()
+                log.debug("import_ptu: Progress: %.1f%%",
+                          float(recNum) * 100 / float(numRecords))
     # FIXME: add correct value for outdict["resolution"]
     outdict["resolution"] = None
 
@@ -576,13 +582,13 @@ def readHT3(version,
             truensync = oflcorrection + nsync
             gotPhoton(truensync, channel + 1, dtime, isT2, recNum, globRes,
                       outdict, outputfile)
-        if recNum % 1000000 == 0:
+        if recNum % 1_000_000 == 0:
             if verbose:
-                print("Progress: {:.1f}%, {} {} {}]\n".format(
-                    float(recNum) * 100 / float(numRecords),
-                    outdict['trueTimeArr'][recNum],
-                    outdict['chanArr'][recNum],
-                    outdict['dTimeArr'][recNum]))
+                log.debug("import_ptu: Progress: %.1f%%, %s %s %s",
+                          float(recNum) * 100 / float(numRecords),
+                          outdict['trueTimeArr'][recNum],
+                          outdict['chanArr'][recNum],
+                          outdict['dTimeArr'][recNum])
     outdict["resolution"] = resolution * 1e6
 
 
