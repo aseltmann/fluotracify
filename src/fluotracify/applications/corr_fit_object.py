@@ -650,9 +650,9 @@ class PicoObject():
                 self.timeSeries[ts_name][f'{key}_CORRECTED'] = tsCorrected
                 self.timeSeriesScale[ts_name][f'{key}_CORRECTED'] = (
                      tsScaleCorrected)
-                self.trueTimeArr[f'{metadata[0]}_{name}_CORRECTED'] = (
+                self.trueTimeArr[f'{metadata[0]}_{ts_name}_CORRECTED'] = (
                     trueTimeCorrected)
-                self.subChanArr[f'{metadata[0]}_{name}_CORRECTED'] = (
+                self.subChanArr[f'{metadata[0]}_{ts_name}_CORRECTED'] = (
                     subChanCorrected)
 
             elif method == 'weights':
@@ -661,8 +661,9 @@ class PicoObject():
                 # for autocorrelation, only channel [:, 0] is relevant
                 photon_weights[:, 0] = np.where(photonMask == 1, weight,
                                                 float(1))
-                self.trueTimeWeights[f'{metadata[0]}_{name}'] = photon_weights
-                self.trueTimeArr[f'{metadata[0]}_{name}_FORWEIGHTS'] = (
+                self.trueTimeWeights[f'{metadata[0]}_{ts_name}'] = (
+                    photon_weights)
+                self.trueTimeArr[f'{metadata[0]}_{ts_name}_FORWEIGHTS'] = (
                     trueTimeCorrected)
 
         log.debug('Finished correctTCSPC() with name %s, timeseries_name %s',
@@ -769,8 +770,10 @@ class PicoObject():
                 m=16, deltat=1, normalize=True)
             # multipletau outputs autotime=0 as first correlation step, which
             # leads to problems with focus-fit-js
-            self.autotime['multipletau'][f'{name[1]}_{name[0]}'] = corr_fn[1:, 0]
-            self.autoNorm['multipletau'][f'{name[1]}_{name[0]}'] = corr_fn[1:, 1]
+            self.autotime['multipletau'][f'{name[1]}_{name[0]}'] = (
+                corr_fn[1:, 0])
+            self.autoNorm['multipletau'][f'{name[1]}_{name[0]}'] = (
+                corr_fn[1:, 1])
 
         log.debug('Finished get_autocorrelation() with method=%s, name=%s',
                   method, name)
