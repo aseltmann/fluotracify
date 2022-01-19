@@ -60,7 +60,7 @@ class PicoObject():
         """
     def __init__(self, input_file, par_obj):
         # parameter object and fit object.
-        log.debug('Start CorrObj creation.')
+        log.debug('PicoObject: Start CorrObj creation.')
         self.par_obj = par_obj
         self.type = 'mainObject'
 
