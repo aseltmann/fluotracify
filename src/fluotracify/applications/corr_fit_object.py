@@ -176,8 +176,6 @@ class PicoObject():
         else:
             self.numOfCH = self.ch_present.__len__()
 
-        print('numOfCH', self.numOfCH, self.ch_present)
-
         self.indx_arr = []
         # I order them this way, for systematic ordering in the plotting.
         # All the plots are included. First the auto, then the cross.
@@ -187,7 +185,8 @@ class PicoObject():
                 if i != j:
                     self.indx_arr.append([i, j])
 
-        log.debug('Finished prepareChannels()')
+        log.debug('Finished prepareChannels() with %s channels: %s',
+                  self.numOfCH, self.ch_present)
 
     def getPhotonDecay(self, photonLifetimeBin=None, name=None):
         """Gets photon decay curve from TCSPC data, specifically lifetimes
