@@ -723,7 +723,11 @@ class PicoObject():
                                   'it does not match channel %s', name, chan)
                         continue
                     # just so that I avoid having two CHx_CHx in front
-                    name = '_'.join(metadata[1:])
+                    if "_CORRECTED" in name:
+                        name = '_'.join(metadata[1:])
+                        tt_key = f'{self.ch_present[i]}_{name}'
+                    else:
+                        tt_key = name
                 except ValueError:
                     # if int(chan) fails
                     log.debug('Given key %s of trueTimeArr does not include a '
@@ -732,7 +736,6 @@ class PicoObject():
                 if method == 'tttr2xfcs':
                     key = (f'CH{self.ch_present[i]}_BIN{self.photonCountBin}'
                            f'_{name.removesuffix("_CORRECTED")}')
-                    tt_key = f'CH{self.ch_present[i]}_{name}'
                     autonorm, autotime = self.crossAndAuto(
                         self.trueTimeArr[tt_key], self.subChanArr[tt_key],
                         [self.ch_present[i], self.ch_present[i]])
