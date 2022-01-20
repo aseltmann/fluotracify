@@ -9868,9 +9868,12 @@ metrics = [tf.keras.metrics.TruePositives(name='tp', thresholds=thresholds),
 
      #+RESULTS:
      |                   |           |                                        |           |         |          |            |           |             |           |
-     | sh-5.1$           | sh-5.1$   | ye53nis@ara-login01.rz.uni-jena.de's | password: |         |          |            |           |             |           |
-     | channel           | 3:        | open                                   | failed:   | connect | failed:  | Connection | refused |             |           |
-     | ye53nis@node131's | password: | channel                                | 3:        | open    | failed:  | connect    | failed:   | Connection  | refused |
+     | sh-5.1$           | sh-5.1$   |
+ye53nis@ara-login01.rz.uni-jena.de's | password: |         |          |            |           |             |           |
+     | channel           | 3:        | open                                   | failed:   | connect | failed:  | Connection | refused
+ |             |           |
+     | ye53nis@node131's | password: | channel                                | 3:        | open    | failed:  | connect    | failed:   | Connection  | refused
+ |
      |                   |           |                                        |           |         |          |            |           |             |           |
      | Last              | login:    | Thu                                    | Jul       | 22      | 00:11:00 | 2021       | from      | login01.ara |           |
 
@@ -11069,7 +11072,7 @@ metrics = [tf.keras.metrics.TruePositives(name='tp', thresholds=thresholds),
      #+end_example
 
 **** update packages
-         - we need:
+    - we need:
       - jupyterlab
       - pip
       - pip:
@@ -12582,6 +12585,214 @@ metrics = [tf.keras.metrics.TruePositives(name='tp', thresholds=thresholds),
 *** TODO There is https://pypi.org/project/multipletau-cor-tttr/ check it out
     - it seems to be just an implementation of cross-correlation. Not sure if it
       works. For now I go with Dominics Focuspoint
+*** update packages
+    - we need:
+      - jupyterlab
+      - pip
+      - pip:
+        - numpy  >>> try without ==1.19.5 (was needed <1.20 for tensorflow at
+          some point)
+        - pandas
+        - matplotlib
+        - seaborn
+        - mlflow  >>> at the moment V1.22
+        - lmfit (needed by =fluotracify.applications.correlate=)
+        - tensorflow (instead of tf-nightly!), at the moment V2.7
+        - fcsfiles
+        - multipletau
+        - scikit-learn
+        - flake8  >>> the following 3 for flycheck
+        - pylint
+        - mypy
+
+
+
+maybe:
+- keras-preprocessing
+- scipy
+- tifffile → needed only for nanosimpy.input_and_output.py → saves out a
+  dictionary of intensity traces as a .tiff.
+
+    #+begin_example
+      conda env remove -n tf-nightly-lab
+      conda create -n tf jupyterlab pip
+      conda activate tf
+      (tf) pip install numpy mlflow lmfit scikit-learn tensorflow matplotlib pandas seaborn fcsfiles multipletau pylint mypy flake8 pyright
+      #+end_example
+
+  #+begin_src sh :session local2
+    conda list -n tf
+  #+end_src
+
+  #+RESULTS:
+  |                              |            |                   |             |    |                                         |
+  | #                            |   packages | in                | environment | at | /home/lex/Programme/miniconda3/envs/tf: |
+  |                              |            |                   |             |    |                                         |
+  | Name                         |    Version | Build             | Channel     |    |                                         |
+  | _libgcc_mutex                |        0.1 | main              |             |    |                                         |
+  | _openmp_mutex                |        4.5 | 1_gnu             |             |    |                                         |
+  | absl-py                      |      1.0.0 | pypi_0            | pypi        |    |                                         |
+  | alembic                      |      1.4.1 | pypi_0            | pypi        |    |                                         |
+  | anyio                        |      2.2.0 | py39h06a4308_1    |             |    |                                         |
+  | argon2-cffi                  |     20.1.0 | py39h27cfd23_1    |             |    |                                         |
+  | asteval                      |     0.9.25 | pypi_0            | pypi        |    |                                         |
+  | astunparse                   |      1.6.3 | pypi_0            | pypi        |    |                                         |
+  | async_generator              |        1.1 | pyhd3eb1b0_0      |             |    |                                         |
+  | attrs                        |     21.2.0 | pyhd3eb1b0_0      |             |    |                                         |
+  | babel                        |      2.9.1 | pyhd3eb1b0_0      |             |    |                                         |
+  | backcall                     |      0.2.0 | pyhd3eb1b0_0      |             |    |                                         |
+  | bleach                       |      4.0.0 | pyhd3eb1b0_0      |             |    |                                         |
+  | brotlipy                     |      0.7.0 | py39h27cfd23_1003 |             |    |                                         |
+  | ca-certificates              | 2021.10.26 | h06a4308_2        |             |    |                                         |
+  | cachetools                   |      4.2.4 | pypi_0            | pypi        |    |                                         |
+  | certifi                      |  2021.10.8 | py39h06a4308_0    |             |    |                                         |
+  | cffi                         |     1.14.6 | py39h400218f_0    |             |    |                                         |
+  | charset-normalizer           |      2.0.4 | pyhd3eb1b0_0      |             |    |                                         |
+  | click                        |      8.0.3 | pypi_0            | pypi        |    |                                         |
+  | cloudpickle                  |      2.0.0 | pypi_0            | pypi        |    |                                         |
+  | cryptography                 |     36.0.0 | py39h9ce1e76_0    |             |    |                                         |
+  | cycler                       |     0.11.0 | pypi_0            | pypi        |    |                                         |
+  | databricks-cli               |     0.16.2 | pypi_0            | pypi        |    |                                         |
+  | debugpy                      |      1.5.1 | py39h295c915_0    |             |    |                                         |
+  | decorator                    |      5.1.0 | pyhd3eb1b0_0      |             |    |                                         |
+  | defusedxml                   |      0.7.1 | pyhd3eb1b0_0      |             |    |                                         |
+  | docker                       |      5.0.3 | pypi_0            | pypi        |    |                                         |
+  | entrypoints                  |        0.3 | py39h06a4308_0    |             |    |                                         |
+  | fcsfiles                     |   2021.6.6 | pypi_0            | pypi        |    |                                         |
+  | flask                        |      2.0.2 | pypi_0            | pypi        |    |                                         |
+  | flatbuffers                  |        2.0 | pypi_0            | pypi        |    |                                         |
+  | fonttools                    |     4.28.5 | pypi_0            | pypi        |    |                                         |
+  | future                       |     0.18.2 | pypi_0            | pypi        |    |                                         |
+  | gast                         |      0.4.0 | pypi_0            | pypi        |    |                                         |
+  | gitdb                        |      4.0.9 | pypi_0            | pypi        |    |                                         |
+  | gitpython                    |     3.1.24 | pypi_0            | pypi        |    |                                         |
+  | google-auth                  |      2.3.3 | pypi_0            | pypi        |    |                                         |
+  | google-auth-oauthlib         |      0.4.6 | pypi_0            | pypi        |    |                                         |
+  | google-pasta                 |      0.2.0 | pypi_0            | pypi        |    |                                         |
+  | greenlet                     |      1.1.2 | pypi_0            | pypi        |    |                                         |
+  | grpcio                       |     1.43.0 | pypi_0            | pypi        |    |                                         |
+  | gunicorn                     |     20.1.0 | pypi_0            | pypi        |    |                                         |
+  | h5py                         |      3.6.0 | pypi_0            | pypi        |    |                                         |
+  | idna                         |        3.3 | pyhd3eb1b0_0      |             |    |                                         |
+  | importlib-metadata           |      4.8.2 | py39h06a4308_0    |             |    |                                         |
+  | importlib_metadata           |      4.8.2 | hd3eb1b0_0        |             |    |                                         |
+  | ipykernel                    |      6.4.1 | py39h06a4308_1    |             |    |                                         |
+  | ipython                      |     7.29.0 | py39hb070fc8_0    |             |    |                                         |
+  | ipython_genutils             |      0.2.0 | pyhd3eb1b0_1      |             |    |                                         |
+  | itsdangerous                 |      2.0.1 | pypi_0            | pypi        |    |                                         |
+  | jedi                         |     0.18.0 | py39h06a4308_1    |             |    |                                         |
+  | jinja2                       |      3.0.2 | pyhd3eb1b0_0      |             |    |                                         |
+  | joblib                       |      1.1.0 | pypi_0            | pypi        |    |                                         |
+  | json5                        |      0.9.6 | pyhd3eb1b0_0      |             |    |                                         |
+  | jsonschema                   |      3.2.0 | pyhd3eb1b0_2      |             |    |                                         |
+  | jupyter_client               |      7.1.0 | pyhd3eb1b0_0      |             |    |                                         |
+  | jupyter_core                 |      4.9.1 | py39h06a4308_0    |             |    |                                         |
+  | jupyter_server               |      1.4.1 | py39h06a4308_0    |             |    |                                         |
+  | jupyterlab                   |      3.2.1 | pyhd3eb1b0_1      |             |    |                                         |
+  | jupyterlab_pygments          |      0.1.2 | py_0              |             |    |                                         |
+  | jupyterlab_server            |      2.8.2 | pyhd3eb1b0_0      |             |    |                                         |
+  | keras                        |      2.7.0 | pypi_0            | pypi        |    |                                         |
+  | keras-preprocessing          |      1.1.2 | pypi_0            | pypi        |    |                                         |
+  | kiwisolver                   |      1.3.2 | pypi_0            | pypi        |    |                                         |
+  | ld_impl_linux-64             |     2.35.1 | h7274673_9        |             |    |                                         |
+  | libclang                     |     12.0.0 | pypi_0            | pypi        |    |                                         |
+  | libffi                       |        3.3 | he6710b0_2        |             |    |                                         |
+  | libgcc-ng                    |      9.3.0 | h5101ec6_17       |             |    |                                         |
+  | libgomp                      |      9.3.0 | h5101ec6_17       |             |    |                                         |
+  | libsodium                    |     1.0.18 | h7b6447c_0        |             |    |                                         |
+  | libstdcxx-ng                 |      9.3.0 | hd4cf53a_17       |             |    |                                         |
+  | lmfit                        |      1.0.3 | pypi_0            | pypi        |    |                                         |
+  | mako                         |      1.1.6 | pypi_0            | pypi        |    |                                         |
+  | markdown                     |      3.3.6 | pypi_0            | pypi        |    |                                         |
+  | markupsafe                   |      2.0.1 | py39h27cfd23_0    |             |    |                                         |
+  | matplotlib                   |      3.5.1 | pypi_0            | pypi        |    |                                         |
+  | matplotlib-inline            |      0.1.2 | pyhd3eb1b0_2      |             |    |                                         |
+  | mistune                      |      0.8.4 | py39h27cfd23_1000 |             |    |                                         |
+  | mlflow                       |     1.22.0 | pypi_0            | pypi        |    |                                         |
+  | multipletau                  |      0.3.3 | pypi_0            | pypi        |    |                                         |
+  | nbclassic                    |      0.2.6 | pyhd3eb1b0_0      |             |    |                                         |
+  | nbclient                     |      0.5.3 | pyhd3eb1b0_0      |             |    |                                         |
+  | nbconvert                    |      6.1.0 | py39h06a4308_0    |             |    |                                         |
+  | nbformat                     |      5.1.3 | pyhd3eb1b0_0      |             |    |                                         |
+  | ncurses                      |        6.3 | h7f8727e_2        |             |    |                                         |
+  | nest-asyncio                 |      1.5.1 | pyhd3eb1b0_0      |             |    |                                         |
+  | notebook                     |      6.4.6 | py39h06a4308_0    |             |    |                                         |
+  | numpy                        |     1.21.5 | pypi_0            | pypi        |    |                                         |
+  | oauthlib                     |      3.1.1 | pypi_0            | pypi        |    |                                         |
+  | openssl                      |     1.1.1l | h7f8727e_0        |             |    |                                         |
+  | opt-einsum                   |      3.3.0 | pypi_0            | pypi        |    |                                         |
+  | packaging                    |       21.3 | pyhd3eb1b0_0      |             |    |                                         |
+  | pandas                       |      1.3.5 | pypi_0            | pypi        |    |                                         |
+  | pandocfilters                |      1.4.3 | py39h06a4308_1    |             |    |                                         |
+  | parso                        |      0.8.2 | pyhd3eb1b0_0      |             |    |                                         |
+  | pexpect                      |      4.8.0 | pyhd3eb1b0_3      |             |    |                                         |
+  | pickleshare                  |      0.7.5 | pyhd3eb1b0_1003   |             |    |                                         |
+  | pillow                       |      8.4.0 | pypi_0            | pypi        |    |                                         |
+  | pip                          |     21.2.4 | py39h06a4308_0    |             |    |                                         |
+  | prometheus-flask-exporter    |     0.18.7 | pypi_0            | pypi        |    |                                         |
+  | prometheus_client            |     0.12.0 | pyhd3eb1b0_0      |             |    |                                         |
+  | prompt-toolkit               |     3.0.20 | pyhd3eb1b0_0      |             |    |                                         |
+  | protobuf                     |     3.19.1 | pypi_0            | pypi        |    |                                         |
+  | ptyprocess                   |      0.7.0 | pyhd3eb1b0_2      |             |    |                                         |
+  | pyasn1                       |      0.4.8 | pypi_0            | pypi        |    |                                         |
+  | pyasn1-modules               |      0.2.8 | pypi_0            | pypi        |    |                                         |
+  | pycparser                    |       2.21 | pyhd3eb1b0_0      |             |    |                                         |
+  | pygments                     |     2.10.0 | pyhd3eb1b0_0      |             |    |                                         |
+  | pyopenssl                    |     21.0.0 | pyhd3eb1b0_1      |             |    |                                         |
+  | pyparsing                    |      3.0.4 | pyhd3eb1b0_0      |             |    |                                         |
+  | pyrsistent                   |     0.18.0 | py39heee7806_0    |             |    |                                         |
+  | pysocks                      |      1.7.1 | py39h06a4308_0    |             |    |                                         |
+  | python                       |      3.9.7 | h12debd9_1        |             |    |                                         |
+  | python-dateutil              |      2.8.2 | pyhd3eb1b0_0      |             |    |                                         |
+  | python-editor                |      1.0.4 | pypi_0            | pypi        |    |                                         |
+  | pytz                         |     2021.3 | pyhd3eb1b0_0      |             |    |                                         |
+  | pyyaml                       |        6.0 | pypi_0            | pypi        |    |                                         |
+  | pyzmq                        |     22.3.0 | py39h295c915_2    |             |    |                                         |
+  | querystring-parser           |      1.2.4 | pypi_0            | pypi        |    |                                         |
+  | readline                     |        8.1 | h27cfd23_0        |             |    |                                         |
+  | requests                     |     2.26.0 | pyhd3eb1b0_0      |             |    |                                         |
+  | requests-oauthlib            |      1.3.0 | pypi_0            | pypi        |    |                                         |
+  | rsa                          |        4.8 | pypi_0            | pypi        |    |                                         |
+  | scikit-learn                 |      1.0.2 | pypi_0            | pypi        |    |                                         |
+  | scipy                        |      1.7.3 | pypi_0            | pypi        |    |                                         |
+  | seaborn                      |     0.11.2 | pypi_0            | pypi        |    |                                         |
+  | send2trash                   |      1.8.0 | pyhd3eb1b0_1      |             |    |                                         |
+  | setuptools                   |     58.0.4 | py39h06a4308_0    |             |    |                                         |
+  | six                          |     1.16.0 | pyhd3eb1b0_0      |             |    |                                         |
+  | smmap                        |      5.0.0 | pypi_0            | pypi        |    |                                         |
+  | sniffio                      |      1.2.0 | py39h06a4308_1    |             |    |                                         |
+  | sqlalchemy                   |     1.4.29 | pypi_0            | pypi        |    |                                         |
+  | sqlite                       |     3.37.0 | hc218d9a_0        |             |    |                                         |
+  | sqlparse                     |      0.4.2 | pypi_0            | pypi        |    |                                         |
+  | tabulate                     |      0.8.9 | pypi_0            | pypi        |    |                                         |
+  | tensorboard                  |      2.7.0 | pypi_0            | pypi        |    |                                         |
+  | tensorboard-data-server      |      0.6.1 | pypi_0            | pypi        |    |                                         |
+  | tensorboard-plugin-wit       |      1.8.0 | pypi_0            | pypi        |    |                                         |
+  | tensorflow                   |      2.7.0 | pypi_0            | pypi        |    |                                         |
+  | tensorflow-estimator         |      2.7.0 | pypi_0            | pypi        |    |                                         |
+  | tensorflow-io-gcs-filesystem |     0.23.1 | pypi_0            | pypi        |    |                                         |
+  | termcolor                    |      1.1.0 | pypi_0            | pypi        |    |                                         |
+  | terminado                    |      0.9.4 | py39h06a4308_0    |             |    |                                         |
+  | testpath                     |      0.5.0 | pyhd3eb1b0_0      |             |    |                                         |
+  | threadpoolctl                |      3.0.0 | pypi_0            | pypi        |    |                                         |
+  | tk                           |     8.6.11 | h1ccaba5_0        |             |    |                                         |
+  | tornado                      |        6.1 | py39h27cfd23_0    |             |    |                                         |
+  | traitlets                    |      5.1.1 | pyhd3eb1b0_0      |             |    |                                         |
+  | typing-extensions            |      4.0.1 | pypi_0            | pypi        |    |                                         |
+  | tzdata                       |      2021e | hda174b7_0        |             |    |                                         |
+  | uncertainties                |      3.1.6 | pypi_0            | pypi        |    |                                         |
+  | urllib3                      |     1.26.7 | pyhd3eb1b0_0      |             |    |                                         |
+  | wcwidth                      |      0.2.5 | pyhd3eb1b0_0      |             |    |                                         |
+  | webencodings                 |      0.5.1 | py39h06a4308_1    |             |    |                                         |
+  | websocket-client             |      1.2.3 | pypi_0            | pypi        |    |                                         |
+  | werkzeug                     |      2.0.2 | pypi_0            | pypi        |    |                                         |
+  | wheel                        |     0.37.0 | pyhd3eb1b0_1      |             |    |                                         |
+  | wrapt                        |     1.13.3 | pypi_0            | pypi        |    |                                         |
+  | xz                           |      5.2.5 | h7b6447c_0        |             |    |                                         |
+  | zeromq                       |      4.3.4 | h2531618_0        |             |    |                                         |
+  | zipp                         |      3.6.0 | pyhd3eb1b0_0      |             |    |                                         |
+  | zlib                         |     1.2.11 | h7f8727e_4        |             |    |                                         |
+
 *** TODO Check out Focuspoint
     :PROPERTIES:
     :header-args:jupyter-python: :session /jpy:localhost#8888:a37e524a-8134-4d8f-b24a-367acaf1bdd3
@@ -12589,28 +12800,47 @@ metrics = [tf.keras.metrics.TruePositives(name='tp', thresholds=thresholds),
     - Because Dominic does not provide the correlation code as pypi, I will copy
       it to my own code repository
       #+BEGIN_SRC jupyter-python
+        import datetime
+        import logging
         import mlflow
+        import os
         import sys
         import matplotlib.pyplot as plt
+        import multipletau
         import numpy as np
+        import tensorflow as tf
+        from pathlib import Path
+        from pprint import pprint
+
         FLUOTRACIFY_PATH = '/home/lex/Programme/drmed-git/src/'
         sys.path.append(FLUOTRACIFY_PATH)
-        from fluotracify.applications import corr_fit_object as cfo
-        from fluotracify.applications import correlate
+        from fluotracify.applications import (fitting_methods_SE as SE,
+                                              fitting_methods_GS as GS,
+                                              fitting_methods_VD as VD,
+                                              fitting_methods_PB as PB,
+                                              corr_fit_object as cfo,
+                                              correlate)
         from fluotracify.imports import ptu_utils as ptu
+        from fluotracify.training import build_model as bm, preprocess_data as ppd
       #+END_SRC
 
       #+RESULTS:
+      : 2022-01-18 12:00:52.167390: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+      : 2022-01-18 12:00:52.167440: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
 
       #+BEGIN_SRC jupyter-python
         import importlib
         importlib.reload(cfo)
         importlib.reload(ptu)
         importlib.reload(correlate)
+        importlib.reload(ppd)
+        importlib.reload(bm)
+
       #+END_SRC
 
       #+RESULTS:
-      : <module 'fluotracify.applications.correlate' from '/home/lex/Programme/drmed-git/src/fluotracify/applications/correlate.py'>
+      : <module 'fluotracify.training.build_model' from '/home/lex/Programme/drmed-git/src/fluotracify/training/build_model.py'>
+
 
       #+BEGIN_SRC jupyter-python
         ptu_test_file = "/home/lex/Programme/drmed-collections/data-from-Eggeling-group/brightbursts/pablo_structured_experiment/DiO LUV 10uM in 20 nM AF4881_T0s_1.ptu"
@@ -12624,113 +12854,485 @@ metrics = [tf.keras.metrics.TruePositives(name='tp', thresholds=thresholds),
                 self.colors = ['blue', 'green', 'red', 'cyan', 'magenta',
                                'yellow', 'black']
                 self.numOfLoaded = 0
+                # very fast from Ncasc ~ 14 onwards
                 self.NcascStart = 0
-                self.NcascEnd = 25
-                self.Nsub = 6
-                self.winInt = 10
-                self.photonCountBin = 25
+                self.NcascEnd = 27  # 25
+                self.Nsub = 6  # 6
+                self.photonLifetimeBin = 10  # used for photon decay
+                self.photonCountBin = 1  # used for time series
 
         par_obj = ParameterClass()
+        #+END_SRC
+
+#+RESULTS:
+
+#+BEGIN_SRC jupyter-python
+  ptufile = cfo.PicoObject(ptu_test_file, par_obj)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+  2022-01-18 19:15:31,031 - Start CorrObj creation.
+  Writing 5757968 records, this may take a while...
+  HydraHarp V2 T3 data
+  Progress: 0.0%, 1000.0070000490003 2 733]
+
+  Progress: 17.4%, 1971619951.3396595 2 391]
+
+  Progress: 34.7%, ('OFL', 1) ('OFL', 1) ('OFL', 1)]
+  Progress: 52.1%, 5262111134.777944 2 34]
+  Progress: 69.5%, 7003620350.342453 2 393]
+  Progress: 86.8%, 8625954756.683298 2 72]
+  2022-01-18 19:15:54,103 - Finished import.
+  2022-01-18 19:15:54,486 - Finished prepareChannels()
+  numOfCH 1 [2]
+  2022-01-18 19:15:55,004 - Finished time2bin. last_time=1560.0, num_bins=156.0
+  2022-01-18 19:15:55,008 - Finished getPhotonDecay() with name DiO LUV 10uM in 20 nM AF4881_T0s_1
+  2022-01-18 19:15:55,203 - Finished time2bin. last_time=9996.0, num_bins=9996.0
+  2022-01-18 19:15:55,207 - Finished getTimeSeries() with truetime_name DiO LUV 10uM in 20 nM AF4881_T0s_1, timeseries_name DiO LUV 10uM in 20 nM AF4881_T0s_1
+  2022-01-18 19:15:55,214 - Finished getPhotonCountingStats() with name: DiO LUV 10uM in 20 nM AF4881_T0s_1
+  2022-01-18 19:15:55,224 - Processed dTimeInfo()
+#+end_example
+
+
+
+
+#+BEGIN_SRC jupyter-python
+  ptufile.getCrossAndAutoCorrelation()
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+  2022-01-09 21:07:22,706 - Starting first crossAndAuto() with ch_present[i] 2 and ch_present[j] 2
+  2022-01-09 21:07:42,054 - crossAndAuto: sum(indeces)=5367511
+  2022-01-09 21:07:42,463 - crossAndAuto: finished preparation
+  2022-01-09 21:08:32,930 - tttr2xfcs: finished Ncasc 0
+  2022-01-09 21:09:22,298 - tttr2xfcs: finished Ncasc 1
+  2022-01-09 21:10:12,001 - tttr2xfcs: finished Ncasc 2
+  2022-01-09 21:11:00,703 - tttr2xfcs: finished Ncasc 3
+  2022-01-09 21:11:40,254 - tttr2xfcs: finished Ncasc 4
+  2022-01-09 21:12:18,470 - tttr2xfcs: finished Ncasc 5
+  2022-01-09 21:12:58,538 - tttr2xfcs: finished Ncasc 62022-01-09 21:13:38,489 - tttr2xfcs: finished Ncasc 7
+  2022-01-09 21:14:19,513 - tttr2xfcs: finished Ncasc 8
+  2022-01-09 21:14:59,947 - tttr2xfcs: finished Ncasc 9
+  2022-01-09 21:15:37,648 - tttr2xfcs: finished Ncasc 10
+  2022-01-09 21:16:08,864 - tttr2xfcs: finished Ncasc 11
+  2022-01-09 21:16:31,829 - tttr2xfcs: finished Ncasc 12
+  2022-01-09 21:16:44,841 - tttr2xfcs: finished Ncasc 13
+  2022-01-09 21:16:51,918 - tttr2xfcs: finished Ncasc 14
+  2022-01-09 21:16:55,128 - tttr2xfcs: finished Ncasc 15
+  2022-01-09 21:16:56,809 - tttr2xfcs: finished Ncasc 16
+  2022-01-09 21:16:57,652 - tttr2xfcs: finished Ncasc 17
+  2022-01-09 21:16:58,128 - tttr2xfcs: finished Ncasc 18
+  2022-01-09 21:16:58,376 - tttr2xfcs: finished Ncasc 19
+  2022-01-09 21:16:58,474 - tttr2xfcs: finished Ncasc 20
+  2022-01-09 21:16:58,524 - tttr2xfcs: finished Ncasc 21
+  2022-01-09 21:16:58,552 - tttr2xfcs: finished Ncasc 22
+  2022-01-09 21:16:58,570 - tttr2xfcs: finished Ncasc 23
+  2022-01-09 21:16:58,579 - tttr2xfcs: finished Ncasc 24
+  2022-01-09 21:16:58,585 - tttr2xfcs: finished Ncasc 25
+  2022-01-09 21:16:58,591 - tttr2xfcs: finished Ncasc 26
+  2022-01-09 21:16:58,593 - Finished crossAndAuto - tttr2xfcs().
+  2022-01-09 21:16:58,997 - Finished crossAndAuto()
+  2022-01-09 21:16:59,016 - Finished crossAndAuto()
+#+end_example
+
+#+BEGIN_SRC jupyter-python
+   pprint(('ptufile.timeSeries', ptufile.timeSeries), depth=3)
+   pprint(('ptufile.timeSeriesScale', ptufile.timeSeriesScale), depth=3)
+   pprint(('ptufile.decayScale', ptufile.decayScale), depth=3)
+   for key, item in ptufile.photonDecay.items():
+       print('ptufile.photonDecay\t\t', key)
+       for key2, item2 in item.items():
+           print('\t', key2, np.shape(item2), type(item2))
+  for (atkey, at), (ankey, an) in zip(ptufile.autotime.items(), ptufile.autoNorm.items()):
+       print('ptufile.autotime / ptufile.autoNorm\t\t', ankey)
+       print('\t shape autotime', np.shape(at))
+       for key2, item2 in an.items():
+           print('\t', key2, np.shape(item2), type(item2))
+
+   pprint(np.shape(ptufile.indx_arr))
+   pprint(('ptufile.kcount', ptufile.kcount), depth=3)
+   pprint(('ptufile.brightnessNandB', ptufile.brightnessNandB))
+   pprint(('ptufile.numberNandB', ptufile.numberNandB))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+  ('ptufile.timeSeries',
+   {'DiO LUV 10uM in 20 nM AF4881_T0s_1': {'CH0_BIN1000': [...]}})
+  ('ptufile.timeSeriesScale',
+   {'DiO LUV 10uM in 20 nM AF4881_T0s_1': {'CH0_BIN1000': [...]}})
+  ('ptufile.decayScale',
+   {'DiO LUV 10uM in 20 nM AF4881_T0s_1': {'CH0_BIN10': [...]}})
+  ptufile.photonDecay		 DiO LUV 10uM in 20 nM AF4881_T0s_1
+     Orig_CH0_BIN10 (156,) <class 'numpy.ndarray'>
+     Min_CH0_BIN10 (156,) <class 'numpy.ndarray'>
+     Norm_CH0_BIN10 (156,) <class 'numpy.ndarray'>
+  ptufile.autotime / ptufile.autoNorm		 DiO LUV 10uM in 20 nM AF4881_T0s_1
+     shape autotime (162, 1)
+     CH0_CH0 (162,) <class 'numpy.ndarray'>
+  (1, 2)
+  ('ptufile.kcount',
+   {'DiO LUV 10uM in 20 nM AF4881_T0s_1': {'CH0_BIN1000': 536.9611844737896}})
+  ('ptufile.brightnessNandB',
+   {'DiO LUV 10uM in 20 nM AF4881_T0s_1': {'CH0_BIN1000': 0.07741845838055586}})
+  ('ptufile.numberNandB',
+   {'DiO LUV 10uM in 20 nM AF4881_T0s_1': {'CH0_BIN1000': 6.936175892065387}})
+#+end_example
+
+
+
+#+BEGIN_SRC jupyter-python
+  decayScale = ptufile.decayScale['DiO LUV 10uM in 20 nM AF4881_T0s_1']['CH0_BIN10']
+  photonDecay = ptufile.photonDecay['DiO LUV 10uM in 20 nM AF4881_T0s_1']
+  timeSeriesScale = ptufile.timeSeriesScale['DiO LUV 10uM in 20 nM AF4881_T0s_1']['CH0_BIN1000']
+  timeSeries = ptufile.timeSeries['DiO LUV 10uM in 20 nM AF4881_T0s_1']['CH0_BIN1000']
+  autotime = ptufile.autotime['DiO LUV 10uM in 20 nM AF4881_T0s_1'].flatten()
+  autoNorm = ptufile.autoNorm['DiO LUV 10uM in 20 nM AF4881_T0s_1']['CH0_CH0']
+
+  plt.figure(figsize=(16, 16), facecolor='white')
+  plt.subplot(4, 2, 1, xlabel='decayScale', title='photonDecay').plot(
+      decayScale, photonDecay['Orig_CH0_BIN10'])
+  plt.subplot(4, 2, 2, xlabel='decayScale', title='photonDecayMin').plot(
+      decayScale, photonDecay['Min_CH0_BIN10'])
+  plt.subplot(4, 2, 3, xlabel='decayScale', title='photonDecayNorm').plot(
+      decayScale, photonDecay['Norm_CH0_BIN10'])
+  plt.subplot(4, 2, 4, title='subChanArr').plot(ptufile.subChanArr)
+  plt.subplot(4, 2, 5, title='trueTimeArr').plot(ptufile.trueTimeArr)
+  plt.subplot(4, 2, 6, xlabel='timeSeriesScale', title='timeSeries').plot(
+      timeSeriesScale, timeSeries)
+  plt.subplot(4, 2, 7, xlabel='autotime', title='semilogx(autoNorm)').semilogx(
+      autotime, autoNorm)
+  plt.tight_layout()
+  plt.show()
+#+END_SRC
+
+#+RESULTS:
+
+
+
+[[file:./.ob-jupyter/plot_after_init.png]]
+
+#+BEGIN_SRC jupyter-python
+  logged_model = 'file:///home/lex/Programme/drmed-git/data/mlruns/8/00f2635d9fa2463c9a066722163405be/artifacts/model'
+  metrics_thresholds = [0.1, 0.3, 0.5, 0.7, 0.9]
+
+  loaded_model = mlflow.keras.load_model(logged_model, compile=False)
+  loaded_model.compile(loss=bm.binary_ce_dice_loss(),
+                       optimizer=tf.keras.optimizers.Adam(),
+                       metrics = bm.unet_metrics(metrics_thresholds))
+  bm.prepare_model(loaded_model)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+  WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
+  2022-01-18 18:44:56,594 - Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
+  test shape: (1, 16384, 1) [1.4064240e-01 1.3650321e-08 7.4799689e-10 ... 3.1755112e-10 1.8236192e-10
+   6.6588524e-10]
+  test shape: (1, 8192, 1). prediction failed
+  test shape: (1, 4096, 1) [1.4064240e-01 1.3650321e-08 7.4799689e-10 ... 3.1755051e-10 1.8236192e-10
+   6.6588524e-10]
+  test shape: (1, 8192, 1) [1.4064240e-01 1.3650321e-08 7.4799689e-10 ... 3.1755112e-10 1.8236192e-10
+   6.6588524e-10]
+  UNET ready for different trace lengths
+#+end_example
+
+
+
+
+[[file:./.ob-jupyter/1b45e8dd5d3f989d32c76c62bd21283e8fac95b3.png]]
+
+
+#+BEGIN_SRC jupyter-python
+  ptufile.predictTimeSeries(model=loaded_model,
+                            scaler='minmax')
+  ptufile.correctTCSPC(method='weights',
+                       weight=0.1)
+  # ptufile.getTimeSeries(timeseries_name='noshift')
+  # ptufile.predictTimeSeries(model=loaded_model,
+  #                           scaler='minmax',
+  #                           name='noshift')
+  # ptufile.correctTCSPC(method='delete',
+  #                      timeseries_name='noshift')
+  ptufile.get_autocorrelation(method='tttr2xfcs_with_weights', name='CH2_DiO LUV 10uM in 20 nM AF4881_T0s_1_FORWEIGHTS')
+  # ptufile.get_autocorrelation(method='tttr2xfcs', name='noshift_CORRECTED')
+  # ptufile.get_autocorrelation(method='tttr2xfcs', name='DiO LUV 10uM in 20 nM AF4881_T0s_1')
+  # ptufile.get_autocorrelation(method='tttr2xfcs', name='DiO LUV 10uM in 20 nM AF4881_T0s_1_CORRECTED')
+  # ptufile.get_autocorrelation(method='multipletau', name=('DiO LUV 10uM in 20 nM AF4881_T0s_1', 'CH2_BIN1'))
+  # ptufile.get_autocorrelation(method='multipletau', name=('noshift', 'CH2_BIN1000_CORRECTED'))
+
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+  2022-01-18 19:27:05,392 - Finished predictTimeSeries() with name=DiO LUV 10uM in 20 nM AF4881_T0s_1
+  2022-01-18 19:27:05,466 - correctTCSPC: some samples: subChan 5367464, truetime 5367464,photonMask 5367464, channelMask 5367511
+  2022-01-18 19:27:05,537 - Finished correctTCSPC() with name DiO LUV 10uM in 20 nM AF4881_T0s_1, timeseries_name DiO LUV 10uM in 20 nM AF4881_T0s_1
+  2022-01-18 19:27:05,538 - get_autocorrelation: Starting tttr2xfcs correlation.
+  3864934.7000000137
+  2022-01-18 19:27:37,208 - tttr2xfcs: finished Ncasc 0
+  2022-01-18 19:28:07,205 - tttr2xfcs: finished Ncasc 1
+  2022-01-18 19:28:39,209 - tttr2xfcs: finished Ncasc 2
+  2022-01-18 19:29:10,440 - tttr2xfcs: finished Ncasc 3
+  2022-01-18 19:29:40,288 - tttr2xfcs: finished Ncasc 4
+  2022-01-18 19:30:12,089 - tttr2xfcs: finished Ncasc 5
+  2022-01-18 19:30:42,830 - tttr2xfcs: finished Ncasc 6
+  2022-01-18 19:31:14,335 - tttr2xfcs: finished Ncasc 7
+  2022-01-18 19:31:48,160 - tttr2xfcs: finished Ncasc 8
+  2022-01-18 19:32:20,211 - tttr2xfcs: finished Ncasc 9
+  2022-01-18 19:32:50,751 - tttr2xfcs: finished Ncasc 10
+  2022-01-18 19:33:18,272 - tttr2xfcs: finished Ncasc 11
+  2022-01-18 19:33:37,274 - tttr2xfcs: finished Ncasc 12
+  2022-01-18 19:33:48,376 - tttr2xfcs: finished Ncasc 13
+  2022-01-18 19:33:54,416 - tttr2xfcs: finished Ncasc 14
+  2022-01-18 19:33:57,258 - tttr2xfcs: finished Ncasc 15
+  2022-01-18 19:33:58,731 - tttr2xfcs: finished Ncasc 16
+  2022-01-18 19:33:59,476 - tttr2xfcs: finished Ncasc 17
+  2022-01-18 19:33:59,833 - tttr2xfcs: finished Ncasc 18
+  2022-01-18 19:34:00,015 - tttr2xfcs: finished Ncasc 19
+  2022-01-18 19:34:00,115 - tttr2xfcs: finished Ncasc 20
+  2022-01-18 19:34:00,164 - tttr2xfcs: finished Ncasc 21
+  2022-01-18 19:34:00,188 - tttr2xfcs: finished Ncasc 22
+  2022-01-18 19:34:00,201 - tttr2xfcs: finished Ncasc 23
+  2022-01-18 19:34:00,208 - tttr2xfcs: finished Ncasc 24
+  2022-01-18 19:34:00,213 - tttr2xfcs: finished Ncasc 25
+  2022-01-18 19:34:00,217 - tttr2xfcs: finished Ncasc 26
+  2022-01-18 19:34:00,761 - old sum: 3697987, new sum: 3864934.7000000137
+  2022-01-18 19:34:00,762 - finished get_autocorrelation() with method=tttr2xfcs_with_weights, name=DiO LUV 10uM in 20 nM AF4881_T0s_1_FORWEIGHTS
+#+end_example
+
+
+
+
+#+begin_src jupyter-python
+  timeSeriesScale = ptufile.timeSeriesScale[
+      'DiO LUV 10uM in 20 nM AF4881_T0s_1']['CH0_BIN1000']
+  timeSeries = ptufile.timeSeries[
+      'DiO LUV 10uM in 20 nM AF4881_T0s_1']['CH0_BIN1000']
+  timeSeriesPrepro = ptufile.timeSeries[
+      'DiO LUV 10uM in 20 nM AF4881_T0s_1']['CH0_BIN1000_PREPRO']
+  predictions = ptufile.predictions[
+      'DiO LUV 10uM in 20 nM AF4881_T0s_1']['CH0_BIN1000']
+  timeSeriesScaleCorrected = ptufile.timeSeriesScale[
+      'DiO LUV 10uM in 20 nM AF4881_T0s_1']['CH0_BIN1000_CORRECTED']
+  timeSeriesCorrected = ptufile.timeSeries[
+      'DiO LUV 10uM in 20 nM AF4881_T0s_1']['CH0_BIN1000_CORRECTED']
+  timeSeriesScaleNoshift = ptufile.timeSeriesScale['noshift']['CH0_BIN1000_CORRECTED']
+  timeSeriesNoshift = ptufile.timeSeries['noshift']['CH0_BIN1000_CORRECTED']
+
+  autoNormNoshift = ptufile.autoNorm[
+      'tttr2xfcs']['noshift_CORRECTED_CH0'].flatten()
+  autoNormNoshift2 = np.where(autoNormNoshift < 0, np.nan, autoNormNoshift)
+  autotimeNoshift = ptufile.autotime[
+      'tttr2xfcs']['noshift_CORRECTED_CH0'].flatten()
+  autotimeNoshift2 = np.where(autoNormNoshift < 0, np.nan, autotimeNoshift)
+  autoNormCorr = ptufile.autoNorm[
+      'tttr2xfcs']['DiO LUV 10uM in 20 nM AF4881_T0s_1_CORRECTED_CH0'].flatten()
+  autoNormCorr2 = np.where(autoNormCorr < 0, np.nan, autoNormCorr)
+  autotimeCorr = ptufile.autotime[
+      'tttr2xfcs']['DiO LUV 10uM in 20 nM AF4881_T0s_1_CORRECTED_CH0'].flatten()
+  autotimeCorr2 = np.where(autoNormCorr < 0, np.nan, autotimeCorr)
+  autoNorm = ptufile.autoNorm[
+      'tttr2xfcs']['DiO LUV 10uM in 20 nM AF4881_T0s_1_CH0'].flatten()
+  autoNorm2 = np.where(autoNorm < -0.2, np.nan, autoNorm)
+  autotime = ptufile.autotime[
+      'tttr2xfcs']['DiO LUV 10uM in 20 nM AF4881_T0s_1_CH0'].flatten()
+  autotime2 = np.where(autoNorm < -0.2, np.nan, autotime)
+
+  plt.figure(figsize=(16, 16), facecolor='white')
+  plt.subplot(4, 2, 1, xlabel='timeSeriesScale', title='timeSeries').plot(
+      timeSeriesScale, timeSeries)
+  plt.subplot(4, 2, 2, xlabel='autotime', title='autoNorm').semilogx(
+      autotime2, autoNorm2)
+  plt.subplot(4, 2, 2).twinx().semilogx(
+      autotime, autoNorm, alpha=0.5, color='tab:orange')
+  plt.subplot(4, 2, 3, title='timeSeriesPrepro + predictions').plot(
+      timeSeriesPrepro)
+  plt.subplot(4, 2, 3, title='timeSeriesPrepro + predictions').plot(
+      predictions, alpha=0.5)
+  plt.subplot(4, 2, 5, xlabel='timeSeriesScaleCorrected', title='timeSeriesCorrected with shift').plot(
+      timeSeriesScaleCorrected, timeSeriesCorrected)
+  plt.subplot(4, 2, 6, xlabel='autotimeCorrected', title='autoNormCorrected with shift').semilogx(
+      autotimeCorr2, autoNormCorr2)
+  plt.subplot(4, 2, 6).twinx().semilogx(
+      autotimeCorr, autoNormCorr, alpha=0.5, color='tab:orange')
+  plt.subplot(4, 2, 7, xlabel='timeSeriesScale', title='timeSeriesCorrected without shift').plot(
+      timeSeriesScaleNoshift, timeSeriesNoshift)
+  plt.subplot(4, 2, 8, xlabel='autotimeNoshift', title='autoNormCorrected without shift').semilogx(
+      autotimeNoshift2, autoNormNoshift2)
+  plt.subplot(4, 2, 8).twinx().semilogx(
+      autotimeNoshift, autoNormNoshift, alpha=0.5, color='tab:orange')
+  plt.tight_layout()
+  plt.show()
+#+end_src
+
+      #+RESULTS:
+
+
+file:./.ob-jupyter/plot_after_correction.png
+
+
+
+      - lets write save function
+      #+BEGIN_SRC jupyter-python
+        name = 'CH2_BIN1_DiO LUV 10uM in 20 nM AF4881_T0s_1'
+        methods = ['multipletau', 'tttr2xfcs', 'tttr2xfcs_with_weights']
+        for m in methods:
+            try:
+                ptufile.save_autocorrelation(name=name, method=m)
+            except Exception:
+                continue
+            print(m)
       #+END_SRC
 
       #+RESULTS:
+      : tttr2xfcs_with_weights
+
+
+- implement correction with =num= of tttr2xfcs
+#+BEGIN_SRC jupyter-python
+  x = ptufile.autotime['tttr2xfcs']['CH2_DiO LUV 10uM in 20 nM AF4881_T0s_1_FORWEIGHTS_WEIGHTED'].flatten()
+  y = ptufile.autoNorm['tttr2xfcs']['CH2_DiO LUV 10uM in 20 nM AF4881_T0s_1_FORWEIGHTS_WEIGHTED'].flatten()
+  y2 = np.where(y < 0, np.nan, y)
+  x2 = np.where(y < 0, np.nan, x)
+  plt.semilogx(x, y)
+  plt.twinx().semilogx(x2, y2, color='tab:orange')
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+| <matplotlib.lines.Line2D | at | 0x7fb82b999550> |
+[[file:./.ob-jupyter/13b6176ba703cffb89640a07da1c209f60f2fe4f.png]]
+:END:
+
+
+
+#+BEGIN_SRC jupyter-python
+        trace = timeSeries
+        predictions = ptufile.predictions[
+            'DiO LUV 10uM in 20 nM AF4881_T0s_1']['CH0_BIN1000']
+        ts_size = ptufile.timeSeriesSize[
+            'DiO LUV 10uM in 20 nM AF4881_T0s_1']['CH0_BIN1000']
+        pred_05 = predictions[:ts_size] > 0.5
+        pred_05_rep = np.repeat(pred_05, trace)
+        trueTimeCorrected = np.array(ptufile.trueTimeArr[
+            'DiO LUV 10uM in 20 nM AF4881_T0s_1'] / 1000)[:pred_05_rep.size]
+        subChanCorrected = np.array(ptufile.subChanArr[
+            'DiO LUV 10uM in 20 nM AF4881_T0s_1'])[:pred_05_rep.size]
+        trueTimeCorrected = np.delete(trueTimeCorrected, pred_05_rep)
+        subChanCorrected = np.delete(subChanCorrected, pred_05_rep)
+        print(trueTimeCorrected.shape, sum(trace), sum(trace * ~pred_05))
+        # idxphot = 0
+        # for nphot, artifact in zip(trace, pred_05):
+        #     if artifact:
+        #         trueTimeCorrected[idxphot:] -= 1000
+        #     else:
+        #         idxphot += nphot
+        # print(f'done {trueTimeCorrected.shape}, {idxphot}')
+        timeSeriesCorrected, timeSeriesScaleCorrected = ptufile.time2bin(
+            trueTimeCorrected, subChanCorrected, ptufile.ch_present[0],
+            1000)
+        print(np.shape(trace))
+        # plot it compared with deleting on time Series directly
+        timeSeriesCorrected2 = np.array(trace)
+        timeSeriesCorrected2 = np.delete(timeSeriesCorrected2, pred_05)
+        timeSeriesCorrected3 = np.where(pred_05 ==1, 0, np.array(trace))
+        tsScaleCorrected = np.array(ptufile.timeSeriesScale['DiO LUV 10uM in 20 nM AF4881_T0s_1']['CH0_BIN1000'])
+        print(tsScaleCorrected[:5])
+        tsScaleCorrected2 = np.delete(tsScaleCorrected, pred_05)
+        plt.figure(figsize=(16, 12), facecolor='white')
+        plt.subplot(3,1,1).plot(tsScaleCorrected2, timeSeriesCorrected2)
+        plt.subplot(3,1,2).plot(timeSeriesScaleCorrected, timeSeriesCorrected)
+        plt.subplot(3,1,3).plot(tsScaleCorrected, timeSeriesCorrected3)
+        plt.show()
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+: 2022-01-11 15:32:27,252 - Finished time2bin. last_time=9995000.0, num_bins=9995.0
+: (3697987,) 5367464 3697987
+: (9996,)
+: [ 500. 1500. 2500. 3500. 4500.]
+[[file:./.ob-jupyter/dc0fa695779104eb20f27467b335eaa9ac69b45d.png]]
+:END:
 
       #+BEGIN_SRC jupyter-python
-        ptufile = cfo.picoObject(ptu_test_file, par_obj, None)
+        # ptufile.autoNorm['multipletau']['DiO LUV 10uM in 20 nM AF4881_T0s_1_CH2_BIN1'].shape
+        # ptufile.autotime['multipletau']['DiO LUV 10uM in 20 nM AF4881_T0s_1_CH2_BIN1'].shape
+        print(ptufile.autotime[
+'tttr2xfcs_with_weights']['CH2_BIN1_DiO LUV 10uM in 20 nM AF4881_T0s_1'].shape)
+        print(ptufile.autoNorm['tttr2xfcs_with_weights']['CH2_BIN1_DiO LUV 10uM in 20 nM AF4881_T0s_1'].shape)
+        print(ptufile.autotime[
+'tttr2xfcs']['CH2_BIN1_iO LUV 10uM in 20 nM AF4881_T0s_1'].shape)
+        print(ptufile.autoNorm['tttr2xfcs']['CH2_BIN1_iO LUV 10uM in 20 nM AF4881_T0s_1'].shape)
+        print(ptufile.autotime[
+'multipletau']['CH2_BIN1_DiO LUV 10uM in 20 nM AF4881_T0s_1'].shape)
+        print(ptufile.autoNorm['multipletau']['CH2_BIN1_DiO LUV 10uM in 20 nM AF4881_T0s_1'].shape)
       #+END_SRC
 
       #+RESULTS:
-      #+begin_example
-        2021-12-30 13:35:47,192 - Start CorrObj creation.
-        Writing 5757968 records, this may take a while...
-        HydraHarp V2 T3 data
-        Progress: 0.0%, 1000.0070000490003 2 733]
+      : (162, 1)
+      : (1, 1, 162)
+      : (162, 1)
+      : (1, 1, 162)
+      : (88,)
+      : (88,)
+      : CH2_BIN1_DiO LUV 10uM in 20 nM AF4881_T0s_1
 
-        Progress: 1.7%, 207633753.43627408 2 632]
+*** Notes from old Focuspoint / ptufile handling / how i developed functions
 
-        Progress: 3.5%, 411390329.73230815 2 186]
-        Progress: 5.2%, 607792654.5485818 2 139]Progress: 6.9%, 784329290.3050321 2 156]
-        Progress: 8.7%, 982411551.8808633 2 19]
-        Progress: 10.4%, 1178267072.8695102 2 58]
-        Progress: 12.2%, 1362512462.5872383 2 720]
-        Progress: 13.9%, 1556291869.0430834 2 115]
-        Progress: 15.6%, 1762362636.538456 2 132]
+      #+BEGIN_SRC jupyter-python
 
-        Progress: 17.4%, 1971619951.3396595 2 391]
-        Progress: 19.1%, ('OFL', 1) ('OFL', 1) ('OFL', 1)]
-        Progress: 20.8%, 2239713752.996271 2 99]
-        Progress: 22.6%, ('OFL', 1) ('OFL', 1) ('OFL', 1)]
-        Progress: 24.3%, 2608440684.084789 2 122]
+        class FitClass():
+            """Stores parameters for fit"""
+            def __init__(self):
+                # self.setWindowTitle('FoCuS FCS fitting software.')
+                #lines.
+                self.left = 0
+                self.right = 0
+                self.activeObj = None
+                self.objIdArr = []
+                self.objStruct = {}
+                self.names = []
+                self.setAutoScale =True
+                self.colors = ['blue','green','red','orange','magenta',
+                               'midnightblue','black']
+                self.objId_sel = None
+                self.root_name = {}
+                # self.win_obj = parent
+                self.type = 'point'
+                self.chisqr = 0.05
+                self.norm_to_one = False
+                self.yscale_min = 0.
+                self.yscale_max = 1.
+                self.xscale_min = 0.0001
+                self.xscale_max = 100000.
+                self.dr = None
+                self.dr1 = None
 
-        Progress: 26.1%, 2703459499.216495 2 69]
 
-        Progress: 27.8%, 2881996723.977068 2 510]
-        Progress: 29.5%, 3059885569.198984 2 71]
+                #Default parameters for each loaded file.
+                #self.def_param = Parameters()
 
-        Progress: 31.3%, 3225261176.828238 2 112]
-        Progress: 33.0%, 3385688099.816699 2 57]
-        Progress: 34.7%, ('OFL', 1) ('OFL', 1) ('OFL', 1)]
-        Progress: 36.5%, 3745071665.5016584 2 278]
-        Progress: 38.2%, ('OFL', 1) ('OFL', 1) ('OFL', 1)]
+                #Initialise the FCS variables
+                SE.initialise_fcs(self)
+                GS.initialise_fcs(self)
+                VD.initialise_fcs(self)
+                PB.initialise_fcs(self)
+        #         self.order_list = ['offset','GN0','N_FCS','cpm','A1','A2','A3',
+        #                            'txy1','txy2','txy3','tz1','tz2','tz3','alpha1',
+        #                            'alpha2','alpha3','AR1','AR2','AR3','B1','B2',
+        #                            'B3','T1','T2','T3','tauT1','tauT2','tauT3',
+        #                            'N_mom','bri','CV','f0','overtb','ACAC','ACCC',
+        #                            'above_zero','s2n']
+        #         self.series_list_model = QtGui.QStandardItemModel()
+        #         self.create_main_frame()
+        #         #self.update_ui()
+        #         self.on_show()
 
-        Progress: 39.9%, 4095550243.851707 2 182]
-
-        Progress: 41.7%, 4272001604.011228 2 334]
-
-        Progress: 43.4%, 4429838458.869212 2 110]
-        Progress: 45.2%, 4594176334.23434 2 71]
-
-        Progress: 46.9%, 4784577592.043145 2 48]
-
-        Progress: 48.6%, 4937751089.257625 2 216]
-        Progress: 50.4%, 5108133481.934374 2 176]
-
-        Progress: 52.1%, 5262111134.777944 2 34]
-        Progress: 53.8%, 5457030099.210694 2 656]
-        Progress: 55.6%, 5636352229.465607 2 168]
-        Progress: 57.3%, 5797928910.502374 2 79]
-
-        Progress: 59.0%, 6003410423.872968 2 46]
-        Progress: 60.8%, 6183934612.542288 2 48]
-        Progress: 62.5%, 6373755491.28844 2 136]
-
-        Progress: 64.3%, ('OFL', 1) ('OFL', 1) ('OFL', 1)]
-        Progress: 66.0%, 6657835654.849585 2 256]
-
-        Progress: 67.7%, 6830145986.021902 2 829]
-        Progress: 69.5%, 7003620350.342453 2 393]
-        Progress: 71.2%, 7157996105.972742 2 57]
-        Progress: 72.9%, 7309849343.945408 2 124]
-
-        Progress: 74.7%, 7500846855.927992 2 93]
-
-        Progress: 76.4%, 7692250145.75102 2 534]
-        Progress: 78.2%, 7860990401.932815 2 118]
-        Progress: 79.9%, 8020465018.255129 2 62]
-        Progress: 81.6%, 8194836413.8548975 2 65]
-        Progress: 83.4%, 8331010017.070121 2 197]
-
-        Progress: 85.1%, 8469219159.534117 2 113]
-        Progress: 86.8%, 8625954756.683298 2 72]
-        Progress: 88.6%, ('OFL', 1) ('OFL', 1) ('OFL', 1)]
-
-        Progress: 90.3%, 8964110073.770517 2 773]
-        Progress: 92.0%, 9137723939.067574 2 315]
-
-        Progress: 93.8%, 9326750337.252361 2 253]
-        Progress: 95.5%, 9514283374.983625 2 372]
-        Progress: 97.3%, 9698651565.560959 2 196]
-
-        Progress: 99.0%, 9885123420.863947 2 91]
-        2021-12-30 13:36:11,875 - Finished import.
-        2021-12-30 13:36:12,256 - Finished prepareChannels()
-        numOfCH 1 [2]
-        2021-12-30 13:36:12,687 - Finished getPhotonDecay()
-        2021-12-30 13:36:12,859 - Finished getTimeSeries()
-        2021-12-30 13:36:12,861 - Finished getPhotonCountingStats()
-        2021-12-30 13:36:12,868 - Processed dTimeInfo()
-      #+end_example
-
+      #+END_SRC
 
       #+BEGIN_SRC jupyter-python
         print('data / metadata')
@@ -12761,6 +13363,7 @@ metrics = [tf.keras.metrics.TruePositives(name='tp', thresholds=thresholds),
         print('numberNandB: {}'.format(ptufile.numberNandB))
         print('objId: {}'.format(ptufile.objId))
         print('photonCountBin: {}'.format(ptufile.photonCountBin))
+        print('photonLifetimeBin: {}'.format(ptufile.photonLifetimeBin))
         print('photonDecay shape: {}'.format(np.shape(ptufile.photonDecay)))
         print('photonDecay example: {}'.format(ptufile.photonDecay[0][:5]))
         print('photonDecayMin shape: {}'.format(np.shape(ptufile.photonDecayMin)))
@@ -12781,21 +13384,20 @@ metrics = [tf.keras.metrics.TruePositives(name='tp', thresholds=thresholds),
         print('trueTimeArr: {}'.format(ptufile.trueTimeArr[:5]))
         print('type: {}'.format(ptufile.type))
         print('unqID: {}'.format(ptufile.unqID))
-        print('winInt: {}'.format(ptufile.winInt))
       #+END_SRC
 
       #+RESULTS:
       #+begin_example
         data / metadata
         CV: []
-        NcascEnd: 25
+        NcascEnd: 5
         NcascStart: 0
-        Nsub: 6
-        autoNorm shape: (1, 1, 150)
+        Nsub: 3
+        autoNorm shape: (1, 1, 15)
         autoNorm example: [-1. -1. -1. -1. -1.]
-        autotime shape: (150,)
-        autotime example: [1.e-06 2.e-06 3.e-06 4.e-06 5.e-06]
-        brightnessNandB: [40.757094083429386]
+        autotime shape: (15,)
+        autotime example: [1.e-06 2.e-06 3.e-06 5.e-06 7.e-06]
+        brightnessNandB: [0.07741845838055586]
         ch_present: [2]
         color: blue
         count0: 5367511.0
@@ -12807,13 +13409,13 @@ metrics = [tf.keras.metrics.TruePositives(name='tp', thresholds=thresholds),
         exit: False
         ext: ptu
         filepath: /home/lex/Programme/drmed-collections/data-from-Eggeling-group/brightbursts/pablo_structured_experiment/DiO LUV 10uM in 20 nM AF4881_T0s_1.ptu
-        kcount: [13429.002506265664]
+        kcount: [536.9611844737896]
         name: DiO LUV 10uM in 20 nM AF4881_T0s_1
         nameAndExt: ['DiO LUV 10uM in 20 nM AF4881_T0s_1', 'ptu']
         numOfCH: 1
-        numberNandB: [13.196084997884729]
+        numberNandB: [6.936175892065387]
         objId: []
-        photonCountBin: 25
+        photonCountBin: 1000
         photonDecay shape: (1, 156)
         photonDecay example: [3593, 28243, 104558, 211550, 296369]
         photonDecayMin shape: (1, 156)
@@ -12826,33 +13428,16 @@ metrics = [tf.keras.metrics.TruePositives(name='tp', thresholds=thresholds),
         subChanArr: [2 2 2 ... 2 2 2]
         subDTimeMax: 1565
         subDTimeMin: 0
-        timeSeries shape: (1, 399)
-        timeSeries: [11048, 11024, 11247, 11428, 11134]
-        timeSeriesScale shape: (1, 399)
-        timeSeriesScale: [12.5, 37.5, 62.5, 87.5, 112.5]
+        timeSeries shape: (1, 9996)
+        timeSeries: [428, 400, 366, 446, 433]
+        timeSeriesScale shape: (1, 9996)
+        timeSeriesScale: [500.0, 1500.0, 2500.0, 3500.0, 4500.0]
         trueTimeArr shape: (5367511,)
         trueTimeArr: [1000.00700005 5100.03570025 5250.03675026 5700.03990028 6525.04567532]
         type: mainObject
         unqID: 0
         winInt: 10
       #+end_example
-      #+RESULTS:
-
-
-      #+BEGIN_SRC jupyter-python
-        print('methods / functions')
-        print('crossAndAuto: {}'.format(ptufile.crossAndAuto))
-        print('par_obj: {}'.format(ptufile.par_obj))
-        print('subArrayGeneration: {}'.format(ptufile.subArrayGeneration))
-
-      #+END_SRC
-
-      #+RESULTS:
-      : methods / functions
-      : crossAndAuto: <bound method picoObject.crossAndAuto of <fluotracify.applications.corr_fit_object.picoObject object at 0x7fab34831070>>
-      : par_obj: <__main__.ParameterClass object at 0x7fab86154070>
-      : subArrayGeneration: <bound method picoObject.subArrayGeneration of <fluotracify.applications.corr_fit_object.picoObject object at 0x7fab34831070>>
-
 
       #+BEGIN_SRC jupyter-python
         plt.figure(figsize=(16, 16), facecolor='white')
@@ -12861,8 +13446,8 @@ metrics = [tf.keras.metrics.TruePositives(name='tp', thresholds=thresholds),
         plt.subplot(4, 2, 3, xlabel='decayScale', title='photonDecayNorm').plot(ptufile.decayScale[0], ptufile.photonDecayNorm[0])
         plt.subplot(4, 2, 4, title='subChanArr').plot(ptufile.subChanArr)
         plt.subplot(4, 2, 5, title='trueTimeArr').plot(ptufile.trueTimeArr)
-        plt.subplot(4, 2, 6, xlabel='autotime', title='semilogx(autoNorm)').semilogx(ptufile.autotime, ptufile.autoNorm[0][0])
-        plt.subplot(4, 2, 7, xlabel='timeSeriesScale', title='timeSeries').plot(ptufile.timeSeriesScale[0], ptufile.timeSeries[0])
+        plt.subplot(4, 2, 6, xlabel='timeSeriesScale', title='timeSeries').plot(ptufile.timeSeriesScale[0], ptufile.timeSeries[0])
+        plt.subplot(4, 2, 7, xlabel='autotime', title='semilogx(autoNorm)').semilogx(ptufile.autotime, ptufile.autoNorm[0][0])
         plt.tight_layout()
         plt.show()
       #+END_SRC
@@ -12870,63 +13455,845 @@ metrics = [tf.keras.metrics.TruePositives(name='tp', thresholds=thresholds),
       #+RESULTS:
 
 
+
+
       [[file:./.ob-jupyter/5cc59eedda3032da70061f56a3969fd2264050c1.png]]
 
 
-
       #+BEGIN_SRC jupyter-python :pandoc t
-        trace = np.array(ptufile.timeSeries).reshape(1, -1, 1)
-
-      #+END_SRC
-
-      #+RESULTS:
-
-      #+BEGIN_SRC jupyter-python
-        logged_model = 'file:///beegfs/ye53nis/drmed-git/data/mlruns/8/00f2635d9fa2463c9a066722163405be/artifacts/model'
-        metrics_thresholds = [0.1, 0.3, 0.5, 0.7, 0.9]
-
-        loaded_model = mlflow.keras.load_model(logged_model, compile=False)
-        loaded_model.compile(loss=bm.binary_ce_dice_loss(),
-                             optimizer=tf.keras.optimizers.Adam(),
-                             metrics = bm.unet_metrics(metrics_thresholds))
-        loaded_model
+        np.shape(ptufile.timeSeries)
+        # ptufile.getTimeSeries(photonCountBin=100)
+        plt.plot(ptufile.timeSeriesScale[0], ptufile.timeSeries[0])
+        print(np.shape(ptufile.timeSeries))
       #+END_SRC
 
       #+RESULTS:
       :RESULTS:
-      # [goto error]
-      : ---------------------------------------------------------------------------
-      : NameError                                 Traceback (most recent call last)
-      : /tmp/ipykernel_12945/3155279477.py in <module>
-      :       2 metrics_thresholds = [0.1, 0.3, 0.5, 0.7, 0.9]
-      :       3
-      : ----> 4 loaded_model = mlflow.keras.load_model(logged_model, compile=False)
-      :       5 loaded_model.compile(loss=bm.binary_ce_dice_loss(),
-      :       6                      optimizer=tf.keras.optimizers.Adam(),
-      :
-      : NameError: name 'mlflow' is not defined
+      : (1, 9996)
+      [[file:./.ob-jupyter/f2e4e21028918508cb0b8f864e92df365a6d2b6d.png]]
       :END:
 
-      #+BEGIN_SRC jupyter-python
+    - Let's create the prediction code!
 
-        mydict['one'] = np.array([i for i in mydict['one'] if not isinstance(i, tuple)])
-        mydict['chanArr'] = np.array([i for i in mydict['chanArr'] if not isinstance(i, tuple)])
-        print(mydict)
+      #+BEGIN_SRC jupyter-python
+        trace = np.array(ptufile.timeSeries[0]).astype(float)
+        trace_size = trace.size
+        if trace_size < 1024:
+            input_size = 1024
+        else:
+            input_size = 2**(np.ceil(np.log2(trace_size))).astype(int)
+        pad_size = input_size - trace_size
+        print(input_size, trace_size, pad_size)
+
+        trace = np.pad(trace, pad_width=(0, pad_size), mode='median')
+        print(trace.shape)
+        trace = np.reshape(trace, newshape=(-1, 1))
+        trace = ppd.scale_trace(trace, 'minmax')
+        print(trace.shape, trace[:5])
+        trace = np.reshape(trace, newshape=(1, -1, 1))
+        print(trace.shape, trace[:5])
+        predictions = loaded_model.predict(trace,
+                                           verbose=0).flatten()
+        pred_05 = predictions > 0.5
+        print(pred_05.shape, pred_05.dtype)
+        plt.figure(figsize=(16, 9), facecolor='white')
+        plt.plot(trace.flatten())
+        plt.plot(pred_05, alpha=0.5)
       #+END_SRC
 
       #+RESULTS:
-      : {'one': array([1, 2]), 'chanArr': array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      :        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      :        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      :        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      :        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])}
+      :RESULTS:
+      #+begin_example
+        16384 9996 6388
+        (16384,)
+        (16384, 1) [[0.04481054]
+         [0.03558484]
+         [0.02438221]
+         [0.05074135]
+         [0.04645799]]
+        (1, 16384, 1) [[[0.04481054]
+          [0.03558484]
+          [0.02438221]
+          ...
+          [0.06589786]
+          [0.06589786]
+          [0.06589786]]]
+        (16384,) bool
+      #+end_example
+      | <matplotlib.lines.Line2D | at | 0x7efcc85e6220> |
+      [[file:./.ob-jupyter/5f41044c9cbfc37ae66119f28f1cdea14b6fb985.png]]
+      :END:
+
+    - cool, now let's tackle the correction code
+      #+BEGIN_SRC jupyter-python
+        # lastDecayTime=9996000.0, numBins=9996.0,
+        # bins[:5]=[   0. 1000. 2000. 3000. 4000.]
+        trace = np.array(ptufile.timeSeries[0])
+        pred_05 = ptufile.predictions[:ptufile.timeSeriesSize] > 0.5
+        pred_05 = np.repeat(pred_05, trace)
+#        bins = np.array(ptufile.timeSeriesScale[0], dtype=int) - ptufile.photonCountBin / 2
+        trueTimePred = np.array(ptufile.trueTimeArr / 1000)[:pred_05.size]
+        print(trueTimePred.shape)
+        trueTimePred = np.delete(trueTimePred, pred_05)
+        print(pred_05.size, pred_05[:5])
+        print(trueTimePred.shape)
+        print(bins)
+        print(pred_05[:5])
+
+      #+END_SRC
+
+      #+RESULTS:
+      : (5367464,)
+      : 5367464 [False False False False False]
+      : (3697987,)
+      : [0.000e+00 1.000e+03 2.000e+03 ... 9.993e+06 9.994e+06 9.995e+06]
+      : [False False False False False]
+
+    - let's implement TCSPC correction including shifting the photons
+      #+BEGIN_SRC jupyter-python
+        trace = np.array(ptufile.timeSeries[0])
+        pred_05 = ptufile.predictions[:ptufile.timeSeriesSize] > 0.5
+        pred_05_rep = np.repeat(pred_05, trace)
+        trueTimeCorrected = np.array(ptufile.trueTimeArr / 1000)[:pred_05_rep.size]
+        subChanCorrected = np.array(ptufile.subChanArr)[:pred_05_rep.size]
+        trueTimeCorrected = np.delete(trueTimeCorrected, pred_05_rep)
+        subChanCorrected = np.delete(subChanCorrected, pred_05_rep)
+        print(trueTimeCorrected.shape, sum(trace), sum(trace * ~pred_05))
+        idxphot = 0
+        for nphot, artifact in zip(trace, pred_05):
+            if artifact:
+                trueTimeCorrected[idxphot:] -= ptufile.photonCountBin
+            else:
+                idxphot += nphot
+        print(f'done {trueTimeCorrected.shape}, {allphot}')
+        timeSeriesCorrected, timeSeriesScaleCorrected = ptufile.delayTime2bin(
+            trueTimeCorrected, subChanCorrected, ptufile.ch_present[0],
+            ptufile.photonCountBin)
+
+        # plot it compared with deleting on time Series directly
+        timeSeriesCorrected2 = np.array(ptufile.timeSeries[0])
+        timeSeriesCorrected2 = np.delete(timeSeriesCorrected2, pred_05)
+        plt.figure(figsize=(16, 12), facecolor='white')
+        plt.subplot(2,1,1).plot(timeSeriesCorrected2)
+        plt.subplot(2,1,2).plot(timeSeriesScaleCorrected, timeSeriesCorrected)
+        plt.show()
+      #+END_SRC
+
+      #+RESULTS:
+      :RESULTS:
+      : (3697987,) 5367464 3697987
+      : 2022-01-05 13:52:06,643 - Finished delayTime2bin. lastDecayTime=7760000.0, numBins=7760.0, bins[:5]=[   0. 1000. 2000. 3000. 4000.]
+      : done (3697987,), 3697987
+      [[file:./.ob-jupyter/9b457b6c4b95408707982c58bfe7dee4e216a378.png]]
+      :END:
+
+      - lets write save function
+
+      #+BEGIN_SRC jupyter-python
+        indx_arr = []
+        for i in range(1):
+            indx_arr.append([i, i])
+            for j in range(1):
+                if i != j:
+                    indx_arr.append([i, j])
+        method = 'multipletau'
+        name = (f'{ptufile.name}', 'CH2_BIN1000')
+        chan = name[1].split('_')
+        chan = chan[0].strip('CH')
+
+        output_file = f'{name[0]}_{name[1]}_{datetime.date.today()}_correlation.csv'
+        Path(ptufile.output_path) / output_file
+      #+END_SRC
+
+      #+RESULTS:
+      : PosixPath('/home/lex/Programme/drmed-git/DiO LUV 10uM in 20 nM AF4881_T0s_1_CH2_BIN1000_2022-01-17_correlation.csv')
 
       #+BEGIN_SRC jupyter-python
 
-      #+END_SRC
-      #+BEGIN_SRC jupyter-python
+        name = (f'{ptufile.name}', 'CH2_BIN1000')
+        if not isinstance(name, tuple) or len(name) != 2:
+            raise ValueError(f'For method={method}, name={name} has to be'
+                             ' a tuple of length 2.')
+        if name[1] not in ptufile.timeSeries[name[0]]:
+            raise ValueError('self.timeSeries[name[0]][name[1]] does not'
+                             'exist.')
+        output_file = f'{name[0]}_{name[1]}_{datetime.date.today()}_correlation.csv'
+        output_file = Path(ptufile.output_path) / output_file
+        chan = name[1].split('_')
+        chan = chan[0].strip('CH')
+        autotime = ptufile.autotime[f'{method}'][f'{name[0]}_{name[1]}']
+        autonorm = ptufile.autoNorm[f'{method}'][f'{name[0]}_{name[1]}']
+        with open(output_file, 'w') as out:
+            out.write('version, 3\n')
+            out.write(f'numOfCH, {ptufile.numOfCH}\n')
+            out.write('type, point\n')
+            out.write(f'parent_name, {name[0]}\n')
+            out.write(f'ch_type, {chan}_{chan}\n')
+            out.write(f'kcount, {ptufile.kcount[name[0]][name[1]]}\n')
+            out.write(f'numberNandB, {ptufile.numberNandB[name[0]][name[1]]}\n')
+            out.write(f'brightnessNandB, {ptufile.brightnessNandB[name[0]][name[1]]}\n')
+            out.write('carpet pos, 0\n')
+            out.write('pc, 0\n')
+            out.write(f'Time (mus), CH{chan} Auto-Correlation\n')
+            for i in range(autotime.shape[0]):
+                out.write(f'{autotime[i]}, {autonorm[i]}\n')
+            out.write('end\n')
 
       #+END_SRC
+
+*** Now correlate experimental traces remotely on jupyter 1
+    :PROPERTIES:
+    :header-args:jupyter-python: :session /jpy:localhost#9999:a37e524a-8134-4d8f-b24a-367acaf1bdd3
+    :END:
+    - let's start
+      #+BEGIN_SRC jupyter-python
+        %cd /beegfs/ye53nis/drmed-git
+      #+END_SRC
+
+      #+RESULTS:
+      : /beegfs/ye53nis/drmed-git
+
+
+      #+BEGIN_SRC jupyter-python
+        import datetime
+        import logging
+        import mlflow
+        import os
+        import sys
+        import matplotlib.pyplot as plt
+        import multipletau
+        import numpy as np
+        import tensorflow as tf
+        from pathlib import Path
+        from pprint import pprint
+
+        FLUOTRACIFY_PATH = '/beegfs/ye53nis/drmed-git/src/'
+        sys.path.append(FLUOTRACIFY_PATH)
+        from fluotracify.applications import (fitting_methods_SE as SE,
+                                              fitting_methods_GS as GS,
+                                              fitting_methods_VD as VD,
+                                              fitting_methods_PB as PB,
+                                              corr_fit_object as cfo,
+                                              correlate)
+        from fluotracify.imports import ptu_utils as ptu
+        from fluotracify.training import build_model as bm, preprocess_data as ppd
+      #+END_SRC
+
+      #+RESULTS:
+
+      #+BEGIN_SRC jupyter-python
+        import importlib
+        importlib.reload(cfo)
+        importlib.reload(ptu)
+        importlib.reload(correlate)
+        importlib.reload(ppd)
+        importlib.reload(bm)
+
+      #+END_SRC
+
+      #+RESULTS:
+      : <module 'fluotracify.training.build_model' from '/beegfs/ye53nis/drmed-git/src/fluotracify/training/build_model.py'>
+
+
+      #+BEGIN_SRC jupyter-python
+        ptu_test_file = "../data/Pablo_structured_experiment/DiO LUV 10uM in 20 nM AF48821_T260s_1.ptu"
+        class ParameterClass():
+            """Stores parameters for correlation """
+            def __init__(self):
+                # Where the data is stored.
+                self.data = []
+                self.objectRef =[]
+                self.subObjectRef =[]
+                self.colors = ['blue', 'green', 'red', 'cyan', 'magenta',
+                               'yellow', 'black']
+                self.numOfLoaded = 0
+                # very fast from Ncasc ~ 14 onwards
+                self.NcascStart = 0
+                self.NcascEnd = 30  # 25
+                self.Nsub = 6  # 6
+                self.photonLifetimeBin = 10  # used for photon decay
+                self.photonCountBin = 1  # used for time series
+
+        par_obj = ParameterClass()
+        #+END_SRC
+
+#+RESULTS:
+
+
+#+BEGIN_SRC jupyter-python
+  ptufile = cfo.PicoObject(ptu_test_file, par_obj)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+  2022-01-19 14:43:27,376 - Start CorrObj creation.
+  Writing 5881858 records, this may take a while...
+  HydraHarp V2 T3 data
+  Progress: 0.0%, 925.0074000592003 2 234]
+
+  Progress: 17.0%, 1575967257.738062 2 43]
+
+  Progress: 34.0%, 3180957372.6589813 2 72]
+  Progress: 51.0%, 4936882745.06196 2 58]
+  Progress: 68.0%, 6630427543.420347 2 101]
+  Progress: 85.0%, 8300982982.863863 2 736]
+  2022-01-19 14:43:42,278 - Finished import.
+  2022-01-19 14:43:42,504 - Finished prepareChannels()
+  numOfCH 1 [2]
+  2022-01-19 14:43:42,795 - Finished time2bin. last_time=1560.0, num_bins=156.0
+  2022-01-19 14:43:42,797 - Finished getPhotonDecay() with name DiO LUV 10uM in 20 nM AF48821_T260s_1
+  2022-01-19 14:43:42,942 - Finished time2bin. last_time=9995.0, num_bins=9995.0
+  2022-01-19 14:43:42,945 - Finished getTimeSeries() with truetime_name DiO LUV 10uM in 20 nM AF48821_T260s_1, timeseries_name DiO LUV 10uM in 20 nM AF48821_T260s_1
+  2022-01-19 14:43:42,948 - Finished getPhotonCountingStats() with name: DiO LUV 10uM in 20 nM AF48821_T260s_1
+  2022-01-19 14:43:42,954 - Processed dTimeInfo()
+#+end_example
+
+
+#+BEGIN_SRC jupyter-python
+  logged_model = 'file:///beegfs/ye53nis/drmed-git/data/mlruns/8/00f2635d9fa2463c9a066722163405be/artifacts/model'
+  metrics_thresholds = [0.1, 0.3, 0.5, 0.7, 0.9]
+
+  loaded_model = mlflow.keras.load_model(logged_model, compile=False)
+  loaded_model.compile(loss=bm.binary_ce_dice_loss(),
+                       optimizer=tf.keras.optimizers.Adam(),
+                       metrics = bm.unet_metrics(metrics_thresholds))
+  bm.prepare_model(loaded_model)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+  WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
+  2022-01-19 14:43:43,275 - Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
+  test shape: (1, 16384, 1) [1.4064237e-01 1.3650321e-08 7.4799689e-10 ... 3.1755112e-10 1.8236226e-10
+   6.6588524e-10]
+  test shape: (1, 8192, 1). prediction failed
+  test shape: (1, 4096, 1) [1.4064237e-01 1.3650321e-08 7.4799689e-10 ... 3.1755112e-10 1.8236226e-10
+   6.6588524e-10]
+  test shape: (1, 8192, 1) [1.4064237e-01 1.3650321e-08 7.4799689e-10 ... 3.1755112e-10 1.8236226e-10
+   6.6588524e-10]
+  UNET ready for different trace lengths
+#+end_example
+
+
+
+
+#+BEGIN_SRC jupyter-python
+  ptufile.predictTimeSeries(model=loaded_model,
+                            scaler='minmax')
+  ptufile.correctTCSPC(method='weights',
+                       weight=0)
+  for key in list(ptufile.trueTimeArr.keys()):
+      if "_FORWEIGHTS" in key:
+          print(key)
+          name_weights = key
+      else:
+          name_noweights = key
+  # ptufile.getTimeSeries(timeseries_name='noshift')
+  # ptufile.predictTimeSeries(model=loaded_model,
+  #                           scaler='minmax',
+  #                           name='noshift')
+  # ptufile.correctTCSPC(shift_photons=False,
+  #                      timeseries_name='noshift')
+  ptufile.get_autocorrelation(method='tttr2xfcs_with_weights', name=name_weights)
+  # ptufile.get_autocorrelation(method='tttr2xfcs', name='noshift_CORRECTED')
+  # ptufile.get_autocorrelation(method='tttr2xfcs', name=name_noweights)
+  # ptufile.get_autocorrelation(method='tttr2xfcs', name='DiO LUV 10uM in 20 nM AF4881_T0s_1_CORRECTED')
+  # ptufile.get_autocorrelation(method='multipletau', name=('DiO LUV 10uM in 20 nM AF4881_T0s_1', 'CH2_BIN1'))
+  # ptufile.get_autocorrelation(method='multipletau', name=('noshift', 'CH2_BIN1000_CORRECTED'))
+
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+  2022-01-19 14:43:52,119 - Finished predictTimeSeries() with name=DiO LUV 10uM in 20 nM AF48821_T260s_1
+  2022-01-19 14:43:52,224 - correctTCSPC: some samples: subChan 5491105, truetime 5491105,photonMask 5491105, channelMask 5491404
+  2022-01-19 14:43:52,265 - Finished correctTCSPC() with name DiO LUV 10uM in 20 nM AF48821_T260s_1, timeseries_name DiO LUV 10uM in 20 nM AF48821_T260s_1
+  2022-01-19 14:43:52,267 - get_autocorrelation: Starting tttr2xfcs correlation.
+  CH2_DiO LUV 10uM in 20 nM AF48821_T260s_1_FORWEIGHTS
+  2022-01-19 14:44:21,607 - tttr2xfcs: finished Ncasc 0
+  2022-01-19 14:44:51,232 - tttr2xfcs: finished Ncasc 1
+  2022-01-19 14:45:21,825 - tttr2xfcs: finished Ncasc 2
+  2022-01-19 14:45:50,270 - tttr2xfcs: finished Ncasc 3
+  2022-01-19 14:46:20,284 - tttr2xfcs: finished Ncasc 4
+  2022-01-19 14:46:49,364 - tttr2xfcs: finished Ncasc 5
+  2022-01-19 14:47:18,797 - tttr2xfcs: finished Ncasc 6
+  2022-01-19 14:47:50,099 - tttr2xfcs: finished Ncasc 7
+  2022-01-19 14:48:21,244 - tttr2xfcs: finished Ncasc 8
+  2022-01-19 14:48:51,908 - tttr2xfcs: finished Ncasc 9
+  2022-01-19 14:49:21,668 - tttr2xfcs: finished Ncasc 10
+  2022-01-19 14:49:46,637 - tttr2xfcs: finished Ncasc 11
+  2022-01-19 14:50:04,645 - tttr2xfcs: finished Ncasc 12
+  2022-01-19 14:50:15,563 - tttr2xfcs: finished Ncasc 13
+  2022-01-19 14:50:20,952 - tttr2xfcs: finished Ncasc 14
+  2022-01-19 14:50:23,660 - tttr2xfcs: finished Ncasc 15
+  2022-01-19 14:50:25,037 - tttr2xfcs: finished Ncasc 16
+  2022-01-19 14:50:25,703 - tttr2xfcs: finished Ncasc 17
+  2022-01-19 14:50:26,047 - tttr2xfcs: finished Ncasc 18
+  2022-01-19 14:50:26,221 - tttr2xfcs: finished Ncasc 19
+  2022-01-19 14:50:26,307 - tttr2xfcs: finished Ncasc 20
+  2022-01-19 14:50:26,351 - tttr2xfcs: finished Ncasc 21
+  2022-01-19 14:50:26,374 - tttr2xfcs: finished Ncasc 22
+  2022-01-19 14:50:26,386 - tttr2xfcs: finished Ncasc 23
+  2022-01-19 14:50:26,393 - tttr2xfcs: finished Ncasc 24
+  2022-01-19 14:50:26,397 - tttr2xfcs: finished Ncasc 25
+  2022-01-19 14:50:26,400 - tttr2xfcs: finished Ncasc 26
+  2022-01-19 14:50:26,402 - tttr2xfcs: finished Ncasc 27
+  2022-01-19 14:50:26,404 - tttr2xfcs: finished Ncasc 28
+  2022-01-19 14:50:26,405 - tttr2xfcs: finished Ncasc 29
+  2022-01-19 14:50:26,808 - finished get_autocorrelation() with method=tttr2xfcs_with_weights, name=DiO LUV 10uM in 20 nM AF48821_T260s_1_FORWEIGHTS
+#+end_example
+
+
+      - lets write save function
+      #+BEGIN_SRC jupyter-python
+        key1 = "1"
+        key2 = "2"
+        key3 = "3"
+        mdict = {}
+        mdict[key1] = {}
+        mdict[key1][key2] = 3
+        if key1 not in mdict:
+            print('hihi')
+            pass
+        if key2 not in mdict[key1]:
+            print('hehe')
+        else:
+            print(mdict)
+      #+END_SRC
+
+      #+RESULTS:
+      : {'1': {'2': 3}}
+
+      #+BEGIN_SRC jupyter-python
+        logging.basicConfig(format='%(asctime)s - %(message)s')
+        log = logging.getLogger(__name__)
+        log.setLevel(logging.DEBUG)
+
+        log.debug("Illegal Channel: #%1d %1u", 1000, 2)
+      #+END_SRC
+
+      #+RESULTS:
+      : 2022-01-19 16:35:10,616 - Illegal Channel: #1000 2
+
+
+
+*** Remote jupyter 2: correlate experimental traces, weight=0, all_dirty_ptu
+    :PROPERTIES:
+    :header-args:jupyter-python: :session /jpy:localhost#9997:b37e524a-8134-4d8f-b24a-367acaf1bdd3
+    :END:
+    - this is the correlation of all_dirty_ptu - one correlation of the pure
+      photon arrival times and one correlation of the traces
+      #+BEGIN_SRC jupyter-python
+        %cd /beegfs/ye53nis/drmed-git
+      #+END_SRC
+
+      #+RESULTS:
+      : /beegfs/ye53nis/drmed-git
+
+
+      #+BEGIN_SRC jupyter-python
+        import datetime
+        import logging
+        import mlflow
+        import os
+        import sys
+        import matplotlib.pyplot as plt
+        import multipletau
+        import numpy as np
+        import tensorflow as tf
+        from pathlib import Path
+        from pprint import pprint
+
+        FLUOTRACIFY_PATH = '/beegfs/ye53nis/drmed-git/src/'
+        sys.path.append(FLUOTRACIFY_PATH)
+        from fluotracify.applications import (fitting_methods_SE as SE,
+                                              fitting_methods_GS as GS,
+                                              fitting_methods_VD as VD,
+                                              fitting_methods_PB as PB,
+                                              corr_fit_object as cfo,
+                                              correlate)
+        from fluotracify.imports import ptu_utils as ptu
+        from fluotracify.training import build_model as bm, preprocess_data as ppd
+
+      #+END_SRC
+
+      #+RESULTS:
+
+      #+BEGIN_SRC jupyter-python
+        import importlib
+        importlib.reload(cfo)
+        importlib.reload(ptu)
+        importlib.reload(correlate)
+        importlib.reload(ppd)
+        importlib.reload(bm)
+
+      #+END_SRC
+
+      #+RESULTS:
+      : <module 'fluotracify.training.build_model' from '/beegfs/ye53nis/drmed-git/src/fluotracify/training/build_model.py'>
+
+
+      #+BEGIN_SRC jupyter-python
+        class ParameterClass():
+            """Stores parameters for correlation """
+            def __init__(self):
+                # Where the data is stored.
+                self.data = []
+                self.objectRef = []
+                self.subObjectRef = []
+                self.colors = ['blue', 'green', 'red', 'cyan', 'magenta',
+                               'yellow', 'black']
+                self.numOfLoaded = 0
+                # very fast from Ncasc ~ 14 onwards
+                self.NcascStart = 15
+                self.NcascEnd = 30  # 25
+                self.Nsub = 6  # 6
+                self.photonLifetimeBin = 10  # used for photon decay
+                self.photonCountBin = 1  # used for time series
+
+        par_obj = ParameterClass()
+
+        loaded_model = mlflow.keras.load_model(logged_model, compile=False)
+        loaded_model.compile(loss=bm.binary_ce_dice_loss(),
+                             optimizer=tf.keras.optimizers.Adam(),
+                             metrics = bm.unet_metrics([0.1, 0.3, 0.5, 0.7, 0.9]))
+        bm.prepare_model(loaded_model)
+        #+END_SRC
+
+        #+RESULTS:
+        : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
+        : 2022-01-19 20:11:41,161 - Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
+        : 2022-01-19 20:11:47,689 - prepare_model: test shape (1, 16384, 1), e.g. [1.4064237e-01 1.3650321e-08 7.4799689e-10 1.7243300e-10 1.3498201e-10]
+        : 2022-01-19 20:11:47,738 - prepare_model: test shape (1, 8192, 1). prediction failed as expected. Retry...
+        : 2022-01-19 20:11:48,354 - prepare_model: test shape (1, 4096, 1), e.g. [1.4064237e-01 1.3650321e-08 7.4799689e-10 1.7243300e-10 1.3498201e-10]
+        : 2022-01-19 20:11:48,406 - prepare_model: test shape (1, 8192, 1), e.g. [1.4064237e-01 1.3650321e-08 7.4799689e-10 1.7243300e-10 1.3498201e-10]
+        : 2022-01-19 20:11:48,407 - prepare_model: UNET ready for different trace lengths
+
+        #+BEGIN_SRC jupyter-python
+          %mkdir /beegfs/ye53nis/saves/2022-01-19_test-ptu/
+        #+END_SRC
+
+        #+RESULTS:
+
+        #+BEGIN_SRC jupyter-python
+          path = "../data/Pablo_structured_experiment"
+          logged_model = 'file:///beegfs/ye53nis/drmed-git/data/mlruns/8/00f2635d9fa2463c9a066722163405be/artifacts/model'
+          weight = 0
+          output_path = '/beegfs/ye53nis/saves/2022-01-19_test-ptu/'
+
+          path = Path(path)
+          files = [path / f for f in os.listdir(path) if f.endswith('.ptu')]
+          if len(files) == 0:
+              raise FileNotFoundError('The path provided does not include any'
+                                      ' .ptu files.')
+          for myfile in files:
+              ptufile = cfo.PicoObject(myfile, par_obj)
+              ptufile.predictTimeSeries(model=loaded_model,
+                                        scaler='minmax')
+              ptufile.correctTCSPC(method='weights',
+                                   weight=weight)
+              shift_name = f'shift_{ptufile.name}'
+              ptufile.getTimeSeries(timeseries_name=shift_name)
+              ptufile.getPhotonCountingStats(name=shift_name)
+              ptufile.predictTimeSeries(model=loaded_model,
+                                        scaler='minmax',
+                                        name=shift_name)
+              ptufile.correctTCSPC(method='delete_and_shift',
+                                   timeseries_name=shift_name)
+              for key in list(ptufile.trueTimeArr.keys()):
+                  if "_FORWEIGHTS" in key:
+                      ptufile.get_autocorrelation(method='tttr2xfcs_with_weights',
+                                                  name=key)
+                  else:
+                      ptufile.get_autocorrelation(method='tttr2xfcs', name=key)
+
+              for m in ['multipletau', 'tttr2xfcs', 'tttr2xfcs_with_weights']:
+                  if m in list(ptufile.autoNorm.keys()):
+                      for key in list(ptufile.autoNorm[m].keys()):
+                          ptufile.save_autocorrelation(name=key, method=m,
+                                                       output_path=output_path)
+
+        #+END_SRC
+
+        #+RESULTS:
+        :RESULTS:
+        #+begin_example
+          dict_keys(['DiO LUV 10uM in 20 nM AF48821_T260s_1', 'CH2_DiO LUV 10uM in 20 nM AF48821_T260s_1_FORWEIGHTS', 'CH2_shift_DiO LUV 10uM in 20 nM AF48821_T260s_1_CORRECTED'])2022-01-19 20:11:48,430 - PicoObject: Start CorrObj creation.
+          2022-01-19 20:11:48,470 - import_ptu: Writing 6124808 records, this may take a while.
+          2022-01-19 20:11:48,543 - import_ptu: HydraHarp V2 T3 data
+          2022-01-19 20:11:48,545 - import_ptu: Progress: 0.0%, 1525.0122000976007 2 41
+          2022-01-19 20:11:50,812 - import_ptu: Progress: 16.3%, ('OFL', 1) ('OFL', 1) ('OFL', 1)
+          2022-01-19 20:11:52,900 - import_ptu: Progress: 32.7%, 3468828075.624605 2 84
+          2022-01-19 20:11:54,979 - import_ptu: Progress: 49.0%, 5165983377.8670225 2 172
+          2022-01-19 20:11:57,030 - import_ptu: Progress: 65.3%, 6813414832.318658 2 91
+          2022-01-19 20:11:59,089 - import_ptu: Progress: 81.6%, 8245506989.055912 2 131
+          2022-01-19 20:12:01,163 - import_ptu: Progress: 98.0%, 9858021914.175312 2 512022-01-19 20:12:04,083 - Finished import.
+          2022-01-19 20:12:04,321 - Finished prepareChannels() with 1 channels: [2]
+          2022-01-19 20:12:04,618 - Finished time2bin. last_time=1560.0, num_bins=156.0
+          2022-01-19 20:12:04,620 - Finished getPhotonDecay() with name DiO LUV 10uM in 20 nM AF48822_T273s_1
+          2022-01-19 20:12:04,765 - Finished time2bin. last_time=9996.0, num_bins=9996.0
+          2022-01-19 20:12:04,768 - Finished getTimeSeries() with truetime_name DiO LUV 10uM in 20 nM AF48822_T273s_1, timeseries_name DiO LUV 10uM in 20 nM AF48822_T273s_1
+          2022-01-19 20:12:04,771 - Finished getPhotonCountingStats() with name: DiO LUV 10uM in 20 nM AF48822_T273s_1
+          2022-01-19 20:12:04,777 - Finished dTimeInfo()
+          2022-01-19 20:12:05,377 - Finished predictTimeSeries() with name=DiO LUV 10uM in 20 nM AF48822_T273s_1
+          2022-01-19 20:12:05,464 - correctTCSPC: some samples: subChan 5733797, truetime 5733797,photonMask 5733797, channelMask 5734313
+          2022-01-19 20:12:05,498 - Finished correctTCSPC() with name DiO LUV 10uM in 20 nM AF48822_T273s_1, timeseries_name DiO LUV 10uM in 20 nM AF48822_T273s_1
+          2022-01-19 20:12:05,647 - Finished time2bin. last_time=9996.0, num_bins=9996.0
+          2022-01-19 20:12:05,649 - Finished getTimeSeries() with truetime_name DiO LUV 10uM in 20 nM AF48822_T273s_1, timeseries_name shift_DiO LUV 10uM in 20 nM AF48822_T273s_1
+          2022-01-19 20:12:05,652 - Finished getPhotonCountingStats() with name: shift_DiO LUV 10uM in 20 nM AF48822_T273s_1
+          2022-01-19 20:12:05,707 - Finished predictTimeSeries() with name=shift_DiO LUV 10uM in 20 nM AF48822_T273s_1
+          2022-01-19 20:12:05,790 - correctTCSPC: some samples: subChan 5733797, truetime 5733797,photonMask 5733797, channelMask 5734313
+          2022-01-19 20:12:05,811 - correctTCSPC: deleted 2247198 photons of 5734313 photons.
+          2022-01-19 20:12:07,086 - correctTCSPC: shifted non-deleted photon arrival times by photonCountBin=1
+          2022-01-19 20:12:07,087 - Finished correctTCSPC() with name DiO LUV 10uM in 20 nM AF48822_T273s_1, timeseries_name shift_DiO LUV 10uM in 20 nM AF48822_T273s_1
+          2022-01-19 20:12:07,088 - get_autocorrelation: Starting tttr2xfcs correlation.with name DiO LUV 10uM in 20 nM AF48822_T273s_1
+          2022-01-19 20:12:07,089 - Given key DiO LUV 10uM in 20 nM AF48822_T273s_1 of trueTimeArr does not include a hint on which channel was used. Assume all channels shall be used and continue
+          2022-01-19 20:12:16,708 - crossAndAuto: sum(indeces)=5734313
+          2022-01-19 20:12:16,773 - crossAndAuto: finished preparation
+          2022-01-19 20:12:17,152 - tttr2xfcs: finished Ncasc 0
+          2022-01-19 20:12:17,512 - tttr2xfcs: finished Ncasc 1
+          2022-01-19 20:12:17,861 - tttr2xfcs: finished Ncasc 2
+          2022-01-19 20:12:18,214 - tttr2xfcs: finished Ncasc 3
+          2022-01-19 20:12:18,571 - tttr2xfcs: finished Ncasc 4
+          2022-01-19 20:12:18,925 - tttr2xfcs: finished Ncasc 5
+          2022-01-19 20:12:19,283 - tttr2xfcs: finished Ncasc 6
+          2022-01-19 20:12:19,630 - tttr2xfcs: finished Ncasc 7
+          2022-01-19 20:12:19,978 - tttr2xfcs: finished Ncasc 8
+          2022-01-19 20:12:20,308 - tttr2xfcs: finished Ncasc 9
+          2022-01-19 20:12:20,610 - tttr2xfcs: finished Ncasc 10
+          2022-01-19 20:12:20,833 - tttr2xfcs: finished Ncasc 11
+          2022-01-19 20:12:20,977 - tttr2xfcs: finished Ncasc 12
+          2022-01-19 20:12:21,054 - tttr2xfcs: finished Ncasc 13
+          2022-01-19 20:12:21,093 - tttr2xfcs: finished Ncasc 14
+          2022-01-19 20:12:23,972 - tttr2xfcs: finished Ncasc 15
+          2022-01-19 20:12:25,419 - tttr2xfcs: finished Ncasc 16
+          2022-01-19 20:12:26,138 - tttr2xfcs: finished Ncasc 17
+          2022-01-19 20:12:26,514 - tttr2xfcs: finished Ncasc 18
+          2022-01-19 20:12:26,700 - tttr2xfcs: finished Ncasc 19
+          2022-01-19 20:12:26,791 - tttr2xfcs: finished Ncasc 20
+          2022-01-19 20:12:26,838 - tttr2xfcs: finished Ncasc 21
+          2022-01-19 20:12:26,864 - tttr2xfcs: finished Ncasc 22
+          2022-01-19 20:12:26,877 - tttr2xfcs: finished Ncasc 23
+          2022-01-19 20:12:26,884 - tttr2xfcs: finished Ncasc 24
+          2022-01-19 20:12:26,888 - tttr2xfcs: finished Ncasc 25
+          2022-01-19 20:12:26,891 - tttr2xfcs: finished Ncasc 26
+          2022-01-19 20:12:26,893 - tttr2xfcs: finished Ncasc 27
+          2022-01-19 20:12:26,894 - tttr2xfcs: finished Ncasc 28
+          2022-01-19 20:12:26,896 - tttr2xfcs: finished Ncasc 29
+          2022-01-19 20:12:26,899 - Finished crossAndAuto - tttr2xfcs().
+          2022-01-19 20:12:27,324 - Finished crossAndAuto()
+          2022-01-19 20:12:27,326 - Finished get_autocorrelation() with method=tttr2xfcs, name=DiO LUV 10uM in 20 nM AF48822_T273s_1
+          2022-01-19 20:12:27,327 - get_autocorrelation: Starting tttr2xfcs correlation.with name CH2_DiO LUV 10uM in 20 nM AF48822_T273s_1_FORWEIGHTS
+          2022-01-19 20:12:27,690 - tttr2xfcs: finished Ncasc 0
+          2022-01-19 20:12:28,034 - tttr2xfcs: finished Ncasc 1
+          2022-01-19 20:12:28,340 - tttr2xfcs: finished Ncasc 2
+          2022-01-19 20:12:28,690 - tttr2xfcs: finished Ncasc 3
+          2022-01-19 20:12:29,039 - tttr2xfcs: finished Ncasc 4
+          2022-01-19 20:12:29,354 - tttr2xfcs: finished Ncasc 5
+          2022-01-19 20:12:29,711 - tttr2xfcs: finished Ncasc 6
+          2022-01-19 20:12:30,058 - tttr2xfcs: finished Ncasc 7
+          2022-01-19 20:12:30,356 - tttr2xfcs: finished Ncasc 8
+          2022-01-19 20:12:30,683 - tttr2xfcs: finished Ncasc 9
+          2022-01-19 20:12:30,948 - tttr2xfcs: finished Ncasc 10
+          2022-01-19 20:12:31,170 - tttr2xfcs: finished Ncasc 11
+          2022-01-19 20:12:31,306 - tttr2xfcs: finished Ncasc 12
+          2022-01-19 20:12:31,383 - tttr2xfcs: finished Ncasc 13
+          2022-01-19 20:12:31,421 - tttr2xfcs: finished Ncasc 14
+          2022-01-19 20:12:34,309 - tttr2xfcs: finished Ncasc 15
+          2022-01-19 20:12:35,687 - tttr2xfcs: finished Ncasc 16
+          2022-01-19 20:12:36,413 - tttr2xfcs: finished Ncasc 17
+          2022-01-19 20:12:36,763 - tttr2xfcs: finished Ncasc 18
+          2022-01-19 20:12:36,935 - tttr2xfcs: finished Ncasc 19
+          2022-01-19 20:12:37,029 - tttr2xfcs: finished Ncasc 20
+          2022-01-19 20:12:37,074 - tttr2xfcs: finished Ncasc 21
+          2022-01-19 20:12:37,099 - tttr2xfcs: finished Ncasc 22
+          2022-01-19 20:12:37,112 - tttr2xfcs: finished Ncasc 23
+          2022-01-19 20:12:37,119 - tttr2xfcs: finished Ncasc 24
+          2022-01-19 20:12:37,123 - tttr2xfcs: finished Ncasc 25
+          2022-01-19 20:12:37,126 - tttr2xfcs: finished Ncasc 26
+          2022-01-19 20:12:37,128 - tttr2xfcs: finished Ncasc 27
+          2022-01-19 20:12:37,130 - tttr2xfcs: finished Ncasc 28
+          2022-01-19 20:12:37,131 - tttr2xfcs: finished Ncasc 29
+          2022-01-19 20:12:37,569 - Finished get_autocorrelation() with method=tttr2xfcs_with_weights, name=DiO LUV 10uM in 20 nM AF48822_T273s_1_FORWEIGHTS
+          2022-01-19 20:12:37,570 - get_autocorrelation: Starting tttr2xfcs correlation.with name CH2_shift_DiO LUV 10uM in 20 nM AF48822_T273s_1_CORRECTED
+          2022-01-19 20:12:43,338 - crossAndAuto: sum(indeces)=3487115
+          2022-01-19 20:12:43,375 - crossAndAuto: finished preparation
+          2022-01-19 20:12:43,560 - tttr2xfcs: finished Ncasc 0
+          2022-01-19 20:12:43,713 - tttr2xfcs: finished Ncasc 1
+          2022-01-19 20:12:43,860 - tttr2xfcs: finished Ncasc 2
+          2022-01-19 20:12:44,007 - tttr2xfcs: finished Ncasc 3
+          2022-01-19 20:12:44,160 - tttr2xfcs: finished Ncasc 4
+          2022-01-19 20:12:44,291 - tttr2xfcs: finished Ncasc 5
+          2022-01-19 20:12:44,434 - tttr2xfcs: finished Ncasc 6
+          2022-01-19 20:12:44,567 - tttr2xfcs: finished Ncasc 7
+          2022-01-19 20:12:44,698 - tttr2xfcs: finished Ncasc 8
+          2022-01-19 20:12:44,832 - tttr2xfcs: finished Ncasc 9
+          2022-01-19 20:12:44,956 - tttr2xfcs: finished Ncasc 10
+          2022-01-19 20:12:45,067 - tttr2xfcs: finished Ncasc 11
+          2022-01-19 20:12:45,153 - tttr2xfcs: finished Ncasc 12
+          2022-01-19 20:12:45,207 - tttr2xfcs: finished Ncasc 13
+          2022-01-19 20:12:45,234 - tttr2xfcs: finished Ncasc 14
+          2022-01-19 20:12:47,334 - tttr2xfcs: finished Ncasc 15
+          2022-01-19 20:12:48,355 - tttr2xfcs: finished Ncasc 16
+          2022-01-19 20:12:48,869 - tttr2xfcs: finished Ncasc 17
+          2022-01-19 20:12:49,129 - tttr2xfcs: finished Ncasc 18
+          2022-01-19 20:12:49,256 - tttr2xfcs: finished Ncasc 19
+          2022-01-19 20:12:49,322 - tttr2xfcs: finished Ncasc 20
+          2022-01-19 20:12:49,356 - tttr2xfcs: finished Ncasc 21
+          2022-01-19 20:12:49,375 - tttr2xfcs: finished Ncasc 22
+          2022-01-19 20:12:49,386 - tttr2xfcs: finished Ncasc 23
+          2022-01-19 20:12:49,392 - tttr2xfcs: finished Ncasc 24
+          2022-01-19 20:12:49,396 - tttr2xfcs: finished Ncasc 25
+          2022-01-19 20:12:49,399 - tttr2xfcs: finished Ncasc 26
+          2022-01-19 20:12:49,401 - tttr2xfcs: finished Ncasc 27
+          2022-01-19 20:12:49,402 - tttr2xfcs: finished Ncasc 28
+          2022-01-19 20:12:49,403 - tttr2xfcs: finished Ncasc 29
+          2022-01-19 20:12:49,406 - Finished crossAndAuto - tttr2xfcs().
+          2022-01-19 20:12:49,677 - Finished crossAndAuto()
+          2022-01-19 20:12:49,679 - Finished get_autocorrelation() with method=tttr2xfcs, name=shift_DiO LUV 10uM in 20 nM AF48822_T273s_1_CORRECTED
+          2022-01-19 20:12:50,125 - Finished save_autocorrelation of file /beegfs/ye53nis/saves/2022-01-19_test-ptu/2022-01-19_tttr2xfcs_CH2_BIN1_DiO LUV 10uM in 20 nM AF48822_T273s_1_correlation.csv
+          2022-01-19 20:12:50,129 - Finished save_autocorrelation of file /beegfs/ye53nis/saves/2022-01-19_test-ptu/2022-01-19_tttr2xfcs_CH2_BIN1_shift_DiO LUV 10uM in 20 nM AF48822_T273s_1_correlation.csv
+          2022-01-19 20:12:50,139 - Finished save_autocorrelation of file /beegfs/ye53nis/saves/2022-01-19_test-ptu/2022-01-19_tttr2xfcs_with_weights_CH2_BIN1_DiO LUV 10uM in 20 nM AF48822_T273s_1_correlation.csv
+          2022-01-19 20:12:50,140 - PicoObject: Start CorrObj creation.
+          2022-01-19 20:12:50,143 - import_ptu: Writing 5881858 records, this may take a while.
+          2022-01-19 20:12:50,219 - import_ptu: HydraHarp V2 T3 data
+          2022-01-19 20:12:50,221 - import_ptu: Progress: 0.0%, 925.0074000592003 2 234
+          2022-01-19 20:12:52,420 - import_ptu: Progress: 17.0%, 1575967257.738062 2 43
+          2022-01-19 20:12:55,127 - import_ptu: Progress: 34.0%, 3180957372.6589813 2 72
+          2022-01-19 20:12:57,356 - import_ptu: Progress: 51.0%, 4936882745.06196 2 58
+          2022-01-19 20:12:59,596 - import_ptu: Progress: 68.0%, 6630427543.420347 2 101
+          2022-01-19 20:13:02,059 - import_ptu: Progress: 85.0%, 8300982982.863863 2 736
+          2022-01-19 20:13:06,838 - Finished import.
+          2022-01-19 20:13:07,067 - Finished prepareChannels() with 1 channels: [2]
+          2022-01-19 20:13:07,353 - Finished time2bin. last_time=1560.0, num_bins=156.0
+          2022-01-19 20:13:07,354 - Finished getPhotonDecay() with name DiO LUV 10uM in 20 nM AF48821_T260s_1
+          2022-01-19 20:13:07,489 - Finished time2bin. last_time=9995.0, num_bins=9995.0
+          2022-01-19 20:13:07,491 - Finished getTimeSeries() with truetime_name DiO LUV 10uM in 20 nM AF48821_T260s_1, timeseries_name DiO LUV 10uM in 20 nM AF48821_T260s_1
+          2022-01-19 20:13:07,494 - Finished getPhotonCountingStats() with name: DiO LUV 10uM in 20 nM AF48821_T260s_1
+          2022-01-19 20:13:07,499 - Finished dTimeInfo()
+          2022-01-19 20:13:07,559 - Finished predictTimeSeries() with name=DiO LUV 10uM in 20 nM AF48821_T260s_1
+          2022-01-19 20:13:07,632 - correctTCSPC: some samples: subChan 5491105, truetime 5491105,photonMask 5491105, channelMask 5491404
+          2022-01-19 20:13:07,665 - Finished correctTCSPC() with name DiO LUV 10uM in 20 nM AF48821_T260s_1, timeseries_name DiO LUV 10uM in 20 nM AF48821_T260s_1
+          2022-01-19 20:13:07,801 - Finished time2bin. last_time=9995.0, num_bins=9995.0
+          2022-01-19 20:13:07,803 - Finished getTimeSeries() with truetime_name DiO LUV 10uM in 20 nM AF48821_T260s_1, timeseries_name shift_DiO LUV 10uM in 20 nM AF48821_T260s_1
+          2022-01-19 20:13:07,807 - Finished getPhotonCountingStats() with name: shift_DiO LUV 10uM in 20 nM AF48821_T260s_1
+          2022-01-19 20:13:07,861 - Finished predictTimeSeries() with name=shift_DiO LUV 10uM in 20 nM AF48821_T260s_1
+          2022-01-19 20:13:07,935 - correctTCSPC: some samples: subChan 5491105, truetime 5491105,photonMask 5491105, channelMask 5491404
+          2022-01-19 20:13:07,959 - correctTCSPC: deleted 1256809 photons of 5491404 photons.
+          2022-01-19 20:13:09,626 - correctTCSPC: shifted non-deleted photon arrival times by photonCountBin=1
+          2022-01-19 20:13:09,628 - Finished correctTCSPC() with name DiO LUV 10uM in 20 nM AF48821_T260s_1, timeseries_name shift_DiO LUV 10uM in 20 nM AF48821_T260s_1
+          2022-01-19 20:13:09,629 - get_autocorrelation: Starting tttr2xfcs correlation.with name DiO LUV 10uM in 20 nM AF48821_T260s_1
+          2022-01-19 20:13:09,629 - Given key DiO LUV 10uM in 20 nM AF48821_T260s_1 of trueTimeArr does not include a hint on which channel was used. Assume all channels shall be used and continue
+          2022-01-19 20:13:18,357 - crossAndAuto: sum(indeces)=5491404
+          2022-01-19 20:13:18,418 - crossAndAuto: finished preparation
+          2022-01-19 20:13:18,768 - tttr2xfcs: finished Ncasc 0
+          2022-01-19 20:13:19,100 - tttr2xfcs: finished Ncasc 1
+          2022-01-19 20:13:19,432 - tttr2xfcs: finished Ncasc 2
+          2022-01-19 20:13:19,766 - tttr2xfcs: finished Ncasc 3
+          2022-01-19 20:13:20,098 - tttr2xfcs: finished Ncasc 4
+          2022-01-19 20:13:20,432 - tttr2xfcs: finished Ncasc 5
+          2022-01-19 20:13:20,762 - tttr2xfcs: finished Ncasc 6
+          2022-01-19 20:13:21,085 - tttr2xfcs: finished Ncasc 7
+          2022-01-19 20:13:21,403 - tttr2xfcs: finished Ncasc 8
+          2022-01-19 20:13:21,707 - tttr2xfcs: finished Ncasc 9
+          2022-01-19 20:13:21,983 - tttr2xfcs: finished Ncasc 10
+          2022-01-19 20:13:22,199 - tttr2xfcs: finished Ncasc 11
+          2022-01-19 20:13:22,327 - tttr2xfcs: finished Ncasc 12
+          2022-01-19 20:13:22,400 - tttr2xfcs: finished Ncasc 13
+          2022-01-19 20:13:22,438 - tttr2xfcs: finished Ncasc 14
+          2022-01-19 20:13:25,271 - tttr2xfcs: finished Ncasc 15
+          2022-01-19 20:13:26,693 - tttr2xfcs: finished Ncasc 16
+          2022-01-19 20:13:27,425 - tttr2xfcs: finished Ncasc 17
+          2022-01-19 20:13:27,788 - tttr2xfcs: finished Ncasc 18
+          2022-01-19 20:13:27,969 - tttr2xfcs: finished Ncasc 19
+          2022-01-19 20:13:28,062 - tttr2xfcs: finished Ncasc 20
+          2022-01-19 20:13:28,108 - tttr2xfcs: finished Ncasc 21
+          2022-01-19 20:13:28,131 - tttr2xfcs: finished Ncasc 22
+          2022-01-19 20:13:28,144 - tttr2xfcs: finished Ncasc 23
+          2022-01-19 20:13:28,152 - tttr2xfcs: finished Ncasc 24
+          2022-01-19 20:13:28,156 - tttr2xfcs: finished Ncasc 25
+          2022-01-19 20:13:28,158 - tttr2xfcs: finished Ncasc 26
+          2022-01-19 20:13:28,160 - tttr2xfcs: finished Ncasc 27
+          2022-01-19 20:13:28,162 - tttr2xfcs: finished Ncasc 28
+          2022-01-19 20:13:28,163 - tttr2xfcs: finished Ncasc 29
+          2022-01-19 20:13:28,166 - Finished crossAndAuto - tttr2xfcs().
+          2022-01-19 20:13:28,566 - Finished crossAndAuto()
+          2022-01-19 20:13:28,568 - Finished get_autocorrelation() with method=tttr2xfcs, name=DiO LUV 10uM in 20 nM AF48821_T260s_1
+          2022-01-19 20:13:28,568 - get_autocorrelation: Starting tttr2xfcs correlation.with name CH2_DiO LUV 10uM in 20 nM AF48821_T260s_1_FORWEIGHTS
+          2022-01-19 20:13:28,914 - tttr2xfcs: finished Ncasc 0
+          2022-01-19 20:13:29,249 - tttr2xfcs: finished Ncasc 1
+          2022-01-19 20:13:29,542 - tttr2xfcs: finished Ncasc 2
+          2022-01-19 20:13:29,873 - tttr2xfcs: finished Ncasc 3
+          2022-01-19 20:13:30,202 - tttr2xfcs: finished Ncasc 4
+          2022-01-19 20:13:30,493 - tttr2xfcs: finished Ncasc 5
+          2022-01-19 20:13:30,822 - tttr2xfcs: finished Ncasc 6
+          2022-01-19 20:13:31,148 - tttr2xfcs: finished Ncasc 7
+          2022-01-19 20:13:31,431 - tttr2xfcs: finished Ncasc 8
+          2022-01-19 20:13:31,737 - tttr2xfcs: finished Ncasc 9
+          2022-01-19 20:13:32,011 - tttr2xfcs: finished Ncasc 10
+          2022-01-19 20:13:32,217 - tttr2xfcs: finished Ncasc 11
+          2022-01-19 20:13:32,349 - tttr2xfcs: finished Ncasc 12
+          2022-01-19 20:13:32,422 - tttr2xfcs: finished Ncasc 13
+          2022-01-19 20:13:32,459 - tttr2xfcs: finished Ncasc 14
+          2022-01-19 20:13:35,310 - tttr2xfcs: finished Ncasc 15
+          2022-01-19 20:13:36,729 - tttr2xfcs: finished Ncasc 16
+          2022-01-19 20:13:37,491 - tttr2xfcs: finished Ncasc 17
+          2022-01-19 20:13:37,874 - tttr2xfcs: finished Ncasc 18
+          2022-01-19 20:13:38,063 - tttr2xfcs: finished Ncasc 19
+          2022-01-19 20:13:38,158 - tttr2xfcs: finished Ncasc 20
+          2022-01-19 20:13:38,205 - tttr2xfcs: finished Ncasc 21
+          2022-01-19 20:13:38,231 - tttr2xfcs: finished Ncasc 22
+          2022-01-19 20:13:38,244 - tttr2xfcs: finished Ncasc 23
+          2022-01-19 20:13:38,251 - tttr2xfcs: finished Ncasc 24
+          2022-01-19 20:13:38,255 - tttr2xfcs: finished Ncasc 25
+          2022-01-19 20:13:38,258 - tttr2xfcs: finished Ncasc 26
+          2022-01-19 20:13:38,260 - tttr2xfcs: finished Ncasc 27
+          2022-01-19 20:13:38,261 - tttr2xfcs: finished Ncasc 28
+          2022-01-19 20:13:38,262 - tttr2xfcs: finished Ncasc 29
+          2022-01-19 20:13:38,729 - Finished get_autocorrelation() with method=tttr2xfcs_with_weights, name=DiO LUV 10uM in 20 nM AF48821_T260s_1_FORWEIGHTS
+          2022-01-19 20:13:38,729 - get_autocorrelation: Starting tttr2xfcs correlation.with name CH2_shift_DiO LUV 10uM in 20 nM AF48821_T260s_1_CORRECTED
+          2022-01-19 20:13:45,969 - crossAndAuto: sum(indeces)=4234595
+          2022-01-19 20:13:46,018 - crossAndAuto: finished preparation
+          2022-01-19 20:13:46,291 - tttr2xfcs: finished Ncasc 0
+          2022-01-19 20:13:46,554 - tttr2xfcs: finished Ncasc 1
+          2022-01-19 20:13:46,820 - tttr2xfcs: finished Ncasc 2
+          2022-01-19 20:13:47,083 - tttr2xfcs: finished Ncasc 3
+          2022-01-19 20:13:47,343 - tttr2xfcs: finished Ncasc 4
+          2022-01-19 20:13:47,599 - tttr2xfcs: finished Ncasc 5
+          2022-01-19 20:13:47,861 - tttr2xfcs: finished Ncasc 6
+          2022-01-19 20:13:48,116 - tttr2xfcs: finished Ncasc 7
+          2022-01-19 20:13:48,335 - tttr2xfcs: finished Ncasc 8
+          2022-01-19 20:13:48,513 - tttr2xfcs: finished Ncasc 9
+          2022-01-19 20:13:48,674 - tttr2xfcs: finished Ncasc 10
+          2022-01-19 20:13:48,803 - tttr2xfcs: finished Ncasc 11
+          2022-01-19 20:13:48,906 - tttr2xfcs: finished Ncasc 12
+          2022-01-19 20:13:48,967 - tttr2xfcs: finished Ncasc 13
+          2022-01-19 20:13:49,000 - tttr2xfcs: finished Ncasc 14
+          2022-01-19 20:13:51,464 - tttr2xfcs: finished Ncasc 15
+          2022-01-19 20:13:52,695 - tttr2xfcs: finished Ncasc 16
+          2022-01-19 20:13:53,303 - tttr2xfcs: finished Ncasc 17
+          2022-01-19 20:13:53,610 - tttr2xfcs: finished Ncasc 18
+          2022-01-19 20:13:53,773 - tttr2xfcs: finished Ncasc 19
+          2022-01-19 20:13:53,852 - tttr2xfcs: finished Ncasc 20
+          2022-01-19 20:13:53,892 - tttr2xfcs: finished Ncasc 21
+          2022-01-19 20:13:53,914 - tttr2xfcs: finished Ncasc 22
+          2022-01-19 20:13:53,926 - tttr2xfcs: finished Ncasc 23
+          2022-01-19 20:13:53,933 - tttr2xfcs: finished Ncasc 24
+          2022-01-19 20:13:53,937 - tttr2xfcs: finished Ncasc 25
+          2022-01-19 20:13:53,940 - tttr2xfcs: finished Ncasc 26
+          2022-01-19 20:13:53,942 - tttr2xfcs: finished Ncasc 27
+          2022-01-19 20:13:53,943 - tttr2xfcs: finished Ncasc 28
+          2022-01-19 20:13:53,945 - tttr2xfcs: finished Ncasc 29
+          2022-01-19 20:13:53,947 - Finished crossAndAuto - tttr2xfcs().
+          2022-01-19 20:13:54,248 - Finished crossAndAuto()
+          2022-01-19 20:13:54,250 - Finished get_autocorrelation() with method=tttr2xfcs, name=shift_DiO LUV 10uM in 20 nM AF48821_T260s_1_CORRECTED
+          2022-01-19 20:13:54,262 - Finished save_autocorrelation of file /beegfs/ye53nis/saves/2022-01-19_test-ptu/2022-01-19_tttr2xfcs_CH2_BIN1_DiO LUV 10uM in 20 nM AF48821_T260s_1_correlation.csv
+          2022-01-19 20:13:54,264 - Finished save_autocorrelation of file /beegfs/ye53nis/saves/2022-01-19_test-ptu/2022-01-19_tttr2xfcs_CH2_BIN1_shift_DiO LUV 10uM in 20 nM AF48821_T260s_1_correlation.csv
+          2022-01-19 20:13:54,266 - Finished save_autocorrelation of file /beegfs/ye53nis/saves/2022-01-19_test-ptu/2022-01-19_tttr2xfcs_with_weights_CH2_BIN1_DiO LUV 10uM in 20 nM AF48821_T260s_1_correlation.csv
+        #+end_example
+        :END:
+      #+RESULTS:
+
 
 
 ** TODOs
@@ -13040,22 +14407,26 @@ to make
       there → shows when e.g. there "never" would be high predictions.
     -
 
+*** TODO possible retraining with traces appended by median to avoid segmentation errors on right margin
 
 * Reconnect
   :LOGBOOK:
   CLOCK: [2020-05-04 Mo 14:59]--[2020-05-04 Mo 14:59] =>  0:00
   :END:
 ** Tmux on Ara, Login node for git pull
-#+CALL: setup-tmux[:session local]
+#+CALL: setup-tmux[:session remote]
 
 #+RESULTS:
 |         |                                        |           |
 | sh-5.1$ | ye53nis@ara-login01.rz.uni-jena.de's | password: |
 | >       | ye53nis@ara-login01.rz.uni-jena.de's | password: |
+ye53nis@ara-login01.rz.uni-jena.de's | password: |
+| >       |
+ye53nis@ara-login01.rz.uni-jena.de's | password: |
 
 Test:
 
-#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session local
+#+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session remote
   cd /beegfs/ye53nis/drmed-git/
   git pull
 #+END_SRC
@@ -13119,40 +14490,44 @@ Test:
    #+END_SRC
 
 
-
 2.
 #+CALL: jpt-tmux[:session jpmux]
 
    #+RESULTS:
    #+begin_example
-     (tf-nightly) [ye53nis@node152 /]$ jupyter lab --no-browser --port=$PORT
-     [I 2021-07-30 15:24:30.855 ServerApp] jupyterlab | extension was successfully linked.
-     [I 2021-07-30 15:24:37.313 ServerApp] nbclassic | extension was successfully linked.
-     [I 2021-07-30 15:24:38.083 LabApp] JupyterLab extension loaded from /home/ye53nis/.conda/envs/tf-nightly/lib/python3.9/site-packages/jupyterlab
-     [I 2021-07-30 15:24:38.083 LabApp] JupyterLab application directory is /home/ye53nis/.conda/envs/tf-nightly/share/jupyter/lab
-     [I 2021-07-30 15:24:38.110 ServerApp] jupyterlab | extension was successfully loaded.
-     [I 2021-07-30 15:24:38.262 ServerApp] nbclassic | extension was successfully loaded.
-     [I 2021-07-30 15:24:38.263 ServerApp] Serving notebooks from local directory: /
-     [I 2021-07-30 15:24:38.263 ServerApp] Jupyter Server 1.4.1 is running at:
-     [I 2021-07-30 15:24:38.263 ServerApp] http://localhost:9999/lab?token=c5a6d2b0c17e319f955017078adb80c170e35cde289130d6
-     [I 2021-07-30 15:24:38.263 ServerApp]  or http://127.0.0.1:9999/lab?token=c5a6d2b0c17e319f955017078adb80c170e35cde289130d6
-     [I 2021-07-30 15:24:38.263 ServerApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
-     [C 2021-07-30 15:24:38.312 ServerApp]
+     (tf) [ye53nis@node165 /]$ jupyter lab --no-browser --port=$PORT
+     [I 2022-01-18 15:34:43.253 ServerApp] jupyterlab | extension was successfully linked.
+     [I 2022-01-18 15:34:50.195 ServerApp] nbclassic | extension was successfully linked.
+     [I 2022-01-18 15:34:50.798 LabApp] JupyterLab extension loaded from /home/ye53nis/.conda/envs/tf/lib/python3.9/site-packages/jupyterlab
+     [I 2022-01-18 15:34:50.798 LabApp] JupyterLab application directory is /home/ye53nis/.conda/envs/tf/share/jupyter/lab
+     [I 2022-01-18 15:34:50.808 ServerApp] jupyterlab | extension was successfully loaded.
+     [I 2022-01-18 15:34:50.898 ServerApp] nbclassic | extension was successfully loaded.
+     [I 2022-01-18 15:34:50.899 ServerApp] Serving notebooks from local directory: /
+     [I 2022-01-18 15:34:50.899 ServerApp] Jupyter Server 1.4.1 is running at:
+     [I 2022-01-18 15:34:50.899 ServerApp] http://localhost:9999/lab?token=2781e1ab09b1b6ce911bc035b8c0ca04eda33cb7a89b5331
+     [I 2022-01-18 15:34:50.899 ServerApp]  or http://127.0.0.1:9999/lab?token=2781e1ab09b1b6ce911bc035b8c0ca04eda33cb7a89b5331
+     [I 2022-01-18 15:34:50.899 ServerApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+     [C 2022-01-18 15:34:50.933 ServerApp]
 
          To access the server, open this file in a browser:
-             file:///home/ye53nis/.local/share/jupyter/runtime/jpserver-197308-open.html
+             file:///home/ye53nis/.local/share/jupyter/runtime/jpserver-390432-open.html
          Or copy and paste one of these URLs:
-             http://localhost:9999/lab?token=c5a6d2b0c17e319f955017078adb80c170e35cde289130d6
-          or http://127.0.0.1:9999/lab?token=c5a6d2b0c17e319f955017078adb80c170e35cde289130d6
+             http://localhost:9999/lab?token=2781e1ab09b1b6ce911bc035b8c0ca04eda33cb7a89b5331
+          or http://127.0.0.1:9999/lab?token=2781e1ab09b1b6ce911bc035b8c0ca04eda33cb7a89b5331
    #+end_example
 
 
 
-#+CALL: ssh-tunnel(port="9999", node="node152")
+
+
+#+CALL: ssh-tunnel(port="9999", node="node165")
 
 #+RESULTS:
-|                   |           |                                        |           |   |          |      |      |             |
-| sh-5.1$           | sh-5.1$   | ye53nis@ara-login01.rz.uni-jena.de's | password: |   |          |      |      |             |
+|                   |           |                                        |           |    |          |      |      |             |
+| sh-5.1$           | sh-5.1$   | ye53nis@ara-login01.rz.uni-jena.de's | password: |    |          |      |      |             |
+| ye53nis@node165's | password: |                                        |           |    |          |      |      |             |
+| Last              | login:    | Wed                                    | Jan       | 19 | 12:49:20 | 2022 | from | login01.ara |
+ye53nis@ara-login01.rz.uni-jena.de's | password: |   |          |      |      |             |
 | ye53nis@node152's | password: |                                        |           |   |          |      |      |             |
 | Last              | login:    | Tue                                    | Aug       | 3 | 11:43:26 | 2021 | from | login01.ara |
 
@@ -13492,6 +14867,65 @@ Test:
    'MPLBACKEND': 'module://ipykernel.pylab.backend_inline'}
 #+end_example
 
+** 2nd Jupyter on Ara
+
+1. Request compute node via tmux
+   #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session jpmux2
+     cd /
+     srun -p s_standard --time=7-10:00:00 --ntasks-per-node=24 --mem-per-cpu=2000 --pty bash
+   #+END_SRC
+
+   #+RESULTS:
+   #+begin_example
+     (base) [ye53nis@login01 /]$ srun -p s_standard --time=7-10:00:00 --ntasks-per-node=24 --mem-per-cpu=2000 --pty bash
+     (base) [ye53nis@node145 /]$
+   #+end_example
+
+
+2.
+   #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session jpmux2
+     conda activate tf
+     export PORT=9997
+     export XDG_RUNTIME_DIR=''
+     export XDG_RUNTIME_DIR=""
+     jupyter lab --no-browser --port=$PORT
+   #+END_SRC
+
+   #+RESULTS:
+   #+begin_example
+     (tf) [ye53nis@node145 /]$ jupyter lab --no-browser --port=$PORT
+     [I 2022-01-19 13:56:58.202 ServerApp] jupyterlab | extension was successfully linked.
+     [I 2022-01-19 13:56:58.814 ServerApp] nbclassic | extension was successfully linked.
+     [I 2022-01-19 13:56:58.874 LabApp] JupyterLab extension loaded from /home/ye53nis/.conda/envs/tf/lib/python3.9/site-packages/jupyterlab
+     [I 2022-01-19 13:56:58.875 LabApp] JupyterLab application directory is /home/ye53nis/.conda/envs/tf/share/jupyter/lab
+     [I 2022-01-19 13:56:58.878 ServerApp] jupyterlab | extension was successfully loaded.
+     [I 2022-01-19 13:56:58.887 ServerApp] nbclassic | extension was successfully loaded.
+     [I 2022-01-19 13:56:58.888 ServerApp] Serving notebooks from local directory: /
+     [I 2022-01-19 13:56:58.888 ServerApp] Jupyter Server 1.4.1 is running at:
+     [I 2022-01-19 13:56:58.888 ServerApp] http://localhost:9997/lab?token=9ad088acb0814d4971fda19803f1277425223efb0fba96e0
+     [I 2022-01-19 13:56:58.888 ServerApp]  or http://127.0.0.1:9997/lab?token=9ad088acb0814d4971fda19803f1277425223efb0fba96e0
+     [I 2022-01-19 13:56:58.888 ServerApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+     [C 2022-01-19 13:56:58.893 ServerApp]
+
+         To access the server, open this file in a browser:
+             file:///home/ye53nis/.local/share/jupyter/runtime/jpserver-166055-open.html
+         Or copy and paste one of these URLs:
+             http://localhost:9997/lab?token=9ad088acb0814d4971fda19803f1277425223efb0fba96e0
+          or http://127.0.0.1:9997/lab?token=9ad088acb0814d4971fda19803f1277425223efb0fba96e0
+   #+end_example
+
+
+
+
+
+#+CALL: ssh-tunnel[:session org-tunnel2](port="9997", node="node145")
+
+#+RESULTS:
+|                   |           |                                        |           |    |          |      |      |             |
+| sh-5.1$           | sh-5.1$   | ye53nis@ara-login01.rz.uni-jena.de's | password: |    |          |      |      |             |
+| ye53nis@node145's | password: |                                        |           |    |          |      |      |             |
+| Last              | login:    | Wed                                    | Jan       | 19 | 13:57:27 | 2022 | from | login01.ara |
+
 ** Tensorboard tunnel, Mlflow ui tunnel
 
 
@@ -13514,9 +14948,11 @@ Test:
 
 #+RESULTS:
 |                   |           |                                        |           |       |          |      |      |                |
-| sh-5.1$           | sh-5.1$   | ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |      |                |
+| sh-5.1$           | sh-5.1$   |
+ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |      |                |
 | ye53nis@login01's | password: |                                        |           |       |          |      |      |                |
-| bind:             | Address   | already                                | in        | use |          |      |      |                |
+| bind:             | Address   | already                                | in        | use
+ |          |      |      |                |
 | Last              | login:    | Thu                                    | Aug       |     5 | 20:32:16 | 2021 | from | 10.231.184.163 |
 
 #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tensorboard
@@ -13539,9 +14975,11 @@ Test:
 
 #+RESULTS:
 |                   |           |                                        |           |       |          |      |      |                |
-| sh-5.1$           | sh-5.1$   | ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |      |                |
+| sh-5.1$           | sh-5.1$   |
+ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |      |                |
 | ye53nis@login01's | password: |                                        |           |       |          |      |      |                |
-| bind:             | Address   | already                                | in        | use |          |      |      |                |
+| bind:             | Address   | already                                | in        | use
+ |          |      |      |                |
 | Last              | login:    | Tue                                    | Aug       |     3 | 13:55:10 | 2021 | from | 10.231.184.125 |
 
 ** gpu node
@@ -13550,8 +14988,10 @@ Test:
 
    #+RESULTS:
    |         |                                        |           |
-   | sh-5.1$ | ye53nis@ara-login01.rz.uni-jena.de's | password: |
-   | >       | ye53nis@ara-login01.rz.uni-jena.de's | password: |
+   | sh-5.1$ |
+ye53nis@ara-login01.rz.uni-jena.de's | password: |
+   | >       |
+ye53nis@ara-login01.rz.uni-jena.de's | password: |
 
    #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session gpu
      cd /
@@ -13582,6 +15022,6 @@ Test:
 ** Jupyter on local machine
 
   #+begin_src sh :session local
-    conda activate tf-nightly-lab
+    conda activate tf
     jupyter lab --no-browser --port=8888
   #+end_src
