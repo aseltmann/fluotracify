@@ -25,7 +25,7 @@ import os
 import time
 
 from pathlib import Path
-from fluotracify.applications import correlate
+from fluotracify.applications import correlate, correlate_cython
 from fluotracify.applications import (fitting_methods_SE as SE,
                                       fitting_methods_GS as GS,
                                       fitting_methods_VD as VD,
@@ -790,15 +790,15 @@ class PicoObject():
                              f'self.autoNorm[{method}].')
         metadata = f'{name}'.split('_')
         timeseries_name = '_'.join(metadata[:2])
-        parent_name = '_'.join(metadata[2:])
+        truetime_name = '_'.join(metadata[2:])
         chan = metadata[0].strip('CH')
 
-        if parent_name not in self.kcount:
-            raise ValueError(f'self.kcount[{parent_name}][{timeseries_name}]'
+        if truetime_name not in self.kcount:
+            raise ValueError(f'self.kcount[{truetime_name}][{timeseries_name}]'
                              'does not exist. Run getTimeSeries and '
                              'getPhotonCountingStats first.')
-        elif timeseries_name not in self.kcount[parent_name]:
-            raise ValueError(f'self.kcount[{parent_name}][{timeseries_name}]'
+        elif timeseries_name not in self.kcount[truetime_name]:
+            raise ValueError(f'self.kcount[{truetime_name}][{timeseries_name}]'
                              'does not exist. Run getTimeSeries and '
                              'getPhotonCountingStats first.')
 
@@ -814,9 +814,9 @@ class PicoObject():
         output_file = output_path / output_file
         autotime = self.autotime[f'{method}'][f'{name}'].flatten()
         autonorm = self.autoNorm[f'{method}'][f'{name}'].flatten()
-        kcount = self.kcount[parent_name][timeseries_name]
-        numberNandB = self.numberNandB[parent_name][timeseries_name]
-        brightnessNandB = self.brightnessNandB[parent_name][timeseries_name]
+        kcount = self.kcount[truetime_name][timeseries_name]
+        numberNandB = self.numberNandB[truetime_name][timeseries_name]
+        brightnessNandB = self.brightnessNandB[truetime_name][timeseries_name]
 
         # compatibility with FoCuS-fit-JS:
         # with 'w': utf-16le (doesn't work), utf-8 (works)
@@ -825,7 +825,7 @@ class PicoObject():
             out.write('version,3.0\n')
             out.write(f'numOfCH,{self.numOfCH}\n')
             out.write('type,point\n')
-            out.write(f'parent_name,{parent_name}\n')
+            out.write(f'parent_name,{method}\n')
             out.write(f'ch_type,{chan}_{chan}\n')
             out.write(f'kcount,{kcount}\n')
             out.write(f'numberNandB,{numberNandB}\n')
