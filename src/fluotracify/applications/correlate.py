@@ -8,7 +8,8 @@ import numpy as np
 from lmfit import Parameters, fit_report, minimize
 from multipletau import autocorrelate
 
-from fluotracify.applications import equations_to_fit as eq
+from fluotracify.applications import (equations_to_fit as eq,
+                                      correlate_cython as ccy)
 
 logging.basicConfig(format='%(asctime)s - %(message)s')
 log = logging.getLogger(__name__)
@@ -243,7 +244,7 @@ def tttr2xfcs(y, num, NcascStart, NcascEnd, Nsub):
                 # i1= np.in1d(y,y+lag,assume_unique=True)
                 # i2= np.in1d(y+lag,y,assume_unique=True)
                 # New method, cython
-                i1, i2 = dividAndConquer(y, y + lag, y.shape[0] + 1)
+                i1, i2 = ccy.dividAndConquer(y, y + lag, y.shape[0] + 1)
                 # If the weights (num) are one as in the first Ncasc round,
                 # then the correlation is equal to np.sum(i1)
                 i1 = np.where(i1.astype(np.bool))[0]
@@ -294,7 +295,12 @@ def delayTime2bin(dTimeArr, chanArr, chanNum, winInt):
 
 
 def dividAndConquer(arr1b, arr2b, arrLength):
-    """divide and conquer fast intersection algorithm. Waithe D 2014"""
+    """divide and conquer fast intersection algorithm. Waithe D 2014
+
+    Notes
+    -----
+    This implementation is very slow. Use correlate_cython.dividAndConquer
+    for a fast cython implementation"""
     arr1bool = np.zeros((arrLength - 1))
     arr2bool = np.zeros((arrLength - 1))
     arr1 = arr1b
