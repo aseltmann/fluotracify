@@ -554,7 +554,7 @@ def unet_hp_metrics(metrics_thresholds):
     return metrics
 
 
-def prepare_model(model):
+def prepare_model(model, input_size_list):
     """Iterate through multiple input sizes to make tensorflow accept them
 
     Notes
@@ -564,7 +564,10 @@ def prepare_model(model):
     not trained on the first time, it will throw an error. After iterating
     through more different input sizes, the error will be gone.
     """
-    for ldelim in [2**14, 2**13, 2**12, 2**13]:
+    if not isinstance(input_size_list, list):
+        raise ValueError('input_size_list has to be a list of test input'
+                         ' sizes.')
+    for ldelim in input_size_list:
         test_features = tf.experimental.numpy.zeros((ldelim))
         test_features = tf.experimental.numpy.reshape(a=test_features,
                                                       newshape=(1, -1, 1))
