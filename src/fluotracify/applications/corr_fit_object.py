@@ -80,23 +80,22 @@ class PicoObject():
         self.NcascStart = self.par_obj.NcascStart
         self.NcascEnd = self.par_obj.NcascEnd
         self.Nsub = self.par_obj.Nsub
-        # 1000 gives microseconds, 1000000 gives ms
+
         self.timeSeriesDividend = 1000000
         self.CV = []
 
         # used for photon decay
         self.photonLifetimeBin = self.par_obj.photonLifetimeBin
-        # used for time series (25)
-        self.photonCountBin = self.par_obj.photonCountBin
+
 
         # define dictionary variables for methods
         (self.photonDecay, self.decayScale, self.photonDecayMin,
          self.photonDecayNorm, self.kcount, self.brightnessNandB,
          self.numberNandB, self.timeSeries, self.autoNorm, self.autotime,
          self.timeSeriesScale, self.timeSeriesSize, self.predictions,
-         self.subChanArr, self.trueTimeArr,
-         self.trueTimeWeights) = ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {},
-                                  {}, {}, {}, {}, {})
+         self.subChanArr, self.trueTimeArr, self.trueTimeWeights,
+         self.photonCountBin) = ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {},
+                                 {}, {}, {}, {}, {}, {})
 
         self.importData()
         self.prepareChannels()
@@ -265,14 +264,17 @@ class PicoObject():
         self.timeSeries[ts_name] = tser = {}
         self.timeSeriesScale[ts_name] = tss = {}
         if photonCountBin is not None:
-            self.photonCountBin = int(photonCountBin)
+            self.photonCountBin[ts_name] = tsb = float(photonCountBin)
+        else:
+            self.photonCountBin[ts_name] = tsb = float(
+                self.par_obj.photonCountBin)
 
         for i in range(self.numOfCH):
-            key = f'CH{self.ch_present[i]}_BIN{self.photonCountBin}'
+            key = f'CH{self.ch_present[i]}_BIN{tsb}'
             timeSeries, timeSeriesScale = self.time2bin(
                 np.array(self.trueTimeArr[name]) / self.timeSeriesDividend,
                 np.array(self.subChanArr[name]), self.ch_present[i],
-                self.photonCountBin)
+                tsb)
             tser[key] = timeSeries
             tss[key] = timeSeriesScale
         log.debug('Finished getTimeSeries() with truetime_name %s'
@@ -294,7 +296,7 @@ class PicoObject():
          self.numberNandB[f'{name}']) = {}, {}, {}
 
         for i in range(self.numOfCH):
-            key = f'CH{self.ch_present[i]}_BIN{self.photonCountBin}'
+            key = f'CH{self.ch_present[i]}_BIN{self.photonCountBin[name]}'
 
             (kcount, brightnessNandB,
              numberNandB) = correlate.photonCountingStats(
@@ -711,6 +713,7 @@ class PicoObject():
                                  'autocorrelation already happened.')
             metadata = name.split('_')
             chan = metadata[0].strip('CH')
+            photon_count_bin = metadata[1].strip('BIN')
 
             log.debug('get_autocorrelation: Starting tttr2xfcs correlation.'
                       'with name %s', name)
@@ -723,24 +726,26 @@ class PicoObject():
                                   ' give a hint on which channel was used and '
                                   'it does not match channel %s', name, chan)
                         continue
+                    photon_count_bin = float(photon_count_bin)
                     # just so that I avoid having two CHx_CHx in front
                     name = '_'.join(metadata[1:])
                     tt_key = f'CH{self.ch_present[i]}_{name}'
                 except ValueError:
                     # if int(chan) fails
                     tt_key = name
+                    photon_count_bin = self.photonCountBin[name]
                     log.debug('Given key %s of trueTimeArr does not include a '
                               'hint on which channel was used. Assume all '
-                              'channels shall be used and continue', name)
+                              'channels are used and continue', name)
                 if method == 'tttr2xfcs':
-                    key = (f'CH{self.ch_present[i]}_BIN{self.photonCountBin}'
+                    key = (f'CH{self.ch_present[i]}_BIN{photon_count_bin}'
                            f'_{name.removesuffix("_CORRECTED")}')
                     autonorm, autotime = self.crossAndAuto(
                         self.trueTimeArr[tt_key], self.subChanArr[tt_key],
                         [self.ch_present[i], self.ch_present[i]])
 
                 elif method == 'tttr2xfcs_with_weights':
-                    key = (f'CH{chan}_BIN{self.photonCountBin}_'
+                    key = (f'CH{chan}_BIN{photon_count_bin}_'
                            f'{name.removesuffix("_FORWEIGHTS")}')
                     tt_arr = self.trueTimeArr[f'CH{chan}_{name}']
                     tt_weights = self.trueTimeWeights[name_weights]
@@ -769,7 +774,7 @@ class PicoObject():
 
             corr_fn = multipletau.autocorrelate(
                 a=self.timeSeries[f'{name[0]}'][f'{name[1]}'],
-                m=16, deltat=1, normalize=True)
+                m=16, deltat=self.photonCountBin[f'{name[0]}'], normalize=True)
             # multipletau outputs autotime=0 as first correlation step, which
             # leads to problems with focus-fit-js
             self.autotime['multipletau'][f'{name[1]}_{name[0]}'] = (
@@ -809,8 +814,8 @@ class PicoObject():
             if not output_path.is_dir():
                 raise NotADirectoryError('output_path should be a directory or'
                                          ' "pwd"')
-        output_file = (f'{datetime.date.today()}_{method}_{name}_'
-                       'correlation.csv')
+        output_file = (f'{datetime.date.today()}_{method}_'
+                       f'{name.replace(".", "dot")}_correlation.csv')
         output_file = output_path / output_file
         autotime = self.autotime[f'{method}'][f'{name}'].flatten()
         autonorm = self.autoNorm[f'{method}'][f'{name}'].flatten()
@@ -832,7 +837,7 @@ class PicoObject():
             out.write(f'brightnessNandB,{brightnessNandB}\n')
             out.write('carpet pos,0\n')
             out.write('pc,0\n')
-            out.write(f'Time (mus),CH{chan} Auto-Correlation\n')
+            out.write(f'Time (ms),CH{chan} Auto-Correlation\n')
             for i in range(autotime.shape[0]):
                 out.write(f'{autotime[i]},{autonorm[i]}\n')
             out.write('end\n')
