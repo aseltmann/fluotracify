@@ -676,9 +676,8 @@ class PicoObject():
                     idxphot = 0
                     for nphot, artifact in zip(trace, timeSeriesMask):
                         if artifact:
-                            trueTimeCorrected[
-                                idxphot:] -= (photon_count_bin *
-                                              self.timeSeriesDividend)
+                            trueTimeCorrected[idxphot:] -= (
+                                photon_count_bin * self.timeSeriesDividend)
                         else:
                             idxphot += nphot
                     log.debug(
@@ -778,8 +777,9 @@ class PicoObject():
             metadata = name.split('_')
             chan = metadata[0].strip('CH')
             chan_name = f"CH{chan}_"
-            photon_count_bin = self.photonCountBin[
-                f'{name.removesuffix("_CORRECTED").removeprefix(chan_name)}']
+            pcb_name = name.removesuffix("_CORRECTED").removesuffix(
+                "_FORWEIGHTS").removeprefix(chan_name)
+            photon_count_bin = self.photonCountBin[f'{pcb_name}']
 
             log.debug(
                 'get_autocorrelation: Starting tttr2xfcs correlation '
