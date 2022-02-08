@@ -25,6 +25,7 @@ import os
 import time
 
 from pathlib import Path
+from typing import Literal, Optional, Union
 from fluotracify.applications import correlate, correlate_cython
 from fluotracify.applications import (fitting_methods_SE as SE,
                                       fitting_methods_GS as GS,
@@ -87,7 +88,6 @@ class PicoObject():
         # used for photon decay
         self.photonLifetimeBin = self.par_obj.photonLifetimeBin
 
-
         # define dictionary variables for methods
         (self.photonDecay, self.decayScale, self.photonDecayMin,
          self.photonDecayNorm, self.kcount, self.brightnessNandB,
@@ -129,10 +129,14 @@ class PicoObject():
                                      out["dTimeArr"], out["resolution"])
                 # Remove Overflow and Markers; they are not handled at the
                 # moment.
-                self.subChanArr[key] = np.array([i for i in self.subChanArr[
-                    key] if not isinstance(i, tuple)])
-                self.trueTimeArr[key] = np.array([i for i in self.trueTimeArr[
-                    key] if not isinstance(i, tuple)])
+                self.subChanArr[key] = np.array([
+                    i for i in self.subChanArr[key]
+                    if not isinstance(i, tuple)
+                ])
+                self.trueTimeArr[key] = np.array([
+                    i for i in self.trueTimeArr[key]
+                    if not isinstance(i, tuple)
+                ])
                 self.dTimeArr = np.array(
                     [i for i in self.dTimeArr if not isinstance(i, tuple)])
             # out = ptuimport(self.filepath)
@@ -230,10 +234,9 @@ class PicoObject():
 
             # Normalisation of the decay functions.
             if np.sum(photonDecay) > 0:
-                phd[f'Min_{key}'] = (
-                    photonDecay - np.min(photonDecay))
-                phd[f'Norm_{key}'] = (
-                    phd[f'Min_{key}'] / np.max(phd[f'Min_{key}']))
+                phd[f'Min_{key}'] = (photonDecay - np.min(photonDecay))
+                phd[f'Norm_{key}'] = (phd[f'Min_{key}'] /
+                                      np.max(phd[f'Min_{key}']))
             else:
                 (phd[f'Min_{key}'], phd[f'Norm_{key}']) = 0, 0
         log.debug('Finished getPhotonDecay() with name %s', name)
@@ -249,10 +252,13 @@ class PicoObject():
         photonCountBin : optional, int
             bin for calculation of time series. Photons arriving in the
             time interval x to x+photonCountBin are aggregated
-        name : optional, str
+        truetime_name : optional, str
+            the key to self.trueTimeArr which determines the photon arrival
+            times to use for the construction of the time series
+        timeseries_name : optional, str
             The time series and time series scale are added to self via a
-            dictionary with the key "name". If None, the current time is taken
-            as a key.
+            dictionary with the key "name". If None, self.name is taken
+            as the key.
         """
         # update if method is called again with new parameters
         name = f'{self.name}' if truetime_name is None else f'{truetime_name}'
@@ -273,12 +279,12 @@ class PicoObject():
             key = f'CH{self.ch_present[i]}_BIN{tsb}'
             timeSeries, timeSeriesScale = self.time2bin(
                 np.array(self.trueTimeArr[name]) / self.timeSeriesDividend,
-                np.array(self.subChanArr[name]), self.ch_present[i],
-                tsb)
+                np.array(self.subChanArr[name]), self.ch_present[i], tsb)
             tser[key] = timeSeries
             tss[key] = timeSeriesScale
-        log.debug('Finished getTimeSeries() with truetime_name %s'
-                  ', timeseries_name %s', name, ts_name)
+        log.debug(
+            'Finished getTimeSeries() with truetime_name %s'
+            ', timeseries_name %s', name, ts_name)
 
     def getPhotonCountingStats(self, name=None):
         """Gets photon counting statistics from time series
@@ -329,11 +335,12 @@ class PicoObject():
                 corr_array[i].append([])
 
         for i, j in corr_comb:
-            log.debug('Starting first crossAndAuto() with ch_present[i] %s '
-                      'and ch_present[j] %s', self.ch_present[i],
-                      self.ch_present[j])
+            log.debug(
+                'Starting first crossAndAuto() with ch_present[i] %s '
+                'and ch_present[j] %s', self.ch_present[i], self.ch_present[j])
             corr_fn, autotime = self.crossAndAuto(
-                np.array(self.trueTimeArr[name]), np.array(self.subChanArr[name]),
+                np.array(self.trueTimeArr[name]),
+                np.array(self.subChanArr[name]),
                 [self.ch_present[i], self.ch_present[j]])
             if corr_array[i][i] == []:
                 an[f'CH{i}_CH{i}'] = corr_fn[:, 0, 0].reshape(-1)
@@ -343,12 +350,13 @@ class PicoObject():
             an[f'CH{j}_CH{i}'] = corr_fn[:, 1, 0].reshape(-1)
 
         if self.numOfCH == 1:
-            log.debug('Starting first crossAndAuto() with ch_present[i] %s '
-                      'and ch_present[j] %s', self.ch_present[i],
-                      self.ch_present[j])
+            log.debug(
+                'Starting first crossAndAuto() with ch_present[i] %s '
+                'and ch_present[j] %s', self.ch_present[i], self.ch_present[j])
             # FIXME: What is i and j here??
             corr_fn, autotime = self.crossAndAuto(
-                np.array(self.trueTimeArr[name]), np.array(self.subChanArr[name]),
+                np.array(self.trueTimeArr[name]),
+                np.array(self.subChanArr[name]),
                 [self.ch_present[i], self.ch_present[j]])
             an['CH0_CH0'] = corr_fn[:, 0, 0].reshape(-1)
 
@@ -403,8 +411,8 @@ class PicoObject():
         # bins are valued as half their span.
         bins_scale = bins[:-1] + (win_int / 2)
         # bins_scale =  np.arange(0,decayTimeCh.shape[0])
-        log.debug('Finished time2bin. last_time=%s, num_bins=%s',
-                  last_time, num_bins)
+        log.debug('Finished time2bin. last_time=%s, num_bins=%s', last_time,
+                  num_bins)
         return list(photons_in_bin), list(bins_scale)
 
     def crossAndAuto(self, trueTimeArr, subChanArr, channelsToUse):
@@ -466,8 +474,8 @@ class PicoObject():
         # time
         photonInd = np.logical_and(self.dTimeArr >= xmin,
                                    self.dTimeArr <= xmax).astype(np.bool)
-        self.subChanArr[f'{self.name}'][
-            np.invert(photonInd).astype(np.bool)] = 16
+        self.subChanArr[f'{self.name}'][np.invert(photonInd).astype(
+            np.bool)] = 16
 
     def predictTimeSeries(self, model, scaler, name=None):
         """Takes a timetrace, performs preprocessing, and applies a compiled
@@ -619,10 +627,10 @@ class PicoObject():
             # match trueTimeArr and subChanArr shape to prediction
             subChanCorrected = subChanCorrected[:photonMask.size]
             trueTimeCorrected = trueTimeCorrected[:photonMask.size]
-            log.debug('correctTCSPC: some samples: subChan %s, truetime %s,'
-                      'photonMask %s, channelMask %s',
-                      subChanCorrected.size, trueTimeCorrected.size,
-                      photonMask.size, np.size(channelMask))
+            log.debug(
+                'correctTCSPC: some samples: subChan %s, truetime %s,'
+                'photonMask %s, channelMask %s', subChanCorrected.size,
+                trueTimeCorrected.size, photonMask.size, np.size(channelMask))
 
             if method in ['delete', 'delete_and_shift']:
                 photon_count_bin = int(metadata[1].strip('BIN'))
@@ -715,16 +723,18 @@ class PicoObject():
             chan = metadata[0].strip('CH')
             photon_count_bin = metadata[1].strip('BIN')
 
-            log.debug('get_autocorrelation: Starting tttr2xfcs correlation.'
-                      'with name %s', name)
+            log.debug(
+                'get_autocorrelation: Starting tttr2xfcs correlation '
+                'with name %s', name)
 
             for i in range(self.numOfCH):
                 try:
                     chan = int(chan)
                     if chan != self.ch_present[i]:
-                        log.debug('Skipping because key %s of trueTimeArr does'
-                                  ' give a hint on which channel was used and '
-                                  'it does not match channel %s', name, chan)
+                        log.debug(
+                            'Skipping because key %s of trueTimeArr does'
+                            ' give a hint on which channel was used and '
+                            'it does not match channel %s', name, chan)
                         continue
                     photon_count_bin = float(photon_count_bin)
                     # just so that I avoid having two CHx_CHx in front
@@ -734,9 +744,10 @@ class PicoObject():
                     # if int(chan) fails
                     tt_key = name
                     photon_count_bin = self.photonCountBin[name]
-                    log.debug('Given key %s of trueTimeArr does not include a '
-                              'hint on which channel was used. Assume all '
-                              'channels are used and continue', name)
+                    log.debug(
+                        'Given key %s of trueTimeArr does not include a '
+                        'hint on which channel was used. Assume all '
+                        'channels are used and continue', name)
                 if method == 'tttr2xfcs':
                     key = (f'CH{self.ch_present[i]}_BIN{photon_count_bin}'
                            f'_{name.removesuffix("_CORRECTED")}')
@@ -750,14 +761,17 @@ class PicoObject():
                     tt_arr = self.trueTimeArr[f'CH{chan}_{name}']
                     tt_weights = self.trueTimeWeights[name_weights]
                     auto, autotime = correlate.tttr2xfcs(
-                        y=tt_arr, num=tt_weights, NcascStart=self.NcascStart,
-                        NcascEnd=self.NcascEnd, Nsub=self.Nsub)
+                        y=tt_arr,
+                        num=tt_weights,
+                        NcascStart=self.NcascStart,
+                        NcascEnd=self.NcascEnd,
+                        Nsub=self.Nsub)
                     # Normalisation of the TCSPC data
                     maxY = np.ceil(max(tt_arr))
                     count = np.sum(tt_weights)
                     autonorm = np.zeros((auto.shape))
-                    autonorm[:, 0, 0] = ((auto[:, 0, 0] * maxY) /
-                                         (count**2)) - 1
+                    autonorm[:, 0,
+                             0] = ((auto[:, 0, 0] * maxY) / (count**2)) - 1
                 self.autoNorm[f'{method}'][key] = autonorm[:, i, i].reshape(
                     1, 1, -1)
                 self.autotime[f'{method}'][key] = autotime.reshape(-1, 1)
@@ -774,13 +788,15 @@ class PicoObject():
 
             corr_fn = multipletau.autocorrelate(
                 a=self.timeSeries[f'{name[0]}'][f'{name[1]}'],
-                m=16, deltat=self.photonCountBin[f'{name[0]}'], normalize=True)
+                m=16,
+                deltat=self.photonCountBin[f'{name[0]}'],
+                normalize=True)
             # multipletau outputs autotime=0 as first correlation step, which
             # leads to problems with focus-fit-js
-            self.autotime['multipletau'][f'{name[1]}_{name[0]}'] = (
-                corr_fn[1:, 0])
-            self.autoNorm['multipletau'][f'{name[1]}_{name[0]}'] = (
-                corr_fn[1:, 1])
+            self.autotime['multipletau'][f'{name[1]}_{name[0]}'] = (corr_fn[1:,
+                                                                            0])
+            self.autoNorm['multipletau'][f'{name[1]}_{name[0]}'] = (corr_fn[1:,
+                                                                            1])
 
         log.debug('Finished get_autocorrelation() with method=%s, name=%s',
                   method, name)
