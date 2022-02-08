@@ -168,8 +168,8 @@ class PicoObject():
         self.color = self.par_obj.colors[self.unqID % len(self.par_obj.colors)]
 
         # How many channels there are in the files.
-        self.ch_present = np.sort(np.unique(np.array(
-            self.subChanArr[f'{self.name}'])))
+        self.ch_present = np.sort(
+            np.unique(np.array(self.subChanArr[f'{self.name}'])))
         for i in range(self.ch_present.__len__() - 1, -1, -1):
             if self.ch_present[i] > 8:
                 self.ch_present = np.delete(self.ch_present, i)
@@ -551,11 +551,14 @@ class PicoObject():
         log.debug('Finished predictTimeSeries() with name=%s', name)
 
     def correctTCSPC(self,
-                     pred_thresh=0.5,
-                     method='weights',
-                     weight=None,
-                     truetime_name=None,
-                     timeseries_name=None):
+                     pred_thresh: float = 0.5,
+                     method: Union[Literal['weights'], Literal['delete'],
+                                   Literal['delete_and_shift']] = 'weights',
+                     weight: Optional[Union[float, Literal['random'],
+                                            Literal['1-pred']]] = None,
+                     bin_after_correction: Optional[float] = None,
+                     truetime_name: Optional[str] = None,
+                     timeseries_name: Optional[str] = None):
         """Takes the artifact prediction from the time series and removes
         the artifacts in the TCSPC data
 
@@ -576,10 +579,26 @@ class PicoObject():
             the bin size which was deleted before. The time series constructed
             from this trueTimeArr will have no drops, all ends are annealed to
             each other.
-        weight = optional, float or None
+        weight = optional, float, int, 'random', '1-pred' or None
             Only used if method='weights'. Photons classified as artifacts are
-            given this weight. If None (or explicitly set to 0), the weight
-            will be set to 0, meaning the photons will not be correlated
+            given this weight.method=method
+            'random': Each predicted bin gets a random weight between 0 and 1
+            '1-pred': Each predicted bin gets a weight of 1 - prediction
+            None: (or explicitly set to 0), the weight will be set to 0,
+            meaning the photons will not be correlated
+        bin_after_correction = optional, float or None
+            Only used if method in ['delete', 'delete_and_shift']. After the
+            prediction was performed on the data, map the prediction to a new
+            time series with this bin (the prediction bin is decided by which
+            time series is given to predictTimeSeries()). This makes sense, if
+            you want to correlate a time series with multipletau using a
+            smaller time series than what makes sense with the prediction model
+        truetime_name = optional, string
+            Used for getting the photon arrival times you want to correct.
+            If None, self.name is chosen
+        timeseries_name = optional, string
+            Used for getting the prediction which is the basis for the
+            correction. If None, self.name is chosen.
 
         Returns
         -------
@@ -601,16 +620,29 @@ class PicoObject():
         methods = ['weights', 'delete', 'delete_and_shift']
         if method not in methods:
             raise ValueError(f'method has to be in {methods}.')
-        if method == 'weight' and (not isinstance(weight, float)
-                                   and weight not in [None, 0, 1]):
+        if method == 'weights' and (not isinstance(weight, (float, int)) and
+                                    weight not in [None, 'random', '1-pred']):
             raise ValueError('if method == "weight", the argument weight'
-                             ' has to be a float, 0, 1 or None')
+                             ' has to be a float, int, the strings "random"'
+                             ', "1-pred", or None.')
+        elif method == 'weights':
+            if bin_after_correction is not None:
+                raise ValueError('bin_after_correction should only be set'
+                                 'for correction methods "delete" or '
+                                 '"delete_and_shift"')
+        if bin_after_correction is not None and not isinstance(
+                bin_after_correction, (float, int)):
+            raise ValueError('bin_after_correction has to be an int or float')
 
         for key, trace in self.timeSeries[ts_name].copy().items():
             if 'PREPRO' in key or 'CORRECTED' in key:
+                log.debug(
+                    'correctTCSPC(): skipped trace self.timeSeries[%s]'
+                    '[%s]', ts_name, key)
                 continue
             metadata = key.split('_')
             chan = int(metadata[0].strip('CH'))
+            photon_count_bin = float(metadata[1].strip('BIN'))
             trace = np.array(trace)
             trace_scale = np.array(self.timeSeriesScale[ts_name][f'{key}'])
             predictions = self.predictions[ts_name][f'{key}']
@@ -633,43 +665,66 @@ class PicoObject():
                 trueTimeCorrected.size, photonMask.size, np.size(channelMask))
 
             if method in ['delete', 'delete_and_shift']:
-                photon_count_bin = int(metadata[1].strip('BIN'))
                 # delete photons classified as artifactual
                 trueTimeCorrected = np.delete(trueTimeCorrected, photonMask)
                 subChanCorrected = np.delete(subChanCorrected, photonMask)
                 log.debug('correctTCSPC: deleted %s photons of %s photons.',
                           len(self.trueTimeArr[name]) - len(trueTimeCorrected),
                           len(self.trueTimeArr[name]))
-
                 if method == 'delete_and_shift':
                     # moves the photons as if the deleted bins never existed
                     idxphot = 0
                     for nphot, artifact in zip(trace, timeSeriesMask):
                         if artifact:
-                            trueTimeCorrected[idxphot:] -= photon_count_bin
+                            trueTimeCorrected[
+                                idxphot:] -= (photon_count_bin *
+                                              self.timeSeriesDividend)
                         else:
                             idxphot += nphot
-                    log.debug('correctTCSPC: shifted non-deleted photon '
-                              'arrival times by photonCountBin=%s',
-                              photon_count_bin)
-                    tsCorrected = np.delete(trace, timeSeriesMask)
-                    tsScaleCorrected = np.delete(trace_scale, timeSeriesMask)
-                else:
-                    tsCorrected = np.where(timeSeriesMask == 1, 0, trace)
-                    tsScaleCorrected = trace_scale
-                self.timeSeries[ts_name][f'{key}_CORRECTED'] = tsCorrected
-                self.timeSeriesScale[ts_name][f'{key}_CORRECTED'] = (
-                     tsScaleCorrected)
+                    log.debug(
+                        'correctTCSPC: shifted non-deleted photon '
+                        'arrival times by photonCountBin=%s', photon_count_bin)
                 self.trueTimeArr[f'{metadata[0]}_{ts_name}_CORRECTED'] = (
                     trueTimeCorrected)
                 self.subChanArr[f'{metadata[0]}_{ts_name}_CORRECTED'] = (
                     subChanCorrected)
 
+                if bin_after_correction is not None:
+                    if method == 'delete_and_shift':
+                        ts_name2 = 'DELSHIFTBIN'
+                    else:
+                        ts_name2 = 'DELBIN'
+                    self.getTimeSeries(
+                        photonCountBin=float(bin_after_correction),
+                        truetime_name=f'{metadata[0]}_{ts_name}_CORRECTED',
+                        timeseries_name=f'{ts_name}_{ts_name2}')
+                    self.getPhotonCountingStats(name=f'{ts_name}_{ts_name2}')
+                else:
+                    if method == 'delete_and_shift':
+                        ts_name2 = 'DELSHIFT'
+                        ts = np.delete(trace, timeSeriesMask)
+                        tss = np.delete(trace_scale, timeSeriesMask)
+                    else:
+                        ts_name2 = 'DEL'
+                        ts = np.where(timeSeriesMask == 1, 0, trace)
+                        tss = trace_scale
+                    self.timeSeries[f'{ts_name}_{ts_name2}'][key] = ts
+                    self.timeSeriesScale[f'{ts_name}_{ts_name2}'][key] = tss
+                    self.photonCountBin = photon_count_bin
+                    self.getPhotonCountingStats(name=f'{ts_name}_{ts_name2}')
+
             elif method == 'weights':
-                weight = float(0) if weight is None else float(weight)
+                if weight == 'random':
+                    rng = np.random.default_rng(seed=42)
+                    myweight = rng.uniform(size=photonMask.shape)
+                elif weight == '1-pred':
+                    timeSeriesMask2 = 1 - predictions[:timeSeriesSize]
+                    myweight = np.repeat(timeSeriesMask2, trace)
+                else:
+                    myweight = float(0) if weight is None else float(weight)
                 photon_weights = np.zeros((subChanCorrected.shape[0], 2))
                 # for autocorrelation, only channel [:, 0] is relevant
-                photon_weights[:, 0] = np.where(photonMask == 1, weight,
+                photon_weights[:, 0] = np.where(photonMask == 1, myweight,
                                                 float(1))
                 self.trueTimeWeights[f'{metadata[0]}_{ts_name}'] = (
                     photon_weights)
@@ -719,9 +774,12 @@ class PicoObject():
                 raise ValueError('self.autoNorm[\'tttr2xfcs\'] already has a'
                                  f' key={name} Check if your desired '
                                  'autocorrelation already happened.')
+
             metadata = name.split('_')
             chan = metadata[0].strip('CH')
-            photon_count_bin = metadata[1].strip('BIN')
+            chan_name = f"CH{chan}_"
+            photon_count_bin = self.photonCountBin[
+                f'{name.removesuffix("_CORRECTED").removeprefix(chan_name)}']
 
             log.debug(
                 'get_autocorrelation: Starting tttr2xfcs correlation '
@@ -811,6 +869,10 @@ class PicoObject():
                              f'self.autoNorm[{method}].')
         metadata = f'{name}'.split('_')
         timeseries_name = '_'.join(metadata[:2])
+        #  if metadata[2] == 'CORRECTED':
+        #     truetime_name = '_'.join(metadata[3:])
+        # else:
+        #     truetime_name = '_'.join(metadata[2:])
         truetime_name = '_'.join(metadata[2:])
         chan = metadata[0].strip('CH')
 
@@ -844,7 +906,8 @@ class PicoObject():
         # with 'wb': works with .encode() behind strings
         with open(output_file, 'w', encoding='utf-8') as out:
             out.write('version,3.0\n')
-            out.write(f'numOfCH,{self.numOfCH}\n')
+            # this is a pure autocorrelation function, so set numOfCH=1
+            out.write(f'numOfCH,{1}\n')
             out.write('type,point\n')
             out.write(f'parent_name,{method}\n')
             out.write(f'ch_type,{chan}_{chan}\n')
