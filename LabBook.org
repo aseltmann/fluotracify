@@ -2063,7 +2063,6 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
       #+RESULTS:
       : fa1b6a82-0827-4730-a145-2ab9f4c967ef
 
-
 *** Analysis 1 of no-correction vs weight=0 vs shift
    :PROPERTIES:
    :header-args:jupyter-python: :session /jpy:localhost#8888:a37e524a-8134-4d8f-b24a-367acaf1bdd3
