@@ -124,21 +124,25 @@ class PicoObject():
             (out, self.ptu_tags, self.ptu_num_records,
              self.glob_res) = ptu.import_ptu(self.filepath)
             if out is not False:
-                (self.subChanArr[key], self.trueTimeArr[key], self.dTimeArr,
+                (subChanArrFull, trueTimeArrFull, dTimeArrFull,
                  self.resolution) = (out["chanArr"], out["trueTimeArr"],
                                      out["dTimeArr"], out["resolution"])
                 # Remove Overflow and Markers; they are not handled at the
                 # moment.
-                self.subChanArr[key] = np.array([
-                    i for i in self.subChanArr[key]
-                    if not isinstance(i, tuple)
-                ])
-                self.trueTimeArr[key] = np.array([
-                    i for i in self.trueTimeArr[key]
-                    if not isinstance(i, tuple)
-                ])
-                self.dTimeArr = np.array(
-                    [i for i in self.dTimeArr if not isinstance(i, tuple)])
+                subChanArr = np.array([i for i in subChanArrFull
+                                       if not isinstance(i, tuple)])
+                trueTimeArr = np.array([i for i in trueTimeArrFull
+                                        if not isinstance(i, tuple)])
+                dTimeArr = np.array([i for i in dTimeArrFull
+                                     if not isinstance(i, tuple)])
+                self.subChanArr[key] = subChanArr
+                self.trueTimeArr[key] = trueTimeArr
+                self.dTimeArr = dTimeArr
+
+                # garbage collection
+                del (subChanArrFull, trueTimeArrFull, dTimeArrFull, subChanArr,
+                     trueTimeArr, dTimeArr)
+
             # out = ptuimport(self.filepath)
             # if out is not False:
             #     (self.subChanArr, self.trueTimeArr, self.dTimeArr,
@@ -413,7 +417,7 @@ class PicoObject():
         # bins_scale =  np.arange(0,decayTimeCh.shape[0])
         log.debug('Finished time2bin. last_time=%s, num_bins=%s', last_time,
                   num_bins)
-        return list(photons_in_bin), list(bins_scale)
+        return np.array(photons_in_bin), np.array(bins_scale)
 
     def crossAndAuto(self, trueTimeArr, subChanArr, channelsToUse):
         # For each channel we loop through and find only those in the correct
@@ -729,6 +733,10 @@ class PicoObject():
                     photon_weights)
                 self.trueTimeArr[f'{metadata[0]}_{ts_name}_FORWEIGHTS'] = (
                     trueTimeCorrected)
+                # garbage collection
+                del photon_weights
+            # garbage collection
+            del trueTimeCorrected
 
         log.debug('Finished correctTCSPC() with name %s, timeseries_name %s',
                   name, ts_name)
