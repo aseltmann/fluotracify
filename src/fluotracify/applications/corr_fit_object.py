@@ -243,6 +243,8 @@ class PicoObject():
                                       np.max(phd[f'Min_{key}']))
             else:
                 (phd[f'Min_{key}'], phd[f'Norm_{key}']) = 0, 0
+        # garbage collection
+        del photonDecay, decayScale
         log.debug('Finished getPhotonDecay() with name %s', name)
 
     def getTimeSeries(self,
@@ -286,6 +288,8 @@ class PicoObject():
                 np.array(self.subChanArr[name]), self.ch_present[i], tsb)
             tser[key] = timeSeries
             tss[key] = timeSeriesScale
+        # garbage collection
+        del timeSeries, timeSeriesScale
         log.debug(
             'Finished getTimeSeries() with truetime_name %s'
             ', timeseries_name %s', name, ts_name)
