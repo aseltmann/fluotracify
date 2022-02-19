@@ -610,6 +610,7 @@
       #+CALL: jp-metadata(_long='True)
 
       #+RESULTS:
+      #+begin_details
       #+begin_example
         No of CPUs in system: 72
         No of CPUs the current process can use: 24
@@ -905,12 +906,13 @@
          'GIT_PAGER': 'cat',
          'MPLBACKEND': 'module://ipykernel.pylab.backend_inline'}
       #+end_example
-
+      #+end_details
    10. Test and save metadata after update in Experiment 2a
 
        #+CALL: jp-metadata(_long='True)
 
        #+RESULTS:
+       #+begin_details
        #+begin_example
          No of CPUs in system: 72
          No of CPUs the current process can use: 24
@@ -1213,13 +1215,14 @@
           'KMP_DUPLICATE_LIB_OK': 'True',
           'KMP_INIT_AT_FORK': 'FALSE'}
        #+end_example
-
+       #+end_details
    11. Test and save metadata for Analysis 4 (=190327_detectordropout= needs a
        lot of RAM)
 
        #+CALL: jp-metadata(_long='True)
 
        #+RESULTS:
+       #+begin_details
        #+begin_example
          No of CPUs in system: 72
          No of CPUs the current process can use: 24
@@ -1519,7 +1522,7 @@
           'GIT_PAGER': 'cat',
           'MPLBACKEND': 'module://matplotlib_inline.backend_inline'}
        #+end_example
-
+       #+end_details
 *** Setup: Jupyter 2 on HPC compute node 2
    :PROPERTIES:
    :header-args:jupyter-python: :session /jpy:localhost#9997:a37e524a-8134-4d8f-b24a-367acaf1bdd3
@@ -1628,6 +1631,7 @@
       #+CALL: jp-metadata(_long='True)
 
       #+RESULTS:
+      #+begin_details
       #+begin_example
         No of CPUs in system: 72
         No of CPUs the current process can use: 24
@@ -1923,12 +1927,13 @@
          'GIT_PAGER': 'cat',
          'MPLBACKEND': 'module://ipykernel.pylab.backend_inline'}
       #+end_example
-
+      #+end_details
    10. Test and save metadata after update in Experiment 2a
 
       #+CALL: jp-metadata(_long='True)
 
       #+RESULTS:
+      #+begin_details
       #+begin_example
         No of CPUs in system: 72
         No of CPUs the current process can use: 24
@@ -2227,7 +2232,7 @@
          'GIT_PAGER': 'cat',
          'MPLBACKEND': 'module://ipykernel.pylab.backend_inline'}
       #+end_example
-
+      #+end_details
 *** Setup: Jupyter 3 on local computer
    :PROPERTIES:
    :header-args:jupyter-python: :session /jpy:localhost#8888:a37e524a-8134-4d8f-b24a-367acaf1bdd3
@@ -2273,6 +2278,7 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
       #+CALL: jp-metadata(_long='True)
 
       #+RESULTS:
+      #+begin_details
       #+begin_example
         No of CPUs in system: 4
         No of CPUs the current process can use: 4
@@ -2551,8 +2557,8 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
          'GIT_PAGER': 'cat',
          'MPLBACKEND': 'module://matplotlib_inline.backend_inline'}
       #+end_example
-
-*** Experiment 1a: Correlate all_clean_ptu on Jupyter 1
+      #+end_details
+*** Experiment 1a: Correlate =all_clean_ptu= on Jupyter 1
    :PROPERTIES:
    :header-args:jupyter-python: :session /jpy:localhost#8889:a37e524a-8134-4d8f-b24a-367acaf1bdd3
    :END:
@@ -2656,7 +2662,7 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
       #+RESULTS:
       : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
 
-   5. Run experiment: Correlate all_clean_ptu on Jupyter 1
+   5. Run experiment: Correlate =all_clean_ptu= on Jupyter 1
 
         #+BEGIN_SRC jupyter-python
           path = Path(path)
@@ -2774,7 +2780,7 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
       #+RESULTS:
       : 8e913e9c-fdcf-4a67-988c-dad76773f19c
 
-*** Experiment 1b: Correlate all_dirty_ptu on Jupyter 2
+*** Experiment 1b: Correlate =all_dirty_ptu= on Jupyter 2
    :PROPERTIES:
    :header-args:jupyter-python: :session /jpy:localhost#9997:a37e524a-8134-4d8f-b24a-367acaf1bdd3
    :END:
@@ -2878,7 +2884,7 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
       #+RESULTS:
       : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
 
-   5. Run experiment: Correlate all_dirty_ptu on Jupyter 2
+   5. Run experiment: Correlate =all_dirty_ptu= on Jupyter 2
 
         #+BEGIN_SRC jupyter-python
           path = Path(path)
@@ -3078,6 +3084,7 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
 
      #+RESULTS:
 
+     #+begin_details
      #+BEGIN_SRC jupyter-python
        folder_clean = Path('data/exp-220120-correlate-ptu/2022-01-20_correlate-all-clean-ptu')
        folder_dirty = Path('data/exp-220120-correlate-ptu/2022-01-20_correlate-all-dirty-ptu')
@@ -3326,6 +3333,7 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
      #+END_SRC
 
      #+RESULTS:
+     #+end_details
 
      #+BEGIN_SRC jupyter-python :pandoc t
        taudiff = pd.DataFrame(data=[clean_v1_taudiff, clean_v2_taudiff, clean_v3_taudiff,
@@ -3422,7 +3430,7 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
      #+END_SRC
 
      #+RESULTS:
-
+     #+begin_details
      #+BEGIN_SRC jupyter-python
        folder_clean = Path('data/exp-220120-correlate-ptu/2022-01-20_correlate-all-clean-ptu')
        folder_clean_weights = Path('data/exp-220120-correlate-ptu/2022-01-25_correlate-all-clean-ptu')
@@ -3622,7 +3630,7 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
      #+END_SRC
 
      #+RESULTS:
-
+     #+end_details
      #+BEGIN_SRC jupyter-python :pandoc t
        taudiff = pd.DataFrame(data=[clean_v1_taudiff, clean_00_taudiff, clean_02_taudiff,
                                     clean_04_taudiff, clean_06_taudiff, clean_08_taudiff,
@@ -3712,7 +3720,7 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
    - *FROM HINDSIGHT: Dominic used a 2D fit here - but we have a 3D situation
      here and this table is so far not reproducible in 3D with equation 1B*
 
-*** Experiment 2a: Update packages and Correlate all_clean_ptu on Jupyter 1
+*** Experiment 2a: Update packages and Correlate =all_clean_ptu= on Jupyter 1
    :PROPERTIES:
    :header-args:jupyter-python: :session /jpy:localhost#8889:a37e524a-8134-4d8f-b24a-367acaf1bdd3
    :END:
@@ -3765,6 +3773,7 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
       #+END_SRC
 
       #+RESULTS:
+      #+begin_details
       #+begin_example
         (base) [ye53nis@login01 drmed-git]$ conda env remove -n tf
 
@@ -4287,6 +4296,7 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
             Running setup.py install for cython ... done
         Successfully installed cython-0.29.27
       #+end_example
+      #+end_details
 
    4. Now Install dividAndConquer as a Cython implementation
       #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
@@ -4387,15 +4397,15 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
       : To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
       : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
 
-   7. Run experiment: Correlate all_clean_ptu of the *AlexaFluor488*
+   7. Run experiment: Correlate =all_clean_ptu= of the *AlexaFluor488*
       experiment on Jupyter 1. We want the following correlations:
       - clean trace → correlation via tttr2xfcs, and multipletau (bin=0.001)
-      - correction=delete → correlation via tttr2xfcs, and multipletau
+      - ~correction=delete~ → correlation via tttr2xfcs, and multipletau
         (bin=0.001)
-      - correction=delete_and_shift → correlation via tttr2xfcs, and multipletau
+      - ~correction=delete_and_shift~ → correlation via tttr2xfcs, and multipletau
         (bin=0.001)
-      - correction=weights-random → correlation via tttr2xfcs
-      - correction=weights-1-pred → correlation via tttr2xfcs
+      - ~correction=weights-random~ → correlation via tttr2xfcs
+      - ~correction=weights-1-pred~ → correlation via tttr2xfcs
 
         #+BEGIN_SRC jupyter-python
           mt_bin = 0.001
@@ -4474,8 +4484,6 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
         : /home/ye53nis/.conda/envs/tf/lib/python3.9/site-packages/multipletau/core.py:175: DtypeWarning: Input dtype is not float; casting to np.float_!
         :   warnings.warn("Input dtype is not float; casting to np.float_!",
 
-
-
    8. According to log, the first run ended with an Error
       #+begin_example
         [I 2022-01-22 21:32:42.402 ServerApp] AsyncIOLoopKernelRestarter: restarting kernel (1/5), keep random ports
@@ -4501,22 +4509,6 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
       : ---------------------------------------------------------
 
       #+BEGIN_SRC jupyter-python
-
-      #+END_SRC
-
-      #+RESULTS:
-      : ---------------------------------------------------------
-
-
-      #+BEGIN_SRC jupyter-python
-
-
-      #+END_SRC
-
-      #+RESULTS:
-
-
-      #+BEGIN_SRC jupyter-python
         [print(stat) for stat in top_stats_base[:10]]
         print("---------------------------------------------------------")
         [print(stat) for stat in top_stats_0[:10]]
@@ -4525,13 +4517,6 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
       #+END_SRC
 
       #+RESULTS:
-      :RESULTS:
-      #+begin_src jupyter-python
-        stat = top_stats[0]
-        print("%s memory blocks: %.1f KiB" % (stat.count, stat.size / 1024))
-        for line in stat.traceback.format():
-            print(line)
-      #+end_src
       #+begin_example
         /home/ye53nis/.conda/envs/tf/lib/python3.9/codeop.py:143: size=225 B, count=2, average=112 B
         /home/ye53nis/.conda/envs/tf/lib/python3.9/site-packages/IPython/core/interactiveshell.py:3377: size=120 B, count=1, average=120 B
@@ -4561,21 +4546,6 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
         /home/ye53nis/.conda/envs/tf/lib/python3.9/tracemalloc.py:558: size=83.3 KiB (+83.2 KiB), count=1533 (+1532), average=56 B
         /beegfs/ye53nis/drmed-git/src/fluotracify/imports/ptu_utils.py:324: size=105 KiB (+28.2 KiB), count=1923 (+516), average=56 B
       #+end_example
-      |---|
-      |---|
-      |---|
-      |---|
-      |---|
-      |---|
-      |---|
-      |---|
-      |---|
-      |---|
-      :END:
-      #+RESULTS:
-      : 112980280 memory blocks: 3530633.5 KiB
-      :   File "/beegfs/ye53nis/drmed-git/src/fluotracify/applications/corr_fit_object.py", line 416
-      :     return list(photons_in_bin), list(bins_scale)
 
       #+BEGIN_SRC jupyter-python
         import linecache
@@ -4693,7 +4663,7 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
       : /home/ye53nis/.conda/envs/tf/lib/python3.9/site-packages/multipletau/core.py:175: DtypeWarning: Input dtype is not float; casting to np.float_!
       :   warnings.warn("Input dtype is not float; casting to np.float_!",
 
-*** Experiment 2b: Correlate all_dirty_ptu on Jupyter 2
+*** Experiment 2b: Correlate =all_dirty_ptu= on Jupyter 2
    :PROPERTIES:
    :header-args:jupyter-python: :session /jpy:localhost#9997:a37e524a-8134-4d8f-b24a-367acaf1bdd3
    :END:
@@ -4806,15 +4776,15 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
       : To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
       : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
 
-   6. Run experiment: Correlate all_dirty_ptu of the *AlexaFluor488 + DiO LUVs*
+   6. Run experiment: Correlate =all_dirty_ptu= of the *AlexaFluor488 + DiO LUVs*
       experiment on Jupyter 2. We want the following correlations:
       - dirty trace → correlation via tttr2xfcs, and multipletau (bin=0.001)
-      - correction=delete → correlation via tttr2xfcs, and multipletau
+      - ~correction=delete~ → correlation via tttr2xfcs, and multipletau
         (bin=0.001)
-      - correction=delete_and_shift → correlation via tttr2xfcs, and multipletau
+      - ~correction=delete_and_shift~ → correlation via tttr2xfcs, and multipletau
         (bin=0.001)
-      - correction=weights-random → correlation via tttr2xfcs
-      - correction=weights-1-pred → correlation via tttr2xfcs
+      - ~correction=weights-random~ → correlation via tttr2xfcs
+      - ~correction=weights-1-pred~ → correlation via tttr2xfcs
 
         #+BEGIN_SRC jupyter-python
           files = [path / f for f in os.listdir(path) if f.endswith('.ptu')]
@@ -4878,7 +4848,7 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
       #+end_example
       Only 229 traces were analyzed.
 
-*** Analysis 3 of multipletau vs tttr2xfcs, fixed delete_and_shift, weight-random and weight-1-pred
+*** Analysis 3 of multipletau vs tttr2xfcs, fixed ~delete_and_shift~, ~weight-random~ and ~weight-1-pred~
    :PROPERTIES:
    :header-args:jupyter-python: :session /jpy:localhost#8888:a37e524a-8134-4d8f-b24a-367acaf1bdd3
    :END:
@@ -4984,7 +4954,8 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
      #+END_SRC
 
      #+RESULTS:
-
+   - load in all the data (see =Details= block)
+     #+begin_details
      #+BEGIN_SRC jupyter-python
        folder_clean = Path('data/exp-220120-correlate-ptu/2022-02-08_correlate-all-clean-ptu')
        folder_clean_w0 = Path('data/exp-220120-correlate-ptu/2022-01-20_correlate-all-clean-ptu')
@@ -5347,7 +5318,7 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
 
 4100 rows × 33 columns
      :END:
-
+     #+end_details
 
    - let's plot all transit times for each correction method and parameters
      #+BEGIN_SRC jupyter-python :pandoc t
@@ -5418,7 +5389,6 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
      #+END_SRC
 
      #+RESULTS:
-
 
      [[file:./data/exp-220120-correlate-ptu/jupyter/analysis3-all-param.png]]
 
@@ -5494,6 +5464,7 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
    - let's have a deeper look in the correlations and fits, first load all the
      correlation and fit plots which were done in
      https://dwaithe.github.io/FCSfitJS/
+     #+begin_details
      #+BEGIN_SRC jupyter-python :pandoc t
        # clean plots, alphafix
        clean_1ax_plot = pd.read_csv(clean_1ax_plot_path, sep=',', na_values=' ').drop('Unnamed: 109', axis=1)
@@ -5824,7 +5795,7 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
      #+END_SRC
 
      #+RESULTS:
-
+     #+end_details
    - now, let's plot correlations and fits for all correction methods:
 
      #+BEGIN_SRC jupyter-python :pandoc t
@@ -6147,7 +6118,8 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
      - both measurements have 2 channels! → Pablo said that is because he didn't
        know the microscope well → I can just use the channel with the higher
        count rates.
-     - let's plot traces, predictions, and correlations:
+     - let's plot traces, predictions, and correlations (see =Details= blocks):
+       #+begin_details
        #+BEGIN_SRC jupyter-python
          path_clean = data_path / '191111_Pex5_1/clean_3of10'
          path_dirty = data_path / '191111_Pex5_1/Tb-PEX5-eGFP_5uW_0.5ugml3_3of177'
@@ -6287,7 +6259,7 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
        #+END_SRC
 
        #+RESULTS:
-
+       #+end_details
      - the results:
        file:./data/exp-220120-correlate-ptu/jupyter/analysis4-191111-pex1.png
      - cave 1: 2 channels - check for the right Channel when plotting (CH2)
@@ -6300,7 +6272,8 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
    - look at third *bright cluster artifacts* folder: =191113_Pex5_2_structured=
      - *clean* = Homo sapiens PEX5, labelled with eGFP
      - *dirty* = Trypanosoma brucei PEX5, labelled with eGFP
-     - let's plot traces, predictions, and correlations:
+     - let's plot traces, predictions, and correlations (see =Details= block):
+       #+begin_details
        #+BEGIN_SRC jupyter-python
          path_clean = data_path / '191113_Pex5_2_structured/HsPEX5EGFP_1-100001_3of250'
          path_dirty = data_path / '191113_Pex5_2_structured/TbPEX5EGFP_1-10002_3of250'
@@ -6434,13 +6407,14 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
        #+END_SRC
 
        #+RESULTS:
-
+       #+end_details
      - the results:
        file:./data/exp-220120-correlate-ptu/jupyter/analysis4-191113_pex2.png
 
    - look at *detector dropout* files
      - from the file Name we have e24 ? HeLa cells with GFP-SNAP
-     - let's see if we can load them
+     - let's see if we can load them (see =Details= block)
+       #+begin_details
        #+BEGIN_SRC jupyter-python
          path_dirty = data_path / "190327_detectordropout/"
          files_dirty = [path_dirty / f for f in os.listdir(path_dirty) if f.endswith('.ptu')]
@@ -6550,7 +6524,7 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
        #+END_SRC
 
        #+RESULTS:
-
+       #+end_details
      - results:
        [[file:./data/exp-220120-correlate-ptu/jupyter/analysis4-190327-detectordropout.png]]
 
@@ -6561,7 +6535,8 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
        - so in =chopIn01= we have 33 traces with a length of about 16 seconds
        - and in =chopIn03= each trace is cut in *3 parts* so we have 99 traces
          with a length of around 5 seconds
-     - Let's load and plot them:
+     - Let's load and plot them (see =Details= block):
+       #+begin_details
        #+BEGIN_SRC jupyter-python :pandoc t
          chop01_cf = pd.read_csv(Path(output_path) / '190327_detectordropout_onlydirty/E24 HeLa GFP_chopIn01_FCS_CurvesAndFits.csv',
                                          header=[0, 1])
@@ -6610,10 +6585,10 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
        #+END_SRC
 
        #+RESULTS:
-
+       #+end_details
        - these are examples of traces cut in 3 parts:
          [[file:./data/exp-220120-correlate-ptu/jupyter/analysis4-190327-chopin01.png]]
-
+       #+begin_details
        #+BEGIN_SRC jupyter-python :pandoc t
          chop03_cf = pd.read_csv(Path(output_path) / '190327_detectordropout_onlydirty/E24 HeLa GFP_chopIn03_FCS_CurvesAndFits.csv',
                                          header=[0, 1])
@@ -6665,11 +6640,12 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
        #+END_SRC
 
        #+RESULTS:
-
+       #+end_details
        - these are examples of traces cut in 9 parts:
          [[file:./data/exp-220120-correlate-ptu/jupyter/analysis4-190327-chopin03.png]]
 
-     - now let's load and plot the transit times:
+     - now let's load and plot the transit times (see =Details= block):
+       #+begin_details
        #+BEGIN_SRC jupyter-python :pandoc t
          chop01 = pd.read_csv(Path(output_path) / '190327_detectordropout_onlydirty/E24 HeLa GFP_chopIn01_FitParameters.csv',
                                    header=[0], index_col=1)
@@ -6698,11 +6674,9 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
        #+END_SRC
 
        #+RESULTS:
-       :RESULTS:
-              | Text | (0 0 clean\n(16s, n=29)) | Text | (1 0 clean\n(5s, n=94)) | Text | (2 0 clean\n(1.6s, n=326)) | Text | (3 0 dirty\n(16s, n=4)) | Text | (4 0 dirty\n(5s, n=5)) | Text | (5 0 dirty\n(1.6s, n=4)) |
-
-       :END:
-       - the results: [[file:./data/exp-220120-correlate-ptu/jupyter/analysis4-190327-all-param.png]]
+       #+end_details
+       - the results:
+         [[file:./data/exp-220120-correlate-ptu/jupyter/analysis4-190327-all-param.png]]
      - it would be possible to train an UNET on simulated data with such
        detector dropout artifacts and test it on the above 4 traces with
        artifacts I have as =.ptu= files. Unfortunately, I only have 1 "clean"
@@ -6714,7 +6688,8 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
      - let's see if we can load them
        - look at *detector dropout* files
      - from the file Name we have e24 ? HeLa cells with GFP-SNAP
-     - let's see if we can load them
+     - let's see if we can load them (see =Details= block)
+       #+begin_details
        #+BEGIN_SRC jupyter-python
          path_clean = data_path / "191107_EGFP_photobleaching/eGFP 5 uW 0.5ugml1"
          path_dirty = data_path / "191107_EGFP_photobleaching/eGFP 10 uW 0.5ugml2"
@@ -6866,13 +6841,14 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
        #+END_SRC
 
        #+RESULTS:
-
+       #+end_details
      - results:
      [[file:./data/exp-220120-correlate-ptu/jupyter/analysis4-191107-photobleaching.png]]
      - seems like this this data does not contain so much of an artifact. Have
        to ask Pablo if there was other data he took.
 
-     - let's see if the transit times are different:
+     - let's see if the transit times are different (see =Details= block):
+       #+begin_details
        #+BEGIN_SRC jupyter-python :pandoc t
          taudiff_dirty_mt = pd.read_csv(Path(output_path) / '191107_photobleaching/dirty/10uW_CH2_multipletau_param.csv',
                                         na_values=' ').loc[:, 'txy1'].rename('dirty (n=5\nmultipletau)')
@@ -6895,7 +6871,7 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
        #+END_SRC
 
        #+RESULTS:
-
+       #+end_details
      - results:
        [[file:./data/exp-220120-correlate-ptu/jupyter/analysis4-191107-all-param.png]]
 
