@@ -392,11 +392,14 @@
          the part after the underscore will be rendered like a subscript:
          =under_score= vs under_score
      - _Things to do after exporting:_
-       - In my workflow, I put the exported =LabBook.html= into the =data=
-         folder. If you move the file, you will have to fix the file links for
-         the new location, e.g. via "Find and replace" =M-%= with find:
-         - in the org file e.g. find =[[file:./data/= and replace with =[[=
-         - in the html file e.g. find =./data= and replace with =.=
+       - In my workflow, the exported =LabBook.html= with the overview of all
+         experiments is in the =data= folder. If you move the file, you will
+         have to fix the file links for the new location, e.g. via "Find and
+         replace" =M-%=:
+         - if you move the org file → in the org file find =[[file:./data/= and
+           replace with =[[file:./= → then export with =C-c C-e w h=
+         - if you export first with =C-c C-e w h= and move the html file to
+           =data= → in the html file find =./data= and replace with =.=
 ** Organization of git
 
 *** remote/origin/main branch:
