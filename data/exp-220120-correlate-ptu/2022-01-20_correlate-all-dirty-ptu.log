@@ -1,0 +1,6 @@
+2022-01-25 00:52:57,129 - Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
+2022-01-25 00:53:05,683 - prepare_model: test shape (1, 16384, 1), e.g. [1.4064237e-01 1.3650321e-08 7.4799689e-10 1.7243300e-10 1.3498201e-10]
+2022-01-25 00:53:05,736 - prepare_model: test shape (1, 8192, 1). prediction failed as expected. Retry...
+2022-01-25 00:53:06,390 - prepare_model: test shape (1, 4096, 1), e.g. [1.4064237e-01 1.3650321e-08 7.4799689e-10 1.7243300e-10 1.3498201e-10]
+2022-01-25 00:53:06,455 - prepare_model: test shape (1, 8192, 1), e.g. [1.4064237e-01 1.3650321e-08 7.4799689e-10 1.7243300e-10 1.3498201e-10]
+2022-01-25 00:53:06,455 - prepare_model: UNET ready for different trace lengths

@@ -1,7 +1,12 @@
 """This module contains functions to build neural networks."""
 
+import logging
 import tensorflow as tf
 from tensorboard.plugins.hparams import api as hp
+
+logging.basicConfig(format='%(asctime)s - %(message)s')
+log = logging.getLogger(__name__)
+log.setLevel(logging.DEBUG)
 
 
 def vgg10_1d(win_len, col_no):
@@ -547,3 +552,30 @@ def unet_hp_metrics(metrics_thresholds):
     metrics.append(hp.Metric("auc"))
     metrics.append(hp.Metric("f1"))
     return metrics
+
+
+def prepare_model(model, input_size_list):
+    """Iterate through multiple input sizes to make tensorflow accept them
+
+    Notes
+    -----
+    Conceptually, the UNET is a fully convolutional model and should accept
+    different input sizes. But after calling the model on an input size it was
+    not trained on the first time, it will throw an error. After iterating
+    through more different input sizes, the error will be gone.
+    """
+    if not isinstance(input_size_list, list):
+        raise ValueError('input_size_list has to be a list of test input'
+                         ' sizes.')
+    for ldelim in input_size_list:
+        test_features = tf.experimental.numpy.zeros((ldelim))
+        test_features = tf.experimental.numpy.reshape(a=test_features,
+                                                      newshape=(1, -1, 1))
+        try:
+            predictions = model.predict(test_features, verbose=0).flatten()
+            log.debug('prepare_model: test shape %s, e.g. %s',
+                      test_features.shape, predictions[:5])
+        except ValueError:
+            log.debug('prepare_model: test shape %s. prediction failed '
+                      'as expected. Retry...', test_features.shape)
+    log.debug('prepare_model: UNET ready for different trace lengths')
