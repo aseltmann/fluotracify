@@ -16,6 +16,7 @@
 #+HTML_HEAD_EXTRA: <style type="text/css">pre.src-jupyter-python {background-color: #FAEAE1;}</style>
 #+HTML_HEAD_EXTRA: <style type="text/css">details {padding: 1em; background-color: #f0f0f0; border-radius: 15px; color: hsl(157 75% 20%); font-size: 0.9em; box-shadow: 0.05em 0.1em 5px 0.01em  #00000057;}</style>
 #+HTML_HEAD_EXTRA: <style type="text/css">details:hover {background:pink;}</style>
+#+HTML_HEAD_EXTRA: <style type="text/css">table {display: block; overflow-x: auto; white-space: nowrap;}</style>
 
 
 * Technical Notes
@@ -360,6 +361,11 @@
        - To discriminate between code blocks for different languages I gave each
          of them a distinct colour using =#+HTML_HEAD_EXTRA: <style...= (see
          above)
+       - I had to configure a style for =table=, so that the
+         - =display: block; overflow-x: auto;= gets the table to be restricted
+           to the width of the text and if it is larger, activates scrolling
+         - =white-space: nowrap;= makes it that there is no wrap in a column, so
+           it might be broader, but better readable if you have scrolling anyway
      - _Things to do before exporting / Troubleshooting while exporting:_
        - when using a dark theme for you emacs, the export of the code blocks
          might show some ugly dark backgrounds from the theme. If this becomes
@@ -467,6 +473,9 @@
 
 ** Changes in this repository (without "* Data" in this file)
 *** Changes in LabBook.org (without "* Data")
+**** 2022-02-19
+     - Add =#+HTML_HEAD_EXTRA: <style...= for =table= to enable scrolling if the
+       table overflows
 **** 2021-12-16
      - Add =details= blocks, corresponding =#+HTML_HEAD_EXTRA: <style...= and
        documentation in  [[Notes on archiving]]
