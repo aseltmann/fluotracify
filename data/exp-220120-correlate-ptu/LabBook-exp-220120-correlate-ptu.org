@@ -6118,7 +6118,7 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
        #+RESULTS:
 
      - the results:
-       file:./data/exp-220120-correlate-ptu/jupyter/analysis4-1911DD-alexa-luvs.png
+       [[file:./jupyter/analysis4-1911DD-alexa-luvs.png]]
 
    - look at second *bright cluster artifacts* folder: =191111_Pex5_1=
      - *clean* = Homo sapiens PEX5, labelled with eGFP
@@ -6269,7 +6269,7 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
        #+RESULTS:
        #+end_details
      - the results:
-       file:./data/exp-220120-correlate-ptu/jupyter/analysis4-191111-pex1.png
+       [[file:./jupyter/analysis4-191111-pex1.png]]
      - cave 1: 2 channels - check for the right Channel when plotting (CH2)
      - cave 2: in the plot, the traces and the correlations don't fit right now
        inside their respecitve group (different order of names in e.g.
@@ -6417,7 +6417,7 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
        #+RESULTS:
        #+end_details
      - the results:
-       file:./data/exp-220120-correlate-ptu/jupyter/analysis4-191113_pex2.png
+       [[file:./jupyter/analysis4-191113_pex2.png]]
 
    - look at *detector dropout* files
      - from the file Name we have e24 ? HeLa cells with GFP-SNAP

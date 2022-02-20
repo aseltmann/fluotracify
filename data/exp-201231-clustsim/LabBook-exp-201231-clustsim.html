@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="en">
 <head>
-<title>Lab Book Fluotracify</title>
-<!-- 2021-01-07 Do 23:36 -->
+<title>Lab book Fluotracify</title>
+<!-- 2022-02-20 So 12:16 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="generator" content="Org-mode">
@@ -11,7 +11,7 @@
 <link  href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/js/bootstrap.min.js"></script>
-<style type="text/css">
+<style>
 /* org mode styles on top of twbs */
 
 html {
@@ -178,7 +178,7 @@ figcaption {
     }
 }
 </style>
-<script type="text/javascript">
+<script>
 $(function() {
     'use strict';
 
@@ -194,6 +194,9 @@ $(function() {
 <style type="text/css">pre.src-tmux {background-color: #E1EED8;}</style>
 <style type="text/css">pre.src-python {background-color: #E6EDF4;}</style>
 <style type="text/css">pre.src-jupyter-python {background-color: #FAEAE1;}</style>
+<style type="text/css">details {padding: 1em; background-color: #f0f0f0; border-radius: 15px; color: hsl(157 75% 20%); font-size: 0.9em; box-shadow: 0.05em 0.1em 5px 0.01em  #00000057;}</style>
+<style type="text/css">details:hover {background:pink;}</style>
+<style type="text/css">table {display: block; overflow-x: auto; white-space: nowrap;}</style>
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -219,11 +222,124 @@ MathJax.Hub.Config({
   }
 });
 </script>
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_SVG"></script>
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_SVG"></script>
 </head>
 <body>
 <div id="content" class="container">
-<div class="row"><div class="col-md-9"><h1 class="title">Lab Book Fluotracify</h1>
+<div class="row"><div class="col-md-3 col-md-push-9"><nav id="table-of-contents">
+<div id="text-table-of-contents" class="bs-docs-sidebar">
+<ul class="nav">
+<li><a href="#sec-1">1. Technical Notes</a>
+<ul class="nav">
+<li><a href="#sec-1-1">1.1. README</a>
+<ul class="nav">
+<li><a href="#sec-1-1-1">1.1.1. General:</a></li>
+<li><a href="#sec-1-1-2">1.1.2. Code block languages used in this document</a></li>
+<li><a href="#sec-1-1-3">1.1.3. Experiments workflow:</a></li>
+<li><a href="#sec-1-1-4">1.1.4. Example for experimental setup procedure</a>
+<ul class="nav">
+<li><a href="#sec-jupyter-setup">1.1.4.1. Setting starting a jupyter kernel from a remote jupyter session using <code>emacs-jupyter</code> in <code>org babel</code></a></li>
+</ul>
+</li>
+<li><a href="#sec-1-1-5">1.1.5. tools used (notes)</a>
+<ul class="nav">
+<li><a href="#sec-1-1-5-1">1.1.5.1. Emacs <code>magit</code></a></li>
+<li><a href="#sec-1-1-5-2">1.1.5.2. jupyter</a></li>
+<li><a href="#sec-1-1-5-3">1.1.5.3. mlflow</a></li>
+<li><a href="#sec-1-1-5-4">1.1.5.4. tensorflow</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-1-2">1.2. Template for data entry and setup notes:</a>
+<ul class="nav">
+<li><a href="#sec-1-2-1">1.2.1. exp-#date-#title</a>
+<ul class="nav">
+<li><a href="#sec-1-2-1-1">1.2.1.1. git:</a></li>
+<li><a href="#sec-1-2-1-2">1.2.1.2. System Metadata:</a></li>
+<li><a href="#scripts-tmux">1.2.1.3. Tmux setup and scripts</a></li>
+<li><a href="#ssh-tunneling">1.2.1.4. SSH tunneling</a></li>
+<li><a href="#scripts-jp">1.2.1.5. jupyter scripts</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-2-2">1.2.2. Setup notes</a>
+<ul class="nav">
+<li><a href="#sec-tmux-setup">1.2.2.1. Setting up a tmux connection from using <code>ob-tmux</code> in <code>org-babel</code></a></li>
+<li><a href="#sec-1-2-2-2">1.2.2.2. <code>emacs-jupyter</code> Setup</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-2-3">1.2.3. Notes on archiving</a>
+<ul class="nav">
+<li><a href="#sec-1-2-3-1">1.2.3.1. Exporting the LabBook.org to html in a twbs style</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-1-3">1.3. Organization of git</a>
+<ul class="nav">
+<li><a href="#sec-1-3-1">1.3.1. remote/origin/main branch:</a></li>
+<li><a href="#sec-1-3-2">1.3.2. remote/origin/exp### branches:</a></li>
+<li><a href="#sec-1-3-3">1.3.3. remote/origin/develop branch:</a></li>
+<li><a href="#sec-1-3-4">1.3.4. remote/origin/data branch:</a></li>
+<li><a href="#sec-1-3-5">1.3.5. Git TAGs</a>
+<ul class="nav">
+<li><a href="#sec-1-3-5-1">1.3.5.1. Stable versions:</a></li>
+<li><a href="#sec-1-3-5-2">1.3.5.2. All tags from git:</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-1-4">1.4. Organization of code</a>
+<ul class="nav">
+<li><a href="#sec-1-4-1">1.4.1. scripts:</a></li>
+<li><a href="#sec-1-4-2">1.4.2. src/</a>
+<ul class="nav">
+<li><a href="#sec-1-4-2-1">1.4.2.1. fluotracify/</a></li>
+<li><a href="#sec-1-4-2-2">1.4.2.2. nanosimpy/</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-1-5">1.5. Changes in this repository (without "* Data" in this file)</a>
+<ul class="nav">
+<li><a href="#sec-1-5-1">1.5.1. Changes in LabBook.org (without "* Data")</a>
+<ul class="nav">
+<li><a href="#sec-1-5-1-1">1.5.1.1. 2022-02-19</a></li>
+<li><a href="#sec-1-5-1-2">1.5.1.2. 2021-12-16</a></li>
+<li><a href="#sec-1-5-1-3">1.5.1.3. 2021-08-05</a></li>
+<li><a href="#sec-1-5-1-4">1.5.1.4. 2021-04-04</a></li>
+<li><a href="#sec-1-5-1-5">1.5.1.5. 2020-11-04</a></li>
+<li><a href="#sec-1-5-1-6">1.5.1.6. 2020-05-31</a></li>
+<li><a href="#sec-1-5-1-7">1.5.1.7. 2020-05-07</a></li>
+<li><a href="#sec-1-5-1-8">1.5.1.8. 2020-04-22</a></li>
+<li><a href="#sec-1-5-1-9">1.5.1.9. 2020-03-30</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-5-2">1.5.2. Changes in src/fluotracify</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-2">2. Data</a>
+<ul class="nav">
+<li><a href="#sec-2-1">2.1. exp-201231-clustersim</a>
+<ul class="nav">
+<li><a href="#sec-2-1-1">2.1.1. connect to jupyter notebook</a></li>
+<li><a href="#sec-2-1-2">2.1.2. record metadata</a></li>
+<li><a href="#sec-2-1-3">2.1.3. set variables</a></li>
+<li><a href="#sec-2-1-4">2.1.4. Do the simulation</a></li>
+<li><a href="#sec-2-1-5">2.1.5. preparing examplary plots of the results (new kernel, new code)</a></li>
+<li><a href="#sec-2-1-6">2.1.6. plots of the simulated traces by diffusion rate</a></li>
+<li><a href="#sec-2-1-7">2.1.7. Learnings</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</nav>
+</div><div class="col-md-9 col-md-pull-3"><h1 class="title">Lab book Fluotracify</h1>
+
 
 <div id="outline-container-sec-1" class="outline-2">
 <h2 id="sec-1"><span class="section-number-2">1</span> Technical Notes</h2>
@@ -246,7 +362,7 @@ behavior in the "* Data" section.
 </li>
 <li>The branching model used is described in <a href="http://starpu-simgrid.gforge.inria.fr/misc/SIGOPS_paper.pdf">this paper</a>. Therefore: if you
 are interested in the "* Data" section, you have to <code>git clone</code> the <i>data</i>
-branch of the repository. The <i>master</i> branch is clean from any results, it
+branch of the repository. The <i>main</i> branch is clean from any results, it
 contains only source code and the analysis.
 </li>
 <li>This project is my take on <a href="https://en.wikipedia.org/wiki/Open-notebook_science">Open-notebook science</a>. The idea was postulated in
@@ -325,6 +441,15 @@ of this document the output of most code blocks is displayed this way.
 In the LabBook.html rendering of this document, these blocks will have a light
 yellow colour (#FBFBBF)
 </pre>
+
+<details>
+<pre class="example">
+This is a literal example block enclosed in a details block. This is useful to
+make the page more readable by collapsing large amounts of output.
+In the Labbook.html rendering of this document, the details block will have a
+light grey colour (#f0f0f0) and a pink color when hovering above it.
+</pre>
+</details>
 </div>
 </div>
 
@@ -332,7 +457,7 @@ yellow colour (#FBFBBF)
 <h4 id="sec-1-1-3"><span class="section-number-4">1.1.3</span> Experiments workflow:</h4>
 <div class="outline-text-4" id="text-1-1-3">
 <ol class="org-ol">
-<li>Create a new branch from <code>master</code>
+<li>Create a new branch from <code>main</code>
 </li>
 <li>Print out the git log from the latest commit and the metadata
 </li>
@@ -342,7 +467,7 @@ yellow colour (#FBFBBF)
 <li>All machine learning runs are saved in <code>data/mlruns</code>, all other data in
 <code>data/#experiment-name</code>
 </li>
-<li>Add a "<b>* #experiment-name" section to this file under [[</b> Data]]
+<li>Add a <code>** exp-&lt;date&gt;-&lt;name&gt;</code>" section to this file under <a href="#sec-2">Data</a>
 </li>
 <li>Commit/push the results of this separate branch
 </li>
@@ -354,15 +479,19 @@ yellow colour (#FBFBBF)
 <div id="outline-container-sec-1-1-4" class="outline-4">
 <h4 id="sec-1-1-4"><span class="section-number-4">1.1.4</span> Example for experimental setup procedure</h4>
 <div class="outline-text-4" id="text-1-1-4">
-</div><ol class="org-ol"><li><a id="sec-jupyter-setup" name="sec-jupyter-setup"></a><a id="sec-1-1-4-1" name="sec-1-1-4-1"></a>Setting starting a jupyter kernel from a remote jupyter session using <code>emacs-jupyter</code> in <code>org babel</code><br ><div class="outline-text-5" id="text-sec-jupyter-setup">
+</div><div id="outline-container-sec-jupyter-setup" class="outline-5">
+<h5 id="sec-jupyter-setup"><a id="sec-1-1-4-1" name="sec-1-1-4-1"></a><span class="section-number-5">1.1.4.1</span> Setting starting a jupyter kernel from a remote jupyter session using <code>emacs-jupyter</code> in <code>org babel</code></h5>
+<div class="outline-text-5" id="text-sec-jupyter-setup">
 </div>
-</li></ol>
+</div>
 </div>
 
 <div id="outline-container-sec-1-1-5" class="outline-4">
 <h4 id="sec-1-1-5"><span class="section-number-4">1.1.5</span> tools used (notes)</h4>
 <div class="outline-text-4" id="text-1-1-5">
-</div><ol class="org-ol"><li><a id="sec-1-1-5-1" name="sec-1-1-5-1"></a>Emacs <code>magit</code><br ><div class="outline-text-5" id="text-1-1-5-1">
+</div><div id="outline-container-sec-1-1-5-1" class="outline-5">
+<h5 id="sec-1-1-5-1"><span class="section-number-5">1.1.5.1</span> Emacs <code>magit</code></h5>
+<div class="outline-text-5" id="text-1-1-5-1">
 <ul class="org-ul">
 <li><code>gitflow-avh</code> (<code>magit-flow</code>) to follow the flow
 </li>
@@ -375,8 +504,10 @@ yellow colour (#FBFBBF)
 </li>
 </ul>
 </div>
-</li>
-<li><a id="sec-1-1-5-2" name="sec-1-1-5-2"></a>jupyter<br ><div class="outline-text-5" id="text-1-1-5-2">
+</div>
+<div id="outline-container-sec-1-1-5-2" class="outline-5">
+<h5 id="sec-1-1-5-2"><span class="section-number-5">1.1.5.2</span> jupyter</h5>
+<div class="outline-text-5" id="text-1-1-5-2">
 <ul class="org-ul">
 <li>emacs jupyter for running and connecting to kernel on server:
 <a href="https://github.com/dzop/emacs-jupyter">https://github.com/dzop/emacs-jupyter</a>
@@ -391,22 +522,26 @@ yellow colour (#FBFBBF)
 </li>
 </ul>
 </div>
-</li>
-<li><a id="sec-1-1-5-3" name="sec-1-1-5-3"></a>mlflow<br ><div class="outline-text-5" id="text-1-1-5-3">
+</div>
+<div id="outline-container-sec-1-1-5-3" class="outline-5">
+<h5 id="sec-1-1-5-3"><span class="section-number-5">1.1.5.3</span> mlflow</h5>
+<div class="outline-text-5" id="text-1-1-5-3">
 <ul class="org-ul">
 <li><a href="https://docs.faculty.ai/user-guide/experiments/index.html">https://docs.faculty.ai/user-guide/experiments/index.html</a> and
 <a href="https://docs.microsoft.com/en-us/azure/databricks/_static/notebooks/hls-image-processing/02-image-segmentation-dl.html">https://docs.microsoft.com/en-us/azure/databricks/_static/notebooks/hls-image-processing/02-image-segmentation-dl.html</a>
 </li>
 </ul>
 </div>
-</li>
-<li><a id="sec-1-1-5-4" name="sec-1-1-5-4"></a>tensorflow<br ><div class="outline-text-5" id="text-1-1-5-4">
+</div>
+<div id="outline-container-sec-1-1-5-4" class="outline-5">
+<h5 id="sec-1-1-5-4"><span class="section-number-5">1.1.5.4</span> tensorflow</h5>
+<div class="outline-text-5" id="text-1-1-5-4">
 <ul class="org-ul">
 <li><a href="https://www.tensorflow.org/tensorboard/image_summaries">https://www.tensorflow.org/tensorboard/image_summaries</a>
 </li>
 </ul>
 </div>
-</li></ol>
+</div>
 </div>
 </div>
 
@@ -416,52 +551,58 @@ yellow colour (#FBFBBF)
 </div><div id="outline-container-sec-1-2-1" class="outline-4">
 <h4 id="sec-1-2-1"><span class="section-number-4">1.2.1</span> exp-#date-#title</h4>
 <div class="outline-text-4" id="text-1-2-1">
-</div><ol class="org-ol"><li><a id="sec-1-2-1-1" name="sec-1-2-1-1"></a>git:<br ><div class="outline-text-5" id="text-1-2-1-1">
+</div><div id="outline-container-sec-1-2-1-1" class="outline-5">
+<h5 id="sec-1-2-1-1"><span class="section-number-5">1.2.1.1</span> git:</h5>
+<div class="outline-text-5" id="text-1-2-1-1">
 <div class="org-src-container">
 
-<pre class="src src-sh">git log -1
+<pre class="src src-sh"><span style="color: #784437;">git</span> <span style="color: #78683f;">log</span> <span style="color: #3f7178;">-1</span>
 </pre>
 </div>
 </div>
-</li>
+</div>
 
-<li><a id="sec-1-2-1-2" name="sec-1-2-1-2"></a>System Metadata:<br ><div class="outline-text-5" id="text-1-2-1-2">
+<div id="outline-container-sec-1-2-1-2" class="outline-5">
+<h5 id="sec-1-2-1-2"><span class="section-number-5">1.2.1.2</span> System Metadata:</h5>
+<div class="outline-text-5" id="text-1-2-1-2">
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python" id="jp-metadata"><span style="color: #859900; font-weight: bold;">import</span> os
-<span style="color: #859900; font-weight: bold;">import</span> pprint
+<pre class="src src-jupyter-python" id="jp-metadata"><span style="color: #859900; font-weight: bold;">import</span> <span style="color: #7e544f;">os</span>
+<span style="color: #859900; font-weight: bold;">import</span> <span style="color: #4f7e67;">pprint</span>
 
-<span style="color: #657b83; background-color: #fdf6e3;">ramlist</span> = os.popen(<span style="color: #2aa198;">'free -th'</span>).readlines()[-<span style="color: #657b83; background-color: #fdf6e3;">1</span>].split()[<span style="color: #657b83; background-color: #fdf6e3;">1</span>:]
+<span style="color: #268bd2;">ramlist</span> = <span style="color: #7e544f;">os</span>.<span style="color: #37785e;">popen</span>(<span style="color: #2aa198;">'free -th'</span>).<span style="color: #7e544f;">readlines</span>()[-1].<span style="color: #7a4f7e;">split</span>()[1:]
 
-print(<span style="color: #2aa198;">'No of CPUs in system:'</span>, os.cpu_count())
-print(<span style="color: #2aa198;">'No of CPUs the current process can use:'</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #657b83; font-weight: bold;">len</span>(os.sched_getaffinity(<span style="color: #657b83; background-color: #fdf6e3;">0</span>)))
-print(<span style="color: #2aa198;">'load average:'</span>, os.getloadavg())
-print(<span style="color: #2aa198;">'os.uname(): '</span>, os.uname())
-print(<span style="color: #2aa198;">'PID of process:'</span>, os.getpid())
-print(<span style="color: #2aa198;">'RAM total: {}, RAM used: {}, RAM free: {}'</span>.format(
-<span style="background-color: #eee8d5;"> </span>   ramlist[<span style="color: #657b83; background-color: #fdf6e3;">0</span>], ramlist[<span style="color: #657b83; background-color: #fdf6e3;">1</span>], ramlist[<span style="color: #657b83; background-color: #fdf6e3;">2</span>]))
+<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #2aa198;">'No of CPUs in system:'</span>, <span style="color: #7e544f;">os</span>.<span style="color: #37785e;">cpu_count</span>())
+<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #2aa198;">'No of CPUs the current process can use:'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #657b83; font-weight: bold;">len</span>(<span style="color: #7e544f;">os</span>.<span style="color: #707e4f;">sched_getaffinity</span>(0)))
+<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #2aa198;">'load average:'</span>, <span style="color: #7e544f;">os</span>.<span style="color: #783778;">getloadavg</span>())
+<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #2aa198;">'os.uname(): '</span>, <span style="color: #7e544f;">os</span>.<span style="color: #3f7178;">uname</span>())
+<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #2aa198;">'PID of process:'</span>, <span style="color: #7e544f;">os</span>.<span style="color: #4f7e67;">getpid</span>())
+<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #2aa198;">'RAM total: {}, RAM used: {}, RAM free: {}'</span>.<span style="color: #78683f;">format</span>(
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #4f5c7e;">ramlist</span>[0], <span style="color: #4f5c7e;">ramlist</span>[1], <span style="color: #4f5c7e;">ramlist</span>[2]))
 
-!echo the current directory: $PWD
-!echo My disk usage:
-!df -h
-<span style="color: #859900; font-weight: bold;">if</span> _long:
-<span style="background-color: #eee8d5;"> </span>   %conda <span style="color: #657b83; font-weight: bold;">list</span>
-<span style="background-color: #eee8d5;"> </span>   pprint.pprint(<span style="color: #657b83; font-weight: bold;">dict</span>(os.environ), <span style="color: #657b83; background-color: #fdf6e3;">sort_dicts</span>=<span style="color: #859900; font-weight: bold;">False</span>)
+!<span style="color: #37785e;">echo</span> <span style="color: #783f5a;">the</span> <span style="color: #43783f;">current</span> <span style="color: #268bd2;">directory</span>: $<span style="color: #4f7e67;">PWD</span>
+!<span style="color: #37785e;">echo</span> <span style="color: #707e4f;">My</span> <span style="color: #784437;">disk</span> <span style="color: #268bd2;">usage</span>:
+!<span style="color: #4f7e67;">df</span> -<span style="color: #7e544f;">h</span>
+<span style="color: #859900; font-weight: bold;">if</span> <span style="color: #268bd2;">_long</span>:
+<span style="background-color: #eee8d5;"> </span>   %<span style="color: #4f5c7e;">conda</span> <span style="color: #657b83; font-weight: bold;">list</span>
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #4f7e67;">pprint</span>.<span style="color: #4f7e67;">pprint</span>(<span style="color: #657b83; font-weight: bold;">dict</span>(<span style="color: #7e544f;">os</span>.<span style="color: #707e4f;">environ</span>), <span style="color: #707e4f;">sort_dicts</span>=<span style="color: #859900; font-weight: bold;">False</span>)
 
 </pre>
 </div>
 </div>
-</li>
+</div>
 
-<li><a id="scripts-tmux" name="scripts-tmux"></a><a id="sec-1-2-1-3" name="sec-1-2-1-3"></a>Tmux setup and scripts<br ><div class="outline-text-5" id="text-scripts-tmux">
+<div id="outline-container-scripts-tmux" class="outline-5">
+<h5 id="scripts-tmux"><a id="sec-1-2-1-3" name="sec-1-2-1-3"></a><span class="section-number-5">1.2.1.3</span> Tmux setup and scripts</h5>
+<div class="outline-text-5" id="text-scripts-tmux">
 <div class="org-src-container">
 
-<pre class="src src-sh" id="setup-tmux">rm ~/.tmux-local-socket-remote-machine
-<span style="color: #268bd2;">REMOTE_SOCKET</span>=$(<span style="color: #6c71c4; font-weight: bold;">ssh</span> ara <span style="color: #2aa198;">'tmux ls -F "#{socket_path}"'</span> | head -1)
+<pre class="src src-sh" id="setup-tmux"><span style="color: #513f78;">rm</span> <span style="color: #7e544f;">~/.tmux-local-socket-remote-machine</span>
+<span style="color: #268bd2;">REMOTE_SOCKET</span>=$(<span style="color: #6c71c4; font-weight: bold;">ssh</span> <span style="color: #783778;">ara</span> <span style="color: #2aa198;">'tmux ls -F "#{socket_path}"'</span> | <span style="color: #4f5c7e;">head</span> <span style="color: #3f7178;">-1</span>)
 <span style="color: #657b83; font-weight: bold;">echo</span> $<span style="color: #268bd2;">REMOTE_SOCKET</span>
-ssh ara -tfN <span style="color: #b58900; font-weight: bold;">\</span>
-    -L ~/.tmux-local-socket-remote-machine:$<span style="color: #268bd2;">REMOTE_SOCKET</span>
+<span style="color: #7a4f7e;">ssh</span> <span style="color: #783778;">ara</span> <span style="color: #7a4f7e;">-tfN</span> <span style="color: #b58900; font-weight: bold;">\</span>
+    <span style="color: #784437;">-L</span> <span style="color: #513f78;">~/.tmux-local-socket-remote-machine:</span>$<span style="color: #268bd2;">REMOTE_SOCKET</span>
 </pre>
 </div>
 
@@ -538,9 +679,11 @@ ssh ara -tfN <span style="color: #b58900; font-weight: bold;">\</span>
 </tbody>
 </table>
 </div>
-</li>
+</div>
 
-<li><a id="ssh-tunneling" name="ssh-tunneling"></a><a id="sec-1-2-1-4" name="sec-1-2-1-4"></a>SSH tunneling<br ><div class="outline-text-5" id="text-ssh-tunneling">
+<div id="outline-container-ssh-tunneling" class="outline-5">
+<h5 id="ssh-tunneling"><a id="sec-1-2-1-4" name="sec-1-2-1-4"></a><span class="section-number-5">1.2.1.4</span> SSH tunneling</h5>
+<div class="outline-text-5" id="text-ssh-tunneling">
 <p>
 Different applications can be run on the remote compute node. If I want to
 access them at the local machine, and open them with the browser, I use this
@@ -549,7 +692,7 @@ tunneling script.
 
 <div class="org-src-container">
 
-<pre class="src src-sh" id="ssh-tunnel">ssh -t -t ara -L $<span style="color: #268bd2;">port</span>:localhost:$<span style="color: #268bd2;">port</span> ssh $<span style="color: #268bd2;">node</span> -L $<span style="color: #268bd2;">port</span>:Localhost:$<span style="color: #268bd2;">port</span>
+<pre class="src src-sh" id="ssh-tunnel"><span style="color: #7a4f7e;">ssh</span> <span style="color: #7e544f;">-t</span> <span style="color: #7e544f;">-t</span> <span style="color: #783778;">ara</span> <span style="color: #784437;">-L</span> $<span style="color: #268bd2;">port</span>:localhost:$<span style="color: #268bd2;">port</span> <span style="color: #7a4f7e;">ssh</span> $<span style="color: #268bd2;">node</span> <span style="color: #784437;">-L</span> $<span style="color: #268bd2;">port</span>:Localhost:$<span style="color: #268bd2;">port</span>
 </pre>
 </div>
 
@@ -565,9 +708,11 @@ Apps I use that way:
 </li>
 </ul>
 </div>
-</li>
+</div>
 
-<li><a id="scripts-jp" name="scripts-jp"></a><a id="sec-1-2-1-5" name="sec-1-2-1-5"></a>jupyter scripts<br ><div class="outline-text-5" id="text-scripts-jp">
+<div id="outline-container-scripts-jp" class="outline-5">
+<h5 id="scripts-jp"><a id="sec-1-2-1-5" name="sec-1-2-1-5"></a><span class="section-number-5">1.2.1.5</span> jupyter scripts</h5>
+<div class="outline-text-5" id="text-scripts-jp">
 <p>
 Starting a jupyter instance on a server where the necessary libraries are
 installed is easy using this script:
@@ -575,11 +720,11 @@ installed is easy using this script:
 
 <div class="org-src-container">
 
-<pre class="src src-tmux" id="jpt-tmux">conda activate tf-nightly
-<span style="color: #657b83; font-weight: bold;">export</span> <span style="color: #268bd2;">PORT</span>=8889
+<pre class="src src-tmux" id="jpt-tmux"><span style="color: #4f5c7e;">conda</span> <span style="color: #4f7e67;">activate</span> <span style="color: #37785e;">tf</span>
+<span style="color: #657b83; font-weight: bold;">export</span> <span style="color: #268bd2;">PORT</span>=<span style="color: #3f7178;">9999</span>
 <span style="color: #657b83; font-weight: bold;">export</span> <span style="color: #268bd2;">XDG_RUNTIME_DIR</span>=<span style="color: #2aa198;">''</span>
 <span style="color: #657b83; font-weight: bold;">export</span> <span style="color: #268bd2;">XDG_RUNTIME_DIR</span>=<span style="color: #2aa198;">""</span>
-jupyter lab --no-browser --port=$<span style="color: #268bd2;">PORT</span>
+<span style="color: #37785e;">jupyter</span> <span style="color: #4f5c7e;">lab</span> <span style="color: #783778;">--no-browser</span> <span style="color: #5e7837;">--port</span>=$<span style="color: #268bd2;">PORT</span>
 </pre>
 </div>
 
@@ -599,13 +744,15 @@ locally to connect to the notebook. If you close Emacs, it would need to be
 reestablished
 </p>
 </div>
-</li></ol>
+</div>
 </div>
 
 <div id="outline-container-sec-1-2-2" class="outline-4">
 <h4 id="sec-1-2-2"><span class="section-number-4">1.2.2</span> Setup notes</h4>
 <div class="outline-text-4" id="text-1-2-2">
-</div><ol class="org-ol"><li><a id="sec-tmux-setup" name="sec-tmux-setup"></a><a id="sec-1-2-2-1" name="sec-1-2-2-1"></a>Setting up a tmux connection from using <code>ob-tmux</code> in <code>org-babel</code><br ><div class="outline-text-5" id="text-sec-tmux-setup">
+</div><div id="outline-container-sec-tmux-setup" class="outline-5">
+<h5 id="sec-tmux-setup"><a id="sec-1-2-2-1" name="sec-1-2-2-1"></a><span class="section-number-5">1.2.2.1</span> Setting up a tmux connection from using <code>ob-tmux</code> in <code>org-babel</code></h5>
+<div class="outline-text-5" id="text-sec-tmux-setup">
 <ul class="org-ul">
 <li>prerequisite: tmux versions need to be the same locally and on the server.
 Let's verify that now.
@@ -614,7 +761,7 @@ Let's verify that now.
 
 <div class="org-src-container">
 
-<pre class="src src-sh">tmux -V
+<pre class="src src-sh"><span style="color: #4f5c7e;">tmux</span> <span style="color: #3f7178;">-V</span>
 </pre>
 </div>
 
@@ -627,7 +774,7 @@ tmux 3.0a
 
 <div class="org-src-container">
 
-<pre class="src src-sh">ssh ara tmux -V
+<pre class="src src-sh"><span style="color: #7a4f7e;">ssh</span> <span style="color: #783778;">ara</span> <span style="color: #4f5c7e;">tmux</span> <span style="color: #3f7178;">-V</span>
 </pre>
 </div>
 
@@ -661,10 +808,10 @@ machine (note that <code>socket_path</code> was introduced in tmux version 2.2)
 
 <div class="org-src-container">
 
-<pre class="src src-sh"><span style="color: #268bd2;">REMOTE_SOCKET</span>=$(<span style="color: #6c71c4; font-weight: bold;">ssh</span> ara <span style="color: #2aa198;">'tmux ls -F "#{socket_path}"'</span> | head -1)
+<pre class="src src-sh"><span style="color: #268bd2;">REMOTE_SOCKET</span>=$(<span style="color: #6c71c4; font-weight: bold;">ssh</span> <span style="color: #783778;">ara</span> <span style="color: #2aa198;">'tmux ls -F "#{socket_path}"'</span> | <span style="color: #4f5c7e;">head</span> <span style="color: #3f7178;">-1</span>)
 <span style="color: #657b83; font-weight: bold;">echo</span> $<span style="color: #268bd2;">REMOTE_SOCKET</span>
-ssh ara -tfN <span style="color: #b58900; font-weight: bold;">\</span>
-    -L ~/.tmux-local-socket-remote-machine:$<span style="color: #268bd2;">REMOTE_SOCKET</span>
+<span style="color: #7a4f7e;">ssh</span> <span style="color: #783778;">ara</span> <span style="color: #7a4f7e;">-tfN</span> <span style="color: #b58900; font-weight: bold;">\</span>
+    <span style="color: #784437;">-L</span> <span style="color: #513f78;">~/.tmux-local-socket-remote-machine:</span>$<span style="color: #268bd2;">REMOTE_SOCKET</span>
 </pre>
 </div>
 
@@ -714,16 +861,18 @@ which allows to print the output from the tmux session in an
 </li>
 </ul>
 </div>
-</li>
+</div>
 
-<li><a id="sec-1-2-2-2" name="sec-1-2-2-2"></a><code>emacs-jupyter</code> Setup<br ><div class="outline-text-5" id="text-1-2-2-2">
+<div id="outline-container-sec-1-2-2-2" class="outline-5">
+<h5 id="sec-1-2-2-2"><span class="section-number-5">1.2.2.2</span> <code>emacs-jupyter</code> Setup</h5>
+<div class="outline-text-5" id="text-1-2-2-2">
 <p>
 <code>Emacs-jupyter</code> aims to be an API for a lot of functionalities of the
 <code>jupyter</code> project. The documentation can be found on <a href="https://github.com/dzop/emacs-jupyter">GitHub</a>.
 </p>
 
 <ol class="org-ol">
-<li>For the <b>whole document</b>: connect ot a running jupyter instance
+<li>For the <b>whole document</b>: connect to a running jupyter instance
 <ol class="org-ol">
 <li><code>M-x jupyter-server-list-kernels</code>
 <ol class="org-ol">
@@ -753,7 +902,7 @@ which allows to print the output from the tmux session in an
 <li>customize the output folder using the following org-mode variable:
 <div class="org-src-container">
 
-<pre class="src src-emacs-lisp">(<span style="color: #859900; font-weight: bold;">setq</span> org-babel-jupyter-resource-directory <span style="color: #2aa198;">"./data/exp-test/plots"</span>)
+<pre class="src src-emacs-lisp">(<span style="color: #859900; font-weight: bold;">setq</span> <span style="color: #783f5a;">org-babel-jupyter-resource-directory</span> <span style="color: #2aa198;">"./data/exp-test/plots"</span>)
 </pre>
 </div>
 
@@ -804,64 +953,127 @@ pressing <code>Shift-TAB</code> in Jupyter notebooks)
 </li>
 </ol>
 </div>
-</li></ol>
 </div>
 </div>
 
+<div id="outline-container-sec-1-2-3" class="outline-4">
+<h4 id="sec-1-2-3"><span class="section-number-4">1.2.3</span> Notes on archiving</h4>
+<div class="outline-text-4" id="text-1-2-3">
+</div><div id="outline-container-sec-1-2-3-1" class="outline-5">
+<h5 id="sec-1-2-3-1"><span class="section-number-5">1.2.3.1</span> Exporting the LabBook.org to html in a twbs style</h5>
+<div class="outline-text-5" id="text-1-2-3-1">
+<ul class="org-ul">
+<li>I am partial to the twitter bootstrap theme of html, since I like it's
+simple design, but clear structure with a nice table of contents at the
+side → the following org mode extension supports a seemless export to
+twitter bootstrap html: <a href="https://github.com/marsmining/ox-twbs">https://github.com/marsmining/ox-twbs</a>
+</li>
+<li>when installed, the export can be triggered via the command
+<code>(org-twbs-export-as-html)</code> or via the keyboard shortcut for export <code>C-c
+       C-e</code> followed by <code>w</code> for Twitter bootstrap and <code>h</code> for saving the .html
+</li>
+<li><span class="underline">Things to configure:</span>
+<ul class="org-ul">
+<li>in general, there are multiple export options:
+<a href="https://orgmode.org/manual/Export-Settings.html">https://orgmode.org/manual/Export-Settings.html</a>
+</li>
+<li>E.g. I set 2 <code>#+OPTIONS</code> keywords at the begin of the file: <code>toc:4</code> and
+<code>H:4</code> which make sure that in my export my sidebar table of contents
+will show numbered headings till a depth of 4.
+</li>
+<li>I configured my code blocks so that they will not be evaluated when
+exporting (I would recommend this especially if you only export for
+archiving) and that both the code block and the output will be exported
+with the keyword: <code>#+PROPERTY: header-args :eval never-export :exports
+         both</code>
+</li>
+<li>To discriminate between code blocks for different languages I gave each
+of them a distinct colour using <code>#+HTML_HEAD_EXTRA: &lt;style...</code> (see
+above)
+</li>
+<li>I had to configure a style for <code>table</code>, so that the
+<ul class="org-ul">
+<li><code>display: block; overflow-x: auto;</code> gets the table to be restricted
+to the width of the text and if it is larger, activates scrolling
+</li>
+<li><code>white-space: nowrap;</code> makes it that there is no wrap in a column, so
+it might be broader, but better readable if you have scrolling anyway
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="underline">Things to do before exporting / Troubleshooting while exporting:</span>
+<ul class="org-ul">
+<li>when using a dark theme for you emacs, the export of the code blocks
+might show some ugly dark backgrounds from the theme. If this becomes
+an issue, change to a light theme for the export with <code>M-x
+         (load-theme)</code> and choose <code>solarized-light</code>
+</li>
+<li>only in the <code>data</code> branch you set the git tags after merging. If you
+want to show them here, execute the corresponding function in <a href="#sec-1-3-5">Git TAGs</a>
+</li>
+<li>make sure your file links work properly! I recommend referencing your
+files relatively (e.g. [ [ f ile:./data/exp-XXXXXX-test/test.png]]
+without spaces). Otherwise there will be errors in your <i><b>Messages</b></i>
+buffer
+</li>
+<li>There might be errors with your code blocks
+<ul class="org-ul">
+<li>e.g. the export function expects you to assign a default variable to
+your functions
+</li>
+<li>if you call a function via the <code>#+CALL</code> mechanism, it wants you to
+include two parentheses for the function, e.g. <code>#+CALL: test()</code>
+</li>
+</ul>
+</li>
+<li>check indentation of code blocks inside lists
+</li>
+<li>add a <code>details</code> block around large output cells. This makes them
+expandable. I added some <code>#+HTML_HEAD_EXTRA: &lt;style...</code> inspired by
+<a href="https://alhassy.github.io/org-special-block-extras/#Folded-Details">alhassy</a>. That's how the <code>details</code> block looks like:
+<pre class="example">
+#+begin_details
+
+#+end_details
+</pre>
+</li>
+<li>If you reference a parameter with an underscore in the name, use the
+org markdown tricks to style them like code (<code>==</code> or <code>~~</code>), otherwise
+the part after the underscore will be rendered like a subscript:
+<code>under_score</code> vs under<sub>score</sub>
+</li>
+</ul>
+</li>
+<li><span class="underline">Things to do after exporting:</span>
+<ul class="org-ul">
+<li>In my workflow, the exported <code>LabBook.html</code> with the overview of all
+experiments is in the <code>data</code> folder. If you move the file, you will
+have to fix the file links for the new location, e.g. via "Find and
+replace" <code>M-%</code>:
+<ul class="org-ul">
+<li>if you move the org file → in the org file find <code>[[file:./data/</code> and
+replace with <code>[[file:./</code> → then export with <code>C-c C-e w h</code>
+</li>
+<li>if you export first with <code>C-c C-e w h</code> and move the html file to
+<code>data</code> → in the html file find <code>./data</code> and replace with <code>.</code>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
 <div id="outline-container-sec-1-3" class="outline-3">
 <h3 id="sec-1-3"><span class="section-number-3">1.3</span> Organization of git</h3>
 <div class="outline-text-3" id="text-1-3">
 </div><div id="outline-container-sec-1-3-1" class="outline-4">
-<h4 id="sec-1-3-1"><span class="section-number-4">1.3.1</span> tools used (notes)</h4>
+<h4 id="sec-1-3-1"><span class="section-number-4">1.3.1</span> remote/origin/main branch:</h4>
 <div class="outline-text-4" id="text-1-3-1">
-</div><ol class="org-ol"><li><a id="sec-1-3-1-1" name="sec-1-3-1-1"></a>- Emacs <code>magit</code><br ><div class="outline-text-5" id="text-1-3-1-1">
-<ul class="org-ul">
-<li><code>gitflow-avh</code> (<code>magit-flow</code>) to follow the flow
-</li>
-<li>possibly <a href="https://github.com/magit/magit-annex">https://github.com/magit/magit-annex</a> for large files. Follow this:
-<a href="https://git-annex.branchable.com/walkthrough/">https://git-annex.branchable.com/walkthrough/</a>
-</li>
-<li>maybe check out git-toolbelt at some point
-<a href="https://github.com/nvie/git-toolbelt#readme">https://github.com/nvie/git-toolbelt#readme</a> with
-<a href="https://nvie.com/posts/git-power-tools/">https://nvie.com/posts/git-power-tools/</a>
-</li>
-</ul>
-</div>
-</li>
-<li><a id="sec-1-3-1-2" name="sec-1-3-1-2"></a>jupyter<br ><div class="outline-text-5" id="text-1-3-1-2">
-<ul class="org-ul">
-<li>emacs jupyter for running and connecting to kernel on server:
-<a href="https://github.com/dzop/emacs-jupyter">https://github.com/dzop/emacs-jupyter</a>
-</li>
-<li>if I actually still would use .ipynb files, these might come handy:
-<ul class="org-ul">
-<li>jupytext: <a href="https://github.com/mwouts/jupytext">https://github.com/mwouts/jupytext</a>
-</li>
-<li>nbstripout: <a href="https://github.com/kynan/nbstripout">https://github.com/kynan/nbstripout</a>
-</li>
-</ul>
-</li>
-</ul>
-</div>
-</li>
-<li><a id="sec-1-3-1-3" name="sec-1-3-1-3"></a>mlflow<br ><div class="outline-text-5" id="text-1-3-1-3">
-<ul class="org-ul">
-<li><a href="https://docs.faculty.ai/user-guide/experiments/index.html">https://docs.faculty.ai/user-guide/experiments/index.html</a> and
-<a href="https://docs.microsoft.com/en-us/azure/databricks/_static/notebooks/hls-image-processing/02-image-segmentation-dl.html">https://docs.microsoft.com/en-us/azure/databricks/_static/notebooks/hls-image-processing/02-image-segmentation-dl.html</a>
-</li>
-</ul>
-</div>
-</li>
-<li><a id="sec-1-3-1-4" name="sec-1-3-1-4"></a>tensorflow<br ><div class="outline-text-5" id="text-1-3-1-4">
-<p>
-<a href="https://www.tensorflow.org/tensorboard/image_summaries">https://www.tensorflow.org/tensorboard/image_summaries</a>
-</p>
-</div>
-</li></ol>
-</div>
-<div id="outline-container-sec-1-3-2" class="outline-4">
-<h4 id="sec-1-3-2"><span class="section-number-4">1.3.2</span> remote/origin/master branch:</h4>
-<div class="outline-text-4" id="text-1-3-2">
 <ul class="org-ul">
 <li>contains all the source code in folder <b><b>src/</b></b> which is used for experiments.
 </li>
@@ -876,12 +1088,12 @@ features. Day-to-day changes in code
 </ul>
 </div>
 </div>
-<div id="outline-container-sec-1-3-3" class="outline-4">
-<h4 id="sec-1-3-3"><span class="section-number-4">1.3.3</span> remote/origin/exp### branches:</h4>
-<div class="outline-text-4" id="text-1-3-3">
+<div id="outline-container-sec-1-3-2" class="outline-4">
+<h4 id="sec-1-3-2"><span class="section-number-4">1.3.2</span> remote/origin/exp### branches:</h4>
+<div class="outline-text-4" id="text-1-3-2">
 <ul class="org-ul">
 <li>if an experiment is done, the code and templates will be branched out from
-<b>master</b> in an <b>#experiment-name</b> branch, ### meaning some meaningful
+<b>main</b> in an <b>#experiment-name</b> branch, ### meaning some meaningful
 descriptor.
 </li>
 <li>all data generated during the experiment (e.g. .csv files, plots, images,
@@ -906,9 +1118,9 @@ executed in, the command line output of the code, and some plots
 </ul>
 </div>
 </div>
-<div id="outline-container-sec-1-3-4" class="outline-4">
-<h4 id="sec-1-3-4"><span class="section-number-4">1.3.4</span> remote/origin/develop branch:</h4>
-<div class="outline-text-4" id="text-1-3-4">
+<div id="outline-container-sec-1-3-3" class="outline-4">
+<h4 id="sec-1-3-3"><span class="section-number-4">1.3.3</span> remote/origin/develop branch:</h4>
+<div class="outline-text-4" id="text-1-3-3">
 <ul class="org-ul">
 <li>this is the branch I use for day to day work on features and exploration.
 All of my current activity can be followed here.
@@ -916,9 +1128,9 @@ All of my current activity can be followed here.
 </ul>
 </div>
 </div>
-<div id="outline-container-sec-1-3-5" class="outline-4">
-<h4 id="sec-1-3-5"><span class="section-number-4">1.3.5</span> remote/origin/data branch:</h4>
-<div class="outline-text-4" id="text-1-3-5">
+<div id="outline-container-sec-1-3-4" class="outline-4">
+<h4 id="sec-1-3-4"><span class="section-number-4">1.3.4</span> remote/origin/data branch:</h4>
+<div class="outline-text-4" id="text-1-3-4">
 <ul class="org-ul">
 <li>contains a full cronicle of the whole research process
 </li>
@@ -932,23 +1144,32 @@ the merge commit to make accessing single experiments easy.
 </div>
 </div>
 
-<div id="outline-container-sec-1-3-6" class="outline-4">
-<h4 id="sec-1-3-6"><span class="section-number-4">1.3.6</span> Git TAGs</h4>
-<div class="outline-text-4" id="text-1-3-6">
-</div><ol class="org-ol"><li><a id="sec-1-3-6-1" name="sec-1-3-6-1"></a>Stable versions:<br ></li>
-<li><a id="sec-1-3-6-2" name="sec-1-3-6-2"></a>All tags from git:<br ><div class="outline-text-5" id="text-1-3-6-2">
+<div id="outline-container-sec-1-3-5" class="outline-4">
+<h4 id="sec-1-3-5"><span class="section-number-4">1.3.5</span> Git TAGs</h4>
+<div class="outline-text-4" id="text-1-3-5">
+</div><div id="outline-container-sec-1-3-5-1" class="outline-5">
+<h5 id="sec-1-3-5-1"><span class="section-number-5">1.3.5.1</span> Stable versions:</h5>
+</div>
+<div id="outline-container-sec-1-3-5-2" class="outline-5">
+<h5 id="sec-1-3-5-2"><span class="section-number-5">1.3.5.2</span> All tags from git:</h5>
+<div class="outline-text-5" id="text-1-3-5-2">
 <div class="org-src-container">
 
-<pre class="src src-sh">git push origin --tags
-git tag -n1
+<pre class="src src-sh"><span style="color: #784437;">git</span> <span style="color: #78683f;">push</span> <span style="color: #783f5a;">origin</span> <span style="color: #7a4f7e;">--tags</span>
+<span style="color: #784437;">git</span> <span style="color: #374478;">tag</span> <span style="color: #707e4f;">-n1</span>
 </pre>
 </div>
 
 <pre class="example">
 exp-200402-test Merge branch 'exp-200402-test' into data
+exp-200520-unet Merge branch 'exp-310520-unet' into data
+exp-200531-unet Merge branch 'heads/exp-310520-unet' into data
+exp-201231-clustsim exp-201231-clustsim
+exp-210204-unet Add exp-210204-unet LabBook part 3
+exp-310520-unet move exp-310520-unet to data branch manually
 </pre>
 </div>
-</li></ol>
+</div>
 </div>
 </div>
 <div id="outline-container-sec-1-4" class="outline-3">
@@ -960,7 +1181,10 @@ exp-200402-test Merge branch 'exp-200402-test' into data
 <div id="outline-container-sec-1-4-2" class="outline-4">
 <h4 id="sec-1-4-2"><span class="section-number-4">1.4.2</span> src/</h4>
 <div class="outline-text-4" id="text-1-4-2">
-</div><ol class="org-ol"><li><a id="sec-1-4-2-1" name="sec-1-4-2-1"></a>fluotracify/<br ><ol class="org-ol"><li><a id="sec-1-4-2-1-1" name="sec-1-4-2-1-1"></a>imports/<br ></li>
+</div><div id="outline-container-sec-1-4-2-1" class="outline-5">
+<h5 id="sec-1-4-2-1"><span class="section-number-5">1.4.2.1</span> fluotracify/</h5>
+<div class="outline-text-5" id="text-1-4-2-1">
+</div><ol class="org-ol"><li><a id="sec-1-4-2-1-1" name="sec-1-4-2-1-1"></a>imports/<br ></li>
 <li><a id="sec-1-4-2-1-2" name="sec-1-4-2-1-2"></a>simulations/<br ></li>
 <li><a id="sec-1-4-2-1-3" name="sec-1-4-2-1-3"></a>training/<br ></li>
 <li><a id="sec-1-4-2-1-4" name="sec-1-4-2-1-4"></a>applications/<br ></li>
@@ -983,15 +1207,17 @@ exp-200402-test Merge branch 'exp-200402-test' into data
 </ul>
 </div>
 </li></ol>
-</li>
+</div>
 
-<li><a id="sec-1-4-2-2" name="sec-1-4-2-2"></a>nanosimpy/<br ><div class="outline-text-5" id="text-1-4-2-2">
+<div id="outline-container-sec-1-4-2-2" class="outline-5">
+<h5 id="sec-1-4-2-2"><span class="section-number-5">1.4.2.2</span> nanosimpy/</h5>
+<div class="outline-text-5" id="text-1-4-2-2">
 <ul class="org-ul">
 <li>cloned from dwaithe with refactoring for Python 3-compatibility
 </li>
 </ul>
 </div>
-</li></ol>
+</div>
 </div>
 </div>
 
@@ -1001,15 +1227,61 @@ exp-200402-test Merge branch 'exp-200402-test' into data
 </div><div id="outline-container-sec-1-5-1" class="outline-4">
 <h4 id="sec-1-5-1"><span class="section-number-4">1.5.1</span> Changes in LabBook.org (without "* Data")</h4>
 <div class="outline-text-4" id="text-1-5-1">
-</div><ol class="org-ol"><li><a id="sec-1-5-1-1" name="sec-1-5-1-1"></a>2020-11-04<br ><div class="outline-text-5" id="text-1-5-1-1">
+</div><div id="outline-container-sec-1-5-1-1" class="outline-5">
+<h5 id="sec-1-5-1-1"><span class="section-number-5">1.5.1.1</span> 2022-02-19</h5>
+<div class="outline-text-5" id="text-1-5-1-1">
 <ul class="org-ul">
-<li>update "jupyter scripts" in  <a href="#sec-1-2">Template for data entry and setup notes:</a>
+<li>Add <code>#+HTML_HEAD_EXTRA: &lt;style...</code> for <code>table</code> to enable scrolling if the
+table overflows
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-1-5-1-2" class="outline-5">
+<h5 id="sec-1-5-1-2"><span class="section-number-5">1.5.1.2</span> 2021-12-16</h5>
+<div class="outline-text-5" id="text-1-5-1-2">
+<ul class="org-ul">
+<li>Add <code>details</code> blocks, corresponding <code>#+HTML_HEAD_EXTRA: &lt;style...</code> and
+documentation in  <a href="#sec-1-2-3">Notes on archiving</a>
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-1-5-1-3" class="outline-5">
+<h5 id="sec-1-5-1-3"><span class="section-number-5">1.5.1.3</span> 2021-08-05</h5>
+<div class="outline-text-5" id="text-1-5-1-3">
+<ul class="org-ul">
+<li>Rename <code>master</code> branch to <code>main</code> branch
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-1-5-1-4" class="outline-5">
+<h5 id="sec-1-5-1-4"><span class="section-number-5">1.5.1.4</span> 2021-04-04</h5>
+<div class="outline-text-5" id="text-1-5-1-4">
+<ul class="org-ul">
+<li>Add <code>#+OPTIONS: H:4</code> and <code>#+OPTIONS: toc:4</code> to show up to 4 levels of
+depth in the html (twbs) export of this LabBook in the table of contents
+at the side
+</li>
+<li>I added <a href="#sec-1-2-3">Notes on archiving</a>
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-1-5-1-5" class="outline-5">
+<h5 id="sec-1-5-1-5"><span class="section-number-5">1.5.1.5</span> 2020-11-04</h5>
+<div class="outline-text-5" id="text-1-5-1-5">
+<ul class="org-ul">
+<li>update "jupyter scripts" in <a href="#sec-1-2">Template for data entry and setup notes:</a>
 for new conda environment on server (now <code>conda activate tf-nightly</code>)
 </li>
 </ul>
 </div>
-</li>
-<li><a id="sec-1-5-1-2" name="sec-1-5-1-2"></a>2020-05-31<br ><div class="outline-text-5" id="text-1-5-1-2">
+</div>
+<div id="outline-container-sec-1-5-1-6" class="outline-5">
+<h5 id="sec-1-5-1-6"><span class="section-number-5">1.5.1.6</span> 2020-05-31</h5>
+<div class="outline-text-5" id="text-1-5-1-6">
 <ul class="org-ul">
 <li>extend general documentation in README
 </li>
@@ -1028,8 +1300,10 @@ jupyter lab. Load a conda environment instead of using Lmod's <code>module
 </li>
 </ul>
 </div>
-</li>
-<li><a id="sec-1-5-1-3" name="sec-1-5-1-3"></a>2020-05-07<br ><div class="outline-text-5" id="text-1-5-1-3">
+</div>
+<div id="outline-container-sec-1-5-1-7" class="outline-5">
+<h5 id="sec-1-5-1-7"><span class="section-number-5">1.5.1.7</span> 2020-05-07</h5>
+<div class="outline-text-5" id="text-1-5-1-7">
 <ul class="org-ul">
 <li>extend documentation on git model
 </li>
@@ -1037,8 +1311,10 @@ jupyter lab. Load a conda environment instead of using Lmod's <code>module
 </li>
 </ul>
 </div>
-</li>
-<li><a id="sec-1-5-1-4" name="sec-1-5-1-4"></a>2020-04-22<br ><div class="outline-text-5" id="text-1-5-1-4">
+</div>
+<div id="outline-container-sec-1-5-1-8" class="outline-5">
+<h5 id="sec-1-5-1-8"><span class="section-number-5">1.5.1.8</span> 2020-04-22</h5>
+<div class="outline-text-5" id="text-1-5-1-8">
 <ul class="org-ul">
 <li>added parts of README which describe the experimental process
 </li>
@@ -1048,14 +1324,16 @@ jupyter lab. Load a conda environment instead of using Lmod's <code>module
 </li>
 </ul>
 </div>
-</li>
-<li><a id="sec-1-5-1-5" name="sec-1-5-1-5"></a>2020-03-30<br ><div class="outline-text-5" id="text-1-5-1-5">
+</div>
+<div id="outline-container-sec-1-5-1-9" class="outline-5">
+<h5 id="sec-1-5-1-9"><span class="section-number-5">1.5.1.9</span> 2020-03-30</h5>
+<div class="outline-text-5" id="text-1-5-1-9">
 <ul class="org-ul">
 <li>set up lab book and form git repo accoring to setup by Luka Stanisic et al
 </li>
 </ul>
 </div>
-</li></ol>
+</div>
 </div>
 <div id="outline-container-sec-1-5-2" class="outline-4">
 <h4 id="sec-1-5-2"><span class="section-number-4">1.5.2</span> Changes in src/fluotracify</h4>
@@ -1084,8 +1362,8 @@ with "bright cluster" artifacts
 </ol>
 <div class="org-src-container">
 
-<pre class="src src-tmux"><span style="color: #657b83; font-weight: bold;">cd</span> /
-srun -p s_standard --time=7-10:00:00 --ntasks-per-node=24 --mem-per-cpu=2000 --pty bash
+<pre class="src src-tmux"><span style="color: #657b83; font-weight: bold;">cd</span> <span style="color: #513f78;">/</span>
+<span style="color: #78683f;">srun</span> <span style="color: #707e4f;">-p</span> <span style="color: #78683f;">s_standard</span> <span style="color: #374478;">--time</span>=<span style="color: #3f7178;">7-10:00:00</span> <span style="color: #7e544f;">--ntasks-per-node</span>=<span style="color: #783f5a;">24</span> <span style="color: #783f5a;">--mem-per-cpu</span>=<span style="color: #3f7178;">2000</span> <span style="color: #7e544f;">--pty</span> <span style="color: #374478;">bash</span>
 </pre>
 </div>
 <ol class="org-ol">
@@ -1187,7 +1465,7 @@ python3           f6f8ea4a-c473-459c-93b6-4984b0987ff8   a few seconds ago    st
 <div class="outline-text-4" id="text-2-1-2">
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python">%cd /beegfs/ye53nis/drmed-git/
+<pre class="src src-jupyter-python">%<span style="color: #707e4f;">cd</span> /<span style="color: #5e7837;">beegfs</span>/<span style="color: #7a4f7e;">ye53nis</span>/<span style="color: #784437;">drmed</span>-<span style="color: #784437;">git</span>/
 </pre>
 </div>
 
@@ -1198,8 +1476,8 @@ python3           f6f8ea4a-c473-459c-93b6-4984b0987ff8   a few seconds ago    st
 
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python">!git log -<span style="color: #657b83; background-color: #fdf6e3;">1</span>
-!git status
+<pre class="src src-jupyter-python">!<span style="color: #784437;">git</span> <span style="color: #78683f;">log</span> -1
+!<span style="color: #784437;">git</span> <span style="color: #374478;">status</span>
 </pre>
 </div>
 
@@ -1227,6 +1505,11 @@ Date:   Thu Dec 31 01:32:25 2020 +0100
 no changes added to commit (use "git add" and/or "git commit -a")
 </pre>
 
+<p>
+<code>#+CALL: jp-metadata(_long='True)</code>
+</p>
+
+<details>
 <pre class="example">
 No of CPUs in system: 72
 No of CPUs the current process can use: 24
@@ -1550,9 +1833,9 @@ Note: you may need to restart the kernel to use updated packages.
  'GIT_PAGER': 'cat',
  'MPLBACKEND': 'module://ipykernel.pylab.backend_inline'}
 </pre>
+</details>
 </div>
 </div>
-
 <div id="outline-container-sec-2-1-3" class="outline-4">
 <h4 id="sec-2-1-3"><span class="section-number-4">2.1.3</span> set variables</h4>
 <div class="outline-text-4" id="text-2-1-3">
@@ -1564,7 +1847,7 @@ see the variables below)
 </ul>
 <div class="org-src-container">
 
-<pre class="src src-emacs-lisp">(<span style="color: #859900; font-weight: bold;">setq</span> org-babel-jupyter-resource-directory <span style="color: #2aa198;">"./data/exp-201231-clustsim"</span>)
+<pre class="src src-emacs-lisp">(<span style="color: #859900; font-weight: bold;">setq</span> <span style="color: #783f5a;">org-babel-jupyter-resource-directory</span> <span style="color: #2aa198;">"./data/exp-201231-clustsim"</span>)
 </pre>
 </div>
 
@@ -1575,23 +1858,23 @@ see the variables below)
 
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python"><span style="color: #859900; font-weight: bold;">import</span> sys
-sys.path.append(<span style="color: #2aa198;">'/beegfs/ye53nis/drmed-git/src/'</span>)
-<span style="color: #859900; font-weight: bold;">from</span> fluotracify.simulations <span style="color: #859900; font-weight: bold;">import</span> simulate_trace_with_artifact <span style="color: #859900; font-weight: bold;">as</span> stwa
+<pre class="src src-jupyter-python"><span style="color: #859900; font-weight: bold;">import</span> <span style="color: #513f78;">sys</span>
+<span style="color: #513f78;">sys</span>.<span style="color: #513f78;">path</span>.<span style="color: #5e7837;">append</span>(<span style="color: #2aa198;">'/beegfs/ye53nis/drmed-git/src/'</span>)
+<span style="color: #859900; font-weight: bold;">from</span> <span style="color: #783778;">fluotracify</span>.<span style="color: #5e7837;">simulations</span> <span style="color: #859900; font-weight: bold;">import</span> <span style="color: #784437;">simulate_trace_with_artifact</span> <span style="color: #859900; font-weight: bold;">as</span> <span style="color: #4f7e67;">stwa</span>
 </pre>
 </div>
 
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python"><span style="color: #657b83; background-color: #fdf6e3;">folder</span> = <span style="color: #2aa198;">'/beegfs/ye53nis/saves/firstartifact_Nov2020/'</span>
-<span style="color: #657b83; background-color: #fdf6e3;">file_name</span> = <span style="color: #2aa198;">'traces_brightclust_Nov2020'</span>
-<span style="color: #657b83; background-color: #fdf6e3;">total_sim_time</span> = <span style="color: #657b83; background-color: #fdf6e3;">16384</span>
-<span style="color: #657b83; background-color: #fdf6e3;">d_mol_arr</span> = [<span style="color: #657b83; background-color: #fdf6e3;">0</span>.<span style="color: #657b83; background-color: #fdf6e3;">069</span>, <span style="color: #657b83; background-color: #fdf6e3;">0</span>.<span style="color: #657b83; background-color: #fdf6e3;">08</span>, <span style="color: #657b83; background-color: #fdf6e3;">0</span>.<span style="color: #657b83; background-color: #fdf6e3;">1</span>, <span style="color: #657b83; background-color: #fdf6e3;">0</span>.<span style="color: #657b83; background-color: #fdf6e3;">2</span>, <span style="color: #657b83; background-color: #fdf6e3;">0</span>.<span style="color: #657b83; background-color: #fdf6e3;">4</span>, <span style="color: #657b83; background-color: #fdf6e3;">0</span>.<span style="color: #657b83; background-color: #fdf6e3;">6</span>, <span style="color: #657b83; background-color: #fdf6e3;">1</span>.<span style="color: #657b83; background-color: #fdf6e3;">0</span>, <span style="color: #657b83; background-color: #fdf6e3;">3</span>.<span style="color: #657b83; background-color: #fdf6e3;">0</span>, <span style="color: #657b83; background-color: #fdf6e3;">10</span>, <span style="color: #657b83; background-color: #fdf6e3;">50</span>]
-<span style="color: #657b83; background-color: #fdf6e3;">col_per_example</span> = <span style="color: #657b83; background-color: #fdf6e3;">3</span>
-<span style="color: #657b83; background-color: #fdf6e3;">label_for</span> = <span style="color: #2aa198;">'both'</span>
-<span style="color: #657b83; background-color: #fdf6e3;">number_of_sets</span> = <span style="color: #657b83; background-color: #fdf6e3;">10</span>
-<span style="color: #657b83; background-color: #fdf6e3;">traces_per_set</span> = <span style="color: #657b83; background-color: #fdf6e3;">100</span>
-<span style="color: #657b83; background-color: #fdf6e3;">artifact</span> = <span style="color: #657b83; background-color: #fdf6e3;">1</span>
+<pre class="src src-jupyter-python"><span style="color: #268bd2;">folder</span> = <span style="color: #2aa198;">'/beegfs/ye53nis/saves/firstartifact_Nov2020/'</span>
+<span style="color: #268bd2;">file_name</span> = <span style="color: #2aa198;">'traces_brightclust_Nov2020'</span>
+<span style="color: #268bd2;">total_sim_time</span> = 16384
+<span style="color: #268bd2;">d_mol_arr</span> = [0.069, 0.08, 0.1, 0.2, 0.4, 0.6, 1.0, 3.0, 10, 50]
+<span style="color: #268bd2;">col_per_example</span> = 3
+<span style="color: #268bd2;">label_for</span> = <span style="color: #2aa198;">'both'</span>
+<span style="color: #268bd2;">number_of_sets</span> = 10
+<span style="color: #268bd2;">traces_per_set</span> = 100
+<span style="color: #268bd2;">artifact</span> = 1
 </pre>
 </div>
 
@@ -1609,7 +1892,7 @@ and detach to a running terminal session.
 </ul>
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python"><span style="color: #657b83; background-color: #fdf6e3;">sys.stdout</span> = <span style="color: #657b83; font-weight: bold;">open</span>(<span style="color: #2aa198;">'/dev/stdout'</span>, <span style="color: #2aa198;">'w'</span>)
+<pre class="src src-jupyter-python"><span style="color: #268bd2;">sys.stdout</span> = <span style="color: #657b83; font-weight: bold;">open</span>(<span style="color: #2aa198;">'/dev/stdout'</span>, <span style="color: #2aa198;">'w'</span>)
 </pre>
 </div>
 </div>
@@ -1619,15 +1902,15 @@ and detach to a running terminal session.
 <div class="outline-text-4" id="text-2-1-4">
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python">stwa.produce_training_data(<span style="color: #657b83; background-color: #fdf6e3;">folder</span>=folder,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>  <span style="color: #657b83; background-color: #fdf6e3;">file_name</span>=file_name,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>  <span style="color: #657b83; background-color: #fdf6e3;">col_per_example</span>=col_per_example,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>  <span style="color: #657b83; background-color: #fdf6e3;">number_of_sets</span>=number_of_sets,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>  <span style="color: #657b83; background-color: #fdf6e3;">traces_per_set</span>=traces_per_set,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>  <span style="color: #657b83; background-color: #fdf6e3;">total_sim_time</span>=total_sim_time,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>  <span style="color: #657b83; background-color: #fdf6e3;">artifact</span>=<span style="color: #657b83; background-color: #fdf6e3;">1</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>  <span style="color: #657b83; background-color: #fdf6e3;">d_mol_arr</span>=d_mol_arr,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>  <span style="color: #657b83; background-color: #fdf6e3;">label_for</span>=label_for)
+<pre class="src src-jupyter-python"><span style="color: #4f7e67;">stwa</span>.<span style="color: #374478;">produce_training_data</span>(<span style="color: #783f5a;">folder</span>=<span style="color: #783f5a;">folder</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>  <span style="color: #78683f;">file_name</span>=<span style="color: #78683f;">file_name</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>  <span style="color: #78683f;">col_per_example</span>=<span style="color: #78683f;">col_per_example</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>  <span style="color: #37785e;">number_of_sets</span>=<span style="color: #37785e;">number_of_sets</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>  <span style="color: #707e4f;">traces_per_set</span>=<span style="color: #707e4f;">traces_per_set</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>  <span style="color: #4f5c7e;">total_sim_time</span>=<span style="color: #4f5c7e;">total_sim_time</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>  <span style="color: #78683f;">artifact</span>=1,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>  <span style="color: #78683f;">d_mol_arr</span>=<span style="color: #78683f;">d_mol_arr</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>  <span style="color: #783f5a;">label_for</span>=<span style="color: #783f5a;">label_for</span>)
 </pre>
 </div>
 
@@ -1639,7 +1922,7 @@ and detach to a running terminal session.
 terminal history limit of tmux, which is at around 1800 lines. This
 means, most of the history couldn't be saved. Here is an example of the
 output:
-
+<details>
 <pre class="example">
 Set 10 ------------------------
 num_of_steps 16384
@@ -1708,6 +1991,7 @@ Processing FWHM 250, num_of_steps 16384
 Processing tracks: [=================   ] 85% complete
 Processing FWHM 250,
 </pre>
+</details>
 </li>
 </ul>
 </div>
@@ -1723,7 +2007,7 @@ set again. On the plus side: the sequence of plotting here is independent
 of the sequence of simulation above.
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python">%cd /beegfs/ye53nis/drmed-git/
+<pre class="src src-jupyter-python">%<span style="color: #707e4f;">cd</span> /<span style="color: #5e7837;">beegfs</span>/<span style="color: #7a4f7e;">ye53nis</span>/<span style="color: #784437;">drmed</span>-<span style="color: #784437;">git</span>/
 </pre>
 </div>
 
@@ -1731,20 +2015,13 @@ of the sequence of simulation above.
 /beegfs/ye53nis/drmed-git
 </pre>
 </li>
-</ul>
 
-<pre class="example">
-/beegfs/ye53nis/drmed-git
-</pre>
-
-
-<ul class="org-ul">
 <li>I also used some additional code for plotting:
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python">!git log -<span style="color: #657b83; background-color: #fdf6e3;">1</span>
+<pre class="src src-jupyter-python">!<span style="color: #784437;">git</span> <span style="color: #78683f;">log</span> -1
 
-!git status
+!<span style="color: #784437;">git</span> <span style="color: #374478;">status</span>
 </pre>
 </div>
 
@@ -1778,7 +2055,7 @@ no changes added to commit (use "git add" and/or "git commit -a")
 not the remote one, since I open this LabBook.org-file on my local machine.
 <div class="org-src-container">
 
-<pre class="src src-emacs-lisp">(<span style="color: #859900; font-weight: bold;">setq</span> org-babel-jupyter-resource-directory <span style="color: #2aa198;">"./data/exp-201231-clustsim"</span>)
+<pre class="src src-emacs-lisp">(<span style="color: #859900; font-weight: bold;">setq</span> <span style="color: #783f5a;">org-babel-jupyter-resource-directory</span> <span style="color: #2aa198;">"./data/exp-201231-clustsim"</span>)
 </pre>
 </div>
 
@@ -1790,19 +2067,19 @@ not the remote one, since I open this LabBook.org-file on my local machine.
 <li>then the necessary imports and variables
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python"><span style="color: #859900; font-weight: bold;">import</span> sys
-sys.path.append(<span style="color: #2aa198;">'/beegfs/ye53nis/drmed-git/src/'</span>)
-<span style="color: #859900; font-weight: bold;">from</span> fluotracify.simulations <span style="color: #859900; font-weight: bold;">import</span> import_simulation_from_csv <span style="color: #859900; font-weight: bold;">as</span> isfc
-<span style="color: #859900; font-weight: bold;">from</span> fluotracify.simulations <span style="color: #859900; font-weight: bold;">import</span> plot_simulations <span style="color: #859900; font-weight: bold;">as</span> ps
+<pre class="src src-jupyter-python"><span style="color: #859900; font-weight: bold;">import</span> <span style="color: #513f78;">sys</span>
+<span style="color: #513f78;">sys</span>.<span style="color: #513f78;">path</span>.<span style="color: #5e7837;">append</span>(<span style="color: #2aa198;">'/beegfs/ye53nis/drmed-git/src/'</span>)
+<span style="color: #859900; font-weight: bold;">from</span> <span style="color: #783778;">fluotracify</span>.<span style="color: #5e7837;">simulations</span> <span style="color: #859900; font-weight: bold;">import</span> <span style="color: #707e4f;">import_simulation_from_csv</span> <span style="color: #859900; font-weight: bold;">as</span> <span style="color: #4f5c7e;">isfc</span>
+<span style="color: #859900; font-weight: bold;">from</span> <span style="color: #783778;">fluotracify</span>.<span style="color: #5e7837;">simulations</span> <span style="color: #859900; font-weight: bold;">import</span> <span style="color: #37785e;">plot_simulations</span> <span style="color: #859900; font-weight: bold;">as</span> <span style="color: #37785e;">ps</span>
 </pre>
 </div>
 
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python"><span style="color: #657b83; background-color: #fdf6e3;">folder</span> = <span style="color: #2aa198;">'/beegfs/ye53nis/saves/firstartifact_Nov2020/'</span>
-<span style="color: #657b83; background-color: #fdf6e3;">col_per_example</span> = <span style="color: #657b83; background-color: #fdf6e3;">3</span>
-<span style="color: #657b83; background-color: #fdf6e3;">d_mol_arr</span> = [<span style="color: #657b83; background-color: #fdf6e3;">0</span>.<span style="color: #657b83; background-color: #fdf6e3;">069</span>, <span style="color: #657b83; background-color: #fdf6e3;">0</span>.<span style="color: #657b83; background-color: #fdf6e3;">08</span>, <span style="color: #657b83; background-color: #fdf6e3;">0</span>.<span style="color: #657b83; background-color: #fdf6e3;">1</span>, <span style="color: #657b83; background-color: #fdf6e3;">0</span>.<span style="color: #657b83; background-color: #fdf6e3;">2</span>, <span style="color: #657b83; background-color: #fdf6e3;">0</span>.<span style="color: #657b83; background-color: #fdf6e3;">4</span>, <span style="color: #657b83; background-color: #fdf6e3;">0</span>.<span style="color: #657b83; background-color: #fdf6e3;">6</span>, <span style="color: #657b83; background-color: #fdf6e3;">1</span>.<span style="color: #657b83; background-color: #fdf6e3;">0</span>, <span style="color: #657b83; background-color: #fdf6e3;">3</span>.<span style="color: #657b83; background-color: #fdf6e3;">0</span>, <span style="color: #657b83; background-color: #fdf6e3;">10</span>, <span style="color: #657b83; background-color: #fdf6e3;">50</span>]
-<span style="color: #657b83; background-color: #fdf6e3;">artifact</span> = <span style="color: #657b83; background-color: #fdf6e3;">1</span>
+<pre class="src src-jupyter-python"><span style="color: #268bd2;">folder</span> = <span style="color: #2aa198;">'/beegfs/ye53nis/saves/firstartifact_Nov2020/'</span>
+<span style="color: #268bd2;">col_per_example</span> = 3
+<span style="color: #268bd2;">d_mol_arr</span> = [0.069, 0.08, 0.1, 0.2, 0.4, 0.6, 1.0, 3.0, 10, 50]
+<span style="color: #268bd2;">artifact</span> = 1
 </pre>
 </div>
 </li>
@@ -1810,16 +2087,17 @@ sys.path.append(<span style="color: #2aa198;">'/beegfs/ye53nis/drmed-git/src/'</
 <li>let's load our data
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python"><span style="color: #657b83; background-color: #fdf6e3;">dataset</span>, <span style="color: #657b83; font-weight: bold;">_</span>, <span style="color: #657b83; background-color: #fdf6e3;">nsamples</span>, <span style="color: #657b83; background-color: #fdf6e3;">experiment_params</span> = isfc.import_from_csv(
-<span style="background-color: #eee8d5;"> </span>   <span style="color: #657b83; background-color: #fdf6e3;">folder</span>=folder,
-<span style="background-color: #eee8d5;"> </span>   <span style="color: #657b83; background-color: #fdf6e3;">header</span>=<span style="color: #657b83; background-color: #fdf6e3;">12</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="color: #657b83; background-color: #fdf6e3;">frac_train</span>=<span style="color: #657b83; background-color: #fdf6e3;">1</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="color: #657b83; background-color: #fdf6e3;">col_per_example</span>=col_per_example,
-<span style="background-color: #eee8d5;"> </span>   <span style="color: #657b83; background-color: #fdf6e3;">dropindex</span>=<span style="color: #859900; font-weight: bold;">None</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="color: #657b83; background-color: #fdf6e3;">dropcolumns</span>=<span style="color: #859900; font-weight: bold;">None</span>)
+<pre class="src src-jupyter-python"><span style="color: #268bd2;">dataset</span>, <span style="color: #657b83; font-weight: bold;">_</span>, <span style="color: #268bd2;">nsamples</span>, <span style="color: #268bd2;">experiment_params</span> = <span style="color: #4f5c7e;">isfc</span>.<span style="color: #37785e;">import_from_csv</span>(
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #783f5a;">folder</span>=<span style="color: #783f5a;">folder</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #513f78;">header</span>=12,
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #7a4f7e;">frac_train</span>=1,
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #78683f;">col_per_example</span>=<span style="color: #78683f;">col_per_example</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #707e4f;">dropindex</span>=<span style="color: #859900; font-weight: bold;">None</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #5e7837;">dropcolumns</span>=<span style="color: #859900; font-weight: bold;">None</span>)
 </pre>
 </div>
 
+<details>
 <pre class="example">
 train 0 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.1/traces_brightclust_Nov2020_D0.1_set007.csv
 train 1 /beegfs/ye53nis/saves/firstartifact_Nov2020/3.0/traces_brightclust_Nov2020_D3.0_set007.csv
@@ -1921,13 +2199,14 @@ train 97 /beegfs/ye53nis/saves/firstartifact_Nov2020/1.0/traces_brightclust_Nov2
 train 98 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set008.csv
 train 99 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2020_D0.4_set005.csv
 </pre>
+</details>
 
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python"><span style="color: #657b83; background-color: #fdf6e3;">out</span> = isfc.separate_data_and_labels(
-<span style="background-color: #eee8d5;"> </span>   <span style="color: #657b83; background-color: #fdf6e3;">array</span>=dataset,
-<span style="background-color: #eee8d5;"> </span>   <span style="color: #657b83; background-color: #fdf6e3;">nsamples</span>=nsamples,
-<span style="background-color: #eee8d5;"> </span>   <span style="color: #657b83; background-color: #fdf6e3;">col_per_example</span>=col_per_example)
+<pre class="src src-jupyter-python"><span style="color: #268bd2;">out</span> = <span style="color: #4f5c7e;">isfc</span>.<span style="color: #3f7178;">separate_data_and_labels</span>(
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #78683f;">array</span>=<span style="color: #37785e;">dataset</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #783f5a;">nsamples</span>=<span style="color: #783f5a;">nsamples</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #78683f;">col_per_example</span>=<span style="color: #78683f;">col_per_example</span>)
 </pre>
 </div>
 
@@ -1939,7 +2218,6 @@ The given DataFrame was split into 3 parts with shapes: [(16384, 10000), (16384,
 </div>
 </div>
 
-
 <div id="outline-container-sec-2-1-6" class="outline-4">
 <h4 id="sec-2-1-6"><span class="section-number-4">2.1.6</span> plots of the simulated traces by diffusion rate</h4>
 <div class="outline-text-4" id="text-2-1-6">
@@ -1947,28 +2225,28 @@ The given DataFrame was split into 3 parts with shapes: [(16384, 10000), (16384,
 <li>the actual plotting function:
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python"><span style="color: #859900; font-weight: bold;">for</span> drate <span style="color: #859900; font-weight: bold;">in</span> d_mol_arr:
-<span style="background-color: #eee8d5;"> </span>   ps.plot_traces_by_diffrates(
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #657b83; background-color: #fdf6e3;">ntraces</span>=<span style="color: #657b83; background-color: #fdf6e3;">10</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #657b83; background-color: #fdf6e3;">col_per_example</span>=col_per_example,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #657b83; background-color: #fdf6e3;">diffrate_of_interest</span>=drate,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #657b83; background-color: #fdf6e3;">data_label_array</span>=out,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #657b83; background-color: #fdf6e3;">experiment_params</span>=experiment_params,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #657b83; background-color: #fdf6e3;">artifact</span>=<span style="color: #657b83; background-color: #fdf6e3;">1</span>)
+<pre class="src src-jupyter-python"><span style="color: #859900; font-weight: bold;">for</span> <span style="color: #3f7178;">drate</span> <span style="color: #859900; font-weight: bold;">in</span> <span style="color: #268bd2;">d_mol_arr</span>:
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #37785e;">ps</span>.<span style="color: #783778;">plot_traces_by_diffrates</span>(
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #783f5a;">ntraces</span>=10,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #78683f;">col_per_example</span>=<span style="color: #78683f;">col_per_example</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #7e544f;">diffrate_of_interest</span>=<span style="color: #3f7178;">drate</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #707e4f;">data_label_array</span>=<span style="color: #7e544f;">out</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #374478;">experiment_params</span>=<span style="color: #374478;">experiment_params</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #78683f;">artifact</span>=1)
 </pre>
 </div>
 
 <p>
-50:    <img src="4683d391bdba74b0c9460a5e968d1135995e4a81.png" class="img-responsive" alt="4683d391bdba74b0c9460a5e968d1135995e4a81.png">
-10:    <img src="963615ec0ac613d53e4c4b11d9b6811c6e38a7f1.png" class="img-responsive" alt="963615ec0ac613d53e4c4b11d9b6811c6e38a7f1.png">
-3:     <img src="f2667c8e27f421f2a47c7f307598b32a6cde5c5f.png" class="img-responsive" alt="f2667c8e27f421f2a47c7f307598b32a6cde5c5f.png">
-1:     <img src="6a89c85b30e41cbb67c477d10e7cc2239e02f081.png" class="img-responsive" alt="6a89c85b30e41cbb67c477d10e7cc2239e02f081.png">
-0.6:   <img src="74f0fbc639df415b140d785e8bf3aa23213c31a4.png" class="img-responsive" alt="74f0fbc639df415b140d785e8bf3aa23213c31a4.png">
-0.4:   <img src="c5d18053e9befd64e8bfc71d4e5e260b2f5606e7.png" class="img-responsive" alt="c5d18053e9befd64e8bfc71d4e5e260b2f5606e7.png">
-0.2:   <img src="ea43e8d0a7d8075efe27429c44e0ea99df1221ac.png" class="img-responsive" alt="ea43e8d0a7d8075efe27429c44e0ea99df1221ac.png">
-0.1:   <img src="727100134d52d8d8967e1cbb2efda097171f06f0.png" class="img-responsive" alt="727100134d52d8d8967e1cbb2efda097171f06f0.png">
-0.08:  <img src="89250a71f8711657f2b8138e2323802a1edea8af.png" class="img-responsive" alt="89250a71f8711657f2b8138e2323802a1edea8af.png">
-0.069: <img src="17e9c4bfb65d91e8100cd9131cabbdb1f35e62e1.png" class="img-responsive" alt="17e9c4bfb65d91e8100cd9131cabbdb1f35e62e1.png">
+50:    <img src="./4683d391bdba74b0c9460a5e968d1135995e4a81.png" class="img-responsive" alt="4683d391bdba74b0c9460a5e968d1135995e4a81.png">
+10:    <img src="./963615ec0ac613d53e4c4b11d9b6811c6e38a7f1.png" class="img-responsive" alt="963615ec0ac613d53e4c4b11d9b6811c6e38a7f1.png">
+3:     <img src="./f2667c8e27f421f2a47c7f307598b32a6cde5c5f.png" class="img-responsive" alt="f2667c8e27f421f2a47c7f307598b32a6cde5c5f.png">
+1:     <img src="./6a89c85b30e41cbb67c477d10e7cc2239e02f081.png" class="img-responsive" alt="6a89c85b30e41cbb67c477d10e7cc2239e02f081.png">
+0.6:   <img src="./74f0fbc639df415b140d785e8bf3aa23213c31a4.png" class="img-responsive" alt="74f0fbc639df415b140d785e8bf3aa23213c31a4.png">
+0.4:   <img src="./c5d18053e9befd64e8bfc71d4e5e260b2f5606e7.png" class="img-responsive" alt="c5d18053e9befd64e8bfc71d4e5e260b2f5606e7.png">
+0.2:   <img src="./ea43e8d0a7d8075efe27429c44e0ea99df1221ac.png" class="img-responsive" alt="ea43e8d0a7d8075efe27429c44e0ea99df1221ac.png">
+0.1:   <img src="./727100134d52d8d8967e1cbb2efda097171f06f0.png" class="img-responsive" alt="727100134d52d8d8967e1cbb2efda097171f06f0.png">
+0.08:  <img src="./89250a71f8711657f2b8138e2323802a1edea8af.png" class="img-responsive" alt="89250a71f8711657f2b8138e2323802a1edea8af.png">
+0.069: <img src="./17e9c4bfb65d91e8100cd9131cabbdb1f35e62e1.png" class="img-responsive" alt="17e9c4bfb65d91e8100cd9131cabbdb1f35e62e1.png">
 </p>
 </li>
 
@@ -1991,73 +2269,11 @@ file.
 </div>
 </div>
 </div>
-</div><div class="col-md-3"><nav id="table-of-contents">
-<div id="text-table-of-contents" class="bs-docs-sidebar">
-<ul class="nav">
-<li><a href="#sec-1">1. Technical Notes</a>
-<ul class="nav">
-<li><a href="#sec-1-1">1.1. README</a>
-<ul class="nav">
-<li><a href="#sec-1-1-1">1.1.1. General:</a></li>
-<li><a href="#sec-1-1-2">1.1.2. Code block languages used in this document</a></li>
-<li><a href="#sec-1-1-3">1.1.3. Experiments workflow:</a></li>
-<li><a href="#sec-1-1-4">1.1.4. Example for experimental setup procedure</a></li>
-<li><a href="#sec-1-1-5">1.1.5. tools used (notes)</a></li>
-</ul>
-</li>
-<li><a href="#sec-1-2">1.2. Template for data entry and setup notes:</a>
-<ul class="nav">
-<li><a href="#sec-1-2-1">1.2.1. exp-#date-#title</a></li>
-<li><a href="#sec-1-2-2">1.2.2. Setup notes</a></li>
-</ul>
-</li>
-<li><a href="#sec-1-3">1.3. Organization of git</a>
-<ul class="nav">
-<li><a href="#sec-1-3-1">1.3.1. tools used (notes)</a></li>
-<li><a href="#sec-1-3-2">1.3.2. remote/origin/master branch:</a></li>
-<li><a href="#sec-1-3-3">1.3.3. remote/origin/exp### branches:</a></li>
-<li><a href="#sec-1-3-4">1.3.4. remote/origin/develop branch:</a></li>
-<li><a href="#sec-1-3-5">1.3.5. remote/origin/data branch:</a></li>
-<li><a href="#sec-1-3-6">1.3.6. Git TAGs</a></li>
-</ul>
-</li>
-<li><a href="#sec-1-4">1.4. Organization of code</a>
-<ul class="nav">
-<li><a href="#sec-1-4-1">1.4.1. scripts:</a></li>
-<li><a href="#sec-1-4-2">1.4.2. src/</a></li>
-</ul>
-</li>
-<li><a href="#sec-1-5">1.5. Changes in this repository (without "* Data" in this file)</a>
-<ul class="nav">
-<li><a href="#sec-1-5-1">1.5.1. Changes in LabBook.org (without "* Data")</a></li>
-<li><a href="#sec-1-5-2">1.5.2. Changes in src/fluotracify</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#sec-2">2. Data</a>
-<ul class="nav">
-<li><a href="#sec-2-1">2.1. exp-201231-clustersim</a>
-<ul class="nav">
-<li><a href="#sec-2-1-1">2.1.1. connect to jupyter notebook</a></li>
-<li><a href="#sec-2-1-2">2.1.2. record metadata</a></li>
-<li><a href="#sec-2-1-3">2.1.3. set variables</a></li>
-<li><a href="#sec-2-1-4">2.1.4. Do the simulation</a></li>
-<li><a href="#sec-2-1-5">2.1.5. preparing examplary plots of the results (new kernel, new code)</a></li>
-<li><a href="#sec-2-1-6">2.1.6. plots of the simulated traces by diffusion rate</a></li>
-<li><a href="#sec-2-1-7">2.1.7. Learnings</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</div>
-</nav>
 </div></div></div>
 <footer id="postamble" class="">
 <div><p class="author">Author: Alexander Seltmann</p>
-<p class="date">Created: 2021-01-07 Do 23:36</p>
-<p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 27.1 (<a href="http://orgmode.org">Org-mode</a> 9.3.6)</p>
+<p class="date">Created: 2022-02-20 So 12:16</p>
+<p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 27.2 (<a href="http://orgmode.org">Org-mode</a> 9.5.2)</p>
 </div>
 </footer>
 </body>

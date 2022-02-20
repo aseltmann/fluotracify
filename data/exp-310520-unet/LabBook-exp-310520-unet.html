@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="en">
 <head>
-<title>Lab Book Fluotracify</title>
-<!-- 2021-01-07 Do 23:30 -->
+<title>Lab book Fluotracify</title>
+<!-- 2022-02-20 So 12:21 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="generator" content="Org-mode">
@@ -11,7 +11,7 @@
 <link  href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/js/bootstrap.min.js"></script>
-<style type="text/css">
+<style>
 /* org mode styles on top of twbs */
 
 html {
@@ -178,7 +178,7 @@ figcaption {
     }
 }
 </style>
-<script type="text/javascript">
+<script>
 $(function() {
     'use strict';
 
@@ -194,6 +194,9 @@ $(function() {
 <style type="text/css">pre.src-tmux {background-color: #E1EED8;}</style>
 <style type="text/css">pre.src-python {background-color: #E6EDF4;}</style>
 <style type="text/css">pre.src-jupyter-python {background-color: #FAEAE1;}</style>
+<style type="text/css">details {padding: 1em; background-color: #f0f0f0; border-radius: 15px; color: hsl(157 75% 20%); font-size: 0.9em; box-shadow: 0.05em 0.1em 5px 0.01em  #00000057;}</style>
+<style type="text/css">details:hover {background:pink;}</style>
+<style type="text/css">table {display: block; overflow-x: auto; white-space: nowrap;}</style>
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -219,11 +222,164 @@ MathJax.Hub.Config({
   }
 });
 </script>
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_SVG"></script>
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_SVG"></script>
 </head>
 <body>
 <div id="content" class="container">
-<div class="row"><div class="col-md-9"><h1 class="title">Lab Book Fluotracify</h1>
+<div class="row"><div class="col-md-3 col-md-push-9"><nav id="table-of-contents">
+<div id="text-table-of-contents" class="bs-docs-sidebar">
+<ul class="nav">
+<li><a href="#sec-1">1. Technical Notes</a>
+<ul class="nav">
+<li><a href="#sec-1-1">1.1. README</a>
+<ul class="nav">
+<li><a href="#sec-1-1-1">1.1.1. General:</a></li>
+<li><a href="#sec-1-1-2">1.1.2. Code block languages used in this document</a></li>
+<li><a href="#sec-1-1-3">1.1.3. Experiments workflow:</a></li>
+<li><a href="#sec-1-1-4">1.1.4. Example for experimental setup procedure</a>
+<ul class="nav">
+<li><a href="#sec-jupyter-setup">1.1.4.1. Setting starting a jupyter kernel from a remote jupyter session using <code>emacs-jupyter</code> in <code>org babel</code></a></li>
+</ul>
+</li>
+<li><a href="#sec-1-1-5">1.1.5. tools used (notes)</a>
+<ul class="nav">
+<li><a href="#sec-1-1-5-1">1.1.5.1. Emacs <code>magit</code></a></li>
+<li><a href="#sec-1-1-5-2">1.1.5.2. jupyter</a></li>
+<li><a href="#sec-1-1-5-3">1.1.5.3. mlflow</a></li>
+<li><a href="#sec-1-1-5-4">1.1.5.4. tensorflow</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-1-2">1.2. Template for data entry and setup notes:</a>
+<ul class="nav">
+<li><a href="#sec-1-2-1">1.2.1. exp-#date-#title</a>
+<ul class="nav">
+<li><a href="#sec-1-2-1-1">1.2.1.1. git:</a></li>
+<li><a href="#sec-1-2-1-2">1.2.1.2. System Metadata:</a></li>
+<li><a href="#scripts-tmux">1.2.1.3. Tmux setup and scripts</a></li>
+<li><a href="#ssh-tunneling">1.2.1.4. SSH tunneling</a></li>
+<li><a href="#scripts-jp">1.2.1.5. jupyter scripts</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-2-2">1.2.2. Setup notes</a>
+<ul class="nav">
+<li><a href="#sec-tmux-setup">1.2.2.1. Setting up a tmux connection from using <code>ob-tmux</code> in <code>org-babel</code></a></li>
+<li><a href="#sec-1-2-2-2">1.2.2.2. <code>emacs-jupyter</code> Setup</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-2-3">1.2.3. Notes on archiving</a>
+<ul class="nav">
+<li><a href="#sec-1-2-3-1">1.2.3.1. Exporting the LabBook.org to html in a twbs style</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-1-3">1.3. Organization of git</a>
+<ul class="nav">
+<li><a href="#sec-1-3-1">1.3.1. remote/origin/main branch:</a></li>
+<li><a href="#sec-1-3-2">1.3.2. remote/origin/exp### branches:</a></li>
+<li><a href="#sec-1-3-3">1.3.3. remote/origin/develop branch:</a></li>
+<li><a href="#sec-1-3-4">1.3.4. remote/origin/data branch:</a></li>
+<li><a href="#sec-1-3-5">1.3.5. Git TAGs</a>
+<ul class="nav">
+<li><a href="#sec-1-3-5-1">1.3.5.1. Stable versions:</a></li>
+<li><a href="#sec-1-3-5-2">1.3.5.2. All tags from git:</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-1-4">1.4. Organization of code</a>
+<ul class="nav">
+<li><a href="#sec-1-4-1">1.4.1. scripts:</a></li>
+<li><a href="#sec-1-4-2">1.4.2. src/</a>
+<ul class="nav">
+<li><a href="#sec-1-4-2-1">1.4.2.1. fluotracify/</a></li>
+<li><a href="#sec-1-4-2-2">1.4.2.2. nanosimpy/</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-1-5">1.5. Changes in this repository (without "* Data" in this file)</a>
+<ul class="nav">
+<li><a href="#sec-1-5-1">1.5.1. Changes in LabBook.org (without "* Data")</a>
+<ul class="nav">
+<li><a href="#sec-1-5-1-1">1.5.1.1. 2022-02-19</a></li>
+<li><a href="#sec-1-5-1-2">1.5.1.2. 2021-12-16</a></li>
+<li><a href="#sec-1-5-1-3">1.5.1.3. 2021-08-05</a></li>
+<li><a href="#sec-1-5-1-4">1.5.1.4. 2021-04-04</a></li>
+<li><a href="#sec-1-5-1-5">1.5.1.5. 2020-11-04</a></li>
+<li><a href="#sec-1-5-1-6">1.5.1.6. 2020-05-31</a></li>
+<li><a href="#sec-1-5-1-7">1.5.1.7. 2020-05-07</a></li>
+<li><a href="#sec-1-5-1-8">1.5.1.8. 2020-04-22</a></li>
+<li><a href="#sec-1-5-1-9">1.5.1.9. 2020-03-30</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-5-2">1.5.2. Changes in src/fluotracify</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-2">2. Data</a>
+<ul class="nav">
+<li><a href="#sec-2-1">2.1. exp-310520-unet</a>
+<ul class="nav">
+<li><a href="#sec-2-1-1">2.1.1. Connect</a>
+<ul class="nav">
+<li><a href="#sec-2-1-1-1">2.1.1.1. Tmux on Ara</a></li>
+<li><a href="#sec-2-1-1-2">2.1.1.2. Compute node for script execution</a></li>
+<li><a href="#sec-2-1-1-3">2.1.1.3. Jupyter on Ara</a></li>
+<li><a href="#sec-2-1-1-4">2.1.1.4. Tensorboard tunnel, Mlflow ui tunnel</a></li>
+</ul>
+</li>
+<li><a href="#sec-2-1-2">2.1.2. git exp 1</a></li>
+<li><a href="#sec-2-1-3">2.1.3. mlflow environment variables</a></li>
+<li><a href="#sec-2-1-4">2.1.4. Learning rate schedule</a></li>
+<li><a href="#sec-2-1-5">2.1.5. test runs</a>
+<ul class="nav">
+<li><a href="#sec-2-1-5-1">2.1.5.1. no 1 - experiment creation failed</a></li>
+<li><a href="#sec-2-1-5-2">2.1.5.2. no 2</a></li>
+</ul>
+</li>
+<li><a href="#sec-2-1-6">2.1.6. experimental run</a></li>
+<li><a href="#sec-2-1-7">2.1.7. read out logs</a>
+<ul class="nav">
+<li><a href="#sec-2-1-7-1">2.1.7.1. read out mlflow logs using CLI</a></li>
+<li><a href="#sec-2-1-7-2">2.1.7.2. Reading out mlflow logs with Python API</a></li>
+</ul>
+</li>
+<li><a href="#sec-2-1-8">2.1.8. Load model from mlflow logs and predict separately loaded data</a></li>
+<li><a href="#sec-2-1-9">2.1.9. git exp 2</a></li>
+<li><a href="#sec-2-1-10">2.1.10. experimental run 2 - full dataset</a></li>
+<li><a href="#sec-2-1-11">2.1.11. read out logs experiment 2</a>
+<ul class="nav">
+<li><a href="#sec-2-1-11-1">2.1.11.1. read out mlflow logs using CLI</a></li>
+<li><a href="#sec-2-1-11-2">2.1.11.2. plots via mlflow ui, comparing run 1 and 2</a></li>
+<li><a href="#sec-2-1-11-3">2.1.11.3. plots via tensorboard ui</a></li>
+<li><a href="#sec-2-1-11-4">2.1.11.4. for next runs</a></li>
+</ul>
+</li>
+<li><a href="#sec-2-1-12">2.1.12. use model from run 2 to correct data</a>
+<ul class="nav">
+<li><a href="#sec-2-1-12-1">2.1.12.1. simulated data from the test set</a></li>
+<li><a href="#sec-2-1-12-2">2.1.12.2. experimental data from Pablo (structured experiment)</a></li>
+</ul>
+</li>
+<li><a href="#sec-2-1-13">2.1.13. git exp 3</a></li>
+<li><a href="#sec-2-1-14">2.1.14. experimental run 3 - bs=3</a></li>
+<li><a href="#sec-2-1-15">2.1.15. git exp 4</a></li>
+<li><a href="#sec-2-1-16">2.1.16. experimental run 4 - bs=7</a></li>
+<li><a href="#sec-2-1-17">2.1.17. git exp 5</a></li>
+<li><a href="#sec-2-1-18">2.1.18. experimental run 5 - full dataset, length=2**13=8192</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</nav>
+</div><div class="col-md-9 col-md-pull-3"><h1 class="title">Lab book Fluotracify</h1>
+
 
 <div id="outline-container-sec-1" class="outline-2">
 <h2 id="sec-1"><span class="section-number-2">1</span> Technical Notes</h2>
@@ -246,7 +402,7 @@ behavior in the "* Data" section.
 </li>
 <li>The branching model used is described in <a href="http://starpu-simgrid.gforge.inria.fr/misc/SIGOPS_paper.pdf">this paper</a>. Therefore: if you
 are interested in the "* Data" section, you have to <code>git clone</code> the <i>data</i>
-branch of the repository. The <i>master</i> branch is clean from any results, it
+branch of the repository. The <i>main</i> branch is clean from any results, it
 contains only source code and the analysis.
 </li>
 <li>This project is my take on <a href="https://en.wikipedia.org/wiki/Open-notebook_science">Open-notebook science</a>. The idea was postulated in
@@ -325,6 +481,15 @@ of this document the output of most code blocks is displayed this way.
 In the LabBook.html rendering of this document, these blocks will have a light
 yellow colour (#FBFBBF)
 </pre>
+
+<details>
+<pre class="example">
+This is a literal example block enclosed in a details block. This is useful to
+make the page more readable by collapsing large amounts of output.
+In the Labbook.html rendering of this document, the details block will have a
+light grey colour (#f0f0f0) and a pink color when hovering above it.
+</pre>
+</details>
 </div>
 </div>
 
@@ -332,7 +497,7 @@ yellow colour (#FBFBBF)
 <h4 id="sec-1-1-3"><span class="section-number-4">1.1.3</span> Experiments workflow:</h4>
 <div class="outline-text-4" id="text-1-1-3">
 <ol class="org-ol">
-<li>Create a new branch from <code>master</code>
+<li>Create a new branch from <code>main</code>
 </li>
 <li>Print out the git log from the latest commit and the metadata
 </li>
@@ -342,7 +507,7 @@ yellow colour (#FBFBBF)
 <li>All machine learning runs are saved in <code>data/mlruns</code>, all other data in
 <code>data/#experiment-name</code>
 </li>
-<li>Add a "<b>* #experiment-name" section to this file under [[</b> Data]]
+<li>Add a <code>** exp-&lt;date&gt;-&lt;name&gt;</code>" section to this file under <a href="#sec-2">Data</a>
 </li>
 <li>Commit/push the results of this separate branch
 </li>
@@ -354,15 +519,19 @@ yellow colour (#FBFBBF)
 <div id="outline-container-sec-1-1-4" class="outline-4">
 <h4 id="sec-1-1-4"><span class="section-number-4">1.1.4</span> Example for experimental setup procedure</h4>
 <div class="outline-text-4" id="text-1-1-4">
-</div><ol class="org-ol"><li><a id="sec-jupyter-setup" name="sec-jupyter-setup"></a><a id="sec-1-1-4-1" name="sec-1-1-4-1"></a>Setting starting a jupyter kernel from a remote jupyter session using <code>emacs-jupyter</code> in <code>org babel</code><br ><div class="outline-text-5" id="text-sec-jupyter-setup">
+</div><div id="outline-container-sec-jupyter-setup" class="outline-5">
+<h5 id="sec-jupyter-setup"><a id="sec-1-1-4-1" name="sec-1-1-4-1"></a><span class="section-number-5">1.1.4.1</span> Setting starting a jupyter kernel from a remote jupyter session using <code>emacs-jupyter</code> in <code>org babel</code></h5>
+<div class="outline-text-5" id="text-sec-jupyter-setup">
 </div>
-</li></ol>
+</div>
 </div>
 
 <div id="outline-container-sec-1-1-5" class="outline-4">
 <h4 id="sec-1-1-5"><span class="section-number-4">1.1.5</span> tools used (notes)</h4>
 <div class="outline-text-4" id="text-1-1-5">
-</div><ol class="org-ol"><li><a id="sec-1-1-5-1" name="sec-1-1-5-1"></a>Emacs <code>magit</code><br ><div class="outline-text-5" id="text-1-1-5-1">
+</div><div id="outline-container-sec-1-1-5-1" class="outline-5">
+<h5 id="sec-1-1-5-1"><span class="section-number-5">1.1.5.1</span> Emacs <code>magit</code></h5>
+<div class="outline-text-5" id="text-1-1-5-1">
 <ul class="org-ul">
 <li><code>gitflow-avh</code> (<code>magit-flow</code>) to follow the flow
 </li>
@@ -375,8 +544,10 @@ yellow colour (#FBFBBF)
 </li>
 </ul>
 </div>
-</li>
-<li><a id="sec-1-1-5-2" name="sec-1-1-5-2"></a>jupyter<br ><div class="outline-text-5" id="text-1-1-5-2">
+</div>
+<div id="outline-container-sec-1-1-5-2" class="outline-5">
+<h5 id="sec-1-1-5-2"><span class="section-number-5">1.1.5.2</span> jupyter</h5>
+<div class="outline-text-5" id="text-1-1-5-2">
 <ul class="org-ul">
 <li>emacs jupyter for running and connecting to kernel on server:
 <a href="https://github.com/dzop/emacs-jupyter">https://github.com/dzop/emacs-jupyter</a>
@@ -391,22 +562,26 @@ yellow colour (#FBFBBF)
 </li>
 </ul>
 </div>
-</li>
-<li><a id="sec-1-1-5-3" name="sec-1-1-5-3"></a>mlflow<br ><div class="outline-text-5" id="text-1-1-5-3">
+</div>
+<div id="outline-container-sec-1-1-5-3" class="outline-5">
+<h5 id="sec-1-1-5-3"><span class="section-number-5">1.1.5.3</span> mlflow</h5>
+<div class="outline-text-5" id="text-1-1-5-3">
 <ul class="org-ul">
 <li><a href="https://docs.faculty.ai/user-guide/experiments/index.html">https://docs.faculty.ai/user-guide/experiments/index.html</a> and
 <a href="https://docs.microsoft.com/en-us/azure/databricks/_static/notebooks/hls-image-processing/02-image-segmentation-dl.html">https://docs.microsoft.com/en-us/azure/databricks/_static/notebooks/hls-image-processing/02-image-segmentation-dl.html</a>
 </li>
 </ul>
 </div>
-</li>
-<li><a id="sec-1-1-5-4" name="sec-1-1-5-4"></a>tensorflow<br ><div class="outline-text-5" id="text-1-1-5-4">
+</div>
+<div id="outline-container-sec-1-1-5-4" class="outline-5">
+<h5 id="sec-1-1-5-4"><span class="section-number-5">1.1.5.4</span> tensorflow</h5>
+<div class="outline-text-5" id="text-1-1-5-4">
 <ul class="org-ul">
 <li><a href="https://www.tensorflow.org/tensorboard/image_summaries">https://www.tensorflow.org/tensorboard/image_summaries</a>
 </li>
 </ul>
 </div>
-</li></ol>
+</div>
 </div>
 </div>
 
@@ -416,52 +591,58 @@ yellow colour (#FBFBBF)
 </div><div id="outline-container-sec-1-2-1" class="outline-4">
 <h4 id="sec-1-2-1"><span class="section-number-4">1.2.1</span> exp-#date-#title</h4>
 <div class="outline-text-4" id="text-1-2-1">
-</div><ol class="org-ol"><li><a id="sec-1-2-1-1" name="sec-1-2-1-1"></a>git:<br ><div class="outline-text-5" id="text-1-2-1-1">
+</div><div id="outline-container-sec-1-2-1-1" class="outline-5">
+<h5 id="sec-1-2-1-1"><span class="section-number-5">1.2.1.1</span> git:</h5>
+<div class="outline-text-5" id="text-1-2-1-1">
 <div class="org-src-container">
 
-<pre class="src src-sh">git log -1
+<pre class="src src-sh"><span style="color: #784437;">git</span> <span style="color: #78683f;">log</span> <span style="color: #3f7178;">-1</span>
 </pre>
 </div>
 </div>
-</li>
+</div>
 
-<li><a id="sec-1-2-1-2" name="sec-1-2-1-2"></a>System Metadata:<br ><div class="outline-text-5" id="text-1-2-1-2">
+<div id="outline-container-sec-1-2-1-2" class="outline-5">
+<h5 id="sec-1-2-1-2"><span class="section-number-5">1.2.1.2</span> System Metadata:</h5>
+<div class="outline-text-5" id="text-1-2-1-2">
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python" id="jp-metadata"><span style="color: #859900; font-weight: bold;">import</span> os
-<span style="color: #859900; font-weight: bold;">import</span> pprint
+<pre class="src src-jupyter-python" id="jp-metadata"><span style="color: #859900; font-weight: bold;">import</span> <span style="color: #7e544f;">os</span>
+<span style="color: #859900; font-weight: bold;">import</span> <span style="color: #4f7e67;">pprint</span>
 
-<span style="color: #657b83; background-color: #fdf6e3;">ramlist</span> = os.popen(<span style="color: #2aa198;">'free -th'</span>).readlines()[-<span style="color: #657b83; background-color: #fdf6e3;">1</span>].split()[<span style="color: #657b83; background-color: #fdf6e3;">1</span>:]
+<span style="color: #268bd2;">ramlist</span> = <span style="color: #7e544f;">os</span>.<span style="color: #37785e;">popen</span>(<span style="color: #2aa198;">'free -th'</span>).<span style="color: #7e544f;">readlines</span>()[-1].<span style="color: #7a4f7e;">split</span>()[1:]
 
-print(<span style="color: #2aa198;">'No of CPUs in system:'</span>, os.cpu_count())
-print(<span style="color: #2aa198;">'No of CPUs the current process can use:'</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #657b83; font-weight: bold;">len</span>(os.sched_getaffinity(<span style="color: #657b83; background-color: #fdf6e3;">0</span>)))
-print(<span style="color: #2aa198;">'load average:'</span>, os.getloadavg())
-print(<span style="color: #2aa198;">'os.uname(): '</span>, os.uname())
-print(<span style="color: #2aa198;">'PID of process:'</span>, os.getpid())
-print(<span style="color: #2aa198;">'RAM total: {}, RAM used: {}, RAM free: {}'</span>.format(
-<span style="background-color: #eee8d5;"> </span>   ramlist[<span style="color: #657b83; background-color: #fdf6e3;">0</span>], ramlist[<span style="color: #657b83; background-color: #fdf6e3;">1</span>], ramlist[<span style="color: #657b83; background-color: #fdf6e3;">2</span>]))
+<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #2aa198;">'No of CPUs in system:'</span>, <span style="color: #7e544f;">os</span>.<span style="color: #37785e;">cpu_count</span>())
+<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #2aa198;">'No of CPUs the current process can use:'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #657b83; font-weight: bold;">len</span>(<span style="color: #7e544f;">os</span>.<span style="color: #707e4f;">sched_getaffinity</span>(0)))
+<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #2aa198;">'load average:'</span>, <span style="color: #7e544f;">os</span>.<span style="color: #783778;">getloadavg</span>())
+<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #2aa198;">'os.uname(): '</span>, <span style="color: #7e544f;">os</span>.<span style="color: #3f7178;">uname</span>())
+<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #2aa198;">'PID of process:'</span>, <span style="color: #7e544f;">os</span>.<span style="color: #4f7e67;">getpid</span>())
+<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #2aa198;">'RAM total: {}, RAM used: {}, RAM free: {}'</span>.<span style="color: #78683f;">format</span>(
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #4f5c7e;">ramlist</span>[0], <span style="color: #4f5c7e;">ramlist</span>[1], <span style="color: #4f5c7e;">ramlist</span>[2]))
 
-!echo the current directory: $PWD
-!echo My disk usage:
-!df -h
-<span style="color: #859900; font-weight: bold;">if</span> _long:
-<span style="background-color: #eee8d5;"> </span>   %conda <span style="color: #657b83; font-weight: bold;">list</span>
-<span style="background-color: #eee8d5;"> </span>   pprint.pprint(<span style="color: #657b83; font-weight: bold;">dict</span>(os.environ), <span style="color: #657b83; background-color: #fdf6e3;">sort_dicts</span>=<span style="color: #859900; font-weight: bold;">False</span>)
+!<span style="color: #37785e;">echo</span> <span style="color: #783f5a;">the</span> <span style="color: #43783f;">current</span> <span style="color: #268bd2;">directory</span>: $<span style="color: #4f7e67;">PWD</span>
+!<span style="color: #37785e;">echo</span> <span style="color: #707e4f;">My</span> <span style="color: #784437;">disk</span> <span style="color: #268bd2;">usage</span>:
+!<span style="color: #4f7e67;">df</span> -<span style="color: #7e544f;">h</span>
+<span style="color: #859900; font-weight: bold;">if</span> <span style="color: #268bd2;">_long</span>:
+<span style="background-color: #eee8d5;"> </span>   %<span style="color: #4f5c7e;">conda</span> <span style="color: #657b83; font-weight: bold;">list</span>
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #4f7e67;">pprint</span>.<span style="color: #4f7e67;">pprint</span>(<span style="color: #657b83; font-weight: bold;">dict</span>(<span style="color: #7e544f;">os</span>.<span style="color: #707e4f;">environ</span>), <span style="color: #707e4f;">sort_dicts</span>=<span style="color: #859900; font-weight: bold;">False</span>)
 
 </pre>
 </div>
 </div>
-</li>
+</div>
 
-<li><a id="scripts-tmux" name="scripts-tmux"></a><a id="sec-1-2-1-3" name="sec-1-2-1-3"></a>Tmux setup and scripts<br ><div class="outline-text-5" id="text-scripts-tmux">
+<div id="outline-container-scripts-tmux" class="outline-5">
+<h5 id="scripts-tmux"><a id="sec-1-2-1-3" name="sec-1-2-1-3"></a><span class="section-number-5">1.2.1.3</span> Tmux setup and scripts</h5>
+<div class="outline-text-5" id="text-scripts-tmux">
 <div class="org-src-container">
 
-<pre class="src src-sh" id="setup-tmux">rm ~/.tmux-local-socket-remote-machine
-<span style="color: #268bd2;">REMOTE_SOCKET</span>=$(<span style="color: #6c71c4; font-weight: bold;">ssh</span> ara <span style="color: #2aa198;">'tmux ls -F "#{socket_path}"'</span> | head -1)
+<pre class="src src-sh" id="setup-tmux"><span style="color: #513f78;">rm</span> <span style="color: #7e544f;">~/.tmux-local-socket-remote-machine</span>
+<span style="color: #268bd2;">REMOTE_SOCKET</span>=$(<span style="color: #6c71c4; font-weight: bold;">ssh</span> <span style="color: #783778;">ara</span> <span style="color: #2aa198;">'tmux ls -F "#{socket_path}"'</span> | <span style="color: #4f5c7e;">head</span> <span style="color: #3f7178;">-1</span>)
 <span style="color: #657b83; font-weight: bold;">echo</span> $<span style="color: #268bd2;">REMOTE_SOCKET</span>
-ssh ara -tfN <span style="color: #b58900; font-weight: bold;">\</span>
-    -L ~/.tmux-local-socket-remote-machine:$<span style="color: #268bd2;">REMOTE_SOCKET</span>
+<span style="color: #7a4f7e;">ssh</span> <span style="color: #783778;">ara</span> <span style="color: #7a4f7e;">-tfN</span> <span style="color: #b58900; font-weight: bold;">\</span>
+    <span style="color: #784437;">-L</span> <span style="color: #513f78;">~/.tmux-local-socket-remote-machine:</span>$<span style="color: #268bd2;">REMOTE_SOCKET</span>
 </pre>
 </div>
 
@@ -538,9 +719,11 @@ ssh ara -tfN <span style="color: #b58900; font-weight: bold;">\</span>
 </tbody>
 </table>
 </div>
-</li>
+</div>
 
-<li><a id="ssh-tunneling" name="ssh-tunneling"></a><a id="sec-1-2-1-4" name="sec-1-2-1-4"></a>SSH tunneling<br ><div class="outline-text-5" id="text-ssh-tunneling">
+<div id="outline-container-ssh-tunneling" class="outline-5">
+<h5 id="ssh-tunneling"><a id="sec-1-2-1-4" name="sec-1-2-1-4"></a><span class="section-number-5">1.2.1.4</span> SSH tunneling</h5>
+<div class="outline-text-5" id="text-ssh-tunneling">
 <p>
 Different applications can be run on the remote compute node. If I want to
 access them at the local machine, and open them with the browser, I use this
@@ -549,7 +732,7 @@ tunneling script.
 
 <div class="org-src-container">
 
-<pre class="src src-sh" id="ssh-tunnel">ssh -t -t ara -L $<span style="color: #268bd2;">port</span>:localhost:$<span style="color: #268bd2;">port</span> ssh $<span style="color: #268bd2;">node</span> -L $<span style="color: #268bd2;">port</span>:Localhost:$<span style="color: #268bd2;">port</span>
+<pre class="src src-sh" id="ssh-tunnel"><span style="color: #7a4f7e;">ssh</span> <span style="color: #7e544f;">-t</span> <span style="color: #7e544f;">-t</span> <span style="color: #783778;">ara</span> <span style="color: #784437;">-L</span> $<span style="color: #268bd2;">port</span>:localhost:$<span style="color: #268bd2;">port</span> <span style="color: #7a4f7e;">ssh</span> $<span style="color: #268bd2;">node</span> <span style="color: #784437;">-L</span> $<span style="color: #268bd2;">port</span>:Localhost:$<span style="color: #268bd2;">port</span>
 </pre>
 </div>
 
@@ -565,9 +748,11 @@ Apps I use that way:
 </li>
 </ul>
 </div>
-</li>
+</div>
 
-<li><a id="scripts-jp" name="scripts-jp"></a><a id="sec-1-2-1-5" name="sec-1-2-1-5"></a>jupyter scripts<br ><div class="outline-text-5" id="text-scripts-jp">
+<div id="outline-container-scripts-jp" class="outline-5">
+<h5 id="scripts-jp"><a id="sec-1-2-1-5" name="sec-1-2-1-5"></a><span class="section-number-5">1.2.1.5</span> jupyter scripts</h5>
+<div class="outline-text-5" id="text-scripts-jp">
 <p>
 Starting a jupyter instance on a server where the necessary libraries are
 installed is easy using this script:
@@ -575,11 +760,11 @@ installed is easy using this script:
 
 <div class="org-src-container">
 
-<pre class="src src-tmux" id="jpt-tmux">conda activate tf-nightly
-<span style="color: #657b83; font-weight: bold;">export</span> <span style="color: #268bd2;">PORT</span>=8889
+<pre class="src src-tmux" id="jpt-tmux"><span style="color: #4f5c7e;">conda</span> <span style="color: #4f7e67;">activate</span> <span style="color: #37785e;">tf</span>
+<span style="color: #657b83; font-weight: bold;">export</span> <span style="color: #268bd2;">PORT</span>=<span style="color: #3f7178;">9999</span>
 <span style="color: #657b83; font-weight: bold;">export</span> <span style="color: #268bd2;">XDG_RUNTIME_DIR</span>=<span style="color: #2aa198;">''</span>
 <span style="color: #657b83; font-weight: bold;">export</span> <span style="color: #268bd2;">XDG_RUNTIME_DIR</span>=<span style="color: #2aa198;">""</span>
-jupyter lab --no-browser --port=$<span style="color: #268bd2;">PORT</span>
+<span style="color: #37785e;">jupyter</span> <span style="color: #4f5c7e;">lab</span> <span style="color: #783778;">--no-browser</span> <span style="color: #5e7837;">--port</span>=$<span style="color: #268bd2;">PORT</span>
 </pre>
 </div>
 
@@ -599,13 +784,15 @@ locally to connect to the notebook. If you close Emacs, it would need to be
 reestablished
 </p>
 </div>
-</li></ol>
+</div>
 </div>
 
 <div id="outline-container-sec-1-2-2" class="outline-4">
 <h4 id="sec-1-2-2"><span class="section-number-4">1.2.2</span> Setup notes</h4>
 <div class="outline-text-4" id="text-1-2-2">
-</div><ol class="org-ol"><li><a id="sec-tmux-setup" name="sec-tmux-setup"></a><a id="sec-1-2-2-1" name="sec-1-2-2-1"></a>Setting up a tmux connection from using <code>ob-tmux</code> in <code>org-babel</code><br ><div class="outline-text-5" id="text-sec-tmux-setup">
+</div><div id="outline-container-sec-tmux-setup" class="outline-5">
+<h5 id="sec-tmux-setup"><a id="sec-1-2-2-1" name="sec-1-2-2-1"></a><span class="section-number-5">1.2.2.1</span> Setting up a tmux connection from using <code>ob-tmux</code> in <code>org-babel</code></h5>
+<div class="outline-text-5" id="text-sec-tmux-setup">
 <ul class="org-ul">
 <li>prerequisite: tmux versions need to be the same locally and on the server.
 Let's verify that now.
@@ -614,7 +801,7 @@ Let's verify that now.
 
 <div class="org-src-container">
 
-<pre class="src src-sh">tmux -V
+<pre class="src src-sh"><span style="color: #4f5c7e;">tmux</span> <span style="color: #3f7178;">-V</span>
 </pre>
 </div>
 
@@ -627,7 +814,7 @@ tmux 3.0a
 
 <div class="org-src-container">
 
-<pre class="src src-sh">ssh ara tmux -V
+<pre class="src src-sh"><span style="color: #7a4f7e;">ssh</span> <span style="color: #783778;">ara</span> <span style="color: #4f5c7e;">tmux</span> <span style="color: #3f7178;">-V</span>
 </pre>
 </div>
 
@@ -661,10 +848,10 @@ machine (note that <code>socket_path</code> was introduced in tmux version 2.2)
 
 <div class="org-src-container">
 
-<pre class="src src-sh"><span style="color: #268bd2;">REMOTE_SOCKET</span>=$(<span style="color: #6c71c4; font-weight: bold;">ssh</span> ara <span style="color: #2aa198;">'tmux ls -F "#{socket_path}"'</span> | head -1)
+<pre class="src src-sh"><span style="color: #268bd2;">REMOTE_SOCKET</span>=$(<span style="color: #6c71c4; font-weight: bold;">ssh</span> <span style="color: #783778;">ara</span> <span style="color: #2aa198;">'tmux ls -F "#{socket_path}"'</span> | <span style="color: #4f5c7e;">head</span> <span style="color: #3f7178;">-1</span>)
 <span style="color: #657b83; font-weight: bold;">echo</span> $<span style="color: #268bd2;">REMOTE_SOCKET</span>
-ssh ara -tfN <span style="color: #b58900; font-weight: bold;">\</span>
-    -L ~/.tmux-local-socket-remote-machine:$<span style="color: #268bd2;">REMOTE_SOCKET</span>
+<span style="color: #7a4f7e;">ssh</span> <span style="color: #783778;">ara</span> <span style="color: #7a4f7e;">-tfN</span> <span style="color: #b58900; font-weight: bold;">\</span>
+    <span style="color: #784437;">-L</span> <span style="color: #513f78;">~/.tmux-local-socket-remote-machine:</span>$<span style="color: #268bd2;">REMOTE_SOCKET</span>
 </pre>
 </div>
 
@@ -714,16 +901,18 @@ which allows to print the output from the tmux session in an
 </li>
 </ul>
 </div>
-</li>
+</div>
 
-<li><a id="sec-1-2-2-2" name="sec-1-2-2-2"></a><code>emacs-jupyter</code> Setup<br ><div class="outline-text-5" id="text-1-2-2-2">
+<div id="outline-container-sec-1-2-2-2" class="outline-5">
+<h5 id="sec-1-2-2-2"><span class="section-number-5">1.2.2.2</span> <code>emacs-jupyter</code> Setup</h5>
+<div class="outline-text-5" id="text-1-2-2-2">
 <p>
 <code>Emacs-jupyter</code> aims to be an API for a lot of functionalities of the
 <code>jupyter</code> project. The documentation can be found on <a href="https://github.com/dzop/emacs-jupyter">GitHub</a>.
 </p>
 
 <ol class="org-ol">
-<li>For the <b>whole document</b>: connect ot a running jupyter instance
+<li>For the <b>whole document</b>: connect to a running jupyter instance
 <ol class="org-ol">
 <li><code>M-x jupyter-server-list-kernels</code>
 <ol class="org-ol">
@@ -753,7 +942,7 @@ which allows to print the output from the tmux session in an
 <li>customize the output folder using the following org-mode variable:
 <div class="org-src-container">
 
-<pre class="src src-emacs-lisp">(<span style="color: #859900; font-weight: bold;">setq</span> org-babel-jupyter-resource-directory <span style="color: #2aa198;">"./data/exp-test/plots"</span>)
+<pre class="src src-emacs-lisp">(<span style="color: #859900; font-weight: bold;">setq</span> <span style="color: #783f5a;">org-babel-jupyter-resource-directory</span> <span style="color: #2aa198;">"./data/exp-test/plots"</span>)
 </pre>
 </div>
 
@@ -804,64 +993,127 @@ pressing <code>Shift-TAB</code> in Jupyter notebooks)
 </li>
 </ol>
 </div>
-</li></ol>
 </div>
 </div>
 
+<div id="outline-container-sec-1-2-3" class="outline-4">
+<h4 id="sec-1-2-3"><span class="section-number-4">1.2.3</span> Notes on archiving</h4>
+<div class="outline-text-4" id="text-1-2-3">
+</div><div id="outline-container-sec-1-2-3-1" class="outline-5">
+<h5 id="sec-1-2-3-1"><span class="section-number-5">1.2.3.1</span> Exporting the LabBook.org to html in a twbs style</h5>
+<div class="outline-text-5" id="text-1-2-3-1">
+<ul class="org-ul">
+<li>I am partial to the twitter bootstrap theme of html, since I like it's
+simple design, but clear structure with a nice table of contents at the
+side → the following org mode extension supports a seemless export to
+twitter bootstrap html: <a href="https://github.com/marsmining/ox-twbs">https://github.com/marsmining/ox-twbs</a>
+</li>
+<li>when installed, the export can be triggered via the command
+<code>(org-twbs-export-as-html)</code> or via the keyboard shortcut for export <code>C-c
+       C-e</code> followed by <code>w</code> for Twitter bootstrap and <code>h</code> for saving the .html
+</li>
+<li><span class="underline">Things to configure:</span>
+<ul class="org-ul">
+<li>in general, there are multiple export options:
+<a href="https://orgmode.org/manual/Export-Settings.html">https://orgmode.org/manual/Export-Settings.html</a>
+</li>
+<li>E.g. I set 2 <code>#+OPTIONS</code> keywords at the begin of the file: <code>toc:4</code> and
+<code>H:4</code> which make sure that in my export my sidebar table of contents
+will show numbered headings till a depth of 4.
+</li>
+<li>I configured my code blocks so that they will not be evaluated when
+exporting (I would recommend this especially if you only export for
+archiving) and that both the code block and the output will be exported
+with the keyword: <code>#+PROPERTY: header-args :eval never-export :exports
+         both</code>
+</li>
+<li>To discriminate between code blocks for different languages I gave each
+of them a distinct colour using <code>#+HTML_HEAD_EXTRA: &lt;style...</code> (see
+above)
+</li>
+<li>I had to configure a style for <code>table</code>, so that the
+<ul class="org-ul">
+<li><code>display: block; overflow-x: auto;</code> gets the table to be restricted
+to the width of the text and if it is larger, activates scrolling
+</li>
+<li><code>white-space: nowrap;</code> makes it that there is no wrap in a column, so
+it might be broader, but better readable if you have scrolling anyway
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><span class="underline">Things to do before exporting / Troubleshooting while exporting:</span>
+<ul class="org-ul">
+<li>when using a dark theme for you emacs, the export of the code blocks
+might show some ugly dark backgrounds from the theme. If this becomes
+an issue, change to a light theme for the export with <code>M-x
+         (load-theme)</code> and choose <code>solarized-light</code>
+</li>
+<li>only in the <code>data</code> branch you set the git tags after merging. If you
+want to show them here, execute the corresponding function in <a href="#sec-1-3-5">Git TAGs</a>
+</li>
+<li>make sure your file links work properly! I recommend referencing your
+files relatively (e.g. [ [ f ile:./data/exp-XXXXXX-test/test.png]]
+without spaces). Otherwise there will be errors in your <i><b>Messages</b></i>
+buffer
+</li>
+<li>There might be errors with your code blocks
+<ul class="org-ul">
+<li>e.g. the export function expects you to assign a default variable to
+your functions
+</li>
+<li>if you call a function via the <code>#+CALL</code> mechanism, it wants you to
+include two parentheses for the function, e.g. <code>#+CALL: test()</code>
+</li>
+</ul>
+</li>
+<li>check indentation of code blocks inside lists
+</li>
+<li>add a <code>details</code> block around large output cells. This makes them
+expandable. I added some <code>#+HTML_HEAD_EXTRA: &lt;style...</code> inspired by
+<a href="https://alhassy.github.io/org-special-block-extras/#Folded-Details">alhassy</a>. That's how the <code>details</code> block looks like:
+<pre class="example">
+#+begin_details
+
+#+end_details
+</pre>
+</li>
+<li>If you reference a parameter with an underscore in the name, use the
+org markdown tricks to style them like code (<code>==</code> or <code>~~</code>), otherwise
+the part after the underscore will be rendered like a subscript:
+<code>under_score</code> vs under<sub>score</sub>
+</li>
+</ul>
+</li>
+<li><span class="underline">Things to do after exporting:</span>
+<ul class="org-ul">
+<li>In my workflow, the exported <code>LabBook.html</code> with the overview of all
+experiments is in the <code>data</code> folder. If you move the file, you will
+have to fix the file links for the new location, e.g. via "Find and
+replace" <code>M-%</code>:
+<ul class="org-ul">
+<li>if you move the org file → in the org file find <code>[[file:./data/</code> and
+replace with <code>[[file:./</code> → then export with <code>C-c C-e w h</code>
+</li>
+<li>if you export first with <code>C-c C-e w h</code> and move the html file to
+<code>data</code> → in the html file find <code>./data</code> and replace with <code>.</code>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
 <div id="outline-container-sec-1-3" class="outline-3">
 <h3 id="sec-1-3"><span class="section-number-3">1.3</span> Organization of git</h3>
 <div class="outline-text-3" id="text-1-3">
 </div><div id="outline-container-sec-1-3-1" class="outline-4">
-<h4 id="sec-1-3-1"><span class="section-number-4">1.3.1</span> tools used (notes)</h4>
+<h4 id="sec-1-3-1"><span class="section-number-4">1.3.1</span> remote/origin/main branch:</h4>
 <div class="outline-text-4" id="text-1-3-1">
-</div><ol class="org-ol"><li><a id="sec-1-3-1-1" name="sec-1-3-1-1"></a>- Emacs <code>magit</code><br ><div class="outline-text-5" id="text-1-3-1-1">
-<ul class="org-ul">
-<li><code>gitflow-avh</code> (<code>magit-flow</code>) to follow the flow
-</li>
-<li>possibly <a href="https://github.com/magit/magit-annex">https://github.com/magit/magit-annex</a> for large files. Follow this:
-<a href="https://git-annex.branchable.com/walkthrough/">https://git-annex.branchable.com/walkthrough/</a>
-</li>
-<li>maybe check out git-toolbelt at some point
-<a href="https://github.com/nvie/git-toolbelt#readme">https://github.com/nvie/git-toolbelt#readme</a> with
-<a href="https://nvie.com/posts/git-power-tools/">https://nvie.com/posts/git-power-tools/</a>
-</li>
-</ul>
-</div>
-</li>
-<li><a id="sec-1-3-1-2" name="sec-1-3-1-2"></a>jupyter<br ><div class="outline-text-5" id="text-1-3-1-2">
-<ul class="org-ul">
-<li>emacs jupyter for running and connecting to kernel on server:
-<a href="https://github.com/dzop/emacs-jupyter">https://github.com/dzop/emacs-jupyter</a>
-</li>
-<li>if I actually still would use .ipynb files, these might come handy:
-<ul class="org-ul">
-<li>jupytext: <a href="https://github.com/mwouts/jupytext">https://github.com/mwouts/jupytext</a>
-</li>
-<li>nbstripout: <a href="https://github.com/kynan/nbstripout">https://github.com/kynan/nbstripout</a>
-</li>
-</ul>
-</li>
-</ul>
-</div>
-</li>
-<li><a id="sec-1-3-1-3" name="sec-1-3-1-3"></a>mlflow<br ><div class="outline-text-5" id="text-1-3-1-3">
-<ul class="org-ul">
-<li><a href="https://docs.faculty.ai/user-guide/experiments/index.html">https://docs.faculty.ai/user-guide/experiments/index.html</a> and
-<a href="https://docs.microsoft.com/en-us/azure/databricks/_static/notebooks/hls-image-processing/02-image-segmentation-dl.html">https://docs.microsoft.com/en-us/azure/databricks/_static/notebooks/hls-image-processing/02-image-segmentation-dl.html</a>
-</li>
-</ul>
-</div>
-</li>
-<li><a id="sec-1-3-1-4" name="sec-1-3-1-4"></a>tensorflow<br ><div class="outline-text-5" id="text-1-3-1-4">
-<p>
-<a href="https://www.tensorflow.org/tensorboard/image_summaries">https://www.tensorflow.org/tensorboard/image_summaries</a>
-</p>
-</div>
-</li></ol>
-</div>
-<div id="outline-container-sec-1-3-2" class="outline-4">
-<h4 id="sec-1-3-2"><span class="section-number-4">1.3.2</span> remote/origin/master branch:</h4>
-<div class="outline-text-4" id="text-1-3-2">
 <ul class="org-ul">
 <li>contains all the source code in folder <b><b>src/</b></b> which is used for experiments.
 </li>
@@ -876,12 +1128,12 @@ features. Day-to-day changes in code
 </ul>
 </div>
 </div>
-<div id="outline-container-sec-1-3-3" class="outline-4">
-<h4 id="sec-1-3-3"><span class="section-number-4">1.3.3</span> remote/origin/exp### branches:</h4>
-<div class="outline-text-4" id="text-1-3-3">
+<div id="outline-container-sec-1-3-2" class="outline-4">
+<h4 id="sec-1-3-2"><span class="section-number-4">1.3.2</span> remote/origin/exp### branches:</h4>
+<div class="outline-text-4" id="text-1-3-2">
 <ul class="org-ul">
 <li>if an experiment is done, the code and templates will be branched out from
-<b>master</b> in an <b>#experiment-name</b> branch, ### meaning some meaningful
+<b>main</b> in an <b>#experiment-name</b> branch, ### meaning some meaningful
 descriptor.
 </li>
 <li>all data generated during the experiment (e.g. .csv files, plots, images,
@@ -906,9 +1158,9 @@ executed in, the command line output of the code, and some plots
 </ul>
 </div>
 </div>
-<div id="outline-container-sec-1-3-4" class="outline-4">
-<h4 id="sec-1-3-4"><span class="section-number-4">1.3.4</span> remote/origin/develop branch:</h4>
-<div class="outline-text-4" id="text-1-3-4">
+<div id="outline-container-sec-1-3-3" class="outline-4">
+<h4 id="sec-1-3-3"><span class="section-number-4">1.3.3</span> remote/origin/develop branch:</h4>
+<div class="outline-text-4" id="text-1-3-3">
 <ul class="org-ul">
 <li>this is the branch I use for day to day work on features and exploration.
 All of my current activity can be followed here.
@@ -916,9 +1168,9 @@ All of my current activity can be followed here.
 </ul>
 </div>
 </div>
-<div id="outline-container-sec-1-3-5" class="outline-4">
-<h4 id="sec-1-3-5"><span class="section-number-4">1.3.5</span> remote/origin/data branch:</h4>
-<div class="outline-text-4" id="text-1-3-5">
+<div id="outline-container-sec-1-3-4" class="outline-4">
+<h4 id="sec-1-3-4"><span class="section-number-4">1.3.4</span> remote/origin/data branch:</h4>
+<div class="outline-text-4" id="text-1-3-4">
 <ul class="org-ul">
 <li>contains a full cronicle of the whole research process
 </li>
@@ -932,23 +1184,32 @@ the merge commit to make accessing single experiments easy.
 </div>
 </div>
 
-<div id="outline-container-sec-1-3-6" class="outline-4">
-<h4 id="sec-1-3-6"><span class="section-number-4">1.3.6</span> Git TAGs</h4>
-<div class="outline-text-4" id="text-1-3-6">
-</div><ol class="org-ol"><li><a id="sec-1-3-6-1" name="sec-1-3-6-1"></a>Stable versions:<br ></li>
-<li><a id="sec-1-3-6-2" name="sec-1-3-6-2"></a>All tags from git:<br ><div class="outline-text-5" id="text-1-3-6-2">
+<div id="outline-container-sec-1-3-5" class="outline-4">
+<h4 id="sec-1-3-5"><span class="section-number-4">1.3.5</span> Git TAGs</h4>
+<div class="outline-text-4" id="text-1-3-5">
+</div><div id="outline-container-sec-1-3-5-1" class="outline-5">
+<h5 id="sec-1-3-5-1"><span class="section-number-5">1.3.5.1</span> Stable versions:</h5>
+</div>
+<div id="outline-container-sec-1-3-5-2" class="outline-5">
+<h5 id="sec-1-3-5-2"><span class="section-number-5">1.3.5.2</span> All tags from git:</h5>
+<div class="outline-text-5" id="text-1-3-5-2">
 <div class="org-src-container">
 
-<pre class="src src-sh">git push origin --tags
-git tag -n1
+<pre class="src src-sh"><span style="color: #784437;">git</span> <span style="color: #78683f;">push</span> <span style="color: #783f5a;">origin</span> <span style="color: #7a4f7e;">--tags</span>
+<span style="color: #784437;">git</span> <span style="color: #374478;">tag</span> <span style="color: #707e4f;">-n1</span>
 </pre>
 </div>
 
 <pre class="example">
 exp-200402-test Merge branch 'exp-200402-test' into data
+exp-200520-unet Merge branch 'exp-310520-unet' into data
+exp-200531-unet Merge branch 'heads/exp-310520-unet' into data
+exp-201231-clustsim exp-201231-clustsim
+exp-210204-unet Add exp-210204-unet LabBook part 3
+exp-310520-unet move exp-310520-unet to data branch manually
 </pre>
 </div>
-</li></ol>
+</div>
 </div>
 </div>
 <div id="outline-container-sec-1-4" class="outline-3">
@@ -960,7 +1221,10 @@ exp-200402-test Merge branch 'exp-200402-test' into data
 <div id="outline-container-sec-1-4-2" class="outline-4">
 <h4 id="sec-1-4-2"><span class="section-number-4">1.4.2</span> src/</h4>
 <div class="outline-text-4" id="text-1-4-2">
-</div><ol class="org-ol"><li><a id="sec-1-4-2-1" name="sec-1-4-2-1"></a>fluotracify/<br ><ol class="org-ol"><li><a id="sec-1-4-2-1-1" name="sec-1-4-2-1-1"></a>imports/<br ></li>
+</div><div id="outline-container-sec-1-4-2-1" class="outline-5">
+<h5 id="sec-1-4-2-1"><span class="section-number-5">1.4.2.1</span> fluotracify/</h5>
+<div class="outline-text-5" id="text-1-4-2-1">
+</div><ol class="org-ol"><li><a id="sec-1-4-2-1-1" name="sec-1-4-2-1-1"></a>imports/<br ></li>
 <li><a id="sec-1-4-2-1-2" name="sec-1-4-2-1-2"></a>simulations/<br ></li>
 <li><a id="sec-1-4-2-1-3" name="sec-1-4-2-1-3"></a>training/<br ></li>
 <li><a id="sec-1-4-2-1-4" name="sec-1-4-2-1-4"></a>applications/<br ></li>
@@ -983,15 +1247,17 @@ exp-200402-test Merge branch 'exp-200402-test' into data
 </ul>
 </div>
 </li></ol>
-</li>
+</div>
 
-<li><a id="sec-1-4-2-2" name="sec-1-4-2-2"></a>nanosimpy/<br ><div class="outline-text-5" id="text-1-4-2-2">
+<div id="outline-container-sec-1-4-2-2" class="outline-5">
+<h5 id="sec-1-4-2-2"><span class="section-number-5">1.4.2.2</span> nanosimpy/</h5>
+<div class="outline-text-5" id="text-1-4-2-2">
 <ul class="org-ul">
 <li>cloned from dwaithe with refactoring for Python 3-compatibility
 </li>
 </ul>
 </div>
-</li></ol>
+</div>
 </div>
 </div>
 
@@ -1001,15 +1267,61 @@ exp-200402-test Merge branch 'exp-200402-test' into data
 </div><div id="outline-container-sec-1-5-1" class="outline-4">
 <h4 id="sec-1-5-1"><span class="section-number-4">1.5.1</span> Changes in LabBook.org (without "* Data")</h4>
 <div class="outline-text-4" id="text-1-5-1">
-</div><ol class="org-ol"><li><a id="sec-1-5-1-1" name="sec-1-5-1-1"></a>2020-11-04<br ><div class="outline-text-5" id="text-1-5-1-1">
+</div><div id="outline-container-sec-1-5-1-1" class="outline-5">
+<h5 id="sec-1-5-1-1"><span class="section-number-5">1.5.1.1</span> 2022-02-19</h5>
+<div class="outline-text-5" id="text-1-5-1-1">
 <ul class="org-ul">
-<li>update "jupyter scripts" in  <a href="#sec-1-2">Template for data entry and setup notes:</a>
+<li>Add <code>#+HTML_HEAD_EXTRA: &lt;style...</code> for <code>table</code> to enable scrolling if the
+table overflows
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-1-5-1-2" class="outline-5">
+<h5 id="sec-1-5-1-2"><span class="section-number-5">1.5.1.2</span> 2021-12-16</h5>
+<div class="outline-text-5" id="text-1-5-1-2">
+<ul class="org-ul">
+<li>Add <code>details</code> blocks, corresponding <code>#+HTML_HEAD_EXTRA: &lt;style...</code> and
+documentation in  <a href="#sec-1-2-3">Notes on archiving</a>
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-1-5-1-3" class="outline-5">
+<h5 id="sec-1-5-1-3"><span class="section-number-5">1.5.1.3</span> 2021-08-05</h5>
+<div class="outline-text-5" id="text-1-5-1-3">
+<ul class="org-ul">
+<li>Rename <code>master</code> branch to <code>main</code> branch
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-1-5-1-4" class="outline-5">
+<h5 id="sec-1-5-1-4"><span class="section-number-5">1.5.1.4</span> 2021-04-04</h5>
+<div class="outline-text-5" id="text-1-5-1-4">
+<ul class="org-ul">
+<li>Add <code>#+OPTIONS: H:4</code> and <code>#+OPTIONS: toc:4</code> to show up to 4 levels of
+depth in the html (twbs) export of this LabBook in the table of contents
+at the side
+</li>
+<li>I added <a href="#sec-1-2-3">Notes on archiving</a>
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-1-5-1-5" class="outline-5">
+<h5 id="sec-1-5-1-5"><span class="section-number-5">1.5.1.5</span> 2020-11-04</h5>
+<div class="outline-text-5" id="text-1-5-1-5">
+<ul class="org-ul">
+<li>update "jupyter scripts" in <a href="#sec-1-2">Template for data entry and setup notes:</a>
 for new conda environment on server (now <code>conda activate tf-nightly</code>)
 </li>
 </ul>
 </div>
-</li>
-<li><a id="sec-1-5-1-2" name="sec-1-5-1-2"></a>2020-05-31<br ><div class="outline-text-5" id="text-1-5-1-2">
+</div>
+<div id="outline-container-sec-1-5-1-6" class="outline-5">
+<h5 id="sec-1-5-1-6"><span class="section-number-5">1.5.1.6</span> 2020-05-31</h5>
+<div class="outline-text-5" id="text-1-5-1-6">
 <ul class="org-ul">
 <li>extend general documentation in README
 </li>
@@ -1028,8 +1340,10 @@ jupyter lab. Load a conda environment instead of using Lmod's <code>module
 </li>
 </ul>
 </div>
-</li>
-<li><a id="sec-1-5-1-3" name="sec-1-5-1-3"></a>2020-05-07<br ><div class="outline-text-5" id="text-1-5-1-3">
+</div>
+<div id="outline-container-sec-1-5-1-7" class="outline-5">
+<h5 id="sec-1-5-1-7"><span class="section-number-5">1.5.1.7</span> 2020-05-07</h5>
+<div class="outline-text-5" id="text-1-5-1-7">
 <ul class="org-ul">
 <li>extend documentation on git model
 </li>
@@ -1037,8 +1351,10 @@ jupyter lab. Load a conda environment instead of using Lmod's <code>module
 </li>
 </ul>
 </div>
-</li>
-<li><a id="sec-1-5-1-4" name="sec-1-5-1-4"></a>2020-04-22<br ><div class="outline-text-5" id="text-1-5-1-4">
+</div>
+<div id="outline-container-sec-1-5-1-8" class="outline-5">
+<h5 id="sec-1-5-1-8"><span class="section-number-5">1.5.1.8</span> 2020-04-22</h5>
+<div class="outline-text-5" id="text-1-5-1-8">
 <ul class="org-ul">
 <li>added parts of README which describe the experimental process
 </li>
@@ -1048,14 +1364,16 @@ jupyter lab. Load a conda environment instead of using Lmod's <code>module
 </li>
 </ul>
 </div>
-</li>
-<li><a id="sec-1-5-1-5" name="sec-1-5-1-5"></a>2020-03-30<br ><div class="outline-text-5" id="text-1-5-1-5">
+</div>
+<div id="outline-container-sec-1-5-1-9" class="outline-5">
+<h5 id="sec-1-5-1-9"><span class="section-number-5">1.5.1.9</span> 2020-03-30</h5>
+<div class="outline-text-5" id="text-1-5-1-9">
 <ul class="org-ul">
 <li>set up lab book and form git repo accoring to setup by Luka Stanisic et al
 </li>
 </ul>
 </div>
-</li></ol>
+</div>
 </div>
 <div id="outline-container-sec-1-5-2" class="outline-4">
 <h4 id="sec-1-5-2"><span class="section-number-4">1.5.2</span> Changes in src/fluotracify</h4>
@@ -1072,7 +1390,9 @@ jupyter lab. Load a conda environment instead of using Lmod's <code>module
 </div><div id="outline-container-sec-2-1-1" class="outline-4">
 <h4 id="sec-2-1-1"><span class="section-number-4">2.1.1</span> Connect</h4>
 <div class="outline-text-4" id="text-2-1-1">
-</div><ol class="org-ol"><li><a id="sec-2-1-1-1" name="sec-2-1-1-1"></a>Tmux on Ara<br ><div class="outline-text-5" id="text-2-1-1-1">
+</div><div id="outline-container-sec-2-1-1-1" class="outline-5">
+<h5 id="sec-2-1-1-1"><span class="section-number-5">2.1.1.1</span> Tmux on Ara</h5>
+<div class="outline-text-5" id="text-2-1-1-1">
 <table class="table table-striped table-bordered table-hover table-condensed">
 
 
@@ -1125,12 +1445,14 @@ Test:
 </pre>
 </div>
 </div>
-</li>
+</div>
 
-<li><a id="sec-2-1-1-2" name="sec-2-1-1-2"></a>Compute node for script execution<br ><div class="outline-text-5" id="text-2-1-1-2">
+<div id="outline-container-sec-2-1-1-2" class="outline-5">
+<h5 id="sec-2-1-1-2"><span class="section-number-5">2.1.1.2</span> Compute node for script execution</h5>
+<div class="outline-text-5" id="text-2-1-1-2">
 <div class="org-src-container">
 
-<pre class="src src-tmux">srun -p s_standard --time=7-10:00:00 --ntasks-per-node=24 --mem-per-cpu=2000 --pty bash
+<pre class="src src-tmux"><span style="color: #78683f;">srun</span> <span style="color: #707e4f;">-p</span> <span style="color: #78683f;">s_standard</span> <span style="color: #374478;">--time</span>=<span style="color: #3f7178;">7-10:00:00</span> <span style="color: #7e544f;">--ntasks-per-node</span>=<span style="color: #783f5a;">24</span> <span style="color: #783f5a;">--mem-per-cpu</span>=<span style="color: #3f7178;">2000</span> <span style="color: #7e544f;">--pty</span> <span style="color: #374478;">bash</span>
 </pre>
 </div>
 
@@ -1138,14 +1460,16 @@ Test:
 (base) [ye53nis@node151 drmed-git]$
 </pre>
 </div>
-</li>
+</div>
 
-<li><a id="sec-2-1-1-3" name="sec-2-1-1-3"></a>Jupyter on Ara<br ><div class="outline-text-5" id="text-2-1-1-3">
+<div id="outline-container-sec-2-1-1-3" class="outline-5">
+<h5 id="sec-2-1-1-3"><span class="section-number-5">2.1.1.3</span> Jupyter on Ara</h5>
+<div class="outline-text-5" id="text-2-1-1-3">
 <ol class="org-ol">
 <li>Request compute node via tmux
 <div class="org-src-container">
 
-<pre class="src src-tmux">srun -p s_standard --time=7-10:00:00 --ntasks-per-node=24 --mem-per-cpu=2000 --pty bash
+<pre class="src src-tmux"><span style="color: #78683f;">srun</span> <span style="color: #707e4f;">-p</span> <span style="color: #78683f;">s_standard</span> <span style="color: #374478;">--time</span>=<span style="color: #3f7178;">7-10:00:00</span> <span style="color: #7e544f;">--ntasks-per-node</span>=<span style="color: #783f5a;">24</span> <span style="color: #783f5a;">--mem-per-cpu</span>=<span style="color: #3f7178;">2000</span> <span style="color: #7e544f;">--pty</span> <span style="color: #374478;">bash</span>
 </pre>
 </div>
 
@@ -1155,7 +1479,7 @@ Test:
 
 <div class="org-src-container">
 
-<pre class="src src-tmux"><span style="color: #657b83; font-weight: bold;">cd</span> /home/ye53nis/DOKTOR
+<pre class="src src-tmux"><span style="color: #657b83; font-weight: bold;">cd</span> <span style="color: #43783f;">/home/ye53nis/DOKTOR</span>
 </pre>
 </div>
 </li>
@@ -1275,6 +1599,7 @@ python3           7fe3d66b-d802-4f0f-b105-9536a917b816   a few seconds ago    st
 Test:
 </p>
 
+<details>
 <pre class="example">
 No of CPUs in system: 72
 No of CPUs the current process can use: 24
@@ -1406,9 +1731,12 @@ tmpfs                 19G     0   19G   0% /run/user/67339
  'GIT_PAGER': 'cat',
  'MPLBACKEND': 'module://ipykernel.pylab.backend_inline'}
 </pre>
+</details>
 </div>
-</li>
-<li><a id="sec-2-1-1-4" name="sec-2-1-1-4"></a>Tensorboard tunnel, Mlflow ui tunnel<br ><div class="outline-text-5" id="text-2-1-1-4">
+</div>
+<div id="outline-container-sec-2-1-1-4" class="outline-5">
+<h5 id="sec-2-1-1-4"><span class="section-number-5">2.1.1.4</span> Tensorboard tunnel, Mlflow ui tunnel</h5>
+<div class="outline-text-5" id="text-2-1-1-4">
 <table class="table table-striped table-bordered table-hover table-condensed">
 
 
@@ -1470,15 +1798,15 @@ tmpfs                 19G     0   19G   0% /run/user/67339
 </tbody>
 </table>
 </div>
-</li></ol>
+</div>
 </div>
 <div id="outline-container-sec-2-1-2" class="outline-4">
 <h4 id="sec-2-1-2"><span class="section-number-4">2.1.2</span> git exp 1</h4>
 <div class="outline-text-4" id="text-2-1-2">
 <div class="org-src-container">
 
-<pre class="src src-tmux">git status
-git log -1
+<pre class="src src-tmux"><span style="color: #784437;">git</span> <span style="color: #374478;">status</span>
+<span style="color: #784437;">git</span> <span style="color: #78683f;">log</span> <span style="color: #3f7178;">-1</span>
 </pre>
 </div>
 
@@ -1509,11 +1837,11 @@ Date:   Sun May 31 21:34:12 2020 +0200
 <div class="outline-text-4" id="text-2-1-3">
 <div class="org-src-container">
 
-<pre class="src src-tmux">conda activate tensorflow_nightly
-<span style="color: #657b83; font-weight: bold;">cd</span> /beegfs/ye53nis/drmed-git
-<span style="color: #657b83; font-weight: bold;">export</span> <span style="color: #268bd2;">MLFLOW_EXPERIMENT_NAME</span>=exp-310520-unet
-<span style="color: #657b83; font-weight: bold;">export</span> <span style="color: #268bd2;">MLFLOW_TRACKING_URI</span>=file:./data/mlruns
-mkdir data/exp-310520-unet
+<pre class="src src-tmux"><span style="color: #4f5c7e;">conda</span> <span style="color: #4f7e67;">activate</span> <span style="color: #4f5c7e;">tensorflow_nightly</span>
+<span style="color: #657b83; font-weight: bold;">cd</span> <span style="color: #783778;">/beegfs/ye53nis/drmed-git</span>
+<span style="color: #657b83; font-weight: bold;">export</span> <span style="color: #268bd2;">MLFLOW_EXPERIMENT_NAME</span>=<span style="color: #37785e;">exp-310520-unet</span>
+<span style="color: #657b83; font-weight: bold;">export</span> <span style="color: #268bd2;">MLFLOW_TRACKING_URI</span>=<span style="color: #707e4f;">file:./data/mlruns</span>
+<span style="color: #7a4f7e;">mkdir</span> <span style="color: #707e4f;">data/exp-310520-unet</span>
 </pre>
 </div>
 
@@ -1528,17 +1856,17 @@ mkdir data/exp-310520-unet
 <div class="outline-text-4" id="text-2-1-4">
 <div class="org-src-container">
 
-<pre class="src src-python"><span style="color: #657b83; background-color: #fdf6e3;">learning_rate</span> = <span style="color: #657b83; background-color: #fdf6e3;">0</span>.<span style="color: #657b83; background-color: #fdf6e3;">2</span>
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #859900; font-weight: bold;">if</span> epoch &gt; <span style="color: #657b83; background-color: #fdf6e3;">10</span>:
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #657b83; background-color: #fdf6e3;">learning_rate</span> = <span style="color: #657b83; background-color: #fdf6e3;">0</span>.<span style="color: #657b83; background-color: #fdf6e3;">02</span>
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #859900; font-weight: bold;">if</span> epoch &gt; <span style="color: #657b83; background-color: #fdf6e3;">20</span>:
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #657b83; background-color: #fdf6e3;">learning_rate</span> = <span style="color: #657b83; background-color: #fdf6e3;">0</span>.<span style="color: #657b83; background-color: #fdf6e3;">01</span>
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #859900; font-weight: bold;">if</span> epoch &gt; <span style="color: #657b83; background-color: #fdf6e3;">40</span>:
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #657b83; background-color: #fdf6e3;">learning_rate</span> = <span style="color: #657b83; background-color: #fdf6e3;">0</span>.<span style="color: #657b83; background-color: #fdf6e3;">001</span>
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #859900; font-weight: bold;">if</span> epoch &gt; <span style="color: #657b83; background-color: #fdf6e3;">60</span>:
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #657b83; background-color: #fdf6e3;">learning_rate</span> = <span style="color: #657b83; background-color: #fdf6e3;">0</span>.<span style="color: #657b83; background-color: #fdf6e3;">0001</span>
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #859900; font-weight: bold;">if</span> epoch &gt; <span style="color: #657b83; background-color: #fdf6e3;">80</span>:
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #657b83; background-color: #fdf6e3;">learning_rate</span> = <span style="color: #657b83; background-color: #fdf6e3;">0</span>.<span style="color: #657b83; background-color: #fdf6e3;">00001</span>
+<pre class="src src-python"><span style="color: #268bd2;">learning_rate</span> = 0.2
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #859900; font-weight: bold;">if</span> <span style="color: #374478;">epoch</span> &gt; <span style="color: #268bd2;">10</span>:
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #268bd2;">learning_rate</span> = 0.02
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #859900; font-weight: bold;">if</span> <span style="color: #374478;">epoch</span> &gt; <span style="color: #268bd2;">20</span>:
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #268bd2;">learning_rate</span> = 0.01
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #859900; font-weight: bold;">if</span> <span style="color: #374478;">epoch</span> &gt; <span style="color: #268bd2;">40</span>:
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #268bd2;">learning_rate</span> = 0.001
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #859900; font-weight: bold;">if</span> <span style="color: #374478;">epoch</span> &gt; <span style="color: #268bd2;">60</span>:
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #268bd2;">learning_rate</span> = 0.0001
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #859900; font-weight: bold;">if</span> <span style="color: #374478;">epoch</span> &gt; <span style="color: #268bd2;">80</span>:
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #268bd2;">learning_rate</span> = 0.00001
 
 </pre>
 </div>
@@ -1548,13 +1876,16 @@ mkdir data/exp-310520-unet
 <div id="outline-container-sec-2-1-5" class="outline-4">
 <h4 id="sec-2-1-5"><span class="section-number-4">2.1.5</span> test runs</h4>
 <div class="outline-text-4" id="text-2-1-5">
-</div><ol class="org-ol"><li><a id="sec-2-1-5-1" name="sec-2-1-5-1"></a>no 1 - experiment creation failed<br ><div class="outline-text-5" id="text-2-1-5-1">
+</div><div id="outline-container-sec-2-1-5-1" class="outline-5">
+<h5 id="sec-2-1-5-1"><span class="section-number-5">2.1.5.1</span> no 1 - experiment creation failed</h5>
+<div class="outline-text-5" id="text-2-1-5-1">
 <div class="org-src-container">
 
-<pre class="src src-tmux">mlflow run . -P <span style="color: #268bd2;">fluotracify_path</span>=/beegfs/ye53nis/drmed-git/src/ -P <span style="color: #268bd2;">epochs</span>=2 -P <span style="color: #268bd2;">learning_rate</span>=None -P <span style="color: #268bd2;">csv_path</span>=/beegfs/ye53nis/saves/firstartifact_Mar2020 -P <span style="color: #268bd2;">steps_per_epoch</span>=400 -P <span style="color: #268bd2;">validation_steps</span>=200
+<pre class="src src-tmux"><span style="color: #5e7837;">mlflow</span> <span style="color: #784437;">run</span> <span style="color: #513f78;">.</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">fluotracify_path</span>=<span style="color: #783778;">/beegfs/ye53nis/drmed-git/src/</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">epochs</span>=<span style="color: #78683f;">2</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">learning_rate</span>=<span style="color: #3f7178;">None</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">csv_path</span>=<span style="color: #7e544f;">/beegfs/ye53nis/saves/firstartifact_Mar2020</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">steps_per_epoch</span>=<span style="color: #78683f;">400</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">validation_steps</span>=<span style="color: #5e7837;">200</span>
 </pre>
 </div>
 
+<details>
 <pre class="example">
 (tensorflow_nightly) [ye53nis@node171 drmed-git]$ mlflow run . -P fluotracify_path=/beegfs/ye53nis/drmed-git/src/ -P epochs=2 -P learning_rate=None -P csv_path=/beegfs/ye53nis/saves/firstartifact_Mar2020 -P
    steps_per_epoch=400 -P validation_steps=200
@@ -1765,10 +2096,11 @@ mkdir data/exp-310520-unet
   2020/05/31 14:29:15 INFO mlflow.projects: === Run (ID 'b37371694a004638a6cd7a94d4d2e77f') succeeded ===
   (tensorflow_nightly) [ye53nis@node171 drmed-git]$ Regard
 </pre>
+</details>
 
 <div class="org-src-container">
 
-<pre class="src src-tmux">mlflow ui
+<pre class="src src-tmux"><span style="color: #5e7837;">mlflow</span> <span style="color: #7e544f;">ui</span>
 </pre>
 </div>
 
@@ -1780,14 +2112,17 @@ mkdir data/exp-310520-unet
 [2020-05-31 15:27:54 +0200] [200871] [INFO] Booting worker with pid: 200871
 </pre>
 </div>
-</li>
-<li><a id="sec-2-1-5-2" name="sec-2-1-5-2"></a>no 2<br ><div class="outline-text-5" id="text-2-1-5-2">
+</div>
+<div id="outline-container-sec-2-1-5-2" class="outline-5">
+<h5 id="sec-2-1-5-2"><span class="section-number-5">2.1.5.2</span> no 2</h5>
+<div class="outline-text-5" id="text-2-1-5-2">
 <div class="org-src-container">
 
-<pre class="src src-tmux">mlflow run . -P <span style="color: #268bd2;">fluotracify_path</span>=/beegfs/ye53nis/drmed-git/src/ -P <span style="color: #268bd2;">epochs</span>=2 -P <span style="color: #268bd2;">learning_rate</span>=None -P <span style="color: #268bd2;">csv_path</span>=/beegfs/ye53nis/saves/firstartifact_Mar2020 -P <span style="color: #268bd2;">steps_per_epoch</span>=10 -P <span style="color: #268bd2;">validation_steps</span>=10
+<pre class="src src-tmux"><span style="color: #5e7837;">mlflow</span> <span style="color: #784437;">run</span> <span style="color: #513f78;">.</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">fluotracify_path</span>=<span style="color: #783778;">/beegfs/ye53nis/drmed-git/src/</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">epochs</span>=<span style="color: #78683f;">2</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">learning_rate</span>=<span style="color: #3f7178;">None</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">csv_path</span>=<span style="color: #7e544f;">/beegfs/ye53nis/saves/firstartifact_Mar2020</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">steps_per_epoch</span>=<span style="color: #784437;">10</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">validation_steps</span>=<span style="color: #784437;">10</span>
 </pre>
 </div>
 
+<details>
 <pre class="example">
 (tensorflow_nightly) [ye53nis@node171 drmed-git]$ mlflow run . -P fluotracify_path=/beegfs/ye53nis/drmed-git/src/ -P epochs=2 -P learning_rate=None -P csv_path=/beegfs/ye53nis/saves/firstartifact_Mar2020 -P
  steps_per_epoch=10 -P validation_steps=10
@@ -1968,6 +2303,7 @@ Epoch 2/2
  auc: 0.0000e+00
 2020/05/31 15:52:36 INFO mlflow.projects: === Run (ID '7f23f6ba7a244914b3cbbebd731d50a1') succeeded ===
 </pre>
+</details>
 
 <p>
 These two test runs used the wrong dataset! the <code>firstartifact_Mar2020</code> dataset
@@ -1976,17 +2312,18 @@ artifact information. This dataset is meant for a Variational
 Autoencoder-Training.
 </p>
 </div>
-</li></ol>
+</div>
 </div>
 <div id="outline-container-sec-2-1-6" class="outline-4">
 <h4 id="sec-2-1-6"><span class="section-number-4">2.1.6</span> experimental run</h4>
 <div class="outline-text-4" id="text-2-1-6">
 <div class="org-src-container">
 
-<pre class="src src-tmux">mlflow run . -P <span style="color: #268bd2;">fluotracify_path</span>=/beegfs/ye53nis/drmed-git/src/ -P <span style="color: #268bd2;">epochs</span>=70 -P <span style="color: #268bd2;">learning_rate</span>=None -P <span style="color: #268bd2;">csv_path</span>=/beegfs/ye53nis/saves/firstartefact_Sep2019 -P <span style="color: #268bd2;">steps_per_epoch</span>=400 -P <span style="color: #268bd2;">validation_steps</span>=200
+<pre class="src src-tmux"><span style="color: #5e7837;">mlflow</span> <span style="color: #784437;">run</span> <span style="color: #513f78;">.</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">fluotracify_path</span>=<span style="color: #783778;">/beegfs/ye53nis/drmed-git/src/</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">epochs</span>=<span style="color: #3f7178;">70</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">learning_rate</span>=<span style="color: #3f7178;">None</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">csv_path</span>=<span style="color: #5e7837;">/beegfs/ye53nis/saves/firstartefact_Sep2019</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">steps_per_epoch</span>=<span style="color: #78683f;">400</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">validation_steps</span>=<span style="color: #5e7837;">200</span>
 </pre>
 </div>
 
+<details>
 <pre class="example">
 (tensorflow_nightly) [ye53nis@node171 drmed-git]$ mlflow run . -P fluotracify_path=/beegfs/ye53nis/drmed-git/src/ -P epochs=70 -P learning_rate=None -P csv_path=/beegfs/ye53nis/saves/firstartefact_Sep2019 -
 P steps_per_epoch=400 -P validation_steps=200
@@ -2377,10 +2714,11 @@ c: 0.9786 - val_loss: 0.3505 - val_tp: 3050870.0000 - val_fp: 101786.0000 - val_
 2020/06/01 10:07:50 INFO mlflow.projects: === Run (ID '1aefda1366f04f5da5d1fc2241ad9208') succeeded ===
 (tensorflow_nightly) [ye53nis@node171 drmed-git]$
 </pre>
+</details>
 
 <div class="org-src-container">
 
-<pre class="src src-tmux">mlflow ui
+<pre class="src src-tmux"><span style="color: #5e7837;">mlflow</span> <span style="color: #7e544f;">ui</span>
 </pre>
 </div>
 
@@ -2396,76 +2734,80 @@ c: 0.9786 - val_loss: 0.3505 - val_tp: 3050870.0000 - val_fp: 101786.0000 - val_
 <div id="outline-container-sec-2-1-7" class="outline-4">
 <h4 id="sec-2-1-7"><span class="section-number-4">2.1.7</span> read out logs</h4>
 <div class="outline-text-4" id="text-2-1-7">
-</div><ol class="org-ol"><li><a id="sec-2-1-7-1" name="sec-2-1-7-1"></a>read out mlflow logs using CLI<br ><div class="outline-text-5" id="text-2-1-7-1">
+</div><div id="outline-container-sec-2-1-7-1" class="outline-5">
+<h5 id="sec-2-1-7-1"><span class="section-number-5">2.1.7.1</span> read out mlflow logs using CLI</h5>
+<div class="outline-text-5" id="text-2-1-7-1">
 <div class="org-src-container">
 
-<pre class="src src-tmux">conda activate tensorflow_env
-<span style="color: #657b83; font-weight: bold;">cd</span> Programme/drmed-git
-<span style="color: #657b83; font-weight: bold;">export</span> <span style="color: #268bd2;">MLFLOW_EXPERIMENT_NAME</span>=exp-devtest
-<span style="color: #657b83; font-weight: bold;">export</span> <span style="color: #268bd2;">MLFLOW_TRACKING_URI</span>=file:./data/mlruns
+<pre class="src src-tmux"><span style="color: #4f5c7e;">conda</span> <span style="color: #4f7e67;">activate</span> <span style="color: #4f5c7e;">tensorflow_env</span>
+<span style="color: #657b83; font-weight: bold;">cd</span> <span style="color: #374478;">Programme/drmed-git</span>
+<span style="color: #657b83; font-weight: bold;">export</span> <span style="color: #268bd2;">MLFLOW_EXPERIMENT_NAME</span>=<span style="color: #784437;">exp-devtest</span>
+<span style="color: #657b83; font-weight: bold;">export</span> <span style="color: #268bd2;">MLFLOW_TRACKING_URI</span>=<span style="color: #707e4f;">file:./data/mlruns</span>
 </pre>
 </div>
 
 <div class="org-src-container">
 
-<pre class="src src-tmux">mlflow experiments list
+<pre class="src src-tmux"><span style="color: #5e7837;">mlflow</span> <span style="color: #783f5a;">experiments</span> <span style="color: #513f78;">list</span>
 </pre>
 </div>
 
 <div class="org-src-container">
 
-<pre class="src src-tmux">mlflow runs list --experiment-id 1
+<pre class="src src-tmux"><span style="color: #5e7837;">mlflow</span> <span style="color: #78683f;">runs</span> <span style="color: #513f78;">list</span> <span style="color: #783f5a;">--experiment-id</span> <span style="color: #5e7837;">1</span>
 </pre>
 </div>
 
 <div class="org-src-container">
 
-<pre class="src src-tmux">mlflow artifacts list -r 47b870b8fdcb4445956635c6758caff3
-mlflow artifacts list -r 47b870b8fdcb4445956635c6758caff3 -a model
-mlflow artifacts list -r 47b870b8fdcb4445956635c6758caff3 -a model_summary.txt
-mlflow artifacts list -r 47b870b8fdcb4445956635c6758caff3 -a tensorboard_logs/train/
+<pre class="src src-tmux"><span style="color: #5e7837;">mlflow</span> <span style="color: #513f78;">artifacts</span> <span style="color: #513f78;">list</span> <span style="color: #4f5c7e;">-r</span> <span style="color: #513f78;">47b870b8fdcb4445956635c6758caff3</span>
+<span style="color: #5e7837;">mlflow</span> <span style="color: #513f78;">artifacts</span> <span style="color: #513f78;">list</span> <span style="color: #4f5c7e;">-r</span> <span style="color: #513f78;">47b870b8fdcb4445956635c6758caff3</span> <span style="color: #7a4f7e;">-a</span> <span style="color: #43783f;">model</span>
+<span style="color: #5e7837;">mlflow</span> <span style="color: #513f78;">artifacts</span> <span style="color: #513f78;">list</span> <span style="color: #4f5c7e;">-r</span> <span style="color: #513f78;">47b870b8fdcb4445956635c6758caff3</span> <span style="color: #7a4f7e;">-a</span> <span style="color: #3f7178;">model_summary.txt</span>
+<span style="color: #5e7837;">mlflow</span> <span style="color: #513f78;">artifacts</span> <span style="color: #513f78;">list</span> <span style="color: #4f5c7e;">-r</span> <span style="color: #513f78;">47b870b8fdcb4445956635c6758caff3</span> <span style="color: #7a4f7e;">-a</span> <span style="color: #4f7e67;">tensorboard_logs/train/</span>
 </pre>
 </div>
 
 <div class="org-src-container">
 
-<pre class="src src-tmux">mlflow artifacts download -r 47b870b8fdcb4445956635c6758caff3
-mlflow artifacts download -r 47b870b8fdcb4445956635c6758caff3 -a model
-mlflow artifacts download -r 47b870b8fdcb4445956635c6758caff3 -a model_summary.txt
-mlflow artifacts download -r 47b870b8fdcb4445956635c6758caff3 -a tensorboard_logs
+<pre class="src src-tmux"><span style="color: #5e7837;">mlflow</span> <span style="color: #513f78;">artifacts</span> <span style="color: #37785e;">download</span> <span style="color: #4f5c7e;">-r</span> <span style="color: #513f78;">47b870b8fdcb4445956635c6758caff3</span>
+<span style="color: #5e7837;">mlflow</span> <span style="color: #513f78;">artifacts</span> <span style="color: #37785e;">download</span> <span style="color: #4f5c7e;">-r</span> <span style="color: #513f78;">47b870b8fdcb4445956635c6758caff3</span> <span style="color: #7a4f7e;">-a</span> <span style="color: #43783f;">model</span>
+<span style="color: #5e7837;">mlflow</span> <span style="color: #513f78;">artifacts</span> <span style="color: #37785e;">download</span> <span style="color: #4f5c7e;">-r</span> <span style="color: #513f78;">47b870b8fdcb4445956635c6758caff3</span> <span style="color: #7a4f7e;">-a</span> <span style="color: #3f7178;">model_summary.txt</span>
+<span style="color: #5e7837;">mlflow</span> <span style="color: #513f78;">artifacts</span> <span style="color: #37785e;">download</span> <span style="color: #4f5c7e;">-r</span> <span style="color: #513f78;">47b870b8fdcb4445956635c6758caff3</span> <span style="color: #7a4f7e;">-a</span> <span style="color: #374478;">tensorboard_logs</span>
 </pre>
 </div>
 
 <div class="org-src-container">
 
-<pre class="src src-tmux">mlflow runs describe --run-id 47b870b8fdcb4445956635c6758caff3
+<pre class="src src-tmux"><span style="color: #5e7837;">mlflow</span> <span style="color: #78683f;">runs</span> <span style="color: #783778;">describe</span> <span style="color: #78683f;">--run-id</span> <span style="color: #513f78;">47b870b8fdcb4445956635c6758caff3</span>
 </pre>
 </div>
 
 <div class="org-src-container">
 
-<pre class="src src-tmux">tensorboard --logdir=data/mlruns/1/47b870b8fdcb4445956635c6758caff3/artifacts/tensorboard_logs
+<pre class="src src-tmux"><span style="color: #783778;">tensorboard</span> <span style="color: #4f5c7e;">--logdir</span>=<span style="color: #4f7e67;">data/mlruns/1/47b870b8fdcb4445956635c6758caff3/artifacts/tensorboard_logs</span>
 </pre>
 </div>
 
 <div class="org-src-container">
 
-<pre class="src src-tmux">mlflow ui --backend-store-uri file:///home/lex/Programme/drmed-git/data/mlruns
+<pre class="src src-tmux"><span style="color: #5e7837;">mlflow</span> <span style="color: #7e544f;">ui</span> <span style="color: #707e4f;">--backend-store-uri</span> <span style="color: #7e544f;">file:///home/lex/Programme/drmed-git/data/mlruns</span>
 </pre>
 </div>
 </div>
-</li>
+</div>
 
-<li><a id="sec-2-1-7-2" name="sec-2-1-7-2"></a>Reading out mlflow logs with Python API<br ><div class="outline-text-5" id="text-2-1-7-2">
+<div id="outline-container-sec-2-1-7-2" class="outline-5">
+<h5 id="sec-2-1-7-2"><span class="section-number-5">2.1.7.2</span> Reading out mlflow logs with Python API</h5>
+<div class="outline-text-5" id="text-2-1-7-2">
 <p>
 I started local machine:
 </p>
 
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python"><span style="color: #859900; font-weight: bold;">import</span> mlflow
-<span style="color: #859900; font-weight: bold;">import</span> pprint
-%cd /home/lex/Programme/drmed-git/
+<pre class="src src-jupyter-python"><span style="color: #859900; font-weight: bold;">import</span> <span style="color: #5e7837;">mlflow</span>
+<span style="color: #859900; font-weight: bold;">import</span> <span style="color: #4f7e67;">pprint</span>
+%<span style="color: #707e4f;">cd</span> /<span style="color: #3f7178;">home</span>/<span style="color: #783f5a;">lex</span>/<span style="color: #784437;">Programme</span>/<span style="color: #784437;">drmed</span>-<span style="color: #784437;">git</span>/
 </pre>
 </div>
 
@@ -2476,20 +2818,20 @@ I started local machine:
 
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python"><span style="color: #657b83; background-color: #fdf6e3;">uri</span> = <span style="color: #2aa198;">'file:///home/lex/Programme/drmed-git/data/mlruns'</span>
-mlflow.set_tracking_uri(uri)
-<span style="color: #657b83; background-color: #fdf6e3;">runs</span> = mlflow.search_runs(<span style="color: #657b83; background-color: #fdf6e3;">experiment_ids</span>=<span style="color: #2aa198;">'0'</span>)
-print(<span style="color: #2aa198;">'run_id of first in list: '</span>, runs.iloc[<span style="color: #657b83; background-color: #fdf6e3;">0</span>].run_id)
-print(<span style="color: #2aa198;">'no of runs in list: '</span>, <span style="color: #657b83; font-weight: bold;">len</span>(runs))
-print()
-runs
+<pre class="src src-jupyter-python"><span style="color: #268bd2;">uri</span> = <span style="color: #2aa198;">'file:///home/lex/Programme/drmed-git/data/mlruns'</span>
+<span style="color: #5e7837;">mlflow</span>.<span style="color: #4f5c7e;">set_tracking_uri</span>(<span style="color: #43783f;">uri</span>)
+<span style="color: #268bd2;">runs</span> = <span style="color: #5e7837;">mlflow</span>.<span style="color: #4f7e67;">search_runs</span>(<span style="color: #7a4f7e;">experiment_ids</span>=<span style="color: #2aa198;">'0'</span>)
+<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #2aa198;">'run_id of first in list: '</span>, <span style="color: #78683f;">runs</span>.<span style="color: #4f5c7e;">iloc</span>[0].<span style="color: #513f78;">run_id</span>)
+<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #2aa198;">'no of runs in list: '</span>, <span style="color: #657b83; font-weight: bold;">len</span>(<span style="color: #78683f;">runs</span>))
+<span style="color: #859900; font-weight: bold;">print</span>()
+<span style="color: #78683f;">runs</span>
 </pre>
 </div>
 
+<details>
 <pre class="example">
 run_id of first in list:  1aefda1366f04f5da5d1fc2241ad9208
 no of runs in list:  1
-
 </pre>
 
 <table class="table table-striped table-bordered table-hover table-condensed">
@@ -2597,48 +2939,50 @@ no of runs in list:  1
 <p>
 1 rows × 52 columns
 </p>
+</details>
 
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python"><span style="color: #657b83; background-color: #fdf6e3;">client</span> = mlflow.tracking.MlflowClient(<span style="color: #657b83; background-color: #fdf6e3;">tracking_uri</span>=uri)
+<pre class="src src-jupyter-python"><span style="color: #268bd2;">client</span> = <span style="color: #5e7837;">mlflow</span>.<span style="color: #43783f;">tracking</span>.<span style="color: #783f5a;">MlflowClient</span>(<span style="color: #37785e;">tracking_uri</span>=<span style="color: #43783f;">uri</span>)
 </pre>
 </div>
 
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python"><span style="color: #657b83; background-color: #fdf6e3;">run_idx</span> = <span style="color: #657b83; background-color: #fdf6e3;">0</span>
+<pre class="src src-jupyter-python"><span style="color: #268bd2;">run_idx</span> = 0
 
 <span style="color: #93a1a1;"># </span><span style="color: #93a1a1;">mlflow.entities.Experiment</span>
-print(<span style="color: #2aa198;">'client.get_experiment()\n'</span>, exp.to_proto())
+<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #2aa198;">'client.get_experiment()\n'</span>, <span style="color: #7a4f7e;">exp</span>.<span style="color: #43783f;">to_proto</span>())
 <span style="color: #93a1a1;"># </span><span style="color: #93a1a1;">mlflow.entities.Metric</span>
 <span style="color: #93a1a1;"># </span><span style="color: #93a1a1;">metent = client.get_metric_history(run_id=runs.iloc[run_idx].run_id, key='loss')</span>
 <span style="color: #93a1a1;"># </span><span style="color: #93a1a1;">for i in metent:</span>
-<span style="background-color: #eee8d5;"> </span>   <span style="color: #93a1a1;"># </span><span style="color: #93a1a1;">print(i)</span>
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #93a1a1;"># print(i)</span>
 
-print(<span style="color: #2aa198;">'- - - mlflow.entities.Run - - -'</span>)
-<span style="color: #657b83; background-color: #fdf6e3;">run</span> = client.get_run(runs.iloc[run_idx].run_id)
-print(<span style="color: #2aa198;">'run.info.to_proto\n'</span>, run.info.to_proto())
-pprint.pprint(run.data.metrics, <span style="color: #657b83; background-color: #fdf6e3;">sort_dicts</span>=<span style="color: #859900; font-weight: bold;">False</span>)
+<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #2aa198;">'- - - mlflow.entities.Run - - -'</span>)
+<span style="color: #268bd2;">run</span> = <span style="color: #37785e;">client</span>.<span style="color: #78683f;">get_run</span>(<span style="color: #78683f;">runs</span>.<span style="color: #4f5c7e;">iloc</span>[<span style="color: #78683f;">run_idx</span>].<span style="color: #513f78;">run_id</span>)
+<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #2aa198;">'run.info.to_proto\n'</span>, <span style="color: #784437;">run</span>.<span style="color: #78683f;">info</span>.<span style="color: #43783f;">to_proto</span>())
+<span style="color: #4f7e67;">pprint</span>.<span style="color: #4f7e67;">pprint</span>(<span style="color: #784437;">run</span>.<span style="color: #784437;">data</span>.<span style="color: #43783f;">metrics</span>, <span style="color: #707e4f;">sort_dicts</span>=<span style="color: #859900; font-weight: bold;">False</span>)
 
-<span style="color: #657b83; background-color: #fdf6e3;">model_path</span> = client.download_artifacts(
-<span style="background-color: #eee8d5;"> </span>   <span style="color: #657b83; background-color: #fdf6e3;">run_id</span>=runs.iloc[run_idx].run_id,
-<span style="background-color: #eee8d5;"> </span>   <span style="color: #657b83; background-color: #fdf6e3;">path</span>=<span style="color: #2aa198;">'model'</span>)
-<span style="color: #657b83; background-color: #fdf6e3;">tensorboard_path</span> = client.download_artifacts(
-<span style="background-color: #eee8d5;"> </span>   <span style="color: #657b83; background-color: #fdf6e3;">run_id</span>=runs.iloc[run_idx].run_id,
-<span style="background-color: #eee8d5;"> </span>   <span style="color: #657b83; background-color: #fdf6e3;">path</span>=<span style="color: #2aa198;">'tensorboard_logs'</span>)
+<span style="color: #268bd2;">model_path</span> = <span style="color: #37785e;">client</span>.<span style="color: #4f5c7e;">download_artifacts</span>(
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #513f78;">run_id</span>=<span style="color: #78683f;">runs</span>.<span style="color: #4f5c7e;">iloc</span>[<span style="color: #78683f;">run_idx</span>].<span style="color: #513f78;">run_id</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #513f78;">path</span>=<span style="color: #2aa198;">'model'</span>)
+<span style="color: #268bd2;">tensorboard_path</span> = <span style="color: #37785e;">client</span>.<span style="color: #4f5c7e;">download_artifacts</span>(
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #513f78;">run_id</span>=<span style="color: #78683f;">runs</span>.<span style="color: #4f5c7e;">iloc</span>[<span style="color: #78683f;">run_idx</span>].<span style="color: #513f78;">run_id</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #513f78;">path</span>=<span style="color: #2aa198;">'tensorboard_logs'</span>)
 
 
 
-print(<span style="color: #2aa198;">'\nmodel_path\n'</span>, model_path)
-print(<span style="color: #2aa198;">'\nMLmodel file'</span>)
-%cat $model_path/MLmodel
-print(<span style="color: #2aa198;">'\nconda.yaml'</span>)
-%cat $model_path/conda.yaml
-print(<span style="color: #2aa198;">'\nkeras_module.txt'</span>)
-%cat $model_path/data/keras_module.txt
+<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #2aa198;">'\nmodel_path\n'</span>, <span style="color: #707e4f;">model_path</span>)
+<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #2aa198;">'\nMLmodel file'</span>)
+%<span style="color: #4f7e67;">cat</span> $<span style="color: #707e4f;">model_path</span>/<span style="color: #513f78;">MLmodel</span>
+<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #2aa198;">'\nconda.yaml'</span>)
+%<span style="color: #4f7e67;">cat</span> $<span style="color: #707e4f;">model_path</span>/<span style="color: #4f5c7e;">conda</span>.<span style="color: #5e7837;">yaml</span>
+<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #2aa198;">'\nkeras_module.txt'</span>)
+%<span style="color: #4f7e67;">cat</span> $<span style="color: #707e4f;">model_path</span>/<span style="color: #784437;">data</span>/<span style="color: #374478;">keras_module</span>.<span style="color: #78683f;">txt</span>
 </pre>
 </div>
 
+<details>
 <pre class="example">
 client.get_experiment()
  experiment_id: "0"
@@ -2717,19 +3061,20 @@ summary_path
 tensorboard_path
  /home/lex/Programme/drmed-git/data/mlruns/0/1aefda1366f04f5da5d1fc2241ad9208/artifacts/tensorboard_logs
 </pre>
-
+</details>
 
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python"><span style="color: #657b83; background-color: #fdf6e3;">summary_path</span> = client.download_artifacts(
-<span style="background-color: #eee8d5;"> </span>   <span style="color: #657b83; background-color: #fdf6e3;">run_id</span>=runs.iloc[run_idx].run_id,
-<span style="background-color: #eee8d5;"> </span>   <span style="color: #657b83; background-color: #fdf6e3;">path</span>=<span style="color: #2aa198;">'model_summary.txt'</span>)
+<pre class="src src-jupyter-python"><span style="color: #268bd2;">summary_path</span> = <span style="color: #37785e;">client</span>.<span style="color: #4f5c7e;">download_artifacts</span>(
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #513f78;">run_id</span>=<span style="color: #78683f;">runs</span>.<span style="color: #4f5c7e;">iloc</span>[<span style="color: #78683f;">run_idx</span>].<span style="color: #513f78;">run_id</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #513f78;">path</span>=<span style="color: #2aa198;">'model_summary.txt'</span>)
 
-print(<span style="color: #2aa198;">'summary_path\n'</span>, summary_path, <span style="color: #2aa198;">'\n'</span>)
-%cat $summary_path
+<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #2aa198;">'summary_path\n'</span>, <span style="color: #783778;">summary_path</span>, <span style="color: #2aa198;">'\n'</span>)
+%<span style="color: #4f7e67;">cat</span> $<span style="color: #783778;">summary_path</span>
 </pre>
 </div>
 
+<details>
 <pre class="example">
 summary_path
  /home/lex/Programme/drmed-git/data/mlruns/0/1aefda1366f04f5da5d1fc2241ad9208/artifacts/model_summary.txt
@@ -2848,32 +3193,32 @@ Trainable params: 33,146,689
 Non-trainable params: 39,296
 __________________________________________________________________________________________________
 </pre>
+</details>
 
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python"><span style="background-color: #eee8d5;"> </span> print(<span style="color: #2aa198;">'\ntensorboard_path\n'</span>, tensorboard_path)
-<span style="background-color: #eee8d5;"> </span> !ls $tensorboard_path
+<pre class="src src-jupyter-python"><span style="background-color: #eee8d5;"> </span> <span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #2aa198;">'\ntensorboard_path\n'</span>, <span style="color: #513f78;">tensorboard_path</span>)
+<span style="background-color: #eee8d5;"> </span> !<span style="color: #4f5c7e;">ls</span> $<span style="color: #513f78;">tensorboard_path</span>
 
 <span style="color: #93a1a1;"># </span><span style="color: #93a1a1;">https://stackoverflow.com/questions/41074688/how-do-you-read-tensorboard-files-programmatically</span>
-<span style="color: #859900; font-weight: bold;">from</span> tensorboard.backend.event_processing <span style="color: #859900; font-weight: bold;">import</span> event_accumulator
-<span style="color: #657b83; background-color: #fdf6e3;">path</span> = <span style="color: #657b83; font-weight: bold;">str</span>(tensorboard_path) + <span style="color: #2aa198;">'/train'</span>
-<span style="color: #657b83; background-color: #fdf6e3;">path2</span> = <span style="color: #657b83; font-weight: bold;">str</span>()
-print(path)
-<span style="color: #657b83; background-color: #fdf6e3;">ea</span> = event_accumulator.EventAccumulator(<span style="color: #657b83; background-color: #fdf6e3;">path</span>=path,
-<span style="background-color: #eee8d5;"> </span>   <span style="color: #657b83; background-color: #fdf6e3;">size_guidance</span>={ <span style="color: #93a1a1;"># </span><span style="color: #93a1a1;">see below regarding this argument</span>
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   event_accumulator.COMPRESSED_HISTOGRAMS: <span style="color: #657b83; background-color: #fdf6e3;">500</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   event_accumulator.IMAGES: <span style="color: #657b83; background-color: #fdf6e3;">4</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   event_accumulator.AUDIO: <span style="color: #657b83; background-color: #fdf6e3;">4</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   event_accumulator.SCALARS: <span style="color: #657b83; background-color: #fdf6e3;">0</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   event_accumulator.HISTOGRAMS: <span style="color: #657b83; background-color: #fdf6e3;">1</span>,
+<span style="color: #859900; font-weight: bold;">from</span> <span style="color: #783778;">tensorboard</span>.<span style="color: #7a4f7e;">backend</span>.<span style="color: #43783f;">event_processing</span> <span style="color: #859900; font-weight: bold;">import</span> <span style="color: #374478;">event_accumulator</span>
+<span style="color: #268bd2;">path</span> = <span style="color: #657b83; font-weight: bold;">str</span>(<span style="color: #513f78;">tensorboard_path</span>) + <span style="color: #2aa198;">'/train'</span>
+<span style="color: #268bd2;">path2</span> = <span style="color: #657b83; font-weight: bold;">str</span>()
+<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #513f78;">path</span>)
+<span style="color: #268bd2;">ea</span> = <span style="color: #374478;">event_accumulator</span>.<span style="color: #707e4f;">EventAccumulator</span>(<span style="color: #513f78;">path</span>=<span style="color: #513f78;">path</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #513f78;">size_guidance</span>={ <span style="color: #93a1a1;"># see below regarding this argument</span>
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #374478;">event_accumulator</span>.<span style="color: #5e7837;">COMPRESSED_HISTOGRAMS</span>: 500,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #374478;">event_accumulator</span>.<span style="color: #374478;">IMAGES</span>: 4,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #374478;">event_accumulator</span>.<span style="color: #37785e;">AUDIO</span>: 4,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #374478;">event_accumulator</span>.<span style="color: #374478;">SCALARS</span>: 0,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #374478;">event_accumulator</span>.<span style="color: #78683f;">HISTOGRAMS</span>: 1,
 <span style="background-color: #eee8d5;"> </span>   })
 
-ea.Reload() <span style="color: #93a1a1;"># </span><span style="color: #93a1a1;">loads events from file</span>
+<span style="color: #5e7837;">ea</span>.<span style="color: #783778;">Reload</span>() <span style="color: #93a1a1;"># loads events from file</span>
 </pre>
 </div>
 
 <pre class="example">
-
 tensorboard_path
  /home/lex/Programme/drmed-git/data/mlruns/0/1aefda1366f04f5da5d1fc2241ad9208/artifacts/tensorboard_logs
 image  metrics	train  validation
@@ -2883,10 +3228,11 @@ image  metrics	train  validation
 
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python">ea.Tags()
+<pre class="src src-jupyter-python"><span style="color: #5e7837;">ea</span>.<span style="color: #78683f;">Tags</span>()
 </pre>
 </div>
 
+<details>
 <pre class="example">
 {'images': ['encode0/conv1d/kernel_0/image/0',
     'encode0/conv1d/bias_0/image/0',
@@ -3846,14 +4192,15 @@ image  metrics	train  validation
    'meta_graph': False,
    'run_metadata': []}
 </pre>
+</details>
 
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python">ea.Scalars(<span style="color: #2aa198;">'epoch_loss'</span>)
+<pre class="src src-jupyter-python"><span style="color: #5e7837;">ea</span>.<span style="color: #374478;">Scalars</span>(<span style="color: #2aa198;">'epoch_loss'</span>)
 </pre>
 </div>
 </div>
-</li></ol>
+</div>
 </div>
 
 <div id="outline-container-sec-2-1-8" class="outline-4">
@@ -3865,9 +4212,9 @@ First, check if the model file has to be downloaded via git lfs
 
 <div class="org-src-container">
 
-<pre class="src src-tmux"><span style="color: #657b83; font-weight: bold;">cd</span> /home/lex/Programme/drmed-git/
-git lfs ls-files
-git lfs checkout
+<pre class="src src-tmux"><span style="color: #657b83; font-weight: bold;">cd</span> <span style="color: #783778;">/home/lex/Programme/drmed-git/</span>
+<span style="color: #784437;">git</span> <span style="color: #783f5a;">lfs</span> <span style="color: #707e4f;">ls-files</span>
+<span style="color: #784437;">git</span> <span style="color: #783f5a;">lfs</span> <span style="color: #783778;">checkout</span>
 </pre>
 </div>
 
@@ -3884,7 +4231,7 @@ Checking out LFS objects: 100% (1/1), 399 MB | 0 B/s, done.
 
 <div class="org-src-container">
 
-<pre class="src src-tmux">git lfs pull
+<pre class="src src-tmux"><span style="color: #784437;">git</span> <span style="color: #783f5a;">lfs</span> <span style="color: #7a4f7e;">pull</span>
 </pre>
 </div>
 
@@ -3905,21 +4252,21 @@ future. See <a href="https://lwn.net/Articles/774125/">here.</a>
 
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python"><span style="color: #859900; font-weight: bold;">import</span> mlflow.keras
-<span style="color: #859900; font-weight: bold;">import</span> mlflow.tensorflow
-<span style="color: #859900; font-weight: bold;">import</span> sys
-<span style="color: #859900; font-weight: bold;">import</span> numpy <span style="color: #859900; font-weight: bold;">as</span> np
-<span style="color: #859900; font-weight: bold;">import</span> tensorflow <span style="color: #859900; font-weight: bold;">as</span> tf
+<pre class="src src-jupyter-python"><span style="color: #859900; font-weight: bold;">import</span> <span style="color: #5e7837;">mlflow</span>.<span style="color: #784437;">keras</span>
+<span style="color: #859900; font-weight: bold;">import</span> <span style="color: #5e7837;">mlflow</span>.<span style="color: #513f78;">tensorflow</span>
+<span style="color: #859900; font-weight: bold;">import</span> <span style="color: #513f78;">sys</span>
+<span style="color: #859900; font-weight: bold;">import</span> <span style="color: #4f5c7e;">numpy</span> <span style="color: #859900; font-weight: bold;">as</span> <span style="color: #707e4f;">np</span>
+<span style="color: #859900; font-weight: bold;">import</span> <span style="color: #513f78;">tensorflow</span> <span style="color: #859900; font-weight: bold;">as</span> <span style="color: #37785e;">tf</span>
 
-<span style="color: #657b83; background-color: #fdf6e3;">project_path</span> = <span style="color: #2aa198;">'/home/lex/Programme/drmed-git'</span>
-<span style="color: #657b83; background-color: #fdf6e3;">fluotracify_path</span> = <span style="color: #2aa198;">'{}/src/'</span>.format(project_path)
-sys.path.append(fluotracify_path)
+<span style="color: #268bd2;">project_path</span> = <span style="color: #2aa198;">'/home/lex/Programme/drmed-git'</span>
+<span style="color: #268bd2;">fluotracify_path</span> = <span style="color: #2aa198;">'{}/src/'</span>.<span style="color: #78683f;">format</span>(<span style="color: #783f5a;">project_path</span>)
+<span style="color: #513f78;">sys</span>.<span style="color: #513f78;">path</span>.<span style="color: #5e7837;">append</span>(<span style="color: #4f5c7e;">fluotracify_path</span>)
 
-<span style="color: #859900; font-weight: bold;">from</span> fluotracify.simulations <span style="color: #859900; font-weight: bold;">import</span> import_simulation_from_csv <span style="color: #859900; font-weight: bold;">as</span> isfc
-<span style="color: #859900; font-weight: bold;">from</span> fluotracify.training <span style="color: #859900; font-weight: bold;">import</span> build_model <span style="color: #859900; font-weight: bold;">as</span> bm, preprocess_data <span style="color: #859900; font-weight: bold;">as</span> ppd
+<span style="color: #859900; font-weight: bold;">from</span> <span style="color: #783778;">fluotracify</span>.<span style="color: #5e7837;">simulations</span> <span style="color: #859900; font-weight: bold;">import</span> <span style="color: #707e4f;">import_simulation_from_csv</span> <span style="color: #859900; font-weight: bold;">as</span> <span style="color: #4f5c7e;">isfc</span>
+<span style="color: #859900; font-weight: bold;">from</span> <span style="color: #783778;">fluotracify</span>.<span style="color: #3f7178;">training</span> <span style="color: #859900; font-weight: bold;">import</span> <span style="color: #783778;">build_model</span> <span style="color: #859900; font-weight: bold;">as</span> <span style="color: #374478;">bm</span>, <span style="color: #784437;">preprocess_data</span> <span style="color: #859900; font-weight: bold;">as</span> <span style="color: #783f5a;">ppd</span>
 
-%cd /home/lex/Programme/drmed-git
-print(tf.__version__)
+%<span style="color: #707e4f;">cd</span> /<span style="color: #3f7178;">home</span>/<span style="color: #783f5a;">lex</span>/<span style="color: #784437;">Programme</span>/<span style="color: #784437;">drmed</span>-<span style="color: #784437;">git</span>
+<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #37785e;">tf</span>.<span style="color: #4f7e67;">__version__</span>)
 </pre>
 </div>
 
@@ -3931,12 +4278,12 @@ print(tf.__version__)
 
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python">mlflow.set_tracking_uri(<span style="color: #2aa198;">'file://{}/data/mlruns'</span>.format(project_path))
-<span style="color: #657b83; background-color: #fdf6e3;">client</span> = mlflow.tracking.MlflowClient(<span style="color: #657b83; background-color: #fdf6e3;">tracking_uri</span>=mlflow.get_tracking_uri())
-<span style="color: #657b83; background-color: #fdf6e3;">model_path</span> = client.download_artifacts(
-<span style="background-color: #eee8d5;"> </span>   <span style="color: #657b83; background-color: #fdf6e3;">run_id</span>=<span style="color: #2aa198;">'1aefda1366f04f5da5d1fc2241ad9208'</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="color: #657b83; background-color: #fdf6e3;">path</span>=<span style="color: #2aa198;">'model'</span>)
-print(model_path)
+<pre class="src src-jupyter-python"><span style="color: #5e7837;">mlflow</span>.<span style="color: #4f5c7e;">set_tracking_uri</span>(<span style="color: #2aa198;">'file://{}/data/mlruns'</span>.<span style="color: #78683f;">format</span>(<span style="color: #783f5a;">project_path</span>))
+<span style="color: #268bd2;">client</span> = <span style="color: #5e7837;">mlflow</span>.<span style="color: #43783f;">tracking</span>.<span style="color: #783f5a;">MlflowClient</span>(<span style="color: #37785e;">tracking_uri</span>=<span style="color: #5e7837;">mlflow</span>.<span style="color: #783f5a;">get_tracking_uri</span>())
+<span style="color: #268bd2;">model_path</span> = <span style="color: #37785e;">client</span>.<span style="color: #4f5c7e;">download_artifacts</span>(
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #513f78;">run_id</span>=<span style="color: #2aa198;">'1aefda1366f04f5da5d1fc2241ad9208'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #513f78;">path</span>=<span style="color: #2aa198;">'model'</span>)
+<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #707e4f;">model_path</span>)
 </pre>
 </div>
 
@@ -3947,7 +4294,7 @@ print(model_path)
 
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python">bm.binary_ce_dice_loss()
+<pre class="src src-jupyter-python"><span style="color: #374478;">bm</span>.<span style="color: #783f5a;">binary_ce_dice_loss</span>()
 </pre>
 </div>
 
@@ -3959,9 +4306,9 @@ print(model_path)
 <div class="org-src-container">
 
 <pre class="src src-jupyter-python"><span style="color: #93a1a1;"># </span><span style="color: #93a1a1;">mlflow.keras module</span>
-<span style="color: #657b83; background-color: #fdf6e3;">model_keras</span> = mlflow.keras.load_model(<span style="color: #657b83; background-color: #fdf6e3;">model_uri</span>=model_path,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #657b83; background-color: #fdf6e3;">custom_objects</span>={<span style="color: #2aa198;">'binary_ce_dice'</span>: bm.binary_ce_dice_loss()})
-model_keras
+<span style="color: #268bd2;">model_keras</span> = <span style="color: #5e7837;">mlflow</span>.<span style="color: #784437;">keras</span>.<span style="color: #783f5a;">load_model</span>(<span style="color: #7a4f7e;">model_uri</span>=<span style="color: #707e4f;">model_path</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #4f5c7e;">custom_objects</span>={<span style="color: #2aa198;">'binary_ce_dice'</span>: <span style="color: #374478;">bm</span>.<span style="color: #783f5a;">binary_ce_dice_loss</span>()})
+<span style="color: #7e544f;">model_keras</span>
 </pre>
 </div>
 
@@ -3972,13 +4319,13 @@ model_keras
 
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python"><span style="color: #657b83; background-color: #fdf6e3;">data</span>, <span style="color: #657b83; font-weight: bold;">_</span>, <span style="color: #657b83; background-color: #fdf6e3;">nsamples</span>, <span style="color: #657b83; background-color: #fdf6e3;">experiment_params</span> = isfc.import_from_csv(
-<span style="background-color: #eee8d5;"> </span>   <span style="color: #657b83; background-color: #fdf6e3;">path</span>=<span style="color: #2aa198;">'/home/lex/Programme/Jupyter/DOKTOR/saves/firstartefact/subsample_rand/'</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="color: #657b83; background-color: #fdf6e3;">header</span>=<span style="color: #657b83; background-color: #fdf6e3;">12</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="color: #657b83; background-color: #fdf6e3;">frac_train</span>=<span style="color: #657b83; background-color: #fdf6e3;">1</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="color: #657b83; background-color: #fdf6e3;">col_per_example</span>=<span style="color: #657b83; background-color: #fdf6e3;">2</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="color: #657b83; background-color: #fdf6e3;">dropindex</span>=<span style="color: #859900; font-weight: bold;">None</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="color: #657b83; background-color: #fdf6e3;">dropcolumns</span>=<span style="color: #2aa198;">'Unnamed: 200'</span>)
+<pre class="src src-jupyter-python"><span style="color: #268bd2;">data</span>, <span style="color: #657b83; font-weight: bold;">_</span>, <span style="color: #268bd2;">nsamples</span>, <span style="color: #268bd2;">experiment_params</span> = <span style="color: #4f5c7e;">isfc</span>.<span style="color: #37785e;">import_from_csv</span>(
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #513f78;">path</span>=<span style="color: #2aa198;">'/home/lex/Programme/Jupyter/DOKTOR/saves/firstartefact/subsample_rand/'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #513f78;">header</span>=12,
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #7a4f7e;">frac_train</span>=1,
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #78683f;">col_per_example</span>=2,
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #707e4f;">dropindex</span>=<span style="color: #859900; font-weight: bold;">None</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #5e7837;">dropcolumns</span>=<span style="color: #2aa198;">'Unnamed: 200'</span>)
 </pre>
 </div>
 
@@ -3990,10 +4337,8 @@ train 2 /home/lex/Programme/Jupyter/DOKTOR/saves/firstartefact/subsample_rand/tr
 
 
 
-<p>
-&lt;&lt;&lt;&lt;&lt;&lt;&lt; Updated upstream
-<code>=====</code>
-</p>
+
+<details>
 <pre class="example">
 input - shape:	 (None, 16384, 1)
 output - shape:	 (None, 16384, 1)
@@ -4112,50 +4457,15 @@ Non-trainable params: 39,296
 __________________________________________________________________________________________________
 None
 </pre>
-<p>
-<code>=====</code>
-  import mlflow.keras
-  import mlflow.tensorflow
-  import sys
-  import numpy as np
-  import tensorflow as tf
-</p>
-
-<p>
-project<sub>path</sub> = '<i>home/lex/Programme/drmed-git'
-fluotracify<sub>path</sub> = '{}/src</i>'.format(project<sub>path</sub>)
-sys.path.append(fluotracify<sub>path</sub>)
-</p>
-
-<p>
-from fluotracify.simulations import import<sub>simulation</sub><sub>from</sub><sub>csv</sub> as isfc
-from fluotracify.training import build<sub>model</sub> as bm, preprocess<sub>data</sub> as ppd
-</p>
-
-<p>
-  %cd /home/lex/Programme/drmed-git
-  print(tf._<sub>version</sub>__)
-#+END<sub>SRC</sub>
-</p>
-
-<pre class="example">
-/home/lex/Programme/drmed-git
-2.3.0-dev20200519
-</pre>
-
-<p>
-&gt;&gt;&gt;&gt;&gt;&gt;&gt; Stashed changes
-&gt;&gt;&gt;&gt;&gt;&gt;&gt; Stashed changes
-</p>
+</details>
 
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python"><span style="color: #657b83; background-color: #fdf6e3;">prediction</span> = model_keras.predict(np.array(data.iloc[:<span style="color: #657b83; background-color: #fdf6e3;">16384</span>, <span style="color: #657b83; background-color: #fdf6e3;">0</span>]).reshape(<span style="color: #657b83; background-color: #fdf6e3;">1</span>, -<span style="color: #657b83; background-color: #fdf6e3;">1</span>, <span style="color: #657b83; background-color: #fdf6e3;">1</span>))
+<pre class="src src-jupyter-python"><span style="color: #268bd2;">prediction</span> = <span style="color: #7e544f;">model_keras</span>.<span style="color: #513f78;">predict</span>(<span style="color: #707e4f;">np</span>.<span style="color: #78683f;">array</span>(<span style="color: #784437;">data</span>.<span style="color: #4f5c7e;">iloc</span>[:16384, 0]).<span style="color: #37785e;">reshape</span>(1, -1, 1))
 </pre>
 </div>
 
 <p>
-&lt;&lt;&lt;&lt;&lt;&lt;&lt; Updated upstream
 I noticed one problem: directly outputting the <code>prediction</code> array for large
 predictions (e.g. 16384 time steps), will freeze emacs. Especially with my setup
 with conversion to org tables. It is possible to output it in the REPL, or print
@@ -4179,26 +4489,25 @@ While here it tries to print everything (I guess). Maybe I should test the
 <p>
 Basically, no matter if I choosnpe the <code>:results</code> header argument, it always gets
 printed with <code>:display org</code> like this.
-<code>=====</code>
 </p>
+
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python">&lt;&lt;&lt;&lt;&lt;&lt;&lt; Updated upstream
-<span style="color: #657b83; background-color: #fdf6e3;">log_dir</span>=<span style="color: #2aa198;">"logs/fit/"</span> + datetime.datetime.now().strftime(<span style="color: #2aa198;">"%Y%m%d-%H%M%S"</span>)
-<span style="color: #657b83; background-color: #fdf6e3;">tensorboard_callback</span> = tf.keras.callbacks.TensorBoard(
-<span style="background-color: #eee8d5;"> </span>   <span style="color: #657b83; background-color: #fdf6e3;">log_dir</span>=log_dir,
-<span style="background-color: #eee8d5;"> </span>   <span style="color: #657b83; background-color: #fdf6e3;">histogram_freq</span>=<span style="color: #657b83; background-color: #fdf6e3;">5</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="color: #657b83; background-color: #fdf6e3;">write_images</span>=<span style="color: #859900; font-weight: bold;">True</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="color: #657b83; background-color: #fdf6e3;">update_freq</span>=<span style="color: #2aa198;">'batch'</span>)
+<pre class="src src-jupyter-python"><span style="color: #268bd2;">log_dir</span>=<span style="color: #2aa198;">"logs/fit/"</span> + <span style="color: #7e544f;">datetime</span>.<span style="color: #7e544f;">datetime</span>.<span style="color: #783f5a;">now</span>().<span style="color: #78683f;">strftime</span>(<span style="color: #2aa198;">"%Y%m%d-%H%M%S"</span>)
+<span style="color: #268bd2;">tensorboard_callback</span> = <span style="color: #37785e;">tf</span>.<span style="color: #784437;">keras</span>.<span style="color: #3f7178;">callbacks</span>.<span style="color: #707e4f;">TensorBoard</span>(
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #513f78;">log_dir</span>=<span style="color: #513f78;">log_dir</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #374478;">histogram_freq</span>=5,
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #783f5a;">write_images</span>=<span style="color: #859900; font-weight: bold;">True</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #7a4f7e;">update_freq</span>=<span style="color: #2aa198;">'batch'</span>)
 
-<span style="color: #657b83; background-color: #fdf6e3;">epochs</span> = <span style="color: #657b83; background-color: #fdf6e3;">50</span>
+<span style="color: #268bd2;">epochs</span> = 50
 
-<span style="color: #657b83; background-color: #fdf6e3;">history</span> = model.fit(<span style="color: #657b83; background-color: #fdf6e3;">x</span>=dataset_train,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #657b83; background-color: #fdf6e3;">epochs</span>=epochs,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #657b83; background-color: #fdf6e3;">steps_per_epoch</span>=<span style="color: #657b83; background-color: #fdf6e3;">400</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #657b83; background-color: #fdf6e3;">validation_data</span>=dataset_val,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #657b83; background-color: #fdf6e3;">validation_steps</span>=tf.math.ceil(num_val_examples / batch_size),
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #657b83; background-color: #fdf6e3;">callbacks</span>=[tensorboard_callback])
+<span style="color: #268bd2;">history</span> = <span style="color: #43783f;">model</span>.<span style="color: #7a4f7e;">fit</span>(<span style="color: #3f7178;">x</span>=<span style="color: #783778;">dataset_train</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #4f7e67;">epochs</span>=<span style="color: #4f7e67;">epochs</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #37785e;">steps_per_epoch</span>=400,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #513f78;">validation_data</span>=<span style="color: #7e544f;">dataset_val</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #7e544f;">validation_steps</span>=<span style="color: #37785e;">tf</span>.<span style="color: #3f7178;">math</span>.<span style="color: #43783f;">ceil</span>(<span style="color: #783778;">num_val_examples</span> / <span style="color: #37785e;">batch_size</span>),
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #3f7178;">callbacks</span>=[<span style="color: #37785e;">tensorboard_callback</span>])
 </pre>
 </div>
 
@@ -4214,38 +4523,10 @@ Epoch 1/50
 ---------------------------------------------------------------------------
 KeyboardInterrupt                         Traceback (most recent call last)
 </pre>
-<p>
-<code>=====</code>
-  bm.binary<sub>ce</sub><sub>dice</sub><sub>loss</sub>()
-#+END<sub>SRC</sub>
-</p>
-
-<pre class="example">
-&lt;function fluotracify.training.build_model.binary_ce_dice_loss.&lt;locals&gt;.binary_ce_dice(y_true, y_pred)&gt;
-</pre>
-
 
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python"><span style="color: #93a1a1;"># </span><span style="color: #93a1a1;">mlflow.keras module</span>
-<span style="color: #657b83; background-color: #fdf6e3;">model_keras</span> = mlflow.keras.load_model(<span style="color: #657b83; background-color: #fdf6e3;">model_uri</span>=model_path,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #657b83; background-color: #fdf6e3;">custom_objects</span>={<span style="color: #2aa198;">'binary_ce_dice'</span>: bm.binary_ce_dice_loss()})
-model_keras
-</pre>
-</div>
-
-<pre class="example">
-&lt;tensorflow.python.keras.engine.functional.Functional at 0x7f3afa29d0a0&gt;
-</pre>
-
-<p>
-&gt;&gt;&gt;&gt;&gt;&gt;&gt; Stashed changes
-&gt;&gt;&gt;&gt;&gt;&gt;&gt; Stashed changes
-</p>
-
-<div class="org-src-container">
-
-<pre class="src src-jupyter-python">prediction
+<pre class="src src-jupyter-python"><span style="color: #374478;">prediction</span>
 </pre>
 </div>
 
@@ -4342,7 +4623,7 @@ without freezing emacs for large tables), use <code>:display plain</code>
 
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python">prediction
+<pre class="src src-jupyter-python"><span style="color: #374478;">prediction</span>
 </pre>
 </div>
 
@@ -4363,8 +4644,8 @@ array([[[1.],
 <div class="outline-text-4" id="text-2-1-9">
 <div class="org-src-container">
 
-<pre class="src src-tmux">git status
-git log -1
+<pre class="src src-tmux"><span style="color: #784437;">git</span> <span style="color: #374478;">status</span>
+<span style="color: #784437;">git</span> <span style="color: #78683f;">log</span> <span style="color: #3f7178;">-1</span>
 </pre>
 </div>
 
@@ -4390,25 +4671,25 @@ current learning rate schedule:
 
 <div class="org-src-container">
 
-<pre class="src src-python"><span style="color: #657b83; background-color: #fdf6e3;">learning_rate</span> = <span style="color: #657b83; background-color: #fdf6e3;">0</span>.<span style="color: #657b83; background-color: #fdf6e3;">1</span>
-<span style="background-color: #eee8d5;"> </span><span style="color: #859900; font-weight: bold;">if</span> epoch &gt; <span style="color: #657b83; background-color: #fdf6e3;">10</span>:
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span><span style="color: #657b83; background-color: #fdf6e3;">learning_rate</span> = <span style="color: #657b83; background-color: #fdf6e3;">0</span>.<span style="color: #657b83; background-color: #fdf6e3;">01</span>
-<span style="background-color: #eee8d5;"> </span><span style="color: #859900; font-weight: bold;">if</span> epoch &gt; <span style="color: #657b83; background-color: #fdf6e3;">20</span>:
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span><span style="color: #657b83; background-color: #fdf6e3;">learning_rate</span> = <span style="color: #657b83; background-color: #fdf6e3;">0</span>.<span style="color: #657b83; background-color: #fdf6e3;">001</span>
-<span style="background-color: #eee8d5;"> </span><span style="color: #859900; font-weight: bold;">if</span> epoch &gt; <span style="color: #657b83; background-color: #fdf6e3;">30</span>:
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span><span style="color: #657b83; background-color: #fdf6e3;">learning_rate</span> = <span style="color: #657b83; background-color: #fdf6e3;">0</span>.<span style="color: #657b83; background-color: #fdf6e3;">0001</span>
-<span style="background-color: #eee8d5;"> </span><span style="color: #859900; font-weight: bold;">if</span> epoch &gt; <span style="color: #657b83; background-color: #fdf6e3;">40</span>:
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span><span style="color: #657b83; background-color: #fdf6e3;">learning_rate</span> = <span style="color: #657b83; background-color: #fdf6e3;">0</span>.<span style="color: #657b83; background-color: #fdf6e3;">00001</span>
-<span style="background-color: #eee8d5;"> </span><span style="color: #859900; font-weight: bold;">if</span> epoch &gt; <span style="color: #657b83; background-color: #fdf6e3;">50</span>:
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span><span style="color: #657b83; background-color: #fdf6e3;">learning_rate</span> = <span style="color: #657b83; background-color: #fdf6e3;">0</span>.<span style="color: #657b83; background-color: #fdf6e3;">000001</span>
-<span style="background-color: #eee8d5;"> </span><span style="color: #859900; font-weight: bold;">if</span> epoch &gt; <span style="color: #657b83; background-color: #fdf6e3;">60</span>:
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span><span style="color: #657b83; background-color: #fdf6e3;">learning_rate</span> = <span style="color: #657b83; background-color: #fdf6e3;">0</span>.<span style="color: #657b83; background-color: #fdf6e3;">00000001</span>
-<span style="background-color: #eee8d5;"> </span><span style="color: #859900; font-weight: bold;">if</span> epoch &gt; <span style="color: #657b83; background-color: #fdf6e3;">70</span>:
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span><span style="color: #657b83; background-color: #fdf6e3;">learning_rate</span> = <span style="color: #657b83; background-color: #fdf6e3;">0</span>.<span style="color: #657b83; background-color: #fdf6e3;">0000000001</span>
-<span style="background-color: #eee8d5;"> </span><span style="color: #859900; font-weight: bold;">if</span> epoch &gt; <span style="color: #657b83; background-color: #fdf6e3;">80</span>:
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span><span style="color: #657b83; background-color: #fdf6e3;">learning_rate</span> = <span style="color: #657b83; background-color: #fdf6e3;">0</span>.<span style="color: #657b83; background-color: #fdf6e3;">000000000001</span>
-<span style="background-color: #eee8d5;"> </span><span style="color: #859900; font-weight: bold;">if</span> epoch &gt; <span style="color: #657b83; background-color: #fdf6e3;">90</span>:
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span><span style="color: #657b83; background-color: #fdf6e3;">learning_rate</span> = <span style="color: #657b83; background-color: #fdf6e3;">0</span>.<span style="color: #657b83; background-color: #fdf6e3;">00000000000001</span>
+<pre class="src src-python"><span style="color: #268bd2;">learning_rate</span> = 0.1
+<span style="background-color: #eee8d5;"> </span><span style="color: #859900; font-weight: bold;">if</span> <span style="color: #374478;">epoch</span> &gt; <span style="color: #268bd2;">10</span>:
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span><span style="color: #268bd2;">learning_rate</span> = 0.01
+<span style="background-color: #eee8d5;"> </span><span style="color: #859900; font-weight: bold;">if</span> <span style="color: #374478;">epoch</span> &gt; <span style="color: #268bd2;">20</span>:
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span><span style="color: #268bd2;">learning_rate</span> = 0.001
+<span style="background-color: #eee8d5;"> </span><span style="color: #859900; font-weight: bold;">if</span> <span style="color: #374478;">epoch</span> &gt; <span style="color: #268bd2;">30</span>:
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span><span style="color: #268bd2;">learning_rate</span> = 0.0001
+<span style="background-color: #eee8d5;"> </span><span style="color: #859900; font-weight: bold;">if</span> <span style="color: #374478;">epoch</span> &gt; <span style="color: #268bd2;">40</span>:
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span><span style="color: #268bd2;">learning_rate</span> = 0.00001
+<span style="background-color: #eee8d5;"> </span><span style="color: #859900; font-weight: bold;">if</span> <span style="color: #374478;">epoch</span> &gt; <span style="color: #268bd2;">50</span>:
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span><span style="color: #268bd2;">learning_rate</span> = 0.000001
+<span style="background-color: #eee8d5;"> </span><span style="color: #859900; font-weight: bold;">if</span> <span style="color: #374478;">epoch</span> &gt; <span style="color: #268bd2;">60</span>:
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span><span style="color: #268bd2;">learning_rate</span> = 0.00000001
+<span style="background-color: #eee8d5;"> </span><span style="color: #859900; font-weight: bold;">if</span> <span style="color: #374478;">epoch</span> &gt; <span style="color: #268bd2;">70</span>:
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span><span style="color: #268bd2;">learning_rate</span> = 0.0000000001
+<span style="background-color: #eee8d5;"> </span><span style="color: #859900; font-weight: bold;">if</span> <span style="color: #374478;">epoch</span> &gt; <span style="color: #268bd2;">80</span>:
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span><span style="color: #268bd2;">learning_rate</span> = 0.000000000001
+<span style="background-color: #eee8d5;"> </span><span style="color: #859900; font-weight: bold;">if</span> <span style="color: #374478;">epoch</span> &gt; <span style="color: #268bd2;">90</span>:
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span><span style="color: #268bd2;">learning_rate</span> = 0.00000000000001
 </pre>
 </div>
 </div>
@@ -4421,10 +4702,11 @@ This time new learning rate
 </p>
 <div class="org-src-container">
 
-<pre class="src src-tmux">mlflow run . -P <span style="color: #268bd2;">fluotracify_path</span>=/beegfs/ye53nis/drmed-git/src/ -P <span style="color: #268bd2;">epochs</span>=100 -P <span style="color: #268bd2;">learning_rate</span>=None -P <span style="color: #268bd2;">csv_path</span>=/beegfs/ye53nis/saves/firstartefact_Sep2019 -P <span style="color: #268bd2;">steps_per_epoch</span>=1280 -P <span style="color: #268bd2;">validation_steps</span>=320
+<pre class="src src-tmux"><span style="color: #5e7837;">mlflow</span> <span style="color: #784437;">run</span> <span style="color: #513f78;">.</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">fluotracify_path</span>=<span style="color: #783778;">/beegfs/ye53nis/drmed-git/src/</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">epochs</span>=<span style="color: #783778;">100</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">learning_rate</span>=<span style="color: #3f7178;">None</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">csv_path</span>=<span style="color: #5e7837;">/beegfs/ye53nis/saves/firstartefact_Sep2019</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">steps_per_epoch</span>=<span style="color: #783f5a;">1280</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">validation_steps</span>=<span style="color: #4f5c7e;">320</span>
 </pre>
 </div>
 
+<details>
 <pre class="example">
 (tensorflow_nightly) [ye53nis@node151 drmed-git]$ mlflow run . -P fluotracify_path=/beegfs/ye53nis/drmed-git/src/ -P epochs=100 -P learning_rate=None -P csv_path=/beegfs/ye53nis/saves/firstartefact_Sep2019 -P steps_per_epoch=1280 -P val
 idation_steps=320
@@ -4894,25 +5176,28 @@ Epoch 100/100
 400/400 [==============================] - 121s 302ms/step - loss: 0.3130 - tp: 6560497.0000 - fp: 267592.0000 - tn: 24822684.0000 - fn: 1117239.0000 - precision: 0.9608 - recall: 0.8545 - accuracy: 0.9577 - auc: 0.9801
 2020/06/14 20:28:16 INFO mlflow.projects: === Run (ID '037e1d9e4ad74784974f4aaac11138cc') succeeded ===
 </pre>
+</details>
 </div>
 </div>
 
 <div id="outline-container-sec-2-1-11" class="outline-4">
 <h4 id="sec-2-1-11"><span class="section-number-4">2.1.11</span> read out logs experiment 2</h4>
 <div class="outline-text-4" id="text-2-1-11">
-</div><ol class="org-ol"><li><a id="sec-2-1-11-1" name="sec-2-1-11-1"></a>read out mlflow logs using CLI<br ><div class="outline-text-5" id="text-2-1-11-1">
+</div><div id="outline-container-sec-2-1-11-1" class="outline-5">
+<h5 id="sec-2-1-11-1"><span class="section-number-5">2.1.11.1</span> read out mlflow logs using CLI</h5>
+<div class="outline-text-5" id="text-2-1-11-1">
 <div class="org-src-container">
 
-<pre class="src src-tmux">conda activate tensorflow_env
-<span style="color: #657b83; font-weight: bold;">cd</span> Programme/drmed-git
-<span style="color: #657b83; font-weight: bold;">export</span> <span style="color: #268bd2;">MLFLOW_EXPERIMENT_NAME</span>=exp-310520-unet
-<span style="color: #657b83; font-weight: bold;">export</span> <span style="color: #268bd2;">MLFLOW_TRACKING_URI</span>=file:./data/mlruns
+<pre class="src src-tmux"><span style="color: #4f5c7e;">conda</span> <span style="color: #4f7e67;">activate</span> <span style="color: #4f5c7e;">tensorflow_env</span>
+<span style="color: #657b83; font-weight: bold;">cd</span> <span style="color: #374478;">Programme/drmed-git</span>
+<span style="color: #657b83; font-weight: bold;">export</span> <span style="color: #268bd2;">MLFLOW_EXPERIMENT_NAME</span>=<span style="color: #37785e;">exp-310520-unet</span>
+<span style="color: #657b83; font-weight: bold;">export</span> <span style="color: #268bd2;">MLFLOW_TRACKING_URI</span>=<span style="color: #707e4f;">file:./data/mlruns</span>
 </pre>
 </div>
 
 <div class="org-src-container">
 
-<pre class="src src-tmux">mlflow experiments list
+<pre class="src src-tmux"><span style="color: #5e7837;">mlflow</span> <span style="color: #783f5a;">experiments</span> <span style="color: #513f78;">list</span>
 </pre>
 </div>
 
@@ -4925,7 +5210,7 @@ Epoch 100/100
 
 <div class="org-src-container">
 
-<pre class="src src-tmux">mlflow runs list --experiment-id 0
+<pre class="src src-tmux"><span style="color: #5e7837;">mlflow</span> <span style="color: #78683f;">runs</span> <span style="color: #513f78;">list</span> <span style="color: #783f5a;">--experiment-id</span> <span style="color: #7a4f7e;">0</span>
 </pre>
 </div>
 
@@ -4938,7 +5223,7 @@ Date                      Name    ID
 
 <div class="org-src-container">
 
-<pre class="src src-tmux"><span style="color: #657b83; font-weight: bold;">export</span> <span style="color: #268bd2;">EXP2</span>=037e1d9e4ad74784974f4aaac11138cc
+<pre class="src src-tmux"><span style="color: #657b83; font-weight: bold;">export</span> <span style="color: #268bd2;">EXP2</span>=<span style="color: #37785e;">037e1d9e4ad74784974f4aaac11138cc</span>
 </pre>
 </div>
 
@@ -4950,10 +5235,10 @@ can change the experiment. I will do it later with
 
 <div class="org-src-container">
 
-<pre class="src src-tmux">mlflow artifacts list -r $<span style="color: #268bd2;">EXP2</span>
-mlflow artifacts list -r $<span style="color: #268bd2;">EXP2</span> -a model
-mlflow artifacts list -r $<span style="color: #268bd2;">EXP2</span> -a model_summary.txt
-mlflow artifacts list -r $<span style="color: #268bd2;">EXP2</span> -a tensorboard_logs/train/
+<pre class="src src-tmux"><span style="color: #5e7837;">mlflow</span> <span style="color: #513f78;">artifacts</span> <span style="color: #513f78;">list</span> <span style="color: #4f5c7e;">-r</span> $<span style="color: #268bd2;">EXP2</span>
+<span style="color: #5e7837;">mlflow</span> <span style="color: #513f78;">artifacts</span> <span style="color: #513f78;">list</span> <span style="color: #4f5c7e;">-r</span> $<span style="color: #268bd2;">EXP2</span> <span style="color: #7a4f7e;">-a</span> <span style="color: #43783f;">model</span>
+<span style="color: #5e7837;">mlflow</span> <span style="color: #513f78;">artifacts</span> <span style="color: #513f78;">list</span> <span style="color: #4f5c7e;">-r</span> $<span style="color: #268bd2;">EXP2</span> <span style="color: #7a4f7e;">-a</span> <span style="color: #3f7178;">model_summary.txt</span>
+<span style="color: #5e7837;">mlflow</span> <span style="color: #513f78;">artifacts</span> <span style="color: #513f78;">list</span> <span style="color: #4f5c7e;">-r</span> $<span style="color: #268bd2;">EXP2</span> <span style="color: #7a4f7e;">-a</span> <span style="color: #4f7e67;">tensorboard_logs/train/</span>
 </pre>
 </div>
 
@@ -5004,10 +5289,10 @@ mlflow artifacts list -r $<span style="color: #268bd2;">EXP2</span> -a tensorboa
 
 <div class="org-src-container">
 
-<pre class="src src-tmux">mlflow artifacts download -r $<span style="color: #268bd2;">EXP2</span>
-mlflow artifacts download -r $<span style="color: #268bd2;">EXP2</span> -a model
-mlflow artifacts download -r $<span style="color: #268bd2;">EXP2</span> -a model_summary.txt
-mlflow artifacts download -r $<span style="color: #268bd2;">EXP2</span> -a tensorboard_logs
+<pre class="src src-tmux"><span style="color: #5e7837;">mlflow</span> <span style="color: #513f78;">artifacts</span> <span style="color: #37785e;">download</span> <span style="color: #4f5c7e;">-r</span> $<span style="color: #268bd2;">EXP2</span>
+<span style="color: #5e7837;">mlflow</span> <span style="color: #513f78;">artifacts</span> <span style="color: #37785e;">download</span> <span style="color: #4f5c7e;">-r</span> $<span style="color: #268bd2;">EXP2</span> <span style="color: #7a4f7e;">-a</span> <span style="color: #43783f;">model</span>
+<span style="color: #5e7837;">mlflow</span> <span style="color: #513f78;">artifacts</span> <span style="color: #37785e;">download</span> <span style="color: #4f5c7e;">-r</span> $<span style="color: #268bd2;">EXP2</span> <span style="color: #7a4f7e;">-a</span> <span style="color: #3f7178;">model_summary.txt</span>
+<span style="color: #5e7837;">mlflow</span> <span style="color: #513f78;">artifacts</span> <span style="color: #37785e;">download</span> <span style="color: #4f5c7e;">-r</span> $<span style="color: #268bd2;">EXP2</span> <span style="color: #7a4f7e;">-a</span> <span style="color: #374478;">tensorboard_logs</span>
 </pre>
 </div>
 
@@ -5020,10 +5305,11 @@ mlflow artifacts download -r $<span style="color: #268bd2;">EXP2</span> -a tenso
 
 <div class="org-src-container">
 
-<pre class="src src-tmux">mlflow runs describe --run-id $<span style="color: #268bd2;">EXP2</span>
+<pre class="src src-tmux"><span style="color: #5e7837;">mlflow</span> <span style="color: #78683f;">runs</span> <span style="color: #783778;">describe</span> <span style="color: #78683f;">--run-id</span> $<span style="color: #268bd2;">EXP2</span>
 </pre>
 </div>
 
+<details>
 <pre class="example">
 {
     "info": {
@@ -5110,53 +5396,60 @@ mlflow artifacts download -r $<span style="color: #268bd2;">EXP2</span> -a tenso
     }
 }
 </pre>
+</details>
 
 <div class="org-src-container">
 
-<pre class="src src-tmux">tensorboard --logdir=data/mlruns/0/$<span style="color: #268bd2;">EXP2</span>/artifacts/tensorboard_logs
+<pre class="src src-tmux"><span style="color: #783778;">tensorboard</span> <span style="color: #4f5c7e;">--logdir</span>=<span style="color: #707e4f;">data/mlruns/0/</span>$<span style="color: #268bd2;">EXP2</span>/artifacts/tensorboard_logs
 </pre>
 </div>
 
 <div class="org-src-container">
 
-<pre class="src src-tmux">mlflow ui --backend-store-uri file:///home/lex/Programme/drmed-git/data/mlruns
+<pre class="src src-tmux"><span style="color: #5e7837;">mlflow</span> <span style="color: #7e544f;">ui</span> <span style="color: #707e4f;">--backend-store-uri</span> <span style="color: #7e544f;">file:///home/lex/Programme/drmed-git/data/mlruns</span>
 </pre>
 </div>
 </div>
-</li>
-<li><a id="sec-2-1-11-2" name="sec-2-1-11-2"></a>plots via mlflow ui, comparing run 1 and 2<br ><div class="outline-text-5" id="text-2-1-11-2">
+</div>
+<div id="outline-container-sec-2-1-11-2" class="outline-5">
+<h5 id="sec-2-1-11-2"><span class="section-number-5">2.1.11.2</span> plots via mlflow ui, comparing run 1 and 2</h5>
+<div class="outline-text-5" id="text-2-1-11-2">
 <p>
 AUC:
-<img src="mlflow_plots/run2_auc.png" class="img-responsive" alt="run2_auc.png">
+<img src="./mlflow_plots/run2_auc.png" class="img-responsive" alt="run2_auc.png">
 Loss:
-<img src="mlflow_plots/run2_loss.png" class="img-responsive" alt="run2_loss.png">
+<img src="./mlflow_plots/run2_loss.png" class="img-responsive" alt="run2_loss.png">
 Precision / Recall:
-<img src="mlflow_plots/run2_prec_recall.png" class="img-responsive" alt="run2_prec_recall.png">
+<img src="./mlflow_plots/run2_prec_recall.png" class="img-responsive" alt="run2_prec_recall.png">
 </p>
 </div>
-</li>
+</div>
 
-<li><a id="sec-2-1-11-3" name="sec-2-1-11-3"></a>plots via tensorboard ui<br ><div class="outline-text-5" id="text-2-1-11-3">
+<div id="outline-container-sec-2-1-11-3" class="outline-5">
+<h5 id="sec-2-1-11-3"><span class="section-number-5">2.1.11.3</span> plots via tensorboard ui</h5>
+<div class="outline-text-5" id="text-2-1-11-3">
 <p>
-prediction 03
-<img src="mlflow_plots/run2_image_plots/prediction_03.png" class="img-responsive" alt="prediction_03.png">
-prediction 20
-<img src="mlflow_plots/run2_image_plots/prediction_20.png" class="img-responsive" alt="prediction_20.png">
-prediction 24
-<img src="mlflow_plots/run2_image_plots/prediction_24.png" class="img-responsive" alt="prediction_24.png">
-prediction 32
-<img src="mlflow_plots/run2_image_plots/prediction_32.png" class="img-responsive" alt="prediction_32.png">
-prediction 99
-<img src="mlflow_plots/run2_image_plots/prediction_99.png" class="img-responsive" alt="prediction_99.png">
-distribution of conv1d-kernel final layer
-<img src="mlflow_plots/run2_image_plots/distribution_conv1d-kernel_finallayer.png" class="img-responsive" alt="distribution_conv1d-kernel_finallayer.png">
-histograms of conv1d-kernel final layer
-<img src="mlflow_plots/run2_image_plots/histograms_conv1d-kernel_finallayer.png" class="img-responsive" alt="histograms_conv1d-kernel_finallayer.png">
+Prediction 03
+<img src="./mlflow_plots/run2_image_plots/prediction_03.png" class="img-responsive" alt="prediction_03.png">
+Prediction 20
+<img src="./mlflow_plots/run2_image_plots/prediction_20.png" class="img-responsive" alt="prediction_20.png">
+Prediction 24
+<img src="./mlflow_plots/run2_image_plots/prediction_24.png" class="img-responsive" alt="prediction_24.png">
+Prediction 32
+<img src="./mlflow_plots/run2_image_plots/prediction_32.png" class="img-responsive" alt="prediction_32.png">
+Prediction 99
+<img src="./mlflow_plots/run2_image_plots/prediction_99.png" class="img-responsive" alt="prediction_99.png">
+Distribution of Conv1D-Kernel (final layer)
+<img src="./mlflow_plots/run2_image_plots/distribution_conv1d-kernel_finallayer.png" class="img-responsive" alt="distribution_conv1d-kernel_finallayer.png">
+Histograms of Conv1D-Kernel (final layer)
+<img src="./mlflow_plots/run2_image_plots/histograms_conv1d-kernel_finallayer.png" class="img-responsive" alt="histograms_conv1d-kernel_finallayer.png">
 </p>
 </div>
-</li>
+</div>
 
-<li><a id="sec-2-1-11-4" name="sec-2-1-11-4"></a>for next runs<br ><div class="outline-text-5" id="text-2-1-11-4">
+<div id="outline-container-sec-2-1-11-4" class="outline-5">
+<h5 id="sec-2-1-11-4"><span class="section-number-5">2.1.11.4</span> for next runs</h5>
+<div class="outline-text-5" id="text-2-1-11-4">
 <ul class="org-ul">
 <li>more steps = good: better recall
 </li>
@@ -5375,24 +5668,28 @@ overfitting → they use 0.7 prob for conv dropout and 0.5 for FC
 </ul>
 </div>
 </li></ol>
-</li></ol>
+</div>
 </div>
 
 <div id="outline-container-sec-2-1-12" class="outline-4">
 <h4 id="sec-2-1-12"><span class="section-number-4">2.1.12</span> use model from run 2 to correct data</h4>
 <div class="outline-text-4" id="text-2-1-12">
-</div><ol class="org-ol"><li><a id="sec-2-1-12-1" name="sec-2-1-12-1"></a>simulated data from the test set<br ><div class="outline-text-5" id="text-2-1-12-1">
+</div><div id="outline-container-sec-2-1-12-1" class="outline-5">
+<h5 id="sec-2-1-12-1"><span class="section-number-5">2.1.12.1</span> simulated data from the test set</h5>
+<div class="outline-text-5" id="text-2-1-12-1">
 
 <figure>
-<p><img src="correction_plots/brightbursts_correction_by_unet_histogram_050_tt_200702.svg" class="img-responsive" alt="brightbursts_correction_by_unet_histogram_050_tt_200702.svg">
+<p><img src="./correction_plots/brightbursts_correction_by_unet_histogram_050_tt_200702.svg" class="img-responsive" alt="brightbursts_correction_by_unet_histogram_050_tt_200702.svg">
 </p>
 </figure>
 </div>
-</li>
-<li><a id="sec-2-1-12-2" name="sec-2-1-12-2"></a>experimental data from Pablo (structured experiment)<br ><div class="outline-text-5" id="text-2-1-12-2">
+</div>
+<div id="outline-container-sec-2-1-12-2" class="outline-5">
+<h5 id="sec-2-1-12-2"><span class="section-number-5">2.1.12.2</span> experimental data from Pablo (structured experiment)</h5>
+<div class="outline-text-5" id="text-2-1-12-2">
 
 <figure>
-<p><img src="correction_plots/ptu_brightbursts_correction_by_unet_histogram_010_tt_200704_400traces.svg" class="img-responsive" alt="ptu_brightbursts_correction_by_unet_histogram_010_tt_200704_400traces.svg">
+<p><img src="./correction_plots/ptu_brightbursts_correction_by_unet_histogram_010_tt_200704_400traces.svg" class="img-responsive" alt="ptu_brightbursts_correction_by_unet_histogram_010_tt_200704_400traces.svg">
 </p>
 </figure>
 </div>
@@ -5406,22 +5703,22 @@ overfitting → they use 0.7 prob for conv dropout and 0.5 for FC
 </li>
 <li>"clean"
 <ul class="org-ul">
-<li>in folders "GroupMeas<sub>5</sub>" and "GroupMeas<sub>6</sub>"
+<li>in folders <code>GroupMeas_5</code>" and <code>GroupMeas_6</code>
 </li>
 <li>Hs-PEX5-eGFP - PEX5 from Homo sapiens, labelled with eGFP
 </li>
-<li>typical filename: 20 nM AF488147<sub>T1754s</sub><sub>1.ptu</sub>
+<li>typical filename: <code>20 nM AF488147_T1754s_1.ptu</code>
 </li>
 </ul>
 </li>
 
 <li>"dirty"
 <ul class="org-ul">
-<li>in folders "GroupMeas<sub>1</sub>" to "GroupMeas<sub>4</sub><sub>4</sub>"
+<li>in folders <code>GroupMeas_1</code> to <code>GroupMeas_4_4</code>
 </li>
 <li>Tp-PEX5-eGFP - PEX5 from Trypanosoma brucei, labelled with eGFP
 </li>
-<li>typical filename: DiO LUV 10uM in 20 nM AF48816<sub>T197s</sub><sub>1.ptu</sub>
+<li>typical filename: <code>DiO LUV 10uM in 20 nM AF48816_T197s_1.ptu</code>
 </li>
 <li>Dio LUV: big vesicles, spikes
 </li>
@@ -5448,10 +5745,14 @@ and correlations are "pure"
 </li>
 <li>diffusion coefficient ~\(22.5...45 \mu m^2 / s\)
 </li>
-<li><img src="correction_plots/run2_hs-pex5-egfp_1mscorr_1.png" class="img-responsive" alt="run2_hs-pex5-egfp_1mscorr_1.png">
+</ul>
 </li>
 </ul>
 </li>
+</ul>
+<ul class="org-ul">
+<li><img src="./correction_plots/run2_hs-pex5-egfp_1mscorr_1.png" class="img-responsive" alt="run2_hs-pex5-egfp_1mscorr_1.png">
+<ul class="org-ul">
 <li><b>for correlation at \(100\mu s\) binning window:</b>
 <ul class="org-ul">
 <li><b>transit time</b> ~\(0.4...0.53ms\)
@@ -5460,10 +5761,12 @@ and correlations are "pure"
 </li>
 <li><b>This is probably the most accurate!</b>
 </li>
-<li><img src="correction_plots/run2_hs-pex5-egfp_100uscorr_1.png" class="img-responsive" alt="run2_hs-pex5-egfp_100uscorr_1.png">
+</ul>
 </li>
 </ul>
 </li>
+<li><img src="./correction_plots/run2_hs-pex5-egfp_100uscorr_1.png" class="img-responsive" alt="run2_hs-pex5-egfp_100uscorr_1.png">
+<ul class="org-ul">
 <li>for correlation at \(10\mu s\) and at 1us binning window:
 <ul class="org-ul">
 <li>transit time ~\(0.09ms\)
@@ -5474,12 +5777,13 @@ and correlations are "pure"
 correctly here with multipletau. Looks like the start of the
 correlation curve is flattening, but multipletau fits an increase
 </li>
-<li><img src="correction_plots/run2_hs-pex5-egfp_10uscorr_1.png" class="img-responsive" alt="run2_hs-pex5-egfp_10uscorr_1.png">
-</li>
 </ul>
 </li>
 </ul>
 </li>
+<li><img src="./correction_plots/run2_hs-pex5-egfp_10uscorr_1.png" class="img-responsive" alt="run2_hs-pex5-egfp_10uscorr_1.png">
+
+<ul class="org-ul">
 <li>second: "dirty" data of Tb-PEX5-eGFP
 </li>
 <li>from plotting 10 traces with the respective binning windows using
@@ -5501,12 +5805,16 @@ correlation curve is flattening, but multipletau fits an increase
 </li>
 <li>with correction: ~\(2...6.3 \mu m^2 / s\)
 </li>
-<li><img src="correction_plots/run2_tb-pex5-egfp_1mscorr_2.png" class="img-responsive" alt="run2_tb-pex5-egfp_1mscorr_2.png">
+</ul>
+</li>
+</ul>
 </li>
 </ul>
 </li>
 </ul>
 </li>
+<li><img src="./correction_plots/run2_tb-pex5-egfp_1mscorr_2.png" class="img-responsive" alt="run2_tb-pex5-egfp_1mscorr_2.png">
+<ul class="org-ul">
 <li>for correlation at \(100 \mu s\) binninw window:
 <ul class="org-ul">
 <li>transit time
@@ -5524,13 +5832,13 @@ correlation curve is flattening, but multipletau fits an increase
 <li>with correction: ~\(0.3...7\mu m^2 / s\)
 </li>
 </ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><img src="./correction_plots/run2_tb-pex5-egfp_100uscorr_1.png" class="img-responsive" alt="run2_tb-pex5-egfp_100uscorr_1.png">
 <ul class="org-ul">
-<li><img src="correction_plots/run2_tb-pex5-egfp_100uscorr_1.png" class="img-responsive" alt="run2_tb-pex5-egfp_100uscorr_1.png">
-</li>
-</ul>
-</li>
-</ul>
-</li>
 <li>for correlation at \(10\mu s\) binning window:
 <ul class="org-ul">
 <li>fitting looks HORRIBLE for the traces corrected by
@@ -5552,37 +5860,36 @@ even though the values are bad.
 <li>with correction: ~\(0.03...52\mu m^2 / s\)
 </li>
 </ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><img src="./correction_plots/run2_tb-pex5-egfp_10uscorr_3.png" class="img-responsive" alt="run2_tb-pex5-egfp_10uscorr_3.png">
 <ul class="org-ul">
-<li><img src="correction_plots/run2_tb-pex5-egfp_10uscorr_3.png" class="img-responsive" alt="run2_tb-pex5-egfp_10uscorr_3.png">
-</li>
-</ul>
-</li>
-</ul>
-</li>
 <li>for correlation at \(1\mu s\) binning window (only 3 traces, because ):
 <ul class="org-ul">
 <li>fits have to be better!
-<ul class="org-ul">
-<li><img src="correction_plots/run2_tb-pex5-egfp_1uscorr_1.png" class="img-responsive" alt="run2_tb-pex5-egfp_1uscorr_1.png">
 </li>
 </ul>
 </li>
 </ul>
 </li>
-</ul>
+<li><img src="./correction_plots/run2_tb-pex5-egfp_1uscorr_1.png" class="img-responsive" alt="run2_tb-pex5-egfp_1uscorr_1.png">
 </li>
 </ul>
 </div>
 </li></ol>
-</li></ol>
 </div>
+</div>
+
 <div id="outline-container-sec-2-1-13" class="outline-4">
 <h4 id="sec-2-1-13"><span class="section-number-4">2.1.13</span> git exp 3</h4>
 <div class="outline-text-4" id="text-2-1-13">
 <div class="org-src-container">
 
-<pre class="src src-tmux">git status
-git log -1
+<pre class="src src-tmux"><span style="color: #784437;">git</span> <span style="color: #374478;">status</span>
+<span style="color: #784437;">git</span> <span style="color: #78683f;">log</span> <span style="color: #3f7178;">-1</span>
 </pre>
 </div>
 
@@ -5608,19 +5915,20 @@ Date:   Wed Jun 17 12:09:44 2020 +0200
 <div class="outline-text-4" id="text-2-1-14">
 <div class="org-src-container">
 
-<pre class="src src-tmux">conda activate tensorflow_nightly
-<span style="color: #657b83; font-weight: bold;">cd</span> /beegfs/ye53nis/drmed-git
-<span style="color: #657b83; font-weight: bold;">export</span> <span style="color: #268bd2;">MLFLOW_EXPERIMENT_NAME</span>=exp-310520-unet
-<span style="color: #657b83; font-weight: bold;">export</span> <span style="color: #268bd2;">MLFLOW_TRACKING_URI</span>=file:./data/mlruns
+<pre class="src src-tmux"><span style="color: #4f5c7e;">conda</span> <span style="color: #4f7e67;">activate</span> <span style="color: #4f5c7e;">tensorflow_nightly</span>
+<span style="color: #657b83; font-weight: bold;">cd</span> <span style="color: #783778;">/beegfs/ye53nis/drmed-git</span>
+<span style="color: #657b83; font-weight: bold;">export</span> <span style="color: #268bd2;">MLFLOW_EXPERIMENT_NAME</span>=<span style="color: #37785e;">exp-310520-unet</span>
+<span style="color: #657b83; font-weight: bold;">export</span> <span style="color: #268bd2;">MLFLOW_TRACKING_URI</span>=<span style="color: #707e4f;">file:./data/mlruns</span>
 </pre>
 </div>
 
 <div class="org-src-container">
 
-<pre class="src src-tmux">mlflow run . -P <span style="color: #268bd2;">fluotracify_path</span>=/beegfs/ye53nis/drmed-git/src -P <span style="color: #268bd2;">batch_size</span>=3 -P <span style="color: #268bd2;">epochs</span>=40 -P <span style="color: #268bd2;">learning_rate</span>=None -P <span style="color: #268bd2;">csv_path</span>=/beegfs/ye53nis/saves/firstartefact_Sep2019 -P <span style="color: #268bd2;">steps_per_epoch</span>=2100 -P <span style="color: #268bd2;">validation_steps</span>=320
+<pre class="src src-tmux"><span style="color: #5e7837;">mlflow</span> <span style="color: #784437;">run</span> <span style="color: #513f78;">.</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">fluotracify_path</span>=<span style="color: #374478;">/beegfs/ye53nis/drmed-git/src</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">batch_size</span>=<span style="color: #7e544f;">3</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">epochs</span>=<span style="color: #5e7837;">40</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">learning_rate</span>=<span style="color: #3f7178;">None</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">csv_path</span>=<span style="color: #5e7837;">/beegfs/ye53nis/saves/firstartefact_Sep2019</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">steps_per_epoch</span>=<span style="color: #7e544f;">2100</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">validation_steps</span>=<span style="color: #4f5c7e;">320</span>
 </pre>
 </div>
 
+<details>
 <pre class="example">
 2020/06/20 00:43:51 INFO mlflow.projects: === Created directory /tmp/tmpxwtlwi2b for downloading remote URIs passed to arguments of type 'path' ===
 2020/06/20 00:43:51 INFO mlflow.projects: === Running command 'source /cluster/miniconda3/bin/../etc/profile.d/conda.sh &amp;&amp; conda activate mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b 1&gt;&amp;2 &amp;&amp; python src/fluotracify/training/train.py /
@@ -5907,6 +6215,7 @@ Epoch 40/40
 667/667 [==============================] - 163s 244ms/step - loss: 0.5248 - tp: 6207113.0000 - fp: 1521051.0000 - tn: 23569214.0000 - fn: 1470623.0000 - precision: 0.8032 - recall: 0.8085 - accuracy: 0.9087 - auc: 0.9439
 2020/06/21 05:32:13 INFO mlflow.projects: === Run (ID '1e98b3ed2e1d421da9592058bd5587a8') succeeded ===
 </pre>
+</details>
 </div>
 </div>
 
@@ -5915,8 +6224,8 @@ Epoch 40/40
 <div class="outline-text-4" id="text-2-1-15">
 <div class="org-src-container">
 
-<pre class="src src-tmux">git status
-git log -1
+<pre class="src src-tmux"><span style="color: #784437;">git</span> <span style="color: #374478;">status</span>
+<span style="color: #784437;">git</span> <span style="color: #78683f;">log</span> <span style="color: #3f7178;">-1</span>
 </pre>
 </div>
 
@@ -5945,10 +6254,11 @@ Date:   Mon Jun 22 00:45:48 2020 +0200
 <div class="outline-text-4" id="text-2-1-16">
 <div class="org-src-container">
 
-<pre class="src src-tmux">mlflow run . -P <span style="color: #268bd2;">fluotracify_path</span>=/beegfs/ye53nis/drmed-git/src -P <span style="color: #268bd2;">batch_size</span>=7 -P <span style="color: #268bd2;">epochs</span>=40 -P <span style="color: #268bd2;">learning_rate</span>=None -P <span style="color: #268bd2;">csv_path</span>=/beegfs/ye53nis/saves/firstartefact_Sep2019 -P <span style="color: #268bd2;">steps_per_epoch</span>=910 -P <span style="color: #268bd2;">validation_steps</span>=225
+<pre class="src src-tmux"><span style="color: #5e7837;">mlflow</span> <span style="color: #784437;">run</span> <span style="color: #513f78;">.</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">fluotracify_path</span>=<span style="color: #374478;">/beegfs/ye53nis/drmed-git/src</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">batch_size</span>=<span style="color: #37785e;">7</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">epochs</span>=<span style="color: #5e7837;">40</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">learning_rate</span>=<span style="color: #3f7178;">None</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">csv_path</span>=<span style="color: #5e7837;">/beegfs/ye53nis/saves/firstartefact_Sep2019</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">steps_per_epoch</span>=<span style="color: #5e7837;">910</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">validation_steps</span>=<span style="color: #5e7837;">225</span>
 </pre>
 </div>
 
+<details>
 <pre class="example">
 2020/06/22 01:46:18 INFO mlflow.projects: === Created directory /tmp/tmpbqom5l09 for downloading remote URIs passed to arguments of type 'path' ===
 2020/06/22 01:46:18 INFO mlflow.projects: === Running command 'source /cluster/miniconda3/bin/../etc/profile.d/conda.sh &amp;&amp; conda activate mlflow-c61a56dd06e99e6740b7159c7af9d54a736a4e4b 1&gt;&amp;2 &amp;&amp; python src/fluotracify/training/train.py /
@@ -6239,6 +6549,7 @@ Epoch 40/40
 
 
 </pre>
+</details>
 </div>
 </div>
 <div id="outline-container-sec-2-1-17" class="outline-4">
@@ -6246,8 +6557,8 @@ Epoch 40/40
 <div class="outline-text-4" id="text-2-1-17">
 <div class="org-src-container">
 
-<pre class="src src-tmux">git status
-git log -1
+<pre class="src src-tmux"><span style="color: #784437;">git</span> <span style="color: #374478;">status</span>
+<span style="color: #784437;">git</span> <span style="color: #78683f;">log</span> <span style="color: #3f7178;">-1</span>
 </pre>
 </div>
 
@@ -6274,10 +6585,11 @@ Date:   Fri Jul 3 00:51:59 2020 +0200
 <div class="outline-text-4" id="text-2-1-18">
 <div class="org-src-container">
 
-<pre class="src src-tmux">mlflow run . -P <span style="color: #268bd2;">fluotracify_path</span>=/beegfs/ye53nis/drmed-git/src -P <span style="color: #268bd2;">batch_size</span>=5 -P <span style="color: #268bd2;">length_delimiter</span>=8192 -P <span style="color: #268bd2;">epochs</span>=40 -P <span style="color: #268bd2;">learning_rate</span>=None -P <span style="color: #268bd2;">csv_path</span>=/beegfs/ye53nis/saves/firstartefact_Sep2019 -P <span style="color: #268bd2;">steps_per_epoch</span>=1280 -P <span style="color: #268bd2;">validation_steps</span>=320
+<pre class="src src-tmux"><span style="color: #5e7837;">mlflow</span> <span style="color: #784437;">run</span> <span style="color: #513f78;">.</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">fluotracify_path</span>=<span style="color: #374478;">/beegfs/ye53nis/drmed-git/src</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">batch_size</span>=<span style="color: #783778;">5</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">length_delimiter</span>=<span style="color: #4f5c7e;">8192</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">epochs</span>=<span style="color: #5e7837;">40</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">learning_rate</span>=<span style="color: #3f7178;">None</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">csv_path</span>=<span style="color: #5e7837;">/beegfs/ye53nis/saves/firstartefact_Sep2019</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">steps_per_epoch</span>=<span style="color: #783f5a;">1280</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">validation_steps</span>=<span style="color: #4f5c7e;">320</span>
 </pre>
 </div>
 
+<details>
 <pre class="example">
 (tensorflow_nightly) [ye53nis@node011 drmed-git]$ mlflow run . -P fluotracify_path=/beegfs/ye53nis/drmed-git/src -P batch_size=5 -P length_delimiter=8192 -P epochs=40 -P learning_rate=None -P csv_path=/beegfs/ye53nis/saves/firstartefact
 _Sep2019 -P steps_per_epoch=1280 -P validation_steps=320
@@ -6567,88 +6879,16 @@ Epoch 40/40
 2020/07/04 09:37:42 INFO mlflow.projects: === Run (ID 'd9b44dc2e3d44ea1a71129808b642af6') succeeded ===
 
 </pre>
+</details>
 </div>
 </div>
 </div>
 </div>
-</div><div class="col-md-3"><nav id="table-of-contents">
-<div id="text-table-of-contents" class="bs-docs-sidebar">
-<ul class="nav">
-<li><a href="#sec-1">1. Technical Notes</a>
-<ul class="nav">
-<li><a href="#sec-1-1">1.1. README</a>
-<ul class="nav">
-<li><a href="#sec-1-1-1">1.1.1. General:</a></li>
-<li><a href="#sec-1-1-2">1.1.2. Code block languages used in this document</a></li>
-<li><a href="#sec-1-1-3">1.1.3. Experiments workflow:</a></li>
-<li><a href="#sec-1-1-4">1.1.4. Example for experimental setup procedure</a></li>
-<li><a href="#sec-1-1-5">1.1.5. tools used (notes)</a></li>
-</ul>
-</li>
-<li><a href="#sec-1-2">1.2. Template for data entry and setup notes:</a>
-<ul class="nav">
-<li><a href="#sec-1-2-1">1.2.1. exp-#date-#title</a></li>
-<li><a href="#sec-1-2-2">1.2.2. Setup notes</a></li>
-</ul>
-</li>
-<li><a href="#sec-1-3">1.3. Organization of git</a>
-<ul class="nav">
-<li><a href="#sec-1-3-1">1.3.1. tools used (notes)</a></li>
-<li><a href="#sec-1-3-2">1.3.2. remote/origin/master branch:</a></li>
-<li><a href="#sec-1-3-3">1.3.3. remote/origin/exp### branches:</a></li>
-<li><a href="#sec-1-3-4">1.3.4. remote/origin/develop branch:</a></li>
-<li><a href="#sec-1-3-5">1.3.5. remote/origin/data branch:</a></li>
-<li><a href="#sec-1-3-6">1.3.6. Git TAGs</a></li>
-</ul>
-</li>
-<li><a href="#sec-1-4">1.4. Organization of code</a>
-<ul class="nav">
-<li><a href="#sec-1-4-1">1.4.1. scripts:</a></li>
-<li><a href="#sec-1-4-2">1.4.2. src/</a></li>
-</ul>
-</li>
-<li><a href="#sec-1-5">1.5. Changes in this repository (without "* Data" in this file)</a>
-<ul class="nav">
-<li><a href="#sec-1-5-1">1.5.1. Changes in LabBook.org (without "* Data")</a></li>
-<li><a href="#sec-1-5-2">1.5.2. Changes in src/fluotracify</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#sec-2">2. Data</a>
-<ul class="nav">
-<li><a href="#sec-2-1">2.1. exp-310520-unet</a>
-<ul class="nav">
-<li><a href="#sec-2-1-1">2.1.1. Connect</a></li>
-<li><a href="#sec-2-1-2">2.1.2. git exp 1</a></li>
-<li><a href="#sec-2-1-3">2.1.3. mlflow environment variables</a></li>
-<li><a href="#sec-2-1-4">2.1.4. Learning rate schedule</a></li>
-<li><a href="#sec-2-1-5">2.1.5. test runs</a></li>
-<li><a href="#sec-2-1-6">2.1.6. experimental run</a></li>
-<li><a href="#sec-2-1-7">2.1.7. read out logs</a></li>
-<li><a href="#sec-2-1-8">2.1.8. Load model from mlflow logs and predict separately loaded data</a></li>
-<li><a href="#sec-2-1-9">2.1.9. git exp 2</a></li>
-<li><a href="#sec-2-1-10">2.1.10. experimental run 2 - full dataset</a></li>
-<li><a href="#sec-2-1-11">2.1.11. read out logs experiment 2</a></li>
-<li><a href="#sec-2-1-12">2.1.12. use model from run 2 to correct data</a></li>
-<li><a href="#sec-2-1-13">2.1.13. git exp 3</a></li>
-<li><a href="#sec-2-1-14">2.1.14. experimental run 3 - bs=3</a></li>
-<li><a href="#sec-2-1-15">2.1.15. git exp 4</a></li>
-<li><a href="#sec-2-1-16">2.1.16. experimental run 4 - bs=7</a></li>
-<li><a href="#sec-2-1-17">2.1.17. git exp 5</a></li>
-<li><a href="#sec-2-1-18">2.1.18. experimental run 5 - full dataset, length=2**13=8192</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</div>
-</nav>
 </div></div></div>
 <footer id="postamble" class="">
 <div><p class="author">Author: Alexander Seltmann</p>
-<p class="date">Created: 2021-01-07 Do 23:30</p>
-<p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 27.1 (<a href="http://orgmode.org">Org-mode</a> 9.3.6)</p>
+<p class="date">Created: 2022-02-20 So 12:21</p>
+<p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 27.2 (<a href="http://orgmode.org">Org-mode</a> 9.5.2)</p>
 </div>
 </footer>
 </body>

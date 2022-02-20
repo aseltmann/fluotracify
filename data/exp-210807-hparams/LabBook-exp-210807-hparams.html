@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <title>Lab book Fluotracify</title>
-<!-- 2021-12-17 Fr 00:09 -->
+<!-- 2022-02-20 So 12:20 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="generator" content="Org-mode">
@@ -196,6 +196,7 @@ $(function() {
 <style type="text/css">pre.src-jupyter-python {background-color: #FAEAE1;}</style>
 <style type="text/css">details {padding: 1em; background-color: #f0f0f0; border-radius: 15px; color: hsl(157 75% 20%); font-size: 0.9em; box-shadow: 0.05em 0.1em 5px 0.01em  #00000057;}</style>
 <style type="text/css">details:hover {background:pink;}</style>
+<style type="text/css">table {display: block; overflow-x: auto; white-space: nowrap;}</style>
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -303,14 +304,15 @@ MathJax.Hub.Config({
 <ul class="nav">
 <li><a href="#sec-1-5-1">1.5.1. Changes in LabBook.org (without "* Data")</a>
 <ul class="nav">
-<li><a href="#sec-1-5-1-1">1.5.1.1. 2021-12-16</a></li>
-<li><a href="#sec-1-5-1-2">1.5.1.2. 2021-08-05</a></li>
-<li><a href="#sec-1-5-1-3">1.5.1.3. 2021-04-04</a></li>
-<li><a href="#sec-1-5-1-4">1.5.1.4. 2020-11-04</a></li>
-<li><a href="#sec-1-5-1-5">1.5.1.5. 2020-05-31</a></li>
-<li><a href="#sec-1-5-1-6">1.5.1.6. 2020-05-07</a></li>
-<li><a href="#sec-1-5-1-7">1.5.1.7. 2020-04-22</a></li>
-<li><a href="#sec-1-5-1-8">1.5.1.8. 2020-03-30</a></li>
+<li><a href="#sec-1-5-1-1">1.5.1.1. 2022-02-19</a></li>
+<li><a href="#sec-1-5-1-2">1.5.1.2. 2021-12-16</a></li>
+<li><a href="#sec-1-5-1-3">1.5.1.3. 2021-08-05</a></li>
+<li><a href="#sec-1-5-1-4">1.5.1.4. 2021-04-04</a></li>
+<li><a href="#sec-1-5-1-5">1.5.1.5. 2020-11-04</a></li>
+<li><a href="#sec-1-5-1-6">1.5.1.6. 2020-05-31</a></li>
+<li><a href="#sec-1-5-1-7">1.5.1.7. 2020-05-07</a></li>
+<li><a href="#sec-1-5-1-8">1.5.1.8. 2020-04-22</a></li>
+<li><a href="#sec-1-5-1-9">1.5.1.9. 2020-03-30</a></li>
 </ul>
 </li>
 <li><a href="#sec-1-5-2">1.5.2. Changes in src/fluotracify</a></li>
@@ -571,7 +573,7 @@ light grey colour (#f0f0f0) and a pink color when hovering above it.
 <div class="outline-text-5" id="text-1-2-1-1">
 <div class="org-src-container">
 
-<pre class="src src-sh">git log -1
+<pre class="src src-sh"><span style="color: #784437;">git</span> <span style="color: #78683f;">log</span> <span style="color: #3f7178;">-1</span>
 </pre>
 </div>
 </div>
@@ -582,26 +584,26 @@ light grey colour (#f0f0f0) and a pink color when hovering above it.
 <div class="outline-text-5" id="text-1-2-1-2">
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python" id="jp-metadata"><span style="color: #859900; font-weight: bold;">import</span> os
-<span style="color: #859900; font-weight: bold;">import</span> pprint
+<pre class="src src-jupyter-python" id="jp-metadata"><span style="color: #859900; font-weight: bold;">import</span> <span style="color: #7e544f;">os</span>
+<span style="color: #859900; font-weight: bold;">import</span> <span style="color: #4f7e67;">pprint</span>
 
-<span style="color: #268bd2;">ramlist</span> = os.popen(<span style="color: #2aa198;">'free -th'</span>).readlines()[-1].split()[1:]
+<span style="color: #268bd2;">ramlist</span> = <span style="color: #7e544f;">os</span>.<span style="color: #37785e;">popen</span>(<span style="color: #2aa198;">'free -th'</span>).<span style="color: #7e544f;">readlines</span>()[-1].<span style="color: #7a4f7e;">split</span>()[1:]
 
-<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #2aa198;">'No of CPUs in system:'</span>, os.cpu_count())
+<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #2aa198;">'No of CPUs in system:'</span>, <span style="color: #7e544f;">os</span>.<span style="color: #37785e;">cpu_count</span>())
 <span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #2aa198;">'No of CPUs the current process can use:'</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #657b83; font-weight: bold;">len</span>(os.sched_getaffinity(0)))
-<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #2aa198;">'load average:'</span>, os.getloadavg())
-<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #2aa198;">'os.uname(): '</span>, os.uname())
-<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #2aa198;">'PID of process:'</span>, os.getpid())
-<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #2aa198;">'RAM total: {}, RAM used: {}, RAM free: {}'</span>.format(
-<span style="background-color: #eee8d5;"> </span>   ramlist[0], ramlist[1], ramlist[2]))
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #657b83; font-weight: bold;">len</span>(<span style="color: #7e544f;">os</span>.<span style="color: #707e4f;">sched_getaffinity</span>(0)))
+<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #2aa198;">'load average:'</span>, <span style="color: #7e544f;">os</span>.<span style="color: #783778;">getloadavg</span>())
+<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #2aa198;">'os.uname(): '</span>, <span style="color: #7e544f;">os</span>.<span style="color: #3f7178;">uname</span>())
+<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #2aa198;">'PID of process:'</span>, <span style="color: #7e544f;">os</span>.<span style="color: #4f7e67;">getpid</span>())
+<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #2aa198;">'RAM total: {}, RAM used: {}, RAM free: {}'</span>.<span style="color: #78683f;">format</span>(
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #4f5c7e;">ramlist</span>[0], <span style="color: #4f5c7e;">ramlist</span>[1], <span style="color: #4f5c7e;">ramlist</span>[2]))
 
-!echo the current <span style="color: #268bd2;">directory</span>: $PWD
-!echo My disk <span style="color: #268bd2;">usage</span>:
-!df -h
+!<span style="color: #37785e;">echo</span> <span style="color: #783f5a;">the</span> <span style="color: #43783f;">current</span> <span style="color: #268bd2;">directory</span>: $<span style="color: #4f7e67;">PWD</span>
+!<span style="color: #37785e;">echo</span> <span style="color: #707e4f;">My</span> <span style="color: #784437;">disk</span> <span style="color: #268bd2;">usage</span>:
+!<span style="color: #4f7e67;">df</span> -<span style="color: #7e544f;">h</span>
 <span style="color: #859900; font-weight: bold;">if</span> <span style="color: #268bd2;">_long</span>:
-<span style="background-color: #eee8d5;"> </span>   %conda <span style="color: #657b83; font-weight: bold;">list</span>
-<span style="background-color: #eee8d5;"> </span>   pprint.pprint(<span style="color: #657b83; font-weight: bold;">dict</span>(os.environ), sort_dicts=<span style="color: #859900; font-weight: bold;">False</span>)
+<span style="background-color: #eee8d5;"> </span>   %<span style="color: #4f5c7e;">conda</span> <span style="color: #657b83; font-weight: bold;">list</span>
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #4f7e67;">pprint</span>.<span style="color: #4f7e67;">pprint</span>(<span style="color: #657b83; font-weight: bold;">dict</span>(<span style="color: #7e544f;">os</span>.<span style="color: #707e4f;">environ</span>), <span style="color: #707e4f;">sort_dicts</span>=<span style="color: #859900; font-weight: bold;">False</span>)
 
 </pre>
 </div>
@@ -613,11 +615,11 @@ light grey colour (#f0f0f0) and a pink color when hovering above it.
 <div class="outline-text-5" id="text-scripts-tmux">
 <div class="org-src-container">
 
-<pre class="src src-sh" id="setup-tmux">rm ~/.tmux-local-socket-remote-machine
-<span style="color: #268bd2;">REMOTE_SOCKET</span>=$(<span style="color: #6c71c4; font-weight: bold;">ssh</span> ara <span style="color: #2aa198;">'tmux ls -F "#{socket_path}"'</span> | head -1)
+<pre class="src src-sh" id="setup-tmux"><span style="color: #513f78;">rm</span> <span style="color: #7e544f;">~/.tmux-local-socket-remote-machine</span>
+<span style="color: #268bd2;">REMOTE_SOCKET</span>=$(<span style="color: #6c71c4; font-weight: bold;">ssh</span> <span style="color: #783778;">ara</span> <span style="color: #2aa198;">'tmux ls -F "#{socket_path}"'</span> | <span style="color: #4f5c7e;">head</span> <span style="color: #3f7178;">-1</span>)
 <span style="color: #657b83; font-weight: bold;">echo</span> $<span style="color: #268bd2;">REMOTE_SOCKET</span>
-ssh ara -tfN <span style="color: #b58900; font-weight: bold;">\</span>
-    -L ~/.tmux-local-socket-remote-machine:$<span style="color: #268bd2;">REMOTE_SOCKET</span>
+<span style="color: #7a4f7e;">ssh</span> <span style="color: #783778;">ara</span> <span style="color: #7a4f7e;">-tfN</span> <span style="color: #b58900; font-weight: bold;">\</span>
+    <span style="color: #784437;">-L</span> <span style="color: #513f78;">~/.tmux-local-socket-remote-machine:</span>$<span style="color: #268bd2;">REMOTE_SOCKET</span>
 </pre>
 </div>
 
@@ -707,7 +709,7 @@ tunneling script.
 
 <div class="org-src-container">
 
-<pre class="src src-sh" id="ssh-tunnel">ssh -t -t ara -L $<span style="color: #268bd2;">port</span>:localhost:$<span style="color: #268bd2;">port</span> ssh $<span style="color: #268bd2;">node</span> -L $<span style="color: #268bd2;">port</span>:Localhost:$<span style="color: #268bd2;">port</span>
+<pre class="src src-sh" id="ssh-tunnel"><span style="color: #7a4f7e;">ssh</span> <span style="color: #7e544f;">-t</span> <span style="color: #7e544f;">-t</span> <span style="color: #783778;">ara</span> <span style="color: #784437;">-L</span> $<span style="color: #268bd2;">port</span>:localhost:$<span style="color: #268bd2;">port</span> <span style="color: #7a4f7e;">ssh</span> $<span style="color: #268bd2;">node</span> <span style="color: #784437;">-L</span> $<span style="color: #268bd2;">port</span>:Localhost:$<span style="color: #268bd2;">port</span>
 </pre>
 </div>
 
@@ -735,11 +737,11 @@ installed is easy using this script:
 
 <div class="org-src-container">
 
-<pre class="src src-tmux" id="jpt-tmux">conda activate tf
-<span style="color: #657b83; font-weight: bold;">export</span> <span style="color: #268bd2;">PORT</span>=9999
+<pre class="src src-tmux" id="jpt-tmux"><span style="color: #4f5c7e;">conda</span> <span style="color: #4f7e67;">activate</span> <span style="color: #37785e;">tf</span>
+<span style="color: #657b83; font-weight: bold;">export</span> <span style="color: #268bd2;">PORT</span>=<span style="color: #3f7178;">9999</span>
 <span style="color: #657b83; font-weight: bold;">export</span> <span style="color: #268bd2;">XDG_RUNTIME_DIR</span>=<span style="color: #2aa198;">''</span>
 <span style="color: #657b83; font-weight: bold;">export</span> <span style="color: #268bd2;">XDG_RUNTIME_DIR</span>=<span style="color: #2aa198;">""</span>
-jupyter lab --no-browser --port=$<span style="color: #268bd2;">PORT</span>
+<span style="color: #37785e;">jupyter</span> <span style="color: #4f5c7e;">lab</span> <span style="color: #783778;">--no-browser</span> <span style="color: #5e7837;">--port</span>=$<span style="color: #268bd2;">PORT</span>
 </pre>
 </div>
 
@@ -776,7 +778,7 @@ Let's verify that now.
 
 <div class="org-src-container">
 
-<pre class="src src-sh">tmux -V
+<pre class="src src-sh"><span style="color: #4f5c7e;">tmux</span> <span style="color: #3f7178;">-V</span>
 </pre>
 </div>
 
@@ -789,7 +791,7 @@ tmux 3.0a
 
 <div class="org-src-container">
 
-<pre class="src src-sh">ssh ara tmux -V
+<pre class="src src-sh"><span style="color: #7a4f7e;">ssh</span> <span style="color: #783778;">ara</span> <span style="color: #4f5c7e;">tmux</span> <span style="color: #3f7178;">-V</span>
 </pre>
 </div>
 
@@ -823,10 +825,10 @@ machine (note that <code>socket_path</code> was introduced in tmux version 2.2)
 
 <div class="org-src-container">
 
-<pre class="src src-sh"><span style="color: #268bd2;">REMOTE_SOCKET</span>=$(<span style="color: #6c71c4; font-weight: bold;">ssh</span> ara <span style="color: #2aa198;">'tmux ls -F "#{socket_path}"'</span> | head -1)
+<pre class="src src-sh"><span style="color: #268bd2;">REMOTE_SOCKET</span>=$(<span style="color: #6c71c4; font-weight: bold;">ssh</span> <span style="color: #783778;">ara</span> <span style="color: #2aa198;">'tmux ls -F "#{socket_path}"'</span> | <span style="color: #4f5c7e;">head</span> <span style="color: #3f7178;">-1</span>)
 <span style="color: #657b83; font-weight: bold;">echo</span> $<span style="color: #268bd2;">REMOTE_SOCKET</span>
-ssh ara -tfN <span style="color: #b58900; font-weight: bold;">\</span>
-    -L ~/.tmux-local-socket-remote-machine:$<span style="color: #268bd2;">REMOTE_SOCKET</span>
+<span style="color: #7a4f7e;">ssh</span> <span style="color: #783778;">ara</span> <span style="color: #7a4f7e;">-tfN</span> <span style="color: #b58900; font-weight: bold;">\</span>
+    <span style="color: #784437;">-L</span> <span style="color: #513f78;">~/.tmux-local-socket-remote-machine:</span>$<span style="color: #268bd2;">REMOTE_SOCKET</span>
 </pre>
 </div>
 
@@ -917,7 +919,7 @@ which allows to print the output from the tmux session in an
 <li>customize the output folder using the following org-mode variable:
 <div class="org-src-container">
 
-<pre class="src src-emacs-lisp">(<span style="color: #859900; font-weight: bold;">setq</span> org-babel-jupyter-resource-directory <span style="color: #2aa198;">"./data/exp-test/plots"</span>)
+<pre class="src src-emacs-lisp">(<span style="color: #859900; font-weight: bold;">setq</span> <span style="color: #783f5a;">org-babel-jupyter-resource-directory</span> <span style="color: #2aa198;">"./data/exp-test/plots"</span>)
 </pre>
 </div>
 
@@ -1006,6 +1008,16 @@ with the keyword: <code>#+PROPERTY: header-args :eval never-export :exports
 of them a distinct colour using <code>#+HTML_HEAD_EXTRA: &lt;style...</code> (see
 above)
 </li>
+<li>I had to configure a style for <code>table</code>, so that the
+<ul class="org-ul">
+<li><code>display: block; overflow-x: auto;</code> gets the table to be restricted
+to the width of the text and if it is larger, activates scrolling
+</li>
+<li><code>white-space: nowrap;</code> makes it that there is no wrap in a column, so
+it might be broader, but better readable if you have scrolling anyway
+</li>
+</ul>
+</li>
 </ul>
 </li>
 <li><span class="underline">Things to do before exporting / Troubleshooting while exporting:</span>
@@ -1043,18 +1055,28 @@ expandable. I added some <code>#+HTML_HEAD_EXTRA: &lt;style...</code> inspired b
 
 #+end_details
 </pre>
-<p>
-If you want an
-</p>
+</li>
+<li>If you reference a parameter with an underscore in the name, use the
+org markdown tricks to style them like code (<code>==</code> or <code>~~</code>), otherwise
+the part after the underscore will be rendered like a subscript:
+<code>under_score</code> vs under<sub>score</sub>
 </li>
 </ul>
 </li>
 <li><span class="underline">Things to do after exporting:</span>
 <ul class="org-ul">
-<li>In my workflow, I put the exported <code>LabBook.html</code> into the <code>data</code>
-folder. If you move the file, you will have to fix the file links for
-the new location, e.g. via "Find and replace" <code>M-%</code> with find:
-<code>[[file:./data/</code> and replace: <code>[[</code>
+<li>In my workflow, the exported <code>LabBook.html</code> with the overview of all
+experiments is in the <code>data</code> folder. If you move the file, you will
+have to fix the file links for the new location, e.g. via "Find and
+replace" <code>M-%</code>:
+<ul class="org-ul">
+<li>if you move the org file → in the org file find <code>[[file:./data/</code> and
+replace with <code>[[file:./</code> → then export with <code>C-c C-e w h</code>
+</li>
+<li>if you export first with <code>C-c C-e w h</code> and move the html file to
+<code>data</code> → in the html file find <code>./data</code> and replace with <code>.</code>
+</li>
+</ul>
 </li>
 </ul>
 </li>
@@ -1150,8 +1172,8 @@ the merge commit to make accessing single experiments easy.
 <div class="outline-text-5" id="text-1-3-5-2">
 <div class="org-src-container">
 
-<pre class="src src-sh">git push origin --tags
-git tag -n1
+<pre class="src src-sh"><span style="color: #784437;">git</span> <span style="color: #78683f;">push</span> <span style="color: #783f5a;">origin</span> <span style="color: #7a4f7e;">--tags</span>
+<span style="color: #784437;">git</span> <span style="color: #374478;">tag</span> <span style="color: #707e4f;">-n1</span>
 </pre>
 </div>
 
@@ -1223,8 +1245,18 @@ exp-310520-unet move exp-310520-unet to data branch manually
 <h4 id="sec-1-5-1"><span class="section-number-4">1.5.1</span> Changes in LabBook.org (without "* Data")</h4>
 <div class="outline-text-4" id="text-1-5-1">
 </div><div id="outline-container-sec-1-5-1-1" class="outline-5">
-<h5 id="sec-1-5-1-1"><span class="section-number-5">1.5.1.1</span> 2021-12-16</h5>
+<h5 id="sec-1-5-1-1"><span class="section-number-5">1.5.1.1</span> 2022-02-19</h5>
 <div class="outline-text-5" id="text-1-5-1-1">
+<ul class="org-ul">
+<li>Add <code>#+HTML_HEAD_EXTRA: &lt;style...</code> for <code>table</code> to enable scrolling if the
+table overflows
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-1-5-1-2" class="outline-5">
+<h5 id="sec-1-5-1-2"><span class="section-number-5">1.5.1.2</span> 2021-12-16</h5>
+<div class="outline-text-5" id="text-1-5-1-2">
 <ul class="org-ul">
 <li>Add <code>details</code> blocks, corresponding <code>#+HTML_HEAD_EXTRA: &lt;style...</code> and
 documentation in  <a href="#sec-1-2-3">Notes on archiving</a>
@@ -1232,18 +1264,18 @@ documentation in  <a href="#sec-1-2-3">Notes on archiving</a>
 </ul>
 </div>
 </div>
-<div id="outline-container-sec-1-5-1-2" class="outline-5">
-<h5 id="sec-1-5-1-2"><span class="section-number-5">1.5.1.2</span> 2021-08-05</h5>
-<div class="outline-text-5" id="text-1-5-1-2">
+<div id="outline-container-sec-1-5-1-3" class="outline-5">
+<h5 id="sec-1-5-1-3"><span class="section-number-5">1.5.1.3</span> 2021-08-05</h5>
+<div class="outline-text-5" id="text-1-5-1-3">
 <ul class="org-ul">
 <li>Rename <code>master</code> branch to <code>main</code> branch
 </li>
 </ul>
 </div>
 </div>
-<div id="outline-container-sec-1-5-1-3" class="outline-5">
-<h5 id="sec-1-5-1-3"><span class="section-number-5">1.5.1.3</span> 2021-04-04</h5>
-<div class="outline-text-5" id="text-1-5-1-3">
+<div id="outline-container-sec-1-5-1-4" class="outline-5">
+<h5 id="sec-1-5-1-4"><span class="section-number-5">1.5.1.4</span> 2021-04-04</h5>
+<div class="outline-text-5" id="text-1-5-1-4">
 <ul class="org-ul">
 <li>Add <code>#+OPTIONS: H:4</code> and <code>#+OPTIONS: toc:4</code> to show up to 4 levels of
 depth in the html (twbs) export of this LabBook in the table of contents
@@ -1254,9 +1286,9 @@ at the side
 </ul>
 </div>
 </div>
-<div id="outline-container-sec-1-5-1-4" class="outline-5">
-<h5 id="sec-1-5-1-4"><span class="section-number-5">1.5.1.4</span> 2020-11-04</h5>
-<div class="outline-text-5" id="text-1-5-1-4">
+<div id="outline-container-sec-1-5-1-5" class="outline-5">
+<h5 id="sec-1-5-1-5"><span class="section-number-5">1.5.1.5</span> 2020-11-04</h5>
+<div class="outline-text-5" id="text-1-5-1-5">
 <ul class="org-ul">
 <li>update "jupyter scripts" in <a href="#sec-1-2">Template for data entry and setup notes:</a>
 for new conda environment on server (now <code>conda activate tf-nightly</code>)
@@ -1264,9 +1296,9 @@ for new conda environment on server (now <code>conda activate tf-nightly</code>)
 </ul>
 </div>
 </div>
-<div id="outline-container-sec-1-5-1-5" class="outline-5">
-<h5 id="sec-1-5-1-5"><span class="section-number-5">1.5.1.5</span> 2020-05-31</h5>
-<div class="outline-text-5" id="text-1-5-1-5">
+<div id="outline-container-sec-1-5-1-6" class="outline-5">
+<h5 id="sec-1-5-1-6"><span class="section-number-5">1.5.1.6</span> 2020-05-31</h5>
+<div class="outline-text-5" id="text-1-5-1-6">
 <ul class="org-ul">
 <li>extend general documentation in README
 </li>
@@ -1286,9 +1318,9 @@ jupyter lab. Load a conda environment instead of using Lmod's <code>module
 </ul>
 </div>
 </div>
-<div id="outline-container-sec-1-5-1-6" class="outline-5">
-<h5 id="sec-1-5-1-6"><span class="section-number-5">1.5.1.6</span> 2020-05-07</h5>
-<div class="outline-text-5" id="text-1-5-1-6">
+<div id="outline-container-sec-1-5-1-7" class="outline-5">
+<h5 id="sec-1-5-1-7"><span class="section-number-5">1.5.1.7</span> 2020-05-07</h5>
+<div class="outline-text-5" id="text-1-5-1-7">
 <ul class="org-ul">
 <li>extend documentation on git model
 </li>
@@ -1297,9 +1329,9 @@ jupyter lab. Load a conda environment instead of using Lmod's <code>module
 </ul>
 </div>
 </div>
-<div id="outline-container-sec-1-5-1-7" class="outline-5">
-<h5 id="sec-1-5-1-7"><span class="section-number-5">1.5.1.7</span> 2020-04-22</h5>
-<div class="outline-text-5" id="text-1-5-1-7">
+<div id="outline-container-sec-1-5-1-8" class="outline-5">
+<h5 id="sec-1-5-1-8"><span class="section-number-5">1.5.1.8</span> 2020-04-22</h5>
+<div class="outline-text-5" id="text-1-5-1-8">
 <ul class="org-ul">
 <li>added parts of README which describe the experimental process
 </li>
@@ -1310,9 +1342,9 @@ jupyter lab. Load a conda environment instead of using Lmod's <code>module
 </ul>
 </div>
 </div>
-<div id="outline-container-sec-1-5-1-8" class="outline-5">
-<h5 id="sec-1-5-1-8"><span class="section-number-5">1.5.1.8</span> 2020-03-30</h5>
-<div class="outline-text-5" id="text-1-5-1-8">
+<div id="outline-container-sec-1-5-1-9" class="outline-5">
+<h5 id="sec-1-5-1-9"><span class="section-number-5">1.5.1.9</span> 2020-03-30</h5>
+<div class="outline-text-5" id="text-1-5-1-9">
 <ul class="org-ul">
 <li>set up lab book and form git repo accoring to setup by Luka Stanisic et al
 </li>
@@ -1417,8 +1449,8 @@ jupyter lab. Load a conda environment instead of using Lmod's <code>module
 <li>first, connect with the GPU node in the high performance cluster
 <div class="org-src-container">
 
-<pre class="src src-tmux"><span style="color: #657b83; font-weight: bold;">cd</span> /
-srun -p gpu_v100 --time=5-10:00:00 --ntasks-per-node=12 --mem-per-cpu=4000 --gres=gpu:1 --pty bash
+<pre class="src src-tmux"><span style="color: #657b83; font-weight: bold;">cd</span> <span style="color: #513f78;">/</span>
+<span style="color: #78683f;">srun</span> <span style="color: #707e4f;">-p</span> <span style="color: #78683f;">gpu_v100</span> <span style="color: #374478;">--time</span>=<span style="color: #5e7837;">5-10:00:00</span> <span style="color: #7e544f;">--ntasks-per-node</span>=<span style="color: #7e544f;">12</span> <span style="color: #783f5a;">--mem-per-cpu</span>=<span style="color: #783778;">4000</span> <span style="color: #3f7178;">--gres</span>=<span style="color: #43783f;">gpu:1</span> <span style="color: #7e544f;">--pty</span> <span style="color: #374478;">bash</span>
 </pre>
 </div>
 
@@ -1431,9 +1463,9 @@ srun -p gpu_v100 --time=5-10:00:00 --ntasks-per-node=12 --mem-per-cpu=4000 --gre
 (see <a href="https://www.tensorflow.org/install/source#gpu">https://www.tensorflow.org/install/source#gpu</a>)
 <div class="org-src-container">
 
-<pre class="src src-tmux">module load nvidia/cuda/11.2
-module load nvidia/cudnn/8.1
-module list
+<pre class="src src-tmux"><span style="color: #707e4f;">module</span> <span style="color: #3f7178;">load</span> <span style="color: #783f5a;">nvidia/cuda/11.2</span>
+<span style="color: #707e4f;">module</span> <span style="color: #3f7178;">load</span> <span style="color: #37785e;">nvidia/cudnn/8.1</span>
+<span style="color: #707e4f;">module</span> <span style="color: #513f78;">list</span>
 </pre>
 </div>
 </li>
@@ -1443,8 +1475,8 @@ and make sure you are on the correct branch
 
 <div class="org-src-container">
 
-<pre class="src src-tmux"><span style="color: #657b83; font-weight: bold;">cd</span> /beegfs/ye53nis/drmed-git
-git checkout exp-210807-hparams
+<pre class="src src-tmux"><span style="color: #657b83; font-weight: bold;">cd</span> <span style="color: #783778;">/beegfs/ye53nis/drmed-git</span>
+<span style="color: #784437;">git</span> <span style="color: #783778;">checkout</span> <span style="color: #783778;">exp-210807-hparams</span>
 </pre>
 </div>
 
@@ -1462,9 +1494,9 @@ Switched to a new branch 'exp-210807-hparams'
 <li>Side quest: remove last remnants of failed git LFS experiments
 <div class="org-src-container">
 
-<pre class="src src-tmux">cat .git/hooks/post-checkout
-rm .git/hooks/post-checkout
-rm .git/hooks/pre-push
+<pre class="src src-tmux"><span style="color: #4f7e67;">cat</span> <span style="color: #4f7e67;">.git/hooks/post-checkout</span>
+<span style="color: #513f78;">rm</span> <span style="color: #4f7e67;">.git/hooks/post-checkout</span>
+<span style="color: #513f78;">rm</span> <span style="color: #783f5a;">.git/hooks/pre-push</span>
 </pre>
 </div>
 
@@ -1487,7 +1519,7 @@ Everything up-to-date
 <li>Load conda environment
 <div class="org-src-container">
 
-<pre class="src src-tmux">conda activate tf
+<pre class="src src-tmux"><span style="color: #4f5c7e;">conda</span> <span style="color: #4f7e67;">activate</span> <span style="color: #37785e;">tf</span>
 </pre>
 </div>
 
@@ -1499,10 +1531,10 @@ Everything up-to-date
 <li>define MLflow environment variables and create log directory
 <div class="org-src-container">
 
-<pre class="src src-tmux"><span style="color: #657b83; font-weight: bold;">cd</span> /beegfs/ye53nis/drmed-git
-<span style="color: #657b83; font-weight: bold;">export</span> <span style="color: #268bd2;">MLFLOW_EXPERIMENT_NAME</span>=exp-210807-hparams
-<span style="color: #657b83; font-weight: bold;">export</span> <span style="color: #268bd2;">MLFLOW_TRACKING_URI</span>=file:/beegfs/ye53nis/drmed-git/data/mlruns
-mkdir data/exp-210807-hparams
+<pre class="src src-tmux"><span style="color: #657b83; font-weight: bold;">cd</span> <span style="color: #783778;">/beegfs/ye53nis/drmed-git</span>
+<span style="color: #657b83; font-weight: bold;">export</span> <span style="color: #268bd2;">MLFLOW_EXPERIMENT_NAME</span>=<span style="color: #783778;">exp-210807-hparams</span>
+<span style="color: #657b83; font-weight: bold;">export</span> <span style="color: #268bd2;">MLFLOW_TRACKING_URI</span>=<span style="color: #78683f;">file:/beegfs/ye53nis/drmed-git/data/mlruns</span>
+<span style="color: #7a4f7e;">mkdir</span> <span style="color: #784437;">data/exp-210807-hparams</span>
 </pre>
 </div>
 
@@ -1521,7 +1553,7 @@ mkdir data/exp-210807-hparams
 <li>customize the output folder using the following org-mode variable:
 <div class="org-src-container">
 
-<pre class="src src-emacs-lisp">(<span style="color: #859900; font-weight: bold;">setq</span> org-babel-jupyter-resource-directory <span style="color: #2aa198;">"./data/exp-210807-hparams/jupyter"</span>)
+<pre class="src src-emacs-lisp">(<span style="color: #859900; font-weight: bold;">setq</span> <span style="color: #783f5a;">org-babel-jupyter-resource-directory</span> <span style="color: #2aa198;">"./data/exp-210807-hparams/jupyter"</span>)
 </pre>
 </div>
 
@@ -1567,8 +1599,8 @@ mkdir data/exp-210807-hparams
 <li>Request compute node
 <div class="org-src-container">
 
-<pre class="src src-tmux"><span style="color: #657b83; font-weight: bold;">cd</span> /
-srun -p s_standard --time=7-10:00:00 --ntasks-per-node=24 --mem-per-cpu=2000 --pty bash
+<pre class="src src-tmux"><span style="color: #657b83; font-weight: bold;">cd</span> <span style="color: #513f78;">/</span>
+<span style="color: #78683f;">srun</span> <span style="color: #707e4f;">-p</span> <span style="color: #78683f;">s_standard</span> <span style="color: #374478;">--time</span>=<span style="color: #3f7178;">7-10:00:00</span> <span style="color: #7e544f;">--ntasks-per-node</span>=<span style="color: #783f5a;">24</span> <span style="color: #783f5a;">--mem-per-cpu</span>=<span style="color: #3f7178;">2000</span> <span style="color: #7e544f;">--pty</span> <span style="color: #374478;">bash</span>
 </pre>
 </div>
 </li>
@@ -1990,8 +2022,8 @@ Note: you may need to restart the kernel to use updated packages.
 <li>Create mlflow tmux session and start mlflow ui
 <div class="org-src-container">
 
-<pre class="src src-tmux">conda activate tf
-mlflow ui --backend-store-uri file:///beegfs/ye53nis/drmed-git/data/mlruns -p 5001
+<pre class="src src-tmux"><span style="color: #4f5c7e;">conda</span> <span style="color: #4f7e67;">activate</span> <span style="color: #37785e;">tf</span>
+<span style="color: #5e7837;">mlflow</span> <span style="color: #7e544f;">ui</span> <span style="color: #707e4f;">--backend-store-uri</span> <span style="color: #7a4f7e;">file:///beegfs/ye53nis/drmed-git/data/mlruns</span> <span style="color: #707e4f;">-p</span> <span style="color: #4f7e67;">5001</span>
 </pre>
 </div>
 
@@ -2107,7 +2139,7 @@ ssh-tunnel[:session local3](port="5001", node="login01"))
 <div class="org-src-container">
 
 <pre class="src src-tmux"><span style="color: #657b83; font-weight: bold;">pwd</span>
-git log -5
+<span style="color: #784437;">git</span> <span style="color: #78683f;">log</span> <span style="color: #513f78;">-5</span>
 </pre>
 </div>
 
@@ -2153,19 +2185,19 @@ Date:   Wed Aug 4 22:36:06 2021 +0200
 <li>GPU, CPU, RAM, file system, env variables, top info
 <div class="org-src-container">
 
-<pre class="src src-tmux">nvcc -V
-<span style="color: #657b83; font-weight: bold;">echo</span> --------------------
-lscpu
-<span style="color: #657b83; font-weight: bold;">echo</span> --------------------
-nproc
-<span style="color: #657b83; font-weight: bold;">echo</span> --------------------
-free -h
-<span style="color: #657b83; font-weight: bold;">echo</span> --------------------
-df -h
-<span style="color: #657b83; font-weight: bold;">echo</span> --------------------
-printenv
-<span style="color: #657b83; font-weight: bold;">echo</span> --------------------
-top -bcn1 -w512 | head -n 15
+<pre class="src src-tmux"><span style="color: #37785e;">nvcc</span> <span style="color: #3f7178;">-V</span>
+<span style="color: #657b83; font-weight: bold;">echo</span> <span style="color: #78683f;">--------------------</span>
+<span style="color: #37785e;">lscpu</span>
+<span style="color: #657b83; font-weight: bold;">echo</span> <span style="color: #78683f;">--------------------</span>
+<span style="color: #374478;">nproc</span>
+<span style="color: #657b83; font-weight: bold;">echo</span> <span style="color: #78683f;">--------------------</span>
+<span style="color: #5e7837;">free</span> <span style="color: #5e7837;">-h</span>
+<span style="color: #657b83; font-weight: bold;">echo</span> <span style="color: #78683f;">--------------------</span>
+<span style="color: #4f7e67;">df</span> <span style="color: #5e7837;">-h</span>
+<span style="color: #657b83; font-weight: bold;">echo</span> <span style="color: #78683f;">--------------------</span>
+<span style="color: #5e7837;">printenv</span>
+<span style="color: #657b83; font-weight: bold;">echo</span> <span style="color: #78683f;">--------------------</span>
+<span style="color: #783f5a;">top</span> <span style="color: #4f5c7e;">-bcn1</span> <span style="color: #37785e;">-w512</span> | <span style="color: #4f5c7e;">head</span> <span style="color: #707e4f;">-n</span> <span style="color: #707e4f;">15</span>
 </pre>
 </div>
 
@@ -2391,7 +2423,7 @@ KiB Swap: 12582908 total, 12580604 free,     2304 used. 12863139+avail Mem
 <li>print conda list
 <div class="org-src-container">
 
-<pre class="src src-tmux">conda list
+<pre class="src src-tmux"><span style="color: #4f5c7e;">conda</span> <span style="color: #513f78;">list</span>
 </pre>
 </div>
 
@@ -2574,17 +2606,17 @@ shapes, which may have implications for the training. Thats why I
 manually created different splits of train and val data.
 <div class="org-src-container">
 
-<pre class="src src-tmux">tree ../saves/firstartifact_Nov2020_train_max3sets
-<span style="color: #657b83; font-weight: bold;">echo</span> --------------------
-tree ../saves/firstartifact_Nov2020_val_max3sets
-<span style="color: #657b83; font-weight: bold;">echo</span> --------------------
-tree ../saves/firstartifact_Nov2020_train_max2sets
-<span style="color: #657b83; font-weight: bold;">echo</span> --------------------
-tree ../saves/firstartifact_Nov2020_val_max2sets_SORTEDIN
-<span style="color: #657b83; font-weight: bold;">echo</span> --------------------
-tree ../saves/firstartifact_Nov2020_train_max1set
-<span style="color: #657b83; font-weight: bold;">echo</span> --------------------
-tree ../saves/firstartifact_Nov2020_test
+<pre class="src src-tmux"><span style="color: #7e544f;">tree</span> <span style="color: #3f7178;">../saves/firstartifact_Nov2020_train_max3sets</span>
+<span style="color: #657b83; font-weight: bold;">echo</span> <span style="color: #78683f;">--------------------</span>
+<span style="color: #7e544f;">tree</span> <span style="color: #783778;">../saves/firstartifact_Nov2020_val_max3sets</span>
+<span style="color: #657b83; font-weight: bold;">echo</span> <span style="color: #78683f;">--------------------</span>
+<span style="color: #7e544f;">tree</span> <span style="color: #783f5a;">../saves/firstartifact_Nov2020_train_max2sets</span>
+<span style="color: #657b83; font-weight: bold;">echo</span> <span style="color: #78683f;">--------------------</span>
+<span style="color: #7e544f;">tree</span> <span style="color: #43783f;">../saves/firstartifact_Nov2020_val_max2sets_SORTEDIN</span>
+<span style="color: #657b83; font-weight: bold;">echo</span> <span style="color: #78683f;">--------------------</span>
+<span style="color: #7e544f;">tree</span> <span style="color: #5e7837;">../saves/firstartifact_Nov2020_train_max1set</span>
+<span style="color: #657b83; font-weight: bold;">echo</span> <span style="color: #78683f;">--------------------</span>
+<span style="color: #7e544f;">tree</span> <span style="color: #37785e;">../saves/firstartifact_Nov2020_test</span>
 </pre>
 </div>
 
@@ -3066,7 +3098,7 @@ printed (but logged in MLFLOW of course)
 
 <div class="org-src-container">
 
-<pre class="src src-tmux">mlflow run . -e search_hparams -P <span style="color: #268bd2;">fluotracify_path</span>=/beegfs/ye53nis/drmed-git/src/ -P <span style="color: #268bd2;">csv_path_train</span>=/beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets -P <span style="color: #268bd2;">csv_path_val</span>=/beegfs/ye53nis/saves/firstartifact_Nov2020_val_max2sets_SORTEDIN -P <span style="color: #268bd2;">num_session_groups</span>=70
+<pre class="src src-tmux"><span style="color: #5e7837;">mlflow</span> <span style="color: #784437;">run</span> <span style="color: #513f78;">.</span> <span style="color: #3f7178;">-e</span> <span style="color: #5e7837;">search_hparams</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">fluotracify_path</span>=<span style="color: #783778;">/beegfs/ye53nis/drmed-git/src/</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">csv_path_train</span>=<span style="color: #374478;">/beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">csv_path_val</span>=<span style="color: #783f5a;">/beegfs/ye53nis/saves/firstartifact_Nov2020_val_max2sets_SORTEDIN</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">num_session_groups</span>=<span style="color: #3f7178;">70</span>
 </pre>
 </div>
 
@@ -5109,7 +5141,7 @@ gfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets --csv_path_val /beegfs/ye
 <div class="org-src-container">
 
 <pre class="src src-tmux"><span style="color: #657b83; font-weight: bold;">pwd</span>
-git log -5
+<span style="color: #784437;">git</span> <span style="color: #78683f;">log</span> <span style="color: #513f78;">-5</span>
 </pre>
 </div>
 
@@ -5188,7 +5220,7 @@ for improvements in the hparam space and I came up with the following:
 
 <div class="org-src-container">
 
-<pre class="src src-tmux">mlflow run . -e search_hparams -P <span style="color: #268bd2;">fluotracify_path</span>=/beegfs/ye53nis/drmed-git/src/ -P <span style="color: #268bd2;">csv_path_train</span>=/beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets -P <span style="color: #268bd2;">csv_path_val</span>=/beegfs/ye53nis/saves/firstartifact_Nov2020_val_max2sets_SORTEDIN -P <span style="color: #268bd2;">num_session_groups</span>=60
+<pre class="src src-tmux"><span style="color: #5e7837;">mlflow</span> <span style="color: #784437;">run</span> <span style="color: #513f78;">.</span> <span style="color: #3f7178;">-e</span> <span style="color: #5e7837;">search_hparams</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">fluotracify_path</span>=<span style="color: #783778;">/beegfs/ye53nis/drmed-git/src/</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">csv_path_train</span>=<span style="color: #374478;">/beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">csv_path_val</span>=<span style="color: #783f5a;">/beegfs/ye53nis/saves/firstartifact_Nov2020_val_max2sets_SORTEDIN</span> <span style="color: #374478;">-P</span> <span style="color: #268bd2;">num_session_groups</span>=<span style="color: #374478;">60</span>
 </pre>
 </div>
 
@@ -7155,7 +7187,7 @@ train_function -&gt; train_function
 <li>start
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python">%cd /beegfs/ye53nis/drmed-git
+<pre class="src src-jupyter-python">%<span style="color: #707e4f;">cd</span> /<span style="color: #5e7837;">beegfs</span>/<span style="color: #7a4f7e;">ye53nis</span>/<span style="color: #784437;">drmed</span>-<span style="color: #784437;">git</span>
 </pre>
 </div>
 
@@ -7166,21 +7198,21 @@ train_function -&gt; train_function
 
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python"><span style="color: #859900; font-weight: bold;">import</span> mlflow
-<span style="color: #859900; font-weight: bold;">import</span> sys
+<pre class="src src-jupyter-python"><span style="color: #859900; font-weight: bold;">import</span> <span style="color: #5e7837;">mlflow</span>
+<span style="color: #859900; font-weight: bold;">import</span> <span style="color: #513f78;">sys</span>
 
-<span style="color: #859900; font-weight: bold;">import</span> matplotlib.pyplot <span style="color: #859900; font-weight: bold;">as</span> plt
-<span style="color: #859900; font-weight: bold;">import</span> numpy <span style="color: #859900; font-weight: bold;">as</span> np
-<span style="color: #859900; font-weight: bold;">import</span> pandas <span style="color: #859900; font-weight: bold;">as</span> pd
+<span style="color: #859900; font-weight: bold;">import</span> <span style="color: #37785e;">matplotlib</span>.<span style="color: #4f7e67;">pyplot</span> <span style="color: #859900; font-weight: bold;">as</span> <span style="color: #4f7e67;">plt</span>
+<span style="color: #859900; font-weight: bold;">import</span> <span style="color: #4f5c7e;">numpy</span> <span style="color: #859900; font-weight: bold;">as</span> <span style="color: #707e4f;">np</span>
+<span style="color: #859900; font-weight: bold;">import</span> <span style="color: #5e7837;">pandas</span> <span style="color: #859900; font-weight: bold;">as</span> <span style="color: #783778;">pd</span>
 </pre>
 </div>
 
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python">sys.path.append(<span style="color: #2aa198;">'src/'</span>)
-<span style="color: #859900; font-weight: bold;">from</span> fluotracify.training <span style="color: #859900; font-weight: bold;">import</span> build_model <span style="color: #859900; font-weight: bold;">as</span> bm, preprocess_data <span style="color: #859900; font-weight: bold;">as</span> ppd
-<span style="color: #859900; font-weight: bold;">from</span> fluotracify.applications <span style="color: #859900; font-weight: bold;">import</span> correlate, plots, correction
-<span style="color: #859900; font-weight: bold;">from</span> fluotracify.imports <span style="color: #859900; font-weight: bold;">import</span> ptu_utils <span style="color: #859900; font-weight: bold;">as</span> ptu
+<pre class="src src-jupyter-python"><span style="color: #513f78;">sys</span>.<span style="color: #513f78;">path</span>.<span style="color: #5e7837;">append</span>(<span style="color: #2aa198;">'src/'</span>)
+<span style="color: #859900; font-weight: bold;">from</span> <span style="color: #783778;">fluotracify</span>.<span style="color: #3f7178;">training</span> <span style="color: #859900; font-weight: bold;">import</span> <span style="color: #783778;">build_model</span> <span style="color: #859900; font-weight: bold;">as</span> <span style="color: #374478;">bm</span>, <span style="color: #784437;">preprocess_data</span> <span style="color: #859900; font-weight: bold;">as</span> <span style="color: #783f5a;">ppd</span>
+<span style="color: #859900; font-weight: bold;">from</span> <span style="color: #783778;">fluotracify</span>.<span style="color: #4f5c7e;">applications</span> <span style="color: #859900; font-weight: bold;">import</span> <span style="color: #5e7837;">correlate</span>, <span style="color: #4f5c7e;">plots</span>, <span style="color: #3f7178;">correction</span>
+<span style="color: #859900; font-weight: bold;">from</span> <span style="color: #783778;">fluotracify</span>.<span style="color: #783f5a;">imports</span> <span style="color: #859900; font-weight: bold;">import</span> <span style="color: #7a4f7e;">ptu_utils</span> <span style="color: #859900; font-weight: bold;">as</span> <span style="color: #78683f;">ptu</span>
 </pre>
 </div>
 </li>
@@ -7191,9 +7223,9 @@ copied the comparison into libreoffice calc by hand and saved it as a
 csv. Now lets load it and print the validation AUC as an example.
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python"><span style="color: #268bd2;">run1_2</span> = pd.read_csv(<span style="color: #2aa198;">'data/exp-210807-hparams/run1-2_comparison.csv'</span>, index_col=0)
-<span style="color: #268bd2;">run1_2_valauc</span> = run1_2.loc[<span style="color: #2aa198;">'val_auc'</span>].astype(<span style="color: #657b83; font-weight: bold;">float</span>)
-run1_2_valauc
+<pre class="src src-jupyter-python"><span style="color: #268bd2;">run1_2</span> = <span style="color: #783778;">pd</span>.<span style="color: #78683f;">read_csv</span>(<span style="color: #2aa198;">'data/exp-210807-hparams/run1-2_comparison.csv'</span>, <span style="color: #784437;">index_col</span>=0)
+<span style="color: #268bd2;">run1_2_valauc</span> = <span style="color: #3f7178;">run1_2</span>.<span style="color: #783778;">loc</span>[<span style="color: #2aa198;">'val_auc'</span>].<span style="color: #374478;">astype</span>(<span style="color: #657b83; font-weight: bold;">float</span>)
+<span style="color: #783f5a;">run1_2_valauc</span>
 </pre>
 </div>
 
@@ -7220,9 +7252,9 @@ the program crashed. We have to remove it and later add it again.
 <div class="org-src-container">
 
 <pre class="src src-jupyter-python"><span style="color: #268bd2;">singles_ls</span> = [<span style="color: #2aa198;">'5441e71efe0f4dae868648e7cc795c65'</span>]
-<span style="color: #268bd2;">run1_2_singles</span> = run1_2.loc[:, singles_ls]
-run1_2_singles.iloc[35:, :] = run1_2_singles.iloc[35:, :].astype(np.float64)
-run1_2_singles
+<span style="color: #268bd2;">run1_2_singles</span> = <span style="color: #3f7178;">run1_2</span>.<span style="color: #783778;">loc</span>[:, <span style="color: #37785e;">singles_ls</span>]
+<span style="color: #7e544f;">run1_2_singles</span>.<span style="color: #4f5c7e;">iloc</span>[35:, :] = <span style="color: #7e544f;">run1_2_singles</span>.<span style="color: #4f5c7e;">iloc</span>[35:, :].<span style="color: #374478;">astype</span>(<span style="color: #707e4f;">np</span>.<span style="color: #707e4f;">float64</span>)
+<span style="color: #7e544f;">run1_2_singles</span>
 </pre>
 </div>
 
@@ -7303,41 +7335,41 @@ run1_2_singles
 
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python"><span style="color: #268bd2;">run1_2</span> = run1_2.drop(columns=singles_ls)
+<pre class="src src-jupyter-python"><span style="color: #268bd2;">run1_2</span> = <span style="color: #3f7178;">run1_2</span>.<span style="color: #5e7837;">drop</span>(<span style="color: #784437;">columns</span>=<span style="color: #37785e;">singles_ls</span>)
 </pre>
 </div>
 
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python"><span style="color: #859900; font-weight: bold;">assert</span> <span style="color: #657b83; font-weight: bold;">len</span>(run1_2.iloc[35:, :].columns) % <span style="color: #268bd2;">2</span> == 0
+<pre class="src src-jupyter-python"><span style="color: #859900; font-weight: bold;">assert</span> <span style="color: #657b83; font-weight: bold;">len</span>(<span style="color: #3f7178;">run1_2</span>.<span style="color: #4f5c7e;">iloc</span>[35:, :].<span style="color: #784437;">columns</span>) % <span style="color: #268bd2;">2</span> == 0
 </pre>
 </div>
 
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python"><span style="color: #268bd2;">run1_2_doubleparams</span> = pd.DataFrame()
-<span style="color: #268bd2;">run1_2_doublemetrics</span> = pd.DataFrame()
+<pre class="src src-jupyter-python"><span style="color: #268bd2;">run1_2_doubleparams</span> = <span style="color: #783778;">pd</span>.<span style="color: #784437;">DataFrame</span>()
+<span style="color: #268bd2;">run1_2_doublemetrics</span> = <span style="color: #783778;">pd</span>.<span style="color: #784437;">DataFrame</span>()
 <span style="color: #268bd2;">double_cols</span> = []
-<span style="color: #859900; font-weight: bold;">for</span> left, right <span style="color: #859900; font-weight: bold;">in</span> <span style="color: #657b83; font-weight: bold;">zip</span>(run1_2.iloc[:, ::2].items(), run1_2.iloc[:, 1::2].items()):
-<span style="background-color: #eee8d5;"> </span>   double_cols.append((left[0], right[0]))
-<span style="background-color: #eee8d5;"> </span>   <span style="color: #268bd2;">current_metrics</span> = left[1].iloc[35:].combine(other=right[1].iloc[35:],
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   func=(<span style="color: #859900; font-weight: bold;">lambda</span> x1, x2: (<span style="color: #657b83; font-weight: bold;">float</span>(x1) + <span style="color: #657b83; font-weight: bold;">float</span>(x2)) / 2))
-<span style="background-color: #eee8d5;"> </span>   <span style="color: #268bd2;">current_params</span> = left[1].iloc[:35].combine(other=right[1].iloc[:35],
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>  func=(<span style="color: #859900; font-weight: bold;">lambda</span> x1, x2: <span style="color: #657b83; font-weight: bold;">set</span>((x1, x2)) <span style="color: #859900; font-weight: bold;">if</span> x1 != x2 <span style="color: #859900; font-weight: bold;">else</span> x1))
-<span style="background-color: #eee8d5;"> </span>   <span style="color: #268bd2;">run1_2_doubleparams</span> = pd.concat([run1_2_doubleparams, current_params], axis=1)
-<span style="background-color: #eee8d5;"> </span>   <span style="color: #268bd2;">run1_2_doublemetrics</span> = pd.concat([run1_2_doublemetrics, current_metrics], axis=1)
+<span style="color: #859900; font-weight: bold;">for</span> <span style="color: #43783f;">left</span>, <span style="color: #783f5a;">right</span> <span style="color: #859900; font-weight: bold;">in</span> <span style="color: #657b83; font-weight: bold;">zip</span>(<span style="color: #3f7178;">run1_2</span>.<span style="color: #4f5c7e;">iloc</span>[:, ::2].<span style="color: #374478;">items</span>(), <span style="color: #3f7178;">run1_2</span>.<span style="color: #4f5c7e;">iloc</span>[:, 1::2].<span style="color: #374478;">items</span>()):
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #7a4f7e;">double_cols</span>.<span style="color: #5e7837;">append</span>((<span style="color: #43783f;">left</span>[0], <span style="color: #783f5a;">right</span>[0]))
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #268bd2;">current_metrics</span> = <span style="color: #43783f;">left</span>[1].<span style="color: #4f5c7e;">iloc</span>[35:].<span style="color: #43783f;">combine</span>(<span style="color: #78683f;">other</span>=<span style="color: #783f5a;">right</span>[1].<span style="color: #4f5c7e;">iloc</span>[35:],
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #4f5c7e;">func</span>=(<span style="color: #859900; font-weight: bold;">lambda</span> <span style="color: #3f7178;">x1</span>, <span style="color: #5e7837;">x2</span>: (<span style="color: #657b83; font-weight: bold;">float</span>(<span style="color: #3f7178;">x1</span>) + <span style="color: #657b83; font-weight: bold;">float</span>(<span style="color: #5e7837;">x2</span>)) / 2))
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #268bd2;">current_params</span> = <span style="color: #43783f;">left</span>[1].<span style="color: #4f5c7e;">iloc</span>[:35].<span style="color: #43783f;">combine</span>(<span style="color: #78683f;">other</span>=<span style="color: #783f5a;">right</span>[1].<span style="color: #4f5c7e;">iloc</span>[:35],
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>  <span style="color: #4f5c7e;">func</span>=(<span style="color: #859900; font-weight: bold;">lambda</span> <span style="color: #3f7178;">x1</span>, <span style="color: #5e7837;">x2</span>: <span style="color: #657b83; font-weight: bold;">set</span>((<span style="color: #3f7178;">x1</span>, <span style="color: #5e7837;">x2</span>)) <span style="color: #859900; font-weight: bold;">if</span> <span style="color: #3f7178;">x1</span> != <span style="color: #5e7837;">x2</span> <span style="color: #859900; font-weight: bold;">else</span> <span style="color: #3f7178;">x1</span>))
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #268bd2;">run1_2_doubleparams</span> = <span style="color: #783778;">pd</span>.<span style="color: #7e544f;">concat</span>([<span style="color: #43783f;">run1_2_doubleparams</span>, <span style="color: #43783f;">current_params</span>], <span style="color: #784437;">axis</span>=1)
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #268bd2;">run1_2_doublemetrics</span> = <span style="color: #783778;">pd</span>.<span style="color: #7e544f;">concat</span>([<span style="color: #43783f;">run1_2_doublemetrics</span>, <span style="color: #784437;">current_metrics</span>], <span style="color: #784437;">axis</span>=1)
 
-<span style="color: #268bd2;">run1_2_doublemetrics</span> = pd.DataFrame(data=run1_2_doublemetrics.to_numpy(),
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   index=run1_2.iloc[35:, :].index,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   columns=double_cols)
+<span style="color: #268bd2;">run1_2_doublemetrics</span> = <span style="color: #783778;">pd</span>.<span style="color: #784437;">DataFrame</span>(<span style="color: #784437;">data</span>=<span style="color: #43783f;">run1_2_doublemetrics</span>.<span style="color: #7a4f7e;">to_numpy</span>(),
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #43783f;">index</span>=<span style="color: #3f7178;">run1_2</span>.<span style="color: #4f5c7e;">iloc</span>[35:, :].<span style="color: #43783f;">index</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #784437;">columns</span>=<span style="color: #7a4f7e;">double_cols</span>)
 
-<span style="color: #268bd2;">run1_2_doubleparams</span> = pd.DataFrame(data=run1_2_doubleparams.to_numpy(),
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>  index=run1_2.iloc[:35, :].index,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>  columns=double_cols)
+<span style="color: #268bd2;">run1_2_doubleparams</span> = <span style="color: #783778;">pd</span>.<span style="color: #784437;">DataFrame</span>(<span style="color: #784437;">data</span>=<span style="color: #43783f;">run1_2_doubleparams</span>.<span style="color: #7a4f7e;">to_numpy</span>(),
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>  <span style="color: #43783f;">index</span>=<span style="color: #3f7178;">run1_2</span>.<span style="color: #4f5c7e;">iloc</span>[:35, :].<span style="color: #43783f;">index</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>  <span style="color: #784437;">columns</span>=<span style="color: #7a4f7e;">double_cols</span>)
 
-<span style="color: #268bd2;">run1_2_combimetrics</span> = pd.concat([run1_2_doublemetrics, run1_2_singles.iloc[35:, :]], axis=1)
-<span style="color: #268bd2;">run1_2_combiparams</span> = pd.concat([run1_2_doubleparams, run1_2_singles.iloc[:35, :]], axis=1)
-run1_2_combiparams
+<span style="color: #268bd2;">run1_2_combimetrics</span> = <span style="color: #783778;">pd</span>.<span style="color: #7e544f;">concat</span>([<span style="color: #43783f;">run1_2_doublemetrics</span>, <span style="color: #7e544f;">run1_2_singles</span>.<span style="color: #4f5c7e;">iloc</span>[35:, :]], <span style="color: #784437;">axis</span>=1)
+<span style="color: #268bd2;">run1_2_combiparams</span> = <span style="color: #783778;">pd</span>.<span style="color: #7e544f;">concat</span>([<span style="color: #43783f;">run1_2_doubleparams</span>, <span style="color: #7e544f;">run1_2_singles</span>.<span style="color: #4f5c7e;">iloc</span>[:35, :]], <span style="color: #784437;">axis</span>=1)
+<span style="color: #7e544f;">run1_2_combiparams</span>
 </pre>
 </div>
 
@@ -8259,13 +8291,13 @@ run1_2_combiparams
 but especially a high Recall as well:
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python"><span style="color: #268bd2;">cond1</span> = run1_2_combimetrics.loc[<span style="color: #2aa198;">'val_auc'</span>] &gt; 0.95
-<span style="color: #268bd2;">cond2</span> = run1_2_combimetrics.loc[<span style="color: #2aa198;">'val_recall0.5'</span>] &gt; 0.85
-<span style="color: #268bd2;">cond3</span> = run1_2_combimetrics.loc[<span style="color: #2aa198;">'val_precision0.5'</span>] &gt; 0.85
+<pre class="src src-jupyter-python"><span style="color: #268bd2;">cond1</span> = <span style="color: #513f78;">run1_2_combimetrics</span>.<span style="color: #783778;">loc</span>[<span style="color: #2aa198;">'val_auc'</span>] &gt; 0.95
+<span style="color: #268bd2;">cond2</span> = <span style="color: #513f78;">run1_2_combimetrics</span>.<span style="color: #783778;">loc</span>[<span style="color: #2aa198;">'val_recall0.5'</span>] &gt; 0.85
+<span style="color: #268bd2;">cond3</span> = <span style="color: #513f78;">run1_2_combimetrics</span>.<span style="color: #783778;">loc</span>[<span style="color: #2aa198;">'val_precision0.5'</span>] &gt; 0.85
 
-<span style="color: #859900; font-weight: bold;">with</span> pd.option_context(<span style="color: #2aa198;">'display.max_rows'</span>, <span style="color: #859900; font-weight: bold;">None</span>, <span style="color: #2aa198;">'display.max_columns'</span>, <span style="color: #859900; font-weight: bold;">None</span>):  <span style="color: #93a1a1;"># more options can be specified also</span>
-<span style="background-color: #eee8d5;"> </span>   display(run1_2_combiparams.loc[:, cond1 &amp; cond2 &amp; cond3])
-<span style="background-color: #eee8d5;"> </span>   display(run1_2_combimetrics.loc[:, cond1 &amp; cond2 &amp; cond3])
+<span style="color: #859900; font-weight: bold;">with</span> <span style="color: #783778;">pd</span>.<span style="color: #5e7837;">option_context</span>(<span style="color: #2aa198;">'display.max_rows'</span>, <span style="color: #859900; font-weight: bold;">None</span>, <span style="color: #2aa198;">'display.max_columns'</span>, <span style="color: #859900; font-weight: bold;">None</span>):  <span style="color: #93a1a1;"># more options can be specified also</span>
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #4f7e67;">display</span>(<span style="color: #7e544f;">run1_2_combiparams</span>.<span style="color: #783778;">loc</span>[:, <span style="color: #784437;">cond1</span> &amp; <span style="color: #374478;">cond2</span> &amp; <span style="color: #783f5a;">cond3</span>])
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #4f7e67;">display</span>(<span style="color: #513f78;">run1_2_combimetrics</span>.<span style="color: #783778;">loc</span>[:, <span style="color: #784437;">cond1</span> &amp; <span style="color: #374478;">cond2</span> &amp; <span style="color: #783f5a;">cond3</span>])
 </pre>
 </div>
 
@@ -9740,13 +9772,13 @@ data.
 
 <pre class="src src-jupyter-python"><span style="color: #268bd2;">path_tb_pex5_egfp</span> = <span style="color: #2aa198;">'/beegfs/ye53nis/data/Pablo_structured_experiment'</span>
 <span style="color: #268bd2;">length_delimiter</span> = 2**13  <span style="color: #93a1a1;"># for U-Net</span>
-<span style="color: #268bd2;">bin_for_correlation</span> = 1e6
-<span style="color: #268bd2;">ptu_1ms</span>, <span style="color: #657b83; font-weight: bold;">_</span> = ptu.import_from_ptu(
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> path=path_tb_pex5_egfp,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> file_delimiter=2,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> photon_count_bin=1e6,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> verbose=<span style="color: #859900; font-weight: bold;">True</span>)
-<span style="color: #268bd2;">ptu_1ms</span> = ptu_1ms
+<span style="color: #268bd2;">bin_for_correlation</span> = <span style="color: #707e4f;">1e6</span>
+<span style="color: #268bd2;">ptu_1ms</span>, <span style="color: #657b83; font-weight: bold;">_</span> = <span style="color: #78683f;">ptu</span>.<span style="color: #3f7178;">import_from_ptu</span>(
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #513f78;">path</span>=<span style="color: #707e4f;">path_tb_pex5_egfp</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #5e7837;">file_delimiter</span>=2,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #784437;">photon_count_bin</span>=<span style="color: #707e4f;">1e6</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #37785e;">verbose</span>=<span style="color: #859900; font-weight: bold;">True</span>)
+<span style="color: #268bd2;">ptu_1ms</span> = <span style="color: #783f5a;">ptu_1ms</span>
 </pre>
 </div>
 
@@ -9766,13 +9798,13 @@ data.
 <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>  <span style="color: #2aa198;">'Data after min-max scaling'</span>: <span style="color: #2aa198;">'minmax'</span>,
 <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>  <span style="color: #2aa198;">'Data after sample-wise L1 normalization (taxicab, LASSO)'</span>: <span style="color: #2aa198;">'l1'</span>,
 <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>  <span style="color: #2aa198;">'Data after sample-wise L2 normalization (Euclidian)'</span>: <span style="color: #2aa198;">'l2'</span>}
-plt.figure(figsize=(16,14), facecolor=<span style="color: #2aa198;">'white'</span>)
-<span style="color: #859900; font-weight: bold;">for</span> i, (text, s) <span style="color: #859900; font-weight: bold;">in</span> <span style="color: #657b83; font-weight: bold;">enumerate</span>(scalers.items()):
-<span style="background-color: #eee8d5;"> </span>   plt.subplot(3, 3, i+1, title=text)
-<span style="background-color: #eee8d5;"> </span>   <span style="color: #859900; font-weight: bold;">if</span> s <span style="color: #859900; font-weight: bold;">is</span> <span style="color: #859900; font-weight: bold;">None</span>:
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   plt.plot(ptu_1ms, alpha=0.75)
+<span style="color: #4f7e67;">plt</span>.<span style="color: #78683f;">figure</span>(<span style="color: #784437;">figsize</span>=(16,14), <span style="color: #4f7e67;">facecolor</span>=<span style="color: #2aa198;">'white'</span>)
+<span style="color: #859900; font-weight: bold;">for</span> <span style="color: #707e4f;">i</span>, (<span style="color: #43783f;">text</span>, <span style="color: #784437;">s</span>) <span style="color: #859900; font-weight: bold;">in</span> <span style="color: #657b83; font-weight: bold;">enumerate</span>(<span style="color: #5e7837;">scalers</span>.<span style="color: #374478;">items</span>()):
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #4f7e67;">plt</span>.<span style="color: #7a4f7e;">subplot</span>(3, 3, <span style="color: #707e4f;">i</span>+1, <span style="color: #783f5a;">title</span>=<span style="color: #43783f;">text</span>)
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #859900; font-weight: bold;">if</span> <span style="color: #784437;">s</span> <span style="color: #859900; font-weight: bold;">is</span> <span style="color: #859900; font-weight: bold;">None</span>:
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #4f7e67;">plt</span>.<span style="color: #43783f;">plot</span>(<span style="color: #783f5a;">ptu_1ms</span>, <span style="color: #7a4f7e;">alpha</span>=0.75)
 <span style="background-color: #eee8d5;"> </span>   <span style="color: #859900; font-weight: bold;">else</span>:
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #859900; font-weight: bold;">print</span>(np.array(ptu_1ms.iloc[:, 0]))
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #707e4f;">np</span>.<span style="color: #78683f;">array</span>(<span style="color: #783f5a;">ptu_1ms</span>.<span style="color: #4f5c7e;">iloc</span>[:, 0]))
 <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #93a1a1;"># We have to circumvent the following error because we want to dropna() for scaling:</span>
 <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #93a1a1;"># /home/ye53nis/.conda/envs/tf/lib/python3.9/site-packages/numpy/core/_asarray.py:136:</span>
 <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #93a1a1;"># VisibleDeprecationWarning: Creating an ndarray from ragged nested sequences (which</span>
@@ -9784,10 +9816,10 @@ plt.figure(figsize=(16,14), facecolor=<span style="color: #2aa198;">'white'</spa
 <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #93a1a1;"># array=[486. 455. 622. ... 580. 522. 682.].</span>
 <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #93a1a1;"># Reshape your data either using array.reshape(-1, 1) if your data has a single feature</span>
 <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #93a1a1;"># or array.reshape(1, -1) if it contains a single sample.</span>
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #268bd2;">tscaled</span> = [ppd.scale_trace(np.array(ptu_1ms.iloc[:, j].dropna(), dtype=<span style="color: #657b83; font-weight: bold;">object</span>).reshape(-1, 1),
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>  scaler=s) <span style="color: #859900; font-weight: bold;">for</span> j <span style="color: #859900; font-weight: bold;">in</span> <span style="color: #657b83; font-weight: bold;">range</span>(2)]
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   [plt.plot(tscaled[k], alpha=0.75) <span style="color: #859900; font-weight: bold;">for</span> k <span style="color: #859900; font-weight: bold;">in</span> <span style="color: #657b83; font-weight: bold;">range</span>(2)]
-plt.tight_layout()
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #268bd2;">tscaled</span> = [<span style="color: #783f5a;">ppd</span>.<span style="color: #7a4f7e;">scale_trace</span>(<span style="color: #707e4f;">np</span>.<span style="color: #78683f;">array</span>(<span style="color: #783f5a;">ptu_1ms</span>.<span style="color: #4f5c7e;">iloc</span>[:, <span style="color: #783f5a;">j</span>].<span style="color: #513f78;">dropna</span>(), <span style="color: #784437;">dtype</span>=<span style="color: #657b83; font-weight: bold;">object</span>).<span style="color: #37785e;">reshape</span>(-1, 1),
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>  <span style="color: #4f5c7e;">scaler</span>=<span style="color: #784437;">s</span>) <span style="color: #859900; font-weight: bold;">for</span> <span style="color: #783f5a;">j</span> <span style="color: #859900; font-weight: bold;">in</span> <span style="color: #657b83; font-weight: bold;">range</span>(2)]
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   [<span style="color: #4f7e67;">plt</span>.<span style="color: #43783f;">plot</span>(<span style="color: #37785e;">tscaled</span>[<span style="color: #374478;">k</span>], <span style="color: #7a4f7e;">alpha</span>=0.75) <span style="color: #859900; font-weight: bold;">for</span> <span style="color: #374478;">k</span> <span style="color: #859900; font-weight: bold;">in</span> <span style="color: #657b83; font-weight: bold;">range</span>(2)]
+<span style="color: #4f7e67;">plt</span>.<span style="color: #513f78;">tight_layout</span>()
 
 </pre>
 </div>
@@ -9858,20 +9890,20 @@ This run is one of the few very good runs where the model got saved out.
 <ol class="org-ol">
 <li>Let's look at some prediction plots
 after 1 epoch:
-<img src="../mlruns/8/00f2635d9fa2463c9a066722163405be/artifacts/predplots/plot0.png" class="img-responsive" alt="plot0.png">
+<img src="./mlruns/8/00f2635d9fa2463c9a066722163405be/artifacts/predplots/plot0.png" class="img-responsive" alt="plot0.png">
 after 5 epochs:
-<img src="../mlruns/8/00f2635d9fa2463c9a066722163405be/artifacts/predplots/plot4.png" class="img-responsive" alt="plot4.png">
+<img src="./mlruns/8/00f2635d9fa2463c9a066722163405be/artifacts/predplots/plot4.png" class="img-responsive" alt="plot4.png">
 after 10 epochs:
-<img src="../mlruns/8/00f2635d9fa2463c9a066722163405be/artifacts/predplots/plot9.png" class="img-responsive" alt="plot9.png">
+<img src="./mlruns/8/00f2635d9fa2463c9a066722163405be/artifacts/predplots/plot9.png" class="img-responsive" alt="plot9.png">
 after 15 epochs:
-<img src="../mlruns/8/00f2635d9fa2463c9a066722163405be/artifacts/predplots/plot14.png" class="img-responsive" alt="plot14.png">
+<img src="./mlruns/8/00f2635d9fa2463c9a066722163405be/artifacts/predplots/plot14.png" class="img-responsive" alt="plot14.png">
 after 20 epochs:
-<img src="../mlruns/8/00f2635d9fa2463c9a066722163405be/artifacts/predplots/plot19.png" class="img-responsive" alt="plot19.png">
+<img src="./mlruns/8/00f2635d9fa2463c9a066722163405be/artifacts/predplots/plot19.png" class="img-responsive" alt="plot19.png">
 </li>
 <li>Now let's print out the model architecture. <code>-n</code> prints out line numbers.
 <div class="org-src-container">
 
-<pre class="src src-sh">cat -n data/mlruns/8/00f2635d9fa2463c9a066722163405be/artifacts/model_summary.txt
+<pre class="src src-sh"><span style="color: #4f7e67;">cat</span> <span style="color: #707e4f;">-n</span> <span style="color: #784437;">data/mlruns/8/00f2635d9fa2463c9a066722163405be/artifacts/model_summary.txt</span>
 </pre>
 </div>
 
@@ -9952,7 +9984,7 @@ after 20 epochs:
 <li>Print out mlflow Model parameters
 <div class="org-src-container">
 
-<pre class="src src-sh">cat -n data/mlruns/8/00f2635d9fa2463c9a066722163405be/artifacts/model/MLmodel
+<pre class="src src-sh"><span style="color: #4f7e67;">cat</span> <span style="color: #707e4f;">-n</span> <span style="color: #4f7e67;">data/mlruns/8/00f2635d9fa2463c9a066722163405be/artifacts/model/MLmodel</span>
 </pre>
 </div>
 
@@ -9978,16 +10010,16 @@ after 20 epochs:
 <div class="org-src-container">
 
 <pre class="src src-sh"><span style="color: #657b83; font-weight: bold;">echo</span> <span style="color: #2aa198;">"time val_recall0.5 epoch"</span>
-cat data/mlruns/8/00f2635d9fa2463c9a066722163405be/metrics/val_recall0.5
+<span style="color: #4f7e67;">cat</span> <span style="color: #5e7837;">data/mlruns/8/00f2635d9fa2463c9a066722163405be/metrics/val_recall0.5</span>
 <span style="color: #657b83; font-weight: bold;">echo</span> <span style="color: #2aa198;">""</span>
 <span style="color: #657b83; font-weight: bold;">echo</span> <span style="color: #2aa198;">"time val_precision0.5 epoch"</span>
-cat data/mlruns/8/00f2635d9fa2463c9a066722163405be/metrics/val_precision0.5
+<span style="color: #4f7e67;">cat</span> <span style="color: #5e7837;">data/mlruns/8/00f2635d9fa2463c9a066722163405be/metrics/val_precision0.5</span>
 <span style="color: #657b83; font-weight: bold;">echo</span> <span style="color: #2aa198;">""</span>
 <span style="color: #657b83; font-weight: bold;">echo</span> <span style="color: #2aa198;">"time val_auc epoch"</span>
-cat data/mlruns/8/00f2635d9fa2463c9a066722163405be/metrics/val_auc
+<span style="color: #4f7e67;">cat</span> <span style="color: #783f5a;">data/mlruns/8/00f2635d9fa2463c9a066722163405be/metrics/val_auc</span>
 <span style="color: #657b83; font-weight: bold;">echo</span> <span style="color: #2aa198;">""</span>
 <span style="color: #657b83; font-weight: bold;">echo</span> <span style="color: #2aa198;">"time val_f1 epoch"</span>
-cat data/mlruns/8/00f2635d9fa2463c9a066722163405be/metrics/val_f1
+<span style="color: #4f7e67;">cat</span> <span style="color: #37785e;">data/mlruns/8/00f2635d9fa2463c9a066722163405be/metrics/val_f1</span>
 </pre>
 </div>
 
@@ -10540,7 +10572,7 @@ training run, not in the hparams run.
 <div class="outline-text-4" id="text-2-1-6">
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python">%cd /beegfs/ye53nis/drmed-git
+<pre class="src src-jupyter-python">%<span style="color: #707e4f;">cd</span> /<span style="color: #5e7837;">beegfs</span>/<span style="color: #7a4f7e;">ye53nis</span>/<span style="color: #784437;">drmed</span>-<span style="color: #784437;">git</span>
 </pre>
 </div>
 
@@ -10551,18 +10583,18 @@ training run, not in the hparams run.
 
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python"><span style="color: #859900; font-weight: bold;">from</span> pathlib <span style="color: #859900; font-weight: bold;">import</span> Path
+<pre class="src src-jupyter-python"><span style="color: #859900; font-weight: bold;">from</span> <span style="color: #43783f;">pathlib</span> <span style="color: #859900; font-weight: bold;">import</span> <span style="color: #78683f;">Path</span>
 
-<span style="color: #859900; font-weight: bold;">import</span> sys
-<span style="color: #859900; font-weight: bold;">import</span> mlflow
-<span style="color: #859900; font-weight: bold;">import</span> matplotlib.pyplot <span style="color: #859900; font-weight: bold;">as</span> plt
-<span style="color: #859900; font-weight: bold;">import</span> numpy <span style="color: #859900; font-weight: bold;">as</span> np
-<span style="color: #859900; font-weight: bold;">import</span> pandas <span style="color: #859900; font-weight: bold;">as</span> pd
-<span style="color: #859900; font-weight: bold;">import</span> seaborn <span style="color: #859900; font-weight: bold;">as</span> sns
-<span style="color: #859900; font-weight: bold;">import</span> tensorflow <span style="color: #859900; font-weight: bold;">as</span> tf
-<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #2aa198;">"tf version: "</span>, tf.version.VERSION)
-<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #2aa198;">"tf.keras version: "</span>, tf.keras.__version__)
-<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #2aa198;">"mlflow version: "</span>, mlflow.version.VERSION)
+<span style="color: #859900; font-weight: bold;">import</span> <span style="color: #513f78;">sys</span>
+<span style="color: #859900; font-weight: bold;">import</span> <span style="color: #5e7837;">mlflow</span>
+<span style="color: #859900; font-weight: bold;">import</span> <span style="color: #37785e;">matplotlib</span>.<span style="color: #4f7e67;">pyplot</span> <span style="color: #859900; font-weight: bold;">as</span> <span style="color: #4f7e67;">plt</span>
+<span style="color: #859900; font-weight: bold;">import</span> <span style="color: #4f5c7e;">numpy</span> <span style="color: #859900; font-weight: bold;">as</span> <span style="color: #707e4f;">np</span>
+<span style="color: #859900; font-weight: bold;">import</span> <span style="color: #5e7837;">pandas</span> <span style="color: #859900; font-weight: bold;">as</span> <span style="color: #783778;">pd</span>
+<span style="color: #859900; font-weight: bold;">import</span> <span style="color: #78683f;">seaborn</span> <span style="color: #859900; font-weight: bold;">as</span> <span style="color: #4f5c7e;">sns</span>
+<span style="color: #859900; font-weight: bold;">import</span> <span style="color: #513f78;">tensorflow</span> <span style="color: #859900; font-weight: bold;">as</span> <span style="color: #37785e;">tf</span>
+<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #2aa198;">"tf version: "</span>, <span style="color: #37785e;">tf</span>.<span style="color: #707e4f;">version</span>.<span style="color: #78683f;">VERSION</span>)
+<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #2aa198;">"tf.keras version: "</span>, <span style="color: #37785e;">tf</span>.<span style="color: #784437;">keras</span>.<span style="color: #4f7e67;">__version__</span>)
+<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #2aa198;">"mlflow version: "</span>, <span style="color: #5e7837;">mlflow</span>.<span style="color: #707e4f;">version</span>.<span style="color: #78683f;">VERSION</span>)
 </pre>
 </div>
 
@@ -10575,21 +10607,21 @@ mlflow version:  1.19.0
 
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python">sys.path.append(<span style="color: #2aa198;">'src/'</span>)
-<span style="color: #859900; font-weight: bold;">from</span> fluotracify.simulations <span style="color: #859900; font-weight: bold;">import</span> (
-<span style="background-color: #eee8d5;"> </span>  import_simulation_from_csv <span style="color: #859900; font-weight: bold;">as</span> isfc,
-<span style="background-color: #eee8d5;"> </span>  analyze_simulations <span style="color: #859900; font-weight: bold;">as</span> ans,
+<pre class="src src-jupyter-python"><span style="color: #513f78;">sys</span>.<span style="color: #513f78;">path</span>.<span style="color: #5e7837;">append</span>(<span style="color: #2aa198;">'src/'</span>)
+<span style="color: #859900; font-weight: bold;">from</span> <span style="color: #783778;">fluotracify</span>.<span style="color: #5e7837;">simulations</span> <span style="color: #859900; font-weight: bold;">import</span> (
+<span style="background-color: #eee8d5;"> </span>  <span style="color: #707e4f;">import_simulation_from_csv</span> <span style="color: #859900; font-weight: bold;">as</span> <span style="color: #4f5c7e;">isfc</span>,
+<span style="background-color: #eee8d5;"> </span>  <span style="color: #43783f;">analyze_simulations</span> <span style="color: #859900; font-weight: bold;">as</span> <span style="color: #7a4f7e;">ans</span>,
 )
-<span style="color: #859900; font-weight: bold;">from</span> fluotracify.training <span style="color: #859900; font-weight: bold;">import</span> build_model <span style="color: #859900; font-weight: bold;">as</span> bm, preprocess_data <span style="color: #859900; font-weight: bold;">as</span> ppd
-<span style="color: #859900; font-weight: bold;">from</span> fluotracify.applications <span style="color: #859900; font-weight: bold;">import</span> correlate, plots, correction
-<span style="color: #859900; font-weight: bold;">from</span> fluotracify.imports <span style="color: #859900; font-weight: bold;">import</span> ptu_utils <span style="color: #859900; font-weight: bold;">as</span> ptu
+<span style="color: #859900; font-weight: bold;">from</span> <span style="color: #783778;">fluotracify</span>.<span style="color: #3f7178;">training</span> <span style="color: #859900; font-weight: bold;">import</span> <span style="color: #783778;">build_model</span> <span style="color: #859900; font-weight: bold;">as</span> <span style="color: #374478;">bm</span>, <span style="color: #784437;">preprocess_data</span> <span style="color: #859900; font-weight: bold;">as</span> <span style="color: #783f5a;">ppd</span>
+<span style="color: #859900; font-weight: bold;">from</span> <span style="color: #783778;">fluotracify</span>.<span style="color: #4f5c7e;">applications</span> <span style="color: #859900; font-weight: bold;">import</span> <span style="color: #5e7837;">correlate</span>, <span style="color: #4f5c7e;">plots</span>, <span style="color: #3f7178;">correction</span>
+<span style="color: #859900; font-weight: bold;">from</span> <span style="color: #783778;">fluotracify</span>.<span style="color: #783f5a;">imports</span> <span style="color: #859900; font-weight: bold;">import</span> <span style="color: #7a4f7e;">ptu_utils</span> <span style="color: #859900; font-weight: bold;">as</span> <span style="color: #78683f;">ptu</span>
 </pre>
 </div>
 
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python"><span style="color: #859900; font-weight: bold;">import</span> importlib
-importlib.reload(correction)
+<pre class="src src-jupyter-python"><span style="color: #859900; font-weight: bold;">import</span> <span style="color: #7e544f;">importlib</span>
+<span style="color: #7e544f;">importlib</span>.<span style="color: #707e4f;">reload</span>(<span style="color: #3f7178;">correction</span>)
 </pre>
 </div>
 
@@ -10598,11 +10630,11 @@ importlib.reload(correction)
 <pre class="src src-jupyter-python"><span style="color: #268bd2;">logged_model</span> = <span style="color: #2aa198;">'file:///beegfs/ye53nis/drmed-git/data/mlruns/8/00f2635d9fa2463c9a066722163405be/artifacts/model'</span>
 <span style="color: #268bd2;">metrics_thresholds</span> = [0.1, 0.3, 0.5, 0.7, 0.9]
 
-<span style="color: #268bd2;">loaded_model</span> = mlflow.keras.load_model(logged_model, <span style="color: #657b83; font-weight: bold;">compile</span>=<span style="color: #859900; font-weight: bold;">False</span>)
-loaded_model.compile(loss=bm.binary_ce_dice_loss(),
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>optimizer=tf.keras.optimizers.Adam(),
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>metrics = bm.unet_metrics(metrics_thresholds))
-loaded_model
+<span style="color: #268bd2;">loaded_model</span> = <span style="color: #5e7837;">mlflow</span>.<span style="color: #784437;">keras</span>.<span style="color: #783f5a;">load_model</span>(<span style="color: #783f5a;">logged_model</span>, <span style="color: #657b83; font-weight: bold;">compile</span>=<span style="color: #859900; font-weight: bold;">False</span>)
+<span style="color: #374478;">loaded_model</span>.<span style="color: #374478;">compile</span>(<span style="color: #783f5a;">loss</span>=<span style="color: #374478;">bm</span>.<span style="color: #783f5a;">binary_ce_dice_loss</span>(),
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span><span style="color: #7a4f7e;">optimizer</span>=<span style="color: #37785e;">tf</span>.<span style="color: #784437;">keras</span>.<span style="color: #43783f;">optimizers</span>.<span style="color: #783778;">Adam</span>(),
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span><span style="color: #43783f;">metrics</span> = <span style="color: #374478;">bm</span>.<span style="color: #374478;">unet_metrics</span>(<span style="color: #37785e;">metrics_thresholds</span>))
+<span style="color: #374478;">loaded_model</span>
 </pre>
 </div>
 
@@ -10617,10 +10649,10 @@ WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer
 <span style="color: #93a1a1;"># </span><span style="color: #93a1a1;">e.g. 2**14, 2**13, 2**12</span>
 <span style="color: #93a1a1;"># </span><span style="color: #93a1a1;">note that: after executing 2**14, then 2**13, there will be an error</span>
 <span style="color: #93a1a1;"># </span><span style="color: #93a1a1;">if you then execute 2**12 and then 2**13 again, the error will be gone</span>
-<span style="color: #268bd2;">test_features</span> = np.zeros((2**14)).reshape(1, -1, 1)
-<span style="color: #859900; font-weight: bold;">print</span>(test_features.shape)
-<span style="color: #268bd2;">predictions</span> = loaded_model.predict(test_features, verbose=0).flatten()
-predictions
+<span style="color: #268bd2;">test_features</span> = <span style="color: #707e4f;">np</span>.<span style="color: #513f78;">zeros</span>((2**14)).<span style="color: #37785e;">reshape</span>(1, -1, 1)
+<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #4f5c7e;">test_features</span>.<span style="color: #78683f;">shape</span>)
+<span style="color: #268bd2;">predictions</span> = <span style="color: #374478;">loaded_model</span>.<span style="color: #513f78;">predict</span>(<span style="color: #4f5c7e;">test_features</span>, <span style="color: #37785e;">verbose</span>=0).<span style="color: #5e7837;">flatten</span>()
+<span style="color: #7a4f7e;">predictions</span>
 </pre>
 </div>
 
@@ -10632,10 +10664,10 @@ array([1.4064237e-01, 1.3650321e-08, 7.4799689e-10, ..., 3.1755112e-10,
 
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python"><span style="color: #268bd2;">test_features2</span> = np.zeros((2**13)).reshape(1, -1, 1)
-<span style="color: #859900; font-weight: bold;">print</span>(test_features2.shape)
-<span style="color: #268bd2;">predictions</span> = loaded_model.predict(test_features2, verbose=0).flatten()
-predictions
+<pre class="src src-jupyter-python"><span style="color: #268bd2;">test_features2</span> = <span style="color: #707e4f;">np</span>.<span style="color: #513f78;">zeros</span>((2**13)).<span style="color: #37785e;">reshape</span>(1, -1, 1)
+<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #4f5c7e;">test_features2</span>.<span style="color: #78683f;">shape</span>)
+<span style="color: #268bd2;">predictions</span> = <span style="color: #374478;">loaded_model</span>.<span style="color: #513f78;">predict</span>(<span style="color: #4f5c7e;">test_features2</span>, <span style="color: #37785e;">verbose</span>=0).<span style="color: #5e7837;">flatten</span>()
+<span style="color: #7a4f7e;">predictions</span>
 </pre>
 </div>
 
@@ -10650,15 +10682,15 @@ array([1.4064237e-01, 1.3650321e-08, 7.4799689e-10, ..., 3.1755112e-10,
 <pre class="src src-jupyter-python"><span style="color: #268bd2;">path_tb_pex5_egfp</span> = <span style="color: #2aa198;">'/beegfs/ye53nis/data/Pablo_structured_experiment'</span>
 <span style="color: #268bd2;">pred_thresh</span> = [0.1, 0.3, 0.5, 0.7, 0.9]
 <span style="color: #268bd2;">length_delimiter</span> = 2**13  <span style="color: #93a1a1;"># for U-Net</span>
-<span style="color: #268bd2;">bin_for_correlation</span> = 1e6
-<span style="color: #268bd2;">out</span> = correction.correct_experimental_traces_from_ptu_by_unet_prediction(
-<span style="background-color: #eee8d5;"> </span> path_list=path_tb_pex5_egfp,
-<span style="background-color: #eee8d5;"> </span> model=loaded_model,
-<span style="background-color: #eee8d5;"> </span> pred_thresh=pred_thresh,
-<span style="background-color: #eee8d5;"> </span> photon_count_bin=bin_for_correlation,
-<span style="background-color: #eee8d5;"> </span> ntraces=<span style="color: #859900; font-weight: bold;">None</span>,
-<span style="background-color: #eee8d5;"> </span> save_as_csv=<span style="color: #859900; font-weight: bold;">True</span>)
-out
+<span style="color: #268bd2;">bin_for_correlation</span> = <span style="color: #707e4f;">1e6</span>
+<span style="color: #268bd2;">out</span> = <span style="color: #3f7178;">correction</span>.<span style="color: #37785e;">correct_experimental_traces_from_ptu_by_unet_prediction</span>(
+<span style="background-color: #eee8d5;"> </span> <span style="color: #513f78;">path_list</span>=<span style="color: #707e4f;">path_tb_pex5_egfp</span>,
+<span style="background-color: #eee8d5;"> </span> <span style="color: #43783f;">model</span>=<span style="color: #374478;">loaded_model</span>,
+<span style="background-color: #eee8d5;"> </span> <span style="color: #5e7837;">pred_thresh</span>=<span style="color: #5e7837;">pred_thresh</span>,
+<span style="background-color: #eee8d5;"> </span> <span style="color: #784437;">photon_count_bin</span>=<span style="color: #7e544f;">bin_for_correlation</span>,
+<span style="background-color: #eee8d5;"> </span> <span style="color: #783f5a;">ntraces</span>=<span style="color: #859900; font-weight: bold;">None</span>,
+<span style="background-color: #eee8d5;"> </span> <span style="color: #374478;">save_as_csv</span>=<span style="color: #859900; font-weight: bold;">True</span>)
+<span style="color: #7e544f;">out</span>
 </pre>
 </div>
 
@@ -11058,15 +11090,15 @@ Processing correlation with correction by prediction of dataset 1
 <pre class="src src-jupyter-python"><span style="color: #268bd2;">path_pex5_exp</span> = [<span style="color: #2aa198;">'/beegfs/ye53nis/data/Pablo_structured_experiment/all_clean_ptu'</span>, <span style="color: #2aa198;">'/beegfs/ye53nis/data/Pablo_structured_experiment/all_dirty_ptu'</span>]
 <span style="color: #268bd2;">pred_thresh</span> = [0.1, 0.3, 0.5, 0.7, 0.9]
 <span style="color: #268bd2;">length_delimiter</span> = 2**13  <span style="color: #93a1a1;"># for U-Net</span>
-<span style="color: #268bd2;">bin_for_correlation</span> = 1e5
-<span style="color: #268bd2;">out</span> = correction.correct_experimental_traces_from_ptu_by_unet_prediction(
-<span style="background-color: #eee8d5;"> </span> path_list=path_pex5_exp,
-<span style="background-color: #eee8d5;"> </span> model=loaded_model,
-<span style="background-color: #eee8d5;"> </span> pred_thresh=pred_thresh,
-<span style="background-color: #eee8d5;"> </span> photon_count_bin=bin_for_correlation,
-<span style="background-color: #eee8d5;"> </span> ntraces=400,
-<span style="background-color: #eee8d5;"> </span> save_as_csv=<span style="color: #859900; font-weight: bold;">True</span>)
-out
+<span style="color: #268bd2;">bin_for_correlation</span> = <span style="color: #707e4f;">1e5</span>
+<span style="color: #268bd2;">out</span> = <span style="color: #3f7178;">correction</span>.<span style="color: #37785e;">correct_experimental_traces_from_ptu_by_unet_prediction</span>(
+<span style="background-color: #eee8d5;"> </span> <span style="color: #513f78;">path_list</span>=<span style="color: #5e7837;">path_pex5_exp</span>,
+<span style="background-color: #eee8d5;"> </span> <span style="color: #43783f;">model</span>=<span style="color: #374478;">loaded_model</span>,
+<span style="background-color: #eee8d5;"> </span> <span style="color: #5e7837;">pred_thresh</span>=<span style="color: #5e7837;">pred_thresh</span>,
+<span style="background-color: #eee8d5;"> </span> <span style="color: #784437;">photon_count_bin</span>=<span style="color: #7e544f;">bin_for_correlation</span>,
+<span style="background-color: #eee8d5;"> </span> <span style="color: #783f5a;">ntraces</span>=400,
+<span style="background-color: #eee8d5;"> </span> <span style="color: #374478;">save_as_csv</span>=<span style="color: #859900; font-weight: bold;">True</span>)
+<span style="color: #7e544f;">out</span>
 </pre>
 </div>
 
@@ -11888,8 +11920,8 @@ Processing correlation with correction by prediction of dataset 2
 
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python"><span style="color: #268bd2;">corr_out</span> = pd.read_csv(filepath_or_buffer=<span style="color: #2aa198;">'data/exp-210807-hparams/2021-08-26_correlations.csv'</span>)
-corr_out
+<pre class="src src-jupyter-python"><span style="color: #268bd2;">corr_out</span> = <span style="color: #783778;">pd</span>.<span style="color: #78683f;">read_csv</span>(<span style="color: #784437;">filepath_or_buffer</span>=<span style="color: #2aa198;">'data/exp-210807-hparams/2021-08-26_correlations.csv'</span>)
+<span style="color: #4f5c7e;">corr_out</span>
 </pre>
 </div>
 
@@ -12029,7 +12061,7 @@ corr_out
 <li>Check out the <code>nan</code> values
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python">corr_out[corr_out[<span style="color: #2aa198;">'$D$ in $\\frac{{\mu m^2}}{{s}}$'</span>].isna()]
+<pre class="src src-jupyter-python"><span style="color: #4f5c7e;">corr_out</span>[<span style="color: #4f5c7e;">corr_out</span>[<span style="color: #2aa198;">'$D$ in $\\frac{{\mu m^2}}{{s}}$'</span>].<span style="color: #374478;">isna</span>()]
 </pre>
 </div>
 
@@ -12054,7 +12086,7 @@ will investigate another time&#x2026;
 <li>Refactor <code>folder-id_traces-used</code> into 2 columns
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python">corr_out[<span style="color: #2aa198;">'folder_id-traces_used'</span>]
+<pre class="src src-jupyter-python"><span style="color: #4f5c7e;">corr_out</span>[<span style="color: #2aa198;">'folder_id-traces_used'</span>]
 </pre>
 </div>
 
@@ -12075,7 +12107,7 @@ Name: folder_id-traces_used, Length: 4800, dtype: object
 
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python">corr_out[[<span style="color: #2aa198;">'Folder ID'</span>, <span style="color: #2aa198;">'Traces used'</span>]] = corr_out[<span style="color: #2aa198;">'folder_id-traces_used'</span>].str.split(pat=<span style="color: #2aa198;">'-'</span>, n=1, expand=<span style="color: #859900; font-weight: bold;">True</span>)
+<pre class="src src-jupyter-python"><span style="color: #4f5c7e;">corr_out</span>[[<span style="color: #2aa198;">'Folder ID'</span>, <span style="color: #2aa198;">'Traces used'</span>]] = <span style="color: #4f5c7e;">corr_out</span>[<span style="color: #2aa198;">'folder_id-traces_used'</span>].<span style="color: #7a4f7e;">str</span>.<span style="color: #7a4f7e;">split</span>(<span style="color: #37785e;">pat</span>=<span style="color: #2aa198;">'-'</span>, <span style="color: #4f5c7e;">n</span>=1, <span style="color: #374478;">expand</span>=<span style="color: #859900; font-weight: bold;">True</span>)
 </pre>
 </div>
 </li>
@@ -12083,15 +12115,15 @@ Name: folder_id-traces_used, Length: 4800, dtype: object
 <li>Some basic statistical descriptions
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python"><span style="color: #268bd2;">corr_stats</span> = pd.DataFrame()
-<span style="color: #859900; font-weight: bold;">for</span> fid <span style="color: #859900; font-weight: bold;">in</span> <span style="color: #657b83; font-weight: bold;">sorted</span>(<span style="color: #657b83; font-weight: bold;">set</span>(corr_out[<span style="color: #2aa198;">'Folder ID'</span>])):
-<span style="background-color: #eee8d5;"> </span>   <span style="color: #859900; font-weight: bold;">for</span> tu <span style="color: #859900; font-weight: bold;">in</span> <span style="color: #657b83; font-weight: bold;">sorted</span>(<span style="color: #657b83; font-weight: bold;">set</span>(corr_out[<span style="color: #2aa198;">'Traces used'</span>])):
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #268bd2;">corr_new</span> = corr_out[(corr_out[<span style="color: #2aa198;">'Folder ID'</span>] == fid) &amp; (corr_out[<span style="color: #2aa198;">'Traces used'</span>] == tu)].describe()
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #268bd2;">new_index_tuple</span> = <span style="color: #657b83; font-weight: bold;">zip</span>(((fid),)*8, ((tu),)*8, (<span style="color: #2aa198;">'count'</span>, <span style="color: #2aa198;">'mean'</span>, <span style="color: #2aa198;">'std'</span>, <span style="color: #2aa198;">'min'</span>, <span style="color: #2aa198;">'25%'</span>, <span style="color: #2aa198;">'50%'</span>, <span style="color: #2aa198;">'75%'</span>, <span style="color: #2aa198;">'max'</span>))
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #268bd2;">corr_new.index</span> = pd.MultiIndex.from_tuples(new_index_tuple, names=[<span style="color: #2aa198;">'Folder ID'</span>, <span style="color: #2aa198;">'Traces used'</span>, <span style="color: #2aa198;">'Stats'</span>])
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #268bd2;">corr_stats</span> = pd.concat([corr_stats, corr_new], axis=0)
-<span style="color: #859900; font-weight: bold;">with</span> pd.option_context(<span style="color: #2aa198;">'display.max_rows'</span>, <span style="color: #859900; font-weight: bold;">None</span>, <span style="color: #2aa198;">'display.max_columns'</span>, <span style="color: #859900; font-weight: bold;">None</span>):
-<span style="background-color: #eee8d5;"> </span>   display(corr_stats)
+<pre class="src src-jupyter-python"><span style="color: #268bd2;">corr_stats</span> = <span style="color: #783778;">pd</span>.<span style="color: #784437;">DataFrame</span>()
+<span style="color: #859900; font-weight: bold;">for</span> <span style="color: #707e4f;">fid</span> <span style="color: #859900; font-weight: bold;">in</span> <span style="color: #657b83; font-weight: bold;">sorted</span>(<span style="color: #657b83; font-weight: bold;">set</span>(<span style="color: #4f5c7e;">corr_out</span>[<span style="color: #2aa198;">'Folder ID'</span>])):
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #859900; font-weight: bold;">for</span> <span style="color: #5e7837;">tu</span> <span style="color: #859900; font-weight: bold;">in</span> <span style="color: #657b83; font-weight: bold;">sorted</span>(<span style="color: #657b83; font-weight: bold;">set</span>(<span style="color: #4f5c7e;">corr_out</span>[<span style="color: #2aa198;">'Traces used'</span>])):
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #268bd2;">corr_new</span> = <span style="color: #4f5c7e;">corr_out</span>[(<span style="color: #4f5c7e;">corr_out</span>[<span style="color: #2aa198;">'Folder ID'</span>] == <span style="color: #707e4f;">fid</span>) &amp; (<span style="color: #4f5c7e;">corr_out</span>[<span style="color: #2aa198;">'Traces used'</span>] == <span style="color: #5e7837;">tu</span>)].<span style="color: #783778;">describe</span>()
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #268bd2;">new_index_tuple</span> = <span style="color: #657b83; font-weight: bold;">zip</span>(((<span style="color: #707e4f;">fid</span>),)*8, ((<span style="color: #5e7837;">tu</span>),)*8, (<span style="color: #2aa198;">'count'</span>, <span style="color: #2aa198;">'mean'</span>, <span style="color: #2aa198;">'std'</span>, <span style="color: #2aa198;">'min'</span>, <span style="color: #2aa198;">'25%'</span>, <span style="color: #2aa198;">'50%'</span>, <span style="color: #2aa198;">'75%'</span>, <span style="color: #2aa198;">'max'</span>))
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #268bd2;">corr_new.index</span> = <span style="color: #783778;">pd</span>.<span style="color: #784437;">MultiIndex</span>.<span style="color: #43783f;">from_tuples</span>(<span style="color: #43783f;">new_index_tuple</span>, <span style="color: #783f5a;">names</span>=[<span style="color: #2aa198;">'Folder ID'</span>, <span style="color: #2aa198;">'Traces used'</span>, <span style="color: #2aa198;">'Stats'</span>])
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #268bd2;">corr_stats</span> = <span style="color: #783778;">pd</span>.<span style="color: #7e544f;">concat</span>([<span style="color: #783778;">corr_stats</span>, <span style="color: #37785e;">corr_new</span>], <span style="color: #784437;">axis</span>=0)
+<span style="color: #859900; font-weight: bold;">with</span> <span style="color: #783778;">pd</span>.<span style="color: #5e7837;">option_context</span>(<span style="color: #2aa198;">'display.max_rows'</span>, <span style="color: #859900; font-weight: bold;">None</span>, <span style="color: #2aa198;">'display.max_columns'</span>, <span style="color: #859900; font-weight: bold;">None</span>):
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #4f7e67;">display</span>(<span style="color: #783778;">corr_stats</span>)
 </pre>
 </div>
 
@@ -12829,29 +12861,29 @@ Name: folder_id-traces_used, Length: 4800, dtype: object
 
 <pre class="src src-jupyter-python"><span style="color: #268bd2;">x</span> = <span style="color: #2aa198;">'Trace lengths'</span>
 
-<span style="color: #268bd2;">g</span> = sns.FacetGrid(data=corr_out,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> col=<span style="color: #2aa198;">'Folder ID'</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> col_wrap=1,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> sharex=<span style="color: #859900; font-weight: bold;">True</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> aspect=1.5,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> height=5,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> legend_out=<span style="color: #859900; font-weight: bold;">True</span>)
-g.map_dataframe(sns.boxplot,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> x=x,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> y=<span style="color: #2aa198;">'Traces used'</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> palette=<span style="color: #2aa198;">'colorblind'</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> showfliers=<span style="color: #859900; font-weight: bold;">False</span>)
-g.map_dataframe(sns.stripplot,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> x=x,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> y=<span style="color: #2aa198;">'Traces used'</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> dodge=<span style="color: #859900; font-weight: bold;">True</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> palette=sns.color_palette([<span style="color: #2aa198;">'0.3'</span>]),
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> size=4,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> jitter=0.2)
-g.set_xlabels(x)
-g.fig.patch.set_facecolor(<span style="color: #2aa198;">'white'</span>)
-g.tight_layout()
-plt.show()
+<span style="color: #268bd2;">g</span> = <span style="color: #4f5c7e;">sns</span>.<span style="color: #374478;">FacetGrid</span>(<span style="color: #784437;">data</span>=<span style="color: #4f5c7e;">corr_out</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #7e544f;">col</span>=<span style="color: #2aa198;">'Folder ID'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #7e544f;">col_wrap</span>=1,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #3f7178;">sharex</span>=<span style="color: #859900; font-weight: bold;">True</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #7e544f;">aspect</span>=1.5,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #513f78;">height</span>=5,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #4f5c7e;">legend_out</span>=<span style="color: #859900; font-weight: bold;">True</span>)
+<span style="color: #7a4f7e;">g</span>.<span style="color: #78683f;">map_dataframe</span>(<span style="color: #4f5c7e;">sns</span>.<span style="color: #707e4f;">boxplot</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #3f7178;">x</span>=<span style="color: #3f7178;">x</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #513f78;">y</span>=<span style="color: #2aa198;">'Traces used'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #5e7837;">palette</span>=<span style="color: #2aa198;">'colorblind'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #43783f;">showfliers</span>=<span style="color: #859900; font-weight: bold;">False</span>)
+<span style="color: #7a4f7e;">g</span>.<span style="color: #78683f;">map_dataframe</span>(<span style="color: #4f5c7e;">sns</span>.<span style="color: #78683f;">stripplot</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #3f7178;">x</span>=<span style="color: #3f7178;">x</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #513f78;">y</span>=<span style="color: #2aa198;">'Traces used'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #513f78;">dodge</span>=<span style="color: #859900; font-weight: bold;">True</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #5e7837;">palette</span>=<span style="color: #4f5c7e;">sns</span>.<span style="color: #7e544f;">color_palette</span>([<span style="color: #2aa198;">'0.3'</span>]),
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #43783f;">size</span>=4,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #783778;">jitter</span>=0.2)
+<span style="color: #7a4f7e;">g</span>.<span style="color: #37785e;">set_xlabels</span>(<span style="color: #3f7178;">x</span>)
+<span style="color: #7a4f7e;">g</span>.<span style="color: #4f7e67;">fig</span>.<span style="color: #7e544f;">patch</span>.<span style="color: #4f5c7e;">set_facecolor</span>(<span style="color: #2aa198;">'white'</span>)
+<span style="color: #7a4f7e;">g</span>.<span style="color: #513f78;">tight_layout</span>()
+<span style="color: #4f7e67;">plt</span>.<span style="color: #374478;">show</span>()
 </pre>
 </div>
 
@@ -12879,29 +12911,29 @@ desired outcome of more found artifacts.
 <span style="color: #93a1a1;"># </span><span style="color: #93a1a1;">'$\\tau_{{D}}$ in $ms$'</span>
 <span style="color: #268bd2;">x</span> = <span style="color: #2aa198;">'$D$ in $\\frac{{\mu m^2}}{{s}}$'</span>
 
-<span style="color: #268bd2;">g</span> = sns.FacetGrid(data=corr_out,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> col=<span style="color: #2aa198;">'Folder ID'</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> col_wrap=1,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> sharex=<span style="color: #859900; font-weight: bold;">True</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> aspect=1.5,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> height=5,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> legend_out=<span style="color: #859900; font-weight: bold;">True</span>)
-g.map_dataframe(sns.boxplot,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> x=x,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> y=<span style="color: #2aa198;">'Traces used'</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> palette=<span style="color: #2aa198;">'colorblind'</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> showfliers=<span style="color: #859900; font-weight: bold;">False</span>).set(xscale = <span style="color: #2aa198;">'log'</span>)
-g.map_dataframe(sns.stripplot,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> x=x,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> y=<span style="color: #2aa198;">'Traces used'</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> dodge=<span style="color: #859900; font-weight: bold;">True</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> palette=sns.color_palette([<span style="color: #2aa198;">'0.3'</span>]),
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> size=4,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> jitter=0.2).set(xscale = <span style="color: #2aa198;">'log'</span>)
-g.set_xlabels(x)
-g.tight_layout()
-g.fig.patch.set_facecolor(<span style="color: #2aa198;">'white'</span>)
-plt.show()
+<span style="color: #268bd2;">g</span> = <span style="color: #4f5c7e;">sns</span>.<span style="color: #374478;">FacetGrid</span>(<span style="color: #784437;">data</span>=<span style="color: #4f5c7e;">corr_out</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #7e544f;">col</span>=<span style="color: #2aa198;">'Folder ID'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #7e544f;">col_wrap</span>=1,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #3f7178;">sharex</span>=<span style="color: #859900; font-weight: bold;">True</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #7e544f;">aspect</span>=1.5,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #513f78;">height</span>=5,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #4f5c7e;">legend_out</span>=<span style="color: #859900; font-weight: bold;">True</span>)
+<span style="color: #7a4f7e;">g</span>.<span style="color: #78683f;">map_dataframe</span>(<span style="color: #4f5c7e;">sns</span>.<span style="color: #707e4f;">boxplot</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #3f7178;">x</span>=<span style="color: #3f7178;">x</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #513f78;">y</span>=<span style="color: #2aa198;">'Traces used'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #5e7837;">palette</span>=<span style="color: #2aa198;">'colorblind'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #43783f;">showfliers</span>=<span style="color: #859900; font-weight: bold;">False</span>).<span style="color: #783778;">set</span>(<span style="color: #783f5a;">xscale</span> = <span style="color: #2aa198;">'log'</span>)
+<span style="color: #7a4f7e;">g</span>.<span style="color: #78683f;">map_dataframe</span>(<span style="color: #4f5c7e;">sns</span>.<span style="color: #78683f;">stripplot</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #3f7178;">x</span>=<span style="color: #3f7178;">x</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #513f78;">y</span>=<span style="color: #2aa198;">'Traces used'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #513f78;">dodge</span>=<span style="color: #859900; font-weight: bold;">True</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #5e7837;">palette</span>=<span style="color: #4f5c7e;">sns</span>.<span style="color: #7e544f;">color_palette</span>([<span style="color: #2aa198;">'0.3'</span>]),
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #43783f;">size</span>=4,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #783778;">jitter</span>=0.2).<span style="color: #783778;">set</span>(<span style="color: #783f5a;">xscale</span> = <span style="color: #2aa198;">'log'</span>)
+<span style="color: #7a4f7e;">g</span>.<span style="color: #37785e;">set_xlabels</span>(<span style="color: #3f7178;">x</span>)
+<span style="color: #7a4f7e;">g</span>.<span style="color: #513f78;">tight_layout</span>()
+<span style="color: #7a4f7e;">g</span>.<span style="color: #4f7e67;">fig</span>.<span style="color: #7e544f;">patch</span>.<span style="color: #4f5c7e;">set_facecolor</span>(<span style="color: #2aa198;">'white'</span>)
+<span style="color: #4f7e67;">plt</span>.<span style="color: #374478;">show</span>()
 </pre>
 </div>
 
@@ -12922,25 +12954,25 @@ lengths. I used a subsample to avoid overplotting.
 <span style="color: #93a1a1;"># </span><span style="color: #93a1a1;">'$\\tau_{{D}}$ in $ms$'</span>
 <span style="color: #268bd2;">x</span> = <span style="color: #2aa198;">'$\\tau_{{D}}$ in $ms$'</span>
 
-<span style="color: #268bd2;">g</span> = sns.FacetGrid(data=corr_out,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> row=<span style="color: #2aa198;">'Traces used'</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> col=<span style="color: #2aa198;">'Folder ID'</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> hue=<span style="color: #2aa198;">'Traces used'</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> sharex=<span style="color: #859900; font-weight: bold;">True</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> sharey=<span style="color: #859900; font-weight: bold;">True</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> aspect=1.5,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> height=3.5,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> margin_titles=<span style="color: #859900; font-weight: bold;">True</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> legend_out=<span style="color: #859900; font-weight: bold;">True</span>)
-g.map_dataframe(sns.scatterplot,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> x=x,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> y=<span style="color: #2aa198;">'Trace lengths'</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> palette=<span style="color: #2aa198;">'colorblind'</span>).set(xscale = <span style="color: #2aa198;">'log'</span>)
-g.add_legend(title=<span style="color: #2aa198;">'Traces used'</span>)
-g.set_xlabels(x)
-g.tight_layout()
-g.fig.patch.set_facecolor(<span style="color: #2aa198;">'white'</span>)
-plt.show()
+<span style="color: #268bd2;">g</span> = <span style="color: #4f5c7e;">sns</span>.<span style="color: #374478;">FacetGrid</span>(<span style="color: #784437;">data</span>=<span style="color: #4f5c7e;">corr_out</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #707e4f;">row</span>=<span style="color: #2aa198;">'Traces used'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #7e544f;">col</span>=<span style="color: #2aa198;">'Folder ID'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #78683f;">hue</span>=<span style="color: #2aa198;">'Traces used'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #3f7178;">sharex</span>=<span style="color: #859900; font-weight: bold;">True</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #783778;">sharey</span>=<span style="color: #859900; font-weight: bold;">True</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #7e544f;">aspect</span>=1.5,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #513f78;">height</span>=3.5,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #4f7e67;">margin_titles</span>=<span style="color: #859900; font-weight: bold;">True</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #4f5c7e;">legend_out</span>=<span style="color: #859900; font-weight: bold;">True</span>)
+<span style="color: #7a4f7e;">g</span>.<span style="color: #78683f;">map_dataframe</span>(<span style="color: #4f5c7e;">sns</span>.<span style="color: #4f7e67;">scatterplot</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #3f7178;">x</span>=<span style="color: #3f7178;">x</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #513f78;">y</span>=<span style="color: #2aa198;">'Trace lengths'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #5e7837;">palette</span>=<span style="color: #2aa198;">'colorblind'</span>).<span style="color: #783778;">set</span>(<span style="color: #783f5a;">xscale</span> = <span style="color: #2aa198;">'log'</span>)
+<span style="color: #7a4f7e;">g</span>.<span style="color: #5e7837;">add_legend</span>(<span style="color: #783f5a;">title</span>=<span style="color: #2aa198;">'Traces used'</span>)
+<span style="color: #7a4f7e;">g</span>.<span style="color: #37785e;">set_xlabels</span>(<span style="color: #3f7178;">x</span>)
+<span style="color: #7a4f7e;">g</span>.<span style="color: #513f78;">tight_layout</span>()
+<span style="color: #7a4f7e;">g</span>.<span style="color: #4f7e67;">fig</span>.<span style="color: #7e544f;">patch</span>.<span style="color: #4f5c7e;">set_facecolor</span>(<span style="color: #2aa198;">'white'</span>)
+<span style="color: #4f7e67;">plt</span>.<span style="color: #374478;">show</span>()
 </pre>
 </div>
 
@@ -12956,25 +12988,25 @@ plt.show()
 <span style="color: #93a1a1;"># </span><span style="color: #93a1a1;">'$\\tau_{{D}}$ in $ms$'</span>
 <span style="color: #268bd2;">x</span> = <span style="color: #2aa198;">'$\\tau_{{D}}$ in $ms$'</span>
 
-<span style="color: #268bd2;">g</span> = sns.FacetGrid(data=corr_out.sample(1000),
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> row=<span style="color: #2aa198;">'Folder ID'</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> hue=<span style="color: #2aa198;">'Traces used'</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> hue_order=[<span style="color: #2aa198;">'orig'</span>, <span style="color: #2aa198;">'pred-0.1'</span>, <span style="color: #2aa198;">'pred-0.3'</span>, <span style="color: #2aa198;">'pred-0.5'</span>, <span style="color: #2aa198;">'pred-0.7'</span>, <span style="color: #2aa198;">'pred-0.9'</span>],
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> sharex=<span style="color: #859900; font-weight: bold;">True</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> sharey=<span style="color: #859900; font-weight: bold;">True</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> aspect=1.5,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> height=4,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> margin_titles=<span style="color: #859900; font-weight: bold;">True</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> legend_out=<span style="color: #859900; font-weight: bold;">True</span>)
-g.map_dataframe(sns.scatterplot,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> x=x,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> y=<span style="color: #2aa198;">'Trace lengths'</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> palette=<span style="color: #2aa198;">'colorblind'</span>).set(xscale = <span style="color: #2aa198;">'log'</span>)
-g.add_legend(title=<span style="color: #2aa198;">'Traces used'</span>)
-g.set_xlabels(x)
-g.tight_layout()
-g.fig.patch.set_facecolor(<span style="color: #2aa198;">'white'</span>)
-plt.show()
+<span style="color: #268bd2;">g</span> = <span style="color: #4f5c7e;">sns</span>.<span style="color: #374478;">FacetGrid</span>(<span style="color: #784437;">data</span>=<span style="color: #4f5c7e;">corr_out</span>.<span style="color: #7e544f;">sample</span>(1000),
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #707e4f;">row</span>=<span style="color: #2aa198;">'Folder ID'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #78683f;">hue</span>=<span style="color: #2aa198;">'Traces used'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #5e7837;">hue_order</span>=[<span style="color: #2aa198;">'orig'</span>, <span style="color: #2aa198;">'pred-0.1'</span>, <span style="color: #2aa198;">'pred-0.3'</span>, <span style="color: #2aa198;">'pred-0.5'</span>, <span style="color: #2aa198;">'pred-0.7'</span>, <span style="color: #2aa198;">'pred-0.9'</span>],
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #3f7178;">sharex</span>=<span style="color: #859900; font-weight: bold;">True</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #783778;">sharey</span>=<span style="color: #859900; font-weight: bold;">True</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #7e544f;">aspect</span>=1.5,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #513f78;">height</span>=4,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #4f7e67;">margin_titles</span>=<span style="color: #859900; font-weight: bold;">True</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #4f5c7e;">legend_out</span>=<span style="color: #859900; font-weight: bold;">True</span>)
+<span style="color: #7a4f7e;">g</span>.<span style="color: #78683f;">map_dataframe</span>(<span style="color: #4f5c7e;">sns</span>.<span style="color: #4f7e67;">scatterplot</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #3f7178;">x</span>=<span style="color: #3f7178;">x</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #513f78;">y</span>=<span style="color: #2aa198;">'Trace lengths'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #5e7837;">palette</span>=<span style="color: #2aa198;">'colorblind'</span>).<span style="color: #783778;">set</span>(<span style="color: #783f5a;">xscale</span> = <span style="color: #2aa198;">'log'</span>)
+<span style="color: #7a4f7e;">g</span>.<span style="color: #5e7837;">add_legend</span>(<span style="color: #783f5a;">title</span>=<span style="color: #2aa198;">'Traces used'</span>)
+<span style="color: #7a4f7e;">g</span>.<span style="color: #37785e;">set_xlabels</span>(<span style="color: #3f7178;">x</span>)
+<span style="color: #7a4f7e;">g</span>.<span style="color: #513f78;">tight_layout</span>()
+<span style="color: #7a4f7e;">g</span>.<span style="color: #4f7e67;">fig</span>.<span style="color: #7e544f;">patch</span>.<span style="color: #4f5c7e;">set_facecolor</span>(<span style="color: #2aa198;">'white'</span>)
+<span style="color: #4f7e67;">plt</span>.<span style="color: #374478;">show</span>()
 </pre>
 </div>
 
@@ -12999,7 +13031,7 @@ length mainly seems to be due to better recognition of artifacts.
 <div class="outline-text-4" id="text-2-1-7">
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python">%cd /beegfs/ye53nis/drmed-git
+<pre class="src src-jupyter-python">%<span style="color: #707e4f;">cd</span> /<span style="color: #5e7837;">beegfs</span>/<span style="color: #7a4f7e;">ye53nis</span>/<span style="color: #784437;">drmed</span>-<span style="color: #784437;">git</span>
 </pre>
 </div>
 
@@ -13010,18 +13042,18 @@ length mainly seems to be due to better recognition of artifacts.
 
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python"><span style="color: #859900; font-weight: bold;">from</span> pathlib <span style="color: #859900; font-weight: bold;">import</span> Path
+<pre class="src src-jupyter-python"><span style="color: #859900; font-weight: bold;">from</span> <span style="color: #43783f;">pathlib</span> <span style="color: #859900; font-weight: bold;">import</span> <span style="color: #78683f;">Path</span>
 
-<span style="color: #859900; font-weight: bold;">import</span> sys
-<span style="color: #859900; font-weight: bold;">import</span> mlflow
-<span style="color: #859900; font-weight: bold;">import</span> matplotlib.pyplot <span style="color: #859900; font-weight: bold;">as</span> plt
-<span style="color: #859900; font-weight: bold;">import</span> numpy <span style="color: #859900; font-weight: bold;">as</span> np
-<span style="color: #859900; font-weight: bold;">import</span> pandas <span style="color: #859900; font-weight: bold;">as</span> pd
-<span style="color: #859900; font-weight: bold;">import</span> seaborn <span style="color: #859900; font-weight: bold;">as</span> sns
-<span style="color: #859900; font-weight: bold;">import</span> tensorflow <span style="color: #859900; font-weight: bold;">as</span> tf
-<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #2aa198;">"tf version: "</span>, tf.version.VERSION)
-<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #2aa198;">"tf.keras version: "</span>, tf.keras.__version__)
-<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #2aa198;">"mlflow version: "</span>, mlflow.version.VERSION)
+<span style="color: #859900; font-weight: bold;">import</span> <span style="color: #513f78;">sys</span>
+<span style="color: #859900; font-weight: bold;">import</span> <span style="color: #5e7837;">mlflow</span>
+<span style="color: #859900; font-weight: bold;">import</span> <span style="color: #37785e;">matplotlib</span>.<span style="color: #4f7e67;">pyplot</span> <span style="color: #859900; font-weight: bold;">as</span> <span style="color: #4f7e67;">plt</span>
+<span style="color: #859900; font-weight: bold;">import</span> <span style="color: #4f5c7e;">numpy</span> <span style="color: #859900; font-weight: bold;">as</span> <span style="color: #707e4f;">np</span>
+<span style="color: #859900; font-weight: bold;">import</span> <span style="color: #5e7837;">pandas</span> <span style="color: #859900; font-weight: bold;">as</span> <span style="color: #783778;">pd</span>
+<span style="color: #859900; font-weight: bold;">import</span> <span style="color: #78683f;">seaborn</span> <span style="color: #859900; font-weight: bold;">as</span> <span style="color: #4f5c7e;">sns</span>
+<span style="color: #859900; font-weight: bold;">import</span> <span style="color: #513f78;">tensorflow</span> <span style="color: #859900; font-weight: bold;">as</span> <span style="color: #37785e;">tf</span>
+<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #2aa198;">"tf version: "</span>, <span style="color: #37785e;">tf</span>.<span style="color: #707e4f;">version</span>.<span style="color: #78683f;">VERSION</span>)
+<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #2aa198;">"tf.keras version: "</span>, <span style="color: #37785e;">tf</span>.<span style="color: #784437;">keras</span>.<span style="color: #4f7e67;">__version__</span>)
+<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #2aa198;">"mlflow version: "</span>, <span style="color: #5e7837;">mlflow</span>.<span style="color: #707e4f;">version</span>.<span style="color: #78683f;">VERSION</span>)
 </pre>
 </div>
 
@@ -13034,14 +13066,14 @@ mlflow version:  1.19.0
 
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python">sys.path.append(<span style="color: #2aa198;">'src/'</span>)
-<span style="color: #859900; font-weight: bold;">from</span> fluotracify.simulations <span style="color: #859900; font-weight: bold;">import</span> (
-<span style="background-color: #eee8d5;"> </span>  import_simulation_from_csv <span style="color: #859900; font-weight: bold;">as</span> isfc,
-<span style="background-color: #eee8d5;"> </span>  analyze_simulations <span style="color: #859900; font-weight: bold;">as</span> ans,
+<pre class="src src-jupyter-python"><span style="color: #513f78;">sys</span>.<span style="color: #513f78;">path</span>.<span style="color: #5e7837;">append</span>(<span style="color: #2aa198;">'src/'</span>)
+<span style="color: #859900; font-weight: bold;">from</span> <span style="color: #783778;">fluotracify</span>.<span style="color: #5e7837;">simulations</span> <span style="color: #859900; font-weight: bold;">import</span> (
+<span style="background-color: #eee8d5;"> </span>  <span style="color: #707e4f;">import_simulation_from_csv</span> <span style="color: #859900; font-weight: bold;">as</span> <span style="color: #4f5c7e;">isfc</span>,
+<span style="background-color: #eee8d5;"> </span>  <span style="color: #43783f;">analyze_simulations</span> <span style="color: #859900; font-weight: bold;">as</span> <span style="color: #7a4f7e;">ans</span>,
 )
-<span style="color: #859900; font-weight: bold;">from</span> fluotracify.training <span style="color: #859900; font-weight: bold;">import</span> build_model <span style="color: #859900; font-weight: bold;">as</span> bm, preprocess_data <span style="color: #859900; font-weight: bold;">as</span> ppd
-<span style="color: #859900; font-weight: bold;">from</span> fluotracify.applications <span style="color: #859900; font-weight: bold;">import</span> correlate, plots, correction
-<span style="color: #859900; font-weight: bold;">from</span> fluotracify.imports <span style="color: #859900; font-weight: bold;">import</span> ptu_utils <span style="color: #859900; font-weight: bold;">as</span> ptu
+<span style="color: #859900; font-weight: bold;">from</span> <span style="color: #783778;">fluotracify</span>.<span style="color: #3f7178;">training</span> <span style="color: #859900; font-weight: bold;">import</span> <span style="color: #783778;">build_model</span> <span style="color: #859900; font-weight: bold;">as</span> <span style="color: #374478;">bm</span>, <span style="color: #784437;">preprocess_data</span> <span style="color: #859900; font-weight: bold;">as</span> <span style="color: #783f5a;">ppd</span>
+<span style="color: #859900; font-weight: bold;">from</span> <span style="color: #783778;">fluotracify</span>.<span style="color: #4f5c7e;">applications</span> <span style="color: #859900; font-weight: bold;">import</span> <span style="color: #5e7837;">correlate</span>, <span style="color: #4f5c7e;">plots</span>, <span style="color: #3f7178;">correction</span>
+<span style="color: #859900; font-weight: bold;">from</span> <span style="color: #783778;">fluotracify</span>.<span style="color: #783f5a;">imports</span> <span style="color: #859900; font-weight: bold;">import</span> <span style="color: #7a4f7e;">ptu_utils</span> <span style="color: #859900; font-weight: bold;">as</span> <span style="color: #78683f;">ptu</span>
 </pre>
 </div>
 
@@ -13061,11 +13093,11 @@ mlflow version:  1.19.0
 
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python"><span style="color: #268bd2;">loaded_model</span> = mlflow.keras.load_model(logged_model, <span style="color: #657b83; font-weight: bold;">compile</span>=<span style="color: #859900; font-weight: bold;">False</span>)
-loaded_model.compile(loss=bm.binary_ce_dice_loss(),
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>optimizer=tf.keras.optimizers.Adam(),
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>metrics = bm.unet_metrics(metrics_thresholds))
-loaded_model
+<pre class="src src-jupyter-python"><span style="color: #268bd2;">loaded_model</span> = <span style="color: #5e7837;">mlflow</span>.<span style="color: #784437;">keras</span>.<span style="color: #783f5a;">load_model</span>(<span style="color: #783f5a;">logged_model</span>, <span style="color: #657b83; font-weight: bold;">compile</span>=<span style="color: #859900; font-weight: bold;">False</span>)
+<span style="color: #374478;">loaded_model</span>.<span style="color: #374478;">compile</span>(<span style="color: #783f5a;">loss</span>=<span style="color: #374478;">bm</span>.<span style="color: #783f5a;">binary_ce_dice_loss</span>(),
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span><span style="color: #7a4f7e;">optimizer</span>=<span style="color: #37785e;">tf</span>.<span style="color: #784437;">keras</span>.<span style="color: #43783f;">optimizers</span>.<span style="color: #783778;">Adam</span>(),
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span><span style="color: #43783f;">metrics</span> = <span style="color: #374478;">bm</span>.<span style="color: #374478;">unet_metrics</span>(<span style="color: #37785e;">metrics_thresholds</span>))
+<span style="color: #374478;">loaded_model</span>
 </pre>
 </div>
 
@@ -13080,10 +13112,10 @@ WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer
 <span style="color: #93a1a1;"># </span><span style="color: #93a1a1;">e.g. 2**14, 2**13, 2**12</span>
 <span style="color: #93a1a1;"># </span><span style="color: #93a1a1;">note that: after executing 2**14, then 2**13, there will be an error</span>
 <span style="color: #93a1a1;"># </span><span style="color: #93a1a1;">if you then execute 2**12 and then 2**13 again, the error will be gone</span>
-<span style="color: #268bd2;">test_features</span> = np.zeros((2**13)).reshape(1, -1, 1)
-<span style="color: #859900; font-weight: bold;">print</span>(test_features.shape)
-<span style="color: #268bd2;">predictions</span> = loaded_model.predict(test_features, verbose=0).flatten()
-predictions
+<span style="color: #268bd2;">test_features</span> = <span style="color: #707e4f;">np</span>.<span style="color: #513f78;">zeros</span>((2**13)).<span style="color: #37785e;">reshape</span>(1, -1, 1)
+<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #4f5c7e;">test_features</span>.<span style="color: #78683f;">shape</span>)
+<span style="color: #268bd2;">predictions</span> = <span style="color: #374478;">loaded_model</span>.<span style="color: #513f78;">predict</span>(<span style="color: #4f5c7e;">test_features</span>, <span style="color: #37785e;">verbose</span>=0).<span style="color: #5e7837;">flatten</span>()
+<span style="color: #7a4f7e;">predictions</span>
 </pre>
 </div>
 
@@ -13099,13 +13131,13 @@ only load test data.
 </p>
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python"><span style="color: #268bd2;">dataset</span>, <span style="color: #657b83; font-weight: bold;">_</span>, <span style="color: #268bd2;">nsamples</span>, <span style="color: #268bd2;">experiment_params</span> = isfc.import_from_csv(
-<span style="background-color: #eee8d5;"> </span>   folder=folder,
-<span style="background-color: #eee8d5;"> </span>   header=12,
-<span style="background-color: #eee8d5;"> </span>   frac_train=1,
-<span style="background-color: #eee8d5;"> </span>   col_per_example=col_per_example,
-<span style="background-color: #eee8d5;"> </span>   dropindex=<span style="color: #859900; font-weight: bold;">None</span>,
-<span style="background-color: #eee8d5;"> </span>   dropcolumns=<span style="color: #859900; font-weight: bold;">None</span>)
+<pre class="src src-jupyter-python"><span style="color: #268bd2;">dataset</span>, <span style="color: #657b83; font-weight: bold;">_</span>, <span style="color: #268bd2;">nsamples</span>, <span style="color: #268bd2;">experiment_params</span> = <span style="color: #4f5c7e;">isfc</span>.<span style="color: #37785e;">import_from_csv</span>(
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #783f5a;">folder</span>=<span style="color: #783f5a;">folder</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #513f78;">header</span>=12,
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #7a4f7e;">frac_train</span>=1,
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #78683f;">col_per_example</span>=<span style="color: #78683f;">col_per_example</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #707e4f;">dropindex</span>=<span style="color: #859900; font-weight: bold;">None</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #5e7837;">dropcolumns</span>=<span style="color: #859900; font-weight: bold;">None</span>)
 </pre>
 </div>
 
@@ -13143,7 +13175,7 @@ only load test data.
 
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python">experiment_params.T.sort_values(by=<span style="color: #2aa198;">'diffusion rate of molecules in micrometer^2 / s'</span>, ignore_index=<span style="color: #859900; font-weight: bold;">True</span>)
+<pre class="src src-jupyter-python"><span style="color: #374478;">experiment_params</span>.<span style="color: #37785e;">T</span>.<span style="color: #374478;">sort_values</span>(<span style="color: #43783f;">by</span>=<span style="color: #2aa198;">'diffusion rate of molecules in micrometer^2 / s'</span>, <span style="color: #78683f;">ignore_index</span>=<span style="color: #859900; font-weight: bold;">True</span>)
 </pre>
 </div>
 
@@ -13714,18 +13746,18 @@ only load test data.
 
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python"><span style="color: #268bd2;">diffrates</span> = experiment_params.loc[<span style="color: #2aa198;">'diffusion rate of molecules in micrometer^2 / s'</span>].astype(np.float32)
-<span style="color: #268bd2;">nmols</span> = experiment_params.loc[<span style="color: #2aa198;">'number of fast molecules'</span>].astype(np.float32)
-<span style="color: #268bd2;">clusters</span> = experiment_params.loc[<span style="color: #2aa198;">'diffusion rate of clusters in micrometer^2 / s'</span>].astype(np.float32)
+<pre class="src src-jupyter-python"><span style="color: #268bd2;">diffrates</span> = <span style="color: #374478;">experiment_params</span>.<span style="color: #783778;">loc</span>[<span style="color: #2aa198;">'diffusion rate of molecules in micrometer^2 / s'</span>].<span style="color: #374478;">astype</span>(<span style="color: #707e4f;">np</span>.<span style="color: #78683f;">float32</span>)
+<span style="color: #268bd2;">nmols</span> = <span style="color: #374478;">experiment_params</span>.<span style="color: #783778;">loc</span>[<span style="color: #2aa198;">'number of fast molecules'</span>].<span style="color: #374478;">astype</span>(<span style="color: #707e4f;">np</span>.<span style="color: #78683f;">float32</span>)
+<span style="color: #268bd2;">clusters</span> = <span style="color: #374478;">experiment_params</span>.<span style="color: #783778;">loc</span>[<span style="color: #2aa198;">'diffusion rate of clusters in micrometer^2 / s'</span>].<span style="color: #374478;">astype</span>(<span style="color: #707e4f;">np</span>.<span style="color: #78683f;">float32</span>)
 
-<span style="color: #268bd2;">dataset_sep</span> = isfc.separate_data_and_labels(array=dataset,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   nsamples=nsamples,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   col_per_example=col_per_example)
+<span style="color: #268bd2;">dataset_sep</span> = <span style="color: #4f5c7e;">isfc</span>.<span style="color: #3f7178;">separate_data_and_labels</span>(<span style="color: #78683f;">array</span>=<span style="color: #37785e;">dataset</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #783f5a;">nsamples</span>=<span style="color: #783f5a;">nsamples</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #78683f;">col_per_example</span>=<span style="color: #78683f;">col_per_example</span>)
 
-<span style="color: #268bd2;">features</span> = dataset_sep[<span style="color: #2aa198;">'0'</span>]
-<span style="color: #268bd2;">labels_artifact</span> = dataset_sep[<span style="color: #2aa198;">'1'</span>]
-<span style="color: #268bd2;">labels_artifact_bool</span> = labels_artifact &gt; lab_thresh
-<span style="color: #268bd2;">labels_puretrace</span> = dataset_sep[<span style="color: #2aa198;">'2'</span>]
+<span style="color: #268bd2;">features</span> = <span style="color: #4f5c7e;">dataset_sep</span>[<span style="color: #2aa198;">'0'</span>]
+<span style="color: #268bd2;">labels_artifact</span> = <span style="color: #4f5c7e;">dataset_sep</span>[<span style="color: #2aa198;">'1'</span>]
+<span style="color: #268bd2;">labels_artifact_bool</span> = <span style="color: #784437;">labels_artifact</span> &gt; <span style="color: #37785e;">lab_thresh</span>
+<span style="color: #268bd2;">labels_puretrace</span> = <span style="color: #4f5c7e;">dataset_sep</span>[<span style="color: #2aa198;">'2'</span>]
 </pre>
 </div>
 
@@ -13739,19 +13771,19 @@ Let's correct the traces with the new model and correlate them!
 </p>
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python"><span style="background-color: #eee8d5;"> </span> <span style="color: #268bd2;">corr_out</span> = ans.correlate_simulations_corrected_by_prediction(
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> model=loaded_model,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> lab_thresh=lab_thresh,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> pred_thresh=pred_thresh,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> artifact=artifact,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> model_type=model_type,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> experiment_params=experiment_params,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> nsamples=nsamples,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> features=features,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> labels_artifact=labels_artifact,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> labels_puretrace=labels_puretrace,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> save_as_csv=<span style="color: #859900; font-weight: bold;">True</span>)
-corr_out
+<pre class="src src-jupyter-python"><span style="background-color: #eee8d5;"> </span> <span style="color: #268bd2;">corr_out</span> = <span style="color: #7a4f7e;">ans</span>.<span style="color: #5e7837;">correlate_simulations_corrected_by_prediction</span>(
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #43783f;">model</span>=<span style="color: #374478;">loaded_model</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #37785e;">lab_thresh</span>=<span style="color: #37785e;">lab_thresh</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #5e7837;">pred_thresh</span>=<span style="color: #5e7837;">pred_thresh</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #78683f;">artifact</span>=<span style="color: #78683f;">artifact</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #783f5a;">model_type</span>=<span style="color: #783f5a;">model_type</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #374478;">experiment_params</span>=<span style="color: #374478;">experiment_params</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #783f5a;">nsamples</span>=<span style="color: #783f5a;">nsamples</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #783f5a;">features</span>=<span style="color: #783f5a;">features</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #784437;">labels_artifact</span>=<span style="color: #784437;">labels_artifact</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #43783f;">labels_puretrace</span>=<span style="color: #43783f;">labels_puretrace</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #374478;">save_as_csv</span>=<span style="color: #859900; font-weight: bold;">True</span>)
+<span style="color: #4f5c7e;">corr_out</span>
 </pre>
 </div>
 
@@ -13764,8 +13796,8 @@ processed correlation of pure 3000 traces
 
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python"><span style="color: #268bd2;">corr_out</span> = pd.read_csv(filepath_or_buffer=<span style="color: #2aa198;">'data/exp-210807-hparams/2021-12-15_correlations.csv'</span>)
-corr_out
+<pre class="src src-jupyter-python"><span style="color: #268bd2;">corr_out</span> = <span style="color: #783778;">pd</span>.<span style="color: #78683f;">read_csv</span>(<span style="color: #784437;">filepath_or_buffer</span>=<span style="color: #2aa198;">'data/exp-210807-hparams/2021-12-15_correlations.csv'</span>)
+<span style="color: #4f5c7e;">corr_out</span>
 </pre>
 </div>
 
@@ -13933,7 +13965,7 @@ corr_out
 <li>Check out the <code>NaN</code> values.
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python"><span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #2aa198;">'All NaN values: {}'</span>.format(corr_out[corr_out[<span style="color: #2aa198;">'$D$ in $\\frac{{\mu m^2}}{{s}}$'</span>].isna()]))
+<pre class="src src-jupyter-python"><span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #2aa198;">'All NaN values: {}'</span>.<span style="color: #78683f;">format</span>(<span style="color: #4f5c7e;">corr_out</span>[<span style="color: #4f5c7e;">corr_out</span>[<span style="color: #2aa198;">'$D$ in $\\frac{{\mu m^2}}{{s}}$'</span>].<span style="color: #374478;">isna</span>()]))
 </pre>
 </div>
 
@@ -13955,32 +13987,32 @@ We confirmed that the correlation did not fail on none of the test traces
 
 <pre class="src src-jupyter-python"><span style="color: #268bd2;">x</span> = <span style="color: #2aa198;">'Trace lengths'</span>
 
-<span style="color: #268bd2;">g</span> = sns.FacetGrid(data=corr_out,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> col=<span style="color: #2aa198;">'Simulated $D$'</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> col_wrap=2,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> sharex=<span style="color: #859900; font-weight: bold;">True</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> aspect=1.5,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> height=5,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> legend_out=<span style="color: #859900; font-weight: bold;">True</span>)
-g.map_dataframe(sns.boxplot,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> x=x,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> y=<span style="color: #2aa198;">'Traces used'</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> hue=<span style="color: #2aa198;">'Simulated $D_{{clust}}$'</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> palette=<span style="color: #2aa198;">'colorblind'</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> showfliers=<span style="color: #859900; font-weight: bold;">False</span>)
-g.add_legend(title=<span style="color: #2aa198;">'Simulated $D_{{clust}}$'</span>)
-g.map_dataframe(sns.stripplot,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> x=x,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> y=<span style="color: #2aa198;">'Traces used'</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> hue=<span style="color: #2aa198;">'Simulated $D_{{clust}}$'</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> dodge=<span style="color: #859900; font-weight: bold;">True</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> palette=sns.color_palette([<span style="color: #2aa198;">'0.3'</span>]),
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> size=4,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> jitter=0.2)
-g.set_xlabels(x)
-g.fig.patch.set_facecolor(<span style="color: #2aa198;">'white'</span>)
-g.tight_layout()
-plt.show()
+<span style="color: #268bd2;">g</span> = <span style="color: #4f5c7e;">sns</span>.<span style="color: #374478;">FacetGrid</span>(<span style="color: #784437;">data</span>=<span style="color: #4f5c7e;">corr_out</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #7e544f;">col</span>=<span style="color: #2aa198;">'Simulated $D$'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #7e544f;">col_wrap</span>=2,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #3f7178;">sharex</span>=<span style="color: #859900; font-weight: bold;">True</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #7e544f;">aspect</span>=1.5,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #513f78;">height</span>=5,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #4f5c7e;">legend_out</span>=<span style="color: #859900; font-weight: bold;">True</span>)
+<span style="color: #7a4f7e;">g</span>.<span style="color: #78683f;">map_dataframe</span>(<span style="color: #4f5c7e;">sns</span>.<span style="color: #707e4f;">boxplot</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #3f7178;">x</span>=<span style="color: #3f7178;">x</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #513f78;">y</span>=<span style="color: #2aa198;">'Traces used'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #78683f;">hue</span>=<span style="color: #2aa198;">'Simulated $D_{{clust}}$'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #5e7837;">palette</span>=<span style="color: #2aa198;">'colorblind'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #43783f;">showfliers</span>=<span style="color: #859900; font-weight: bold;">False</span>)
+<span style="color: #7a4f7e;">g</span>.<span style="color: #5e7837;">add_legend</span>(<span style="color: #783f5a;">title</span>=<span style="color: #2aa198;">'Simulated $D_{{clust}}$'</span>)
+<span style="color: #7a4f7e;">g</span>.<span style="color: #78683f;">map_dataframe</span>(<span style="color: #4f5c7e;">sns</span>.<span style="color: #78683f;">stripplot</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #3f7178;">x</span>=<span style="color: #3f7178;">x</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #513f78;">y</span>=<span style="color: #2aa198;">'Traces used'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #78683f;">hue</span>=<span style="color: #2aa198;">'Simulated $D_{{clust}}$'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #513f78;">dodge</span>=<span style="color: #859900; font-weight: bold;">True</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #5e7837;">palette</span>=<span style="color: #4f5c7e;">sns</span>.<span style="color: #7e544f;">color_palette</span>([<span style="color: #2aa198;">'0.3'</span>]),
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #43783f;">size</span>=4,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #783778;">jitter</span>=0.2)
+<span style="color: #7a4f7e;">g</span>.<span style="color: #37785e;">set_xlabels</span>(<span style="color: #3f7178;">x</span>)
+<span style="color: #7a4f7e;">g</span>.<span style="color: #4f7e67;">fig</span>.<span style="color: #7e544f;">patch</span>.<span style="color: #4f5c7e;">set_facecolor</span>(<span style="color: #2aa198;">'white'</span>)
+<span style="color: #7a4f7e;">g</span>.<span style="color: #513f78;">tight_layout</span>()
+<span style="color: #4f7e67;">plt</span>.<span style="color: #374478;">show</span>()
 </pre>
 </div>
 
@@ -14002,32 +14034,32 @@ distribution follows a log normal, use a log scale.
 <span style="color: #93a1a1;"># </span><span style="color: #93a1a1;">'$\\tau_{{D}}$ in $ms$'</span>
 <span style="color: #268bd2;">x</span> = <span style="color: #2aa198;">'$\\tau_{{D}}$ in $ms$'</span>
 
-<span style="color: #268bd2;">g</span> = sns.FacetGrid(data=corr_out,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> col=<span style="color: #2aa198;">'Simulated $D$'</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> col_wrap=2,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> sharex=<span style="color: #859900; font-weight: bold;">False</span>,  <span style="color: #93a1a1;"># False for x=D or x=tau, True for x=Trace lengths</span>
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> aspect=1.5,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> height=5,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> legend_out=<span style="color: #859900; font-weight: bold;">True</span>)
-g.map_dataframe(sns.boxplot,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> x=x,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> y=<span style="color: #2aa198;">'Traces used'</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> hue=<span style="color: #2aa198;">'Simulated $D_{{clust}}$'</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> palette=<span style="color: #2aa198;">'colorblind'</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> showfliers=<span style="color: #859900; font-weight: bold;">False</span>).set(xscale = <span style="color: #2aa198;">'log'</span>)
-g.add_legend(title=<span style="color: #2aa198;">'Simulated $D_{{clust}}$'</span>)
-g.map_dataframe(sns.stripplot,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> x=x,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> y=<span style="color: #2aa198;">'Traces used'</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> hue=<span style="color: #2aa198;">'Simulated $D_{{clust}}$'</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> dodge=<span style="color: #859900; font-weight: bold;">True</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> palette=sns.color_palette([<span style="color: #2aa198;">'0.3'</span>]),
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> size=4,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> jitter=0.2).set(xscale = <span style="color: #2aa198;">'log'</span>)
-g.set_xlabels(x)
-g.fig.patch.set_facecolor(<span style="color: #2aa198;">'white'</span>)
-g.tight_layout()
-plt.show()
+<span style="color: #268bd2;">g</span> = <span style="color: #4f5c7e;">sns</span>.<span style="color: #374478;">FacetGrid</span>(<span style="color: #784437;">data</span>=<span style="color: #4f5c7e;">corr_out</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #7e544f;">col</span>=<span style="color: #2aa198;">'Simulated $D$'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #7e544f;">col_wrap</span>=2,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #3f7178;">sharex</span>=<span style="color: #859900; font-weight: bold;">False</span>,  <span style="color: #93a1a1;"># False for x=D or x=tau, True for x=Trace lengths</span>
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #7e544f;">aspect</span>=1.5,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #513f78;">height</span>=5,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #4f5c7e;">legend_out</span>=<span style="color: #859900; font-weight: bold;">True</span>)
+<span style="color: #7a4f7e;">g</span>.<span style="color: #78683f;">map_dataframe</span>(<span style="color: #4f5c7e;">sns</span>.<span style="color: #707e4f;">boxplot</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #3f7178;">x</span>=<span style="color: #3f7178;">x</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #513f78;">y</span>=<span style="color: #2aa198;">'Traces used'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #78683f;">hue</span>=<span style="color: #2aa198;">'Simulated $D_{{clust}}$'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #5e7837;">palette</span>=<span style="color: #2aa198;">'colorblind'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #43783f;">showfliers</span>=<span style="color: #859900; font-weight: bold;">False</span>).<span style="color: #783778;">set</span>(<span style="color: #783f5a;">xscale</span> = <span style="color: #2aa198;">'log'</span>)
+<span style="color: #7a4f7e;">g</span>.<span style="color: #5e7837;">add_legend</span>(<span style="color: #783f5a;">title</span>=<span style="color: #2aa198;">'Simulated $D_{{clust}}$'</span>)
+<span style="color: #7a4f7e;">g</span>.<span style="color: #78683f;">map_dataframe</span>(<span style="color: #4f5c7e;">sns</span>.<span style="color: #78683f;">stripplot</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #3f7178;">x</span>=<span style="color: #3f7178;">x</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #513f78;">y</span>=<span style="color: #2aa198;">'Traces used'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #78683f;">hue</span>=<span style="color: #2aa198;">'Simulated $D_{{clust}}$'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #513f78;">dodge</span>=<span style="color: #859900; font-weight: bold;">True</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #5e7837;">palette</span>=<span style="color: #4f5c7e;">sns</span>.<span style="color: #7e544f;">color_palette</span>([<span style="color: #2aa198;">'0.3'</span>]),
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #43783f;">size</span>=4,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #783778;">jitter</span>=0.2).<span style="color: #783778;">set</span>(<span style="color: #783f5a;">xscale</span> = <span style="color: #2aa198;">'log'</span>)
+<span style="color: #7a4f7e;">g</span>.<span style="color: #37785e;">set_xlabels</span>(<span style="color: #3f7178;">x</span>)
+<span style="color: #7a4f7e;">g</span>.<span style="color: #4f7e67;">fig</span>.<span style="color: #7e544f;">patch</span>.<span style="color: #4f5c7e;">set_facecolor</span>(<span style="color: #2aa198;">'white'</span>)
+<span style="color: #7a4f7e;">g</span>.<span style="color: #513f78;">tight_layout</span>()
+<span style="color: #4f7e67;">plt</span>.<span style="color: #374478;">show</span>()
 </pre>
 </div>
 
@@ -14055,8 +14087,8 @@ lengths using a subsample to avoid overplotting.
 
 <div class="org-src-container">
 
-<pre class="src src-jupyter-python"><span style="color: #268bd2;">corr_scatter</span> = corr_out[corr_out[<span style="color: #2aa198;">'Traces used'</span>].isin([<span style="color: #2aa198;">'corrected by labels (control)'</span>, <span style="color: #2aa198;">'corrected by prediction'</span>])].sample(1000)
-corr_scatter
+<pre class="src src-jupyter-python"><span style="color: #268bd2;">corr_scatter</span> = <span style="color: #4f5c7e;">corr_out</span>[<span style="color: #4f5c7e;">corr_out</span>[<span style="color: #2aa198;">'Traces used'</span>].<span style="color: #374478;">isin</span>([<span style="color: #2aa198;">'corrected by labels (control)'</span>, <span style="color: #2aa198;">'corrected by prediction'</span>])].<span style="color: #7e544f;">sample</span>(1000)
+<span style="color: #5e7837;">corr_scatter</span>
 </pre>
 </div>
 
@@ -14225,19 +14257,19 @@ corr_scatter
 <pre class="src src-jupyter-python"><span style="color: #93a1a1;"># </span><span style="color: #93a1a1;">'$D$ in $\\frac{{\mu m^2}}{{s}}$'</span>
 <span style="color: #93a1a1;"># </span><span style="color: #93a1a1;">'$\\tau_{{D}}$ in $ms$'</span>
 <span style="color: #268bd2;">x</span> = <span style="color: #2aa198;">'$D$ in $\\frac{{\mu m^2}}{{s}}$'</span>
-<span style="color: #268bd2;">g</span> = sns.relplot(
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> data=corr_scatter,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> x=x, y=<span style="color: #2aa198;">"Trace lengths"</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> row=<span style="color: #2aa198;">"Traces used"</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> hue=<span style="color: #2aa198;">"Simulated $D$"</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> style=<span style="color: #2aa198;">"Simulated $D_{{clust}}$"</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> kind=<span style="color: #2aa198;">"scatter"</span>,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> aspect=1.5,
-<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> palette=<span style="color: #2aa198;">'colorblind'</span>).set(xscale=<span style="color: #2aa198;">'log'</span>)
-g.set_xlabels(x)
-g.tight_layout()
-g.fig.patch.set_facecolor(<span style="color: #2aa198;">'white'</span>)
-plt.show()
+<span style="color: #268bd2;">g</span> = <span style="color: #4f5c7e;">sns</span>.<span style="color: #7a4f7e;">relplot</span>(
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #784437;">data</span>=<span style="color: #5e7837;">corr_scatter</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #3f7178;">x</span>=<span style="color: #3f7178;">x</span>, <span style="color: #513f78;">y</span>=<span style="color: #2aa198;">"Trace lengths"</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #707e4f;">row</span>=<span style="color: #2aa198;">"Traces used"</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #78683f;">hue</span>=<span style="color: #2aa198;">"Simulated $D$"</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #3f7178;">style</span>=<span style="color: #2aa198;">"Simulated $D_{{clust}}$"</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #783778;">kind</span>=<span style="color: #2aa198;">"scatter"</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #7e544f;">aspect</span>=1.5,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #5e7837;">palette</span>=<span style="color: #2aa198;">'colorblind'</span>).<span style="color: #783778;">set</span>(<span style="color: #783f5a;">xscale</span>=<span style="color: #2aa198;">'log'</span>)
+<span style="color: #7a4f7e;">g</span>.<span style="color: #37785e;">set_xlabels</span>(<span style="color: #3f7178;">x</span>)
+<span style="color: #7a4f7e;">g</span>.<span style="color: #513f78;">tight_layout</span>()
+<span style="color: #7a4f7e;">g</span>.<span style="color: #4f7e67;">fig</span>.<span style="color: #7e544f;">patch</span>.<span style="color: #4f5c7e;">set_facecolor</span>(<span style="color: #2aa198;">'white'</span>)
+<span style="color: #4f7e67;">plt</span>.<span style="color: #374478;">show</span>()
 </pre>
 </div>
 
@@ -14276,8 +14308,8 @@ the achieved transit times are too low / diffrates are too fast.
 </div></div></div>
 <footer id="postamble" class="">
 <div><p class="author">Author: Alexander Seltmann</p>
-<p class="date">Created: 2021-12-17 Fr 00:09</p>
-<p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 27.2 (<a href="http://orgmode.org">Org-mode</a> 9.4.4)</p>
+<p class="date">Created: 2022-02-20 So 12:20</p>
+<p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 27.2 (<a href="http://orgmode.org">Org-mode</a> 9.5.2)</p>
 </div>
 </footer>
 </body>
