@@ -4,7 +4,7 @@ import logging
 import tensorflow as tf
 from tensorboard.plugins.hparams import api as hp
 
-logging.basicConfig(format='%(asctime)s - %(message)s')
+logging.basicConfig(format='%(asctime)s - %(message)s - build model')
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 
@@ -375,8 +375,8 @@ def unet_1d_alt(input_size):
                                      kernel_size=1,
                                      activation='sigmoid')(y0)
 
-    print('input - shape:\t', inputs.shape)
-    print('output - shape:\t', outputs.shape)
+    log.debug('unet: input shape: %s, output shape: %s', inputs.shape,
+              outputs.shape)
 
     unet = tf.keras.Model(inputs=inputs, outputs=outputs)
     return unet
@@ -466,8 +466,8 @@ def unet_1d_alt2(input_size, n_levels, first_filters, pool_size,
                                      kernel_size=1,
                                      activation='sigmoid')(ldict['y0'])
 
-    print('input - shape:\t', inputs.shape)
-    print('output - shape:\t', outputs.shape)
+    log.debug('unet: input shape: %s, output shape: %s', inputs.shape,
+              outputs.shape)
 
     unet = tf.keras.Model(inputs=inputs,
                           outputs=outputs,
@@ -481,7 +481,7 @@ def unet_1d_alt2(input_size, n_levels, first_filters, pool_size,
 
 
 class F1Score(tf.keras.metrics.Metric):
-    def __init__(self, name="f1", from_logits=False, **kwargs):
+    def __init__(self, name="f1", from_logits=True, **kwargs):
         super(F1Score, self).__init__(name=name, **kwargs)
         self.precision = tf.keras.metrics.Precision(from_logits)
         self.recall = tf.keras.metrics.Recall(from_logits)
@@ -576,10 +576,9 @@ def prepare_model(model, input_size_list):
                                                       newshape=(1, -1, 1))
         try:
             predictions = model.predict(test_features, verbose=0).flatten()
-            log.debug('prepare_model: test shape %s, e.g. %s',
-                      test_features.shape, predictions[:5])
+            log.debug('test shape %s, e.g. %s', test_features.shape,
+                      predictions[:5])
         except ValueError:
-            log.debug(
-                'prepare_model: test shape %s. prediction failed '
-                'as expected. Retry...', test_features.shape)
-    log.debug('prepare_model: UNET ready for different trace lengths')
+            log.debug('test shape %s. prediction failed as expected. Retry...',
+                      test_features.shape)
+    log.debug('UNET ready for different trace lengths')

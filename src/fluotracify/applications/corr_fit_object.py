@@ -1,5 +1,8 @@
-"""Taken from Dominic Waithe's FCS Bulk Correlation Software FOCUSpoint
-Copyright (C) 2015  Dominic Waithe
+"""Load Fluorescence Correlation Spectroscopy files, predict and correct
+artifacts, and autocorrelate the data. Written by Alex Seltmann 2021.
+
+Loading and correlation adapted from Dominic Waithe's FCS Bulk Correlation
+Software FOCUSpoint Copyright (C) 2015  Dominic Waithe
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

@@ -3,6 +3,7 @@ on simulated fluroescence traces using mlflow. It is meant to be put into the
 `MLproject` file of a mlflow setup or executed via `mlflow run`."""
 
 import datetime
+import logging
 import sys
 
 import click
@@ -15,21 +16,25 @@ from tensorboard.plugins.hparams import api as hp
 
 # fixes a problem when calling plotting functions on the server
 matplotlib.use('agg')
+# use logging
+logging.basicConfig(format='%(asctime)s - %(message)s - train')
+log = logging.getLogger(__name__)
+log.setLevel(logging.DEBUG)
 
-print("Python version: ", sys.version)
-print("Tensorflow version: ", tf.__version__)
-print("tf.keras version:", tf.keras.__version__)
-print('Cudnn version: ', build.build_info['cudnn_version'])
-print('Cuda version: ', build.build_info['cuda_version'])
+log.debug("Python version: %s", sys.version)
+log.debug("Tensorflow version: %s", tf.__version__)
+log.debug("tf.keras version: %s", tf.keras.__version__)
+log.debug('Cudnn version: %s', build.build_info['cudnn_version'])
+log.debug('Cuda version: %s', build.build_info['cuda_version'])
 # Workaround for a "No algorithm worked" bug on GPUs
 # see https://github.com/tensorflow/tensorflow/issues/45044
 physical_devices = tf.config.list_physical_devices('GPU')
-print('GPUs: {}. Trying to set memory growth to "True"...'.format(
-    physical_devices))
+log.debug('GPUs: %s. Trying to set memory growth to "True"...', physical_devices)
 try:
     tf.config.experimental.set_memory_growth(physical_devices[0], True)
+    log.debug('Setting memory growth successful.')
 except IndexError:
-    print('No GPU was found on this machine.')
+    log.debug('No GPU was found on this machine. ')
 
 # logging with mlflow: most of the logging happens with the autolog feature,
 # which is already quite powerful. Since I want to add custom logs, I have to
@@ -63,8 +68,9 @@ except IndexError:
 @click.option('--fluotracify_path',
               type=str,
               default='~/Programme/drmed-git/src/')
-def mlflow_run(batch_size, input_size, lr_start, lr_power, epochs, csv_path_train, csv_path_val, col_per_example, scaler, n_levels, first_filters, pool_size,
-               fluotracify_path):
+def mlflow_run(batch_size, input_size, lr_start, lr_power, epochs,
+               csv_path_train, csv_path_val, col_per_example, scaler, n_levels,
+               first_filters, pool_size, fluotracify_path):
     sys.path.append(fluotracify_path)
 
     if True:  # isort workaround
@@ -90,17 +96,12 @@ def mlflow_run(batch_size, input_size, lr_start, lr_power, epochs, csv_path_trai
 
         Parameters:
         -----------
-        train_ds, val_ds : tf.Dataset
+        dataset_train, dataset_val : tf.Dataset
             Train and validation data as tf.Datasets.
-        hp_logdir : str
+        logdir : str
             The top-level logdir to which to write summary data.
-        hparams : dict
-            A dict mapping hyperparameters in `HPARAMS` to values.
         num_train_examples, num_val_examples : int
             number of train and validation examples
-        best_auc_val : float
-            Best validation AUC. If the trained model is currently the best,
-            it is saved.
 
         Returns:
         --------
@@ -246,8 +247,6 @@ def mlflow_run(batch_size, input_size, lr_start, lr_power, epochs, csv_path_trai
 
     with mlflow.start_run() as _:
         mlflow.tensorflow.autolog(every_n_iter=1, log_models=False)
-        best_auc_val = tf.experimental.numpy.finfo(
-            tf.experimental.numpy.float64).min
 
         experiment_params_train.to_csv(EXP_PARAM_PATH_TRAIN)
         experiment_params_val.to_csv(EXP_PARAM_PATH_VAL)
