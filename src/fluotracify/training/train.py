@@ -262,8 +262,7 @@ def mlflow_run(batch_size, input_size, lr_start, lr_power, epochs, csv_path_trai
                 dataset_val=dataset_val,
                 logdir=LOG_DIR,
                 num_train_examples=num_train_examples,
-                num_val_examples=num_val_examples,
-                best_auc_val=best_auc_val)
+                num_val_examples=num_val_examples)
 
 
 if __name__ == "__main__":
