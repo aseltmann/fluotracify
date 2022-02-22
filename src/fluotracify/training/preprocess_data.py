@@ -1,6 +1,8 @@
 """This module contains preprocessing functions for the training of neural
 networks."""
 
+import logging
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -16,6 +18,10 @@ from sklearn.preprocessing import (
     StandardScaler,
     normalize,
 )
+
+logging.basicConfig(format='%(asctime)s - %(message)s - preprocess')
+log = logging.getLogger(__name__)
+log.setLevel(logging.DEBUG)
 
 
 def tfds_from_pddf(features_df, labels_df, frac_val=None):
@@ -65,7 +71,7 @@ def tfds_from_pddf(features_df, labels_df, frac_val=None):
         dataset = tf.data.Dataset.from_tensor_slices((X_tensor, y_tensor))
         dataset = dataset.map(replace_nan)
 
-        print('number of examples: {}\n'.format(num_total_examples))
+        log.debug('number of examples: %s', num_total_examples)
         out = (dataset, num_total_examples)
     elif 0 < frac_val < 1:
         # for training: split dataset in training and validation set
@@ -77,9 +83,8 @@ def tfds_from_pddf(features_df, labels_df, frac_val=None):
         dataset_train = dataset.take(num_train_examples)
         dataset_val = dataset.skip(num_train_examples)
 
-        print('number of training examples: {}, number of validation '
-              'examples: {}\n\n------------------------'.format(
-                  num_train_examples, num_val_examples))
+        log.debug('number of training examples: %s, number of validation '
+                  'examples: %s', num_train_examples, num_val_examples)
         out = (dataset_train, dataset_val, num_train_examples,
                num_val_examples)
 
