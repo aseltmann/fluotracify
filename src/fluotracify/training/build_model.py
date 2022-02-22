@@ -382,8 +382,9 @@ def unet_1d_alt(input_size):
     return unet
 
 
-def unet_1d_alt2(input_size, n_levels, first_filters, pool_size):
-    """U-Net as described by Ronneberger et al.
+def unet_1d_alt2(input_size, n_levels, first_filters, pool_size,
+                 metrics_thresholds):
+    """Defines compiled U-Net
 
     Parameters
     ----------
@@ -398,15 +399,12 @@ def unet_1d_alt2(input_size, n_levels, first_filters, pool_size):
     pool_size : int, Optional. Default: 2
         Pool size of the MaxPool1D layer, as well as kernel size and
         strides of the Conv1DTranspose layer
+    metrics_thresholds : list of float between 0 and 1
+        compute metrics with these prediction thresholds
 
     Returns
     -------
-    Model as described by the tensorflow.keras Functional API
-
-    Raises
-    ------
-    - ValueError: the number of filters in filters_ls has to be equal
-    to n_levels
+    Compiled Model as described by the tensorflow.keras Functional API
 
     Notes
     -----
@@ -474,6 +472,11 @@ def unet_1d_alt2(input_size, n_levels, first_filters, pool_size):
     unet = tf.keras.Model(inputs=inputs,
                           outputs=outputs,
                           name='unet_depth{}'.format(n_levels))
+
+    optimizer = tf.keras.optimizers.Adam()
+    loss = binary_ce_dice_loss()
+    metrics = unet_metrics(metrics_thresholds)
+    unet.compile(loss=loss, optimizer=optimizer, metrics=metrics)
     return unet
 
 
@@ -576,6 +579,7 @@ def prepare_model(model, input_size_list):
             log.debug('prepare_model: test shape %s, e.g. %s',
                       test_features.shape, predictions[:5])
         except ValueError:
-            log.debug('prepare_model: test shape %s. prediction failed '
-                      'as expected. Retry...', test_features.shape)
+            log.debug(
+                'prepare_model: test shape %s. prediction failed '
+                'as expected. Retry...', test_features.shape)
     log.debug('prepare_model: UNET ready for different trace lengths')

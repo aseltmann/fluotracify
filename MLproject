@@ -7,15 +7,13 @@ entry_points:
     parameters:
       fluotracify_path: {type: path, default: ~/Programme/drmed-git/src/}
       batch_size: {type: float, default: 5}
-      frac_val: {type: float, default: 0.2}
-      length_delimiter: {type: float, default: 16384}
-      learning_rate: {type: float, default: 1e-5}
+      input_size: {type: float, default: 16384}
+      lr_start: {type: float, default: 1e-5}
+      lr_power: {type: float, default: 1}
       epochs: {type: float, default: 10}
       csv_path_train: {type: path, default: ~/Programme/Jupyter/DOKTOR/saves/firstartefact/subsample_rand/}
-      csv_path_test: {type: path, default: ~/Programme/Jupyter/DOKTOR/saves/firstartefact/subsample_rand/}
+      csv_path_val: {type: path, default: ~/Programme/Jupyter/DOKTOR/saves/firstartefact/subsample_rand/}
       col_per_example: {type: float, default: 3}
-      steps_per_epoch: {type: float, default: 10}
-      validation_steps: {type: float, default: 10}
       scaler: {type: string, default: 'robust'}
       n_levels: {type: float, default: 5}
       first_filters: {type: float, default: 64}
@@ -23,15 +21,13 @@ entry_points:
     command: "python src/fluotracify/training/train.py
                  --fluotracify_path {fluotracify_path}
                  --batch_size {batch_size}
-                 --frac_val {frac_val}
-                 --length_delimiter {length_delimiter}
-                 --learning_rate {learning_rate}
+                 --input_size {input_size}
+                 --lr_start {lr_start}
+                 --lr_power {lr_power}
                  --epochs {epochs}
                  --csv_path_train {csv_path_train}
-                 --csv_path_test {csv_path_test}
+                 --csv_path_val {csv_path_val}
                  --col_per_example {col_per_example}
-                 --steps_per_epoch {steps_per_epoch}
-                 --validation_steps {validation_steps}
                  --scaler {scaler}
                  --n_levels {n_levels}
                  --first_filters {first_filters}
