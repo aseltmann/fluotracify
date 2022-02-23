@@ -13,6 +13,8 @@ import mlflow.tensorflow
 import tensorflow as tf
 import tensorflow.python.platform.build_info as build
 
+# fix a problem with tf.experimental.numpy
+tf.experimental.numpy.experimental_enable_numpy_behavior(prefer_float32=False)
 # fixes a problem when calling plotting functions on the server
 matplotlib.use('agg')
 # use logging
@@ -36,9 +38,16 @@ try:
 except IndexError:
     log.debug('No GPU was found on this machine. ')
 
-# logging with mlflow: most of the logging happens with the autolog feature,
-# which is already quite powerful. Since I want to add custom logs, I have to
-# start and end the log manually with mlflow.start_run() and mlflow.end_run()
+LOG_DIR = "../tmp/tb-" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+LABEL_THRESH = 0.04
+# FIXME (PENDING): at some point, I want to plot metrics vs thresholds
+# from TF side, this is possible by providing the `thresholds`
+# argument as a list of thresholds
+# but currently, mlflow does not support logging lists, so I log the
+# elements of the list one by one
+METRICS_THRESHOLDS = [0.1, 0.3, 0.5, 0.7, 0.9]
+EXP_PARAM_PATH_TRAIN = '../tmp/experiment_params_train.csv'
+EXP_PARAM_PATH_VAL = '../tmp/experiment_params_val.csv'
 
 
 @click.command()
@@ -50,11 +59,11 @@ except IndexError:
 @click.option(
     '--csv_path_train',
     type=click.Path(exists=True),
-    default= '~/Programme/Jupyter/DOKTOR/saves/firstartefact/subsample_rand/')
+    default='~/Programme/Jupyter/DOKTOR/saves/firstartefact/subsample_rand/')
 @click.option(
     '--csv_path_val',
     type=click.Path(exists=True),
-    default= '~/Programme/Jupyter/DOKTOR/saves/firstartefact/subsample_rand/')
+    default='~/Programme/Jupyter/DOKTOR/saves/firstartefact/subsample_rand/')
 @click.option('--col_per_example', type=int, default=3)
 @click.option('--scaler', type=click.Choice(['standard', 'robust', 'maxabs',
                                              'quant_g', 'minmax', 'l1', 'l2']),
@@ -74,17 +83,6 @@ def mlflow_run(batch_size, input_size, lr_start, lr_power, epochs,
         from fluotracify.training import (build_model as bm,
                                           preprocess_data as ppd)
         from fluotracify.training import evaluate
-
-    LOG_DIR = "../tmp/tb-" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-    LABEL_THRESH = 0.04
-    # FIXME (PENDING): at some point, I want to plot metrics vs thresholds
-    # from TF side, this is possible by providing the `thresholds`
-    # argument as a list of thresholds
-    # but currently, mlflow does not support logging lists, so I log the
-    # elements of the list one by one
-    METRICS_THRESHOLDS = [0.1, 0.3, 0.5, 0.7, 0.9]
-    EXP_PARAM_PATH_TRAIN = '../tmp/experiment_params_train.csv'
-    EXP_PARAM_PATH_VAL = '../tmp/experiment_params_val.csv'
 
     if input_size == -1:
         input_size = None
@@ -106,7 +104,10 @@ def mlflow_run(batch_size, input_size, lr_start, lr_power, epochs,
         --------
         """
         ds_train_prep = dataset_train.map(
-            lambda trace, label: ppd.tf_crop_trace(trace, label, input_size),
+            lambda trace, label: ppd.tf_crop_trace(trace, label, 14000),
+            num_parallel_calls=tf.data.AUTOTUNE)
+        ds_train_prep = dataset_train.map(
+            lambda trace, label: ppd.tf_pad_trace(trace, label),
             num_parallel_calls=tf.data.AUTOTUNE)
         ds_train_prep = ds_train_prep.map(
             lambda trace, label: ppd.tf_scale_trace(trace, label, scaler),
@@ -116,7 +117,10 @@ def mlflow_run(batch_size, input_size, lr_start, lr_power, epochs,
                 batch_size, drop_remainder=True).prefetch(tf.data.AUTOTUNE)
 
         ds_val_prep = dataset_val.map(
-            lambda trace, label: ppd.tf_crop_trace(trace, label, input_size),
+            lambda trace, label: ppd.tf_crop_trace(trace, label, 14000),
+            num_parallel_calls=tf.data.AUTOTUNE)
+        ds_val_prep = dataset_val.map(
+            lambda trace, label: ppd.tf_pad_trace(trace, label),
             num_parallel_calls=tf.data.AUTOTUNE)
         ds_val_prep = ds_val_prep.map(
             lambda trace, label: ppd.tf_scale_trace(trace, label, scaler),
@@ -130,7 +134,7 @@ def mlflow_run(batch_size, input_size, lr_start, lr_power, epochs,
                                 first_filters=first_filters,
                                 pool_size=pool_size,
                                 metrics_thresholds=METRICS_THRESHOLDS)
-
+    def later():
         def log_plots(epoch, logs):
             """Image logging function for tf.keras.callbacks.LambdaCallback
 
