@@ -43,7 +43,7 @@ except IndexError:
 
 @click.command()
 @click.option('--batch_size', type=int, default=5)
-@click.option('--input_size', default=16384)
+@click.option('--input_size', type=int, default=16384)
 @click.option('--lr_start', type=float, default=1e-5)
 @click.option('--lr_power', type=float, default=1)
 @click.option('--epochs', type=int, default=10)
@@ -85,6 +85,9 @@ def mlflow_run(batch_size, input_size, lr_start, lr_power, epochs,
     METRICS_THRESHOLDS = [0.1, 0.3, 0.5, 0.7, 0.9]
     EXP_PARAM_PATH_TRAIN = '../tmp/experiment_params_train.csv'
     EXP_PARAM_PATH_VAL = '../tmp/experiment_params_val.csv'
+
+    if input_size == -1:
+        input_size = None
 
     def run_one(dataset_train, dataset_val, logdir, num_train_examples,
                 num_val_examples):
