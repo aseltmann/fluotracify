@@ -481,12 +481,25 @@ def unet_1d_alt2(input_size, n_levels, first_filters, pool_size,
 
 
 class BinaryFBeta(tf.keras.metrics.Metric):
-    """An F-beta score implementation by Jolomi Tosanwumi, see
-    https://towardsdatascience.com/f-beta-score-in-keras-part-i-86ad190a252f"""
+    """A stateless F-beta score implementation by Jolomi Tosanwumi, see
+    https://towardsdatascience.com/f-beta-score-in-keras-part-i-86ad190a252f
+
+    Notes
+    -----
+    - the F1-Score is an implementation of the harmonic mean of precision and
+    recall. The goal is to minimize type I and type II errors - and harmonic
+    mean penalizes lower values more than higher values, so that we don't get a
+    high score when one of precision or recall is low.
+    - FBeta makes it possible to give more weight to Precision or Recall. It
+    introduces beta_squared, which is the ratio of the weight of Recall to the
+    weight of Precision.
+      - beta > 1: Recall weighted more than Precision
+      - beta < 1: Precision weighted more than Recall
+    """
     def __init__(self, name='binary_fbeta', beta=1, threshold=0.5,
                  epsilon=1e-7, **kwargs):
         # initializing an object of the super class
-        super(BinaryFBeta, self).__init__(name=name, **kwargs)
+        super().__init__(name=name, **kwargs)
 
         # initializing state variables
         self.tp = self.add_weight(name='tp', initializer='zeros')
@@ -518,15 +531,15 @@ class BinaryFBeta(tf.keras.metrics.Metric):
     def result(self):
         """this is called at the end of each batch after states variables are
         updated. It is used to compute and return the metric for each batch."""
-        self.precision = self.tp/(self.predicted_positive+self.epsilon)
-        self.recall = self.tp/(self.actual_positive+self.epsilon)
+        self.precision = self.tp / (self.predicted_positive+self.epsilon)
+        self.recall = self.tp / (self.actual_positive+self.epsilon)
 
         # calculating fbeta
         self.fb = (1+self.beta_squared)*self.precision*self.recall / (
             self.beta_squared*self.precision + self.recall + self.epsilon)
         return self.fb
 
-    def reset_states(self):
+    def reset_state(self):
         """this is called at the end of each epoch. It is used to clear
         (reinitialize) the state variables."""
         self.tp.assign(0)
@@ -571,7 +584,7 @@ def unet_metrics(metrics_thresholds):
     metrics.append(
         tf.keras.metrics.BinaryAccuracy(name='accuracy', threshold=0.5))
     metrics.append(tf.keras.metrics.AUC(name='auc', num_thresholds=100))
-    metrics.append(BinaryFBeta())
+    metrics.append(BinaryFBeta(name='f1'))
     return metrics
 
 

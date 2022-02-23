@@ -12,7 +12,6 @@ import mlflow
 import mlflow.tensorflow
 import tensorflow as tf
 import tensorflow.python.platform.build_info as build
-from tensorboard.plugins.hparams import api as hp
 
 # fixes a problem when calling plotting functions on the server
 matplotlib.use('agg')
@@ -29,7 +28,8 @@ log.debug('Cuda version: %s', build.build_info['cuda_version'])
 # Workaround for a "No algorithm worked" bug on GPUs
 # see https://github.com/tensorflow/tensorflow/issues/45044
 physical_devices = tf.config.list_physical_devices('GPU')
-log.debug('GPUs: %s. Trying to set memory growth to "True"...', physical_devices)
+log.debug('GPUs: %s. Trying to set memory growth to "True"...',
+          physical_devices)
 try:
     tf.config.experimental.set_memory_growth(physical_devices[0], True)
     log.debug('Setting memory growth successful.')
@@ -52,27 +52,26 @@ except IndexError:
 @click.option('--epochs', type=int, default=10)
 @click.option(
     '--csv_path_train',
-    type=str,
-    default=
-    '/home/lex/Programme/Jupyter/DOKTOR/saves/firstartefact/subsample_rand/')
+    type=click.Path(exists=True),
+    default= '~/Programme/Jupyter/DOKTOR/saves/firstartefact/subsample_rand/')
 @click.option(
     '--csv_path_val',
-    type=str,
-    default=
-    '/home/lex/Programme/Jupyter/DOKTOR/saves/firstartefact/subsample_rand/')
+    type=click.Path(exists=True),
+    default= '~/Programme/Jupyter/DOKTOR/saves/firstartefact/subsample_rand/')
 @click.option('--col_per_example', type=int, default=3)
-@click.option('--scaler', type=str, default='robust')
+@click.option('--scaler', type=click.Choice(['standard', 'robust', 'maxabs',
+                                             'quant_g', 'minmax', 'l1', 'l2']),
+              default='robust')
 @click.option('--n_levels', type=int, default=9)
 @click.option('--first_filters', type=int, default=64)
 @click.option('--pool_size', type=int, default=2)
 @click.option('--fluotracify_path',
-              type=str,
+              type=click.Path(exists=True),
               default='~/Programme/drmed-git/src/')
 def mlflow_run(batch_size, input_size, lr_start, lr_power, epochs,
                csv_path_train, csv_path_val, col_per_example, scaler, n_levels,
                first_filters, pool_size, fluotracify_path):
     sys.path.append(fluotracify_path)
-
     if True:  # isort workaround
         from fluotracify.simulations import import_simulation_from_csv as isfc
         from fluotracify.training import (build_model as bm,
