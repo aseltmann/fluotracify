@@ -4,7 +4,7 @@ import logging
 import tensorflow as tf
 from tensorboard.plugins.hparams import api as hp
 
-logging.basicConfig(format='%(asctime)s - %(message)s - build model')
+logging.basicConfig(format='%(asctime)s - build model -  %(message)s')
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 
@@ -480,24 +480,58 @@ def unet_1d_alt2(input_size, n_levels, first_filters, pool_size,
     return unet
 
 
-class F1Score(tf.keras.metrics.Metric):
-    def __init__(self, name="f1", from_logits=True, **kwargs):
-        super(F1Score, self).__init__(name=name, **kwargs)
-        self.precision = tf.keras.metrics.Precision(from_logits)
-        self.recall = tf.keras.metrics.Recall(from_logits)
+class BinaryFBeta(tf.keras.metrics.Metric):
+    """An F-beta score implementation by Jolomi Tosanwumi, see
+    https://towardsdatascience.com/f-beta-score-in-keras-part-i-86ad190a252f"""
+    def __init__(self, name='binary_fbeta', beta=1, threshold=0.5,
+                 epsilon=1e-7, **kwargs):
+        # initializing an object of the super class
+        super(BinaryFBeta, self).__init__(name=name, **kwargs)
 
-    def update_state(self, y_true, y_pred, sample_weight=None):
-        self.precision.update_state(y_true, y_pred, sample_weight)
-        self.recall.update_state(y_true, y_pred, sample_weight)
+        # initializing state variables
+        self.tp = self.add_weight(name='tp', initializer='zeros')
+        self.actual_positive = self.add_weight(name='fp', initializer='zeros')
+        self.predicted_positive = self.add_weight(
+            name='fn', initializer='zeros')
+
+        # initializing other atrributes that wouldn't be changed for every
+        # object of this class
+        self.beta_squared = beta**2
+        self.threshold = threshold
+        self.epsilon = epsilon
+
+    def update_state(self, ytrue, ypred, sample_weight=None):
+        """this method is called at the end of each batch and is used to change
+        (update) the state variables."""
+        ytrue = tf.cast(ytrue, tf.float32)
+        ypred = tf.cast(ypred, tf.float32)
+
+        # setting values of ypred greater than the set threshold to 1 while
+        # those lesser to 0
+        ypred = tf.cast(tf.greater_equal(ypred, tf.constant(self.threshold)),
+                        tf.float32)
+        # updating atrributes
+        self.tp.assign_add(tf.reduce_sum(ytrue*ypred))
+        self.predicted_positive.assign_add(tf.reduce_sum(ypred))
+        self.actual_positive.assign_add(tf.reduce_sum(ytrue))
 
     def result(self):
-        p = self.precision.result()
-        r = self.recall.result()
-        return (2 * p * r) / (p + r + tf.keras.backend.epsilon())
+        """this is called at the end of each batch after states variables are
+        updated. It is used to compute and return the metric for each batch."""
+        self.precision = self.tp/(self.predicted_positive+self.epsilon)
+        self.recall = self.tp/(self.actual_positive+self.epsilon)
 
-    def reset_state(self):
-        self.precision.reset_state()
-        self.recall.reset_state()
+        # calculating fbeta
+        self.fb = (1+self.beta_squared)*self.precision*self.recall / (
+            self.beta_squared*self.precision + self.recall + self.epsilon)
+        return self.fb
+
+    def reset_states(self):
+        """this is called at the end of each epoch. It is used to clear
+        (reinitialize) the state variables."""
+        self.tp.assign(0)
+        self.predicted_positive.assign(0)
+        self.actual_positive.assign(0)
 
 
 def unet_metrics(metrics_thresholds):
@@ -537,7 +571,7 @@ def unet_metrics(metrics_thresholds):
     metrics.append(
         tf.keras.metrics.BinaryAccuracy(name='accuracy', threshold=0.5))
     metrics.append(tf.keras.metrics.AUC(name='auc', num_thresholds=100))
-    metrics.append(F1Score(name='f1'))
+    metrics.append(BinaryFBeta())
     return metrics
 
 

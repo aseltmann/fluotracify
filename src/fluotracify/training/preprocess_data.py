@@ -19,7 +19,7 @@ from sklearn.preprocessing import (
     normalize,
 )
 
-logging.basicConfig(format='%(asctime)s - %(message)s - preprocess')
+logging.basicConfig(format='%(asctime)s - preprocess - %(message)s')
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 
