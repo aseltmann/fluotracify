@@ -43,10 +43,7 @@ except IndexError:
 
 @click.command()
 @click.option('--batch_size', type=int, default=5)
-@click.option('--input_size',
-              type=int,
-              default=16384,
-              help='number of time steps after which to crop your trace')
+@click.option('--input_size', default=16384)
 @click.option('--lr_start', type=float, default=1e-5)
 @click.option('--lr_power', type=float, default=1)
 @click.option('--epochs', type=int, default=10)
