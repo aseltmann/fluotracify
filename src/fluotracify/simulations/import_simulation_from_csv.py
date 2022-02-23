@@ -8,7 +8,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-logging.basicConfig(format='%(asctime)s - %(message)s - sim import tools')
+logging.basicConfig(format='%(asctime)s - sim import tools - %(message)s')
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 

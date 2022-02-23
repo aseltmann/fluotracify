@@ -41,7 +41,7 @@ from fluotracify.training import preprocess_data as ppd
 
 import numpy as np
 
-logging.basicConfig(format='%(asctime)s - %(message)s')
+logging.basicConfig(format='%(asctime)s - correlate & fit - %(message)s')
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 

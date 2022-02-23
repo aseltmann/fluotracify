@@ -17,7 +17,7 @@ from tensorboard.plugins.hparams import api as hp
 # fixes a problem when calling plotting functions on the server
 matplotlib.use('agg')
 # use logging
-logging.basicConfig(format='%(asctime)s - %(message)s - train')
+logging.basicConfig(format='%(asctime)s - train -  %(message)s')
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 
