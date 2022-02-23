@@ -22,6 +22,8 @@ from sklearn.preprocessing import (
 logging.basicConfig(format='%(asctime)s - preprocess - %(message)s')
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
+# fix a problem with tf.experimental.numpy
+tf.experimental.numpy.experimental_enable_numpy_behavior(prefer_float32=False)
 
 
 def tfds_from_pddf(features_df, labels_df, frac_val=None):
@@ -107,6 +109,50 @@ def tf_crop_trace(trace, label, length_delimiter):
     """
     trace = trace[:length_delimiter]
     label = label[:length_delimiter]
+    trace_shape = trace.shape
+    label_shape = label.shape
+    trace.set_shape(trace_shape)
+    label.set_shape(label_shape)
+    return trace, label
+
+
+def tf_pad_trace(trace, label):
+    """Part of tf.data pipeline. Pad the end of the trace with the
+    median of the trace. Set the label for this pad to 0 (no artifact)
+
+    Notes
+    -----
+    - at the moment, the implementation of `tf.experimental.numpy.pad` does not
+    support the mode `median` (see
+    https://www.tensorflow.org/api_docs/python/tf/experimental/numpy/pad)
+    - that's why an own pure tf implementation of a median is used (see
+    https://stackoverflow.com/questions/43824665/tensorflow-median-value)
+    """
+    def get_median(v):
+        v = tf.reshape(v, [-1])
+        mid = v.get_shape()[0] // 2 + 1
+        return tf.nn.top_k(v, mid).values[-1]
+
+    trace_size = trace.size
+    if trace_size < 1024:
+        input_size = 1024
+    else:
+        # new size is the next biggest power of 2 → this is important for the
+        # skip connections of the UNET
+        input_size = 2**tf.experimental.numpy.ceil(tf.experimental.numpy.log2(
+            trace_size)).numpy().astype(int)
+    pad_size = input_size - trace_size
+
+    # pad trace
+    pad_median = get_median(trace)
+    trace = tf.experimental.numpy.pad(trace, pad_width=[[0, pad_size], [0, 0]],
+                                      mode='constant',
+                                      constant_values=pad_median)
+    # pad label
+    label = tf.experimental.numpy.pad(label, pad_width=[[0, pad_size], [0, 0]],
+                                      mode='constant',
+                                      constant_values=0)
+
     trace_shape = trace.shape
     label_shape = label.shape
     trace.set_shape(trace_shape)

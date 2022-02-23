@@ -15,6 +15,8 @@ import tensorflow as tf
 import tensorflow.python.platform.build_info as build
 from tensorboard.plugins.hparams import api as hp
 
+# fix a problem with tf.experimental.numpy
+tf.experimental.numpy.experimental_enable_numpy_behavior(prefer_float32=False)
 # fixes a problem when calling plotting functions on the server
 matplotlib.use('agg')
 

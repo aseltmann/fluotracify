@@ -7,6 +7,8 @@ from tensorboard.plugins.hparams import api as hp
 logging.basicConfig(format='%(asctime)s - build model -  %(message)s')
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
+# fix a problem with tf.experimental.numpy
+tf.experimental.numpy.experimental_enable_numpy_behavior(prefer_float32=False)
 
 
 def vgg10_1d(win_len, col_no):
