@@ -115,12 +115,12 @@ def import_from_csv(folder,
         if idx < nfiles:
             train = pd.concat([train, converted_float], axis=1)
             if frac_train == 1:
-                log.debug('%s/%s: %s', idx, nfiles, myfile)
+                log.debug('%s/%s: %s', idx+1, nfiles, myfile)
             else:
-                log.debug('train file %s/%s: %s', idx, nfiles, myfile)
+                log.debug('train file %s/%s: %s', idx+1, nfiles, myfile)
         else:
             test = pd.concat([test, converted_float], axis=1)
-            log.debug('validation file %s/%s: %s', idx, nfiles, myfile)
+            log.debug('validation file %s/%s: %s', idx+1, nfiles, myfile)
 
     return train, test, nsamples, experiment_params
 

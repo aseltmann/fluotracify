@@ -139,8 +139,9 @@ def tf_pad_trace(trace, label):
     else:
         # new size is the next biggest power of 2 → this is important for the
         # skip connections of the UNET
-        input_size = 2**tf.experimental.numpy.ceil(tf.experimental.numpy.log2(
-            trace_size)).numpy().astype(int)
+        input_size = 2**tf.experimental.numpy.ceil(
+            tf.experimental.numpy.log2(trace_size))
+    input_size = tf.cast(input_size, tf.int32)
     pad_size = input_size - trace_size
 
     # pad trace
