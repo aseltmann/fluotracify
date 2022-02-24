@@ -2,14 +2,14 @@
 on simulated fluroescence traces using mlflow. It is meant to be put into the
 `MLproject` file of a mlflow setup or executed via `mlflow run`."""
 
+import click
 import datetime
 import logging
-import sys
-
-import click
 import matplotlib
 import mlflow
 import mlflow.tensorflow
+import sys
+
 import tensorflow as tf
 import tensorflow.python.platform.build_info as build
 
@@ -106,11 +106,11 @@ def mlflow_run(batch_size, input_size, lr_start, lr_power, epochs,
         ds_train_prep = dataset_train.map(
             lambda trace, label: ppd.tf_crop_trace(trace, label, 14000),
             num_parallel_calls=tf.data.AUTOTUNE)
-        ds_train_prep = dataset_train.map(
-            lambda trace, label: ppd.tf_pad_trace(trace, label),
-            num_parallel_calls=tf.data.AUTOTUNE)
         ds_train_prep = ds_train_prep.map(
             lambda trace, label: ppd.tf_scale_trace(trace, label, scaler),
+            num_parallel_calls=tf.data.AUTOTUNE)
+        ds_train_prep = ds_train_prep.map(
+            lambda trace, label: ppd.tf_pad_trace(trace, label),
             num_parallel_calls=tf.data.AUTOTUNE)
         ds_train_prep = ds_train_prep.shuffle(
             buffer_size=num_train_examples).repeat().batch(
@@ -119,11 +119,11 @@ def mlflow_run(batch_size, input_size, lr_start, lr_power, epochs,
         ds_val_prep = dataset_val.map(
             lambda trace, label: ppd.tf_crop_trace(trace, label, 14000),
             num_parallel_calls=tf.data.AUTOTUNE)
-        ds_val_prep = dataset_val.map(
-            lambda trace, label: ppd.tf_pad_trace(trace, label),
-            num_parallel_calls=tf.data.AUTOTUNE)
         ds_val_prep = ds_val_prep.map(
             lambda trace, label: ppd.tf_scale_trace(trace, label, scaler),
+            num_parallel_calls=tf.data.AUTOTUNE)
+        ds_val_prep = ds_val_prep.map(
+            lambda trace, label: ppd.tf_pad_trace(trace, label),
             num_parallel_calls=tf.data.AUTOTUNE)
         ds_val_prep = ds_val_prep.shuffle(
             buffer_size=num_val_examples).repeat().batch(
