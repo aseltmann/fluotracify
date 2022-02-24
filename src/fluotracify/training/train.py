@@ -134,7 +134,7 @@ def mlflow_run(batch_size, input_size, lr_start, lr_power, epochs,
                                 first_filters=first_filters,
                                 pool_size=pool_size,
                                 metrics_thresholds=METRICS_THRESHOLDS)
-    def later():
+
         def log_plots(epoch, logs):
             """Image logging function for tf.keras.callbacks.LambdaCallback
 
