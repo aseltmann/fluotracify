@@ -109,9 +109,8 @@ def mlflow_run(batch_size, input_size, lr_start, lr_power, epochs,
         ds_train_prep = ds_train_prep.map(
             lambda trace, label: ppd.tf_scale_trace(trace, label, scaler),
             num_parallel_calls=tf.data.AUTOTUNE)
-        ds_train_prep = ds_train_prep.map(
-            lambda trace, label: ppd.tf_pad_trace(trace, label),
-            num_parallel_calls=tf.data.AUTOTUNE)
+        ds_train_prep = ds_train_prep.map(ppd.tf_pad_trace,
+                                          num_parallel_calls=tf.data.AUTOTUNE)
         ds_train_prep = ds_train_prep.shuffle(
             buffer_size=num_train_examples).repeat().batch(
                 batch_size, drop_remainder=True).prefetch(tf.data.AUTOTUNE)
@@ -122,9 +121,8 @@ def mlflow_run(batch_size, input_size, lr_start, lr_power, epochs,
         ds_val_prep = ds_val_prep.map(
             lambda trace, label: ppd.tf_scale_trace(trace, label, scaler),
             num_parallel_calls=tf.data.AUTOTUNE)
-        ds_val_prep = ds_val_prep.map(
-            lambda trace, label: ppd.tf_pad_trace(trace, label),
-            num_parallel_calls=tf.data.AUTOTUNE)
+        ds_val_prep = ds_val_prep.map(ppd.tf_pad_trace,
+                                      num_parallel_calls=tf.data.AUTOTUNE)
         ds_val_prep = ds_val_prep.shuffle(
             buffer_size=num_val_examples).repeat().batch(
                 batch_size, drop_remainder=True).prefetch(tf.data.AUTOTUNE)
