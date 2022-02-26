@@ -194,18 +194,19 @@ def scale_trace(trace, scaler):
         If the value for scaler is not in ('standard', 'robust', 'maxabs',
         'quant_g', 'minmax', 'l1', 'l2')
     """
-    if scaler == 'standard':
+    scaler = tf.convert_to_tensor(scaler)
+    if scaler == tf.convert_to_tensor('standard'):
         trace = StandardScaler().fit_transform(trace)
-    elif scaler == 'robust':
+    elif scaler == tf.convert_to_tensor('robust'):
         trace = RobustScaler(quantile_range=(25, 75)).fit_transform(trace)
-    elif scaler == 'maxabs':
+    elif scaler == tf.convert_to_tensor('maxabs'):
         trace = MaxAbsScaler().fit_transform(trace)
-    elif scaler == 'quant_g':
+    elif scaler == tf.convert_to_tensor('quant_g'):
         trace = QuantileTransformer(
             output_distribution='normal').fit_transform(trace)
-    elif scaler == 'minmax':
+    elif scaler == tf.convert_to_tensor('minmax'):
         trace = MinMaxScaler().fit_transform(trace)
-    elif scaler in ('l1', 'l2'):
+    elif scaler in (tf.convert_to_tensor('l1'), tf.convert_to_tensor('l2')):
         trace = normalize(X=trace, norm=scaler, axis=0)
     else:
         raise ValueError(
