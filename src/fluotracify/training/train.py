@@ -84,11 +84,8 @@ def mlflow_run(batch_size, input_size, lr_start, lr_power, epochs,
                                           preprocess_data as ppd)
         from fluotracify.training import evaluate
 
-    if input_size == -1:
-        input_size = None
-
-    def run_one(dataset_train, dataset_val, logdir, num_train_examples,
-                num_val_examples):
+    def run_one(dataset_train, dataset_val, logdir, crop_size,
+                num_train_examples, num_val_examples):
         """Run a training/validation session.
 
         Parameters:
@@ -104,7 +101,7 @@ def mlflow_run(batch_size, input_size, lr_start, lr_power, epochs,
         --------
         """
         ds_train_prep = dataset_train.map(
-            lambda trace, label: ppd.tf_crop_trace(trace, label, 14000),
+            lambda trace, label: ppd.tf_crop_trace(trace, label, crop_size),
             num_parallel_calls=tf.data.AUTOTUNE)
         ds_train_prep = ds_train_prep.map(
             lambda trace, label: ppd.tf_scale_trace(trace, label, scaler),
@@ -116,7 +113,7 @@ def mlflow_run(batch_size, input_size, lr_start, lr_power, epochs,
                 batch_size, drop_remainder=True).prefetch(tf.data.AUTOTUNE)
 
         ds_val_prep = dataset_val.map(
-            lambda trace, label: ppd.tf_crop_trace(trace, label, 14000),
+            lambda trace, label: ppd.tf_crop_trace(trace, label, crop_size),
             num_parallel_calls=tf.data.AUTOTUNE)
         ds_val_prep = ds_val_prep.map(
             lambda trace, label: ppd.tf_scale_trace(trace, label, scaler),
@@ -127,7 +124,7 @@ def mlflow_run(batch_size, input_size, lr_start, lr_power, epochs,
             buffer_size=num_val_examples).repeat().batch(
                 batch_size, drop_remainder=True).prefetch(tf.data.AUTOTUNE)
 
-        model = bm.unet_1d_alt2(input_size=input_size,
+        model = bm.unet_1d_alt2(input_size=None,
                                 n_levels=n_levels,
                                 first_filters=first_filters,
                                 pool_size=pool_size,
@@ -261,6 +258,7 @@ def mlflow_run(batch_size, input_size, lr_start, lr_power, epochs,
         run_one(dataset_train=dataset_train,
                 dataset_val=dataset_val,
                 logdir=LOG_DIR,
+                crop_size=input_size,
                 num_train_examples=num_train_examples,
                 num_val_examples=num_val_examples)
 
