@@ -10575,7 +10575,6 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |         |          |         
        (base) [ye53nis@node131 /]$
      #+end_example
 
-
 **** test run 3- trying new setup (robust, n_levels=5, first_filters=32) with gpu
 
      #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session gpu
@@ -10891,7 +10890,6 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |         |          |         
             Add search_hparams; MLproject entrypoint
         (base) [ye53nis@node128 drmed-git]$
       #+end_example
-
 
 **** tmux gpu node
      #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session gpu
@@ -12588,13 +12586,13 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |         |          |         
      #+END_SRC
 **** one trick to make mlflowui show artifacts
 
-
 *** DONE Implement talos 1.0 with mlflow, see [[file:~/Dokumente/org/04_Digital-und-Technik/programmieren.org::*Querying runs programmatically][here]] - or other Hyperparameter optimization
     CLOSED: [2021-07-25 So 16:42]
 - an implementation of hyperopt + unet training [[https://www.kaggle.com/yassinealouini/mlflow-hyperopt-u-net-workflo][here]]
 
 ** Add TCSPC correlation algorithm <2021-12-17 Fr>
-*** TODO There is https://pypi.org/project/multipletau-cor-tttr/ check it out
+*** DONE There is https://pypi.org/project/multipletau-cor-tttr/ check it out
+CLOSED: [2022-02-27 So 18:26]
     - it seems to be just an implementation of cross-correlation. Not sure if it
       works. For now I go with Dominics Focuspoint
 *** update packages
@@ -12805,7 +12803,8 @@ maybe:
   | zipp                         |      3.6.0 | pyhd3eb1b0_0      |             |    |                                         |
   | zlib                         |     1.2.11 | h7f8727e_4        |             |    |                                         |
 
-*** TODO Check out Focuspoint
+*** DONE Check out Focuspoint
+CLOSED: [2022-02-27 So 18:26]
     :PROPERTIES:
     :header-args:jupyter-python: :session /jpy:localhost#8888:a37e524a-8134-4d8f-b24a-367acaf1bdd3
     :END:
@@ -13888,7 +13887,6 @@ file:./.ob-jupyter/plot_after_correction.png
       : 2022-01-19 16:35:10,616 - Illegal Channel: #1000 2
 
 
-
 *** Remote jupyter 2: correlate experimental traces, weight=0, all_dirty_ptu
     :PROPERTIES:
     :header-args:jupyter-python: :session /jpy:localhost#9997:b37e524a-8134-4d8f-b24a-367acaf1bdd3
@@ -14306,7 +14304,6 @@ file:./.ob-jupyter/plot_after_correction.png
         :END:
       #+RESULTS:
 
-
 ** After I realized I mixed up the experiments <2022-01-29 Sa>
 *** Implementing correlation with cython
    :PROPERTIES:
@@ -14500,7 +14497,6 @@ file:./.ob-jupyter/plot_after_correction.png
        [0;31mKeyboardInterrupt[0m:
      #+end_example
      :END:
-
 
 
 *** Checking out all the experiments
@@ -15591,6 +15587,1589 @@ file:./.ob-jupyter/plot_after_correction.png
      : done (4269009,), 4269009, 8863997592.980743
      [[file:./.ob-jupyter/28b58bbf840288c286e141d8cef4f05e95cbc368.png]]
      :END:
+
+** Retrain unets properly, enable random input size <2022-02-20 So>
+*** DONE adapt train.py to hparams; add input_size=None; add trace preprocessing
+CLOSED: [2022-02-26 Sa 20:30]
+
+| hp_batch_size    |                  13 |                  5 |                 11 |                  23 |                  13 |                 13 |                 4 |                  18 |                 26 |                 15 | ... |                  9 |                 4 |                 18 |                 10 |                  4 |                  20 |                 14 |                  5 |                 18 |                 14 |
+| hp_epochs        |                  20 |                 20 |                 20 |                  20 |                  20 |                 20 |                20 |                  20 |                 20 |                 20 | ... |                 20 |                20 |                 20 |                 20 |                 20 |                  20 |                 20 |                 20 |                 20 |                 20 |
+| hp_first_filters |                 107 |                 33 |                102 |                  58 |                 108 |                 41 |                64 |                  59 |                 44 |                 23 | ... |                 64 |               128 |                 32 |                 16 |                 64 |                  32 |                128 |                 64 |                 32 |                 16 |
+| hp_input_size    |                8192 |               4096 |              16384 |                8192 |                8192 |              16384 |              4096 |                4096 |              16384 |              16384 | ... |               4096 |              4096 |              16384 |               4096 |               8192 |                4096 |               4096 |              16384 |              16384 |               4096 |
+| hp_lr_power      |                   5 |                  7 |                  6 |                   6 |                   6 |                  6 |                 2 |                   2 |                  1 |                  7 | ... |                  1 |                 5 |                  5 |                  1 |                  1 |                   5 |                  1 |                  5 |                  1 |                  5 |
+| hp_lr_start      | 0.00782433731433605 | 0.0183838908333744 | 0.0482033274205359 | 0.00878855796222036 | 0.00652659278503235 | 0.0571175071464742 | 0.047837465592254 | 0.03304582515016 99 | 0.0136170138242663 | 0.0305060808685107 | ... | 0.0100697459464075 | 0.024311131849965 | 0.0275283294963226 | 0.0923388677844686 | 0.0183950335666331 | 0.00805377739706802 | 0.0730305548495589 | 0.0100791137947559 | 0.0799422633823613 | 0.0271446293545328 |
+| hp_n_levels      |                   3 |                  5 |                  1 |                   1 |                   6 |                  3 |                 5 |                   1 |                  7 |                  6 | ... |                  5 |                 3 |                  5 |                  3 |                  9 |                   5 |                  3 |                  3 |                  7 |                  7 |
+| hp_pool_size     |                   8 |                  2 |                  8 |                   2 |                   2 |                  4 |                 4 |                   8 |                  2 |                  4 | ... |                  4 |                 4 |                  4 |                  2 |                  2 |                   4 |                  4 |                  4 |                  2 |                  2 |
+| hp_scaler        |              maxabs |             robust |            quant_g |              minmax |              minmax |                 l1 |          standard |             quant_g |           standard |            quant_g | ... |             maxabs |            maxabs |             maxabs |             minmax |            quant_g |                  l2 |             robust |             robust |                 l2 |            quant_g |
+**** mlflow environment variables
+
+     #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session gpu
+       conda activate tf
+       cd /beegfs/ye53nis/drmed-git
+       export MLFLOW_EXPERIMENT_NAME=exp-220222-test
+       export MLFLOW_TRACKING_URI=file:./data/mlruns
+       mkdir data/exp-220222-test/jupyter
+       mkdir ../tmp
+     #+END_SRC
+
+     #+RESULTS:
+     #+begin_example
+       (tf) [ye53nis@node128 drmed-git]$ conda activate tf
+       cd /beegfs/ye53nis/drmed-git
+       export MLFLOW_EXPERIMENT_NAME=exp-220222-test
+       (tf) [ye53nis@node128 drmed-git]$ cd /beegfs/ye53nis/drmed-git
+       (tf) [ye53nis@node128 drmed-git]$ export MLFLOW_EXPERIMENT_NAME=exp-220222-test
+       (tf) [ye53nis@node128 drmed-git]$ export MLFLOW_TRACKING_URI=file:./data/mlruns
+       (tf) [ye53nis@node128 drmed-git]$ mkdir data/exp-220222-test/jupyter
+       mkdir: cannot create directory ‘data/exp-220222-test/jupyter’: File exists
+       (tf) [ye53nis@node128 drmed-git]$ mkdir ../tmp
+       mkdir: cannot create directory ‘../tmp’: File exists
+       (tf) [ye53nis@node128 drmed-git]$
+     #+end_example
+
+     #+begin_src emacs-lisp
+       (setq org-babel-jupyter-resource-directory "./data/exp-220222-test/jupyter")
+     #+end_src
+
+     #+RESULTS:
+     : ./data/exp-220222-test/jupyter
+
+**** git and meta data
+     #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session gpu
+       pwd
+       git log -5
+     #+END_SRC
+
+     #+RESULTS:
+     #+begin_example
+       (tf) [ye53nis@node128 drmed-git]$ pwd
+       /beegfs/ye53nis/drmed-git
+       (tf) [ye53nis@node128 drmed-git]$ git log -5
+       commit a6533aa097a3d42f83996ce09d5ebee4a7f37f47
+       Author: Apoplex <oligolex@vivaldi.net>
+       Date:   Wed Feb 23 14:04:19 2022 +0100
+
+           Fix click input_size
+
+       commit c162b3fc48d1d06fd54a5324d3859a616a92de5d
+       Author: Apoplex <oligolex@vivaldi.net>
+       Date:   Wed Feb 23 13:47:11 2022 +0100
+
+           Tweak BinaryFBeta; Add click.Choice and click.Path
+
+       commit 404569d3c648a631551ab6b098c264055a1723ae
+       Author: Apoplex <oligolex@vivaldi.net>
+       Date:   Wed Feb 23 12:55:36 2022 +0100
+
+           Add BinaryFBeta; fix logging
+
+       commit cbc01164ba1ad22f8eb2e660df77772e2db2b681
+       Author: Apoplex <oligolex@vivaldi.net>
+       Date:   Tue Feb 22 22:44:02 2022 +0100
+
+           Add logging; formatting; try fixing F1Score
+
+       commit 2c6a1ccbd776fc812b4f45628a9ebedf48f28605
+       Author: Apoplex <oligolex@vivaldi.net>
+       Date:   Tue Feb 22 21:34:17 2022 +0100
+
+           Fix run_one
+       (tf) [ye53nis@node128 drmed-git]$
+     #+end_example
+
+
+     #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session gpu
+       nvcc -V
+       echo --------------------
+       lscpu
+       echo --------------------
+       nproc
+       echo --------------------
+       free -h
+       echo --------------------
+       df -h
+       echo --------------------
+       printenv
+       echo --------------------
+       top -bcn1 -w512 | head -n 15
+     #+END_SRC
+
+     #+RESULTS:
+     #+begin_example
+       (tf) [ye53nis@node128 drmed-git]$ nvcc -V
+       nvcc: NVIDIA (R) Cuda compiler driver
+       Copyright (c) 2005-2020 NVIDIA Corporation
+       Built on Mon_Nov_30_19:08:53_PST_2020
+       Cuda compilation tools, release 11.2, V11.2.67
+       Build cuda_11.2.r11.2/compiler.29373293_0
+       (tf) [ye53nis@node128 drmed-git]$ echo --------------------
+       --------------------
+       (tf) [ye53nis@node128 drmed-git]$ lscpu
+       Architecture:          x86_64
+       CPU op-mode(s):        32-bit, 64-bit
+       Byte Order:            Little Endian
+       CPU(s):                48
+       On-line CPU(s) list:   0-47
+       Thread(s) per core:    2
+       Core(s) per socket:    12
+       Socket(s):             2
+       NUMA node(s):          4
+       Vendor ID:             GenuineIntel
+       CPU family:            6
+       Model:                 79
+       Model name:            Intel(R) Xeon(R) CPU E5-2650 v4 @ 2.20GHz
+       Stepping:              1
+       CPU MHz:               1247.033
+       CPU max MHz:           2900.0000
+       CPU min MHz:           1200.0000
+       BogoMIPS:              4399.79
+       Virtualization:        VT-x
+       L1d cache:             32K
+       L1i cache:             32K
+       L2 cache:              256K
+       L3 cache:              15360K
+       NUMA node0 CPU(s):     0-5,24-29
+       NUMA node1 CPU(s):     6-11,30-35
+       NUMA node2 CPU(s):     12-17,36-41
+       NUMA node3 CPU(s):     18-23,42-47
+       Flags:                 fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc arch_perfmon pebs bts rep_good nopl xtopology nonst
+       op_tsc aperfmperf eagerfpu pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid dca sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch epb cat_l3 cd
+       p_l3 intel_ppin intel_pt ibrs ibpb stibp tpr_shadow vnmi flexpriority ept vpid fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm cqm rdt_a rdseed adx smap xsaveopt cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local dtherm ida
+       arat pln pts spec_ctrl intel_stibp
+       (tf) [ye53nis@node128 drmed-git]$ echo --------------------
+       --------------------
+       (tf) [ye53nis@node128 drmed-git]$ nproc
+       12
+       (tf) [ye53nis@node128 drmed-git]$ echo --------------------
+       --------------------
+       (tf) [ye53nis@node128 drmed-git]$ free -h
+                     total        used        free      shared  buff/cache   available
+       Mem:           125G        1.5G        118G        230M        6.1G        123G
+       Swap:           11G          0B         11G
+       (tf) [ye53nis@node128 drmed-git]$ echo --------------------
+       --------------------
+       (tf) [ye53nis@node128 drmed-git]$ df -h
+       Filesystem           Size  Used Avail Use% Mounted on
+       /dev/sda1             50G  7.0G   44G  14% /
+       devtmpfs              63G     0   63G   0% /dev
+       tmpfs                 63G  188M   63G   1% /dev/shm
+       tmpfs                 63G   43M   63G   1% /run
+       tmpfs                 63G     0   63G   0% /sys/fs/cgroup
+       nfs01-ib:/cluster    2.0T  468G  1.6T  23% /cluster
+       nfs01-ib:/home        80T   68T   13T  85% /home
+       nfs03-ib:/pool/work  100T   71T   29T  71% /nfsdata
+       /dev/sda3            6.0G  635M  5.4G  11% /var
+       /dev/sda6            169G  354M  169G   1% /local
+       /dev/sda5            2.0G   37M  2.0G   2% /tmp
+       beegfs_nodev         524T  474T   51T  91% /beegfs
+       (tf) [ye53nis@node128 drmed-git]$ echo --------------------
+       --------------------
+       (tf) [ye53nis@node128 drmed-git]$ printenv
+       SLURM_CHECKPOINT_IMAGE_DIR=/var/slurm/checkpoint
+       SLURM_NODELIST=node128
+       CUDA_PATH=/cluster/nvidia/cuda/11.2
+       SLURM_JOB_NAME=bash
+       CUDA_INC_PATH=/cluster/nvidia/cuda/11.2/include
+       XDG_SESSION_ID=44301
+       SLURMD_NODENAME=node128
+       SLURM_TOPOLOGY_ADDR=node128
+       SLURM_NTASKS_PER_NODE=12
+       HOSTNAME=login01
+       SLURM_PRIO_PROCESS=0
+       SLURM_SRUN_COMM_PORT=45719
+       SHELL=/bin/bash
+       TERM=screen
+       MLFLOW_EXPERIMENT_NAME=exp-220222-test
+       SLURM_JOB_QOS=qstand
+       SLURM_PTY_WIN_ROW=53
+       HISTSIZE=1000
+       TMPDIR=/tmp
+       SLURM_TOPOLOGY_ADDR_PATTERN=node
+       SSH_CLIENT=10.231.181.128 49370 22
+       INCLUDEDIR=/cluster/nvidia/cuda/11.2/include
+       CONDA_SHLVL=2
+       CONDA_PROMPT_MODIFIER=(tf)
+       OLDPWD=/
+       QTDIR=/usr/lib64/qt-3.3
+       QTINC=/usr/lib64/qt-3.3/include
+       SSH_TTY=/dev/pts/79
+       NO_PROXY=localhost,127.0.0.0/8,.uni-jena.de,141.35.0.0/16,10.0.0.0/8,192.168.0.0/16,172.0.0.0/8,fe80::/7,2001:638:1558::/24,vmaster,node001
+       QT_GRAPHICSSYSTEM_CHECKED=1
+       SLURM_NNODES=1
+       USER=ye53nis
+       http_proxy=http://internet4nzm.rz.uni-jena.de:3128
+       LD_LIBRARY_PATH=/cluster/nvidia/cuda/11.2/lib64:/cluster/nvidia/cuda/11.2/nvvm/lib64:/cluster/nvidia/cudnn/8.1//lib64
+       LS_COLORS=rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=01;05;37;41:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01
+       ;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:
+       ,*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01
+       ;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:
+       ,*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;3
+       5:*.cgm=01;35:*.emf=01;35:*.axv=01;35:*.anx=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=01;36:*.au=01;36:*.flac=01;36:*.mid=01;36:*.midi=01;36:*.mka=01;36:*.mp3=01;36:*.mpc=01;36:*.ogg=01;36:*.ra=01;36:*.wav=01;36:*.axa=01;36:*.oga=01;36:*.spx=
+       01;36:*.xspf=01;36:
+       CONDA_EXE=/cluster/miniconda3/bin/conda
+       SLURM_STEP_NUM_NODES=1
+       SLURM_JOBID=1613312
+       SRUN_DEBUG=3
+       FTP_PROXY=http://internet4nzm.rz.uni-jena.de:3128
+       ftp_proxy=http://internet4nzm.rz.uni-jena.de:3128
+       SLURM_NTASKS=12
+       SLURM_LAUNCH_NODE_IPADDR=192.168.192.5
+       SLURM_STEP_ID=0
+       TMUX=/tmp/tmux-67339/default,20557,7
+       _CE_CONDA=
+       CONDA_PREFIX_1=/cluster/miniconda3
+       MODCUDA=YES
+       SLURM_STEP_LAUNCHER_PORT=45719
+       SLURM_TASKS_PER_NODE=12
+       MAIL=/var/spool/mail/ye53nis
+       PATH=/cluster/nvidia/cuda/11.2/bin:/cluster/nvidia/cuda/11.2/nvvm:/cluster/nvidia/cuda/11.2/open64/bin:/cluster/nvidia/cuda/11.2/libnvvp:/home/ye53nis/.conda/envs/tf/bin:/home/lex/Programme/miniconda3/envs/tf-nightly-lab/bin:/home/lex/P
+       rogramme/miniconda3/condabin:/home/lex/.local/bin:/bin:/usr/bin:/usr/local/bin:/usr/local/sbin:/usr/lib/jvm/default/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/var/lib/snapd/snap/bin:/usr/sbin:/home/ye53nis/.local/bi
+       n:/home/ye53nis/bin
+       SLURM_WORKING_CLUSTER=hpc:192.168.192.1:6817:8448
+       SLURM_JOB_ID=1613312
+       LD_RUN_PATH=/cluster/nvidia/cuda/11.2/lib64
+       SLURM_STEP_GPUS=0
+       CONDA_PREFIX=/home/ye53nis/.conda/envs/tf
+       CUDA_LIB_PATH=/cluster/nvidia/cuda/11.2/lib64
+       SLURM_JOB_USER=ye53nis
+       SLURM_STEPID=0
+       PWD=/beegfs/ye53nis/drmed-git
+       _LMFILES_=/cluster/modulefiles/nvidia/cuda/11.2:/cluster/modulefiles/nvidia/cudnn/8.1
+       CUDA_VISIBLE_DEVICES=0
+       SLURM_SRUN_COMM_HOST=192.168.192.5
+       LANG=en_US.UTF-8
+       SLURM_PTY_WIN_COL=236
+       SLURM_UMASK=0022
+       MODULEPATH=/usr/share/Modules/modulefiles:/etc/modulefiles:/cluster/modulefiles
+       SLURM_JOB_UID=67339
+       LOADEDMODULES=nvidia/cuda/11.2:nvidia/cudnn/8.1
+       SLURM_NODEID=0
+       TMUX_PANE=%7
+       SLURM_SUBMIT_DIR=/
+       SLURM_TASK_PID=43544
+       SLURM_NPROCS=12
+       SLURM_CPUS_ON_NODE=12
+       SLURM_DISTRIBUTION=block
+       HTTPS_PROXY=http://internet4nzm.rz.uni-jena.de:3128
+       https_proxy=http://internet4nzm.rz.uni-jena.de:3128
+       SLURM_PROCID=0
+       HISTCONTROL=ignoredups
+       _CE_M=
+       SLURM_JOB_NODELIST=node128
+       SLURM_PTY_PORT=41660
+       HOME=/home/ye53nis
+       SHLVL=3
+       SLURM_LOCALID=0
+       SLURM_JOB_GID=13280
+       SLURM_JOB_CPUS_PER_NODE=12
+       SLURM_CLUSTER_NAME=hpc
+       no_proxy=localhost,127.0.0.0/8,.uni-jena.de,141.35.0.0/16,10.0.0.0/8,192.168.0.0/16,172.0.0.0/8,fe80::/7,2001:638:1558::/24,vmaster,node001
+       SLURM_GTIDS=0,1,2,3,4,5,6,7,8,9,10,11
+       SLURM_SUBMIT_HOST=login01
+       HTTP_PROXY=http://internet4nzm.rz.uni-jena.de:3128
+       SLURM_JOB_PARTITION=gpu_p100
+       MATHEMATICA_HOME=/cluster/apps/mathematica/11.3
+       CONDA_PYTHON_EXE=/cluster/miniconda3/bin/python
+       LOGNAME=ye53nis
+       SLURM_STEP_NUM_TASKS=12
+       QTLIB=/usr/lib64/qt-3.3/lib
+       GPU_DEVICE_ORDINAL=0
+       SLURM_JOB_ACCOUNT=iaob
+       MLFLOW_TRACKING_URI=file:./data/mlruns
+       SLURM_JOB_NUM_NODES=1
+       MODULESHOME=/usr/share/Modules
+       CONDA_DEFAULT_ENV=tf
+       LESSOPEN=||/usr/bin/lesspipe.sh %s
+       SLURM_STEP_TASKS_PER_NODE=12
+       SLURM_STEP_NODELIST=node128
+       DISPLAY=:0
+       XDG_RUNTIME_DIR=/run/user/67339
+       INCLUDE=/cluster/nvidia/cudnn/8.1//include
+       XAUTHORITY=/home/lex/.Xauthority
+       BASH_FUNC_module()=() {  eval `/usr/bin/modulecmd bash $*`
+       }
+       _=/bin/printenv
+       (tf) [ye53nis@node128 drmed-git]$ echo --------------------
+       --------------------
+       (tf) [ye53nis@node128 drmed-git]$ top -bcn1 -w512 | head -n 15
+       top - 19:25:29 up 67 days,  7:40,  0 users,  load average: 0.00, 0.01, 0.05
+       Tasks: 530 total,   1 running, 529 sleeping,   0 stopped,   0 zombie
+       %Cpu(s):  0.2 us,  0.2 sy,  0.0 ni, 99.6 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+       KiB Mem : 13191630+total, 12393914+free,  1603012 used,  6374148 buff/cache
+       KiB Swap: 12582908 total, 12582908 free,        0 used. 12913006+avail Mem
+
+         PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMAND
+        8199 ye53nis   20   0  172744   2616   1668 R   5.6  0.0   0:00.02 top -bcn1 -w512
+           1 root      20   0   71788   7548   2584 S   0.0  0.0  33:19.51 /usr/lib/systemd/systemd --switched-root --system --deserialize 22
+           2 root      20   0       0      0      0 S   0.0  0.0   0:01.55 [kthreadd]
+           3 root      20   0       0      0      0 S   0.0  0.0   0:06.91 [ksoftirqd/0]
+           5 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 [kworker/0:0H]
+           8 root      rt   0       0      0      0 S   0.0  0.0   0:06.58 [migration/0]
+           9 root      20   0       0      0      0 S   0.0  0.0   0:00.00 [rcu_bh]
+          10 root      20   0       0      0      0 S   0.0  0.0  41:47.32 [rcu_sched]
+       (tf) [ye53nis@node128 drmed-git]$
+     #+end_example
+
+     #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session gpu
+       conda list
+     #+END_SRC
+
+     #+RESULTS:
+     #+begin_example
+       (tf) [ye53nis@node128 drmed-git]$ conda list
+       # packages in environment at /home/ye53nis/.conda/envs/tf:
+       #
+       # Name                    Version                   Build  Channel
+       _libgcc_mutex             0.1                        main
+       _openmp_mutex             4.5                       1_gnu
+       absl-py                   1.0.0                    pypi_0    pypi
+       alembic                   1.7.6                    pypi_0    pypi
+       anyio                     2.2.0            py39h06a4308_1
+       argon2-cffi               20.1.0           py39h27cfd23_1
+       asteval                   0.9.26                   pypi_0    pypi
+       astunparse                1.6.3                    pypi_0    pypi
+       async_generator           1.10               pyhd3eb1b0_0
+       attrs                     21.4.0             pyhd3eb1b0_0
+       babel                     2.9.1              pyhd3eb1b0_0
+       backcall                  0.2.0              pyhd3eb1b0_0
+       bleach                    4.1.0              pyhd3eb1b0_0
+       brotlipy                  0.7.0           py39h27cfd23_1003
+       ca-certificates           2021.10.26           h06a4308_2
+       cachetools                5.0.0                    pypi_0    pypi
+       certifi                   2021.10.8        py39h06a4308_2
+       cffi                      1.15.0           py39hd667e15_1
+       charset-normalizer        2.0.4              pyhd3eb1b0_0
+       click                     8.0.3                    pypi_0    pypi
+       cloudpickle               2.0.0                    pypi_0    pypi
+       cryptography              36.0.0           py39h9ce1e76_0
+       cycler                    0.11.0                   pypi_0    pypi
+       cython                    0.29.27                  pypi_0    pypi
+       databricks-cli            0.16.4                   pypi_0    pypi
+       debugpy                   1.5.1            py39h295c915_0
+       decorator                 5.1.1              pyhd3eb1b0_0
+       defusedxml                0.7.1              pyhd3eb1b0_0
+       docker                    5.0.3                    pypi_0    pypi
+       entrypoints               0.3              py39h06a4308_0
+       fcsfiles                  2022.2.2                 pypi_0    pypi
+       flask                     2.0.2                    pypi_0    pypi
+       flatbuffers               2.0                      pypi_0    pypi
+       fonttools                 4.29.1                   pypi_0    pypi
+       future                    0.18.2                   pypi_0    pypi
+       gast                      0.5.3                    pypi_0    pypi
+       gitdb                     4.0.9                    pypi_0    pypi
+       gitpython                 3.1.26                   pypi_0    pypi
+       google-auth               2.6.0                    pypi_0    pypi
+       google-auth-oauthlib      0.4.6                    pypi_0    pypi
+       google-pasta              0.2.0                    pypi_0    pypi
+       greenlet                  1.1.2                    pypi_0    pypi
+       grpcio                    1.43.0                   pypi_0    pypi
+       gunicorn                  20.1.0                   pypi_0    pypi
+       h5py                      3.6.0                    pypi_0    pypi
+       idna                      3.3                pyhd3eb1b0_0
+       importlib-metadata        4.8.2            py39h06a4308_0
+       importlib_metadata        4.8.2                hd3eb1b0_0
+       ipykernel                 6.4.1            py39h06a4308_1
+       ipython                   7.31.1           py39h06a4308_0
+       ipython_genutils          0.2.0              pyhd3eb1b0_1
+       itsdangerous              2.0.1                    pypi_0    pypi
+       jedi                      0.18.1           py39h06a4308_1
+       jinja2                    3.0.2              pyhd3eb1b0_0
+       joblib                    1.1.0                    pypi_0    pypi
+       json5                     0.9.6              pyhd3eb1b0_0
+       jsonschema                3.2.0              pyhd3eb1b0_2
+       jupyter_client            7.1.2              pyhd3eb1b0_0
+       jupyter_core              4.9.1            py39h06a4308_0
+       jupyter_server            1.4.1            py39h06a4308_0
+       jupyterlab                3.2.1              pyhd3eb1b0_1
+       jupyterlab_pygments       0.1.2                      py_0
+       jupyterlab_server         2.10.2             pyhd3eb1b0_1
+       keras                     2.8.0                    pypi_0    pypi
+       keras-preprocessing       1.1.2                    pypi_0    pypi
+       kiwisolver                1.3.2                    pypi_0    pypi
+       ld_impl_linux-64          2.35.1               h7274673_9
+       libclang                  13.0.0                   pypi_0    pypi
+       libffi                    3.3                  he6710b0_2
+       libgcc-ng                 9.3.0               h5101ec6_17
+       libgomp                   9.3.0               h5101ec6_17
+       libsodium                 1.0.18               h7b6447c_0
+       libstdcxx-ng              9.3.0               hd4cf53a_17
+       lmfit                     1.0.3                    pypi_0    pypi
+       mako                      1.1.6                    pypi_0    pypi
+       markdown                  3.3.6                    pypi_0    pypi
+       markupsafe                2.0.1            py39h27cfd23_0
+       matplotlib                3.5.1                    pypi_0    pypi
+       matplotlib-inline         0.1.2              pyhd3eb1b0_2
+       mistune                   0.8.4           py39h27cfd23_1000
+       mlflow                    1.23.1                   pypi_0    pypi
+       multipletau               0.3.3                    pypi_0    pypi
+       nbclassic                 0.2.6              pyhd3eb1b0_0
+       nbclient                  0.5.3              pyhd3eb1b0_0
+       nbconvert                 6.3.0            py39h06a4308_0
+       nbformat                  5.1.3              pyhd3eb1b0_0
+       ncurses                   6.3                  h7f8727e_2
+       nest-asyncio              1.5.1              pyhd3eb1b0_0
+       notebook                  6.4.6            py39h06a4308_0
+       numpy                     1.22.2                   pypi_0    pypi
+       oauthlib                  3.2.0                    pypi_0    pypi
+       openssl                   1.1.1m               h7f8727e_0
+       opt-einsum                3.3.0                    pypi_0    pypi
+       packaging                 21.3               pyhd3eb1b0_0
+       pandas                    1.4.0                    pypi_0    pypi
+       pandocfilters             1.5.0              pyhd3eb1b0_0
+       parso                     0.8.3              pyhd3eb1b0_0
+       pexpect                   4.8.0              pyhd3eb1b0_3
+       pickleshare               0.7.5           pyhd3eb1b0_1003
+       pillow                    9.0.1                    pypi_0    pypi
+       pip                       21.2.4           py39h06a4308_0
+       prometheus-flask-exporter 0.18.7                   pypi_0    pypi
+       prometheus_client         0.13.1             pyhd3eb1b0_0
+       prompt-toolkit            3.0.20             pyhd3eb1b0_0
+       protobuf                  3.19.4                   pypi_0    pypi
+       ptyprocess                0.7.0              pyhd3eb1b0_2
+       pyasn1                    0.4.8                    pypi_0    pypi
+       pyasn1-modules            0.2.8                    pypi_0    pypi
+       pycparser                 2.21               pyhd3eb1b0_0
+       pygments                  2.11.2             pyhd3eb1b0_0
+       pyopenssl                 22.0.0             pyhd3eb1b0_0
+       pyparsing                 3.0.4              pyhd3eb1b0_0
+       pyrsistent                0.18.0           py39heee7806_0
+       pysocks                   1.7.1            py39h06a4308_0
+       python                    3.9.7                h12debd9_1
+       python-dateutil           2.8.2              pyhd3eb1b0_0
+       pytz                      2021.3             pyhd3eb1b0_0
+       pyyaml                    6.0                      pypi_0    pypi
+       pyzmq                     22.3.0           py39h295c915_2
+       querystring-parser        1.2.4                    pypi_0    pypi
+       readline                  8.1.2                h7f8727e_1
+       requests                  2.27.1             pyhd3eb1b0_0
+       requests-oauthlib         1.3.1                    pypi_0    pypi
+       rsa                       4.8                      pypi_0    pypi
+       scikit-learn              1.0.2                    pypi_0    pypi
+       scipy                     1.8.0                    pypi_0    pypi
+       seaborn                   0.11.2                   pypi_0    pypi
+       send2trash                1.8.0              pyhd3eb1b0_1
+       setuptools                58.0.4           py39h06a4308_0
+       six                       1.16.0             pyhd3eb1b0_0
+       smmap                     5.0.0                    pypi_0    pypi
+       sniffio                   1.2.0            py39h06a4308_1
+       sqlalchemy                1.4.31                   pypi_0    pypi
+       sqlite                    3.37.2               hc218d9a_0
+       sqlparse                  0.4.2                    pypi_0    pypi
+       tabulate                  0.8.9                    pypi_0    pypi
+       tensorboard               2.8.0                    pypi_0    pypi
+       tensorboard-data-server   0.6.1                    pypi_0    pypi
+       tensorboard-plugin-wit    1.8.1                    pypi_0    pypi
+       tensorflow                2.8.0                    pypi_0    pypi
+       tensorflow-io-gcs-filesystem 0.24.0                   pypi_0    pypi
+       termcolor                 1.1.0                    pypi_0    pypi
+       terminado                 0.9.4            py39h06a4308_0
+       testpath                  0.5.0              pyhd3eb1b0_0
+       tf-estimator-nightly      2.8.0.dev2021122109          pypi_0    pypi
+       threadpoolctl             3.1.0                    pypi_0    pypi
+       tk                        8.6.11               h1ccaba5_0
+       tornado                   6.1              py39h27cfd23_0
+       traitlets                 5.1.1              pyhd3eb1b0_0
+       typing-extensions         4.0.1                    pypi_0    pypi
+       tzdata                    2021e                hda174b7_0
+       uncertainties             3.1.6                    pypi_0    pypi
+       urllib3                   1.26.8             pyhd3eb1b0_0
+       wcwidth                   0.2.5              pyhd3eb1b0_0
+       webencodings              0.5.1            py39h06a4308_1
+       websocket-client          1.2.3                    pypi_0    pypi
+       werkzeug                  2.0.3                    pypi_0    pypi
+       wheel                     0.37.1             pyhd3eb1b0_0
+       wrapt                     1.13.3                   pypi_0    pypi
+       xz                        5.2.5                h7b6447c_0
+       zeromq                    4.3.4                h2531618_0
+       zipp                      3.7.0              pyhd3eb1b0_0
+       zlib                      1.2.11               h7f8727e_4
+       (tf) [ye53nis@node128 drmed-git]$
+     #+end_example
+
+     #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session gpu
+       tree ../saves/firstartifact_Nov2020_train_max3sets
+       echo --------------------
+       tree ../saves/firstartifact_Nov2020_val_max3sets
+       echo --------------------
+       tree ../saves/firstartifact_Nov2020_train_max2sets
+       echo --------------------
+       tree ../saves/firstartifact_Nov2020_val_max2sets_SORTEDIN
+       echo --------------------
+       tree ../saves/firstartifact_Nov2020_train_max1set
+       echo --------------------
+       tree ../saves/firstartifact_Nov2020_test
+     #+END_SRC
+
+     #+RESULTS:
+     #+begin_example
+       (tf) [ye53nis@node128 drmed-git]$ tree ../saves/firstartifact_Nov2020_train_max3sets
+       ../saves/firstartifact_Nov2020_train_max3sets
+       ├── 0.069
+       │   ├── 0.01
+       │   ├── 0.1
+       │   │   ├── traces_brightclust_Nov2020_D0.069_set002.csv
+       │   │   ├── traces_brightclust_Nov2020_D0.069_set003.csv
+       │   │   └── traces_brightclust_Nov2020_D0.069_set006.csv
+       │   └── 1.0
+       │       └── traces_brightclust_Nov2020_D0.069_set009.csv
+       ├── 0.08
+       │   ├── 0.01
+       │   │   └── traces_brightclust_Nov2020_D0.08_set007.csv
+       │   ├── 0.1
+       │   │   ├── traces_brightclust_Nov2020_D0.08_set002.csv
+       │   │   ├── traces_brightclust_Nov2020_D0.08_set006.csv
+       │   │   └── traces_brightclust_Nov2020_D0.08_set008.csv
+       │   └── 1.0
+       │       ├── traces_brightclust_Nov2020_D0.08_set004.csv
+       │       └── traces_brightclust_Nov2020_D0.08_set009.csv
+       ├── 0.1
+       │   ├── 0.01
+       │   │   ├── traces_brightclust_Nov2020_D0.1_set004.csv
+       │   │   ├── traces_brightclust_Nov2020_D0.1_set006.csv
+       │   │   └── traces_brightclust_Nov2020_D0.1_set008.csv
+       │   ├── 0.1
+       │   └── 1.0
+       │       ├── traces_brightclust_Nov2020_D0.1_set003.csv
+       │       └── traces_brightclust_Nov2020_D0.1_set007.csv
+       ├── 0.2
+       │   ├── 0.01
+       │   │   └── traces_brightclust_Nov2020_D0.2_set003.csv
+       │   ├── 0.1
+       │   │   ├── traces_brightclust_Nov2020_D0.2_set001.csv
+       │   │   ├── traces_brightclust_Nov2020_D0.2_set004.csv
+       │   │   └── traces_brightclust_Nov2020_D0.2_set006.csv
+       │   └── 1.0
+       │       ├── traces_brightclust_Nov2020_D0.2_set009.csv
+       │       └── traces_brightclust_Nov2020_D0.2_set010.csv
+       ├── 0.4
+       │   ├── 0.01
+       │   │   ├── traces_brightclust_Nov2020_D0.4_set004.csv
+       │   │   └── traces_brightclust_Nov2020_D0.4_set010.csv
+       │   ├── 0.1
+       │   │   ├── traces_brightclust_Nov2020_D0.4_set002.csv
+       │   │   ├── traces_brightclust_Nov2020_D0.4_set003.csv
+       │   │   └── traces_brightclust_Nov2020_D0.4_set009.csv
+       │   └── 1.0
+       │       ├── traces_brightclust_Nov2020_D0.4_set006.csv
+       │       └── traces_brightclust_Nov2020_D0.4_set007.csv
+       ├── 0.6
+       │   ├── 0.01
+       │   │   └── traces_brightclust_Nov2020_D0.6_set010.csv
+       │   ├── 0.1
+       │   │   ├── traces_brightclust_Nov2020_D0.6_set004.csv
+       │   │   ├── traces_brightclust_Nov2020_D0.6_set005.csv
+       │   │   └── traces_brightclust_Nov2020_D0.6_set006.csv
+       │   └── 1.0
+       │       ├── traces_brightclust_Nov2020_D0.6_set001.csv
+       │       └── traces_brightclust_Nov2020_D0.6_set002.csv
+       ├── 10
+       │   ├── 0.01
+       │   │   ├── traces_brightclust_Nov2020_D10_set003.csv
+       │   │   ├── traces_brightclust_Nov2020_D10_set004.csv
+       │   │   └── traces_brightclust_Nov2020_D10_set008.csv
+       │   ├── 0.1
+       │   │   ├── traces_brightclust_Nov2020_D10_set006.csv
+       │   │   └── traces_brightclust_Nov2020_D10_set007.csv
+       │   └── 1.0
+       │       └── traces_brightclust_Nov2020_D10_set010.csv
+       ├── 1.0
+       │   ├── 0.01
+       │   │   └── traces_brightclust_Nov2020_D1.0_set010.csv
+       │   ├── 0.1
+       │   │   ├── traces_brightclust_Nov2020_D1.0_set004.csv
+       │   │   ├── traces_brightclust_Nov2020_D1.0_set007.csv
+       │   │   └── traces_brightclust_Nov2020_D1.0_set009.csv
+       │   └── 1.0
+       │       ├── traces_brightclust_Nov2020_D1.0_set001.csv
+       │       ├── traces_brightclust_Nov2020_D1.0_set002.csv
+       │       └── traces_brightclust_Nov2020_D1.0_set008.csv
+       ├── 3.0
+       │   ├── 0.01
+       │   │   ├── traces_brightclust_Nov2020_D3.0_set005.csv
+       │   │   ├── traces_brightclust_Nov2020_D3.0_set006.csv
+       │   │   └── traces_brightclust_Nov2020_D3.0_set008.csv
+       │   ├── 0.1
+       │   │   └── traces_brightclust_Nov2020_D3.0_set010.csv
+       │   └── 1.0
+       │       ├── traces_brightclust_Nov2020_D3.0_set001.csv
+       │       ├── traces_brightclust_Nov2020_D3.0_set003.csv
+       │       └── traces_brightclust_Nov2020_D3.0_set009.csv
+       └── 50
+           ├── 0.01
+           │   └── traces_brightclust_Nov2020_D50_set006.csv
+           ├── 0.1
+           │   ├── traces_brightclust_Nov2020_D50_set009.csv
+           │   └── traces_brightclust_Nov2020_D50_set010.csv
+           └── 1.0
+               ├── traces_brightclust_Nov2020_D50_set004.csv
+               ├── traces_brightclust_Nov2020_D50_set005.csv
+               └── traces_brightclust_Nov2020_D50_set007.csv
+
+       40 directories, 60 files
+       (tf) [ye53nis@node128 drmed-git]$ echo --------------------
+       --------------------
+       (tf) [ye53nis@node128 drmed-git]$ tree ../saves/firstartifact_Nov2020_val_max3sets
+       ../saves/firstartifact_Nov2020_val_max3sets
+       ├── 0.069
+       │   ├── 0.01
+       │   ├── 0.1
+       │   │   ├── traces_brightclust_Nov2020_D0.069_set007.csv
+       │   │   └── traces_brightclust_Nov2020_D0.069_set008.csv
+       │   └── 1.0
+       ├── 0.08
+       │   ├── 0.01
+       │   ├── 0.1
+       │   │   └── traces_brightclust_Nov2020_D0.08_set010.csv
+       │   └── 1.0
+       ├── 0.1
+       │   ├── 0.01
+       │   │   ├── traces_brightclust_Nov2020_D0.1_set009.csv
+       │   │   └── traces_brightclust_Nov2020_D0.1_set010.csv
+       │   ├── 0.1
+       │   └── 1.0
+       ├── 0.2
+       │   ├── 0.01
+       │   ├── 0.1
+       │   │   └── traces_brightclust_Nov2020_D0.2_set008.csv
+       │   └── 1.0
+       ├── 0.4
+       │   ├── 0.01
+       │   ├── 0.1
+       │   └── 1.0
+       ├── 0.6
+       │   ├── 0.01
+       │   ├── 0.1
+       │   │   └── traces_brightclust_Nov2020_D0.6_set007.csv
+       │   └── 1.0
+       ├── 10
+       │   ├── 0.01
+       │   │   └── traces_brightclust_Nov2020_D10_set009.csv
+       │   ├── 0.1
+       │   └── 1.0
+       ├── 1.0
+       │   ├── 0.01
+       │   ├── 0.1
+       │   └── 1.0
+       ├── 3.0
+       │   ├── 0.01
+       │   ├── 0.1
+       │   └── 1.0
+       └── 50
+           ├── 0.01
+           ├── 0.1
+           └── 1.0
+               └── traces_brightclust_Nov2020_D50_set008.csv
+
+       40 directories, 9 files
+       (tf) [ye53nis@node128 drmed-git]$ echo --------------------
+       --------------------
+       (tf) [ye53nis@node128 drmed-git]$ tree ../saves/firstartifact_Nov2020_train_max2sets
+       ../saves/firstartifact_Nov2020_train_max2sets
+       ├── 0.069
+       │   ├── 0.01
+       │   ├── 0.1
+       │   │   ├── traces_brightclust_Nov2020_D0.069_set002.csv
+       │   │   └── traces_brightclust_Nov2020_D0.069_set003.csv
+       │   └── 1.0
+       │       └── traces_brightclust_Nov2020_D0.069_set009.csv
+       ├── 0.08
+       │   ├── 0.01
+       │   │   └── traces_brightclust_Nov2020_D0.08_set007.csv
+       │   ├── 0.1
+       │   │   ├── traces_brightclust_Nov2020_D0.08_set002.csv
+       │   │   └── traces_brightclust_Nov2020_D0.08_set006.csv
+       │   └── 1.0
+       │       ├── traces_brightclust_Nov2020_D0.08_set004.csv
+       │       └── traces_brightclust_Nov2020_D0.08_set009.csv
+       ├── 0.1
+       │   ├── 0.01
+       │   │   ├── traces_brightclust_Nov2020_D0.1_set004.csv
+       │   │   └── traces_brightclust_Nov2020_D0.1_set006.csv
+       │   ├── 0.1
+       │   └── 1.0
+       │       ├── traces_brightclust_Nov2020_D0.1_set003.csv
+       │       └── traces_brightclust_Nov2020_D0.1_set007.csv
+       ├── 0.2
+       │   ├── 0.01
+       │   │   └── traces_brightclust_Nov2020_D0.2_set003.csv
+       │   ├── 0.1
+       │   │   ├── traces_brightclust_Nov2020_D0.2_set001.csv
+       │   │   └── traces_brightclust_Nov2020_D0.2_set004.csv
+       │   └── 1.0
+       │       ├── traces_brightclust_Nov2020_D0.2_set009.csv
+       │       └── traces_brightclust_Nov2020_D0.2_set010.csv
+       ├── 0.4
+       │   ├── 0.01
+       │   │   ├── traces_brightclust_Nov2020_D0.4_set004.csv
+       │   │   └── traces_brightclust_Nov2020_D0.4_set010.csv
+       │   ├── 0.1
+       │   │   ├── traces_brightclust_Nov2020_D0.4_set002.csv
+       │   │   └── traces_brightclust_Nov2020_D0.4_set003.csv
+       │   └── 1.0
+       │       ├── traces_brightclust_Nov2020_D0.4_set006.csv
+       │       └── traces_brightclust_Nov2020_D0.4_set007.csv
+       ├── 0.6
+       │   ├── 0.01
+       │   │   └── traces_brightclust_Nov2020_D0.6_set010.csv
+       │   ├── 0.1
+       │   │   ├── traces_brightclust_Nov2020_D0.6_set004.csv
+       │   │   └── traces_brightclust_Nov2020_D0.6_set005.csv
+       │   └── 1.0
+       │       ├── traces_brightclust_Nov2020_D0.6_set001.csv
+       │       └── traces_brightclust_Nov2020_D0.6_set002.csv
+       ├── 10
+       │   ├── 0.01
+       │   │   ├── traces_brightclust_Nov2020_D10_set003.csv
+       │   │   └── traces_brightclust_Nov2020_D10_set004.csv
+       │   ├── 0.1
+       │   │   ├── traces_brightclust_Nov2020_D10_set006.csv
+       │   │   └── traces_brightclust_Nov2020_D10_set007.csv
+       │   └── 1.0
+       │       └── traces_brightclust_Nov2020_D10_set010.csv
+       ├── 1.0
+       │   ├── 0.01
+       │   │   └── traces_brightclust_Nov2020_D1.0_set010.csv
+       │   ├── 0.1
+       │   │   ├── traces_brightclust_Nov2020_D1.0_set004.csv
+       │   │   └── traces_brightclust_Nov2020_D1.0_set007.csv
+       │   └── 1.0
+       │       ├── traces_brightclust_Nov2020_D1.0_set001.csv
+       │       └── traces_brightclust_Nov2020_D1.0_set002.csv
+       ├── 3.0
+       │   ├── 0.01
+       │   │   ├── traces_brightclust_Nov2020_D3.0_set005.csv
+       │   │   └── traces_brightclust_Nov2020_D3.0_set006.csv
+       │   ├── 0.1
+       │   │   └── traces_brightclust_Nov2020_D3.0_set010.csv
+       │   └── 1.0
+       │       ├── traces_brightclust_Nov2020_D3.0_set001.csv
+       │       └── traces_brightclust_Nov2020_D3.0_set003.csv
+       └── 50
+           ├── 0.01
+           │   └── traces_brightclust_Nov2020_D50_set006.csv
+           ├── 0.1
+           │   ├── traces_brightclust_Nov2020_D50_set009.csv
+           │   └── traces_brightclust_Nov2020_D50_set010.csv
+           └── 1.0
+               ├── traces_brightclust_Nov2020_D50_set004.csv
+               └── traces_brightclust_Nov2020_D50_set005.csv
+
+       40 directories, 48 files
+       (tf) [ye53nis@node128 drmed-git]$ echo --------------------
+       --------------------
+       (tf) [ye53nis@node128 drmed-git]$ tree ../saves/firstartifact_Nov2020_val_max2sets_SORTEDIN
+       ../saves/firstartifact_Nov2020_val_max2sets_SORTEDIN
+       ├── 0.069
+       │   ├── 0.01
+       │   ├── 0.1
+       │   │   └── traces_brightclust_Nov2020_D0.069_set006.csv
+       │   └── 1.0
+       ├── 0.08
+       │   ├── 0.01
+       │   ├── 0.1
+       │   │   └── traces_brightclust_Nov2020_D0.08_set008.csv
+       │   └── 1.0
+       ├── 0.1
+       │   ├── 0.01
+       │   │   └── traces_brightclust_Nov2020_D0.1_set008.csv
+       │   ├── 0.1
+       │   └── 1.0
+       ├── 0.2
+       │   ├── 0.01
+       │   ├── 0.1
+       │   │   └── traces_brightclust_Nov2020_D0.2_set006.csv
+       │   └── 1.0
+       ├── 0.4
+       │   ├── 0.01
+       │   ├── 0.1
+       │   │   └── traces_brightclust_Nov2020_D0.4_set009.csv
+       │   └── 1.0
+       ├── 0.6
+       │   ├── 0.01
+       │   ├── 0.1
+       │   │   └── traces_brightclust_Nov2020_D0.6_set006.csv
+       │   └── 1.0
+       ├── 10
+       │   ├── 0.01
+       │   │   └── traces_brightclust_Nov2020_D10_set008.csv
+       │   ├── 0.1
+       │   └── 1.0
+       ├── 1.0
+       │   ├── 0.01
+       │   ├── 0.1
+       │   │   └── traces_brightclust_Nov2020_D1.0_set009.csv
+       │   └── 1.0
+       │       └── traces_brightclust_Nov2020_D1.0_set008.csv
+       ├── 3.0
+       │   ├── 0.01
+       │   │   └── traces_brightclust_Nov2020_D3.0_set008.csv
+       │   ├── 0.1
+       │   └── 1.0
+       │       └── traces_brightclust_Nov2020_D3.0_set009.csv
+       └── 50
+           ├── 0.01
+           ├── 0.1
+           └── 1.0
+               └── traces_brightclust_Nov2020_D50_set007.csv
+
+       40 directories, 12 files
+       (tf) [ye53nis@node128 drmed-git]$ echo --------------------
+       --------------------
+       (tf) [ye53nis@node128 drmed-git]$ tree ../saves/firstartifact_Nov2020_train_max1set
+       ../saves/firstartifact_Nov2020_train_max1set
+       ├── 0.069
+       │   ├── 0.1
+       │   │   └── traces_brightclust_Nov2020_D0.069_set002.csv
+       │   └── 1.0
+       │       └── traces_brightclust_Nov2020_D0.069_set009.csv
+       ├── 0.08
+       │   ├── 0.01
+       │   │   └── traces_brightclust_Nov2020_D0.08_set007.csv
+       │   ├── 0.1
+       │   │   └── traces_brightclust_Nov2020_D0.08_set002.csv
+       │   └── 1.0
+       │       └── traces_brightclust_Nov2020_D0.08_set004.csv
+       ├── 0.1
+       │   ├── 0.01
+       │   │   └── traces_brightclust_Nov2020_D0.1_set004.csv
+       │   ├── 0.1
+       │   └── 1.0
+       │       └── traces_brightclust_Nov2020_D0.1_set003.csv
+       ├── 0.2
+       │   ├── 0.01
+       │   │   └── traces_brightclust_Nov2020_D0.2_set003.csv
+       │   ├── 0.1
+       │   │   └── traces_brightclust_Nov2020_D0.2_set001.csv
+       │   └── 1.0
+       │       └── traces_brightclust_Nov2020_D0.2_set009.csv
+       ├── 0.4
+       │   ├── 0.01
+       │   │   └── traces_brightclust_Nov2020_D0.4_set004.csv
+       │   ├── 0.1
+       │   │   └── traces_brightclust_Nov2020_D0.4_set002.csv
+       │   └── 1.0
+       │       └── traces_brightclust_Nov2020_D0.4_set006.csv
+       ├── 0.6
+       │   ├── 0.01
+       │   │   └── traces_brightclust_Nov2020_D0.6_set010.csv
+       │   ├── 0.1
+       │   │   └── traces_brightclust_Nov2020_D0.6_set004.csv
+       │   └── 1.0
+       │       └── traces_brightclust_Nov2020_D0.6_set001.csv
+       ├── 10
+       │   ├── 0.01
+       │   │   └── traces_brightclust_Nov2020_D10_set003.csv
+       │   ├── 0.1
+       │   │   └── traces_brightclust_Nov2020_D10_set006.csv
+       │   └── 1.0
+       │       └── traces_brightclust_Nov2020_D10_set010.csv
+       ├── 1.0
+       │   ├── 0.01
+       │   │   └── traces_brightclust_Nov2020_D1.0_set010.csv
+       │   ├── 0.1
+       │   │   └── traces_brightclust_Nov2020_D1.0_set004.csv
+       │   └── 1.0
+       │       └── traces_brightclust_Nov2020_D1.0_set001.csv
+       ├── 3.0
+       │   ├── 0.01
+       │   │   └── traces_brightclust_Nov2020_D3.0_set005.csv
+       │   ├── 0.1
+       │   │   └── traces_brightclust_Nov2020_D3.0_set010.csv
+       │   └── 1.0
+       │       └── traces_brightclust_Nov2020_D3.0_set001.csv
+       └── 50
+           ├── 0.01
+           │   └── traces_brightclust_Nov2020_D50_set006.csv
+           ├── 0.1
+           │   └── traces_brightclust_Nov2020_D50_set009.csv
+           └── 1.0
+               └── traces_brightclust_Nov2020_D50_set004.csv
+
+       39 directories, 28 files
+       (tf) [ye53nis@node128 drmed-git]$ echo --------------------
+       --------------------
+       (tf) [ye53nis@node128 drmed-git]$ tree ../saves/firstartifact_Nov2020_test
+       ../saves/firstartifact_Nov2020_test
+       ├── 0.069
+       │   ├── 0.01
+       │   │   └── traces_brightclust_Nov2020_D0.069_set005.csv
+       │   ├── 0.1
+       │   │   └── traces_brightclust_Nov2020_D0.069_set001.csv
+       │   └── 1.0
+       │       └── traces_brightclust_Nov2020_D0.069_set010.csv
+       ├── 0.08
+       │   ├── 0.01
+       │   │   └── traces_brightclust_Nov2020_D0.08_set005.csv
+       │   ├── 0.1
+       │   │   └── traces_brightclust_Nov2020_D0.08_set003.csv
+       │   └── 1.0
+       │       └── traces_brightclust_Nov2020_D0.08_set001.csv
+       ├── 0.1
+       │   ├── 0.01
+       │   │   └── traces_brightclust_Nov2020_D0.1_set002.csv
+       │   ├── 0.1
+       │   │   └── traces_brightclust_Nov2020_D0.1_set005.csv
+       │   └── 1.0
+       │       └── traces_brightclust_Nov2020_D0.1_set001.csv
+       ├── 0.2
+       │   ├── 0.01
+       │   │   └── traces_brightclust_Nov2020_D0.2_set002.csv
+       │   ├── 0.1
+       │   │   └── traces_brightclust_Nov2020_D0.2_set007.csv
+       │   └── 1.0
+       │       └── traces_brightclust_Nov2020_D0.2_set005.csv
+       ├── 0.4
+       │   ├── 0.01
+       │   │   └── traces_brightclust_Nov2020_D0.4_set008.csv
+       │   ├── 0.1
+       │   │   └── traces_brightclust_Nov2020_D0.4_set001.csv
+       │   └── 1.0
+       │       └── traces_brightclust_Nov2020_D0.4_set005.csv
+       ├── 0.6
+       │   ├── 0.01
+       │   │   └── traces_brightclust_Nov2020_D0.6_set008.csv
+       │   ├── 0.1
+       │   │   └── traces_brightclust_Nov2020_D0.6_set003.csv
+       │   └── 1.0
+       │       └── traces_brightclust_Nov2020_D0.6_set009.csv
+       ├── 10
+       │   ├── 0.01
+       │   │   └── traces_brightclust_Nov2020_D10_set002.csv
+       │   ├── 0.1
+       │   │   └── traces_brightclust_Nov2020_D10_set001.csv
+       │   └── 1.0
+       │       └── traces_brightclust_Nov2020_D10_set005.csv
+       ├── 1.0
+       │   ├── 0.01
+       │   │   └── traces_brightclust_Nov2020_D1.0_set006.csv
+       │   ├── 0.1
+       │   │   └── traces_brightclust_Nov2020_D1.0_set003.csv
+       │   └── 1.0
+       │       └── traces_brightclust_Nov2020_D1.0_set005.csv
+       ├── 3.0
+       │   ├── 0.01
+       │   │   └── traces_brightclust_Nov2020_D3.0_set004.csv
+       │   ├── 0.1
+       │   │   └── traces_brightclust_Nov2020_D3.0_set007.csv
+       │   └── 1.0
+       │       └── traces_brightclust_Nov2020_D3.0_set002.csv
+       └── 50
+           ├── 0.01
+           │   └── traces_brightclust_Nov2020_D50_set002.csv
+           ├── 0.1
+           │   └── traces_brightclust_Nov2020_D50_set003.csv
+           └── 1.0
+               └── traces_brightclust_Nov2020_D50_set001.csv
+
+       40 directories, 30 files
+       (tf) [ye53nis@node128 drmed-git]$
+     #+end_example
+
+**** test run - input_size=None
+
+     #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session gpu
+       mlflow run . -e main -P fluotracify_path=/beegfs/ye53nis/drmed-git/src/ \
+              -P batch_size=13 \
+              -P input_size=-1 \
+              -P lr_start=0.008 \
+              -P lr_power=5 \
+              -P epochs=5 \
+              -P csv_path_train=/beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets \
+              -P csv_path_val=/beegfs/ye53nis/saves/firstartifact_Nov2020_val_max2sets_SORTEDIN \
+              -P scaler=maxabs \
+              -P n_levels=3 \
+              -P pool_size=8
+     #+END_SRC
+
+**** try if prediction on variable input sizes works
+    :PROPERTIES:
+    :header-args:jupyter-python: :session /jpy:localhost#8888:a37e524a-8134-4d8f-b24a-367acaf1bdd3
+    :END:
+    #+BEGIN_SRC jupyter-python
+      %cd ~/Programme/drmed-git
+    #+END_SRC
+
+    #+RESULTS:
+    : /home/lex/Programme/drmed-git
+
+    #+BEGIN_SRC jupyter-python
+      import os
+      import sys
+
+      import matplotlib.pyplot as plt
+      import numpy as np
+      import pandas as pd
+      import seaborn as sns
+
+      from pathlib import Path
+      from pprint import pprint
+      from tensorflow.keras.optimizers import Adam
+      from mlflow.keras import load_model
+
+      FLUOTRACIFY_PATH = '/home/lex/Programme/drmed-git/src/'
+      sys.path.append(FLUOTRACIFY_PATH)
+      from fluotracify.applications import corr_fit_object as cfo
+      from fluotracify.training import build_model as bm
+
+      # sns.set_theme(style="whitegrid")
+      sns.set()
+    #+END_SRC
+
+    #+RESULTS:
+
+    #+BEGIN_SRC jupyter-python
+      class ParameterClass():
+          """Stores parameters for correlation """
+          def __init__(self):
+              # Where the data is stored.
+              self.data = []
+              self.objectRef = []
+              self.subObjectRef = []
+              self.colors = ['blue', 'green', 'red', 'cyan', 'magenta',
+                             'yellow', 'black']
+              self.numOfLoaded = 0
+              # very fast from Ncasc ~ 14 onwards
+              self.NcascStart = 0
+              self.NcascEnd = 30  # 25
+              self.Nsub = 6  # 6
+              self.photonLifetimeBin = 10  # used for photon decay
+              self.photonCountBin = 1  # used for time series
+
+      data_path = Path("/home/lex/Programme/drmed-collections/data-from-Eggeling-group/brightbursts")
+      output_path = "/home/lex/Programme/drmed-collections/example_correlations"
+      logged_model = 'file:///home/lex/Programme/drmed-git/data/mlruns/9/0b8b33776db348d188c8354b6811606e/artifacts/model'
+      par_obj = ParameterClass()
+
+      loaded_model = load_model(logged_model, compile=False)
+      loaded_model.compile(loss=bm.binary_ce_dice_loss(),
+                           optimizer=Adam(),
+                           metrics = bm.unet_metrics([0.1, 0.3, 0.5, 0.7, 0.9]))
+      # bm.prepare_model(loaded_model, [2**14, 2**13, 2**12, 2**15, 2**13])
+    #+END_SRC
+
+    #+RESULTS:
+    #+begin_example
+      2022-02-23 15:31:53.205896: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcuda.so.1'; dlerror: libcuda.so.1: cannot open shared object file: No such file or directory
+      2022-02-23 15:31:53.206033: W tensorflow/stream_executor/cuda/cuda_driver.cc:269] failed call to cuInit: UNKNOWN ERROR (303)
+      2022-02-23 15:31:53.206124: I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:156] kernel driver does not appear to be running on this host (Topialex): /proc/driver/nvidia/version does not exist
+      2022-02-23 15:31:53.212010: I tensorflow/core/platform/cpu_feature_guard.cc:151] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 FMA
+      To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+      WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
+      2022-02-23 15:31:54,450 - Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
+      2022-02-23 15:32:14,842 - test shape (1, 16384, 1), e.g. [6.4859336e-09 3.2990063e-10 6.6564490e-11 4.3329128e-11 4.7212637e-11]
+      2022-02-23 15:32:17,444 - test shape (1, 8192, 1), e.g. [6.4859336e-09 3.2990063e-10 6.6564490e-11 4.3329128e-11 4.7212637e-11]
+      2022-02-23 15:32:20,008 - test shape (1, 4096, 1), e.g. [6.4859336e-09 3.2990063e-10 6.6564490e-11 4.3329128e-11 4.7212637e-11]
+      2022-02-23 15:32:20,738 - test shape (1, 32768, 1), e.g. [6.4859336e-09 3.2990063e-10 6.6564490e-11 4.3329128e-11 4.7212637e-11]
+      2022-02-23 15:32:21,198 - test shape (1, 8192, 1), e.g. [6.4859336e-09 3.2990063e-10 6.6564490e-11 4.3329128e-11 4.7212637e-11]
+      2022-02-23 15:32:21,200 - UNET ready for different trace lengths
+    #+end_example
+
+    #+BEGIN_SRC jupyter-python
+      path_clean = data_path / '191111_Pex5_1/clean_3of10'
+      path_dirty = data_path / '191111_Pex5_1/Tb-PEX5-eGFP_5uW_0.5ugml3_3of177'
+      files_clean = [path_clean / f for f in os.listdir(path_clean) if f.endswith('.ptu')]
+      files_dirty = [path_dirty / f for f in os.listdir(path_dirty) if f.endswith('.ptu')]
+      traces = pd.DataFrame()
+      predtraces = pd.DataFrame()
+      preds = pd.DataFrame()
+      corrs = pd.DataFrame()
+      mt_bin = 1e-3
+
+
+      for myfile in (files_dirty):
+          ptufile = cfo.PicoObject(myfile, par_obj)
+          ptufile.predictTimeSeries(model=loaded_model,
+                                    scaler='maxabs')
+          # mt_name = f'us_{ptufile.name}'
+          # ptufile.getTimeSeries(timeseries_name=mt_name,
+          #                       photonCountBin=mt_bin)
+          # ptufile.getPhotonCountingStats(name=mt_name)
+          break
+    #+END_SRC
+
+    #+RESULTS:
+    #+begin_example
+      2022-02-23 15:35:12,387 - PicoObject: Start CorrObj creation.
+      2022-02-23 15:35:12,393 - import_ptu: Writing 1429373 records, this may take a while.
+      2022-02-23 15:35:12,434 - import_ptu: HydraHarp V2 T3 data
+      2022-02-23 15:35:12,436 - import_ptu: Progress: 0.0%, 5600.044800358403 2 77
+      2022-02-23 15:35:16,487 - import_ptu: Progress: 70.0%, 14012260073.080585 2 106
+      2022-02-23 15:35:19,239 - Finished import.
+      2022-02-23 15:35:19,371 - Finished prepareChannels() with 2 channels: [1 2]
+      2022-02-23 15:35:19,378 - Finished time2bin. last_time=1560.0, num_bins=156.0
+      2022-02-23 15:35:19,456 - Finished time2bin. last_time=1560.0, num_bins=156.0
+      2022-02-23 15:35:19,457 - Finished getPhotonDecay() with name Lex Tb-PEX5-eGFP11_T222s_12022-02-23 15:35:19,471 - Finished time2bin. last_time=19971.0, num_bins=19971.0
+      2022-02-23 15:35:19,528 - Finished time2bin. last_time=19999.0, num_bins=19999.0
+      2022-02-23 15:35:19,529 - Finished getTimeSeries() with truetime_name Lex Tb-PEX5-eGFP11_T222s_1, timeseries_name Lex Tb-PEX5-eGFP11_T222s_1
+      2022-02-23 15:35:19,530 - Finished getPhotonCountingStats() with name: Lex Tb-PEX5-eGFP11_T222s_1
+      2022-02-23 15:35:19,532 - Finished dTimeInfo()
+      2022-02-23 15:35:20,348 - Finished predictTimeSeries() with name=Lex Tb-PEX5-eGFP11_T222s_1
+    #+end_example
+
+    #+BEGIN_SRC jupyter-python :pandoc t
+      plt.figure(figsize=(16,9))
+      plt.plot(ptufile.predictions['Lex Tb-PEX5-eGFP11_T222s_1']['CH2_BIN1.0'])
+      plt.show()
+      # ptufile.timeSeries['Lex Tb-PEX5-eGFP11_T222s_1']['CH2_BIN1.0']
+      # ptufile.predictions['Lex Tb-PEX5-eGFP11_T222s_1']['CH2_BIN1.0']
+    #+END_SRC
+
+    #+RESULTS:
+
+**** git
+     #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session gpu
+       pwd
+       git log -5
+     #+END_SRC
+
+     #+RESULTS:
+     #+begin_example
+       (tf) [ye53nis@node128 drmed-git]$ pwd
+       /beegfs/ye53nis/drmed-git
+       (tf) [ye53nis@node128 drmed-git]$ git log -5
+       commit 6179595f5b39b39c9a3860b01315801e755e2d5d
+       Author: Apoplex <oligolex@vivaldi.net>
+       Date:   Sat Feb 26 20:04:07 2022 +0100
+
+           Fix scale_trace; simplify tf_pad_trace call
+
+       commit 1a8bd2030eb322fc444f17c6ee08eac6718702be
+       Author: Apoplex <oligolex@vivaldi.net>
+       Date:   Thu Feb 24 16:11:39 2022 +0100
+
+           test tf_pad_trace
+
+       commit 44a47b2bfc8a3c0392c0809017d2bff9947595b2
+       Author: Apoplex <oligolex@vivaldi.net>
+       Date:   Thu Feb 24 16:10:33 2022 +0100
+
+           Fix tf_pad_trace
+
+       commit c8088c04a15df7af97118d267868ca2f56c44b45
+       Author: Apoplex <oligolex@vivaldi.net>
+       Date:   Wed Feb 23 19:06:16 2022 +0100
+
+           Add tf_pad_trace; Add tf numpy; crop trace 14000
+
+       commit 390e353df6c9624c45580db9cce2c4023d7c3b68
+       Author: Apoplex <oligolex@vivaldi.net>
+       Date:   Wed Feb 23 14:21:08 2022 +0100
+
+           Fix click input_size #2
+       (tf) [ye53nis@node128 drmed-git]$
+     #+end_example
+
+**** test run - append a median at the end of the trace
+     #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session gpu
+       mlflow run . -e main -P fluotracify_path=/beegfs/ye53nis/drmed-git/src/ \
+              -P batch_size=13 \
+              -P input_size=-1 \
+              -P lr_start=0.008 \
+              -P lr_power=5 \
+              -P epochs=5 \
+              -P csv_path_train=/beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets \
+              -P csv_path_val=/beegfs/ye53nis/saves/firstartifact_Nov2020_val_max2sets_SORTEDIN \
+              -P scaler=maxabs \
+              -P n_levels=3 \
+              -P pool_size=8
+     #+END_SRC
+**** append a median at the end of the trace - jupyter
+    :PROPERTIES:
+    :header-args:jupyter-python: :session /jpy:localhost#8888:a37e524a-8134-4d8f-b24a-367acaf1bdd3
+    :END:
+    #+BEGIN_SRC jupyter-python
+      %cd ~/Programme/drmed-git
+    #+END_SRC
+
+    #+RESULTS:
+    : /home/lex/Programme/drmed-git
+
+    #+BEGIN_SRC jupyter-python
+      import os
+      import sys
+
+      import matplotlib.pyplot as plt
+      import numpy as np
+      import tensorflow as tf
+
+      from pathlib import Path
+      from pprint import pprint
+      from mlflow.keras import load_model
+
+      FLUOTRACIFY_PATH = '/home/lex/Programme/drmed-git/src/'
+      sys.path.append(FLUOTRACIFY_PATH)
+      from fluotracify.simulations import import_simulation_from_csv as isfc
+      from fluotracify.training import (build_model as bm,
+                                        preprocess_data as ppd)
+
+      tf.experimental.numpy.experimental_enable_numpy_behavior(prefer_float32=False)
+    #+END_SRC
+
+    #+RESULTS:
+
+    #+BEGIN_SRC jupyter-python
+      import importlib
+      importlib.reload(ppd)
+
+    #+END_SRC
+
+    #+RESULTS:
+    : <module 'fluotracify.training.preprocess_data' from '/home/lex/Programme/drmed-git/src/fluotracify/training/preprocess_data.py'>
+
+
+    #+BEGIN_SRC jupyter-python
+      csv_path_train = Path("/home/lex/Programme/drmed-collections/DOKTOR/saves/firstartifact_Nov2020_test_subsample")
+      logged_model = 'file:///home/lex/Programme/drmed-git/data/mlruns/9/0b8b33776db348d188c8354b6811606e/artifacts/model'
+
+      loaded_model = load_model(logged_model, compile=False)
+      loaded_model.compile(loss=bm.binary_ce_dice_loss(),
+                           optimizer=tf.keras.optimizers.Adam(),
+                           metrics = bm.unet_metrics([0.1, 0.3, 0.5, 0.7, 0.9]))
+      # bm.prepare_model(loaded_model, [2**14, 2**13, 2**12, 2**15, 2**13])
+    #+END_SRC
+
+    #+RESULTS:
+    : 2022-02-26 19:46:47.738402: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcuda.so.1'; dlerror: libcuda.so.1: cannot open shared object file: No such file or directory
+    : 2022-02-26 19:46:47.738448: W tensorflow/stream_executor/cuda/cuda_driver.cc:269] failed call to cuInit: UNKNOWN ERROR (303)
+    : 2022-02-26 19:46:47.738483: I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:156] kernel driver does not appear to be running on this host (Topialex): /proc/driver/nvidia/version does not exist
+    : 2022-02-26 19:46:47.738939: I tensorflow/core/platform/cpu_feature_guard.cc:151] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 FMA
+    : To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+    : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
+    : 2022-02-26 19:46:48,355 - sim import tools - Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
+
+    #+BEGIN_SRC jupyter-python
+      train, _, nsamples_train, experiment_params_train = isfc.import_from_csv(
+          folder=csv_path_train,
+          header=12,
+          frac_train=1,
+          col_per_example=3,
+          dropindex=None,
+          dropcolumns=None)
+      train_sep = isfc.separate_data_and_labels(array=train,
+                                                nsamples=nsamples_train,
+                                                col_per_example=3)
+      train_data = train_sep['0']
+      train_labels = train_sep['1']
+      train_labels_bool = train_labels > 0.04
+      dataset_train, num_train_examples = ppd.tfds_from_pddf(
+          features_df=train_data, labels_df=train_labels_bool, frac_val=False)
+
+
+    #+END_SRC
+
+    #+RESULTS:
+    : 2022-02-26 19:46:58,590 - sim import tools - 1/4: /home/lex/Programme/drmed-collections/DOKTOR/saves/firstartifact_Nov2020_test_subsample/traces_brightclust_Nov2020_D1.0_set003.csv
+    : 2022-02-26 19:47:02,962 - sim import tools - 2/4: /home/lex/Programme/drmed-collections/DOKTOR/saves/firstartifact_Nov2020_test_subsample/traces_brightclust_Nov2020_D3.0_set004.csv
+    : 2022-02-26 19:47:12,441 - sim import tools - 4/4: /home/lex/Programme/drmed-collections/DOKTOR/saves/firstartifact_Nov2020_test_subsample/traces_brightclust_Nov2020_D0.069_set001.csv
+    : 2022-02-26 19:47:12,467 - sim import tools - The given DataFrame was split into 3 parts with shapes: [(16384, 400), (16384, 400), (16384, 400)]
+    : 2022-02-26 19:47:12.602088: W tensorflow/core/framework/cpu_allocator_impl.cc:82] Allocation of 26214400 exceeds 10% of free system memory.
+    : 2022-02-26 19:47:12.629133: W tensorflow/core/framework/cpu_allocator_impl.cc:82] Allocation of 26214400 exceeds 10% of free system memory.
+    : 2022-02-26 19:47:12.732843: W tensorflow/core/framework/cpu_allocator_impl.cc:82] Allocation of 26214400 exceeds 10% of free system memory.
+    : 2022-02-26 19:47:12,830 - sim import tools - number of examples: 400
+
+    #+BEGIN_SRC jupyter-python :pandoc t
+      for i, j in dataset_train:
+          print(i)
+          plt.plot(i.numpy().flatten())
+          break
+    #+END_SRC
+
+    #+RESULTS:
+    :RESULTS:
+    #+begin_example
+      2022-02-26 19:47:25.450086: W tensorflow/core/framework/cpu_allocator_impl.cc:82] Allocation of 26214400 exceeds 10% of free system memory.
+      2022-02-26 19:47:25.481097: W tensorflow/core/framework/cpu_allocator_impl.cc:82] Allocation of 26214400 exceeds 10% of free system memory.
+      tf.Tensor(
+      [[754.0185 ]
+       [666.79456]
+       [715.9573 ]
+       ...
+       [609.65247]
+       [620.97955]
+       [751.63727]], shape=(16384, 1), dtype=float32)
+    #+end_example
+    [[file:./.ob-jupyter/dfdb954ca48cd8e6b2f9937303bc767c17a369a6.png]]
+    :END:
+    #+BEGIN_SRC jupyter-python :pandoc t
+      scaler = 'robust'
+      ds_train_prep = dataset_train.map(
+          lambda trace, label: ppd.tf_crop_trace(trace, label, 14000),
+          num_parallel_calls=tf.data.AUTOTUNE)
+      # ds_train_prep = ds_train_prep.map(
+      #     lambda trace, label: ppd.tf_pad_trace(trace, label),
+      #     num_parallel_calls=tf.data.AUTOTUNE)
+      ds_train_prep = ds_train_prep.map(
+          lambda trace, label: ppd.tf_scale_trace(trace, label, scaler),
+          num_parallel_calls=tf.data.AUTOTUNE)
+      ds_train_prep = ds_train_prep.map(ppd.tf_pad_trace,
+                                        num_parallel_calls=tf.data.AUTOTUNE)
+    #+END_SRC
+
+    #+RESULTS:
+
+    #+BEGIN_SRC jupyter-python :pandoc t
+      scaler = tf.convert_to_tensor('minmax')
+      scaler == tf.convert_to_tensor('minmax')
+    #+END_SRC
+
+    #+RESULTS:
+    : <tf.Tensor: shape=(), dtype=bool, numpy=True>
+
+    #+BEGIN_SRC jupyter-python :pandoc t
+      for i, j in ds_train_prep:
+          print(i)
+          plt.plot(i.numpy().flatten())
+          plt.plot(j.numpy().flatten())
+          break
+    #+END_SRC
+
+    #+RESULTS:
+    :RESULTS:
+    : tf.Tensor(
+    : [[ 9.9756628e-01]
+    :  [ 6.4003998e-01]
+    :  [ 8.4155536e-01]
+    :  ...
+    :  [-7.1551447e-05]
+    :  [-7.1551447e-05]
+    :  [-7.1551447e-05]], shape=(16384, 1), dtype=float32)
+    [[file:./.ob-jupyter/836dac9006044c65de19fa8c5e83498bd6386459.png]]
+    :END:
+
+*** DONE possible retraining with traces appended by median to avoid segmentation errors on right margin
+CLOSED: [2022-02-23 Mi 15:53]
+   - noticed that predictions dont work for input size of 2**15 → looked at unet
+     with variable inputs, try tf.keras.layers.Input((None, None, 1) or (1,
+     None, 1)) → variable batch size, variable length or just variable length
+     - https://github.com/keras-team/keras/issues/1920 Variable-size image to
+       convolutional  layer
+     - https://github.com/ptrblck/pytorch_misc/blob/master/unet_demo.py pytorch
+       unet with variable input size
+     - https://github.com/keras-team/keras/issues/1920#issuecomment-193883690
+       fchollet mentions input_shape=(1, None, None)
+     - https://github.com/karolzak/keras-unet/issues/32 got following rules:
+       1. Set the input of the network to allow for a variable size input using
+          "None" as a placeholder dimension on the input_shape. See Francois
+          Chollet's answer here.
+       2. Use convolutional layers only until a global pooling operation has
+          occurred (e.g. GlobalMaxPooling2D). Then Dense layers etc. can be used
+          because the size is now fixed.
+       3. Use a batch size of 1 only. This avoids dealing with mixed sizes
+          within a batch.
+       4. Write a small custom Sequence that creates batches of size 1 from the
+          list of inputs. I did this to avoid dealing with different sizes
+          inside a single Numpy array.
+       5. Use Model.fit_generator on your custom Sequence for training and
+          validation. (v.s. Model.fit)
+       6. For some reason, Model.predict_generator popped even when using the
+          Sequence as above. I had to resort to using Model.predict on
+          individual inputs.
+     - https://www.quora.com/How-are-variably-shaped-and-sized-images-given-inputs-to-convoluted-neural-networks
+       some background and explanation of fully convolutional and why global
+       average pooling is necessary if a dense layer is needed
+     - https://stats.stackexchange.com/questions/388859/is-it-possible-to-give-variable-sized-images-as-input-to-a-convolutional-neural
+       mentions transformations, resize, crop, fully convolutional, spatial
+       pyramid pooling
+
+*** DONE [#A] Do Calibration plots for training analysis
+CLOSED: [2022-02-26 Sa 22:13]
+    :PROPERTIES:
+    :header-args:jupyter-python: :session /jpy:localhost#8888:a37e524a-8134-4d8f-b24a-367acaf1bdd3
+    :END:
+    - predicted probability on x-axis in bins (0-0.1, 0.1-0.2, ...) and allocate
+      the true probability (0 or 1) there, compute confidence intervals
+    - also plot a bar plot in each bin of the absolute number of predictions in
+      there → shows when e.g. there "never" would be high predictions.
+    #+BEGIN_SRC jupyter-python
+      %cd ~/Programme/drmed-git
+    #+END_SRC
+
+    #+RESULTS:
+    : /home/lex/Programme/drmed-git
+
+    #+BEGIN_SRC jupyter-python
+      import os
+      import sys
+
+      import matplotlib.pyplot as plt
+      import numpy as np
+      import tensorflow as tf
+      import sklearn.calibration as skc
+
+      from pathlib import Path
+      from pprint import pprint
+      from mlflow.keras import load_model
+
+      FLUOTRACIFY_PATH = '/home/lex/Programme/drmed-git/src/'
+      sys.path.append(FLUOTRACIFY_PATH)
+      from fluotracify.simulations import import_simulation_from_csv as isfc
+      from fluotracify.training import (build_model as bm,
+                                        preprocess_data as ppd)
+
+      tf.experimental.numpy.experimental_enable_numpy_behavior(prefer_float32=False)
+    #+END_SRC
+
+    #+RESULTS:
+
+    #+BEGIN_SRC jupyter-python
+      import importlib
+      importlib.reload(ppd)
+
+    #+END_SRC
+
+    #+RESULTS:
+    : <module 'fluotracify.training.preprocess_data' from '/home/lex/Programme/drmed-git/src/fluotracify/training/preprocess_data.py'>
+
+
+    #+BEGIN_SRC jupyter-python
+      csv_path_train = Path("/home/lex/Programme/drmed-collections/DOKTOR/saves/firstartifact_Nov2020_test_subsample")
+      logged_model = 'file:///home/lex/Programme/drmed-git/data/mlruns/9/0b8b33776db348d188c8354b6811606e/artifacts/model'
+      # 0b8b33776db348d188c8354b6811606e
+      # a8315c2a1ac747d6be5150c848a08254
+      scaler = 'robust'
+
+      loaded_model = load_model(logged_model, compile=False)
+      loaded_model.compile(loss=bm.binary_ce_dice_loss(),
+                           optimizer=tf.keras.optimizers.Adam(),
+                           metrics = bm.unet_metrics([0.1, 0.3, 0.5, 0.7, 0.9]))
+      # bm.prepare_model(loaded_model, [2**14, 2**13, 2**12, 2**15, 2**13])
+    #+END_SRC
+
+    #+RESULTS:
+    : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
+    : 2022-02-26 21:52:06,778 - sim import tools - Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
+
+    #+BEGIN_SRC jupyter-python
+      train, _, nsamples_train, experiment_params_train = isfc.import_from_csv(
+          folder=csv_path_train,
+          header=12,
+          frac_train=1,
+          col_per_example=3,
+          dropindex=None,
+          dropcolumns=None)
+      train_sep = isfc.separate_data_and_labels(array=train,
+                                                nsamples=nsamples_train,
+                                                col_per_example=3)
+      train_data = train_sep['0']
+      train_labels = train_sep['1']
+      train_labels_bool = train_labels > 0.04
+      dataset_train, num_train_examples = ppd.tfds_from_pddf(
+          features_df=train_data, labels_df=train_labels_bool, frac_val=False)
+      ds_train_prep = dataset_train.map(
+          lambda trace, label: ppd.tf_crop_trace(trace, label, 14000),
+          num_parallel_calls=tf.data.AUTOTUNE)
+      ds_train_prep = ds_train_prep.map(
+          lambda trace, label: ppd.tf_scale_trace(trace, label, scaler),
+          num_parallel_calls=tf.data.AUTOTUNE)
+      ds_train_prep = ds_train_prep.map(ppd.tf_pad_trace,
+                                        num_parallel_calls=tf.data.AUTOTUNE)
+
+    #+END_SRC
+
+    #+RESULTS:
+    #+begin_example
+      2022-02-26 21:50:34,870 - sim import tools - 2/4: /home/lex/Programme/drmed-collections/DOKTOR/saves/firstartifact_Nov2020_test_subsample/traces_brightclust_Nov2020_D3.0_set004.csv
+      2022-02-26 21:50:38,400 - sim import tools - 3/4: /home/lex/Programme/drmed-collections/DOKTOR/saves/firstartifact_Nov2020_test_subsample/traces_brightclust_Nov2020_D0.2_set002.csv
+      2022-02-26 21:50:42,159 - sim import tools - 4/4: /home/lex/Programme/drmed-collections/DOKTOR/saves/firstartifact_Nov2020_test_subsample/traces_brightclust_Nov2020_D0.069_set001.csv
+      2022-02-26 21:50:42,180 - sim import tools - The given DataFrame was split into 3 parts with shapes: [(16384, 400), (16384, 400), (16384, 400)]
+      2022-02-26 21:50:42,403 - sim import tools - number of examples: 400
+      2022-02-26 21:50:45,944 - sim import tools - 1/4: /home/lex/Programme/drmed-collections/DOKTOR/saves/firstartifact_Nov2020_test_subsample/traces_brightclust_Nov2020_D1.0_set003.csv
+      2022-02-26 21:50:49,413 - sim import tools - 2/4: /home/lex/Programme/drmed-collections/DOKTOR/saves/firstartifact_Nov2020_test_subsample/traces_brightclust_Nov2020_D3.0_set004.csv
+      2022-02-26 21:50:52,997 - sim import tools - 3/4: /home/lex/Programme/drmed-collections/DOKTOR/saves/firstartifact_Nov2020_test_subsample/traces_brightclust_Nov2020_D0.2_set002.csv
+      2022-02-26 21:50:56,405 - sim import tools - 4/4: /home/lex/Programme/drmed-collections/DOKTOR/saves/firstartifact_Nov2020_test_subsample/traces_brightclust_Nov2020_D0.069_set001.csv
+      2022-02-26 21:50:56,426 - sim import tools - The given DataFrame was split into 3 parts with shapes: [(16384, 400), (16384, 400), (16384, 400)]2022-02-26 21:50:56,712 - sim import tools - number of examples: 400
+    #+end_example
+
+    #+BEGIN_SRC jupyter-python
+      fig = plt.figure(figsize=(10, 10))
+      gs = fig.add_gridspec(4, 2)
+
+      ax_calibration_curve = fig.add_subplot(gs[:2, :2])
+      calibration_displays = {}
+      pred_ls, true_ls = [], []
+
+      for features, trues in ds_train_prep.take(10):
+          preds = loaded_model.predict(features.reshape(1, -1, 1))
+          pred_ls.append(preds.reshape(-1))
+          true_ls.append(trues.reshape(-1))
+
+      pred_ls = np.array(pred_ls).flatten()
+      true_ls = np.array(true_ls).flatten()
+
+      display = skc.CalibrationDisplay.from_predictions(
+          true_ls,
+          pred_ls,
+          n_bins=5,
+          name="fraction of artifacts",
+          ax=ax_calibration_curve
+      )
+      calibration_displays["fraction of artifacts"] = display
+      # Add histogram
+      grid_positions = [(2, 0), (2, 1), (3, 0), (3, 1)]
+      row, col = (2, 0)
+      ax = fig.add_subplot(gs[row, col])
+
+      ax.hist(
+          calibration_displays["fraction of artifacts"].y_prob,
+          range=(0, 1),
+          bins=10,
+          label="fraction of artifacts",
+      )
+      ax.set(title="fraction of artifacts", xlabel="Mean predicted probability", ylabel="Count")
+
+      plt.tight_layout()
+      plt.show()
+    #+END_SRC
+
+    #+RESULTS:
+    [[file:./.ob-jupyter/e10d8babff13682c1a604bcb852a225fbadde745.png]]
+
+
+
+    #+BEGIN_SRC jupyter-python :pandoc t
+      fig = plt.figure(figsize=(10, 10))
+      gs = GridSpec(4, 2)
+
+      ax_calibration_curve = fig.add_subplot(gs[:2, :2])
+      calibration_displays = {}
+
+      clf_list = [(loaded_model, "Test model")]
+      for i, (clf, name) in enumerate(clf_list):
+          clf.fit(X_train, y_train)
+          display = CalibrationDisplay.from_estimator(
+              clf,
+              X_test,
+              y_test,
+              n_bins=10,
+              name=name,
+              ax=ax_calibration_curve,
+              color=colors(i),
+          )
+          calibration_displays[name] = display
+
+      ax_calibration_curve.grid()
+      ax_calibration_curve.set_title("Calibration plots (Naive Bayes)")
+
+      # Add histogram
+      grid_positions = [(2, 0), (2, 1), (3, 0), (3, 1)]
+      for i, (_, name) in enumerate(clf_list):
+          row, col = grid_positions[i]
+          ax = fig.add_subplot(gs[row, col])
+
+          ax.hist(
+              calibration_displays[name].y_prob,
+              range=(0, 1),
+              bins=10,
+              label=name,
+              color=colors(i),
+          )
+          ax.set(title=name, xlabel="Mean predicted probability", ylabel="Count")
+
+      plt.tight_layout()
+      plt.show()
+    #+END_SRC
+
+
 ** TODOs
 *** TODO super cool way of presenting work:https://stanfordmlgroup.github.io/projects/ecg/
 
@@ -15695,15 +17274,8 @@ to make
       - https://github.com/pypa/sampleproject
 
       -
-*** TODO [#A] Do Calibration plots for training analysis
-    - predicted probability on x-axis in bins (0-0.1, 0.1-0.2, ...) and allocate
-      the true probability (0 or 1) there, compute confidence intervals
-    - also plot a bar plot in each bin of the absolute number of predictions in
-      there → shows when e.g. there "never" would be high predictions.
-    -
 
 
-*** TODO possible retraining with traces appended by median to avoid segmentation errors on right margin
 
 * Reconnect
   :LOGBOOK:
@@ -15713,9 +17285,10 @@ to make
 #+CALL: setup-tmux[:session remote]
 
 #+RESULTS:
-|         |                                        |           |
-| sh-5.1$ | ye53nis@ara-login01.rz.uni-jena.de's | password: |
-| >       | ye53nis@ara-login01.rz.uni-jena.de's | password: |
+|                         |                                        |           |
+| sh-5.1$                 | ye53nis@ara-login01.rz.uni-jena.de's | password: |
+| /tmp/tmux-67339/default |                                        |           |
+| >                       | ye53nis@ara-login01.rz.uni-jena.de's | password: |
 ye53nis@ara-login01.rz.uni-jena.de's | password: |
 | >       |
 ye53nis@ara-login01.rz.uni-jena.de's | password: |
@@ -15729,38 +17302,21 @@ Test:
 
 #+RESULTS:
 #+begin_example
-  (base) [ye53nis@login01 drmed-git]$ git status
-  # On branch develop
-  # Untracked files:
-  #   (use "git add <file>..." to include in what will be committed)
-  #
-  #       data/exp-devtest/
-  #       data/exp-test/
-  #       data/mlruns/0/037e1d9e4ad74784974f4aaac11138cc/
-  #       data/mlruns/0/19ccbacbf4334e5496aa8aca189b48f6/
-  #       data/mlruns/0/1d1a38b21990451582bf9b07a9487820/
-  #       data/mlruns/0/1e98b3ed2e1d421da9592058bd5587a8/
-  #       data/mlruns/0/265692a2dfa1437f99a847dd7fe0c8e4/
-  #       data/mlruns/0/306234c75c9c48058cbd694579eff31b/
-  #       data/mlruns/0/67f319f4d8f746ffa6af7c161bdd0a7b/
-  #       data/mlruns/0/7f23f6ba7a244914b3cbbebd731d50a1/
-  #       data/mlruns/0/83913f83a27245e7b16d9847de14e2ed/
-  #       data/mlruns/0/bf2ced34703e42eba1858a9515694a9e/
-  #       data/mlruns/0/d57baeff5b994289bf6ce4c842a87509/
-  #       data/mlruns/0/d9b44dc2e3d44ea1a71129808b642af6/
-  #       data/mlruns/0/e4ad17b5c0e3489f89194eff033a9279/
-  #       data/mlruns/0/f9da7fa18bcd4dd79eee13e35f4a5573/
-  #       data/mlruns/0/fce85613c2724819a168ba0d34cff11d/
-  #       data/mlruns/1/504c8c02948c498fa7485c044b956468/
-  #       data/mlruns/1/6444eabd24a7402a92f895804b01163c/
-  #       data/mlruns/mlruns/
-  #       data/tb/
-  #       experiment_params.csv
-  #       mlruns/
-  #       test.pdf
-  #       test.svg
-  #       tramp.YDPCnB
-  no changes added to commit (use "git add" and/or "git commit -a")
+  (base) [ye53nis@login01 drmed-git]$ git pull
+  Username for 'https://github.com':aseltmann
+  Password for 'https://aseltmann@github.com':
+  Updating 0676351..e59833f
+  Fast-forward
+   LabBook.org                                             | 1288 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+   src/fluotracify/applications/_correlate_cython_setup.py |   10 ++
+   src/fluotracify/applications/corr_fit_object.py         |  288 +++++++++++++++++++++++++--------------
+   src/fluotracify/applications/correlate.py               |   12 +-
+   src/fluotracify/applications/correlate_cython.pyx       |   37 +++++
+   src/fluotracify/training/build_model.py                 |    7 +-
+   6 files changed, 1533 insertions(+), 109 deletions(-)
+   create mode 100644 src/fluotracify/applications/_correlate_cython_setup.py
+   create mode 100755 src/fluotracify/applications/correlate_cython.pyx
+  (base) [ye53nis@login01 drmed-git]$
 #+end_example
 
 ** Compute node for script execution
@@ -16280,11 +17836,12 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
 
 ** gpu node
 
-   #+CALL: setup-tmux[:session local]
+   #+CALL: setup-tmux[:session local2]
 
    #+RESULTS:
    |         |                                        |           |
-   | sh-5.1$ |
+   | sh-5.1$ | ye53nis@ara-login01.rz.uni-jena.de's | password: |
+   | >       | ye53nis@ara-login01.rz.uni-jena.de's | password: |
 ye53nis@ara-login01.rz.uni-jena.de's | password: |
    | >       |
 ye53nis@ara-login01.rz.uni-jena.de's | password: |
@@ -16296,9 +17853,7 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |
 
    #+RESULTS:
    #+begin_example
-     (tf) [ye53nis@login01 /]$ srun -p gpu_a100 --time=3-10:00:00 --ntasks-per-node=12 --mem-per-cpu=4000 --gres=gpu:1 --pty bash
-     (base) [ye53nis@node131 /]$ cd /
-     (base) [ye53nis@node131 /]$
+     (base) [ye53nis@node128 /]$
    #+end_example
 
    #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session gpu
@@ -16309,14 +17864,16 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |
 
    #+RESULTS:
    #+begin_example
-     (base) [ye53nis@node131 /]$ module list
+     (base) [ye53nis@node128 /]$ module list
      Currently Loaded Modulefiles:
        1) nvidia/cuda/11.2   2) nvidia/cudnn/8.1
-     (base) [ye53nis@node131 /]$
+     (base) [ye53nis@node128 /]$
    #+end_example
 
 ** Jupyter on local machine
-
+  :PROPERTIES:
+  :header-args:jupyter-python: :session /jpy:localhost#8888:a37e524a-8134-4d8f-b24a-367acaf1bdd3
+  :END:
   #+begin_src sh :session local
     conda activate tf
     jupyter lab --no-browser --port=8888
