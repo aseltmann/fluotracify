@@ -53,7 +53,8 @@ def correct_correlation_by_label(ntraces, traces_of_interest,
         if len(trace_corrected_bylabel) < 32:
             continue
 
-        diff_corrected_bylabel, trans_corrected_bylabel, _ = correlate.correlate(
+        (diff_corrected_bylabel, trans_corrected_bylabel,
+         _) = correlate.correlate_and_fit(
             trace=trace_corrected_bylabel.astype(np.float64),
             fwhm=fwhm,
             diffrate=None,
