@@ -13886,7 +13886,6 @@ file:./.ob-jupyter/plot_after_correction.png
       #+RESULTS:
       : 2022-01-19 16:35:10,616 - Illegal Channel: #1000 2
 
-
 *** Remote jupyter 2: correlate experimental traces, weight=0, all_dirty_ptu
     :PROPERTIES:
     :header-args:jupyter-python: :session /jpy:localhost#9997:b37e524a-8134-4d8f-b24a-367acaf1bdd3
@@ -14497,7 +14496,6 @@ file:./.ob-jupyter/plot_after_correction.png
        [0;31mKeyboardInterrupt[0m:
      #+end_example
      :END:
-
 
 *** Checking out all the experiments
    :PROPERTIES:
@@ -17169,6 +17167,324 @@ CLOSED: [2022-02-26 Sa 22:13]
       plt.show()
     #+END_SRC
 
+*** TODO update packages to fix pydot and graphviz to make model plotting work
+**** update packages
+    - we need:
+      - jupyterlab
+      - pip
+      - pip:
+        - numpy
+        - pandas
+        - matplotlib
+        - seaborn
+        - mlflow  >>> at the moment V1.22
+        - lmfit (needed by =fluotracify.applications.correlate=)
+        - tensorflow
+        - fcsfiles
+        - multipletau
+        - scikit-learn
+        - *pydot >>> for =tf.keras.utils.plot_model=. Also needs =graphviz=,
+          which is already installed in my linux machine.*
+        - flake8  >>> the following 3 for flycheck
+        - pylint
+        - mypy
+
+    - maybe:
+      - keras-preprocessing
+      - scipy
+      - tifffile → needed only for nanosimpy.input_and_output.py → saves out a
+        dictionary of intensity traces as a .tiff.
+
+      #+begin_example
+        (base) [lex@Topialex ~]$ pamac info graphviz
+        Name                  : graphviz
+        Version               : 2.50.0-2
+        Description           : Graph visualization software
+        URL                   : https://www.graphviz.org/
+        Licences              : EPL
+        Repository            : extra
+        Installed Size        : 10,4 MB
+        Groups                : --
+        Depends On            : libltdl gd librsvg libxaw ghostscript pango gts gsfonts libnsl libpng
+        Optional Dependencies : mono: sharp bindings [Installed]
+                                guile: guile bindings [Installed]
+                                lua: lua bindings [Installed]
+                                ocaml: ocaml bindings
+                                perl: perl bindings [Installed]
+                                python: python bindings [Installed]
+                                r: r bindings [Installed]
+                                tcl: tcl bindings [Installed]
+                                qt5-base: gvedit [Installed]
+                                gtk2: gtk output plugin [Installed]
+                                xterm: vimdot [Installed]
+        Required By           : gimp
+        Optional For          : asciidoc gegl gperftools vtk
+        Provides              : --
+        Replaces              : --
+        Conflicts With        : --
+        Packager              : Antonio Rojas <arojas@archlinux.org>
+        Build Date            : Mo 06 Dez 2021 22:06:37 CET
+        Install Date          : Di 04 Jan 2022 10:24:54 CET
+        Install Reason        : Explicitly installed
+        Validated By          : Signature
+        Backup files          : --
+
+        (base) [lex@Topialex ~]$ pamac info pydot
+        Error: target not found: pydot
+
+        (base) [lex@Topialex ~]$ conda activate tf
+        (tf) [lex@Topialex ~]$ pip install pydot
+        Collecting pydot
+          Downloading pydot-1.4.2-py2.py3-none-any.whl (21 kB)
+        Requirement already satisfied: pyparsing>=2.1.4 in ./Programme/miniconda3/envs/tf/lib/python3.9/site-packages (from pydot) (3.0.4)
+        Installing collected packages: pydot
+        Successfully installed pydot-1.4.2
+      #+end_example
+
+    #+begin_src sh :session local2
+      conda list -n tf
+    #+end_src
+
+    #+RESULTS:
+    |                              |            |                   |             |    |                                         |
+    | #                            |   packages | in                | environment | at | /home/lex/Programme/miniconda3/envs/tf: |
+    |                              |            |                   |             |    |                                         |
+    | Name                         |    Version | Build             | Channel     |    |                                         |
+    | _libgcc_mutex                |        0.1 | main              |             |    |                                         |
+    | _openmp_mutex                |        4.5 | 1_gnu             |             |    |                                         |
+    | absl-py                      |      1.0.0 | pypi_0            | pypi        |    |                                         |
+    | alembic                      |      1.4.1 | pypi_0            | pypi        |    |                                         |
+    | anyio                        |      2.2.0 | py39h06a4308_1    |             |    |                                         |
+    | argon2-cffi                  |     20.1.0 | py39h27cfd23_1    |             |    |                                         |
+    | asteval                      |     0.9.25 | pypi_0            | pypi        |    |                                         |
+    | astroid                      |      2.9.2 | pypi_0            | pypi        |    |                                         |
+    | astunparse                   |      1.6.3 | pypi_0            | pypi        |    |                                         |
+    | async_generator              |        1.1 | pyhd3eb1b0_0      |             |    |                                         |
+    | attrs                        |     21.2.0 | pyhd3eb1b0_0      |             |    |                                         |
+    | babel                        |      2.9.1 | pyhd3eb1b0_0      |             |    |                                         |
+    | backcall                     |      0.2.0 | pyhd3eb1b0_0      |             |    |                                         |
+    | bleach                       |      4.0.0 | pyhd3eb1b0_0      |             |    |                                         |
+    | brotlipy                     |      0.7.0 | py39h27cfd23_1003 |             |    |                                         |
+    | ca-certificates              | 2021.10.26 | h06a4308_2        |             |    |                                         |
+    | cachetools                   |      4.2.4 | pypi_0            | pypi        |    |                                         |
+    | certifi                      |  2021.10.8 | py39h06a4308_0    |             |    |                                         |
+    | cffi                         |     1.14.6 | py39h400218f_0    |             |    |                                         |
+    | charset-normalizer           |      2.0.4 | pyhd3eb1b0_0      |             |    |                                         |
+    | click                        |      8.0.3 | pypi_0            | pypi        |    |                                         |
+    | cloudpickle                  |      2.0.0 | pypi_0            | pypi        |    |                                         |
+    | cryptography                 |     36.0.0 | py39h9ce1e76_0    |             |    |                                         |
+    | cycler                       |     0.11.0 | pypi_0            | pypi        |    |                                         |
+    | cython                       |    0.29.26 | pypi_0            | pypi        |    |                                         |
+    | databricks-cli               |     0.16.2 | pypi_0            | pypi        |    |                                         |
+    | debugpy                      |      1.5.1 | py39h295c915_0    |             |    |                                         |
+    | decorator                    |      5.1.0 | pyhd3eb1b0_0      |             |    |                                         |
+    | defusedxml                   |      0.7.1 | pyhd3eb1b0_0      |             |    |                                         |
+    | docker                       |      5.0.3 | pypi_0            | pypi        |    |                                         |
+    | entrypoints                  |        0.3 | py39h06a4308_0    |             |    |                                         |
+    | fcsfiles                     |   2021.6.6 | pypi_0            | pypi        |    |                                         |
+    | flake8                       |      4.0.1 | pypi_0            | pypi        |    |                                         |
+    | flask                        |      2.0.2 | pypi_0            | pypi        |    |                                         |
+    | flatbuffers                  |        2.0 | pypi_0            | pypi        |    |                                         |
+    | focuspoint                   |        0.1 | pypi_0            | pypi        |    |                                         |
+    | fonttools                    |     4.28.5 | pypi_0            | pypi        |    |                                         |
+    | future                       |     0.18.2 | pypi_0            | pypi        |    |                                         |
+    | gast                         |      0.4.0 | pypi_0            | pypi        |    |                                         |
+    | gitdb                        |      4.0.9 | pypi_0            | pypi        |    |                                         |
+    | gitpython                    |     3.1.24 | pypi_0            | pypi        |    |                                         |
+    | google-auth                  |      2.3.3 | pypi_0            | pypi        |    |                                         |
+    | google-auth-oauthlib         |      0.4.6 | pypi_0            | pypi        |    |                                         |
+    | google-pasta                 |      0.2.0 | pypi_0            | pypi        |    |                                         |
+    | greenlet                     |      1.1.2 | pypi_0            | pypi        |    |                                         |
+    | grpcio                       |     1.43.0 | pypi_0            | pypi        |    |                                         |
+    | gunicorn                     |     20.1.0 | pypi_0            | pypi        |    |                                         |
+    | h5py                         |      3.6.0 | pypi_0            | pypi        |    |                                         |
+    | idna                         |        3.3 | pyhd3eb1b0_0      |             |    |                                         |
+    | importlib-metadata           |      4.8.2 | py39h06a4308_0    |             |    |                                         |
+    | importlib_metadata           |      4.8.2 | hd3eb1b0_0        |             |    |                                         |
+    | ipykernel                    |      6.4.1 | py39h06a4308_1    |             |    |                                         |
+    | ipython                      |     7.29.0 | py39hb070fc8_0    |             |    |                                         |
+    | ipython_genutils             |      0.2.0 | pyhd3eb1b0_1      |             |    |                                         |
+    | isort                        |     5.10.1 | pypi_0            | pypi        |    |                                         |
+    | itsdangerous                 |      2.0.1 | pypi_0            | pypi        |    |                                         |
+    | jedi                         |     0.18.0 | py39h06a4308_1    |             |    |                                         |
+    | jinja2                       |      3.0.2 | pyhd3eb1b0_0      |             |    |                                         |
+    | joblib                       |      1.1.0 | pypi_0            | pypi        |    |                                         |
+    | json5                        |      0.9.6 | pyhd3eb1b0_0      |             |    |                                         |
+    | jsonschema                   |      3.2.0 | pyhd3eb1b0_2      |             |    |                                         |
+    | jupyter_client               |      7.1.0 | pyhd3eb1b0_0      |             |    |                                         |
+    | jupyter_core                 |      4.9.1 | py39h06a4308_0    |             |    |                                         |
+    | jupyter_server               |      1.4.1 | py39h06a4308_0    |             |    |                                         |
+    | jupyterlab                   |      3.2.1 | pyhd3eb1b0_1      |             |    |                                         |
+    | jupyterlab_pygments          |      0.1.2 | py_0              |             |    |                                         |
+    | jupyterlab_server            |      2.8.2 | pyhd3eb1b0_0      |             |    |                                         |
+    | keras                        |      2.7.0 | pypi_0            | pypi        |    |                                         |
+    | keras-preprocessing          |      1.1.2 | pypi_0            | pypi        |    |                                         |
+    | kiwisolver                   |      1.3.2 | pypi_0            | pypi        |    |                                         |
+    | lazy-object-proxy            |      1.7.1 | pypi_0            | pypi        |    |                                         |
+    | ld_impl_linux-64             |     2.35.1 | h7274673_9        |             |    |                                         |
+    | libclang                     |     12.0.0 | pypi_0            | pypi        |    |                                         |
+    | libffi                       |        3.3 | he6710b0_2        |             |    |                                         |
+    | libgcc-ng                    |      9.3.0 | h5101ec6_17       |             |    |                                         |
+    | libgomp                      |      9.3.0 | h5101ec6_17       |             |    |                                         |
+    | libsodium                    |     1.0.18 | h7b6447c_0        |             |    |                                         |
+    | libstdcxx-ng                 |      9.3.0 | hd4cf53a_17       |             |    |                                         |
+    | lmfit                        |      1.0.3 | pypi_0            | pypi        |    |                                         |
+    | mako                         |      1.1.6 | pypi_0            | pypi        |    |                                         |
+    | markdown                     |      3.3.6 | pypi_0            | pypi        |    |                                         |
+    | markupsafe                   |      2.0.1 | py39h27cfd23_0    |             |    |                                         |
+    | matplotlib                   |      3.5.1 | pypi_0            | pypi        |    |                                         |
+    | matplotlib-inline            |      0.1.2 | pyhd3eb1b0_2      |             |    |                                         |
+    | mccabe                       |      0.6.1 | pypi_0            | pypi        |    |                                         |
+    | mistune                      |      0.8.4 | py39h27cfd23_1000 |             |    |                                         |
+    | mlflow                       |     1.22.0 | pypi_0            | pypi        |    |                                         |
+    | multipletau                  |      0.3.3 | pypi_0            | pypi        |    |                                         |
+    | mypy                         |       0.93 | pypi_0            | pypi        |    |                                         |
+    | mypy-extensions              |      0.4.3 | pypi_0            | pypi        |    |                                         |
+    | nbclassic                    |      0.2.6 | pyhd3eb1b0_0      |             |    |                                         |
+    | nbclient                     |      0.5.3 | pyhd3eb1b0_0      |             |    |                                         |
+    | nbconvert                    |      6.1.0 | py39h06a4308_0    |             |    |                                         |
+    | nbformat                     |      5.1.3 | pyhd3eb1b0_0      |             |    |                                         |
+    | ncurses                      |        6.3 | h7f8727e_2        |             |    |                                         |
+    | nest-asyncio                 |      1.5.1 | pyhd3eb1b0_0      |             |    |                                         |
+    | nodeenv                      |      1.6.0 | pypi_0            | pypi        |    |                                         |
+    | notebook                     |      6.4.6 | py39h06a4308_0    |             |    |                                         |
+    | numpy                        |     1.21.5 | pypi_0            | pypi        |    |                                         |
+    | oauthlib                     |      3.1.1 | pypi_0            | pypi        |    |                                         |
+    | openssl                      |     1.1.1l | h7f8727e_0        |             |    |                                         |
+    | opt-einsum                   |      3.3.0 | pypi_0            | pypi        |    |                                         |
+    | packaging                    |       21.3 | pyhd3eb1b0_0      |             |    |                                         |
+    | pandas                       |      1.3.5 | pypi_0            | pypi        |    |                                         |
+    | pandocfilters                |      1.4.3 | py39h06a4308_1    |             |    |                                         |
+    | parso                        |      0.8.2 | pyhd3eb1b0_0      |             |    |                                         |
+    | pexpect                      |      4.8.0 | pyhd3eb1b0_3      |             |    |                                         |
+    | pickleshare                  |      0.7.5 | pyhd3eb1b0_1003   |             |    |                                         |
+    | pillow                       |      8.4.0 | pypi_0            | pypi        |    |                                         |
+    | pip                          |     21.2.4 | py39h06a4308_0    |             |    |                                         |
+    | platformdirs                 |      2.4.1 | pypi_0            | pypi        |    |                                         |
+    | prometheus-flask-exporter    |     0.18.7 | pypi_0            | pypi        |    |                                         |
+    | prometheus_client            |     0.12.0 | pyhd3eb1b0_0      |             |    |                                         |
+    | prompt-toolkit               |     3.0.20 | pyhd3eb1b0_0      |             |    |                                         |
+    | protobuf                     |     3.19.1 | pypi_0            | pypi        |    |                                         |
+    | ptyprocess                   |      0.7.0 | pyhd3eb1b0_2      |             |    |                                         |
+    | pyasn1                       |      0.4.8 | pypi_0            | pypi        |    |                                         |
+    | pyasn1-modules               |      0.2.8 | pypi_0            | pypi        |    |                                         |
+    | pycodestyle                  |      2.8.0 | pypi_0            | pypi        |    |                                         |
+    | pycparser                    |       2.21 | pyhd3eb1b0_0      |             |    |                                         |
+    | pydot                        |      1.4.2 | pypi_0            | pypi        |    |                                         |
+    | pyflakes                     |      2.4.0 | pypi_0            | pypi        |    |                                         |
+    | pygments                     |     2.10.0 | pyhd3eb1b0_0      |             |    |                                         |
+    | pylint                       |     2.12.2 | pypi_0            | pypi        |    |                                         |
+    | pyopenssl                    |     21.0.0 | pyhd3eb1b0_1      |             |    |                                         |
+    | pyparsing                    |      3.0.4 | pyhd3eb1b0_0      |             |    |                                         |
+    | pyright                      |     0.0.13 | pypi_0            | pypi        |    |                                         |
+    | pyrsistent                   |     0.18.0 | py39heee7806_0    |             |    |                                         |
+    | pysocks                      |      1.7.1 | py39h06a4308_0    |             |    |                                         |
+    | python                       |      3.9.7 | h12debd9_1        |             |    |                                         |
+    | python-dateutil              |      2.8.2 | pyhd3eb1b0_0      |             |    |                                         |
+    | python-editor                |      1.0.4 | pypi_0            | pypi        |    |                                         |
+    | pytz                         |     2021.3 | pyhd3eb1b0_0      |             |    |                                         |
+    | pyyaml                       |        6.0 | pypi_0            | pypi        |    |                                         |
+    | pyzmq                        |     22.3.0 | py39h295c915_2    |             |    |                                         |
+    | querystring-parser           |      1.2.4 | pypi_0            | pypi        |    |                                         |
+    | readline                     |        8.1 | h27cfd23_0        |             |    |                                         |
+    | requests                     |     2.26.0 | pyhd3eb1b0_0      |             |    |                                         |
+    | requests-oauthlib            |      1.3.0 | pypi_0            | pypi        |    |                                         |
+    | rsa                          |        4.8 | pypi_0            | pypi        |    |                                         |
+    | scikit-learn                 |      1.0.2 | pypi_0            | pypi        |    |                                         |
+    | scipy                        |      1.7.3 | pypi_0            | pypi        |    |                                         |
+    | seaborn                      |     0.11.2 | pypi_0            | pypi        |    |                                         |
+    | send2trash                   |      1.8.0 | pyhd3eb1b0_1      |             |    |                                         |
+    | setuptools                   |     58.0.4 | py39h06a4308_0    |             |    |                                         |
+    | six                          |     1.16.0 | pyhd3eb1b0_0      |             |    |                                         |
+    | smmap                        |      5.0.0 | pypi_0            | pypi        |    |                                         |
+    | sniffio                      |      1.2.0 | py39h06a4308_1    |             |    |                                         |
+    | sqlalchemy                   |     1.4.29 | pypi_0            | pypi        |    |                                         |
+    | sqlite                       |     3.37.0 | hc218d9a_0        |             |    |                                         |
+    | sqlparse                     |      0.4.2 | pypi_0            | pypi        |    |                                         |
+    | tabulate                     |      0.8.9 | pypi_0            | pypi        |    |                                         |
+    | tensorboard                  |      2.7.0 | pypi_0            | pypi        |    |                                         |
+    | tensorboard-data-server      |      0.6.1 | pypi_0            | pypi        |    |                                         |
+    | tensorboard-plugin-wit       |      1.8.0 | pypi_0            | pypi        |    |                                         |
+    | tensorflow                   |      2.7.0 | pypi_0            | pypi        |    |                                         |
+    | tensorflow-estimator         |      2.7.0 | pypi_0            | pypi        |    |                                         |
+    | tensorflow-io-gcs-filesystem |     0.23.1 | pypi_0            | pypi        |    |                                         |
+    | termcolor                    |      1.1.0 | pypi_0            | pypi        |    |                                         |
+    | terminado                    |      0.9.4 | py39h06a4308_0    |             |    |                                         |
+    | testpath                     |      0.5.0 | pyhd3eb1b0_0      |             |    |                                         |
+    | threadpoolctl                |      3.0.0 | pypi_0            | pypi        |    |                                         |
+    | tk                           |     8.6.11 | h1ccaba5_0        |             |    |                                         |
+    | toml                         |     0.10.2 | pypi_0            | pypi        |    |                                         |
+    | tomli                        |      2.0.0 | pypi_0            | pypi        |    |                                         |
+    | tornado                      |        6.1 | py39h27cfd23_0    |             |    |                                         |
+    | traitlets                    |      5.1.1 | pyhd3eb1b0_0      |             |    |                                         |
+    | typing-extensions            |      4.0.1 | pypi_0            | pypi        |    |                                         |
+    | tzdata                       |      2021e | hda174b7_0        |             |    |                                         |
+    | uncertainties                |      3.1.6 | pypi_0            | pypi        |    |                                         |
+    | urllib3                      |     1.26.7 | pyhd3eb1b0_0      |             |    |                                         |
+    | wcwidth                      |      0.2.5 | pyhd3eb1b0_0      |             |    |                                         |
+    | webencodings                 |      0.5.1 | py39h06a4308_1    |             |    |                                         |
+    | websocket-client             |      1.2.3 | pypi_0            | pypi        |    |                                         |
+    | werkzeug                     |      2.0.2 | pypi_0            | pypi        |    |                                         |
+    | wheel                        |     0.37.0 | pyhd3eb1b0_1      |             |    |                                         |
+    | wrapt                        |     1.13.3 | pypi_0            | pypi        |    |                                         |
+    | xz                           |      5.2.5 | h7b6447c_0        |             |    |                                         |
+    | zeromq                       |      4.3.4 | h2531618_0        |             |    |                                         |
+    | zipp                         |      3.6.0 | pyhd3eb1b0_0      |             |    |                                         |
+    | zlib                         |     1.2.11 | h7f8727e_4        |             |    |                                         |
+
+**** test model plotting
+    :PROPERTIES:
+    :header-args:jupyter-python: :session /jpy:localhost#8888:a37e524a-8134-4d8f-b24a-367acaf1bdd3
+    :END:
+
+    #+BEGIN_SRC jupyter-python
+      %cd ~/Programme/drmed-git
+    #+END_SRC
+
+    #+RESULTS:
+    : /home/lex/Programme/drmed-git
+
+    #+BEGIN_SRC jupyter-python
+      import sys
+      import tensorflow as tf
+      from mlflow.keras import load_model
+      from pathlib import Path
+
+      FLUOTRACIFY_PATH = '/home/lex/Programme/drmed-git/src/'
+      sys.path.append(FLUOTRACIFY_PATH)
+      from fluotracify.training import build_model as bm
+    #+END_SRC
+
+    #+RESULTS:
+
+    #+BEGIN_SRC jupyter-python
+      logged_model = Path('/home/lex/Programme/drmed-git/data/mlruns/9/0b8b33776db348d188c8354b6811606e/artifacts/model')
+      output_dir = Path('./data/exp-220222-test/jupyter')
+      loaded_model = load_model(logged_model, compile=False)
+      loaded_model_runid = logged_model / 'MLmodel'
+      loaded_model_runid = !cat $loaded_model_runid | grep run_id
+      loaded_model_runid = loaded_model_runid[0].strip('run_id: ')
+      loaded_model.compile(loss=bm.binary_ce_dice_loss(),
+                           optimizer=tf.keras.optimizers.Adam(),
+                           metrics = bm.unet_metrics([0.1, 0.3, 0.5, 0.7, 0.9]))
+      tf.keras.utils.plot_model(loaded_model, to_file=output_dir / f'plot-arch-{loaded_model_runid}.pdf',
+                                show_shapes=True, show_layer_names=True,
+                                show_dtype=False, rankdir='TB')
+    #+END_SRC
+
+    #+RESULTS:
+    : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
+    : 2022-02-28 17:22:50,180 - build model -  Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
+
+
+    #+BEGIN_SRC jupyter-python
+      logged_model_info = Path('/home/lex/Programme/drmed-git/data/mlruns/9/0b8b33776db348d188c8354b6811606e/artifacts/model/MLmodel')
+      test = !cat $logged_model_info | grep run_id
+      test[0].strip('run_id: ')
+    #+END_SRC
+
+    #+RESULTS:
+    : 0b8b33776db348d188c8354b6811606e
 
 ** TODOs
 *** TODO super cool way of presenting work:https://stanfordmlgroup.github.io/projects/ecg/
@@ -17190,8 +17506,6 @@ CLOSED: [2022-02-26 Sa 22:13]
   tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:30] Cannot dlopen some
   TensorRT libraries. If you would like to use Nvidia GPU with TensorRT, please
   make sure the missing libraries mentioned above are installed properly
-*** TODO fix pydot and graphviz to make model plotting work
-
 *** PENDING Fix isort and sys.path conflicts
     - State "PENDING"    from "TODO"       [2020-05-02 Sa 13:06] \\
       Waiting for isort 5.0.0 release
