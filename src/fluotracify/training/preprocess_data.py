@@ -206,8 +206,10 @@ def scale_trace(trace, scaler):
             output_distribution='normal').fit_transform(trace)
     elif scaler == tf.convert_to_tensor('minmax'):
         trace = MinMaxScaler().fit_transform(trace)
-    elif scaler in (tf.convert_to_tensor('l1'), tf.convert_to_tensor('l2')):
-        trace = normalize(X=trace, norm=scaler, axis=0)
+    elif scaler == tf.convert_to_tensor('l1'):
+        trace = normalize(X=trace, norm='l1', axis=0)
+    elif scaler == tf.convert_to_tensor('l2'):
+        trace = normalize(X=trace, norm='l2', axis=0)
     else:
         raise ValueError(
             'scaler has to be a string. currently supported are:'
