@@ -63,7 +63,7 @@ def tfds_from_pddf(features_df, labels_df, frac_val=None):
     if frac_val in (0, 1, True, False, None):
         # if we create a test dataset: no validation set, no shuffling
         dataset = tf.data.Dataset.from_tensor_slices((X_tensor, y_tensor))
-        dataset = dataset.map(tfds_replace_nan)
+        dataset = dataset.map(tfds_replace_nan_in_traces_and_labels)
 
         log.debug('number of examples: %s', num_total_examples)
         out = (dataset, num_total_examples)
@@ -73,7 +73,7 @@ def tfds_from_pddf(features_df, labels_df, frac_val=None):
         num_train_examples = num_total_examples - num_val_examples
 
         dataset = tf.data.Dataset.from_tensor_slices((X_tensor, y_tensor))
-        dataset = dataset.map(tfds_replace_nan)
+        dataset = dataset.map(tfds_replace_nan_in_traces_and_labels)
         dataset_train = dataset.take(num_train_examples)
         dataset_val = dataset.skip(num_train_examples)
 
@@ -94,24 +94,24 @@ def convert_to_tfds_for_unet(trace):
     num_total_examples = trace.shape[0]
     trace = tf.reshape(tensor=trace, shape=(num_total_examples, -1, 1))
     dataset = tf.data.Dataset.from_tensor_slices(trace)
-    dataset = dataset.map(replace_nan)
+    dataset = dataset.map(tfds_replace_nan)
     return dataset
 
 
-def tfds_replace_nan(trace, label):
+def tfds_replace_nan_in_traces_and_labels(trace, label):
     """Part of tf.data pipeline. Replaces nan values with zeros"""
     trace = tf.where(tf.math.is_nan(trace), tf.zeros_like(trace), trace)
     label = tf.where(tf.math.is_nan(label), tf.zeros_like(label), label)
     return trace, label
 
 
-def replace_nan(trace):
+def tfds_replace_nan(trace):
     """Replaces nan values with zeros"""
     trace = tf.where(tf.math.is_nan(trace), tf.zeros_like(trace), trace)
     return trace
 
 
-def tfds_crop_trace(trace, label, length_delimiter):
+def tfds_crop_trace_and_labels(trace, label, length_delimiter):
     """Part of tf.data pipeline. Crop trace and label to a maximum length of
     length_delimiter
     """
@@ -124,7 +124,7 @@ def tfds_crop_trace(trace, label, length_delimiter):
     return trace, label
 
 
-def crop_trace(trace, length_delimiter):
+def tfds_crop_trace(trace, length_delimiter):
     """Crop trace and label to a maximum length of length_delimiter """
     trace = trace[:length_delimiter]
     trace_shape = trace.shape
@@ -132,7 +132,7 @@ def crop_trace(trace, length_delimiter):
     return trace
 
 
-def tfds_pad_trace(trace, label):
+def tfds_pad_trace_and_label(trace, label):
     """Part of tf.data pipeline. Pad the end of the trace with the
     median of the trace. Set the label for this pad to 0 (no artifact)
 
@@ -159,7 +159,7 @@ def tfds_pad_trace(trace, label):
     return trace, label
 
 
-def pad_trace(trace, is_label=False):
+def tfds_pad_trace(trace, is_label=False):
     """Pad an arbitrary trace with a median up to a length of the next biggest
     power of 2.
 
@@ -206,7 +206,7 @@ def _get_pad_size_and_value(trace):
     return pad_size, pad_value
 
 
-def tfds_scale_trace(trace, label, scaler):
+def tfds_scale_trace_and_label(trace, label, scaler):
     """Part of tf.data pipeline. Wrapper function to be able to .map()
     scale_trace()
     """
@@ -216,6 +216,18 @@ def tfds_scale_trace(trace, label, scaler):
                                Tout=[tf.float32])
     trace.set_shape(trace_shape)
     return trace, label
+
+
+def tfds_scale_trace(trace, scaler):
+    """Part of tf.data pipeline. Wrapper function to be able to .map()
+    scale_trace()
+    """
+    trace_shape = trace.shape
+    [trace, ] = tf.py_function(func=scale_trace,
+                               inp=[trace, scaler],
+                               Tout=[tf.float32])
+    trace.set_shape(trace_shape)
+    return trace
 
 
 def scale_trace(trace, scaler):
