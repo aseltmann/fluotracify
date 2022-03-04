@@ -105,8 +105,7 @@ def import_from_csv(folder,
                                        index_col=0,
                                        usecols=[0, 1],
                                        skipfooter=len(raw_dataset),
-                                       squeeze=True,
-                                       engine='python')
+                                       engine='python').squeeze('columns')
         experiment_params = pd.concat([experiment_params, experiment_param],
                                       axis=1,
                                       ignore_index=True,
