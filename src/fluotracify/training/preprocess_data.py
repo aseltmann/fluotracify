@@ -7,23 +7,15 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import tensorflow as tf
+import tensorflow.experimental.numpy as tnp
+import sklearn.preprocessing as skp
 
-from sklearn.preprocessing import (
-    MaxAbsScaler,
-    MinMaxScaler,
-    Normalizer,
-    PowerTransformer,
-    QuantileTransformer,
-    RobustScaler,
-    StandardScaler,
-    normalize,
-)
 
 logging.basicConfig(format='%(asctime)s - preprocess - %(message)s')
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 # fix a problem with tf.experimental.numpy
-tf.experimental.numpy.experimental_enable_numpy_behavior(prefer_float32=False)
+tnp.experimental_enable_numpy_behavior(prefer_float32=False)
 
 
 def tfds_from_pddf(features_df, labels_df, frac_val=None):
@@ -71,7 +63,7 @@ def tfds_from_pddf(features_df, labels_df, frac_val=None):
     if frac_val in (0, 1, True, False, None):
         # if we create a test dataset: no validation set, no shuffling
         dataset = tf.data.Dataset.from_tensor_slices((X_tensor, y_tensor))
-        dataset = dataset.map(replace_nan)
+        dataset = dataset.map(tfds_replace_nan)
 
         log.debug('number of examples: %s', num_total_examples)
         out = (dataset, num_total_examples)
@@ -81,7 +73,7 @@ def tfds_from_pddf(features_df, labels_df, frac_val=None):
         num_train_examples = num_total_examples - num_val_examples
 
         dataset = tf.data.Dataset.from_tensor_slices((X_tensor, y_tensor))
-        dataset = dataset.map(replace_nan)
+        dataset = dataset.map(tfds_replace_nan)
         dataset_train = dataset.take(num_train_examples)
         dataset_val = dataset.skip(num_train_examples)
 
@@ -96,14 +88,30 @@ def tfds_from_pddf(features_df, labels_df, frac_val=None):
     return out
 
 
-def replace_nan(trace, label):
+def convert_to_tfds_for_unet(trace):
+    trace = tf.convert_to_tensor(value=trace, dtype=tf.float32)
+    trace = tf.transpose(a=trace, perm=[1, 0])
+    num_total_examples = trace.shape[0]
+    trace = tf.reshape(tensor=trace, shape=(num_total_examples, -1, 1))
+    dataset = tf.data.Dataset.from_tensor_slices(trace)
+    dataset = dataset.map(replace_nan)
+    return dataset
+
+
+def tfds_replace_nan(trace, label):
     """Part of tf.data pipeline. Replaces nan values with zeros"""
     trace = tf.where(tf.math.is_nan(trace), tf.zeros_like(trace), trace)
     label = tf.where(tf.math.is_nan(label), tf.zeros_like(label), label)
     return trace, label
 
 
-def tf_crop_trace(trace, label, length_delimiter):
+def replace_nan(trace):
+    """Replaces nan values with zeros"""
+    trace = tf.where(tf.math.is_nan(trace), tf.zeros_like(trace), trace)
+    return trace
+
+
+def tfds_crop_trace(trace, label, length_delimiter):
     """Part of tf.data pipeline. Crop trace and label to a maximum length of
     length_delimiter
     """
@@ -116,7 +124,15 @@ def tf_crop_trace(trace, label, length_delimiter):
     return trace, label
 
 
-def tf_pad_trace(trace, label):
+def crop_trace(trace, length_delimiter):
+    """Crop trace and label to a maximum length of length_delimiter """
+    trace = trace[:length_delimiter]
+    trace_shape = trace.shape
+    trace.set_shape(trace_shape)
+    return trace
+
+
+def tfds_pad_trace(trace, label):
     """Part of tf.data pipeline. Pad the end of the trace with the
     median of the trace. Set the label for this pad to 0 (no artifact)
 
@@ -128,6 +144,48 @@ def tf_pad_trace(trace, label):
     - that's why an own pure tf implementation of a median is used (see
     https://stackoverflow.com/questions/43824665/tensorflow-median-value)
     """
+    pad_size, pad_median = _get_pad_size_and_value(trace)
+    trace = tnp.pad(trace, pad_width=[[0, pad_size], [0, 0]],
+                    mode='constant',
+                    constant_values=pad_median)
+    label = tnp.pad(label, pad_width=[[0, pad_size], [0, 0]],
+                    mode='constant',
+                    constant_values=0)
+
+    trace_shape = trace.shape
+    label_shape = label.shape
+    trace.set_shape(trace_shape)
+    label.set_shape(label_shape)
+    return trace, label
+
+
+def pad_trace(trace, is_label=False):
+    """Pad an arbitrary trace with a median up to a length of the next biggest
+    power of 2.
+
+    Parameters
+    ----------
+    trace : tf.Tensor or np.array
+    is_label : bool
+        if True, pad with zeros at the end. If False, pad with median.
+    """
+    pad_size, pad_median = _get_pad_size_and_value(trace)
+    if is_label:
+        trace = tnp.pad(trace, pad_width=[[0, pad_size], [0, 0]],
+                        mode='constant',
+                        constant_values=0)
+    else:
+        trace = tnp.pad(trace, pad_width=[[0, pad_size], [0, 0]],
+                        mode='constant',
+                        constant_values=pad_median)
+
+    trace_shape = trace.shape
+    trace.set_shape(trace_shape)
+    return trace
+
+
+def _get_pad_size_and_value(trace):
+    """Get pad size and pad value. """
     def get_median(v):
         v = tf.reshape(v, [-1])
         mid = v.get_shape()[0] // 2 + 1
@@ -139,29 +197,16 @@ def tf_pad_trace(trace, label):
     else:
         # new size is the next biggest power of 2 → this is important for the
         # skip connections of the UNET
-        input_size = 2**tf.experimental.numpy.ceil(
-            tf.experimental.numpy.log2(trace_size))
+        input_size = 2**tnp.ceil(tnp.log2(trace_size))
     input_size = tf.cast(input_size, tf.int32)
     pad_size = input_size - trace_size
 
     # pad trace
-    pad_median = get_median(trace)
-    trace = tf.experimental.numpy.pad(trace, pad_width=[[0, pad_size], [0, 0]],
-                                      mode='constant',
-                                      constant_values=pad_median)
-    # pad label
-    label = tf.experimental.numpy.pad(label, pad_width=[[0, pad_size], [0, 0]],
-                                      mode='constant',
-                                      constant_values=0)
-
-    trace_shape = trace.shape
-    label_shape = label.shape
-    trace.set_shape(trace_shape)
-    label.set_shape(label_shape)
-    return trace, label
+    pad_value = get_median(trace)
+    return pad_size, pad_value
 
 
-def tf_scale_trace(trace, label, scaler):
+def tfds_scale_trace(trace, label, scaler):
     """Part of tf.data pipeline. Wrapper function to be able to .map()
     scale_trace()
     """
@@ -196,20 +241,20 @@ def scale_trace(trace, scaler):
     """
     scaler = tf.convert_to_tensor(scaler)
     if scaler == tf.convert_to_tensor('standard'):
-        trace = StandardScaler().fit_transform(trace)
+        trace = skp.StandardScaler().fit_transform(trace)
     elif scaler == tf.convert_to_tensor('robust'):
-        trace = RobustScaler(quantile_range=(25, 75)).fit_transform(trace)
+        trace = skp.RobustScaler(quantile_range=(25, 75)).fit_transform(trace)
     elif scaler == tf.convert_to_tensor('maxabs'):
-        trace = MaxAbsScaler().fit_transform(trace)
+        trace = skp.MaxAbsScaler().fit_transform(trace)
     elif scaler == tf.convert_to_tensor('quant_g'):
-        trace = QuantileTransformer(
+        trace = skp.QuantileTransformer(
             output_distribution='normal').fit_transform(trace)
     elif scaler == tf.convert_to_tensor('minmax'):
-        trace = MinMaxScaler().fit_transform(trace)
+        trace = skp.MinMaxScaler().fit_transform(trace)
     elif scaler == tf.convert_to_tensor('l1'):
-        trace = normalize(X=trace, norm='l1', axis=0)
+        trace = skp.normalize(X=trace, norm='l1', axis=0)
     elif scaler == tf.convert_to_tensor('l2'):
-        trace = normalize(X=trace, norm='l2', axis=0)
+        trace = skp.normalize(X=trace, norm='l2', axis=0)
     else:
         raise ValueError(
             'scaler has to be a string. currently supported are:'
@@ -764,15 +809,17 @@ def make_distributions(X, transpose=False):
         X_ind = X.index
         X_col = X.columns
 
-    scaler_stand = StandardScaler().fit(X)
-    scaler_minmax = MinMaxScaler().fit(X)
-    scaler_maxabs = MaxAbsScaler().fit(X)
-    scaler_robust = RobustScaler(quantile_range=(25, 75)).fit(X)
-    scaler_powerb = PowerTransformer(method='box-cox').fit(X)
-    scaler_powery = PowerTransformer(method='yeo-johnson').fit(X)
+    scaler_stand = skp.StandardScaler().fit(X)
+    scaler_minmax = skp.MinMaxScaler().fit(X)
+    scaler_maxabs = skp.MaxAbsScaler().fit(X)
+    scaler_robust = skp.RobustScaler(quantile_range=(25, 75)).fit(X)
+    scaler_powerb = skp.PowerTransformer(method='box-cox').fit(X)
+    scaler_powery = skp.PowerTransformer(method='yeo-johnson').fit(X)
     scaler_powery.lambdas_ = scaler_powerb.lambdas_
-    scaler_quantu = QuantileTransformer(output_distribution='uniform').fit(X)
-    scaler_quantn = QuantileTransformer(output_distribution='normal').fit(X)
+    scaler_quantu = skp.QuantileTransformer(
+        output_distribution='uniform').fit(X)
+    scaler_quantn = skp.QuantileTransformer(
+        output_distribution='normal').fit(X)
 
     distributions = [
         ('Unscaled data', pd.DataFrame(X, columns=X_col, index=X_ind), np.nan),
@@ -802,15 +849,15 @@ def make_distributions(X, transpose=False):
          pd.DataFrame(scaler_quantn.transform(X), columns=X_col,
                       index=X_ind), scaler_quantn),
         ('Data after sample-wise L2 normalizing',
-         pd.DataFrame(Normalizer(norm='l2').transform(X.T),
+         pd.DataFrame(skp.Normalizer(norm='l2').transform(X.T),
                       columns=X_ind,
                       index=X_col).T, np.nan),
         ('Data after sample-wise L1 normalizing',
-         pd.DataFrame(Normalizer(norm='l1').transform(X.T),
+         pd.DataFrame(skp.Normalizer(norm='l1').transform(X.T),
                       columns=X_ind,
                       index=X_col).T, np.nan),
         ('Data after maximum rescaling',
-         pd.DataFrame(Normalizer(norm='max').transform(X.T),
+         pd.DataFrame(skp.Normalizer(norm='max').transform(X.T),
                       columns=X_ind,
                       index=X_col).T, np.nan)
     ]
