@@ -508,3 +508,570 @@
 **** 2020-03-30
     - set up lab book and form git repo accoring to setup by Luka Stanisic et al
 *** Changes in src/fluotracify
+* Data
+** exp-220316-publication1
+*** Setup: Jupyter on local computer
+   :PROPERTIES:
+   :header-args:jupyter-python: :session /jpy:localhost#8888:a37e524a-8134-4d8f-b24a-367acaf1bdd3
+   :END:
+   1. let's start a conda environment in the sh session local and start
+      jupterlab there.
+      #+begin_src sh :session local
+        conda activate tf
+        jupyter lab --no-browser --port=8888
+      #+end_src
+
+      #+begin_example
+        sh-5.1$ [I 2022-03-16 15:03:56.359 ServerApp] jupyterlab | extension was successfully linked.
+        [I 2022-03-16 15:03:56.565 ServerApp] nbclassic | extension was successfully linked.
+        [I 2022-03-16 15:03:56.604 LabApp] JupyterLab extension loaded from /home/lex/Programme/miniconda3/envs/tf/lib/python3.9/site-packages/jupyterlab
+        [I 2022-03-16 15:03:56.604 LabApp] JupyterLab application directory is /home/lex/Programme/miniconda3/envs/tf/share/jupyter/lab
+        [I 2022-03-16 15:03:56.608 ServerApp] jupyterlab | extension was successfully loaded.
+        [I 2022-03-16 15:03:56.615 ServerApp] nbclassic | extension was successfully loaded.
+        [I 2022-03-16 15:03:56.615 ServerApp] Serving notebooks from local directory: /home/lex/Programme/drmed-git
+        [I 2022-03-16 15:03:56.615 ServerApp] Jupyter Server 1.4.1 is running at:
+        [I 2022-03-16 15:03:56.615 ServerApp] http://localhost:8888/lab?token=19554a9e5e286f799f4ebeb592d24f1210f639d786d16d8e
+        [I 2022-03-16 15:03:56.615 ServerApp]  or http://127.0.0.1:8888/lab?token=19554a9e5e286f799f4ebeb592d24f1210f639d786d16d8e
+        [I 2022-03-16 15:03:56.615 ServerApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+        [C 2022-03-16 15:03:56.619 ServerApp]
+
+            To access the server, open this file in a browser:
+                file:///home/lex/.local/share/jupyter/runtime/jpserver-172531-open.html
+            Or copy and paste one of these URLs:
+                http://localhost:8888/lab?token=19554a9e5e286f799f4ebeb592d24f1210f639d786d16d8e
+             or http://127.0.0.1:8888/lab?token=19554a9e5e286f799f4ebeb592d24f1210f639d786d16d8e
+
+      #+end_example
+
+   2. I started a Python3 kernel using =jupyter-server-list-kernels=. Then I
+      added the kernel ID to the =:PROPERTIES:= drawer of this (and following)
+      subtrees.
+
+      #+begin_example
+      python3           03038b73-b2b5-49ce-a1dc-21afb6247d0f   a few seconds ago    starting   0
+      #+end_example
+
+   3. Test: (~#+CALL: jp-metadata(_long='True)~)
+      #+CALL: jp-metadata(_long='True)
+
+      #+RESULTS:
+      :RESULTS:
+      #+begin_example
+        No of CPUs in system: 4
+        No of CPUs the current process can use: 4
+        load average: (0.54, 0.96, 0.87)
+        os.uname():  posix.uname_result(sysname='Linux', nodename='Topialex', release='5.13.19-2-MANJARO', version='#1 SMP PREEMPT Sun Sep 19 21:31:53 UTC 2021', machine='x86_64')
+        PID of process: 173537
+        RAM total: 16Gi, RAM used: 2,7Gi, RAM free: 8,9Gi
+        the current directory: /home/lex/Programme/drmed-git
+        My disk usage:
+        Filesystem      Size  Used Avail Use% Mounted on
+        dev             3,9G     0  3,9G   0% /dev
+        run             3,9G  1,5M  3,9G   1% /run
+        /dev/sda2       167G  127G   32G  81% /
+        tmpfs           3,9G  115M  3,8G   3% /dev/shm
+        tmpfs           3,9G  7,8M  3,9G   1% /tmp
+        /dev/sda1       300M  264K  300M   1% /boot/efi
+        tmpfs           784M  104K  784M   1% /run/user/1000# packages in environment at /home/lex/Programme/miniconda3/envs/tf:
+        #
+        # Name                    Version                   Build  Channel
+        _libgcc_mutex             0.1                        main
+        _openmp_mutex             4.5                       1_gnu
+        absl-py                   1.0.0                    pypi_0    pypi
+        alembic                   1.4.1                    pypi_0    pypi
+        anyio                     2.2.0            py39h06a4308_1
+        argon2-cffi               20.1.0           py39h27cfd23_1
+        asteval                   0.9.25                   pypi_0    pypi
+        astroid                   2.9.2                    pypi_0    pypi
+        astunparse                1.6.3                    pypi_0    pypi
+        async_generator           1.10               pyhd3eb1b0_0
+        attrs                     21.2.0             pyhd3eb1b0_0
+        babel                     2.9.1              pyhd3eb1b0_0
+        backcall                  0.2.0              pyhd3eb1b0_0
+        bleach                    4.0.0              pyhd3eb1b0_0
+        brotlipy                  0.7.0           py39h27cfd23_1003
+        ca-certificates           2021.10.26           h06a4308_2
+        cachetools                4.2.4                    pypi_0    pypi
+        certifi                   2021.10.8        py39h06a4308_0
+        cffi                      1.14.6           py39h400218f_0
+        charset-normalizer        2.0.4              pyhd3eb1b0_0
+        click                     8.0.3                    pypi_0    pypi
+        cloudpickle               2.0.0                    pypi_0    pypi
+        cryptography              36.0.0           py39h9ce1e76_0
+        cycler                    0.11.0                   pypi_0    pypi
+        cython                    0.29.26                  pypi_0    pypi
+        databricks-cli            0.16.2                   pypi_0    pypi
+        debugpy                   1.5.1            py39h295c915_0
+        decorator                 5.1.0              pyhd3eb1b0_0
+        defusedxml                0.7.1              pyhd3eb1b0_0
+        docker                    5.0.3                    pypi_0    pypi
+        entrypoints               0.3              py39h06a4308_0
+        fcsfiles                  2021.6.6                 pypi_0    pypi
+        flake8                    4.0.1                    pypi_0    pypi
+        flask                     2.0.2                    pypi_0    pypi
+        flatbuffers               2.0                      pypi_0    pypi
+        focuspoint                0.1                      pypi_0    pypi
+        fonttools                 4.28.5                   pypi_0    pypi
+        future                    0.18.2                   pypi_0    pypi
+        gast                      0.4.0                    pypi_0    pypi
+        gitdb                     4.0.9                    pypi_0    pypi
+        gitpython                 3.1.24                   pypi_0    pypi
+        google-auth               2.3.3                    pypi_0    pypi
+        google-auth-oauthlib      0.4.6                    pypi_0    pypi
+        google-pasta              0.2.0                    pypi_0    pypi
+        greenlet                  1.1.2                    pypi_0    pypi
+        grpcio                    1.43.0                   pypi_0    pypi
+        gunicorn                  20.1.0                   pypi_0    pypi
+        h5py                      3.6.0                    pypi_0    pypi
+        idna                      3.3                pyhd3eb1b0_0
+        importlib-metadata        4.8.2            py39h06a4308_0
+        importlib_metadata        4.8.2                hd3eb1b0_0
+        ipykernel                 6.4.1            py39h06a4308_1
+        ipython                   7.29.0           py39hb070fc8_0
+        ipython_genutils          0.2.0              pyhd3eb1b0_1
+        isort                     5.10.1                   pypi_0    pypi
+        itsdangerous              2.0.1                    pypi_0    pypi
+        jedi                      0.18.0           py39h06a4308_1
+        jinja2                    3.0.2              pyhd3eb1b0_0
+        joblib                    1.1.0                    pypi_0    pypi
+        json5                     0.9.6              pyhd3eb1b0_0
+        jsonschema                3.2.0              pyhd3eb1b0_2
+        jupyter_client            7.1.0              pyhd3eb1b0_0
+        jupyter_core              4.9.1            py39h06a4308_0
+        jupyter_server            1.4.1            py39h06a4308_0
+        jupyterlab                3.2.1              pyhd3eb1b0_1
+        jupyterlab_pygments       0.1.2                      py_0
+        jupyterlab_server         2.8.2              pyhd3eb1b0_0
+        keras                     2.7.0                    pypi_0    pypi
+        keras-preprocessing       1.1.2                    pypi_0    pypi
+        kiwisolver                1.3.2                    pypi_0    pypi
+        lazy-object-proxy         1.7.1                    pypi_0    pypi
+        ld_impl_linux-64          2.35.1               h7274673_9
+        libclang                  12.0.0                   pypi_0    pypi
+        libffi                    3.3                  he6710b0_2
+        libgcc-ng                 9.3.0               h5101ec6_17
+        libgomp                   9.3.0               h5101ec6_17
+        libsodium                 1.0.18               h7b6447c_0
+        libstdcxx-ng              9.3.0               hd4cf53a_17
+        lmfit                     1.0.3                    pypi_0    pypi
+        mako                      1.1.6                    pypi_0    pypi
+        markdown                  3.3.6                    pypi_0    pypi
+        markupsafe                2.0.1            py39h27cfd23_0
+        matplotlib                3.5.1                    pypi_0    pypi
+        matplotlib-inline         0.1.2              pyhd3eb1b0_2
+        mccabe                    0.6.1                    pypi_0    pypi
+        mistune                   0.8.4           py39h27cfd23_1000
+        mlflow                    1.22.0                   pypi_0    pypi
+        multipletau               0.3.3                    pypi_0    pypi
+        mypy                      0.930                    pypi_0    pypi
+        mypy-extensions           0.4.3                    pypi_0    pypi
+        nbclassic                 0.2.6              pyhd3eb1b0_0
+        nbclient                  0.5.3              pyhd3eb1b0_0
+        nbconvert                 6.1.0            py39h06a4308_0
+        nbformat                  5.1.3              pyhd3eb1b0_0
+        ncurses                   6.3                  h7f8727e_2
+        nest-asyncio              1.5.1              pyhd3eb1b0_0
+        nodeenv                   1.6.0                    pypi_0    pypi
+        notebook                  6.4.6            py39h06a4308_0
+        numpy                     1.21.5                   pypi_0    pypi
+        oauthlib                  3.1.1                    pypi_0    pypi
+        openssl                   1.1.1l               h7f8727e_0
+        opt-einsum                3.3.0                    pypi_0    pypi
+        packaging                 21.3               pyhd3eb1b0_0
+        pandas                    1.3.5                    pypi_0    pypi
+        pandocfilters             1.4.3            py39h06a4308_1
+        parso                     0.8.2              pyhd3eb1b0_0
+        pexpect                   4.8.0              pyhd3eb1b0_3
+        pickleshare               0.7.5           pyhd3eb1b0_1003
+        pillow                    8.4.0                    pypi_0    pypi
+        pip                       21.2.4           py39h06a4308_0
+        platformdirs              2.4.1                    pypi_0    pypi
+        prometheus-flask-exporter 0.18.7                   pypi_0    pypi
+        prometheus_client         0.12.0             pyhd3eb1b0_0
+        prompt-toolkit            3.0.20             pyhd3eb1b0_0
+        protobuf                  3.19.1                   pypi_0    pypi
+        ptyprocess                0.7.0              pyhd3eb1b0_2
+        pyasn1                    0.4.8                    pypi_0    pypi
+        pyasn1-modules            0.2.8                    pypi_0    pypi
+        pycodestyle               2.8.0                    pypi_0    pypi
+        pycparser                 2.21               pyhd3eb1b0_0
+        pydot                     1.4.2                    pypi_0    pypi
+        pyflakes                  2.4.0                    pypi_0    pypi
+        pygments                  2.10.0             pyhd3eb1b0_0
+        pylint                    2.12.2                   pypi_0    pypi
+        pyopenssl                 21.0.0             pyhd3eb1b0_1
+        pyparsing                 3.0.4              pyhd3eb1b0_0
+        pyright                   0.0.13                   pypi_0    pypi
+        pyrsistent                0.18.0           py39heee7806_0
+        pysocks                   1.7.1            py39h06a4308_0
+        python                    3.9.7                h12debd9_1
+        python-dateutil           2.8.2              pyhd3eb1b0_0
+        python-editor             1.0.4                    pypi_0    pypi
+        pytz                      2021.3             pyhd3eb1b0_0
+        pyyaml                    6.0                      pypi_0    pypi
+        pyzmq                     22.3.0           py39h295c915_2
+        querystring-parser        1.2.4                    pypi_0    pypi
+        readline                  8.1                  h27cfd23_0
+        requests                  2.26.0             pyhd3eb1b0_0
+        requests-oauthlib         1.3.0                    pypi_0    pypi
+        rsa                       4.8                      pypi_0    pypi
+        scikit-learn              1.0.2                    pypi_0    pypi
+        scipy                     1.7.3                    pypi_0    pypi
+        seaborn                   0.11.2                   pypi_0    pypi
+        send2trash                1.8.0              pyhd3eb1b0_1
+        setuptools                58.0.4           py39h06a4308_0
+        six                       1.16.0             pyhd3eb1b0_0
+        smmap                     5.0.0                    pypi_0    pypi
+        sniffio                   1.2.0            py39h06a4308_1
+        sqlalchemy                1.4.29                   pypi_0    pypi
+        sqlite                    3.37.0               hc218d9a_0
+        sqlparse                  0.4.2                    pypi_0    pypi
+        tabulate                  0.8.9                    pypi_0    pypi
+        tensorboard               2.7.0                    pypi_0    pypi
+        tensorboard-data-server   0.6.1                    pypi_0    pypi
+        tensorboard-plugin-wit    1.8.0                    pypi_0    pypi
+        tensorflow                2.7.0                    pypi_0    pypi
+        tensorflow-estimator      2.7.0                    pypi_0    pypi
+        tensorflow-io-gcs-filesystem 0.23.1                   pypi_0    pypi
+        termcolor                 1.1.0                    pypi_0    pypi
+        terminado                 0.9.4            py39h06a4308_0
+        testpath                  0.5.0              pyhd3eb1b0_0
+        threadpoolctl             3.0.0                    pypi_0    pypi
+        tk                        8.6.11               h1ccaba5_0
+        toml                      0.10.2                   pypi_0    pypi
+        tomli                     2.0.0                    pypi_0    pypi
+        tornado                   6.1              py39h27cfd23_0
+        traitlets                 5.1.1              pyhd3eb1b0_0
+        typing-extensions         4.0.1                    pypi_0    pypi
+        tzdata                    2021e                hda174b7_0
+        uncertainties             3.1.6                    pypi_0    pypi
+        urllib3                   1.26.7             pyhd3eb1b0_0
+        wcwidth                   0.2.5              pyhd3eb1b0_0
+        webencodings              0.5.1            py39h06a4308_1
+        websocket-client          1.2.3                    pypi_0    pypi
+        werkzeug                  2.0.2                    pypi_0    pypi
+        wheel                     0.37.0             pyhd3eb1b0_1
+        wrapt                     1.13.3                   pypi_0    pypi
+        xz                        5.2.5                h7b6447c_0
+        zeromq                    4.3.4                h2531618_0
+        zipp                      3.6.0              pyhd3eb1b0_0
+        zlib                      1.2.11               h7f8727e_4
+
+        Note: you may need to restart the kernel to use updated packages.
+        {'SHELL': '/bin/bash',
+         'SESSION_MANAGER': 'local/Topialex:@/tmp/.ICE-unix/982,unix/Topialex:/tmp/.ICE-unix/982',
+         'WINDOWID': '0',
+         'COLORTERM': 'truecolor',
+         'XDG_CONFIG_DIRS': '/home/lex/.config/kdedefaults:/etc/xdg',
+         'XDG_SESSION_PATH': '/org/freedesktop/DisplayManager/Session1',
+         'CONDA_EXE': '/home/lex/Programme/miniconda3/bin/conda',
+         '_CE_M': '',
+         'LANGUAGE': 'en_GB',
+         'TERMCAP': '',
+         'LC_ADDRESS': 'de_DE.UTF-8',
+         'LC_NAME': 'de_DE.UTF-8',
+         'INSIDE_EMACS': '27.2,comint',
+         'SHELL_SESSION_ID': '705160b4e8124043a99f47cc2610e9a5',
+         'DESKTOP_SESSION': 'plasma',
+         'LC_MONETARY': 'de_DE.UTF-8',
+         'GTK_RC_FILES': '/etc/gtk/gtkrc:/home/lex/.gtkrc:/home/lex/.config/gtkrc',
+         'XCURSOR_SIZE': '24',
+         'GTK_MODULES': 'canberra-gtk-module',
+         'XDG_SEAT': 'seat0',
+         'PWD': '/home/lex/Programme/drmed-git',
+         'XDG_SESSION_DESKTOP': 'KDE',
+         'LOGNAME': 'lex',
+         'XDG_SESSION_TYPE': 'x11',
+         'CONDA_PREFIX': '/home/lex/Programme/miniconda3/envs/tf',
+         'DSSI_PATH': '/home/lex/.dssi:/usr/lib/dssi:/usr/local/lib/dssi',
+         'SYSTEMD_EXEC_PID': '862',
+         'XAUTHORITY': '/home/lex/.Xauthority',
+         'MOTD_SHOWN': 'pam',
+         'GTK2_RC_FILES': '/etc/gtk-2.0/gtkrc:/home/lex/.gtkrc-2.0:/home/lex/.config/gtkrc-2.0',
+         'HOME': '/home/lex',
+         'LC_PAPER': 'de_DE.UTF-8',
+         'LANG': 'de_DE.UTF-8',
+         'VST_PATH': '/home/lex/.vst:/usr/lib/vst:/usr/local/lib/vst',
+         'XDG_CURRENT_DESKTOP': 'KDE',
+         'KONSOLE_DBUS_SERVICE': ':1.33',
+         'COLUMNS': '80',
+         'KONSOLE_DBUS_SESSION': '/Sessions/2',
+         'PROFILEHOME': '',
+         'CONDA_PROMPT_MODIFIER': '(tf) ',
+         'XDG_SEAT_PATH': '/org/freedesktop/DisplayManager/Seat0',
+         'KONSOLE_VERSION': '211202',
+         'KDE_SESSION_UID': '1000',
+         'XDG_SESSION_CLASS': 'user',
+         'LC_IDENTIFICATION': 'de_DE.UTF-8',
+         'TERM': 'xterm-color',
+         '_CE_CONDA': '',
+         'USER': 'lex',
+         'COLORFGBG': '15;0',
+         'CONDA_SHLVL': '2',
+         'KDE_SESSION_VERSION': '5',
+         'PAM_KWALLET5_LOGIN': '/run/user/1000/kwallet5.socket',
+         'DISPLAY': ':0',
+         'SHLVL': '2',
+         'LC_TELEPHONE': 'de_DE.UTF-8',
+         'LC_MEASUREMENT': 'de_DE.UTF-8',
+         'XDG_VTNR': '1',
+         'XDG_SESSION_ID': '2',
+         'QT_LINUX_ACCESSIBILITY_ALWAYS_ON': '1',
+         'CONDA_PYTHON_EXE': '/home/lex/Programme/miniconda3/bin/python',
+         'MOZ_PLUGIN_PATH': '/usr/lib/mozilla/plugins',
+         'XDG_RUNTIME_DIR': '/run/user/1000',
+         'CONDA_DEFAULT_ENV': 'tf',
+         'LC_TIME': 'de_DE.UTF-8',
+         'QT_AUTO_SCREEN_SCALE_FACTOR': '0',
+         'XCURSOR_THEME': 'breeze_cursors',
+         'XDG_DATA_DIRS': '/home/lex/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share:/usr/local/share:/usr/share:/var/lib/snapd/desktop',
+         'KDE_FULL_SESSION': 'true',
+         'BROWSER': 'vivaldi-stable',
+         'PATH': '/home/lex/Programme/miniconda3/envs/tf/bin:/home/lex/Programme/miniconda3/condabin:/home/lex/.local/bin:/bin:/usr/bin:/usr/local/bin:/usr/local/sbin:/usr/lib/jvm/default/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/var/lib/snapd/snap/bin:/home/lex/Programme/miniconda3/bin',
+         'DBUS_SESSION_BUS_ADDRESS': 'unix:path=/run/user/1000/bus',
+         'LV2_PATH': '/home/lex/.lv2:/usr/lib/lv2:/usr/local/lib/lv2',
+         'KDE_APPLICATIONS_AS_SCOPE': '1',
+         'MAIL': '/var/spool/mail/lex',
+         'CONDA_PREFIX_1': '/home/lex/Programme/miniconda3',
+         'LC_NUMERIC': 'de_DE.UTF-8',
+         'LADSPA_PATH': '/home/lex/.ladspa:/usr/lib/ladspa:/usr/local/lib/ladspa',
+         'CADENCE_AUTO_STARTED': 'true',
+         '_': '/home/lex/Programme/miniconda3/envs/tf/bin/jupyter',
+         'PYDEVD_USE_FRAME_EVAL': 'NO',
+         'JPY_PARENT_PID': '172531',
+         'CLICOLOR': '1',
+         'PAGER': 'cat',
+         'GIT_PAGER': 'cat',
+         'MPLBACKEND': 'module://matplotlib_inline.backend_inline'}
+      #+end_example
+      : 521f8643-09b8-47dd-af7d-7f663d754c25
+      :END:
+
+   4. Branch out git branch =exp-220316-publication1= from =main= (done via
+      magit) and make sure you are on the correct branch
+
+      #+begin_src sh :session local2
+        cd /home/lex/Programme/drmed-git
+        git status
+      #+end_src
+
+      #+RESULTS:
+      #+begin_example
+        sh-5.1$ cd /home/lex/Programme/drmed-git
+        sh-5.1$ git status
+        On branch exp-220316-publication1
+        Your branch is up to date with 'origin/exp-220316-publication1'.
+      #+end_example
+
+   5. Create experiment folder including the plot folder for jupyter plots
+      #+begin_src sh :session local2
+        mkdir -p ./data/exp-220316-publication1/jupyter
+      #+end_src
+
+      #+RESULTS:
+
+   6. set output directory for matplotlib plots in jupyter
+      #+begin_src emacs-lisp
+        (setq org-babel-jupyter-resource-directory "./data/exp-220316-publication1/jupyter")
+      #+end_src
+
+      #+RESULTS:
+      : ./data/exp-220316-publication1/jupyter
+
+   7.
+*** current git logg
+     #+BEGIN_SRC sh :session local2 :results org
+       pwd
+       git --no-pager log -5
+     #+END_SRC
+
+     #+RESULTS:
+     #+begin_src org
+     /home/lex/Programme/drmed-git
+     commit d51b11eda090b9301e783ec35bdfd26c7bf0709c (HEAD -> exp-220316-publication1, origin/main, origin/exp-220316-publication1, origin/HEAD, main)
+     Date:   Sun Feb 27 18:40:00 2022 +0100
+
+         fix model input_size to None; else to crop_size
+
+     commit c637444d8b798603629f6f0bd72ee55af7f81a5f
+     Date:   Sun Feb 27 18:39:29 2022 +0100
+
+         Fix function call correlate_and_fit
+
+     commit 291c6619c12bc39d526137a43d976b3cb4881e50
+     Date:   Sat Feb 26 20:04:07 2022 +0100
+
+         Fix scale_trace; simplify tf_pad_trace call
+
+     commit dcca8b9e17909a95b824c8a7b1fec52eeed198c3
+     Date:   Thu Feb 24 16:11:39 2022 +0100
+
+         test tf_pad_trace
+
+     commit 6cf2da85748ef13f2e752bea8989a6d31549ced3
+     Date:   Thu Feb 24 16:10:33 2022 +0100
+
+         Fix tf_pad_trace
+     #+end_src
+
+
+*** Plot 1: simulation-prediction-correction pipeline
+   :PROPERTIES:
+   :header-args:jupyter-python: :session /jpy:localhost#8888:a37e524a-8134-4d8f-b24a-367acaf1bdd3
+   :END:
+
+   - to interprete the correlations correctly, let's plot the underlying
+     experimental data.
+     #+BEGIN_SRC jupyter-python
+       %cd ~/Programme/drmed-collections/data-from-Eggeling-group/brightbursts
+     #+END_SRC
+
+     #+RESULTS:
+     : /home/lex/Programme/drmed-collections/data-from-Eggeling-group/brightbursts
+
+     #+BEGIN_SRC jupyter-python
+       %cd ~/Programme/drmed-git
+     #+END_SRC
+
+     #+RESULTS:
+     : /home/lex/Programme/drmed-git
+
+   - load modules
+     #+BEGIN_SRC jupyter-python
+       import logging
+       import os
+       import sys
+
+       import matplotlib.pyplot as plt
+       import numpy as np
+       import pandas as pd
+       import seaborn as sns
+
+       from pathlib import Path
+       from pprint import pprint
+       from tensorflow.keras.optimizers import Adam
+       from mlflow.keras import load_model
+
+       FLUOTRACIFY_PATH = '/home/lex/Programme/drmed-git/src/'
+       sys.path.append(FLUOTRACIFY_PATH)
+       from fluotracify.applications import corr_fit_object as cfo
+       from fluotracify.training import build_model as bm
+       from fluotracify.simulations import (
+          import_simulation_from_csv as isfc,
+          analyze_simulations as ans,
+       )
+
+       logging.basicConfig(filename="/home/lex/Programme/drmed-git/data/exp-220316-publication1/jupyter.log",
+                           filemode='w', format='%(asctime)s - %(message)s',
+                           force=True,
+                           level=logging.DEBUG)
+       sns.set()
+       sns.set_theme(style="whitegrid")
+     #+END_SRC
+
+     #+RESULTS:
+
+    #+BEGIN_SRC jupyter-python
+      import importlib
+      importlib.reload(ppd)
+      importlib.reload(isfc)
+    #+END_SRC
+
+   - first, we prepare our correction functions as we did before
+     #+BEGIN_SRC jupyter-python
+       class ParameterClass():
+           """Stores parameters for correlation """
+           def __init__(self):
+               # very fast from Ncasc ~ 14 onwards
+               self.NcascStart = 0
+               self.NcascEnd = 30  # 25
+               self.Nsub = 6  # 6
+               self.photonLifetimeBin = 10  # used for photon decay
+               self.photonCountBin = 1  # used for time series
+
+       logged_model = 'file:///beegfs/ye53nis/drmed-git/data/mlruns/8/00f2635d9fa2463c9a066722163405be/artifacts/model'
+       par_obj = ParameterClass()
+
+       loaded_model = load_model(logged_model, compile=False)
+       loaded_model.compile(loss=bm.binary_ce_dice_loss(),
+                            optimizer=Adam(),
+                            metrics = bm.unet_metrics([0.1, 0.3, 0.5, 0.7, 0.9]))
+       bm.prepare_model(loaded_model, [2**14, 2**13, 2**12, 2**15, 2**13])
+       #+END_SRC
+
+       #+RESULTS:
+       :RESULTS:
+       # [goto error]
+       #+begin_example
+         [0;31m---------------------------------------------------------------------------[0m
+         [0;31mOSError[0m                                   Traceback (most recent call last)
+         [0;32m/tmp/ipykernel_226115/126380399.py[0m in [0;36m<module>[0;34m[0m
+         [1;32m     14[0m [0mpar_obj[0m [0;34m=[0m [0mParameterClass[0m[0;34m([0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+         [1;32m     15[0m [0;34m[0m[0m
+         [0;32m---> 16[0;31m [0mloaded_model[0m [0;34m=[0m [0mload_model[0m[0;34m([0m[0mlogged_model[0m[0;34m,[0m [0mcompile[0m[0;34m=[0m[0;32mFalse[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+         [0m[1;32m     17[0m loaded_model.compile(loss=bm.binary_ce_dice_loss(),
+         [1;32m     18[0m                      [0moptimizer[0m[0;34m=[0m[0mAdam[0m[0;34m([0m[0;34m)[0m[0;34m,[0m[0;34m[0m[0;34m[0m[0m
+
+         [0;32m~/Programme/miniconda3/envs/tf/lib/python3.9/site-packages/mlflow/keras.py[0m in [0;36mload_model[0;34m(model_uri, dst_path, **kwargs)[0m
+         [1;32m    541[0m         [0mpredictions[0m [0;34m=[0m [0mkeras_model[0m[0;34m.[0m[0mpredict[0m[0;34m([0m[0mx_test[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+         [1;32m    542[0m     """
+         [0;32m--> 543[0;31m     [0mlocal_model_path[0m [0;34m=[0m [0m_download_artifact_from_uri[0m[0;34m([0m[0martifact_uri[0m[0;34m=[0m[0mmodel_uri[0m[0;34m,[0m [0moutput_path[0m[0;34m=[0m[0mdst_path[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+         [0m[1;32m    544[0m     [0mflavor_conf[0m [0;34m=[0m [0m_get_flavor_configuration[0m[0;34m([0m[0mmodel_path[0m[0;34m=[0m[0mlocal_model_path[0m[0;34m,[0m [0mflavor_name[0m[0;34m=[0m[0mFLAVOR_NAME[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+         [1;32m    545[0m     [0mkeras_module[0m [0;34m=[0m [0mimportlib[0m[0;34m.[0m[0mimport_module[0m[0;34m([0m[0mflavor_conf[0m[0;34m.[0m[0mget[0m[0;34m([0m[0;34m"keras_module"[0m[0;34m,[0m [0;34m"keras"[0m[0;34m)[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+
+         [0;32m~/Programme/miniconda3/envs/tf/lib/python3.9/site-packages/mlflow/tracking/artifact_utils.py[0m in [0;36m_download_artifact_from_uri[0;34m(artifact_uri, output_path)[0m
+         [1;32m     93[0m         [0mroot_uri[0m [0;34m=[0m [0mprefix[0m [0;34m+[0m [0murllib[0m[0;34m.[0m[0mparse[0m[0;34m.[0m[0murlunparse[0m[0;34m([0m[0mparsed_uri[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+         [1;32m     94[0m [0;34m[0m[0m
+         [0;32m---> 95[0;31m     return get_artifact_repository(artifact_uri=root_uri).download_artifacts(
+         [0m[1;32m     96[0m         [0martifact_path[0m[0;34m=[0m[0martifact_path[0m[0;34m,[0m [0mdst_path[0m[0;34m=[0m[0moutput_path[0m[0;34m[0m[0;34m[0m[0m
+         [1;32m     97[0m     )
+
+         [0;32m~/Programme/miniconda3/envs/tf/lib/python3.9/site-packages/mlflow/store/artifact/local_artifact_repo.py[0m in [0;36mdownload_artifacts[0;34m(self, artifact_path, dst_path)[0m
+         [1;32m     77[0m         [0mlocal_artifact_path[0m [0;34m=[0m [0mos[0m[0;34m.[0m[0mpath[0m[0;34m.[0m[0mjoin[0m[0;34m([0m[0mself[0m[0;34m.[0m[0martifact_dir[0m[0;34m,[0m [0mos[0m[0;34m.[0m[0mpath[0m[0;34m.[0m[0mnormpath[0m[0;34m([0m[0martifact_path[0m[0;34m)[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+         [1;32m     78[0m         [0;32mif[0m [0;32mnot[0m [0mos[0m[0;34m.[0m[0mpath[0m[0;34m.[0m[0mexists[0m[0;34m([0m[0mlocal_artifact_path[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+         [0;32m---> 79[0;31m             [0;32mraise[0m [0mIOError[0m[0;34m([0m[0;34m"No such file or directory: '{}'"[0m[0;34m.[0m[0mformat[0m[0;34m([0m[0mlocal_artifact_path[0m[0;34m)[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+         [0m[1;32m     80[0m         [0;32mreturn[0m [0mos[0m[0;34m.[0m[0mpath[0m[0;34m.[0m[0mabspath[0m[0;34m([0m[0mlocal_artifact_path[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+         [1;32m     81[0m [0;34m[0m[0m
+
+         [0;31mOSError[0m: No such file or directory: '/beegfs/ye53nis/drmed-git/data/mlruns/8/00f2635d9fa2463c9a066722163405be/artifacts/model'
+       #+end_example
+       :END:
+
+    #+BEGIN_SRC jupyter-python
+      col_per_example = 3
+      lab_thresh = 0.04
+      pred_thresh = 0.5
+      artifact = 0
+      model_type = 1
+      fwhm = 250
+      model_ls = ['484af471c61943fa90e5f78e78a229f0', '0cd2023eeaf745aca0d3e8ad5e1fc653', 'fe81d71c52404ed790b3a32051258da9',
+                  'ff67be0b68e540a9a29a36a2d0c7a5be', '19e3e786e1bc4e2b93856f5dc9de8216', '347669d050f344ad9fb9e480c814f727',
+                  'c1204e3a8a1e4c40a35b5b7b1922d1ce', '714af8cd12c1441eac4ca980e8c20070', '34a6d207ac594035b1009c330fb67a65']
+
+      input_path = '/beegfs/ye53nis/saves/firstartifact_Nov2020_test'
+      output_path = "/beegfs/ye53nis/drmed-git/data/exp-220227-unet/2022-03-01_experimental/"
+
+      dataset, _, nsamples, experiment_params = isfc.import_from_csv(
+          folder=input_path,
+          header=12,
+          frac_train=1,
+          col_per_example=col_per_example,
+          dropindex=None,
+          dropcolumns=None)
+
+      diffrates = experiment_params.loc['diffusion rate of molecules in micrometer^2 / s'].astype(np.float32)
+      nmols = experiment_params.loc['number of fast molecules'].astype(np.float32)
+      clusters = experiment_params.loc['diffusion rate of clusters in micrometer^2 / s'].astype(np.float32)
+
+      dataset_sep = isfc.separate_data_and_labels(array=dataset,
+                                                  nsamples=nsamples,
+                                                  col_per_example=col_per_example)
+
+      features = ppd.convert_to_tfds_for_unet(dataset_sep['0'])
+      labels_artifact = dataset_sep['1']
+      labels_artifact_bool = labels_artifact > lab_thresh
+      labels_artifact_bool = ppd.convert_to_tfds_for_unet(labels_artifact_bool)
+      labels_puretrace = ppd.convert_to_tfds_for_unet(dataset_sep['2'])
+
+      next(features.as_numpy_iterator())
+    #+END_SRC
