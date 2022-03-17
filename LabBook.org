@@ -970,6 +970,8 @@
      #+END_SRC
 
      #+RESULTS:
+     : 2022-03-17 12:58:33.614476: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+     : 2022-03-17 12:58:33.614550: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
 
     #+BEGIN_SRC jupyter-python
       import importlib
@@ -989,14 +991,8 @@
                self.photonLifetimeBin = 10  # used for photon decay
                self.photonCountBin = 1  # used for time series
 
-       logged_model = 'file:///beegfs/ye53nis/drmed-git/data/mlruns/8/00f2635d9fa2463c9a066722163405be/artifacts/model'
        par_obj = ParameterClass()
 
-       loaded_model = load_model(logged_model, compile=False)
-       loaded_model.compile(loss=bm.binary_ce_dice_loss(),
-                            optimizer=Adam(),
-                            metrics = bm.unet_metrics([0.1, 0.3, 0.5, 0.7, 0.9]))
-       bm.prepare_model(loaded_model, [2**14, 2**13, 2**12, 2**15, 2**13])
        #+END_SRC
 
        #+RESULTS:
@@ -1044,15 +1040,23 @@
       artifact = 0
       model_type = 1
       fwhm = 250
-      model_ls = ['484af471c61943fa90e5f78e78a229f0', '0cd2023eeaf745aca0d3e8ad5e1fc653', 'fe81d71c52404ed790b3a32051258da9',
-                  'ff67be0b68e540a9a29a36a2d0c7a5be', '19e3e786e1bc4e2b93856f5dc9de8216', '347669d050f344ad9fb9e480c814f727',
-                  'c1204e3a8a1e4c40a35b5b7b1922d1ce', '714af8cd12c1441eac4ca980e8c20070', '34a6d207ac594035b1009c330fb67a65']
+      model_ls = ['ff67be0b68e540a9a29a36a2d0c7a5be', '347669d050f344ad9fb9e480c814f727',
+                  '714af8cd12c1441eac4ca980e8c20070', '34a6d207ac594035b1009c330fb67a65']
 
-      input_path = '/beegfs/ye53nis/saves/firstartifact_Nov2020_test'
-      output_path = "/beegfs/ye53nis/drmed-git/data/exp-220227-unet/2022-03-01_experimental/"
 
-      dataset, _, nsamples, experiment_params = isfc.import_from_csv(
-          folder=input_path,
+      logged_model = f'file:///beegfs/ye53nis/drmed-git/data/mlruns/10/{model_ls[0]}/artifacts/model'
+      loaded_model = load_model(logged_model, compile=False)
+      loaded_model.compile(loss=bm.binary_ce_dice_loss(),
+                           optimizer=Adam(),
+                           metrics = bm.unet_metrics([0.1, 0.3, 0.5, 0.7, 0.9]))
+      bm.prepare_model(loaded_model, [2**14, 2**13, 2**12, 2**15, 2**13])
+
+      exp_path = Path('/home/lex/Programme/drmed-collections/drmed-bioexps/brightbursts/1911DD_alexafluor488+LUVs/')
+      sim_path = Path('/home/lex/Programme/drmed-collections/drmed-simexps/firstartifact_Nov2020_test')
+      output_path = Path("/home/lex/Programme/drmed-git/data/exp-220316-publication1/")
+
+      sim, _, nsamples, sim_params = isfc.import_from_csv(
+          folder=sim_path,
           header=12,
           frac_train=1,
           col_per_example=col_per_example,
@@ -1063,9 +1067,9 @@
       nmols = experiment_params.loc['number of fast molecules'].astype(np.float32)
       clusters = experiment_params.loc['diffusion rate of clusters in micrometer^2 / s'].astype(np.float32)
 
-      dataset_sep = isfc.separate_data_and_labels(array=dataset,
-                                                  nsamples=nsamples,
-                                                  col_per_example=col_per_example)
+      sim_sep = isfc.separate_data_and_labels(array=sim,
+                                              nsamples=nsamples,
+                                              col_per_example=col_per_example)
 
       features = ppd.convert_to_tfds_for_unet(dataset_sep['0'])
       labels_artifact = dataset_sep['1']
@@ -1074,4 +1078,23 @@
       labels_puretrace = ppd.convert_to_tfds_for_unet(dataset_sep['2'])
 
       next(features.as_numpy_iterator())
+      next(features.as_numpy_iterator())
+      next(features.as_numpy_iterator())
+      next(features.as_numpy_iterator())
+      next(features.as_numpy_iterator())
     #+END_SRC
+
+*** the trained models
+
+   10. all metrics after 100th epoch with hparams
+       | run                                | val_auc | val_f1 0.5 | val_prec 0.5 | val_recall 0.5 | model size | hp_batch_size | hp_first_filters | hp_input_size       | hp_lr_power |        hp_lr_start | hp_n_levels | hp_pool_size | hp_scaler |
+       |------------------------------------+---------+------------+--------------+----------------+------------+---------------+------------------+---------------------+-------------+--------------------+-------------+--------------+-----------|
+       | 484af471c61943fa90e5f78e78a229f0   |  0.9814 |     0.9187 |       0.9091 |         0.9285 | 275 MB     |            26 |               44 | 16384 (here: 14000) |           1 | 0.0136170138242663 |           7 |            2 | standard  |
+       | 0cd2023eeaf745aca0d3e8ad5e1fc653   |  0.9818 |     0.9069 |       0.8955 |         0.9185 | 200 MB     |            15 |               23 | 16384 (here: 14000) |           7 | 0.0305060808685107 |           6 |            4 | quant_g   |
+       | fe81d71c52404ed790b3a32051258da9   |  0.9849 |     0.9260 |       0.9184 |         0.9338 | 186 MB     |            20 |               78 | 16384 (here: 14000) |           4 | 0.0584071108418767 |           4 |            4 | standard  |
+       | ff67be0b68e540a9a29a36a2d0c7a5be + |  0.9859 |     0.9298 |       0.9230 |         0.9367 | 14 MB      |            28 |                6 | 16384 (here: 14000) |           1 | 0.0553313915596308 |           5 |            4 | minmax    |
+       | 19e3e786e1bc4e2b93856f5dc9de8216   |  0.9595 |     0.8911 |       0.8983 |         0.8839 | 172 MB     |            20 |              128 | 16384 (here: 14000) |           1 |  0.043549707353273 |           3 |            4 | standard  |
+       | 347669d050f344ad9fb9e480c814f727 + |  0.9848 |     0.9246 |       0.9254 |         0.9238 | 73 MB      |            10 |               16 | 8192 (here: 14000)  |           1 | 0.0627676336651573 |           5 |            4 | robust    |
+       | c1204e3a8a1e4c40a35b5b7b1922d1ce   |  0.9858 |     0.9207 |       0.9179 |         0.9234 | 312 MB     |            14 |               16 | 16384 (here: 14000) |           5 | 0.0192390310290551 |           9 |            2 | robust    |
+       | 714af8cd12c1441eac4ca980e8c20070 + |  0.9843 |     0.9304 |       0.9257 |         0.9352 | 234 MB     |             9 |               64 | 4096 (here: 14000)  |           1 | 0.0100697459464075 |           5 |            4 | maxabs    |
+       | 34a6d207ac594035b1009c330fb67a65 + |  0.9652 |     0.8613 |       0.8598 |         0.8629 | 7 MB       |            17 |               16 | 16384 (here: 14000) |           5 | 0.0101590069352232 |           3 |            4 | l2        |
