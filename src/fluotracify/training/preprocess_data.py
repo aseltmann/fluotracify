@@ -98,6 +98,16 @@ def convert_to_tfds_for_unet(trace):
     return dataset
 
 
+def scale_pad_and_batch_tfds_for_unet(dataset, scaler):
+    dataset = dataset.map(
+       lambda trace: tfds_scale_trace(trace, scaler),
+       num_parallel_calls=tf.data.AUTOTUNE)
+    dataset = dataset.map(tfds_pad_trace,
+                          num_parallel_calls=tf.data.AUTOTUNE)
+    dataset = dataset.batch(1)
+    return dataset
+
+
 def tfds_replace_nan_in_traces_and_labels(trace, label):
     """Part of tf.data pipeline. Replaces nan values with zeros"""
     trace = tf.where(tf.math.is_nan(trace), tf.zeros_like(trace), trace)
