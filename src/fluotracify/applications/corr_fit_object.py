@@ -683,6 +683,7 @@ class PicoObject():
                           len(self.trueTimeArr[name]) - len(trueTimeCorrected),
                           len(self.trueTimeArr[name]))
                 if method == 'delete_and_shift':
+                    method_name = 'DELSHIFT'
                     # moves the photons as if the deleted bins never existed
                     idxphot = 0
                     for nphot, artifact in zip(trace, timeSeriesMask):
@@ -694,9 +695,11 @@ class PicoObject():
                     log.debug(
                         'correctTCSPC: shifted non-deleted photon '
                         'arrival times by photonCountBin=%s', photon_count_bin)
-                self.trueTimeArr[f'{metadata[0]}_{ts_name}_CORRECTED'] = (
+                else:
+                    method_name = 'DEL'
+                self.trueTimeArr[f'{metadata[0]}_{ts_name}_{method_name}'] = (
                     trueTimeCorrected)
-                self.subChanArr[f'{metadata[0]}_{ts_name}_CORRECTED'] = (
+                self.subChanArr[f'{metadata[0]}_{ts_name}_{method_name}'] = (
                     subChanCorrected)
 
                 if bin_after_correction is not None:
@@ -706,22 +709,24 @@ class PicoObject():
                         ts_name2 = 'DELBIN'
                     self.getTimeSeries(
                         photonCountBin=float(bin_after_correction),
-                        truetime_name=f'{metadata[0]}_{ts_name}_CORRECTED',
+                        truetime_name=f'{metadata[0]}_{ts_name}_{method_name}',
                         timeseries_name=f'{ts_name}_{ts_name2}')
                     self.getPhotonCountingStats(name=f'{ts_name}_{ts_name2}')
                 else:
+                    ts_name2 = method_name
                     if method == 'delete_and_shift':
-                        ts_name2 = 'DELSHIFT'
                         ts = np.delete(trace, timeSeriesMask)
                         tss = np.delete(trace_scale, timeSeriesMask)
                     else:
-                        ts_name2 = 'DEL'
                         ts = np.where(timeSeriesMask == 1, 0, trace)
                         tss = trace_scale
-                    self.timeSeries[f'{ts_name}_{ts_name2}'][key] = ts
-                    self.timeSeriesScale[f'{ts_name}_{ts_name2}'][key] = tss
-                    self.photonCountBin = photon_count_bin
-                    self.getPhotonCountingStats(name=f'{ts_name}_{ts_name2}')
+                    tt_key = f'{ts_name}_{ts_name2}'
+                    self.timeSeries[tt_key] = sk = {}
+                    self.timeSeriesScale[tt_key] = ssk = {}
+                    self.timeSeriesSize[tt_key] = sik = {}
+                    sk[key], ssk[key], sik[key] = ts, tss, ts.size
+                    self.photonCountBin[tt_key] = photon_count_bin
+                    self.getPhotonCountingStats(name=tt_key)
 
             elif method == 'weights':
                 if weight == 'random':
@@ -792,8 +797,7 @@ class PicoObject():
             metadata = name.split('_')
             chan = metadata[0].strip('CH')
             chan_name = f"CH{chan}_"
-            pcb_name = name.removesuffix("_CORRECTED").removesuffix(
-                "_FORWEIGHTS").removeprefix(chan_name)
+            pcb_name = name.removesuffix("_FORWEIGHTS").removeprefix(chan_name)
             photon_count_bin = self.photonCountBin[f'{pcb_name}']
 
             log.debug(
@@ -823,7 +827,7 @@ class PicoObject():
                         'channels are used and continue', name)
                 if method == 'tttr2xfcs':
                     key = (f'CH{self.ch_present[i]}_BIN{photon_count_bin}'
-                           f'_{name.removesuffix("_CORRECTED")}')
+                           f'_{name}')
                     autonorm, autotime = self.crossAndAuto(
                         self.trueTimeArr[tt_key], self.subChanArr[tt_key],
                         [self.ch_present[i], self.ch_present[i]])
