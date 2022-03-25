@@ -879,7 +879,7 @@
       : ./data/exp-220316-publication1/jupyter
 
    7.
-*** current git logg
+*** current git log
      #+BEGIN_SRC sh :session local2 :results org
        pwd
        git --no-pager log -5
@@ -955,7 +955,8 @@
        FLUOTRACIFY_PATH = '/home/lex/Programme/drmed-git/src/'
        sys.path.append(FLUOTRACIFY_PATH)
        from fluotracify.applications import corr_fit_object as cfo
-       from fluotracify.training import build_model as bm
+       from fluotracify.training import (build_model as bm,
+                                         preprocess_data as ppd)
        from fluotracify.simulations import (
           import_simulation_from_csv as isfc,
           analyze_simulations as ans,
@@ -965,124 +966,712 @@
                            filemode='w', format='%(asctime)s - %(message)s',
                            force=True,
                            level=logging.DEBUG)
-       sns.set()
-       sns.set_theme(style="whitegrid")
+
+       sns.set_theme(style="whitegrid", font_scale=2, palette='colorblind',
+                     context='paper')
+
+       model_ls = ['ff67be0b68e540a9a29a36a2d0c7a5be', '347669d050f344ad9fb9e480c814f727',
+                   '714af8cd12c1441eac4ca980e8c20070', '34a6d207ac594035b1009c330fb67a65']
+
+       model_name_ls = ['ff67b', '34766', '714af', '34a6d']
+
+       scaler_ls = ['minmax', 'robust', 'maxabs', 'l2']
+
+       pred_thresh = 0.5
+
      #+END_SRC
 
      #+RESULTS:
-     : 2022-03-17 12:58:33.614476: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
-     : 2022-03-17 12:58:33.614550: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
 
     #+BEGIN_SRC jupyter-python
       import importlib
       importlib.reload(ppd)
       importlib.reload(isfc)
+      importlib.reload(cfo)
     #+END_SRC
+
+    #+RESULTS:
+    : <module 'fluotracify.applications.corr_fit_object' from '/home/lex/Programme/drmed-git/src/fluotracify/applications/corr_fit_object.py'>
+
+*** Plot 1 part 1: simulated data
+   :PROPERTIES:
+   :header-args:jupyter-python: :session /jpy:localhost#8888:a37e524a-8134-4d8f-b24a-367acaf1bdd3
+   :END:
+   - load simulated data
+     #+BEGIN_SRC jupyter-python :pandoc t
+       col_per_example = 3
+       lab_thresh = 0.04
+       artifact = 0
+       model_type = 1
+       fwhm = 250
+       sim_path = Path('/home/lex/Programme/drmed-collections/drmed-simexps/firstartifact_Nov2020_test')
+
+       sim, _, nsamples, sim_params = isfc.import_from_csv(
+           folder=sim_path,
+           header=12,
+           frac_train=1,
+           col_per_example=col_per_example,
+           dropindex=None,
+           dropcolumns=None)
+
+       diffrates = sim_params.loc['diffusion rate of molecules in micrometer^2 / s'].astype(np.float32)
+       nmols = sim_params.loc['number of fast molecules'].astype(np.float32)
+       clusters = sim_params.loc['diffusion rate of clusters in micrometer^2 / s'].astype(np.float32)
+       sim_columns = [f'{d:.4}-{c:.4}' for d, c in zip(
+           np.repeat(diffrates, nsamples[0]),
+           np.repeat(clusters, nsamples[0]))]
+
+       sim_sep = isfc.separate_data_and_labels(array=sim,
+                                               nsamples=nsamples,
+                                               col_per_example=col_per_example)
+       sim_dirty = sim_sep['0']
+       sim_dirty.columns = sim_columns
+
+       sim_labels = sim_sep['1']
+       sim_labels.columns = sim_columns
+       sim_labbool = sim_labels > lab_thresh
+       sim_labbool.columns = sim_columns
+       sim_clean = sim_sep['2']
+       sim_clean.columns = sim_columns
+
+       sim_dirty
+     #+END_SRC
+
+     #+RESULTS:
+     :RESULTS:
+     |       | 1.0-0.01    | 1.0-0.01    | 1.0-0.01    | 1.0-0.01    | 1.0-0.01    | 1.0-0.01    | 1.0-0.01    | 1.0-0.01    | 1.0-0.01    | 1.0-0.01    | ... | 0.2-1.0     | 0.2-1.0     | 0.2-1.0     | 0.2-1.0     | 0.2-1.0     | 0.2-1.0     | 0.2-1.0     | 0.2-1.0     | 0.2-1.0     | 0.2-1.0     |
+|-------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-----+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------|
+| 0     | 1137.443359 | 1254.458618 | 1186.574097 | 637.306458  | 1521.684692 | 677.170532  | 1168.362671 | 1628.718506 | 861.776672  | 1243.531494 | ... | 2118.657471 | 2057.639404 | 2126.922119 | 2617.964111 | 2258.764160 | 1694.151733 | 2535.143555 | 1785.972900 | 1853.346924 | 1877.305298 |
+| 1     | 1064.766479 | 1159.596069 | 1132.475220 | 655.323914  | 1631.872070 | 649.373230  | 1024.309570 | 1539.610596 | 691.026367  | 1204.659668 | ... | 2012.791870 | 2061.374268 | 2091.853516 | 2586.619141 | 2235.359863 | 1668.724854 | 2436.026855 | 1799.635376 | 1799.471191 | 1984.344727 |
+| 2     | 1115.380615 | 1163.550903 | 1068.131348 | 545.208313  | 1413.081055 | 837.581787  | 840.185547  | 1512.560181 | 716.668457  | 1181.674438 | ... | 2006.173218 | 2163.941162 | 2082.030273 | 2646.836670 | 2196.885254 | 1640.936279 | 2431.697021 | 1876.269775 | 1787.451538 | 1962.721680 |
+| 3     | 1030.869263 | 1301.564697 | 983.654480  | 606.174805  | 1435.475098 | 720.902344  | 1067.250610 | 1480.001465 | 716.686279  | 1196.109375 | ... | 2134.022217 | 2177.704102 | 1974.039673 | 2626.399170 | 2225.066895 | 1703.989258 | 2377.174805 | 1895.044922 | 1816.981689 | 2000.941528 |
+| 4     | 1186.906616 | 1372.696045 | 996.091431  | 636.747498  | 1436.380249 | 762.980469  | 1070.283569 | 1540.874634 | 666.972290  | 1099.720581 | ... | 2044.460327 | 2236.866699 | 2008.952026 | 2597.411133 | 2286.010254 | 1804.218506 | 2429.243652 | 1947.826660 | 2091.532715 | 1986.765747 |
+| ...   | ...         | ...         | ...         | ...         | ...         | ...         | ...         | ...         | ...         | ...         | ... | ...         | ...         | ...         | ...         | ...         | ...         | ...         | ...         | ...         | ...         |
+| 16379 | 1188.258057 | 1123.808472 | 1324.048828 | 902.520935  | 661.328552  | 998.909485  | 1213.814697 | 1167.788574 | 3718.382568 | 891.315002  | ... | 1598.518677 | 2353.616699 | 2227.808350 | 1894.450806 | 2645.360352 | 2667.197021 | 1719.079224 | 1756.946533 | 1781.044312 | 2295.302734 |
+| 16380 | 1275.702759 | 990.943237  | 1260.360107 | 961.117737  | 710.035889  | 919.583374  | 1208.030151 | 1169.737183 | 3433.009521 | 1090.649414 | ... | 1620.662964 | 2252.820801 | 2298.797607 | 1827.205933 | 2597.988770 | 3049.374023 | 1653.942993 | 1784.218140 | 1755.557007 | 2246.948730 |
+| 16381 | 1262.139771 | 1006.014893 | 1240.076538 | 953.885193  | 758.210388  | 858.521240  | 1081.140625 | 1249.674683 | 3732.000000 | 1211.191162 | ... | 1560.511108 | 2228.376709 | 2438.944580 | 1899.014893 | 2542.006592 | 2174.580566 | 1628.585693 | 1828.769043 | 1669.530396 | 2234.492432 |
+| 16382 | 1224.168945 | 1037.138672 | 1208.973633 | 956.065491  | 711.904297  | 1024.894653 | 958.588318  | 1180.880371 | 3712.922119 | 1279.076660 | ... | 1474.871338 | 2231.594971 | 2567.258545 | 1872.668457 | 2573.971191 | 1882.204590 | 1687.768677 | 1695.901855 | 1683.422363 | 2134.369629 |
+| 16383 | 1217.611328 | 850.246277  | 1159.042236 | 1022.052185 | 658.546997  | 1143.581909 | 921.202820  | 1029.407349 | 3904.530762 | 1204.061890 | ... | 1408.810913 | 2243.148926 | 3569.665527 | 1926.308838 | 2456.016113 | 2522.900879 | 1738.134644 | 1684.547119 | 1698.406616 | 2192.371338 |
+
+16384 rows × 1200 columns
+     :END:
+
+
+     #+BEGIN_SRC jupyter-python :pandoc t
+       with pd.option_context('display.max_rows', None, 'display.max_columns', None, 'display.max_seq_items', None):
+           display(sim_pred.columns)
+     #+END_SRC
+
+     #+RESULTS:
+
+
+
+   - plot simulated data with and without predictions
+     #+BEGIN_SRC jupyter-python
+       plot1_index = ['50.0-0.01', '50.0-0.1', '50.0-1.0',
+                      '0.2-0.01', '0.2-0.1', '0.2-1.0',
+                      '0.069-0.01', '0.069-0.1', '0.069-1.0']
+       plot1_traceno = [1, 1, 0,
+                        5, 0, 0,
+                        1, 1, 0]
+     #+END_SRC
+
+     #+RESULTS:
+
+     #+BEGIN_SRC jupyter-python :pandoc t
+       plot1_titles = ['fast molecules and slow clusters:\nsimulations', 'fast molecules and medium clusters:\nsimulations', 'fast molecules and fast clusters:\nsimulations',
+                       'medium molecules and slow clusters:\nsimulations', 'medium molecules and medium clusters:\nsimulations', 'medium molecules and fast clusters:\nsimulations',
+                       'slow molecules and slow clusters:\nsimulations', 'slow molecules and medium clusters:\nsimulations', 'slow molecules and fast clusters:\nsimulations']
+
+       for txt, idx, t in zip(plot1_titles, plot1_index, plot1_traceno):
+           fig = plt.figure()
+           ax = plt.subplot(111)
+           ax.set_prop_cycle(color=[sns.color_palette()[0]])
+           sns.lineplot(data=sim_dirty.loc[:, idx].iloc[:, t], label='trace')
+           plt.legend(bbox_to_anchor=(1.02, 1), loc='upper left', borderaxespad=0)
+           plt.setp(ax, xlabel=r'Time [$ms$]', ylabel=r'Intensity [$a.u.$]',
+             title=txt)
+           plot1_file = f'data/exp-220316-publication1/jupyter/plot1_{txt}'.replace(' ', '_').replace('\n', '_')
+           plt.savefig(f'{plot1_file}.pdf', bbox_inches='tight', dpi=300)
+           os.system(f'pdf2svg {plot1_file}.pdf {plot1_file}.svg')
+           os.system(f'rm {plot1_file}.pdf')
+
+     #+END_SRC
+
+     #+RESULTS:
+
+     file:./data/exp-220316-publication1/jupyter/plot1_slow_molecules_and_slow_clusters:_simulations.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_slow_molecules_and_medium_clusters:_simulations.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_slow_molecules_and_fast_clusters:_simulations.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_medium_molecules_and_slow_clusters:_simulations.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_medium_molecules_and_medium_clusters:_simulations.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_medium_molecules_and_fast_clusters:_simulations.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_fast_molecules_and_slow_clusters:_simulations.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_fast_molecules_and_medium_clusters:_simulations.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_fast_molecules_and_fast_clusters:_simulations.svg
+
+
+     #+BEGIN_SRC jupyter-python :pandoc t
+       plot1_titles1 = ['fast molecules:\nslow cluster labels', 'fast molecules:\nmedium cluster labels', 'fast molecules:\nfast cluster labels',
+                        'medium molecules:\nslow cluster labels', 'medium molecules:\nmedium cluster labels', 'medium molecules:\nfast cluster labels',
+                        'slow molecules:\nslow cluster labels', 'slow molecules:\nmedium cluster labels', 'slow molecules:\nfast cluster labels']
+
+       for txt, idx, t in zip(plot1_titles1, plot1_index, plot1_traceno):
+           fig = plt.figure()
+           ax = plt.subplot(111)
+           ax.set_prop_cycle(color=[sns.color_palette()[4]])
+           sns.lineplot(data=sim_labels.loc[:, idx].iloc[:, t], label='cluster\ntrace')
+           plt.axhline(y=0.04, xmin=0, xmax=1, label='label\nthreshold',
+                       color=sns.color_palette()[7], linestyle='--')
+           plt.legend(bbox_to_anchor=(1.02, 1), loc='upper left', borderaxespad=0)
+           plt.setp(ax, xlabel=r'Time [$ms$]', ylabel=r'Intensity [$a.u.$]',
+             title=txt)
+           plot1_file = f'data/exp-220316-publication1/jupyter/plot1_{txt}'.replace(' ', '_').replace('\n', '_')
+
+           plt.savefig(f'{plot1_file}.pdf', bbox_inches='tight', dpi=300)
+           os.system(f'pdf2svg {plot1_file}.pdf {plot1_file}.svg')
+           os.system(f'rm {plot1_file}.pdf')
+
+     #+END_SRC
+
+     #+RESULTS:
+
+
+     file:./data/exp-220316-publication1/jupyter/plot1_slow_molecules:_slow_cluster_labels.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_slow_molecules:_medium_cluster_labels.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_slow_molecules:_fast_cluster_labels.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_medium_molecules:_slow_cluster_labels.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_medium_molecules:_medium_cluster_labels.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_medium_molecules:_fast_cluster_labels.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_fast_molecules:_slow_cluster_labels.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_fast_molecules:_medium_cluster_labels.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_fast_molecules:_fast_cluster_labels.svg
+
+
+     #+BEGIN_SRC jupyter-python
+       plot1_titles2 = ['fast molecules and slow clusters:\nlabel-based segmentation',
+                        'fast molecules and medium clusters:\nlabel-based segmentation',
+                        'fast molecules and fast clusters:\nlabel-based segmentation',
+                        'medium molecules and slow clusters:\nlabel-based segmentation',
+                        'medium molecules and medium clusters:\nlabel-based segmentation',
+                        'medium molecules and fast clusters:\nlabel-based segmentation',
+                        'slow molecules and slow clusters:\nlabel-based segmentation',
+                        'slow molecules and medium clusters:\nlabel-based segmentation',
+                        'slow molecules and fast clusters:\nlabel-based segmentation']
+
+
+       for txt, idx, t in zip(plot1_titles2, plot1_index, plot1_traceno):
+           fig = plt.figure()
+           ax = plt.subplot(111)
+
+
+           ax.set_prop_cycle(color=[sns.color_palette()[4]])
+           sim_labbool_scaled = sim_dirty.loc[:, idx].iloc[
+               :, t].max() * sim_labbool.loc[:, idx].iloc[:, t]
+           sns.lineplot(data=sim_labbool_scaled, alpha=0.5)
+           plt.fill_between(x=sim_labbool.loc[:, idx].iloc[:, t].index,
+                            y1=sim_labbool_scaled,
+                            y2=0, alpha=0.5, label='$label_{thr}=1$\n(clusters\ndominant)')
+
+           ax.set_prop_cycle(color=[sns.color_palette()[2]])
+           sim_invbool_scaled = sim_dirty.loc[:, idx].iloc[
+               :, t].max() * ~sim_labbool.loc[:, idx].iloc[:, t]
+           plt.fill_between(x=sim_labbool.loc[:, idx].iloc[:, t].index,
+                            y1=sim_invbool_scaled,
+                            y2=0, alpha=0.5, label='$label_{thr}=0$\n(molecules\ndominant)')
+           ax.set_prop_cycle(color=[sns.color_palette()[0]])
+           sns.lineplot(data=sim_dirty.loc[:, idx].iloc[:, t], label='trace')
+
+
+           plt.legend(bbox_to_anchor=(1.02, 1), loc='upper left', borderaxespad=0)
+           plt.setp(ax, xlabel=r'Time [$ms$]', ylabel=r'Intensity [$a.u.$]',
+             title=txt)
+           plot1_file = f'data/exp-220316-publication1/jupyter/plot1_{txt}'.replace(
+               ' ', '_').replace('\n', '_')
+           plt.savefig(f'{plot1_file}.pdf', bbox_inches='tight', dpi=300)
+           os.system(f'pdf2svg {plot1_file}.pdf {plot1_file}.svg')
+           os.system(f'rm {plot1_file}.pdf')
+     #+END_SRC
+
+     #+RESULTS:
+
+
+     file:./data/exp-220316-publication1/jupyter/plot1_slow_molecules_and_slow_clusters:_label-based_segmentation.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_slow_molecules_and_medium_clusters:_label-based_segmentation.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_slow_molecules_and_fast_clusters:_label-based_segmentation.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_medium_molecules_and_slow_clusters:_label-based_segmentation.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_medium_molecules_and_medium_clusters:_label-based_segmentation.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_medium_molecules_and_fast_clusters:_label-based_segmentation.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_fast_molecules_and_slow_clusters:_label-based_segmentation.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_fast_molecules_and_medium_clusters:_label-based_segmentation.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_fast_molecules_and_fast_clusters:_label-based_segmentation.svg
+
+
+     #+BEGIN_SRC jupyter-python
+
+       plot1_titles3 = ['fast molecules:\nslow cluster prediction',
+                        'fast molecules:\nmedium cluster prediction',
+                        'fast molecules:\nfast cluster prediction',
+                        'medium molecules:\nslow cluster prediction',
+                        'medium molecules:\nmedium cluster prediction',
+                        'medium molecules:\nfast cluster prediction',
+                        'slow molecules:\nslow cluster prediction',
+                        'slow molecules:\nmedium cluster prediction',
+                        'slow molecules:\nfast cluster prediction']
+
+       plot1_titles4 = ['fast molecules and slow clusters:\nprediction-based segmentation',
+                        'fast molecules and medium clusters:\nprediction-based segmentation',
+                        'fast molecules and fast clusters:\nprediction-based segmentation',
+                        'medium molecules and slow clusters:\nprediction-based segmentation',
+                        'medium molecules and medium clusters:\nprediction-based segmentation',
+                        'medium molecules and fast clusters:\nprediction-based segmentation',
+                        'slow molecules and slow clusters:\nprediction-based segmentation',
+                        'slow molecules and medium clusters:\nprediction-based segmentation',
+                        'slow molecules and fast clusters:\nprediction-based segmentation']
+
+       plot1_titles5 = ['fast molecules and slow clusters:\nprediction-based "cut and shift" correction',
+                        'fast molecules and medium clusters:\nprediction-based "cut and shift" correction',
+                        'fast molecules and fast clusters:\nprediction-based "cut and shift" correction',
+                        'medium molecules and slow clusters:\nprediction-based "cut and shift" correction',
+                        'medium molecules and medium clusters:\nprediction-based "cut and shift" correction',
+                        'medium molecules and fast clusters:\nprediction-based "cut and shift" correction',
+                        'slow molecules and slow clusters:\nprediction-based "cut and shift" correction',
+                        'slow molecules and medium clusters:\nprediction-based "cut and shift" correction',
+                        'slow molecules and fast clusters:\nprediction-based "cut and shift" correction']
+
+       def plot_predictions(model_id, filename):
+           def plot_cluster_prediction(filename):
+               for txt, idx, t in zip(plot1_titles3, plot1_index, plot1_traceno):
+                   fig = plt.figure()
+                   ax = plt.subplot(111)
+                   ax.set_prop_cycle(color=[sns.color_palette()[3]])
+                   sns.lineplot(data=sim_pred.loc[:, idx].iloc[:, t],
+                                label='prediction\n(artifact\nprobability)')
+                   plt.axhline(y=pred_thresh, xmin=0, xmax=1,
+                               label='prediction\nthreshold',
+                               color=sns.color_palette()[7], linestyle='--')
+                   plt.legend(bbox_to_anchor=(1.02, 1), loc='upper left', borderaxespad=0)
+                   plt.setp(ax, xlabel=r'Time [$ms$]', ylabel=r'Intensity [$a.u.$]',
+                     title=txt)
+                   plot1_file = f'{filename}_{txt}'.replace(' ', '_').replace('\n', '_')
+                   plt.savefig(f'{plot1_file}.pdf', bbox_inches='tight', dpi=300)
+                   os.system(f'pdf2svg {plot1_file}.pdf {plot1_file}.svg')
+                   os.system(f'rm {plot1_file}.pdf')
+
+           def plot_prediction_based_segmentation(filename):
+               for txt, idx, t in zip(plot1_titles4, plot1_index, plot1_traceno):
+                   fig = plt.figure()
+                   ax = plt.subplot(111)
+
+
+                   ax.set_prop_cycle(color=[sns.color_palette()[3]])
+                   sim_predbool_scaled = sim_dirty.loc[:, idx].iloc[:, t].max() * sim_predbool.loc[:, idx].iloc[:, t]
+                   sns.lineplot(data=sim_predbool_scaled, alpha=0.5)
+                   plt.fill_between(x=sim_predbool.loc[:, idx].iloc[:, t].index,
+                                    y1=sim_predbool_scaled,
+                                    y2=0, alpha=0.5, label='$pred_{thr}=1$\n(clusters\ndominant)')
+
+                   ax.set_prop_cycle(color=[sns.color_palette()[2]])
+                   sim_invpred_scaled = sim_dirty.loc[:, idx].iloc[:, t].max() * ~sim_predbool.loc[:, idx].iloc[:, t]
+                   plt.fill_between(x=sim_predbool.loc[:, idx].iloc[:, t].index,
+                                    y1=sim_invpred_scaled,
+                                    y2=0, alpha=0.5, label='$pred_{thr}=0$\n(molecules\ndominant)')
+                   ax.set_prop_cycle(color=[sns.color_palette()[0]])
+                   sns.lineplot(data=sim_dirty.loc[:, idx].iloc[:, t], label='trace')
+                   plt.legend(bbox_to_anchor=(1.02, 1), loc='upper left', borderaxespad=0)
+                   plt.setp(ax, xlabel=r'Time [$ms$]', ylabel=r'Intensity [$a.u.$]',
+                     title=txt)
+                   plot1_file = f'{filename}_{txt}'.replace(' ', '_').replace('\n', '_')
+                   plt.savefig(f'{plot1_file}.pdf', bbox_inches='tight', dpi=300)
+                   os.system(f'pdf2svg {plot1_file}.pdf {plot1_file}.svg')
+                   os.system(f'rm {plot1_file}.pdf')
+
+           def plot_prediction_based_cut_and_shift_correction(filename):
+               for txt, idx, t in zip(plot1_titles5, plot1_index, plot1_traceno):
+                   fig = plt.figure()
+                   ax = plt.subplot(111)
+                   ax.set_prop_cycle(color=[sns.color_palette()[0]])
+                   sns.lineplot(data=sim_corr.loc[:, idx].iloc[:, t], label='trace')
+                   plt.legend(bbox_to_anchor=(1.02, 1), loc='upper left', borderaxespad=0)
+                   plt.setp(ax, xlabel=r'Time [$ms$]', ylabel=r'Intensity [$a.u.$]',
+                     title=txt)
+                   plot1_file = f'{filename}_{txt}'.replace(' ', '_').replace(
+                       '\n', '_').replace('"', '')
+                   plt.savefig(f'{plot1_file}.pdf', bbox_inches='tight', dpi=300)
+                   os.system(f'pdf2svg {plot1_file}.pdf {plot1_file}.svg')
+                   os.system(f'rm {plot1_file}.pdf')
+
+           logged_model = Path(f'/home/lex/Programme/drmed-git/data/mlruns/10/{model_ls[model_id]}/artifacts/model')
+           loaded_model = load_model(logged_model, compile=False)
+           loaded_model.compile(loss=bm.binary_ce_dice_loss(),
+                                optimizer=Adam(),
+                                metrics = bm.unet_metrics([0.1, 0.3, 0.5, 0.7, 0.9]))
+
+           sim_dirty_prepro = ppd.convert_to_tfds_for_unet(sim_dirty)
+           sim_dirty_prepro = ppd.scale_pad_and_batch_tfds_for_unet(
+               sim_dirty_prepro, scaler=scaler_ls[model_id])
+           sim_pred = loaded_model.predict(sim_dirty_prepro, verbose=0)
+           sim_pred = pd.DataFrame(sim_pred.squeeze(axis=2)).T
+           sim_pred.columns = sim_columns
+           sim_predbool = sim_pred > pred_thresh
+
+           sim_corr = pd.DataFrame()
+           for i in range(len(sim_dirty.columns)):
+               sim_corr_trace = np.delete(sim_dirty.iloc[:, i].values,
+                                          sim_predbool.iloc[:, i].values)
+               sim_corr_trace = pd.DataFrame(sim_corr_trace)
+               sim_corr = pd.concat([sim_corr, sim_corr_trace], axis='columns')
+
+           sim_corr.columns = sim_columns
+
+           plot_cluster_prediction(filename)
+           plot_prediction_based_segmentation(filename)
+           plot_prediction_based_cut_and_shift_correction(filename)
+           plt.close('all')
+
+     #+END_SRC
+
+     #+RESULTS:
+
+   - first model: =ff67be0b68e540a9a29a36a2d0c7a5be=
+     #+BEGIN_SRC jupyter-python
+       plot_predictions(model_id=0,
+                        filename='data/exp-220316-publication1/jupyter/plot1_ff67b')
+     #+END_SRC
+
+     #+RESULTS:
+
+     file:./data/exp-220316-publication1/jupyter/plot1_ff67b_slow_molecules:_slow_cluster_prediction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_ff67b_slow_molecules:_medium_cluster_prediction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_ff67b_slow_molecules:_fast_cluster_prediction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_ff67b_medium_molecules:_slow_cluster_prediction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_ff67b_medium_molecules:_medium_cluster_prediction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_ff67b_medium_molecules:_fast_cluster_prediction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_ff67b_fast_molecules:_slow_cluster_prediction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_ff67b_fast_molecules:_medium_cluster_prediction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_ff67b_fast_molecules:_fast_cluster_prediction.svg
+
+     file:./data/exp-220316-publication1/jupyter/plot1_ff67b_slow_molecules_and_slow_clusters:_prediction-based_segmentation.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_ff67b_slow_molecules_and_medium_clusters:_prediction-based_segmentation.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_ff67b_slow_molecules_and_fast_clusters:_prediction-based_segmentation.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_ff67b_medium_molecules_and_slow_clusters:_prediction-based_segmentation.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_ff67b_medium_molecules_and_medium_clusters:_prediction-based_segmentation.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_ff67b_medium_molecules_and_fast_clusters:_prediction-based_segmentation.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_ff67b_fast_molecules_and_slow_clusters:_prediction-based_segmentation.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_ff67b_fast_molecules_and_medium_clusters:_prediction-based_segmentation.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_ff67b_fast_molecules_and_fast_clusters:_prediction-based_segmentation.svg
+
+     file:./data/exp-220316-publication1/jupyter/plot1_ff67b_slow_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_ff67b_slow_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_ff67b_slow_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_ff67b_medium_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_ff67b_medium_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_ff67b_medium_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_ff67b_fast_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_ff67b_fast_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_ff67b_fast_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
+
+
+   - second model: =347669d050f344ad9fb9e480c814f727=
+     #+BEGIN_SRC jupyter-python
+       plot_predictions(model_id=1,
+                        filename='data/exp-220316-publication1/jupyter/plot1_34766')
+
+     #+END_SRC
+
+     #+RESULTS:
+     : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
+     : /tmp/ipykernel_5495/3600776436.py:87: RuntimeWarning: More than 20 figures have been opened. Figures created through the pyplot interface (`matplotlib.pyplot.figure`) are retained until explicitly closed and may consume too much memory. (To control this warning, see the rcParam `figure.max_open_warning`).
+     :   fig = plt.figure()
+
+
+
+     #+RESULTS:
+
+     file:./data/exp-220316-publication1/jupyter/plot1_34766_slow_molecules:_slow_cluster_prediction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_34766_slow_molecules:_medium_cluster_prediction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_34766_slow_molecules:_fast_cluster_prediction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_34766_medium_molecules:_slow_cluster_prediction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_34766_medium_molecules:_medium_cluster_prediction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_34766_medium_molecules:_fast_cluster_prediction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_34766_fast_molecules:_slow_cluster_prediction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_34766_fast_molecules:_medium_cluster_prediction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_34766_fast_molecules:_fast_cluster_prediction.svg
+
+     file:./data/exp-220316-publication1/jupyter/plot1_34766_slow_molecules_and_slow_clusters:_prediction-based_segmentation.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_34766_slow_molecules_and_medium_clusters:_prediction-based_segmentation.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_34766_slow_molecules_and_fast_clusters:_prediction-based_segmentation.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_34766_medium_molecules_and_slow_clusters:_prediction-based_segmentation.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_34766_medium_molecules_and_medium_clusters:_prediction-based_segmentation.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_34766_medium_molecules_and_fast_clusters:_prediction-based_segmentation.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_34766_fast_molecules_and_slow_clusters:_prediction-based_segmentation.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_34766_fast_molecules_and_medium_clusters:_prediction-based_segmentation.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_34766_fast_molecules_and_fast_clusters:_prediction-based_segmentation.svg
+
+     file:./data/exp-220316-publication1/jupyter/plot1_34766_slow_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_34766_slow_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_34766_slow_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_34766_medium_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_34766_medium_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_34766_medium_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_34766_fast_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_34766_fast_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_34766_fast_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
+
+
+   - third model: =714af8cd12c1441eac4ca980e8c20070=
+     #+BEGIN_SRC jupyter-python
+       plot_predictions(model_id=2,
+                        filename='data/exp-220316-publication1/jupyter/plot1_714af')
+     #+END_SRC
+
+     #+RESULTS:
+     :   fig = plt.figure()
+     : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
+     : /tmp/ipykernel_5495/3600776436.py:87: RuntimeWarning: More than 20 figures have been opened. Figures created through the pyplot interface (`matplotlib.pyplot.figure`) are retained until explicitly closed and may consume too much memory. (To control this warning, see the rcParam `figure.max_open_warning`).
+     :   fig = plt.figure()
+
+
+
+
+
+
+
+     file:./data/exp-220316-publication1/jupyter/plot1_714af_slow_molecules:_slow_cluster_prediction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_714af_slow_molecules:_medium_cluster_prediction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_714af_slow_molecules:_fast_cluster_prediction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_714af_medium_molecules:_slow_cluster_prediction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_714af_medium_molecules:_medium_cluster_prediction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_714af_medium_molecules:_fast_cluster_prediction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_714af_fast_molecules:_slow_cluster_prediction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_714af_fast_molecules:_medium_cluster_prediction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_714af_fast_molecules:_fast_cluster_prediction.svg
+
+     file:./data/exp-220316-publication1/jupyter/plot1_714af_slow_molecules_and_slow_clusters:_prediction-based_segmentation.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_714af_slow_molecules_and_medium_clusters:_prediction-based_segmentation.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_714af_slow_molecules_and_fast_clusters:_prediction-based_segmentation.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_714af_medium_molecules_and_slow_clusters:_prediction-based_segmentation.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_714af_medium_molecules_and_medium_clusters:_prediction-based_segmentation.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_714af_medium_molecules_and_fast_clusters:_prediction-based_segmentation.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_714af_fast_molecules_and_slow_clusters:_prediction-based_segmentation.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_714af_fast_molecules_and_medium_clusters:_prediction-based_segmentation.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_714af_fast_molecules_and_fast_clusters:_prediction-based_segmentation.svg
+
+     file:./data/exp-220316-publication1/jupyter/plot1_714af_slow_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_714af_slow_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_714af_slow_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_714af_medium_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_714af_medium_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_714af_medium_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_714af_fast_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_714af_fast_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_714af_fast_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
+
+   - fourth model: =34a6d207ac594035b1009c330fb67a65=
+     #+BEGIN_SRC jupyter-python
+       plot_predictions(model_id=3,
+                        filename='data/exp-220316-publication1/jupyter/plot1_34a6d')
+
+     #+END_SRC
+
+     #+RESULTS:
+     : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
+     : /tmp/ipykernel_5495/3600776436.py:87: RuntimeWarning: More than 20 figures have been opened. Figures created through the pyplot interface (`matplotlib.pyplot.figure`) are retained until explicitly closed and may consume too much memory. (To control this warning, see the rcParam `figure.max_open_warning`).
+     :   fig = plt.figure()
+
+     file:./data/exp-220316-publication1/jupyter/plot1_34a6d_slow_molecules:_slow_cluster_prediction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_34a6d_slow_molecules:_medium_cluster_prediction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_34a6d_slow_molecules:_fast_cluster_prediction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_34a6d_medium_molecules:_slow_cluster_prediction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_34a6d_medium_molecules:_medium_cluster_prediction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_34a6d_medium_molecules:_fast_cluster_prediction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_34a6d_fast_molecules:_slow_cluster_prediction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_34a6d_fast_molecules:_medium_cluster_prediction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_34a6d_fast_molecules:_fast_cluster_prediction.svg
+
+
+     file:./data/exp-220316-publication1/jupyter/plot1_34a6d_slow_molecules_and_slow_clusters:_prediction-based_segmentation.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_34a6d_slow_molecules_and_medium_clusters:_prediction-based_segmentation.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_34a6d_slow_molecules_and_fast_clusters:_prediction-based_segmentation.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_34a6d_medium_molecules_and_slow_clusters:_prediction-based_segmentation.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_34a6d_medium_molecules_and_medium_clusters:_prediction-based_segmentation.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_34a6d_medium_molecules_and_fast_clusters:_prediction-based_segmentation.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_34a6d_fast_molecules_and_slow_clusters:_prediction-based_segmentation.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_34a6d_fast_molecules_and_medium_clusters:_prediction-based_segmentation.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_34a6d_fast_molecules_and_fast_clusters:_prediction-based_segmentation.svg
+
+
+     file:./data/exp-220316-publication1/jupyter/plot1_34a6d_slow_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_34a6d_slow_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_34a6d_slow_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_34a6d_medium_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_34a6d_medium_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_34a6d_medium_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_34a6d_fast_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_34a6d_fast_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_34a6d_fast_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
+
+   - plot correlations, then fit with =focus-fit-js=
+     #+BEGIN_SRC jupyter-python :pandoc t
+       # sns.lineplot(data=sim_pred.loc[:, idx].iloc[:, 0], label='trace')
+       # sim_dirty.drop(sim_predbool, axis='index')
+
+
+
+
+
+       corr_fn = multipletau.autocorrelate(
+                a=self.timeSeries[f'{name[0]}'][f'{name[1]}'],
+                m=16,
+                deltat=self.photonCountBin[f'{name[0]}'],
+                normalize=True)
+
+
+     #+END_SRC
+
+     #+RESULTS:
+
+     [[file:./data/exp-220316-publication1/jupyter/edf056e7749bf85f1d2b663fea4e3e33b4ece5f7.png]]
+
+*** Plot 1 part 2: biological data
+   :PROPERTIES:
+   :header-args:jupyter-python: :session /jpy:localhost#8888:a37e524a-8134-4d8f-b24a-367acaf1bdd3
+   :END:
+   - load biological data
+     #+BEGIN_SRC jupyter-python
+       exp_path = Path('/home/lex/Programme/drmed-collections/drmed-bioexps/brightbursts/1911DD_alexafluor488+LUVs/')
+
+     #+END_SRC
+
+     #+RESULTS:
 
    - first, we prepare our correction functions as we did before
      #+BEGIN_SRC jupyter-python
-       class ParameterClass():
-           """Stores parameters for correlation """
-           def __init__(self):
-               # very fast from Ncasc ~ 14 onwards
-               self.NcascStart = 0
-               self.NcascEnd = 30  # 25
-               self.Nsub = 6  # 6
-               self.photonLifetimeBin = 10  # used for photon decay
-               self.photonCountBin = 1  # used for time series
+       data_path = Path("/home/lex/Programme/drmed-collections/drmed-bioexps/brightbursts/1911DD_alexafluor488+LUVs")
+       path_clean = data_path / 'clean_subsample/'
+       path_dirty = data_path / 'dirty_subsample/'
+       output_path = Path("data/exp-220316-publication1/220323_bioexps")
 
-       par_obj = ParameterClass()
+       def get_traces_and_predictions_from_ptu(path, model_id, output_path):
+           class ParameterClass():
+               """Stores parameters for correlation """
+               def __init__(self):
+                   self.data = []
+                   self.objectRef = []
+                   self.numOfLoaded = 0
+                   self.colors = ['blue', 'green', 'red', 'cyan', 'magenta',
+                       'yellow', 'black']
+                   # very fast from Ncasc ~ 14 onwards
+                   self.NcascStart = 0
+                   self.NcascEnd = 30  # 25
+                   self.Nsub = 6  # 6
+                   self.photonLifetimeBin = 10  # used for photon decay
+                   self.photonCountBin = 1  # used for time series
 
-       #+END_SRC
+           par_obj = ParameterClass()
 
-       #+RESULTS:
-       :RESULTS:
-       # [goto error]
-       #+begin_example
-         [0;31m---------------------------------------------------------------------------[0m
-         [0;31mOSError[0m                                   Traceback (most recent call last)
-         [0;32m/tmp/ipykernel_226115/126380399.py[0m in [0;36m<module>[0;34m[0m
-         [1;32m     14[0m [0mpar_obj[0m [0;34m=[0m [0mParameterClass[0m[0;34m([0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
-         [1;32m     15[0m [0;34m[0m[0m
-         [0;32m---> 16[0;31m [0mloaded_model[0m [0;34m=[0m [0mload_model[0m[0;34m([0m[0mlogged_model[0m[0;34m,[0m [0mcompile[0m[0;34m=[0m[0;32mFalse[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
-         [0m[1;32m     17[0m loaded_model.compile(loss=bm.binary_ce_dice_loss(),
-         [1;32m     18[0m                      [0moptimizer[0m[0;34m=[0m[0mAdam[0m[0;34m([0m[0;34m)[0m[0;34m,[0m[0;34m[0m[0;34m[0m[0m
+           scaler = scaler_ls[model_id]
+           logged_model = Path(f'/home/lex/Programme/drmed-git/data/mlruns/10/{model_ls[model_id]}/artifacts/model')
+           loaded_model = load_model(logged_model, compile=False)
+           loaded_model.compile(loss=bm.binary_ce_dice_loss(),
+                                optimizer=Adam(),
+                                metrics = bm.unet_metrics([0.1, 0.3, 0.5, 0.7, 0.9]))
 
-         [0;32m~/Programme/miniconda3/envs/tf/lib/python3.9/site-packages/mlflow/keras.py[0m in [0;36mload_model[0;34m(model_uri, dst_path, **kwargs)[0m
-         [1;32m    541[0m         [0mpredictions[0m [0;34m=[0m [0mkeras_model[0m[0;34m.[0m[0mpredict[0m[0;34m([0m[0mx_test[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
-         [1;32m    542[0m     """
-         [0;32m--> 543[0;31m     [0mlocal_model_path[0m [0;34m=[0m [0m_download_artifact_from_uri[0m[0;34m([0m[0martifact_uri[0m[0;34m=[0m[0mmodel_uri[0m[0;34m,[0m [0moutput_path[0m[0;34m=[0m[0mdst_path[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
-         [0m[1;32m    544[0m     [0mflavor_conf[0m [0;34m=[0m [0m_get_flavor_configuration[0m[0;34m([0m[0mmodel_path[0m[0;34m=[0m[0mlocal_model_path[0m[0;34m,[0m [0mflavor_name[0m[0;34m=[0m[0mFLAVOR_NAME[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
-         [1;32m    545[0m     [0mkeras_module[0m [0;34m=[0m [0mimportlib[0m[0;34m.[0m[0mimport_module[0m[0;34m([0m[0mflavor_conf[0m[0;34m.[0m[0mget[0m[0;34m([0m[0;34m"keras_module"[0m[0;34m,[0m [0;34m"keras"[0m[0;34m)[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
-
-         [0;32m~/Programme/miniconda3/envs/tf/lib/python3.9/site-packages/mlflow/tracking/artifact_utils.py[0m in [0;36m_download_artifact_from_uri[0;34m(artifact_uri, output_path)[0m
-         [1;32m     93[0m         [0mroot_uri[0m [0;34m=[0m [0mprefix[0m [0;34m+[0m [0murllib[0m[0;34m.[0m[0mparse[0m[0;34m.[0m[0murlunparse[0m[0;34m([0m[0mparsed_uri[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
-         [1;32m     94[0m [0;34m[0m[0m
-         [0;32m---> 95[0;31m     return get_artifact_repository(artifact_uri=root_uri).download_artifacts(
-         [0m[1;32m     96[0m         [0martifact_path[0m[0;34m=[0m[0martifact_path[0m[0;34m,[0m [0mdst_path[0m[0;34m=[0m[0moutput_path[0m[0;34m[0m[0;34m[0m[0m
-         [1;32m     97[0m     )
-
-         [0;32m~/Programme/miniconda3/envs/tf/lib/python3.9/site-packages/mlflow/store/artifact/local_artifact_repo.py[0m in [0;36mdownload_artifacts[0;34m(self, artifact_path, dst_path)[0m
-         [1;32m     77[0m         [0mlocal_artifact_path[0m [0;34m=[0m [0mos[0m[0;34m.[0m[0mpath[0m[0;34m.[0m[0mjoin[0m[0;34m([0m[0mself[0m[0;34m.[0m[0martifact_dir[0m[0;34m,[0m [0mos[0m[0;34m.[0m[0mpath[0m[0;34m.[0m[0mnormpath[0m[0;34m([0m[0martifact_path[0m[0;34m)[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
-         [1;32m     78[0m         [0;32mif[0m [0;32mnot[0m [0mos[0m[0;34m.[0m[0mpath[0m[0;34m.[0m[0mexists[0m[0;34m([0m[0mlocal_artifact_path[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
-         [0;32m---> 79[0;31m             [0;32mraise[0m [0mIOError[0m[0;34m([0m[0;34m"No such file or directory: '{}'"[0m[0;34m.[0m[0mformat[0m[0;34m([0m[0mlocal_artifact_path[0m[0;34m)[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
-         [0m[1;32m     80[0m         [0;32mreturn[0m [0mos[0m[0;34m.[0m[0mpath[0m[0;34m.[0m[0mabspath[0m[0;34m([0m[0mlocal_artifact_path[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
-         [1;32m     81[0m [0;34m[0m[0m
-
-         [0;31mOSError[0m: No such file or directory: '/beegfs/ye53nis/drmed-git/data/mlruns/8/00f2635d9fa2463c9a066722163405be/artifacts/model'
-       #+end_example
-       :END:
-
-    #+BEGIN_SRC jupyter-python
-      col_per_example = 3
-      lab_thresh = 0.04
-      pred_thresh = 0.5
-      artifact = 0
-      model_type = 1
-      fwhm = 250
-      model_ls = ['ff67be0b68e540a9a29a36a2d0c7a5be', '347669d050f344ad9fb9e480c814f727',
-                  '714af8cd12c1441eac4ca980e8c20070', '34a6d207ac594035b1009c330fb67a65']
+           files = [path / f for f in os.listdir(path) if f.endswith('.ptu')]
+           traces = pd.DataFrame()
+           predtraces = pd.DataFrame()
+           preds = pd.DataFrame()
+           corrtraces = pd.DataFrame()
 
 
-      logged_model = f'file:///beegfs/ye53nis/drmed-git/data/mlruns/10/{model_ls[0]}/artifacts/model'
-      loaded_model = load_model(logged_model, compile=False)
-      loaded_model.compile(loss=bm.binary_ce_dice_loss(),
-                           optimizer=Adam(),
-                           metrics = bm.unet_metrics([0.1, 0.3, 0.5, 0.7, 0.9]))
-      bm.prepare_model(loaded_model, [2**14, 2**13, 2**12, 2**15, 2**13])
+           for myfile in (files):
+               ptufile = cfo.PicoObject(myfile, par_obj)
+               ptufile.predictTimeSeries(model=loaded_model,
+                                         scaler=scaler)
+               ptufile.correctTCSPC(method='delete_and_shift')
+               for key in list(ptufile.trueTimeArr.keys()):
+                   ptufile.get_autocorrelation(method='tttr2xfcs', name=key)
+               for key in list(ptufile.timeSeries.keys()):
+                   if "DELSHIFT" in key:
+                       for k, i in ptufile.timeSeries[key].items():
+                           if "1.0" in k:
+                               corrtraces = pd.concat([corrtraces, pd.DataFrame(
+                                   i, columns=[f'{key}_{k}'])],
+                                                      axis='columns')
+                   else:
+                       for k, i in ptufile.timeSeries[key].items():
+                           if "PREPRO" in k:
+                               if "1.0" in k:
+                                   predtraces = pd.concat([predtraces, pd.DataFrame(
+                                       i, columns=[f'{key}_{k}'])],
+                                                          axis='columns')
+                           elif "1.0" in k:
+                               traces = pd.concat([traces, pd.DataFrame(
+                                   i, columns=[f'{key}_{k}'])],
+                                                  axis='columns')
+                               preds = pd.concat([preds, pd.DataFrame(
+                                   data=ptufile.predictions[key][k],
+                                   columns=[f'{key}_{k}'])],
+                                                 axis='columns')
 
-      exp_path = Path('/home/lex/Programme/drmed-collections/drmed-bioexps/brightbursts/1911DD_alexafluor488+LUVs/')
-      sim_path = Path('/home/lex/Programme/drmed-collections/drmed-simexps/firstartifact_Nov2020_test')
-      output_path = Path("/home/lex/Programme/drmed-git/data/exp-220316-publication1/")
+               for m in ['multipletau', 'tttr2xfcs', 'tttr2xfcs_with_weights']:
+                   if m in list(ptufile.autoNorm.keys()):
+                       for key, item in list(ptufile.autoNorm[m].items()):
+                           ptufile.save_autocorrelation(name=key, method=m,
+                                                        output_path=output_path)
+           predtraces.to_csv(Path(output_path) / f'{path.name}_predtraces.csv')
+           traces.to_csv(Path(output_path) / f'{path.name}_traces.csv')
+           preds.to_csv(Path(output_path) / f'{path.name}_preds.csv')
+           corrtraces.to_csv(Path(output_path) / f'{path.name}_corrtraces.csv')
 
-      sim, _, nsamples, sim_params = isfc.import_from_csv(
-          folder=sim_path,
-          header=12,
-          frac_train=1,
-          col_per_example=col_per_example,
-          dropindex=None,
-          dropcolumns=None)
+     #+END_SRC
 
-      diffrates = experiment_params.loc['diffusion rate of molecules in micrometer^2 / s'].astype(np.float32)
-      nmols = experiment_params.loc['number of fast molecules'].astype(np.float32)
-      clusters = experiment_params.loc['diffusion rate of clusters in micrometer^2 / s'].astype(np.float32)
+     #+RESULTS:
 
-      sim_sep = isfc.separate_data_and_labels(array=sim,
-                                              nsamples=nsamples,
-                                              col_per_example=col_per_example)
+     #+BEGIN_SRC jupyter-python
+       model_id = 0
+       ptufile = get_traces_and_predictions_from_ptu(path_dirty, model_id, output_path)
+     #+END_SRC
 
-      features = ppd.convert_to_tfds_for_unet(dataset_sep['0'])
-      labels_artifact = dataset_sep['1']
-      labels_artifact_bool = labels_artifact > lab_thresh
-      labels_artifact_bool = ppd.convert_to_tfds_for_unet(labels_artifact_bool)
-      labels_puretrace = ppd.convert_to_tfds_for_unet(dataset_sep['2'])
+     #+RESULTS:
+     : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
 
-      next(features.as_numpy_iterator())
-      next(features.as_numpy_iterator())
-      next(features.as_numpy_iterator())
-      next(features.as_numpy_iterator())
-      next(features.as_numpy_iterator())
-    #+END_SRC
+     #+BEGIN_SRC jupyter-python
+       model_id = 0
+       get_traces_and_predictions_from_ptu(path_clean, model_id, output_path)
+     #+END_SRC
+
+     #+RESULTS:
+     : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
+
+
+     #+BEGIN_SRC jupyter-python
+       key = 'DiO LUV 10uM in 20 nM AF48889_T1067s_1'
+       key2 = 'DiO LUV 10uM in 20 nM AF48889_T1067s_1_DELSHIFT'
+       tt_key = 'CH2_DiO LUV 10uM in 20 nM AF48889_T1067s_1_CORRECTED'
+       ts_key = 'CH2_BIN1.0'
+       ts = ptufile.timeSeries[key2][ts_key]
+       # ptufile.predictions['20 nM AF48897_T1160s_1']['CH2_BIN1.0']
+       ptufile.timeSeriesSize[key2][ts_key]
+       pprint(ptufile.trueTimeArr.keys())
+       pprint(ptufile.kcount.keys())
+       pprint(ptufile.timeSeries.keys())
+       pprint(ptufile.autoNorm['tttr2xfcs'].keys())
+       for n in ptufile.trueTimeArr.keys():
+           if 'DiO LUV 10uM in 20 nM AF48889_T1067s_1_DELSHIFT' in n:
+               print(n)
+     #+END_SRC
+
+     #+RESULTS:
+     : dict_keys(['DiO LUV 10uM in 20 nM AF48889_T1067s_1', 'CH2_DiO LUV 10uM in 20 nM AF48889_T1067s_1_DELSHIFT'])
+     : dict_keys(['DiO LUV 10uM in 20 nM AF48889_T1067s_1', 'DiO LUV 10uM in 20 nM AF48889_T1067s_1_DELSHIFT'])
+     : dict_keys(['DiO LUV 10uM in 20 nM AF48889_T1067s_1', 'DiO LUV 10uM in 20 nM AF48889_T1067s_1_DELSHIFT'])
+     : dict_keys(['CH2_BIN1.0_DiO LUV 10uM in 20 nM AF48889_T1067s_1', 'CH2_BIN1.0_DiO LUV 10uM in 20 nM AF48889_T1067s_1_DELSHIFT'])
+     : CH2_DiO LUV 10uM in 20 nM AF48889_T1067s_1_DELSHIFT
+     'CH2_DiO LUV 10uM in 20 nM AF48889_T1067s_1_CORRECTED'])
+     : dict_keys(['DiO LUV 10uM in 20 nM AF48889_T1067s_1',
+      'DiO LUV 10uM in 20 nM AF48889_T1067s_1_DELSHIFT'])
+
 
 *** the trained models
 
