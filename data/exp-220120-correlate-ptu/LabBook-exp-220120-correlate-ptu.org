@@ -6931,3 +6931,199 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
        performs so badly.
      - regarding the ~delete~ and ~weights=0~ corrections it is not clear, why
        they are not equal → have to re-do them in the same experiment.
+
+*** Analysis 5: fitting with Focuspoint instead of focus-fit-js
+   :PROPERTIES:
+   :header-args:jupyter-python: :session /jpy:localhost#8888:a37e524a-8134-4d8f-b24a-367acaf1bdd3
+   :END:
+   - *Attention: this section was added after the branch
+     =exp-220120-correlate-ptu= was merged into =data=.*
+   - it turns out, that there is a software error in =focus-fit-js= which makes
+     3D plots unreliable. Together with Pablo, we double-checked the data
+     acquired with the standalone software =FoCuS-point-correlator=, written by
+     Dominic as well, and tested for years.
+   - With a 3D fit now working, we tried to do a 2 component fit on the data and
+     see if we can regain the underlying transit times of the fast and slow
+     components
+
+   - now let's look at the results:
+     #+BEGIN_SRC jupyter-python
+       %cd /home/lex/Programme/drmed-git
+     #+END_SRC
+
+     #+RESULTS:
+     : /home/lex/Programme/drmed-git
+
+     #+BEGIN_SRC jupyter-python
+       import numpy as np
+       import matplotlib.pyplot as plt
+       import pandas as pd
+       import seaborn as sns
+       from pathlib import Path
+       from pprint import pprint
+       # use seaborn style as default even if I just use matplotlib
+       sns.set()
+       sns.set_palette('colorblind')
+     #+END_SRC
+
+     #+RESULTS:
+
+   - load in all the data (see =Details= block)
+     #+begin_details
+     #+BEGIN_SRC jupyter-python
+       path = Path('data/exp-220120-correlate-ptu/2022-03-25_FoCuS-point-analysis')
+
+       # clean params
+       clean_nocorr_notrip_1spec_param_path = path / 'clean-nocorrection-notriplet-1species-5AR_outputParam.csv'
+       # clean_nocorr_tripfixed_1spec_param_path = path / 'clean-nocorrection-triplet2a-0dot25-B1-0dot01-tauT1_outputParam.csv'
+
+       # dirty params
+       dirty_nocorr_notrip_2spec_param_path = path / 'dirty-nocorrection-notriplet-2species-5AR_outputParam.csv'
+       # dirty_nocorr_tripsemifixed_2spec_param_path = path / 'dirty-nocorrection-triplet2a-float-B1-0dot01-tauT1-2species-5AR_outputParam.csv'
+       # dirty_nocorr_tripfixed_2spec_param_path = path / 'dirty-nocorrection-triplet2a-0dot25-B1-0dot01-tauT1-2species-5AR_outputParam.csv'
+
+       # dirty params
+       dirty_cutshift_notrip_2spec_param_path = path / 'dirty-cutandshift-notriplet-2species-5AR_outputParam.csv'
+       # dirty_cutshift_tripsemifixed_2spec_param_path = path / 'dirty-cutandshift-triplet2a-float-B1-0dot01-tauT1-2species-5AR_outputParam.csv'
+       # dirty_cutshift_tripfixed_2spec_param_path = path / 'dirty-cutandshift-triplet2a-0dot25-B1-0dot01-tauT1-2species-5AR_outputParam.csv'
+       dirty_delete_notrip_2spec_param_path = path / 'dirty-delete-notriplet-2species-5AR_outputParam.csv'
+       dirty_weight0_notrip_2spec_param_path = path / 'dirty-weight0-notriplet-2species-5AR_outputParam.csv'
+       dirty_1pred_notrip_2spec_param_path = path / 'dirty-1-pred-notriplet-2species-5AR_outputParam.csv'
+     #+END_SRC
+
+     #+RESULTS:
+
+     #+BEGIN_SRC jupyter-python :pandoc t
+       # clean params
+       clean_param =  pd.read_csv(clean_nocorr_notrip_1spec_param_path, sep=',').assign(
+           triplet=229*['None',], species=229*['1',], dimension=229*['3D eq 1B, AR=5',], fraction=229*['small',],
+           correlator=229*['tttr2xfcs',], artifact=229*['clean',], correction=229*['No correction',])
+       # clean_param =  pd.read_csv(clean_nocorr_tripfixed_1spec_param_path, sep=',').assign(
+       #     triplet=229*['B1=0.25, tauT1=0.01',], species=229*['1',], dimension=229*['3D eq 1B, AR=5',],
+       #     correlator=229*['tttr2xfcs',], artifact=229*['clean',], correction=229*['No correction',])
+       # clean_param['txy2'] = clean_param['txy1']  # for plotting purposes
+       # clean_param['A2'] = clean_param['A1']  # for plotting purposes
+
+       # dirty params
+       dirty_nocorr =  pd.read_csv(dirty_nocorr_notrip_2spec_param_path, sep=',').assign(
+           triplet=173*['None',], species=173*['2',], dimension=173*['3D eq 1B, AR=5',], fraction=173*['small',],
+           correlator=173*['tttr2xfcs',], artifact=173*['dirty',], correction=173*['No correction',])
+       # dirty_nocorr_tripsemi =  pd.read_csv(dirty_nocorr_tripsemifixed_2spec_param_path, sep=',').assign(
+       #     triplet=173*['B1=float, tauT1=0.01',], species=173*['2, AR=5',],
+       #     correlator=173*['tttr2xfcs',], artifact=173*['dirty',], correction=173*['None',])
+       # dirty_nocorr_tripfix =  pd.read_csv(dirty_nocorr_tripfixed_2spec_param_path, sep=',').assign(
+       #     triplet=173*['B1=0.25, tauT1=0.01',], species=173*['2, AR=5',],
+       #     correlator=173*['tttr2xfcs',], artifact=173*['dirty',], correction=173*['None',])
+       dirty_weight0 =  pd.read_csv(dirty_weight0_notrip_2spec_param_path, sep=',').assign(
+           triplet=173*['None',], species=173*['2',], dimension=173*['3D eq 1B, AR=5',], fraction=173*['small',],
+           correlator=173*['tttr2xfcs',], artifact=173*['dirty',], correction=173*['weight=0',])
+
+
+       dirty_cutshift =  pd.read_csv(dirty_cutshift_notrip_2spec_param_path, sep=',').assign(
+           triplet=53*['None',], species=53*['2',], dimension=53*['3D eq 1B, AR=5',], fraction=53*['small',],
+           correlator=53*['tttr2xfcs',], artifact=53*['dirty',], correction=53*['cut and shift',])
+       # dirty_cutshift_tripsemi =  pd.read_csv(dirty_cutshift_tripsemifixed_2spec_param_path, sep=',').assign(
+       #     triplet=53*['B1=float, tauT1=0.01',], species=53*['2, AR=5',],
+       #     correlator=53*['tttr2xfcs',], artifact=53*['dirty',], correction=53*['cut and shift',])
+       # dirty_cutshift_tripfix =  pd.read_csv(dirty_cutshift_tripfixed_2spec_param_path, sep=',').assign(
+       #     triplet=53*['B1=0.25, tauT1=0.01',], species=53*['2, AR=5',],
+       #     correlator=53*['tttr2xfcs',], artifact=53*['dirty',], correction=53*['cut and shift',])
+       dirty_delete =  pd.read_csv(dirty_delete_notrip_2spec_param_path, sep=',').assign(
+           triplet=53*['None',], species=53*['2',], dimension=53*['3D eq 1B, AR=5',], fraction=53*['small',],
+           correlator=53*['tttr2xfcs',], artifact=53*['dirty',], correction=53*['delete',])
+       dirty_1pred =  pd.read_csv(dirty_1pred_notrip_2spec_param_path, sep=',').assign(
+           triplet=53*['None',], species=53*['2',], dimension=53*['3D eq 1B, AR=5',], fraction=53*['small',],
+           correlator=53*['tttr2xfcs',], artifact=53*['dirty',], correction=53*['weight=1-prediction',])
+
+       all_param = pd.concat([clean_param, dirty_nocorr, dirty_weight0,
+                              dirty_cutshift, dirty_delete, dirty_1pred],
+                             ignore_index=True)
+
+       all_param["artifact-correction"] = all_param[["artifact", "correction"]].agg(' - '.join, axis=1)
+       all_param = pd.wide_to_long(all_param, stubnames='txy', i=['name_of_plot'], j='fitted species (txy)')
+
+       all_param = all_param.reset_index()
+       all_param = pd.wide_to_long(all_param, stubnames='A', i=['name_of_plot', 'fitted species (txy)'], j='fitted species (A)')
+       all_param = all_param.reset_index()
+
+     #+END_SRC
+
+     #+BEGIN_SRC jupyter-python :pandoc t
+       g = sns.catplot(data=all_param,
+                       y='txy',
+                       x='artifact-correction',
+                       hue='fitted species (txy)',
+                       sharey=True,
+                       height=5,
+                       aspect=2,
+                       legend_out=True,
+                       kind='boxen',
+                       showfliers=False)
+       g.map_dataframe(sns.stripplot,
+             y='txy',
+             x='artifact-correction',
+             hue='fitted species (txy)',
+             dodge=True,
+             palette=sns.color_palette(['0.3']),
+             size=4,
+             jitter=0.2)
+       g.tight_layout()
+       g.fig.suptitle('Transit times of AlexaFluor488 (clean) vs \nAlexaFluor488 + Dio LUVs (dirty) with different correction methods',
+                      y=1.08, size=20)
+       for axes in g.axes.flat:
+            _ = axes.set_xticklabels(axes.get_xticklabels(), rotation=45)
+       plt.setp(g.axes, yscale='log', xlabel='biological sample - correction method',
+                ylabel=r'transit time $\tau_{D}$ (log)')
+       plt.show()
+     #+END_SRC
+
+     #+RESULTS:
+
+     #+BEGIN_SRC jupyter-python :pandoc t
+       g = sns.catplot(data=all_param,
+                       y='A',
+                       x='artifact-correction',
+                       hue='fitted species (A)',
+                       sharey=True,
+                       height=5,
+                       aspect=2,
+                       legend_out=True,
+                       kind='boxen',
+                       showfliers=False)
+       g.map_dataframe(sns.stripplot,
+             y='A',
+             x='artifact-correction',
+             hue='fitted species (A)',
+             dodge=True,
+             palette=sns.color_palette(['0.3']),
+             size=4,
+             jitter=0.2)
+       g.tight_layout()
+       g.fig.suptitle('Fraction sizes of AlexaFluor488 (clean) vs\nAlexaFluor488 + Dio LUVs (dirty) with different correction methods',
+                      y=1.08, size=20)
+       for axes in g.axes.flat:
+            _ = axes.set_xticklabels(axes.get_xticklabels(), rotation=45)
+       plt.setp(g.axes, xlabel='biological sample - correction method',
+                ylabel='relative fraction size')
+       plt.show()
+     #+END_SRC
+
+     #+RESULTS:
+     #+end_details
+
+   - let's have a look at transit times and fraction sizes of AF488 vs
+     AF488 + DioLUVs + different correction methods
+     [[file:./jupyter/analysis5-all-param-transit-times.png]]
+     [[file:./jupyter/analysis5-all-param-fraction-sizes.png]]
+
+   - I also had a look at different triplet parameters, we decided in the end
+     against using them for the sake of simplicity:
+     [[file:./jupyter/analysis5-2spec-triplet-3D-transit-times.png]]
+     [[file:./jupyter/analysis5-2spec-triplet-3D-fraction-size.png]]
+
+   - let's save the DataFrame used for plotting so that re-using it is simpler:
+     #+BEGIN_SRC jupyter-python :pandoc t
+       all_param.to_csv('data/exp-220120-correlate-ptu/2022-04-05_all-params.csv')
+     #+END_SRC
+
+     #+RESULTS:

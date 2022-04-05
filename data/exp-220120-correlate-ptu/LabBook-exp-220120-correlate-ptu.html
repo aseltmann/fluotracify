@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <title>Lab book Fluotracify</title>
-<!-- 2022-02-20 So 12:10 -->
+<!-- 2022-04-05 Di 13:13 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="generator" content="Org-mode">
@@ -336,6 +336,7 @@ MathJax.Hub.Config({
 <li><a href="#sec-2-1-10">2.1.10. Analysis 3 of multipletau vs tttr2xfcs, fixed <code>delete_and_shift</code>, <code>weight-random</code> and <code>weight-1-pred</code></a></li>
 <li><a href="#sec-2-1-11">2.1.11. Analysis 4: show examples of all experimental traces</a></li>
 <li><a href="#sec-2-1-12">2.1.12. learnings from exp-220120-correlate-ptu</a></li>
+<li><a href="#sec-2-1-13">2.1.13. Analysis 5: fitting with Focuspoint instead of focus-fit-js</a></li>
 </ul>
 </li>
 </ul>
@@ -10486,12 +10487,225 @@ they are not equal → have to re-do them in the same experiment.
 </ul>
 </div>
 </div>
+
+<div id="outline-container-sec-2-1-13" class="outline-4">
+<h4 id="sec-2-1-13"><span class="section-number-4">2.1.13</span> Analysis 5: fitting with Focuspoint instead of focus-fit-js</h4>
+<div class="outline-text-4" id="text-2-1-13">
+<ul class="org-ul">
+<li><b>Attention: this section was added after the branch
+<code>exp-220120-correlate-ptu</code> was merged into <code>data</code>.</b>
+</li>
+<li>it turns out, that there is a software error in <code>focus-fit-js</code> which makes
+3D plots unreliable. Together with Pablo, we double-checked the data
+acquired with the standalone software <code>FoCuS-point-correlator</code>, written by
+Dominic as well, and tested for years.
+</li>
+<li>With a 3D fit now working, we tried to do a 2 component fit on the data and
+see if we can regain the underlying transit times of the fast and slow
+components
+</li>
+
+<li>now let's look at the results:
+<div class="org-src-container">
+
+<pre class="src src-jupyter-python">%<span style="color: #707e4f;">cd</span> /<span style="color: #3f7178;">home</span>/<span style="color: #783f5a;">lex</span>/<span style="color: #784437;">Programme</span>/<span style="color: #784437;">drmed</span>-<span style="color: #784437;">git</span>
+</pre>
+</div>
+
+<pre class="example">
+/home/lex/Programme/drmed-git
+</pre>
+
+
+<div class="org-src-container">
+
+<pre class="src src-jupyter-python"><span style="color: #859900; font-weight: bold;">import</span> <span style="color: #4f5c7e;">numpy</span> <span style="color: #859900; font-weight: bold;">as</span> <span style="color: #707e4f;">np</span>
+<span style="color: #859900; font-weight: bold;">import</span> <span style="color: #37785e;">matplotlib</span>.<span style="color: #4f7e67;">pyplot</span> <span style="color: #859900; font-weight: bold;">as</span> <span style="color: #4f7e67;">plt</span>
+<span style="color: #859900; font-weight: bold;">import</span> <span style="color: #5e7837;">pandas</span> <span style="color: #859900; font-weight: bold;">as</span> <span style="color: #783778;">pd</span>
+<span style="color: #859900; font-weight: bold;">import</span> <span style="color: #78683f;">seaborn</span> <span style="color: #859900; font-weight: bold;">as</span> <span style="color: #4f5c7e;">sns</span>
+<span style="color: #859900; font-weight: bold;">from</span> <span style="color: #43783f;">pathlib</span> <span style="color: #859900; font-weight: bold;">import</span> <span style="color: #78683f;">Path</span>
+<span style="color: #859900; font-weight: bold;">from</span> <span style="color: #4f7e67;">pprint</span> <span style="color: #859900; font-weight: bold;">import</span> <span style="color: #4f7e67;">pprint</span>
+<span style="color: #93a1a1;"># </span><span style="color: #93a1a1;">use seaborn style as default even if I just use matplotlib</span>
+<span style="color: #4f5c7e;">sns</span>.<span style="color: #783778;">set</span>()
+<span style="color: #4f5c7e;">sns</span>.<span style="color: #7e544f;">set_palette</span>(<span style="color: #2aa198;">'colorblind'</span>)
+</pre>
+</div>
+</li>
+
+<li>load in all the data (see <code>Details</code> block)
+<details>
+<div class="org-src-container">
+
+<pre class="src src-jupyter-python"><span style="color: #268bd2;">path</span> = <span style="color: #78683f;">Path</span>(<span style="color: #2aa198;">'data/exp-220120-correlate-ptu/2022-03-25_FoCuS-point-analysis'</span>)
+
+<span style="color: #93a1a1;"># </span><span style="color: #93a1a1;">clean params</span>
+<span style="color: #268bd2;">clean_nocorr_notrip_1spec_param_path</span> = <span style="color: #513f78;">path</span> / <span style="color: #2aa198;">'clean-nocorrection-notriplet-1species-5AR_outputParam.csv'</span>
+<span style="color: #93a1a1;"># </span><span style="color: #93a1a1;">clean_nocorr_tripfixed_1spec_param_path = path / 'clean-nocorrection-triplet2a-0dot25-B1-0dot01-tauT1_outputParam.csv'</span>
+
+<span style="color: #93a1a1;"># </span><span style="color: #93a1a1;">dirty params</span>
+<span style="color: #268bd2;">dirty_nocorr_notrip_2spec_param_path</span> = <span style="color: #513f78;">path</span> / <span style="color: #2aa198;">'dirty-nocorrection-notriplet-2species-5AR_outputParam.csv'</span>
+<span style="color: #93a1a1;"># </span><span style="color: #93a1a1;">dirty_nocorr_tripsemifixed_2spec_param_path = path / 'dirty-nocorrection-triplet2a-float-B1-0dot01-tauT1-2species-5AR_outputParam.csv'</span>
+<span style="color: #93a1a1;"># </span><span style="color: #93a1a1;">dirty_nocorr_tripfixed_2spec_param_path = path / 'dirty-nocorrection-triplet2a-0dot25-B1-0dot01-tauT1-2species-5AR_outputParam.csv'</span>
+
+<span style="color: #93a1a1;"># </span><span style="color: #93a1a1;">dirty params</span>
+<span style="color: #268bd2;">dirty_cutshift_notrip_2spec_param_path</span> = <span style="color: #513f78;">path</span> / <span style="color: #2aa198;">'dirty-cutandshift-notriplet-2species-5AR_outputParam.csv'</span>
+<span style="color: #93a1a1;"># </span><span style="color: #93a1a1;">dirty_cutshift_tripsemifixed_2spec_param_path = path / 'dirty-cutandshift-triplet2a-float-B1-0dot01-tauT1-2species-5AR_outputParam.csv'</span>
+<span style="color: #93a1a1;"># </span><span style="color: #93a1a1;">dirty_cutshift_tripfixed_2spec_param_path = path / 'dirty-cutandshift-triplet2a-0dot25-B1-0dot01-tauT1-2species-5AR_outputParam.csv'</span>
+<span style="color: #268bd2;">dirty_delete_notrip_2spec_param_path</span> = <span style="color: #513f78;">path</span> / <span style="color: #2aa198;">'dirty-delete-notriplet-2species-5AR_outputParam.csv'</span>
+<span style="color: #268bd2;">dirty_weight0_notrip_2spec_param_path</span> = <span style="color: #513f78;">path</span> / <span style="color: #2aa198;">'dirty-weight0-notriplet-2species-5AR_outputParam.csv'</span>
+<span style="color: #268bd2;">dirty_1pred_notrip_2spec_param_path</span> = <span style="color: #513f78;">path</span> / <span style="color: #2aa198;">'dirty-1-pred-notriplet-2species-5AR_outputParam.csv'</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-jupyter-python"><span style="color: #93a1a1;"># </span><span style="color: #93a1a1;">clean params</span>
+<span style="color: #268bd2;">clean_param</span> =  <span style="color: #783778;">pd</span>.<span style="color: #78683f;">read_csv</span>(<span style="color: #43783f;">clean_nocorr_notrip_1spec_param_path</span>, <span style="color: #707e4f;">sep</span>=<span style="color: #2aa198;">','</span>).<span style="color: #707e4f;">assign</span>(
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #784437;">triplet</span>=229*[<span style="color: #2aa198;">'None'</span>,], <span style="color: #707e4f;">species</span>=229*[<span style="color: #2aa198;">'1'</span>,], <span style="color: #7a4f7e;">dimension</span>=229*[<span style="color: #2aa198;">'3D eq 1B, AR=5'</span>,], <span style="color: #3f7178;">fraction</span>=229*[<span style="color: #2aa198;">'small'</span>,],
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #5e7837;">correlator</span>=229*[<span style="color: #2aa198;">'tttr2xfcs'</span>,], <span style="color: #78683f;">artifact</span>=229*[<span style="color: #2aa198;">'clean'</span>,], <span style="color: #3f7178;">correction</span>=229*[<span style="color: #2aa198;">'No correction'</span>,])
+<span style="color: #93a1a1;"># </span><span style="color: #93a1a1;">clean_param =  pd.read_csv(clean_nocorr_tripfixed_1spec_param_path, sep=',').assign(</span>
+<span style="color: #93a1a1;">#     </span><span style="color: #93a1a1;">triplet=229*['B1=0.25, tauT1=0.01',], species=229*['1',], dimension=229*['3D eq 1B, AR=5',],</span>
+<span style="color: #93a1a1;">#     </span><span style="color: #93a1a1;">correlator=229*['tttr2xfcs',], artifact=229*['clean',], correction=229*['No correction',])</span>
+<span style="color: #93a1a1;"># </span><span style="color: #93a1a1;">clean_param['txy2'] = clean_param['txy1']  # for plotting purposes</span>
+<span style="color: #93a1a1;"># </span><span style="color: #93a1a1;">clean_param['A2'] = clean_param['A1']  # for plotting purposes</span>
+
+<span style="color: #93a1a1;"># </span><span style="color: #93a1a1;">dirty params</span>
+<span style="color: #268bd2;">dirty_nocorr</span> =  <span style="color: #783778;">pd</span>.<span style="color: #78683f;">read_csv</span>(<span style="color: #4f5c7e;">dirty_nocorr_notrip_2spec_param_path</span>, <span style="color: #707e4f;">sep</span>=<span style="color: #2aa198;">','</span>).<span style="color: #707e4f;">assign</span>(
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #784437;">triplet</span>=173*[<span style="color: #2aa198;">'None'</span>,], <span style="color: #707e4f;">species</span>=173*[<span style="color: #2aa198;">'2'</span>,], <span style="color: #7a4f7e;">dimension</span>=173*[<span style="color: #2aa198;">'3D eq 1B, AR=5'</span>,], <span style="color: #3f7178;">fraction</span>=173*[<span style="color: #2aa198;">'small'</span>,],
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #5e7837;">correlator</span>=173*[<span style="color: #2aa198;">'tttr2xfcs'</span>,], <span style="color: #78683f;">artifact</span>=173*[<span style="color: #2aa198;">'dirty'</span>,], <span style="color: #3f7178;">correction</span>=173*[<span style="color: #2aa198;">'No correction'</span>,])
+<span style="color: #93a1a1;"># </span><span style="color: #93a1a1;">dirty_nocorr_tripsemi =  pd.read_csv(dirty_nocorr_tripsemifixed_2spec_param_path, sep=',').assign(</span>
+<span style="color: #93a1a1;">#     </span><span style="color: #93a1a1;">triplet=173*['B1=float, tauT1=0.01',], species=173*['2, AR=5',],</span>
+<span style="color: #93a1a1;">#     </span><span style="color: #93a1a1;">correlator=173*['tttr2xfcs',], artifact=173*['dirty',], correction=173*['None',])</span>
+<span style="color: #93a1a1;"># </span><span style="color: #93a1a1;">dirty_nocorr_tripfix =  pd.read_csv(dirty_nocorr_tripfixed_2spec_param_path, sep=',').assign(</span>
+<span style="color: #93a1a1;">#     </span><span style="color: #93a1a1;">triplet=173*['B1=0.25, tauT1=0.01',], species=173*['2, AR=5',],</span>
+<span style="color: #93a1a1;">#     </span><span style="color: #93a1a1;">correlator=173*['tttr2xfcs',], artifact=173*['dirty',], correction=173*['None',])</span>
+<span style="color: #268bd2;">dirty_weight0</span> =  <span style="color: #783778;">pd</span>.<span style="color: #78683f;">read_csv</span>(<span style="color: #707e4f;">dirty_weight0_notrip_2spec_param_path</span>, <span style="color: #707e4f;">sep</span>=<span style="color: #2aa198;">','</span>).<span style="color: #707e4f;">assign</span>(
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #784437;">triplet</span>=173*[<span style="color: #2aa198;">'None'</span>,], <span style="color: #707e4f;">species</span>=173*[<span style="color: #2aa198;">'2'</span>,], <span style="color: #7a4f7e;">dimension</span>=173*[<span style="color: #2aa198;">'3D eq 1B, AR=5'</span>,], <span style="color: #3f7178;">fraction</span>=173*[<span style="color: #2aa198;">'small'</span>,],
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #5e7837;">correlator</span>=173*[<span style="color: #2aa198;">'tttr2xfcs'</span>,], <span style="color: #78683f;">artifact</span>=173*[<span style="color: #2aa198;">'dirty'</span>,], <span style="color: #3f7178;">correction</span>=173*[<span style="color: #2aa198;">'weight=0'</span>,])
+
+
+<span style="color: #268bd2;">dirty_cutshift</span> =  <span style="color: #783778;">pd</span>.<span style="color: #78683f;">read_csv</span>(<span style="color: #513f78;">dirty_cutshift_notrip_2spec_param_path</span>, <span style="color: #707e4f;">sep</span>=<span style="color: #2aa198;">','</span>).<span style="color: #707e4f;">assign</span>(
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #784437;">triplet</span>=53*[<span style="color: #2aa198;">'None'</span>,], <span style="color: #707e4f;">species</span>=53*[<span style="color: #2aa198;">'2'</span>,], <span style="color: #7a4f7e;">dimension</span>=53*[<span style="color: #2aa198;">'3D eq 1B, AR=5'</span>,], <span style="color: #3f7178;">fraction</span>=53*[<span style="color: #2aa198;">'small'</span>,],
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #5e7837;">correlator</span>=53*[<span style="color: #2aa198;">'tttr2xfcs'</span>,], <span style="color: #78683f;">artifact</span>=53*[<span style="color: #2aa198;">'dirty'</span>,], <span style="color: #3f7178;">correction</span>=53*[<span style="color: #2aa198;">'cut and shift'</span>,])
+<span style="color: #93a1a1;"># </span><span style="color: #93a1a1;">dirty_cutshift_tripsemi =  pd.read_csv(dirty_cutshift_tripsemifixed_2spec_param_path, sep=',').assign(</span>
+<span style="color: #93a1a1;">#     </span><span style="color: #93a1a1;">triplet=53*['B1=float, tauT1=0.01',], species=53*['2, AR=5',],</span>
+<span style="color: #93a1a1;">#     </span><span style="color: #93a1a1;">correlator=53*['tttr2xfcs',], artifact=53*['dirty',], correction=53*['cut and shift',])</span>
+<span style="color: #93a1a1;"># </span><span style="color: #93a1a1;">dirty_cutshift_tripfix =  pd.read_csv(dirty_cutshift_tripfixed_2spec_param_path, sep=',').assign(</span>
+<span style="color: #93a1a1;">#     </span><span style="color: #93a1a1;">triplet=53*['B1=0.25, tauT1=0.01',], species=53*['2, AR=5',],</span>
+<span style="color: #93a1a1;">#     </span><span style="color: #93a1a1;">correlator=53*['tttr2xfcs',], artifact=53*['dirty',], correction=53*['cut and shift',])</span>
+<span style="color: #268bd2;">dirty_delete</span> =  <span style="color: #783778;">pd</span>.<span style="color: #78683f;">read_csv</span>(<span style="color: #4f7e67;">dirty_delete_notrip_2spec_param_path</span>, <span style="color: #707e4f;">sep</span>=<span style="color: #2aa198;">','</span>).<span style="color: #707e4f;">assign</span>(
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #784437;">triplet</span>=53*[<span style="color: #2aa198;">'None'</span>,], <span style="color: #707e4f;">species</span>=53*[<span style="color: #2aa198;">'2'</span>,], <span style="color: #7a4f7e;">dimension</span>=53*[<span style="color: #2aa198;">'3D eq 1B, AR=5'</span>,], <span style="color: #3f7178;">fraction</span>=53*[<span style="color: #2aa198;">'small'</span>,],
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #5e7837;">correlator</span>=53*[<span style="color: #2aa198;">'tttr2xfcs'</span>,], <span style="color: #78683f;">artifact</span>=53*[<span style="color: #2aa198;">'dirty'</span>,], <span style="color: #3f7178;">correction</span>=53*[<span style="color: #2aa198;">'delete'</span>,])
+<span style="color: #268bd2;">dirty_1pred</span> =  <span style="color: #783778;">pd</span>.<span style="color: #78683f;">read_csv</span>(<span style="color: #37785e;">dirty_1pred_notrip_2spec_param_path</span>, <span style="color: #707e4f;">sep</span>=<span style="color: #2aa198;">','</span>).<span style="color: #707e4f;">assign</span>(
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #784437;">triplet</span>=53*[<span style="color: #2aa198;">'None'</span>,], <span style="color: #707e4f;">species</span>=53*[<span style="color: #2aa198;">'2'</span>,], <span style="color: #7a4f7e;">dimension</span>=53*[<span style="color: #2aa198;">'3D eq 1B, AR=5'</span>,], <span style="color: #3f7178;">fraction</span>=53*[<span style="color: #2aa198;">'small'</span>,],
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #5e7837;">correlator</span>=53*[<span style="color: #2aa198;">'tttr2xfcs'</span>,], <span style="color: #78683f;">artifact</span>=53*[<span style="color: #2aa198;">'dirty'</span>,], <span style="color: #3f7178;">correction</span>=53*[<span style="color: #2aa198;">'weight=1-prediction'</span>,])
+
+<span style="color: #268bd2;">all_param</span> = <span style="color: #783778;">pd</span>.<span style="color: #7e544f;">concat</span>([<span style="color: #7a4f7e;">clean_param</span>, <span style="color: #7a4f7e;">dirty_nocorr</span>, <span style="color: #4f7e67;">dirty_weight0</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>  <span style="color: #3f7178;">dirty_cutshift</span>, <span style="color: #783f5a;">dirty_delete</span>, <span style="color: #4f7e67;">dirty_1pred</span>],
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #78683f;">ignore_index</span>=<span style="color: #859900; font-weight: bold;">True</span>)
+
+<span style="color: #37785e;">all_param</span>[<span style="color: #2aa198;">"artifact-correction"</span>] = <span style="color: #37785e;">all_param</span>[[<span style="color: #2aa198;">"artifact"</span>, <span style="color: #2aa198;">"correction"</span>]].<span style="color: #78683f;">agg</span>(<span style="color: #2aa198;">' - '</span>.<span style="color: #784437;">join</span>, <span style="color: #784437;">axis</span>=1)
+<span style="color: #268bd2;">all_param</span> = <span style="color: #783778;">pd</span>.<span style="color: #4f7e67;">wide_to_long</span>(<span style="color: #37785e;">all_param</span>, <span style="color: #784437;">stubnames</span>=<span style="color: #2aa198;">'txy'</span>, <span style="color: #707e4f;">i</span>=[<span style="color: #2aa198;">'name_of_plot'</span>], <span style="color: #783f5a;">j</span>=<span style="color: #2aa198;">'fitted species (txy)'</span>)
+
+<span style="color: #268bd2;">all_param</span> = <span style="color: #37785e;">all_param</span>.<span style="color: #78683f;">reset_index</span>()
+<span style="color: #268bd2;">all_param</span> = <span style="color: #783778;">pd</span>.<span style="color: #4f7e67;">wide_to_long</span>(<span style="color: #37785e;">all_param</span>, <span style="color: #784437;">stubnames</span>=<span style="color: #2aa198;">'A'</span>, <span style="color: #707e4f;">i</span>=[<span style="color: #2aa198;">'name_of_plot'</span>, <span style="color: #2aa198;">'fitted species (txy)'</span>], <span style="color: #783f5a;">j</span>=<span style="color: #2aa198;">'fitted species (A)'</span>)
+<span style="color: #268bd2;">all_param</span> = <span style="color: #37785e;">all_param</span>.<span style="color: #78683f;">reset_index</span>()
+
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-jupyter-python"><span style="color: #268bd2;">g</span> = <span style="color: #4f5c7e;">sns</span>.<span style="color: #78683f;">catplot</span>(<span style="color: #784437;">data</span>=<span style="color: #37785e;">all_param</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #513f78;">y</span>=<span style="color: #2aa198;">'txy'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #3f7178;">x</span>=<span style="color: #2aa198;">'artifact-correction'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #78683f;">hue</span>=<span style="color: #2aa198;">'fitted species (txy)'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #783778;">sharey</span>=<span style="color: #859900; font-weight: bold;">True</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #513f78;">height</span>=5,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #7e544f;">aspect</span>=2,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #4f5c7e;">legend_out</span>=<span style="color: #859900; font-weight: bold;">True</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #783778;">kind</span>=<span style="color: #2aa198;">'boxen'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #43783f;">showfliers</span>=<span style="color: #859900; font-weight: bold;">False</span>)
+<span style="color: #7a4f7e;">g</span>.<span style="color: #78683f;">map_dataframe</span>(<span style="color: #4f5c7e;">sns</span>.<span style="color: #78683f;">stripplot</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #513f78;">y</span>=<span style="color: #2aa198;">'txy'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #3f7178;">x</span>=<span style="color: #2aa198;">'artifact-correction'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #78683f;">hue</span>=<span style="color: #2aa198;">'fitted species (txy)'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #513f78;">dodge</span>=<span style="color: #859900; font-weight: bold;">True</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #5e7837;">palette</span>=<span style="color: #4f5c7e;">sns</span>.<span style="color: #7e544f;">color_palette</span>([<span style="color: #2aa198;">'0.3'</span>]),
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #43783f;">size</span>=4,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #783778;">jitter</span>=0.2)
+<span style="color: #7a4f7e;">g</span>.<span style="color: #513f78;">tight_layout</span>()
+<span style="color: #7a4f7e;">g</span>.<span style="color: #4f7e67;">fig</span>.<span style="color: #4f5c7e;">suptitle</span>(<span style="color: #2aa198;">'Transit times of AlexaFluor488 (clean) vs \nAlexaFluor488 + Dio LUVs (dirty) with different correction methods'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>  <span style="color: #513f78;">y</span>=1.08, <span style="color: #43783f;">size</span>=20)
+<span style="color: #859900; font-weight: bold;">for</span> <span style="color: #43783f;">axes</span> <span style="color: #859900; font-weight: bold;">in</span> <span style="color: #268bd2;">g.axes.flat</span>:
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span><span style="color: #657b83; font-weight: bold;">_</span> = <span style="color: #43783f;">axes</span>.<span style="color: #37785e;">set_xticklabels</span>(<span style="color: #43783f;">axes</span>.<span style="color: #5e7837;">get_xticklabels</span>(), <span style="color: #374478;">rotation</span>=45)
+<span style="color: #4f7e67;">plt</span>.<span style="color: #3f7178;">setp</span>(<span style="color: #7a4f7e;">g</span>.<span style="color: #43783f;">axes</span>, <span style="color: #37785e;">yscale</span>=<span style="color: #2aa198;">'log'</span>, <span style="color: #783f5a;">xlabel</span>=<span style="color: #2aa198;">'biological sample - correction method'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span><span style="color: #707e4f;">ylabel</span>=<span style="color: #5e7837;">r</span><span style="color: #2aa198;">'transit time $\tau_{D}$ (log)'</span>)
+<span style="color: #4f7e67;">plt</span>.<span style="color: #374478;">show</span>()
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-jupyter-python"><span style="color: #268bd2;">g</span> = <span style="color: #4f5c7e;">sns</span>.<span style="color: #78683f;">catplot</span>(<span style="color: #784437;">data</span>=<span style="color: #37785e;">all_param</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #513f78;">y</span>=<span style="color: #2aa198;">'A'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #3f7178;">x</span>=<span style="color: #2aa198;">'artifact-correction'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #78683f;">hue</span>=<span style="color: #2aa198;">'fitted species (A)'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #783778;">sharey</span>=<span style="color: #859900; font-weight: bold;">True</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #513f78;">height</span>=5,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #7e544f;">aspect</span>=2,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #4f5c7e;">legend_out</span>=<span style="color: #859900; font-weight: bold;">True</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #783778;">kind</span>=<span style="color: #2aa198;">'boxen'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #43783f;">showfliers</span>=<span style="color: #859900; font-weight: bold;">False</span>)
+<span style="color: #7a4f7e;">g</span>.<span style="color: #78683f;">map_dataframe</span>(<span style="color: #4f5c7e;">sns</span>.<span style="color: #78683f;">stripplot</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #513f78;">y</span>=<span style="color: #2aa198;">'A'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #3f7178;">x</span>=<span style="color: #2aa198;">'artifact-correction'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #78683f;">hue</span>=<span style="color: #2aa198;">'fitted species (A)'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #513f78;">dodge</span>=<span style="color: #859900; font-weight: bold;">True</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #5e7837;">palette</span>=<span style="color: #4f5c7e;">sns</span>.<span style="color: #7e544f;">color_palette</span>([<span style="color: #2aa198;">'0.3'</span>]),
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #43783f;">size</span>=4,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span> <span style="color: #783778;">jitter</span>=0.2)
+<span style="color: #7a4f7e;">g</span>.<span style="color: #513f78;">tight_layout</span>()
+<span style="color: #7a4f7e;">g</span>.<span style="color: #4f7e67;">fig</span>.<span style="color: #4f5c7e;">suptitle</span>(<span style="color: #2aa198;">'Fraction sizes of AlexaFluor488 (clean) vs\nAlexaFluor488 + Dio LUVs (dirty) with different correction methods'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>  <span style="color: #513f78;">y</span>=1.08, <span style="color: #43783f;">size</span>=20)
+<span style="color: #859900; font-weight: bold;">for</span> <span style="color: #43783f;">axes</span> <span style="color: #859900; font-weight: bold;">in</span> <span style="color: #268bd2;">g.axes.flat</span>:
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span><span style="color: #657b83; font-weight: bold;">_</span> = <span style="color: #43783f;">axes</span>.<span style="color: #37785e;">set_xticklabels</span>(<span style="color: #43783f;">axes</span>.<span style="color: #5e7837;">get_xticklabels</span>(), <span style="color: #374478;">rotation</span>=45)
+<span style="color: #4f7e67;">plt</span>.<span style="color: #3f7178;">setp</span>(<span style="color: #7a4f7e;">g</span>.<span style="color: #43783f;">axes</span>, <span style="color: #783f5a;">xlabel</span>=<span style="color: #2aa198;">'biological sample - correction method'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span><span style="color: #707e4f;">ylabel</span>=<span style="color: #2aa198;">'relative fraction size'</span>)
+<span style="color: #4f7e67;">plt</span>.<span style="color: #374478;">show</span>()
+</pre>
+</div>
+</details>
+</li>
+
+<li>let's have a look at transit times and fraction sizes of AF488 vs
+AF488 + DioLUVs + different correction methods
+<img src="./jupyter/analysis5-all-param-transit-times.png" class="img-responsive" alt="analysis5-all-param-transit-times.png">
+<img src="./jupyter/analysis5-all-param-fraction-sizes.png" class="img-responsive" alt="analysis5-all-param-fraction-sizes.png">
+</li>
+
+<li>I also had a look at different triplet parameters, we decided in the end
+against using them for the sake of simplicity:
+<img src="./jupyter/analysis5-2spec-triplet-3D-transit-times.png" class="img-responsive" alt="analysis5-2spec-triplet-3D-transit-times.png">
+<img src="./jupyter/analysis5-2spec-triplet-3D-fraction-size.png" class="img-responsive" alt="analysis5-2spec-triplet-3D-fraction-size.png">
+</li>
+
+<li>let's save the DataFrame used for plotting so that re-using it is simpler:
+<div class="org-src-container">
+
+<pre class="src src-jupyter-python"><span style="color: #37785e;">all_param</span>.<span style="color: #513f78;">to_csv</span>(<span style="color: #2aa198;">'data/exp-220120-correlate-ptu/2022-04-05_all-params.csv'</span>)
+</pre>
+</div>
+</li>
+</ul>
+</div>
+</div>
 </div>
 </div>
 </div></div></div>
 <footer id="postamble" class="">
 <div><p class="author">Author: Alexander Seltmann</p>
-<p class="date">Created: 2022-02-20 So 12:10</p>
+<p class="date">Created: 2022-04-05 Di 13:13</p>
 <p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 27.2 (<a href="http://orgmode.org">Org-mode</a> 9.5.2)</p>
 </div>
 </footer>
