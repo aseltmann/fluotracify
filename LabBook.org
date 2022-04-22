@@ -923,13 +923,6 @@
    - to interprete the correlations correctly, let's plot the underlying
      experimental data.
      #+BEGIN_SRC jupyter-python
-       %cd ~/Programme/drmed-collections/data-from-Eggeling-group/brightbursts
-     #+END_SRC
-
-     #+RESULTS:
-     : /home/lex/Programme/drmed-collections/data-from-Eggeling-group/brightbursts
-
-     #+BEGIN_SRC jupyter-python
        %cd ~/Programme/drmed-git
      #+END_SRC
 
@@ -955,6 +948,7 @@
        FLUOTRACIFY_PATH = '/home/lex/Programme/drmed-git/src/'
        sys.path.append(FLUOTRACIFY_PATH)
        from fluotracify.applications import corr_fit_object as cfo
+       from fluotracify.imports import ptu_utils as ptu
        from fluotracify.training import (build_model as bm,
                                          preprocess_data as ppd)
        from fluotracify.simulations import (
@@ -982,6 +976,8 @@
      #+END_SRC
 
      #+RESULTS:
+     : 2022-04-12 14:56:03.263050: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+     : 2022-04-12 14:56:03.263176: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
 
     #+BEGIN_SRC jupyter-python
       import importlib
@@ -1246,14 +1242,14 @@
                    ax = plt.subplot(111)
                    ax.set_prop_cycle(color=[sns.color_palette()[3]])
                    sns.lineplot(data=sim_pred.loc[:, idx].iloc[:, t],
-                                label='prediction\n(artifact\nprobability)')
+                                label='prediction')
                    plt.axhline(y=pred_thresh, xmin=0, xmax=1,
                                label='prediction\nthreshold',
                                color=sns.color_palette()[7], linestyle='--')
                    plt.legend(bbox_to_anchor=(1.02, 1), loc='upper left', borderaxespad=0)
-                   plt.setp(ax, xlabel=r'Time [$ms$]', ylabel=r'Intensity [$a.u.$]',
-                     title=txt)
-                   plot1_file = f'{filename}_{txt}'.replace(' ', '_').replace('\n', '_')
+                   plt.setp(ax, xlabel=r'Time [$ms$]', ylabel='artifact probability',
+                     title=txt, ylim=[0, 1]
+                   plot1_file) = f'{filename}_{txt}'.replace(' ', '_').replace('\n', '_')
                    plt.savefig(f'{plot1_file}.pdf', bbox_inches='tight', dpi=300)
                    os.system(f'pdf2svg {plot1_file}.pdf {plot1_file}.svg')
                    os.system(f'rm {plot1_file}.pdf')
@@ -1535,16 +1531,8 @@
 
 *** Plot 1 part 2: biological data
    :PROPERTIES:
-   :header-args:jupyter-python: :session /jpy:localhost#8888:a37e524a-8134-4d8f-b24a-367acaf1bdd3
+   :header-args:jupyter-python: :session /jpy:localhost#8888:a37e524a-8134-4d8f-b24a-367acaf1bdd3 :pandoc t
    :END:
-   - load biological data
-     #+BEGIN_SRC jupyter-python
-       exp_path = Path('/home/lex/Programme/drmed-collections/drmed-bioexps/brightbursts/1911DD_alexafluor488+LUVs/')
-
-     #+END_SRC
-
-     #+RESULTS:
-
    - first, we prepare our correction functions as we did before
      #+BEGIN_SRC jupyter-python
        data_path = Path("/home/lex/Programme/drmed-collections/drmed-bioexps/brightbursts/1911DD_alexafluor488+LUVs")
@@ -1586,6 +1574,7 @@
 
            for myfile in (files):
                ptufile = cfo.PicoObject(myfile, par_obj)
+               break
                ptufile.predictTimeSeries(model=loaded_model,
                                          scaler=scaler)
                ptufile.correctTCSPC(method='delete_and_shift')
@@ -1672,6 +1661,360 @@
      : dict_keys(['DiO LUV 10uM in 20 nM AF48889_T1067s_1',
       'DiO LUV 10uM in 20 nM AF48889_T1067s_1_DELSHIFT'])
 
+     #+BEGIN_SRC jupyter-python
+       corr_clean = pd.read_csv(Path(output_path) / 'clean_nocorrection_3D-AR5_1spec_rawFitData.csv',
+                                index_col=0, usecols=[0, 1, 3, 5], na_values=' ')
+       fit_clean = pd.read_csv(Path(output_path) / 'clean_nocorrection_3D-AR5_1spec_rawFitData.csv',
+                               index_col=0, usecols=[0, 2, 4, 6], na_values=' ')
+       param_clean = pd.read_csv(Path(output_path) / 'clean_nocorrection_3D-AR5_1spec_outputParam.csv',
+                                 index_col=0)
+
+       preds_clean = pd.read_csv(Path(output_path) / 'clean_subsample_preds.csv', index_col=0)
+       predtraces_clean = pd.read_csv(Path(output_path) / 'clean_subsample_predtraces.csv', index_col=0)
+       traces_clean = pd.read_csv(Path(output_path) / 'clean_subsample_traces.csv', index_col=0)
+       corrtraces_clean = pd.read_csv(Path(output_path) / 'clean_subsample_corrtraces.csv', index_col=0)
+
+       corr_noc_dirty = pd.read_csv(Path(output_path) / 'dirty_nocorrection_3D-AR5_2spec_rawFitData.csv',
+                                index_col=0, usecols=[0, 1, 3, 5], na_values=' ')
+       fit_noc_dirty = pd.read_csv(Path(output_path) / 'dirty_nocorrection_3D-AR5_2spec_rawFitData.csv',
+                               index_col=0, usecols=[0, 2, 4, 6], na_values=' ')
+       param_noc_dirty = pd.read_csv(Path(output_path) / 'dirty_nocorrection_3D-AR5_2spec_outputParam.csv',
+                                     index_col=0)
+       corr_cas_dirty = pd.read_csv(Path(output_path) / 'dirty_cutandshift_3D-AR5_2spec_rawFitData.csv',
+                                index_col=0, usecols=[0, 1, 3, 5], na_values=' ')
+       fit_cas_dirty = pd.read_csv(Path(output_path) / 'dirty_cutandshift_3D-AR5_2spec_rawFitData.csv',
+                               index_col=0, usecols=[0, 2, 4, 6], na_values=' ')
+       param_cas_dirty = pd.read_csv(Path(output_path) / 'dirty_cutandshift_3D-AR5_2spec_outputParam.csv',
+                                index_col=0)
+
+       preds_dirty = pd.read_csv(Path(output_path) / 'dirty_subsample_preds.csv', index_col=0)
+       predtraces_dirty = pd.read_csv(Path(output_path) / 'dirty_subsample_predtraces.csv', index_col=0)
+       traces_dirty = pd.read_csv(Path(output_path) / 'dirty_subsample_traces.csv', index_col=0)
+       corrtraces_dirty = pd.read_csv(Path(output_path) / 'dirty_subsample_corrtraces.csv', index_col=0)
+     #+END_SRC
+
+     #+RESULTS:
+
+     #+BEGIN_SRC jupyter-python
+       def plot_bio_traces(df, txt):
+           for i, t in enumerate(df.items()):
+               t = t[1]
+               fig = plt.figure()
+               ax = plt.subplot(111)
+               ax.set_prop_cycle(color=[sns.color_palette()[0]])
+               sns.lineplot(data=t, label='trace')
+               plt.legend(bbox_to_anchor=(1.02, 1), loc='upper left', borderaxespad=0)
+               plt.setp(ax, xlabel=r'Time [$ms$]', ylabel=r'Intensity [$a.u.$]',
+                 title=txt)
+               plot1_file = f'data/exp-220316-publication1/jupyter/plot1_{txt}_{i}'.replace(
+                   ' ', '_').replace('\n', '_').replace('(', '').replace(')', '').replace('"', '')
+               plt.savefig(f'{plot1_file}.pdf', bbox_inches='tight', dpi=300)
+               os.system(f'pdf2svg {plot1_file}.pdf {plot1_file}.svg')
+               os.system(f'rm {plot1_file}.pdf')
+           plt.close('all')
+
+       def plot_bio_prediction_based_cut_and_shift_correction(df, txt):
+           for i, t in enumerate(df.items()):
+               t = t[1]
+               fig = plt.figure()
+               ax = plt.subplot(111)
+               ax.set_prop_cycle(color=[sns.color_palette()[0]])
+               sns.lineplot(data=t, label='trace')
+               plt.legend(bbox_to_anchor=(1.02, 1), loc='upper left', borderaxespad=0)
+               plt.setp(ax, xlabel=r'Time [$ms$]', ylabel=r'Intensity [$a.u.$]',
+                 title=txt)
+               break
+               plot1_file = f'{filename}_{txt}'.replace(' ', '_').replace(
+                   '\n', '_').replace('"', '')
+               plt.savefig(f'{plot1_file}.pdf', bbox_inches='tight', dpi=300)
+               os.system(f'pdf2svg {plot1_file}.pdf {plot1_file}.svg')
+               os.system(f'rm {plot1_file}.pdf')
+
+       def plot_bio_cluster_prediction(df, txt):
+           for i, col in enumerate(df.columns):
+               fig = plt.figure()
+               ax = plt.subplot(111)
+               ax.set_prop_cycle(color=[sns.color_palette()[3]])
+               sns.lineplot(data=df.loc[:, col],
+                            label='prediction')
+               plt.axhline(y=pred_thresh, xmin=0, xmax=1,
+                           label='prediction\nthreshold',
+                           color=sns.color_palette()[7], linestyle='--')
+               plt.legend(bbox_to_anchor=(1.02, 1), loc='upper left', borderaxespad=0)
+               plt.setp(ax, xlabel=r'Time [$ms$]', ylabel=r'artifact probability',
+                 title=txt, ylim=[0, 1])
+               plot1_file = f'data/exp-220316-publication1/jupyter/plot1_{txt}_preds_{i}'.replace(
+                   ' ', '_').replace('\n', '_').replace('(', '').replace(')', '')
+               plt.savefig(f'{plot1_file}.pdf', bbox_inches='tight', dpi=300)
+               os.system(f'pdf2svg {plot1_file}.pdf {plot1_file}.svg')
+               os.system(f'rm {plot1_file}.pdf')
+           plt.close('all')
+
+       def plot_bio_prediction_based_segmentation(traces_df, pred_df, txt):
+           for i, (t, p) in enumerate(zip(traces_df.items(), pred_df.items())):
+               t = t[1]
+               p = p[1] > pred_thresh
+               p = p[:t.size]
+               p_bool = t.max() * p
+               p_invbool = t.max() * ~p
+
+               fig = plt.figure()
+               ax = plt.subplot(111)
+               ax.set_prop_cycle(color=[sns.color_palette()[3]])
+               sns.lineplot(data=p_bool, alpha=0.5)
+               plt.fill_between(x=p_bool.index,
+                                y1=p_bool,
+                                y2=0, alpha=0.5, label='$pred_{thr}=1$\n(LUVs\ndominant)')
+
+               ax.set_prop_cycle(color=[sns.color_palette()[2]])
+               plt.fill_between(x=p_invbool.index,
+                                y1=p_invbool,
+                                y2=0, alpha=0.5, label='$pred_{thr}=0$\n(AF488\ndominant)')
+               ax.set_prop_cycle(color=[sns.color_palette()[0]])
+               sns.lineplot(data=t, label='trace')
+               plt.legend(bbox_to_anchor=(1.02, 1), loc='upper left', borderaxespad=0)
+               plt.setp(ax, xlabel=r'Time [$ms$]', ylabel=r'Intensity [$a.u.$]',
+                 title=txt)
+               plot1_file = f'data/exp-220316-publication1/jupyter/plot1_{txt}_{i}'.replace(
+                   ' ', '_').replace('\n', '_').replace('(', '').replace(')', '')
+               plt.savefig(f'{plot1_file}.pdf', bbox_inches='tight', dpi=300)
+               os.system(f'pdf2svg {plot1_file}.pdf {plot1_file}.svg')
+               os.system(f'rm {plot1_file}.pdf')
+           plt.close('all')
+
+       def plot_bio_clean_corr_and_fit(corr_df, fit_df, param_df, txt):
+           for i, (c, f, param) in enumerate(zip(corr_df.items(), fit_df.items(), param_df.T.items())):
+               c = c[1]
+               f = f[1]
+               txy = param[1].loc['txy1']
+               f_xmin = f.dropna().index[0]
+               f_xmax = f.dropna().index[-1]
+               xlims = [f_xmin - 0.5*f_xmin, f_xmax + f_xmax]
+               ylims = [f.dropna().iloc[-1] - 0.01, f.dropna().iloc[0] + 0.01]
+
+               fig = plt.figure()
+               ax = plt.subplot(111)
+               ax.set_prop_cycle(color=[sns.color_palette()[0]])
+               plt.semilogx(c.index, c, '.', label='Correlation')
+               ax.set_prop_cycle(color=[sns.color_palette()[2]])
+               plt.semilogx(f.index, f, '-', lw=3.0, label='Fit\n'+rf'$\tau_D=${txy:.3f}')
+               plt.axvline(x=txy, color=sns.color_palette()[2])
+               plt.setp(ax, xlim=xlims, ylim=ylims, title=txt,
+                        xlabel=r'$\tau$ (ms)', ylabel=r'Correlation G($\tau$)')
+               ax.grid(False)
+               plt.legend(bbox_to_anchor=(1.02, 1), loc='upper left', borderaxespad=0)
+               plot1_file = f'data/exp-220316-publication1/jupyter/plot1_{txt}_{i}'.replace(
+                   ' ', '_').replace('\n', '_').replace('(', '').replace(')', '')
+               plt.savefig(f'{plot1_file}.pdf', bbox_inches='tight', dpi=300)
+               os.system(f'pdf2svg {plot1_file}.pdf {plot1_file}.svg')
+               os.system(f'rm {plot1_file}.pdf')
+           plt.close('all')
+
+       def plot_bio_corrs_and_fits(corr_df1, corr_df2, fit_df1, fit_df2, param_df1, param_df2, txt):
+           for i, (c1, c2, f1, f2, param1, param2) in enumerate(zip(corr_df1.items(), corr_df2.items(),
+                      fit_df1.items(), fit_df2.items(), param_df1.T.items(), param_df2.T.items())):
+               c1, c2 = c1[1], c2[1]
+               f1, f2 = f1[1], f2[1]
+               txy11, txy12 = param1[1].loc['txy1'], param2[1].loc['txy1']
+               txy21, txy22 = param1[1].loc['txy2'], param2[1].loc['txy2']
+               f_xmin = np.min([f1.dropna().index[0], f2.dropna().index[0]])
+               f_xmax = np.max([f1.dropna().index[-1], f2.dropna().index[-1]])
+               f_ymin1, f_ymin2 = f1.dropna().iloc[-1], f2.dropna().iloc[-1]
+               f_ymax1, f_ymax2 = f1.dropna().iloc[0], f2.dropna().iloc[0]
+               xlims = [f_xmin - 0.5*f_xmin, f_xmax + f_xmax]
+               ylims1 = [f_ymin1 - np.abs(2*f_ymin1), f_ymax1 + 0.1*f_ymax1]
+               ylims2= [f_ymin2 - np.abs(2*f_ymin2), f_ymax2 + 0.1*f_ymax2]
+               fig = plt.figure()
+               ax1 = plt.subplot(111)
+               ax1.set_prop_cycle(color=[sns.color_palette()[0]])
+               p1, = ax1.semilogx(c1.index, c1, '.', label='Correlation\n(no correction)')
+               ax1.set_prop_cycle(color=[sns.color_palette()[2]])
+               f1_label = 'Fit (no correction)\n'+r'$\tau_{D,1}=$'+f'{txy11:.3f}\n'+r'$\tau_{D,2}=$'+f'{txy21:.3f}'
+               p2, = ax1.semilogx(f1.index, f1, '-', lw=3.0, label=f1_label)
+
+               ax2 = ax1.twinx()
+               ax2.set_prop_cycle(color=[sns.color_palette()[1]])
+               p3, = ax2.semilogx(c2.index, c2, '.', label='Correlation\n(cut and shift)')
+               ax2.set_prop_cycle(color=[sns.color_palette()[3]])
+               f2_label = 'Fit (cut and shift)\n'+r'$\tau_{D,1}=$'+f'{txy12:.3f}\n'+r'$\tau_{D,2}=$'+f'{txy22:.3f}'
+               p4, = ax2.semilogx(f2.index, f2, '-', lw=3.0, label=f2_label)
+               plt.axvline(x=txy11, color=sns.color_palette()[2])
+               plt.axvline(x=txy12, color=sns.color_palette()[3])
+               plt.axvline(x=txy21, color=sns.color_palette()[2])
+               plt.axvline(x=txy22, color=sns.color_palette()[3])
+
+               plt.setp(ax1, xlim=xlims, ylim=ylims1, title=txt,
+                        xlabel=r'$\tau$ (ms)', ylabel=r'Normalized $G(\tau)$',
+                        yticklabels=[], yticks=[])
+               ax1.grid(False)
+               plt.setp(ax2, xlim=xlims, ylim=ylims2, title=txt,
+                        xlabel=r'$\tau$ (ms)', yticklabels=[], yticks=[])
+               ax2.grid(False)
+               plt.legend(handles=[p1, p3, p2, p4], bbox_to_anchor=(1.02, 1),
+                          loc='upper left', borderaxespad=0)
+               plot1_file = f'data/exp-220316-publication1/jupyter/plot1_{txt}_{i}'.replace(
+                   ' ', '_').replace('\n', '_').replace('(', '').replace(')', '')
+               plt.savefig(f'{plot1_file}.pdf', bbox_inches='tight', dpi=300)
+               os.system(f'pdf2svg {plot1_file}.pdf {plot1_file}.svg')
+               os.system(f'rm {plot1_file}.pdf')
+           plt.close('all')
+     #+END_SRC
+
+     #+RESULTS:
+
+     #+BEGIN_SRC jupyter-python
+       plot_bio_traces(traces_clean, txt='AlexaFluor 488 in solution (clean)')
+       plot_bio_traces(traces_dirty, txt='AlexaFluor 488 + DiO LUVs in solution (dirty)')
+     #+END_SRC
+
+     #+RESULTS:
+
+
+     file:./data/exp-220316-publication1/jupyter/plot1_AlexaFluor_488_in_solution_clean_0.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_AlexaFluor_488_in_solution_clean_1.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_AlexaFluor_488_in_solution_clean_2.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_AlexaFluor_488_+_DiO_LUVs_in_solution_dirty_0.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_AlexaFluor_488_+_DiO_LUVs_in_solution_dirty_1.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_AlexaFluor_488_+_DiO_LUVs_in_solution_dirty_2.svg
+
+
+     #+BEGIN_SRC jupyter-python
+       plot_bio_cluster_prediction(preds_clean, txt='AlexaFluor 488 in solution (clean):\nLUV prediction')
+       plot_bio_cluster_prediction(preds_dirty, txt='AlexaFluor 488 + DiO LUVs in solution (dirty):\nLUV prediction')
+     #+END_SRC
+
+     #+RESULTS:
+
+     file:./data/exp-220316-publication1/jupyter/plot1_AlexaFluor_488_+_DiO_LUVs_in_solution_dirty:_LUV_prediction_preds_0.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_AlexaFluor_488_+_DiO_LUVs_in_solution_dirty:_LUV_prediction_preds_1.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_AlexaFluor_488_+_DiO_LUVs_in_solution_dirty:_LUV_prediction_preds_2.svg
+     [[file:./data/exp-220316-publication1/jupyter/plot1_AlexaFluor_488_in_solution_clean:_LUV_prediction_preds_0.svg]]
+     [[file:./data/exp-220316-publication1/jupyter/plot1_AlexaFluor_488_in_solution_clean:_LUV_prediction_preds_1.svg]]
+     [[file:./data/exp-220316-publication1/jupyter/plot1_AlexaFluor_488_in_solution_clean:_LUV_prediction_preds_2.svg]]
+
+
+     #+BEGIN_SRC jupyter-python
+       plot_bio_prediction_based_segmentation(
+           traces_dirty, preds_dirty,
+           txt='AlexaFluor 488 + DiO LUVs in solution (dirty):\nprediction-based segmentation')
+       plot_bio_prediction_based_segmentation(
+           traces_clean, preds_clean,
+           txt='AlexaFluor 488 in solution (clean):\nprediction-based segmentation')
+     #+END_SRC
+
+     #+RESULTS:
+
+     file:./data/exp-220316-publication1/jupyter/plot1_AlexaFluor_488_+_DiO_LUVs_in_solution_dirty:_prediction-based_segmentation_0.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_AlexaFluor_488_+_DiO_LUVs_in_solution_dirty:_prediction-based_segmentation_1.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_AlexaFluor_488_+_DiO_LUVs_in_solution_dirty:_prediction-based_segmentation_2.svg
+     [[file:./data/exp-220316-publication1/jupyter/plot1_AlexaFluor_488_in_solution_clean:_prediction-based_segmentation_0.svg]]
+     [[file:./data/exp-220316-publication1/jupyter/plot1_AlexaFluor_488_in_solution_clean:_prediction-based_segmentation_1.svg]]
+     [[file:./data/exp-220316-publication1/jupyter/plot1_AlexaFluor_488_in_solution_clean:_prediction-based_segmentation_2.svg]]
+
+
+     #+BEGIN_SRC jupyter-python
+       plot_bio_traces(corrtraces_clean,
+                       txt='AlexaFluor 488 in solution (clean):\nprediction-based "cut and shift" correction')
+       plot_bio_traces(corrtraces_dirty,
+                       txt='AlexaFluor 488 + DiO LUVs in solution (dirty):\nprediction-based "cut and shift" correction')
+     #+END_SRC
+
+     #+RESULTS:
+
+     file:./data/exp-220316-publication1/jupyter/plot1_AlexaFluor_488_+_DiO_LUVs_in_solution_dirty:_prediction-based_cut_and_shift_correction_0.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_AlexaFluor_488_+_DiO_LUVs_in_solution_dirty:_prediction-based_cut_and_shift_correction_1.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_AlexaFluor_488_+_DiO_LUVs_in_solution_dirty:_prediction-based_cut_and_shift_correction_2.svg
+     [[file:./data/exp-220316-publication1/jupyter/plot1_AlexaFluor_488_in_solution_clean:_prediction-based_cut_and_shift_correction_0.svg]]
+     [[file:./data/exp-220316-publication1/jupyter/plot1_AlexaFluor_488_in_solution_clean:_prediction-based_cut_and_shift_correction_1.svg]]
+     [[file:./data/exp-220316-publication1/jupyter/plot1_AlexaFluor_488_in_solution_clean:_prediction-based_cut_and_shift_correction_2.svg]]
+
+
+     #+BEGIN_SRC jupyter-python
+       plot_bio_clean_corr_and_fit(corr_clean, fit_clean, param_clean,
+                                   txt='AlexaFluor 488 in solution (clean):\nCorrelation and 1-component Fit')
+       plot_bio_corrs_and_fits(corr_noc_dirty, corr_cas_dirty, fit_noc_dirty, fit_cas_dirty, param_noc_dirty, param_cas_dirty,
+                               txt='AlexaFluor 488 + DiO LUVs in solution (dirty):\nCorrelations and 2-component Fits')
+
+     #+END_SRC
+
+     #+RESULTS:
+
+     file:./data/exp-220316-publication1/jupyter/plot1_AlexaFluor_488_+_DiO_LUVs_in_solution_dirty:_Correlations_and_2-component_Fits_0.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_AlexaFluor_488_+_DiO_LUVs_in_solution_dirty:_Correlations_and_2-component_Fits_1.svg
+     file:./data/exp-220316-publication1/jupyter/plot1_AlexaFluor_488_+_DiO_LUVs_in_solution_dirty:_Correlations_and_2-component_Fits_2.svg
+     [[file:./data/exp-220316-publication1/jupyter/plot1_AlexaFluor_488_in_solution_clean:_Correlation_and_1-component_Fit_0.svg]]
+     [[file:./data/exp-220316-publication1/jupyter/plot1_AlexaFluor_488_in_solution_clean:_Correlation_and_1-component_Fit_1.svg]]
+     [[file:./data/exp-220316-publication1/jupyter/plot1_AlexaFluor_488_in_solution_clean:_Correlation_and_1-component_Fit_2.svg]]
+
+
+   - now we load a ptufile just to visualize the correction method on TCSPC data
+     (here: TTTR)
+     #+BEGIN_SRC jupyter-python
+       data_path = Path("/home/lex/Programme/drmed-collections/drmed-bioexps/brightbursts/1911DD_alexafluor488+LUVs")
+       path_clean = data_path / 'clean_subsample/'
+       path_dirty = data_path / 'dirty_subsample/'
+       output_path = Path("data/exp-220316-publication1/220323_bioexps")
+
+       def get_ptu(path, output_path):
+
+           files = [path / f for f in os.listdir(path) if f.endswith('.ptu')]
+
+           for myfile in (files):
+               myfile = Path(myfile)
+               (out, ptu_tags, ptu_num_records, glob_res) = ptu.import_ptu(myfile)
+               (subChanArrFull, trueTimeArrFull, dTimeArrFull,
+                resolution) = (out["chanArr"], out["trueTimeArr"],
+                               out["dTimeArr"], out["resolution"])
+                # Remove Overflow and Markers; they are not handled at the
+                # moment.
+               subChanArr = np.array([i for i in subChanArrFull
+                                      if not isinstance(i, tuple)])
+               trueTimeArr = np.array([i for i in trueTimeArrFull
+                                       if not isinstance(i, tuple)])
+               dTimeArr = np.array([i for i in dTimeArrFull
+                                    if not isinstance(i, tuple)])
+               return trueTimeArr, dTimeArr
+
+       ptufile = get_ptu(path_dirty, output_path)
+     #+END_SRC
+
+     #+RESULTS:
+
+     #+BEGIN_SRC jupyter-python
+       test = pd.DataFrame(data=[ptufile[0], ptufile[1]], index=['macroscopic times', 'microscobpic times'], dtype=int)
+       test
+     #+END_SRC
+
+     #+RESULTS:
+     :RESULTS:
+     : /home/lex/Programme/miniconda3/envs/tf/lib/python3.9/site-packages/pandas/core/frame.py:702: FutureWarning: In a future version, passing float-dtype values and an integer dtype to DataFrame will retain floating dtype if they cannot be cast losslessly (matching Series behavior). To retain the old behavior, use DataFrame(data).astype(dtype)
+     :   mgr = arrays_to_mgr(
+     |                    |   0 |    1 |    2 | ... |    5018346 |    5018347 |    5018348 |
+     |--------------------+-----+------+------+-----+------------+------------+------------|
+     | macroscopic times  | 875 | 1400 | 2525 | ... | 9996191498 | 9996192848 | 9996196673 |
+     | microscobpic times |  39 |   46 |  602 | ... |        238 |        111 |         42 |
+
+     2 rows × 5018349 columns
+     :END:
+
+     #+BEGIN_SRC jupyter-python
+
+       display(test.iloc[:, 750:753])
+       display(test.iloc[:, 1540:1543])
+     #+END_SRC
+
+     #+RESULTS:
+     :RESULTS:
+     |                    |     750 |     751 |     752 |
+     |--------------------+---------+---------+---------|
+     | macroscopic times  |  999781 | 1001257 | 1001582 |
+     | microscobpic times |      84 |     101 |     220 |
+
+     |                    |    1540 |    1541 |    1542 |
+     |--------------------+---------+---------+---------|
+     | macroscopic times  | 1999613 | 2000339 | 2000814 |
+     | microscopic times  |      72 |     103 |     970 |
+     :END:
 
 *** the trained models
 
