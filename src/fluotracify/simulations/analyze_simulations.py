@@ -8,6 +8,8 @@ import pandas as pd
 
 from fluotracify.applications import correction, correlate
 
+SEED = 42
+
 
 def correct_correlation_by_label(ntraces, traces_of_interest,
                                  labels_of_interest, fwhm):
@@ -354,3 +356,56 @@ def correlate_simulations_corrected_by_prediction(model,
                         na_rep='NaN',
                         index=False)
     return data_out
+
+
+def cut_simulations_and_shuffle_chunks(array, ncuts):
+    """Cut timeseries randomly and shuffle the chunks of columnwise-ordered
+    timeseries in pandas DataFrame
+
+    Parameters
+    ----------
+    array : pandas DataFrame
+        rows are steps in timeseries, columns are different traces
+    ncuts : int > 1
+        number of cuts (number of chunks = ncuts + 1)
+
+    Returns
+    -------
+    out : pandas DataFrame
+        same traces ordered columnwise, but chunks of rows are shuffled
+
+    Raises
+    ------
+    ValueError:
+        if ncuts is not a integer >= 1
+    ValueError:
+        if array is not a pandas DataFrame
+    """
+    try:
+        ncuts = int(ncuts)
+    except (ValueError, TypeError) as exc:
+        raise ValueError('ncuts has to be an integer') from exc
+    if ncuts < 1:
+        raise ValueError('ncuts has to be >= 1')
+    if not isinstance(array, pd.DataFrame):
+        raise ValueError('array has to be a pandas DataFrame')
+
+    rng = np.random.default_rng(seed=SEED)
+    array_cut = pd.DataFrame()
+    for ntrace in range(array.shape[1]):
+        pos_of_cuts = rng.choice(array.iloc[:, ntrace].index,
+                                 ncuts,
+                                 replace=False,
+                                 shuffle=False)
+        pos_of_cuts.sort()
+        # do operations on numpy array for speed
+        trace = array.iloc[:, ntrace].to_numpy()
+        # split trace at cut positions and return chunks as list of pd Series
+        trace = np.split(trace, pos_of_cuts)
+        # shuffle the list of series
+        trace = rng.permuted(trace)
+        # concatenate the series back to one whole trace and reset the index
+        trace = np.concatenate(trace)
+        trace = pd.Series(trace, name=array.iloc[:, ntrace].name)
+        array_cut = pd.concat([array_cut, trace], axis=1)
+    return array_cut
