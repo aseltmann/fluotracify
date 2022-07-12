@@ -3820,7 +3820,7 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
 
 *** Analysis 1a: Run models on simulated test data
     :PROPERTIES:
-    :header-args:jupyter-python: :session /jpy:localhost#8889:a37e524a-8134-4d8f-b24a-367acaf1bdd3 :pandoc t
+    :header-args:jupyter-python: :session /jpy:localhost#8889:d37e524a-8134-4d8f-b24a-367acaf1bdd3 :pandoc t
     :END:
 
     #+BEGIN_SRC jupyter-python
@@ -3850,7 +3850,9 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
 
       FLUOTRACIFY_PATH = '/beegfs/ye53nis/drmed-git/src/'
       sys.path.append(FLUOTRACIFY_PATH)
-      from fluotracify.applications import corr_fit_object as cfo
+      from fluotracify.applications import (corr_fit_object as cfo,
+                                            correction,
+                                            correlate)
       from fluotracify.imports import ptu_utils as ptu
       from fluotracify.training import (build_model as bm,
                                         preprocess_data as ppd)
@@ -4000,72 +4002,16 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
     :END:
 
     #+begin_src jupyter-python :pandoc t
-      def correlate_and_save(df, out_path, txt):
-          for idx, col in enumerate(df.columns):
-              trace = df.iloc[:, idx].dropna()
-              corr_fn = multipletau.autocorrelate(
-                  a=trace,
-                  m=16,
-                  deltat=1,
-                  normalize=True)
-              autotime = corr_fn[1:, 0]
-              autonorm = corr_fn[1:, 1]
-              out_txt = f'{txt}_{col.replace(".", "dot")}'
-              out_file = Path(f'{datetime.date.today()}_multipletau_'
-                                 f'{out_txt}_{idx:04}_correlation.csv')
-              out_file = Path(out_path) / out_file
 
-              with open(out_file, 'w', encoding='utf-8') as out:
-                  out.write('version,3.0\n')
-                  out.write('numOfCh,1\n')
-                  out.write('type,point\n')
-                  out.write(f'parent_name,{out_txt}\n')
-                  out.write('ch_type,1_1\n')
-                  out.write('kcount,1\n')  # arbitrary value
-                  out.write('numberNandB,1\n')  # arbitrary value
-                  out.write('brightnessNandB,1\n')  # arbitrary value
-                  out.write('carpet pos,0\n')
-                  out.write('pc,0\n')
-                  out.write('Time (ms),CH1 Auto-Correlation\n')
-                  for i in range(autotime.shape[0]):
-                      out.write(f'{autotime[i]},{autonorm[i]}\n')
-                  out.write('end\n')
-              log.debug('predict_correct_correlate: Finished saving of file %s', out_file)
+      logged_scaler = Path(f'/beegfs/ye53nis/drmed-git/data/mlruns/10/{model_ls[model_id]}/params/scaler')
+      logged_scaler = !cat $logged_scaler
+      logged_scaler = logged_scaler[0]
 
-      def predict_correct_correlate(sim_df, model_id, out_path, txt):
-
-          logged_scaler = Path(f'/beegfs/ye53nis/drmed-git/data/mlruns/10/{model_ls[model_id]}/params/scaler')
-          logged_scaler = !cat $logged_scaler
-          logged_scaler = logged_scaler[0]
-
-          logged_model = Path(f'/beegfs/ye53nis/drmed-git/data/mlruns/10/{model_ls[model_id]}/artifacts/model')
-          logged_model = load_model(logged_model, compile=False)
-          logged_model.compile(loss=bm.binary_ce_dice_loss(),
-                               optimizer=Adam(),
-                               metrics = bm.unet_metrics([0.1, 0.3, 0.5, 0.7, 0.9]))
-
-          # predict traces
-          sim_dirty_prepro = ppd.convert_to_tfds_for_unet(sim_df)
-          sim_dirty_prepro = ppd.scale_pad_and_batch_tfds_for_unet(
-              sim_dirty_prepro, scaler=logged_scaler)
-          sim_pred = logged_model.predict(sim_dirty_prepro, verbose=0)
-          sim_pred = pd.DataFrame(sim_pred.squeeze(axis=2)).T
-          sim_pred.columns = sim_columns
-          sim_predbool = sim_pred > pred_thresh
-          log.debug('predict_correct_correlate: Finished prediction with model %s', model_ls[model_id])
-
-          # correct traces
-          sim_corr = pd.DataFrame()
-          for i in range(len(sim_df.columns)):
-              sim_corr_trace = np.delete(sim_df.iloc[:, i].values,
-                                         sim_predbool.iloc[:, i].values)
-              sim_corr_trace = pd.DataFrame(sim_corr_trace)
-              sim_corr = pd.concat([sim_corr, sim_corr_trace], axis='columns')
-          sim_corr.columns = sim_columns
-          log.debug('predict_correct_correlate: Finished "cut and shift" correction.')
-
-          # after correction
-          correlate_and_save(df=sim_corr, out_path=out_path, txt=txt)
+      logged_model = Path(f'/beegfs/ye53nis/drmed-git/data/mlruns/10/{model_ls[model_id]}/artifacts/model')
+      logged_model = load_model(logged_model, compile=False)
+      logged_model.compile(loss=bm.binary_ce_dice_loss(),
+                           optimizer=Adam(),
+                           metrics = bm.unet_metrics([0.1, 0.3, 0.5, 0.7, 0.9]))
 
     #+end_src
 
@@ -4080,17 +4026,18 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
       # plt.setp(ax, xscale='log')
 
       # before correction
-      correlate_and_save(
+      correlate.correlate_timetrace_and_save(
           df=sim_dirty,
           out_path="/beegfs/ye53nis/drmed-git/data/exp-220227-unet/2022-04-22_simulations/",
-          txt='dirty')
+          out_txt='dirty')
 
       for mid, mname in enumerate(model_name_ls):
-          predict_correct_correlate(
+          ans.predict_correct_correlate_simulations(
               sim_df=sim_dirty,
-              model_id=mid,
+              model=logged_model,
+              scaler=logged_scaler,
               out_path="/beegfs/ye53nis/drmed-git/data/exp-220227-unet/2022-04-22_simulations/",
-              txt=mname)
+              out_txt=mname)
 
     #+END_SRC
 
@@ -4584,37 +4531,6 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
 
 
      #+BEGIN_SRC jupyter-python :pandoc t
-       def correlate_and_save(df, out_path, txt):
-           for idx, col in enumerate(df.columns):
-               trace = df.iloc[:, idx].dropna()
-               corr_fn = multipletau.autocorrelate(
-                   a=trace,
-                   m=16,
-                   deltat=1,
-                   normalize=True)
-               autotime = corr_fn[1:, 0]
-               autonorm = corr_fn[1:, 1]
-               out_txt = f'{txt}_{col.replace(".", "dot")}'
-               out_file = Path(f'{datetime.date.today()}_multipletau_'
-                               f'{out_txt}_{idx:04}_correlation.csv')
-               out_file = Path(out_path) / out_file
-
-               with open(out_file, 'w', encoding='utf-8') as out:
-                   out.write('version,3.0\n')
-                   out.write('numOfCh,1\n')
-                   out.write('type,point\n')
-                   out.write(f'parent_name,{out_txt}\n')
-                   out.write('ch_type,1_1\n')
-                   out.write('kcount,1\n')  # arbitrary value
-                   out.write('numberNandB,1\n')  # arbitrary value
-                   out.write('brightnessNandB,1\n')  # arbitrary value
-                   out.write('carpet pos,0\n')
-                   out.write('pc,0\n')
-                   out.write('Time (ms),CH1 Auto-Correlation\n')
-                   for i in range(autotime.shape[0]):
-                       out.write(f'{autotime[i]},{autonorm[i]}\n')
-                   out.write('end\n')
-               log.debug('correlate_and_save: Finished saving of file %s', out_file)
 
        def label_correct_correlate(sim, sim_params, lab_thresh, out_path):
            diffrates = sim_params.loc['diffusion rate of molecules in micrometer^2 / s'].astype(np.float32)
@@ -4657,8 +4573,8 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
            lab_str = f'{lab_thresh}'.replace(".", "dot")
            cas_txt = f'labthresh-{lab_str}_cutandshift'
            del_txt = f'labthresh-{lab_str}_delete'
-           correlate_and_save(df=sim_cas, out_path=out_path, txt=cas_txt)
-           correlate_and_save(df=sim_del, out_path=out_path, txt=del_txt)
+           correlate.correlate_timetrace_and_save(df=sim_cas, out_path=out_path, out_txt=cas_txt)
+           correlate.correlate_timetrace_and_save(df=sim_del, out_path=out_path, out_txt=del_txt)
 
 
      #+END_SRC
@@ -6588,7 +6504,7 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
       : 2022-06-06 11:31:39.219797: I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:156] kernel driver does not appear to be running on this host (node152): /proc/driver/nvidia/version does not exist
       : 2022-06-06 11:31:39.220117: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 AVX512F FMA
       : To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
-      : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
+      : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `
 
 **** node 3
     :PROPERTIES:
