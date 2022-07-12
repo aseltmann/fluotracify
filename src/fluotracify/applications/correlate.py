@@ -2,18 +2,170 @@
 dimensional fluorescence traces. Largely based on Dominic Waithe's FOCUSpoint
 """
 
+import datetime
 import logging
+import os
+
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
+
 from lmfit import Parameters, fit_report, minimize
 from multipletau import autocorrelate
+from pathlib import Path
 
 from fluotracify.applications import (equations_to_fit as eq,
-                                      correlate_cython as ccy)
+                                      correlate_cython as ccy,
+                                      corr_fit_object as cfo)
 
 logging.basicConfig(format='%(asctime)s - %(message)s')
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
+
+
+def correlate_timetrace_and_save(df, out_path, out_txt):
+    """Correlate FCS timetraces ordered columnwise and save each correlation as a
+    single .csv file which can then be fitted by fitting software such as
+    D. Waithe's FOCUSpoint or FCSfitJS (https://dwaithe.github.io/FCSfitJS/)
+
+    Paramters
+    ---------
+    df : pandas DataFrame
+        FCS traces ordered columnwise
+    out_path : str or Path
+        Path where .csv files are saved
+    out_txt : str
+        Used for custom filename, the final file is saved as
+        <out_path>/<datetime>_multipletau_<out_txt>_<df-column-name>_correlation.csv
+
+    Returns
+    -------
+    Nothing, but saves files as described
+
+    Raises
+    ------
+    ValueError
+        if df is not a pd.DataFrame
+    ValueError
+        if out_path is not convertible to a pathlib.Path
+    """
+    if not isinstance(df, pd.DataFrame):
+        raise ValueError('df has to be a pandas DataFrame')
+    try:
+        out_path = Path(out_path)
+    except TypeError as exc:
+        raise ValueError(
+            'out_path has to be convertible to a pathlib.Path') from exc
+
+    for idx, col in enumerate(df.columns):
+        trace = df.iloc[:, idx].dropna()
+        corr_fn = autocorrelate(
+            a=trace,
+            m=16,
+            deltat=1,
+            normalize=True)
+        # there was a bug with the 0th step when loading the file in FCSfitJS
+        # so we just skip it as a workaround
+        autotime = corr_fn[1:, 0]
+        autonorm = corr_fn[1:, 1]
+        out_txt = f'{out_txt}_{col.replace(".", "dot")}'
+        out_file = Path(f'{datetime.date.today()}_multipletau_'
+                        f'{out_txt}_{idx:04}_correlation.csv')
+        out_file = out_path / out_file
+
+        with open(out_file, 'w', encoding='utf-8') as out:
+            out.write('version,3.0\n')
+            out.write('numOfCh,1\n')
+            out.write('type,point\n')
+            out.write(f'parent_name,{out_txt}\n')
+            out.write('ch_type,1_1\n')
+            out.write('kcount,1\n')  # arbitrary value
+            out.write('numberNandB,1\n')  # arbitrary value
+            out.write('brightnessNandB,1\n')  # arbitrary value
+            out.write('carpet pos,0\n')
+            out.write('pc,0\n')
+            out.write('Time (ms),CH1 Auto-Correlation\n')
+            for i in range(autotime.shape[0]):
+                out.write(f'{autotime[i]},{autonorm[i]}\n')
+            out.write('end\n')
+        log.debug('predict_correct_correlate: Finished saving of file %s',
+                  out_file)
+
+
+def correlate_ptu_and_save(in_path, out_path):
+    """Helper function for corr_fit_object.py. Autocorrelate FCS TCSPC data
+    using the tttr2xfcs algorithm and save each correlation as a single .csv
+    file which can then be fitted by fitting software such as D. Waithe's
+    FOCUSpoint or FCSfitJS (https://dwaithe.github.io/FCSfitJS/)
+
+    Parameters
+    ----------
+    in_path : str or pathlib.Path
+        Folder containing .ptu files
+    out_path : str or pathlib.Path
+        Folder for output files
+
+    Returns
+    -------
+    Nothing, but saves a single .csv file for each input file as described.
+
+    Raises
+    ------
+    ValueError
+        if in_path or out_path are not convertible to a pathlib.Path
+
+    Notes
+    -----
+    - To tune tttr2xfcs correlation parameters, instantiate an own
+    ParameterClass()
+    - For tuning different correlation algorithms, or fluorescence trace
+    artifact prediction and correction, directly use the functions provided
+    in corr_fit_object.py.
+    """
+    try:
+        in_path = Path(in_path)
+        out_path = Path(out_path)
+    except TypeError as exc:
+        raise ValueError('in_path and out_path have to be convertible to a'
+                         ' pathlib.Path') from exc
+
+    files = [in_path / f for f in os.listdir(in_path) if f.endswith('.ptu')]
+
+    class ParameterClass():
+        """Stores parameters for correlation """
+        def __init__(self):
+            # Where the data is stored.
+            self.data = []
+            self.objectRef = []
+            self.subObjectRef = []
+            self.colors = ['blue', 'green', 'red', 'cyan', 'magenta',
+                           'yellow', 'black']
+            self.numOfLoaded = 0
+            # very fast from Ncasc ~ 14 onwards
+            self.NcascStart = 0
+            self.NcascEnd = 30  # 25
+            self.Nsub = 6  # 6
+            self.photonLifetimeBin = 10  # used for photon decay
+            self.photonCountBin = 1  # used for time series
+
+    par_obj = ParameterClass()
+
+    for _, myfile in enumerate(files):
+        ptufile = cfo.PicoObject(myfile, par_obj)
+        # init calls the following methods:
+        # self.importData() - imports .ptu data to memory
+        # self.prepareChannels() - checks how many channels are used
+        # self.getPhotonDecay() - gets photon decay curve
+        # self.getTimeSeries() - gets time series
+        # self.getPhotonCountingStats() - gets photon counting statistics
+        for key in list(ptufile.trueTimeArr.keys()):
+            ptufile.get_autocorrelation(method='tttr2xfcs', name=key)
+
+        for m in ['multipletau', 'tttr2xfcs', 'tttr2xfcs_with_weights']:
+            if m in list(ptufile.autoNorm.keys()):
+                for key, _ in list(ptufile.autoNorm[m].items()):
+                    ptufile.save_autocorrelation(name=key, method=m,
+                                                 output_path=out_path)
 
 
 def correlate_and_fit(trace, fwhm, diffrate=None, time_step=1., verbose=True):
