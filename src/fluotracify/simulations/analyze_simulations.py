@@ -1,12 +1,18 @@
 """This module contains functions which are used to analyze the simulated fluorescence traces"""
 
 import datetime
+import logging
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
 from fluotracify.applications import correction, correlate
+from fluotracify.training import preprocess_data as ppd
+
+logging.basicConfig(format='%(asctime)s - %(message)s')
+log = logging.getLogger(__name__)
+log.setLevel(logging.DEBUG)
 
 SEED = 42
 
@@ -56,12 +62,12 @@ def correct_correlation_by_label(ntraces, traces_of_interest,
             continue
 
         (diff_corrected_bylabel, trans_corrected_bylabel,
-         _) = correlate.correlate_and_fit(
-            trace=trace_corrected_bylabel.astype(np.float64),
-            fwhm=fwhm,
-            diffrate=None,
-            time_step=1.,
-            verbose=False)
+         _) = correlate.correlate_and_fit(trace=trace_corrected_bylabel.astype(
+             np.float64),
+                                          fwhm=fwhm,
+                                          diffrate=None,
+                                          time_step=1.,
+                                          verbose=False)
         diffrates_corrected_bylabel.append(diff_corrected_bylabel)
         transit_times_corrected_bylabel.append(trans_corrected_bylabel)
         tracelen_corrected_bylabel.append(len(trace_corrected_bylabel))
@@ -356,6 +362,65 @@ def correlate_simulations_corrected_by_prediction(model,
                         na_rep='NaN',
                         index=False)
     return data_out
+
+
+def predict_correct_correlate_simulations(sim_df,
+                                          model,
+                                          scaler,
+                                          out_path,
+                                          out_txt,
+                                          pred_thresh=0.5):
+    """Predict peak artifacts in columnwise ordered FCS time traces using
+    unet prediction model, then correct for peak artifacts using the
+    'cutandshift' method, correlate the resulting traces, and save out
+    the result as .csv
+
+    Parameters
+    ----------
+    sim_df : pandas DataFrame
+        FCS time traces ordered columnwise
+    model : compiled keras prediction model
+        U-Net architecture as trained in fluotracify.training.build_model.py
+    scaler : str
+        scaler which was applied to the data as part of the training pipeline
+        (will be added to the model pipeline)
+    out_path : str or pathlib.Path
+        Path where .csv files are saved
+    out_txt : str
+        Used for custom filename, the final file is saved as
+        <out_path>/<datetime>_multipletau_<out_txt>_<df-column-name>_correlation.csv
+    pred_thresh : float
+        prediction threshold applied to the resulting time-step wise prediction of
+        the unet
+
+    Returns
+    -------
+    Nothing, but saves files as described
+
+    """
+    # predict traces
+    sim_dirty_prepro = ppd.convert_to_tfds_for_unet(sim_df)
+    sim_dirty_prepro = ppd.scale_pad_and_batch_tfds_for_unet(sim_dirty_prepro,
+                                                             scaler=scaler)
+    sim_pred = model.predict(sim_dirty_prepro, verbose=0)
+    sim_pred = pd.DataFrame(sim_pred.squeeze(axis=2)).T
+    sim_pred.columns = sim_df.columns
+    sim_predbool = sim_pred > pred_thresh
+    log.debug('predict_correct_correlate: Finished prediction with model %s',
+              model.name)
+
+    # correct traces
+    sim_corr = pd.DataFrame()
+    for i in range(len(sim_df.columns)):
+        sim_corr_trace = np.delete(sim_df.iloc[:, i].values,
+                                   sim_predbool.iloc[:, i].values)
+        sim_corr_trace = pd.DataFrame(sim_corr_trace)
+        sim_corr = pd.concat([sim_corr, sim_corr_trace], axis='columns')
+    sim_corr.columns = sim_df.columns
+    log.debug('predict_correct_correlate: Finished "cut and shift" correction')
+
+    # after correction
+    correlate.correlate_timetrace_and_save(sim_corr, out_path, out_txt)
 
 
 def cut_simulations_and_shuffle_chunks(array, ncuts):
