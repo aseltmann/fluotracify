@@ -68,9 +68,9 @@ def correlate_timetrace_and_save(df, out_path, out_txt):
         # so we just skip it as a workaround
         autotime = corr_fn[1:, 0]
         autonorm = corr_fn[1:, 1]
-        out_txt = f'{out_txt}_{col.replace(".", "dot")}'
+        out_file_txt = f'{out_txt}_{col.replace(".", "dot")}'
         out_file = Path(f'{datetime.date.today()}_multipletau_'
-                        f'{out_txt}_{idx:04}_correlation.csv')
+                        f'{out_file_txt}_{idx:04}_correlation.csv')
         out_file = out_path / out_file
 
         with open(out_file, 'w', encoding='utf-8') as out:
