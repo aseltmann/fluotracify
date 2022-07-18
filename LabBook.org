@@ -914,7 +914,6 @@
          Fix tf_pad_trace
      #+end_src
 
-
 *** Plot 1: simulation-prediction-correction pipeline
    :PROPERTIES:
    :header-args:jupyter-python: :session /jpy:localhost#8888:a37e524a-8134-4d8f-b24a-367acaf1bdd3
@@ -976,8 +975,8 @@
      #+END_SRC
 
      #+RESULTS:
-     : 2022-04-12 14:56:03.263050: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
-     : 2022-04-12 14:56:03.263176: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+     : 2022-07-14 12:10:23.479985: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+     : 2022-07-14 12:10:23.480010: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
 
     #+BEGIN_SRC jupyter-python
       import importlib
@@ -2015,6 +2014,392 @@
      | macroscopic times  | 1999613 | 2000339 | 2000814 |
      | microscopic times  |      72 |     103 |     970 |
      :END:
+
+*** Plot 2: characterization of cutandshift
+   :PROPERTIES:
+   :header-args:jupyter-python: :session /jpy:localhost#8888:137e524a-8134-4d8f-b24a-367acaf1bdd3 :pandoc t
+   :END:
+   - We want to check the following properties of FCS trace cutting:
+     1. does cutting introduce artifacts (Does condition of stationarity hold?)
+        → plot of mean / median / mode of transit times in clean trace when cut
+        with growing number of cuts and then shuffling the trace
+
+     #+BEGIN_SRC jupyter-python
+       %cd ~/Programme/drmed-git
+     #+END_SRC
+
+     #+RESULTS:
+     : /home/lex/Programme/drmed-git
+
+   - load modules
+     #+BEGIN_SRC jupyter-python
+       import logging
+       import os
+       import pdb
+       import sys
+
+       import matplotlib.pyplot as plt
+       import numpy as np
+       import pandas as pd
+       import seaborn as sns
+
+       from pathlib import Path
+       from pprint import pprint
+
+       FLUOTRACIFY_PATH = '/home/lex/Programme/drmed-git/src/'
+       sys.path.append(FLUOTRACIFY_PATH)
+       from fluotracify.applications import (corr_fit_object as cfo,
+                                             correlate)
+       from fluotracify.imports import ptu_utils as ptu
+       from fluotracify.simulations import (
+          import_simulation_from_csv as isfc,
+          analyze_simulations as ans,
+       )
+
+       logging.basicConfig(filename="/home/lex/Programme/drmed-git/data/exp-220316-publication1/jupyter.log",
+                           filemode='w', format='%(asctime)s - %(message)s',
+                           force=True,
+                           level=logging.DEBUG)
+
+       sns.set_theme(style="whitegrid", font_scale=2, palette='colorblind',
+                     context='paper')
+
+     #+END_SRC
+
+     #+RESULTS:
+     : 2022-07-15 11:55:18.766590: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+     : 2022-07-15 11:55:18.766686: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+
+    #+BEGIN_SRC jupyter-python
+      import importlib
+      importlib.reload(correlate)
+      importlib.reload(ans)
+    #+END_SRC
+
+    #+RESULTS:
+    : <module 'fluotracify.simulations.analyze_simulations' from '/home/lex/Programme/drmed-git/src/fluotracify/simulations/analyze_simulations.py'>
+
+   - load simulated data
+     #+BEGIN_SRC jupyter-python :pandoc t
+       col_per_example = 3
+       lab_thresh = 0.04
+       artifact = 0
+       model_type = 1
+       fwhm = 250
+       sim_path = Path('/home/lex/Programme/drmed-collections/drmed-simexps/firstartifact_Nov2020_test')
+
+       sim, _, nsamples, sim_params = isfc.import_from_csv(
+           folder=sim_path,
+           header=12,
+           frac_train=1,
+           col_per_example=col_per_example,
+           dropindex=None,
+           dropcolumns=None)
+
+       diffrates = sim_params.loc['diffusion rate of molecules in micrometer^2 / s'].astype(np.float32)
+       nmols = sim_params.loc['number of fast molecules'].astype(np.float32)
+       clusters = sim_params.loc['diffusion rate of clusters in micrometer^2 / s'].astype(np.float32)
+       sim_columns = [f'{d:.4}' for d, c in zip(
+           np.repeat(diffrates, nsamples[0]),
+           np.repeat(clusters, nsamples[0]))]
+
+       sim_sep = isfc.separate_data_and_labels(array=sim,
+                                               nsamples=nsamples,
+                                               col_per_example=col_per_example)
+       sim_dirty = sim_sep['0']
+       sim_dirty.columns = sim_columns
+
+       sim_labels = sim_sep['1']
+       sim_labels.columns = sim_columns
+       sim_labbool = sim_labels > lab_thresh
+       sim_labbool.columns = sim_columns
+       sim_clean = sim_sep['2']
+       sim_clean.columns = sim_columns
+
+       sim_dirty
+     #+END_SRC
+
+     #+RESULTS:
+     :RESULTS:
+     |       | 1.0         | 1.0         | 1.0         | 1.0         | 1.0         | 1.0         | 1.0         | 1.0         | 1.0         | 1.0         | ... | 0.2         | 0.2         | 0.2         | 0.2         | 0.2         | 0.2         | 0.2         | 0.2         | 0.2         | 0.2         |
+|-------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-----+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------|
+| 0     | 1137.443359 | 1254.458618 | 1186.574097 | 637.306458  | 1521.684692 | 677.170532  | 1168.362671 | 1628.718506 | 861.776672  | 1243.531494 | ... | 2118.657471 | 2057.639404 | 2126.922119 | 2617.964111 | 2258.764160 | 1694.151733 | 2535.143555 | 1785.972900 | 1853.346924 | 1877.305298 |
+| 1     | 1064.766479 | 1159.596069 | 1132.475220 | 655.323914  | 1631.872070 | 649.373230  | 1024.309570 | 1539.610596 | 691.026367  | 1204.659668 | ... | 2012.791870 | 2061.374268 | 2091.853516 | 2586.619141 | 2235.359863 | 1668.724854 | 2436.026855 | 1799.635376 | 1799.471191 | 1984.344727 |
+| 2     | 1115.380615 | 1163.550903 | 1068.131348 | 545.208313  | 1413.081055 | 837.581787  | 840.185547  | 1512.560181 | 716.668457  | 1181.674438 | ... | 2006.173218 | 2163.941162 | 2082.030273 | 2646.836670 | 2196.885254 | 1640.936279 | 2431.697021 | 1876.269775 | 1787.451538 | 1962.721680 |
+| 3     | 1030.869263 | 1301.564697 | 983.654480  | 606.174805  | 1435.475098 | 720.902344  | 1067.250610 | 1480.001465 | 716.686279  | 1196.109375 | ... | 2134.022217 | 2177.704102 | 1974.039673 | 2626.399170 | 2225.066895 | 1703.989258 | 2377.174805 | 1895.044922 | 1816.981689 | 2000.941528 |
+| 4     | 1186.906616 | 1372.696045 | 996.091431  | 636.747498  | 1436.380249 | 762.980469  | 1070.283569 | 1540.874634 | 666.972290  | 1099.720581 | ... | 2044.460327 | 2236.866699 | 2008.952026 | 2597.411133 | 2286.010254 | 1804.218506 | 2429.243652 | 1947.826660 | 2091.532715 | 1986.765747 |
+| ...   | ...         | ...         | ...         | ...         | ...         | ...         | ...         | ...         | ...         | ...         | ... | ...         | ...         | ...         | ...         | ...         | ...         | ...         | ...         | ...         | ...         |
+| 16379 | 1188.258057 | 1123.808472 | 1324.048828 | 902.520935  | 661.328552  | 998.909485  | 1213.814697 | 1167.788574 | 3718.382568 | 891.315002  | ... | 1598.518677 | 2353.616699 | 2227.808350 | 1894.450806 | 2645.360352 | 2667.197021 | 1719.079224 | 1756.946533 | 1781.044312 | 2295.302734 |
+| 16380 | 1275.702759 | 990.943237  | 1260.360107 | 961.117737  | 710.035889  | 919.583374  | 1208.030151 | 1169.737183 | 3433.009521 | 1090.649414 | ... | 1620.662964 | 2252.820801 | 2298.797607 | 1827.205933 | 2597.988770 | 3049.374023 | 1653.942993 | 1784.218140 | 1755.557007 | 2246.948730 |
+| 16381 | 1262.139771 | 1006.014893 | 1240.076538 | 953.885193  | 758.210388  | 858.521240  | 1081.140625 | 1249.674683 | 3732.000000 | 1211.191162 | ... | 1560.511108 | 2228.376709 | 2438.944580 | 1899.014893 | 2542.006592 | 2174.580566 | 1628.585693 | 1828.769043 | 1669.530396 | 2234.492432 |
+| 16382 | 1224.168945 | 1037.138672 | 1208.973633 | 956.065491  | 711.904297  | 1024.894653 | 958.588318  | 1180.880371 | 3712.922119 | 1279.076660 | ... | 1474.871338 | 2231.594971 | 2567.258545 | 1872.668457 | 2573.971191 | 1882.204590 | 1687.768677 | 1695.901855 | 1683.422363 | 2134.369629 |
+| 16383 | 1217.611328 | 850.246277  | 1159.042236 | 1022.052185 | 658.546997  | 1143.581909 | 921.202820  | 1029.407349 | 3904.530762 | 1204.061890 | ... | 1408.810913 | 2243.148926 | 3569.665527 | 1926.308838 | 2456.016113 | 2522.900879 | 1738.134644 | 1684.547119 | 1698.406616 | 2192.371338 |
+
+16384 rows × 1200 columns
+     :END:
+
+   - I wrote a small function to cut the simulated traces and shuffle the
+     resulting chunks. Let's look at the results:
+     #+BEGIN_SRC jupyter-python
+       sim_clean_cut = ans.cut_simulations_and_shuffle_chunks(sim_clean, 1000)
+     #+END_SRC
+
+     #+RESULTS:
+     : /home/lex/Programme/drmed-git/src/fluotracify/simulations/analyze_simulations.py:406: VisibleDeprecationWarning: Creating an ndarray from ragged nested sequences (which is a list-or-tuple of lists-or-tuples-or ndarrays with different lengths or shapes) is deprecated. If you meant to do this, you must specify 'dtype=object' when creating the ndarray.
+     :   # shuffle the list of series
+
+
+
+     #+begin_src jupyter-python
+       %%timeit
+       sim_clean_cut = pd.DataFrame()
+       # 230 µs ± 6.17
+       pos_of_cuts = rng.choice(sim_clean.iloc[:, 0].index, 15000, replace=False, shuffle=False)
+       # 3.81 ms ± 186 µs
+       pos_of_cuts.sort()
+       # 15.8 ms ± 796 µs
+       trace = np.split(sim_clean.iloc[:, 0].to_numpy(), pos_of_cuts)
+       # 1.3 ms ± 32.2 µs
+       trace = rng.permuted(trace)
+       # 2.97 ms ± 173 µs
+       trace = np.concatenate(trace)
+
+       trace = pd.Series(trace, name=sim_clean.iloc[:, 0].name)
+       sim_clean_cut = pd.concat([sim_clean_cut, trace], axis=1)
+     #+end_src
+
+     #+RESULTS:
+     : <magic-timeit>:9: VisibleDeprecationWarning: Creating an ndarray from ragged nested sequences (which is a list-or-tuple of lists-or-tuples-or ndarrays with different lengths or shapes) is deprecated. If you meant to do this, you must specify 'dtype=object' when creating the ndarray.
+     : 38.4 ms ± 1.7 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+
+
+     #+BEGIN_SRC jupyter-python
+       out_path = Path('/home/lex/Programme/drmed-git/data/exp-220316-publication1/220714_sim-cutandshift')
+       for i in [1, 10, 100, 1000, 10000]:
+           sim_clean_cut = ans.cut_simulations_and_shuffle_chunks(sim_clean, i)
+
+           for name in set(sim_clean.columns):
+               out_folder = out_path / f'{name}' /  f'{i}_cuts'
+               out_txt = f'{i}-cuts'
+               %mkdir -p $out_folder
+               correlate.correlate_timetrace_and_save(sim_clean_cut.loc[:, name], out_folder, out_txt)
+
+     #+END_SRC
+
+     #+RESULTS:
+     : /home/lex/Programme/drmed-git/src/fluotracify/simulations/analyze_simulations.py:471: VisibleDeprecationWarning: Creating an ndarray from ragged nested sequences (which is a list-or-tuple of lists-or-tuples-or ndarrays with different lengths or shapes) is deprecated. If you meant to do this, you must specify 'dtype=object' when creating the ndarray.
+     :   trace = rng.permuted(trace)
+
+     #+BEGIN_SRC jupyter-python
+       out_path = Path('/home/lex/Programme/drmed-git/data/exp-220316-publication1/220714_sim-cutandshift')
+       for i in [2 , 4, 8, 20, 40, 80, 200, 400, 800]:
+           sim_clean_cut = ans.cut_simulations_and_shuffle_chunks(sim_clean, i)
+
+           for name in set(sim_clean.columns):
+               out_folder = out_path / f'{name}' /  f'{i}_cuts'
+               out_txt = f'{i}-cuts'
+               %mkdir -p $out_folder
+               correlate.correlate_timetrace_and_save(sim_clean_cut.loc[:, name], out_folder, out_txt)
+
+     #+END_SRC
+
+     #+RESULTS:
+
+     #+BEGIN_SRC jupyter-python
+       out_path = Path('/home/lex/Programme/drmed-git/data/exp-220316-publication1/220714_sim-cutandshift')
+       for i in [0]:
+           for name in set(sim_clean.columns):
+               out_folder = out_path / f'{name}' /  f'{i}_cuts'
+               out_txt = f'{i}-cuts'
+               %mkdir -p $out_folder
+               correlate.correlate_timetrace_and_save(sim_clean.loc[:, name], out_folder, out_txt)
+
+     #+END_SRC
+
+     #+RESULTS:
+
+
+   - let's load and plot cuts vs transit times from 3 different base molecule
+     speeds (varying molecule numbers): 0.069, 0.2, and 1.0 um^2/s respectively.
+     #+BEGIN_SRC jupyter-python
+       path = Path('data/exp-220316-publication1/220714_sim-cutandshift')
+
+       # slowest molecules
+       odot069_0cuts_path = path / '0.069/0.069-all-results/0dot069_0-cuts_outputParam.csv'
+       odot069_1cuts_path = path / '0.069/0.069-all-results/0dot069_1-cuts_outputParam.csv'
+       odot069_2cuts_path = path / '0.069/0.069-all-results/0dot069_2-cuts_outputParam.csv'
+       odot069_4cuts_path = path / '0.069/0.069-all-results/0dot069_4-cuts_outputParam.csv'
+       odot069_8cuts_path = path / '0.069/0.069-all-results/0dot069_8-cuts_outputParam.csv'
+       odot069_10cuts_path = path / '0.069/0.069-all-results/0dot069_10-cuts_outputParam.csv'
+       odot069_20cuts_path = path / '0.069/0.069-all-results/0dot069_20-cuts_outputParam.csv'
+       odot069_40cuts_path = path / '0.069/0.069-all-results/0dot069_40-cuts_outputParam.csv'
+       odot069_80cuts_path = path / '0.069/0.069-all-results/0dot069_80-cuts_outputParam.csv'
+       odot069_100cuts_path = path / '0.069/0.069-all-results/0dot069_100-cuts_outputParam.csv'
+       odot069_200cuts_path = path / '0.069/0.069-all-results/0dot069_200-cuts_outputParam.csv'
+       odot069_400cuts_path = path / '0.069/0.069-all-results/0dot069_400-cuts_outputParam.csv'
+       odot069_800cuts_path = path / '0.069/0.069-all-results/0dot069_800-cuts_outputParam.csv'
+       odot069_1000cuts_path = path / '0.069/0.069-all-results/0dot069_1000-cuts_outputParam.csv'
+       odot069_10000cuts_path = path / '0.069/0.069-all-results/0dot069_10000-cuts_outputParam.csv'
+
+       # medium molecules
+       odot2_0cuts_path = path / '0.2/0.2-all-results/0dot2_0-cuts_outputParam.csv'
+       odot2_1cuts_path = path / '0.2/0.2-all-results/0dot2_1-cuts_outputParam.csv'
+       odot2_2cuts_path = path / '0.2/0.2-all-results/0dot2_2-cuts_outputParam.csv'
+       odot2_4cuts_path = path / '0.2/0.2-all-results/0dot2_4-cuts_outputParam.csv'
+       odot2_8cuts_path = path / '0.2/0.2-all-results/0dot2_8-cuts_outputParam.csv'
+       odot2_10cuts_path = path / '0.2/0.2-all-results/0dot2_10-cuts_outputParam.csv'
+       odot2_20cuts_path = path / '0.2/0.2-all-results/0dot2_20-cuts_outputParam.csv'
+       odot2_40cuts_path = path / '0.2/0.2-all-results/0dot2_40-cuts_outputParam.csv'
+       odot2_80cuts_path = path / '0.2/0.2-all-results/0dot2_80-cuts_outputParam.csv'
+       odot2_100cuts_path = path / '0.2/0.2-all-results/0dot2_100-cuts_outputParam.csv'
+       odot2_200cuts_path = path / '0.2/0.2-all-results/0dot2_200-cuts_outputParam.csv'
+       odot2_400cuts_path = path / '0.2/0.2-all-results/0dot2_400-cuts_outputParam.csv'
+       odot2_800cuts_path = path / '0.2/0.2-all-results/0dot2_800-cuts_outputParam.csv'
+       odot2_1000cuts_path = path / '0.2/0.2-all-results/0dot2_1000-cuts_outputParam.csv'
+       odot2_10000cuts_path = path / '0.2/0.2-all-results/0dot2_10000-cuts_outputParam.csv'
+
+       # fast molecules
+       one_0cuts_path = path / '1.0/1.0-all-results/1dot0_0-cuts_outputParam.csv'
+       one_1cuts_path = path / '1.0/1.0-all-results/1dot0_1-cuts_outputParam.csv'
+       one_2cuts_path = path / '1.0/1.0-all-results/1dot0_2-cuts_outputParam.csv'
+       one_4cuts_path = path / '1.0/1.0-all-results/1dot0_4-cuts_outputParam.csv'
+       one_8cuts_path = path / '1.0/1.0-all-results/1dot0_8-cuts_outputParam.csv'
+       one_10cuts_path = path / '1.0/1.0-all-results/1dot0_10-cuts_outputParam.csv'
+       one_20cuts_path = path / '1.0/1.0-all-results/1dot0_20-cuts_outputParam.csv'
+       one_40cuts_path = path / '1.0/1.0-all-results/1dot0_40-cuts_outputParam.csv'
+       one_80cuts_path = path / '1.0/1.0-all-results/1dot0_80-cuts_outputParam.csv'
+       one_100cuts_path = path / '1.0/1.0-all-results/1dot0_100-cuts_outputParam.csv'
+       one_200cuts_path = path / '1.0/1.0-all-results/1dot0_200-cuts_outputParam.csv'
+       one_400cuts_path = path / '1.0/1.0-all-results/1dot0_400-cuts_outputParam.csv'
+       one_800cuts_path = path / '1.0/1.0-all-results/1dot0_800-cuts_outputParam.csv'
+       one_1000cuts_path = path / '1.0/1.0-all-results/1dot0_1000-cuts_outputParam.csv'
+       one_10000cuts_path = path / '1.0/1.0-all-results/1dot0_10000-cuts_outputParam.csv'
+
+       # slowest molecules
+       odot069_0cuts = pd.read_csv(odot069_0cuts_path, sep=',').assign(speed=300*[0.069,])
+       odot069_1cuts = pd.read_csv(odot069_1cuts_path, sep=',').assign(speed=300*[0.069,])
+       odot069_2cuts = pd.read_csv(odot069_2cuts_path, sep=',').assign(speed=300*[0.069,])
+       odot069_4cuts = pd.read_csv(odot069_4cuts_path, sep=',').assign(speed=300*[0.069,])
+       odot069_8cuts = pd.read_csv(odot069_8cuts_path, sep=',').assign(speed=300*[0.069,])
+       odot069_10cuts = pd.read_csv(odot069_10cuts_path, sep=',').assign(speed=300*[0.069,])
+       odot069_20cuts = pd.read_csv(odot069_20cuts_path, sep=',').assign(speed=300*[0.069,])
+       odot069_40cuts = pd.read_csv(odot069_40cuts_path, sep=',').assign(speed=300*[0.069,])
+       odot069_80cuts = pd.read_csv(odot069_80cuts_path, sep=',').assign(speed=300*[0.069,])
+       odot069_100cuts = pd.read_csv(odot069_100cuts_path, sep=',').assign(speed=300*[0.069,])
+       odot069_200cuts = pd.read_csv(odot069_200cuts_path, sep=',').assign(speed=300*[0.069,])
+       odot069_400cuts = pd.read_csv(odot069_400cuts_path, sep=',').assign(speed=300*[0.069,])
+       odot069_800cuts = pd.read_csv(odot069_800cuts_path, sep=',').assign(speed=300*[0.069,])
+       odot069_1000cuts = pd.read_csv(odot069_1000cuts_path, sep=',').assign(speed=300*[0.069,])
+       odot069_10000cuts = pd.read_csv(odot069_10000cuts_path, sep=',').assign(speed=300*[0.069,])
+
+       # medium speed molecules
+       odot2_0cuts = pd.read_csv(odot2_0cuts_path, sep=',').assign(speed=300*[0.2,])
+       odot2_1cuts = pd.read_csv(odot2_1cuts_path, sep=',').assign(speed=300*[0.2,])
+       odot2_2cuts = pd.read_csv(odot2_2cuts_path, sep=',').assign(speed=300*[0.2,])
+       odot2_4cuts = pd.read_csv(odot2_4cuts_path, sep=',').assign(speed=300*[0.2,])
+       odot2_8cuts = pd.read_csv(odot2_8cuts_path, sep=',').assign(speed=300*[0.2,])
+       odot2_10cuts = pd.read_csv(odot2_10cuts_path, sep=',').assign(speed=300*[0.2,])
+       odot2_20cuts = pd.read_csv(odot2_20cuts_path, sep=',').assign(speed=300*[0.2,])
+       odot2_40cuts = pd.read_csv(odot2_40cuts_path, sep=',').assign(speed=300*[0.2,])
+       odot2_80cuts = pd.read_csv(odot2_80cuts_path, sep=',').assign(speed=300*[0.2,])
+       odot2_100cuts = pd.read_csv(odot2_100cuts_path, sep=',').assign(speed=300*[0.2,])
+       odot2_200cuts = pd.read_csv(odot2_200cuts_path, sep=',').assign(speed=300*[0.2,])
+       odot2_400cuts = pd.read_csv(odot2_400cuts_path, sep=',').assign(speed=300*[0.2,])
+       odot2_800cuts = pd.read_csv(odot2_800cuts_path, sep=',').assign(speed=300*[0.2,])
+       odot2_1000cuts = pd.read_csv(odot2_1000cuts_path, sep=',').assign(speed=300*[0.2,])
+       odot2_10000cuts = pd.read_csv(odot2_10000cuts_path, sep=',').assign(speed=300*[0.2,])
+
+
+       # faster molecules
+       one_0cuts = pd.read_csv(one_0cuts_path, sep=',').assign(speed=300*[1.0,])
+       one_1cuts = pd.read_csv(one_1cuts_path, sep=',').assign(speed=300*[1.0,])
+       one_2cuts = pd.read_csv(one_2cuts_path, sep=',').assign(speed=300*[1.0,])
+       one_4cuts = pd.read_csv(one_4cuts_path, sep=',').assign(speed=300*[1.0,])
+       one_8cuts = pd.read_csv(one_8cuts_path, sep=',').assign(speed=300*[1.0,])
+       one_10cuts = pd.read_csv(one_10cuts_path, sep=',').assign(speed=300*[1.0,])
+       one_20cuts = pd.read_csv(one_20cuts_path, sep=',').assign(speed=300*[1.0,])
+       one_40cuts = pd.read_csv(one_40cuts_path, sep=',').assign(speed=300*[1.0,])
+       one_80cuts = pd.read_csv(one_80cuts_path, sep=',').assign(speed=300*[1.0,])
+       one_100cuts = pd.read_csv(one_100cuts_path, sep=',').assign(speed=300*[1.0,])
+       one_200cuts = pd.read_csv(one_200cuts_path, sep=',').assign(speed=300*[1.0,])
+       one_400cuts = pd.read_csv(one_400cuts_path, sep=',').assign(speed=300*[1.0,])
+       one_800cuts = pd.read_csv(one_800cuts_path, sep=',').assign(speed=300*[1.0,])
+       one_1000cuts = pd.read_csv(one_1000cuts_path, sep=',').assign(speed=300*[1.0,])
+       one_10000cuts = pd.read_csv(one_10000cuts_path, sep=',').assign(speed=300*[1.0,])
+
+       all_param = pd.concat([odot069_0cuts, odot069_1cuts, odot069_2cuts,
+                              odot069_4cuts, odot069_8cuts, odot069_10cuts,
+                              odot069_20cuts, odot069_40cuts, odot069_80cuts,
+                              odot069_100cuts, odot069_200cuts, odot069_400cuts,
+                              odot069_800cuts, odot069_1000cuts, odot069_10000cuts,
+                              odot2_0cuts, odot2_1cuts, odot2_2cuts,
+                              odot2_4cuts, odot2_8cuts, odot2_10cuts,
+                              odot2_20cuts, odot2_40cuts, odot2_80cuts,
+                              odot2_100cuts, odot2_200cuts, odot2_400cuts,
+                              odot2_800cuts, odot2_1000cuts, odot2_10000cuts,
+                              one_0cuts, one_1cuts, one_2cuts,
+                              one_4cuts, one_8cuts, one_10cuts,
+                              one_20cuts, one_40cuts, one_80cuts,
+                              one_100cuts, one_200cuts, one_400cuts,
+                              one_800cuts, one_1000cuts, one_10000cuts])
+       all_param.head()
+     #+END_SRC
+
+     #+RESULTS:
+     :RESULTS:
+     |   | name_of_plot                                      | master_file | parent_name | parent_uqid | time of fit              | Diff_eq     | Diff_species | Triplet_eq | Triplet_species | Dimen | ... |  A1 | stdev(A1) |       txy1 | stdev(txy1) | alpha1 | stdev(alpha1) | N (mom) | bri (kHz) | above zero | speed |
+     |---+---------------------------------------------------+-------------+-------------+-------------+--------------------------+-------------+--------------+------------+-----------------+-------+-----+-----+-----------+------------+-------------+--------+---------------+---------+-----------+------------+-------|
+     | 0 | 2022-07-15_multipletau_0-cuts_0dot069_0000_cor... | Not known   | 0-cuts      |           0 | Fri Jul 15 11:59:09 2022 | Equation 1A |            1 | no triplet |               1 |    2D | ... | 1.0 |         0 | 260.674853 |   17.960765 |    1.0 |             0 |     1.0 |       1.0 |   0.829787 | 0.069 |
+     | 1 | 2022-07-15_multipletau_0-cuts_0dot069_0001_cor... | Not known   | 0-cuts      |           0 | Fri Jul 15 11:59:09 2022 | Equation 1A |            1 | no triplet |               1 |    2D | ... | 1.0 |         0 | 243.225061 |   27.450702 |    1.0 |             0 |     1.0 |       1.0 |   0.808511 | 0.069 |
+     | 2 | 2022-07-15_multipletau_0-cuts_0dot069_0002_cor... | Not known   | 0-cuts      |           0 | Fri Jul 15 11:59:09 2022 | Equation 1A |            1 | no triplet |               1 |    2D | ... | 1.0 |         0 | 203.668625 |   16.326836 |    1.0 |             0 |     1.0 |       1.0 |   0.765957 | 0.069 |
+     | 3 | 2022-07-15_multipletau_0-cuts_0dot069_0003_cor... | Not known   | 0-cuts      |           0 | Fri Jul 15 11:59:09 2022 | Equation 1A |            1 | no triplet |               1 |    2D | ... | 1.0 |         0 | 146.365708 |   15.385068 |    1.0 |             0 |     1.0 |       1.0 |   0.808511 | 0.069 |
+     | 4 | 2022-07-15_multipletau_0-cuts_0dot069_0004_cor... | Not known   | 0-cuts      |           0 | Fri Jul 15 11:59:09 2022 | Equation 1A |            1 | no triplet |               1 |    2D | ... | 1.0 |         0 |  95.248179 |    5.913751 |    1.0 |             0 |     1.0 |       1.0 |   0.829787 | 0.069 |
+
+5 rows × 28 columns
+     :END:
+
+
+
+     #+BEGIN_SRC jupyter-python
+       g = sns.catplot(data=all_param,
+                       y='txy1',
+                       x='parent_name',
+                       row='speed',
+                       height=5,
+                       aspect=2,
+                       legend_out=True,
+                       kind='boxen',
+                       showfliers=False)
+       g.map_dataframe(sns.stripplot,
+             y='txy1',
+             x='parent_name',
+             dodge=True,
+             palette=sns.color_palette(['0.3']),
+             size=4,
+             jitter=0.2)
+       g.fig.suptitle('transit time deterioration after with\nincreasing number of cuts and shuffling',
+                      size=25)
+
+       # g._legend.set_title('')
+       # new_labels = ['424 traces of\nAlexaFluor488\n(no artifacts)\n$\\tau_D$ from\n1 species fit',
+       #               '440 traces of\nAF488 + DiO LUVs\n(peak artifacts)\n$\\tau_D$ from\nfast sp. of 2 sp. fit']
+       # for t, l in zip(g._legend.texts, new_labels):
+       #     t.set_text(l)
+       for i, axes in enumerate(g.axes.flat):
+          _ = axes.set_xticklabels(axes.get_xticklabels(), rotation=45)
+
+       plt.setp(g.axes, yscale='log', xlabel='number of cuts',
+                ylabel=r'log transit time $\tau_{D}$ $[ms]$')
+
+       g.tight_layout()
+       plot2_file = 'plot2_transit-times-vs-cuts'
+       plt.savefig(f'./data/exp-220316-publication1/jupyter/{plot2_file}.pdf', bbox_inches='tight', dpi=300)
+       os.system(f'pdf2svg {plot2_file}.pdf {plot2_file}.svg')
+       plt.close('all')
+     #+END_SRC
+
+     #+RESULTS:
+     : Unable to open file
 
 *** the trained models
 
