@@ -390,8 +390,8 @@ def predict_correct_correlate_simulations(sim_df,
         Used for custom filename, the final file is saved as
         <out_path>/<datetime>_multipletau_<out_txt>_<df-column-name>_correlation.csv
     pred_thresh : float
-        prediction threshold applied to the resulting time-step wise prediction of
-        the unet
+        prediction threshold applied to the resulting time-step wise prediction
+        of the unet
 
     Returns
     -------
@@ -418,6 +418,54 @@ def predict_correct_correlate_simulations(sim_df,
         sim_corr = pd.concat([sim_corr, sim_corr_trace], axis='columns')
     sim_corr.columns = sim_df.columns
     log.debug('predict_correct_correlate: Finished "cut and shift" correction')
+
+    # after correction
+    correlate.correlate_timetrace_and_save(sim_corr, out_path, out_txt)
+
+
+def threshold_predict_correct_correlate_simulations(sim_df,
+                                                    out_path,
+                                                    out_txt,
+                                                    threshold=2):
+    """Predict peak artifacts in columnwise ordered FCS time traces using
+    robust scaling and thresholding, then correct for peak artifacts using
+    the 'cutandshift' method, correlate the resulting traces, and save out
+    the result as .csv
+
+    Parameters
+    ----------
+    sim_df : pandas DataFrame
+        FCS time traces ordered columnwise
+    out_path : str or pathlib.Path
+        Path where .csv files are saved
+    out_txt : str
+        Used for custom filename, the final file is saved as
+        <out_path>/<datetime>_multipletau_<out_txt>_<df-column-name>_correlation.csv
+
+    Returns
+    -------
+    Nothing, but saves files as described
+
+    Notes
+    -----
+    - Robust scaling removes the median and scales the data according to
+      the quantile range (here 25th quantile to 75th quantile). This
+      captures outliers better than mean/variance scaling.
+    - threshold=2 is a heuristical threshold which worked well with the
+      fluorescence traces with simulated peak artifacts
+    """
+
+    sim_corr = pd.DataFrame()
+    for i in range(len(sim_df.columns)):
+        trace = sim_df.iloc[:, i].to_numpy()
+        trace_pred = ppd.scale_trace(trace.reshape(-1, 1), 'robust')
+        trace_pred = trace_pred.flatten() > threshold
+        trace_corr = np.delete(trace, trace_pred)
+        trace_corr = pd.DataFrame(trace_corr)
+        sim_corr = pd.concat([sim_corr, trace_corr], axis='columns')
+    sim_corr.columns = sim_df.columns
+    log.debug('threshold_predict_correct_correlate: Finished'
+              ' "cut and shift" correction')
 
     # after correction
     correlate.correlate_timetrace_and_save(sim_corr, out_path, out_txt)
