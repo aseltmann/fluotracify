@@ -821,8 +821,8 @@ def make_distributions(X, transpose=False):
 
     if isinstance(X, pd.Series):
         X_ind = [X.name]
-        X = np.array(X).reshape(1, -1)
         X_col = X.columns
+        X = np.array(X).reshape(1, -1)
     elif transpose:
         X_ind = X.columns
         X_col = X.index
