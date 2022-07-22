@@ -522,3 +522,52 @@ def cut_simulations_and_shuffle_chunks(array, ncuts):
         trace = pd.Series(trace, name=array.iloc[:, ntrace].name)
         array_cut = pd.concat([array_cut, trace], axis=1)
     return array_cut
+
+
+def convert_diffcoeff_to_transittimes(diff, fwhm):
+    """Convert diffusion coefficient to transit times in FCS measurements
+
+    Parameters
+    ----------
+    diff : float or int
+        diffusion coefficient in um^2/s
+    fwhm : float or int
+        full width half maximum in nm
+
+    Returns
+    -------
+    tt : float
+        transit times in ms
+    tt_low_high : list of float
+        log 10% interval around expected transit times.
+
+    Notes
+    -----
+    - transit times and diffusion coefficients are log normal distributed and
+    inversely proportional to each other
+    - Derivation of conversion equation from a conventional Gaussian excitation
+    volume (by Dominic Waithe):
+      FWHM = 2*np.sqrt(2*np.log(2))*sigma
+      # FWHM to sigma conversion
+      sigma = FWHM/(2*np.sqrt(2*np.log(2)))
+      # Sigma from FWHM
+      G = np.exp(-x**2/(2*sigma**2))
+      # is conventional Gaussian
+      G = np.exp(-x**2/(2*(FWHM/(2*np.sqrt(2*np.log(2))))**2))
+      # substitute FWHM for sigma
+      G = np.exp(-x**2/(2*(FWHM**2/(4*2*np.log(2)))))
+      # open the brackets and square contents
+      G = np.exp((-x**2/(2*(FWHM**2)/8.))*(np.log(2)))
+      # decompose fraction
+      G = np.exp((np.log(2.)))**(-x**2/((FWHM**2)/4.0))
+      # power law decomposition
+      G = 2.**(-x**2/(FWHM/2.0)**2)
+      # e^(ln2) = 2 identity.
+    """
+    tt = ((250 / 1000)**2 * 1000) / (8 * np.log(2) * diff)
+    tt_log = np.log(tt)
+    # tt_0dot05 = 0.05 * tt_log
+    tt_0dot1 = 0.1 * tt_log
+    tt_low_high = sorted([np.exp(tt_log - tt_0dot1),
+                          np.exp(tt_log + tt_0dot1)])
+    return tt, tt_low_high
