@@ -134,12 +134,12 @@ class PicoObject():
                                      out["dTimeArr"], out["resolution"])
                 # Remove Overflow and Markers; they are not handled at the
                 # moment.
-                subChanArr = np.array([i for i in subChanArrFull
-                                       if not isinstance(i, tuple)])
-                trueTimeArr = np.array([i for i in trueTimeArrFull
-                                        if not isinstance(i, tuple)])
-                dTimeArr = np.array([i for i in dTimeArrFull
-                                     if not isinstance(i, tuple)])
+                subChanArr = np.array(
+                    [i for i in subChanArrFull if not isinstance(i, tuple)])
+                trueTimeArr = np.array(
+                    [i for i in trueTimeArrFull if not isinstance(i, tuple)])
+                dTimeArr = np.array(
+                    [i for i in dTimeArrFull if not isinstance(i, tuple)])
                 self.subChanArr[key] = subChanArr
                 self.trueTimeArr[key] = trueTimeArr
                 self.dTimeArr = dTimeArr
@@ -490,17 +490,27 @@ class PicoObject():
         self.subChanArr[f'{self.name}'][np.invert(photonInd).astype(
             np.bool)] = 16
 
-    def predictTimeSeries(self, model, scaler, name=None):
+    def predictTimeSeries(self,
+                          method,
+                          scaler,
+                          model=None,
+                          threshold=None,
+                          name=None):
         """Takes a timetrace, performs preprocessing, and applies a compiled
         unet for artifact detection
 
         Parameters
         ----------
-        model : tf.keras.Functional model
+        method : ('threshold', 'unet')
+        model : optional, tf.keras.Functional model
+        threshold : optional, int or float
+            Every timestep above threshold is considered artifactual (useful
+            for e.g. peak artifacts)
         scaler : ('standard', 'robust', 'maxabs', 'quant_g', 'minmax', l1',
                   'l2')
-            Scales / normalizes the input trace. Check with which scaler the
-            training data of the model was scaled and use the same one.
+            Scales / normalizes the input trace. If method='threshold', the
+            threshold is applied to the scaled data. If method='unet', check
+            the scaler the unet was trained with.
 
         Returns
         -------
@@ -514,7 +524,9 @@ class PicoObject():
 
         Note
         ----
-        - The input size of the model:
+        - for method='threshold': robust scaling + threshold=2 seems to work
+          fine
+        - for method='unet': The input size of the model:
             The prediction is made with the trace padded with the median to an
             input size of at least 1024, or if bigger to the size of the next
             biggest power of 2, e.g. 2**13 (8192), 2**14 (16384), ...
@@ -525,6 +537,15 @@ class PicoObject():
         - At the moment we assume one trace (timeSeries[0])
         """
         name = f'{self.name}' if name is None else f'{name}'
+        if method == 'threshold' and (not isinstance(threshold, (float, int))):
+            raise ValueError('If method="threshold", the threshold parameter'
+                             ' has to be int or float')
+        elif method == 'unet':
+            if model is None:
+                raise ValueError('If method="unet", the model parameter has to'
+                                 ' be a compiled tf.keras.Functional model')
+        else:
+            raise ValueError('method has to be "threshold" or "unet"')
         if name not in self.timeSeries:
             raise ValueError(f'name={name} is not a valid key for the'
                              'dictionary self.timeSeries')
@@ -533,14 +554,15 @@ class PicoObject():
         for key, trace in self.timeSeries[name].copy().items():
             trace = np.array(trace).astype(float)
             trace_size = trace.size
-            if trace_size < 1024:
-                input_size = 1024
-            else:
-                input_size = 2**(np.ceil(np.log2(trace_size))).astype(int)
-            pad_size = input_size - trace_size
+            if method == 'unet':
+                if trace_size < 1024:
+                    input_size = 1024
+                else:
+                    input_size = 2**(np.ceil(np.log2(trace_size))).astype(int)
+                pad_size = input_size - trace_size
 
-            # pad trace for unet input
-            trace = np.pad(trace, pad_width=(0, pad_size), mode='median')
+                # pad trace for unet input
+                trace = np.pad(trace, pad_width=(0, pad_size), mode='median')
 
             # scale trace
             trace = np.reshape(trace, newshape=(-1, 1))
@@ -550,12 +572,15 @@ class PicoObject():
                 raise ValueError('Scaling failed.') from ex
 
             # predict trace
-            trace = np.reshape(trace, newshape=(1, -1, 1))
-            try:
-                predictions = model.predict(trace, verbose=0).flatten()
-            except Exception as ex:
-                raise ValueError('The prediction failed. Double-check correct'
-                                 ' input model, input size..') from ex
+            if method == 'unet':
+                trace = np.reshape(trace, newshape=(1, -1, 1))
+                try:
+                    predictions = model.predict(trace, verbose=0).flatten()
+                except Exception as ex:
+                    raise ValueError('The prediction failed. Check correct'
+                                     ' input model, input size..') from ex
+            elif method == 'threshold':
+                predictions = trace.flatten() > threshold
 
             self.predictions[name][f'{key}'] = predictions
             self.timeSeries[name][f'{key}_PREPRO'] = trace.flatten().astype(
