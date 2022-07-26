@@ -535,9 +535,10 @@ class PicoObject():
         - At the moment we assume one trace (timeSeries[0])
         """
         name = f'{self.name}' if name is None else f'{name}'
-        if method == 'threshold' and (not isinstance(threshold, (float, int))):
-            raise ValueError('If method="threshold", the threshold parameter'
-                             ' has to be int or float')
+        if method == 'threshold':
+            if not isinstance(threshold, (float, int)):
+                raise ValueError('If method="threshold", the threshold'
+                                 ' parameter has to be int or float')
         elif method == 'unet':
             if model is None:
                 raise ValueError('If method="unet", the model parameter has to'
