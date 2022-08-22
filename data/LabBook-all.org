@@ -8309,7 +8309,7 @@ Histograms of Conv1D-Kernel (final layer)
 
 *** preparing examplary plots of the results (new kernel, new code)
     :PROPERTIES:
-    :header-args:jupyter-python: :session /jpy:localhost#9999:43e1342d-23dc-4275-bb9d-b98b5fc0a804
+    :header-args:jupyter-python: :session /jpy:localhost#8889:43e1342d-23dc-4275-bb9d-b98b5fc0a804 :pandoc t
     :END:
     - I used a different jupyter kernel for loading (See properties drawer
       above), thus libraries have to be imported again and parameters have to be
@@ -8509,10 +8509,405 @@ Histograms of Conv1D-Kernel (final layer)
       #+RESULTS:
       : The given DataFrame was split into 3 parts with shapes: [(16384, 10000), (16384, 10000), (16384, 10000)]
 
+    - *added <2022-08-22 Mo>*: For machine learning, we did 3 splits of data: =train=, =validation=,
+      =test=. Let's load them and characterize them
+      #+begin_details
+      #+BEGIN_SRC jupyter-python
+        %cd /beegfs/ye53nis/drmed-git
+      #+END_SRC
+
+      #+RESULTS:
+      : /beegfs/ye53nis/drmed-git
+
+      #+BEGIN_SRC jupyter-python
+        !git log -1
+
+        !git status
+      #+END_SRC
+
+      #+RESULTS:
+      #+begin_example
+        commit 6def0df6b174f2f51efc279d6add74e9f809e1eb
+        Author: Apoplex <oligolex@vivaldi.net>
+        Date:   Fri Jul 15 14:36:15 2022 +0200
+
+            fix correlate_timetrace_and_save
+        # On branch exp-220227-unet
+        # Changes not staged for commit:
+        #   (use "git add <file>..." to update what will be committed)
+        #   (use "git checkout -- <file>..." to discard changes in working directory)
+        #   (commit or discard the untracked or modified content in submodules)
+        #
+        #	modified:   src/nanosimpy (untracked content)
+        #
+        # Untracked files:
+        #   (use "git add <file>..." to include in what will be committed)
+        #
+        #	data/0.069.svg
+        #	data/exp-210204-unet/
+        #	data/exp-220120-correlate-ptu/
+        #	data/exp-220227-unet/2022-03-01_experimental/
+        #	data/exp-220227-unet/2022-04-22_simulations/
+        #	data/exp-220227-unet/2022-05-17_simulations/
+        #	data/exp-220227-unet/2022-05-22_experimental/
+        #	data/exp-220227-unet/2022-06-02_experimental-pex5/
+        #	data/exp-220316-publication1/
+        #	data/exp-devtest/
+        #	data/exp-test/
+        #	data/mlruns/
+        #	data/tb/
+        #	experiment_params.csv
+        #	src/fluotracify/applications/correlate_cython.c
+        #	test
+        #	tramp.YDPCnB
+        no changes added to commit (use "git add" and/or "git commit -a")
+      #+end_example
+
+      #+begin_src jupyter-python
+        import sys
+
+        import numpy as np
+        import pandas as pd
+
+
+        from pathlib import Path
+        from pprint import pprint
+
+        FLUOTRACIFY_PATH = '/beegfs/ye53nis/drmed-git/src/'
+        sys.path.append(FLUOTRACIFY_PATH)
+        from fluotracify.simulations import (
+           import_simulation_from_csv as isfc,
+           analyze_simulations as ans,
+        )
+
+      #+end_src
+
+      #+RESULTS:
+      : 2022-08-22 14:53:59.575866: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+      : 2022-08-22 14:53:59.575902: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+
+      #+BEGIN_SRC jupyter-python
+        col_per_example = 3
+        lab_thresh = 0.04
+        artifact = 0
+        model_type = 1
+        fwhm = 250
+
+        train_path = Path('/beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets')
+        val_path = Path('/beegfs/ye53nis/saves/firstartifact_Nov2020_val_max2sets_SORTEDIN')
+        test_path = Path('/beegfs/ye53nis/saves/firstartifact_Nov2020_test')
+
+        train, _, nsamples_train, train_params = isfc.import_from_csv(
+            folder=train_path,
+            header=12,
+            frac_train=1,
+            col_per_example=col_per_example,
+            dropindex=None,
+            dropcolumns=None)
+
+        val, _, nsamples_val, val_params = isfc.import_from_csv(
+            folder=val_path,
+            header=12,
+            frac_train=1,
+            col_per_example=col_per_example,
+            dropindex=None,
+            dropcolumns=None)
+
+        test, _, nsamples_test, test_params = isfc.import_from_csv(
+            folder=test_path,
+            header=12,
+            frac_train=1,
+            col_per_example=col_per_example,
+            dropindex=None,
+            dropcolumns=None)
+
+      #+END_SRC
+
+      #+RESULTS:
+      #+begin_example
+        2022-08-22 15:01:07,583 - sim import tools - 1/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/1.0/0.1/traces_brightclust_Nov2020_D1.0_set004.csv
+        2022-08-22 15:01:10,900 - sim import tools - 2/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.08/0.1/traces_brightclust_Nov2020_D0.08_set002.csv
+        2022-08-22 15:01:14,230 - sim import tools - 3/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.6/1.0/traces_brightclust_Nov2020_D0.6_set001.csv
+        2022-08-22 15:01:24,427 - sim import tools - 4/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/1.0/0.1/traces_brightclust_Nov2020_D1.0_set007.csv
+        2022-08-22 15:01:28,527 - sim import tools - 5/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/1.0/1.0/traces_brightclust_Nov2020_D1.0_set002.csv
+        2022-08-22 15:01:32,186 - sim import tools - 6/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/10/1.0/traces_brightclust_Nov2020_D10_set010.csv
+        2022-08-22 15:01:36,667 - sim import tools - 7/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/10/0.01/traces_brightclust_Nov2020_D10_set004.csv
+        2022-08-22 15:01:40,508 - sim import tools - 8/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/3.0/0.1/traces_brightclust_Nov2020_D3.0_set010.csv
+        2022-08-22 15:01:44,080 - sim import tools - 9/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.08/1.0/traces_brightclust_Nov2020_D0.08_set009.csv
+        2022-08-22 15:01:49,585 - sim import tools - 10/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.1/1.0/traces_brightclust_Nov2020_D0.1_set003.csv2022-08-22 15:01:53,212 - sim import tools - 11/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.1/1.0/traces_brightclust_Nov2020_D0.1_set007.csv
+        2022-08-22 15:01:56,689 - sim import tools - 12/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/1.0/1.0/traces_brightclust_Nov2020_D1.0_set001.csv
+        2022-08-22 15:02:00,568 - sim import tools - 13/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/10/0.01/traces_brightclust_Nov2020_D10_set003.csv
+        2022-08-22 15:02:04,222 - sim import tools - 14/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.6/1.0/traces_brightclust_Nov2020_D0.6_set002.csv
+        2022-08-22 15:02:07,872 - sim import tools - 15/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/50/1.0/traces_brightclust_Nov2020_D50_set005.csv
+        2022-08-22 15:02:11,754 - sim import tools - 16/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.069/1.0/traces_brightclust_Nov2020_D0.069_set009.csv
+        2022-08-22 15:02:16,110 - sim import tools - 17/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/50/1.0/traces_brightclust_Nov2020_D50_set004.csv
+        2022-08-22 15:02:19,635 - sim import tools - 18/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.4/0.01/traces_brightclust_Nov2020_D0.4_set010.csv
+        2022-08-22 15:02:23,317 - sim import tools - 19/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.2/1.0/traces_brightclust_Nov2020_D0.2_set009.csv
+        2022-08-22 15:02:26,787 - sim import tools - 20/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/1.0/0.01/traces_brightclust_Nov2020_D1.0_set010.csv
+        2022-08-22 15:02:30,350 - sim import tools - 21/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.4/1.0/traces_brightclust_Nov2020_D0.4_set007.csv
+        2022-08-22 15:02:38,204 - sim import tools - 22/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.2/1.0/traces_brightclust_Nov2020_D0.2_set010.csv
+        2022-08-22 15:02:42,002 - sim import tools - 23/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/3.0/1.0/traces_brightclust_Nov2020_D3.0_set001.csv
+        2022-08-22 15:02:47,861 - sim import tools - 24/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.4/0.1/traces_brightclust_Nov2020_D0.4_set003.csv
+        2022-08-22 15:02:51,915 - sim import tools - 25/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/3.0/1.0/traces_brightclust_Nov2020_D3.0_set003.csv
+        2022-08-22 15:02:55,479 - sim import tools - 26/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.1/0.01/traces_brightclust_Nov2020_D0.1_set004.csv
+        2022-08-22 15:02:59,060 - sim import tools - 27/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.2/0.1/traces_brightclust_Nov2020_D0.2_set001.csv
+        2022-08-22 15:03:02,729 - sim import tools - 28/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.6/0.1/traces_brightclust_Nov2020_D0.6_set005.csv
+        2022-08-22 15:03:06,402 - sim import tools - 29/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.08/0.1/traces_brightclust_Nov2020_D0.08_set006.csv
+        2022-08-22 15:03:10,838 - sim import tools - 30/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.4/0.01/traces_brightclust_Nov2020_D0.4_set004.csv
+        2022-08-22 15:03:15,520 - sim import tools - 31/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/10/0.1/traces_brightclust_Nov2020_D10_set006.csv
+        2022-08-22 15:03:19,243 - sim import tools - 32/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.2/0.1/traces_brightclust_Nov2020_D0.2_set004.csv
+        2022-08-22 15:03:24,959 - sim import tools - 33/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/3.0/0.01/traces_brightclust_Nov2020_D3.0_set005.csv
+        2022-08-22 15:03:28,685 - sim import tools - 34/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.069/0.1/traces_brightclust_Nov2020_D0.069_set003.csv
+        2022-08-22 15:03:32,498 - sim import tools - 35/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.2/0.01/traces_brightclust_Nov2020_D0.2_set003.csv
+        2022-08-22 15:03:36,044 - sim import tools - 36/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/50/0.01/traces_brightclust_Nov2020_D50_set006.csv
+        2022-08-22 15:03:39,848 - sim import tools - 37/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.6/0.1/traces_brightclust_Nov2020_D0.6_set004.csv
+        2022-08-22 15:03:43,605 - sim import tools - 38/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.08/1.0/traces_brightclust_Nov2020_D0.08_set004.csv
+        2022-08-22 15:03:47,474 - sim import tools - 39/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.6/0.01/traces_brightclust_Nov2020_D0.6_set010.csv
+        2022-08-22 15:03:51,072 - sim import tools - 40/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/10/0.1/traces_brightclust_Nov2020_D10_set007.csv
+        2022-08-22 15:03:54,988 - sim import tools - 41/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.4/1.0/traces_brightclust_Nov2020_D0.4_set006.csv
+        2022-08-22 15:04:01,497 - sim import tools - 42/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.4/0.1/traces_brightclust_Nov2020_D0.4_set002.csv
+        2022-08-22 15:04:05,120 - sim import tools - 43/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.1/0.01/traces_brightclust_Nov2020_D0.1_set006.csv
+        2022-08-22 15:04:08,664 - sim import tools - 44/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/3.0/0.01/traces_brightclust_Nov2020_D3.0_set006.csv
+        2022-08-22 15:04:13,252 - sim import tools - 45/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/50/0.1/traces_brightclust_Nov2020_D50_set010.csv
+        2022-08-22 15:04:16,976 - sim import tools - 46/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.08/0.01/traces_brightclust_Nov2020_D0.08_set007.csv
+        2022-08-22 15:04:20,744 - sim import tools - 47/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.069/0.1/traces_brightclust_Nov2020_D0.069_set002.csv
+        2022-08-22 15:04:24,635 - sim import tools - 48/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/50/0.1/traces_brightclust_Nov2020_D50_set009.csv
+        2022-08-22 15:04:28,258 - sim import tools - 1/12: /beegfs/ye53nis/saves/firstartifact_Nov2020_val_max2sets_SORTEDIN/1.0/0.1/traces_brightclust_Nov2020_D1.0_set009.csv
+        2022-08-22 15:04:31,883 - sim import tools - 2/12: /beegfs/ye53nis/saves/firstartifact_Nov2020_val_max2sets_SORTEDIN/50/1.0/traces_brightclust_Nov2020_D50_set007.csv
+        2022-08-22 15:04:36,746 - sim import tools - 3/12: /beegfs/ye53nis/saves/firstartifact_Nov2020_val_max2sets_SORTEDIN/0.4/0.1/traces_brightclust_Nov2020_D0.4_set009.csv
+        2022-08-22 15:04:40,324 - sim import tools - 4/12: /beegfs/ye53nis/saves/firstartifact_Nov2020_val_max2sets_SORTEDIN/3.0/1.0/traces_brightclust_Nov2020_D3.0_set009.csv
+        2022-08-22 15:04:44,167 - sim import tools - 5/12: /beegfs/ye53nis/saves/firstartifact_Nov2020_val_max2sets_SORTEDIN/0.1/0.01/traces_brightclust_Nov2020_D0.1_set008.csv
+        2022-08-22 15:04:47,733 - sim import tools - 6/12: /beegfs/ye53nis/saves/firstartifact_Nov2020_val_max2sets_SORTEDIN/10/0.01/traces_brightclust_Nov2020_D10_set008.csv
+        2022-08-22 15:04:51,261 - sim import tools - 7/12: /beegfs/ye53nis/saves/firstartifact_Nov2020_val_max2sets_SORTEDIN/0.08/0.1/traces_brightclust_Nov2020_D0.08_set008.csv
+        2022-08-22 15:04:54,837 - sim import tools - 8/12: /beegfs/ye53nis/saves/firstartifact_Nov2020_val_max2sets_SORTEDIN/1.0/1.0/traces_brightclust_Nov2020_D1.0_set008.csv
+        2022-08-22 15:04:58,638 - sim import tools - 9/12: /beegfs/ye53nis/saves/firstartifact_Nov2020_val_max2sets_SORTEDIN/3.0/0.01/traces_brightclust_Nov2020_D3.0_set008.csv
+        2022-08-22 15:05:02,079 - sim import tools - 10/12: /beegfs/ye53nis/saves/firstartifact_Nov2020_val_max2sets_SORTEDIN/0.2/0.1/traces_brightclust_Nov2020_D0.2_set006.csv
+        2022-08-22 15:05:06,190 - sim import tools - 11/12: /beegfs/ye53nis/saves/firstartifact_Nov2020_val_max2sets_SORTEDIN/0.069/0.1/traces_brightclust_Nov2020_D0.069_set006.csv
+        2022-08-22 15:05:09,643 - sim import tools - 12/12: /beegfs/ye53nis/saves/firstartifact_Nov2020_val_max2sets_SORTEDIN/0.6/0.1/traces_brightclust_Nov2020_D0.6_set006.csv
+        2022-08-22 15:05:13,347 - sim import tools - 1/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.069/1.0/traces_brightclust_Nov2020_D0.069_set010.csv
+        2022-08-22 15:05:17,852 - sim import tools - 2/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/50/0.1/traces_brightclust_Nov2020_D50_set003.csv
+        2022-08-22 15:05:21,482 - sim import tools - 3/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.4/0.1/traces_brightclust_Nov2020_D0.4_set001.csv
+        2022-08-22 15:05:25,196 - sim import tools - 4/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.2/0.1/traces_brightclust_Nov2020_D0.2_set007.csv
+        2022-08-22 15:05:29,300 - sim import tools - 5/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/3.0/1.0/traces_brightclust_Nov2020_D3.0_set002.csv
+        2022-08-22 15:05:32,904 - sim import tools - 6/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/3.0/0.01/traces_brightclust_Nov2020_D3.0_set004.csv
+        2022-08-22 15:05:36,427 - sim import tools - 7/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/50/0.01/traces_brightclust_Nov2020_D50_set002.csv
+        2022-08-22 15:05:42,126 - sim import tools - 8/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.2/1.0/traces_brightclust_Nov2020_D0.2_set005.csv
+        2022-08-22 15:05:45,767 - sim import tools - 9/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.6/1.0/traces_brightclust_Nov2020_D0.6_set009.csv
+        2022-08-22 15:05:49,081 - sim import tools - 10/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/10/0.1/traces_brightclust_Nov2020_D10_set001.csv
+        2022-08-22 15:05:52,579 - sim import tools - 11/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.08/1.0/traces_brightclust_Nov2020_D0.08_set001.csv
+        2022-08-22 15:05:56,075 - sim import tools - 12/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.6/0.1/traces_brightclust_Nov2020_D0.6_set003.csv
+        2022-08-22 15:05:59,546 - sim import tools - 13/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.1/1.0/traces_brightclust_Nov2020_D0.1_set001.csv
+        2022-08-22 15:06:03,365 - sim import tools - 14/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.4/1.0/traces_brightclust_Nov2020_D0.4_set005.csv
+        2022-08-22 15:06:06,954 - sim import tools - 15/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/10/1.0/traces_brightclust_Nov2020_D10_set005.csv
+        2022-08-22 15:06:10,482 - sim import tools - 16/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/1.0/1.0/traces_brightclust_Nov2020_D1.0_set005.csv
+        2022-08-22 15:06:15,475 - sim import tools - 17/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.069/0.1/traces_brightclust_Nov2020_D0.069_set001.csv
+        2022-08-22 15:06:19,122 - sim import tools - 18/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/50/1.0/traces_brightclust_Nov2020_D50_set001.csv
+        2022-08-22 15:06:22,559 - sim import tools - 19/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.1/0.01/traces_brightclust_Nov2020_D0.1_set002.csv
+        2022-08-22 15:06:26,128 - sim import tools - 20/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.08/0.1/traces_brightclust_Nov2020_D0.08_set003.csv
+        2022-08-22 15:06:29,503 - sim import tools - 21/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/1.0/0.01/traces_brightclust_Nov2020_D1.0_set006.csv
+        2022-08-22 15:06:32,862 - sim import tools - 22/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/1.0/0.1/traces_brightclust_Nov2020_D1.0_set003.csv
+        2022-08-22 15:06:36,597 - sim import tools - 23/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.2/0.01/traces_brightclust_Nov2020_D0.2_set002.csv
+        2022-08-22 15:06:40,322 - sim import tools - 24/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.1/0.1/traces_brightclust_Nov2020_D0.1_set005.csv
+        2022-08-22 15:06:43,806 - sim import tools - 25/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/3.0/0.1/traces_brightclust_Nov2020_D3.0_set007.csv
+        2022-08-22 15:06:47,273 - sim import tools - 26/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.08/0.01/traces_brightclust_Nov2020_D0.08_set005.csv
+        2022-08-22 15:06:51,150 - sim import tools - 27/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.069/0.01/traces_brightclust_Nov2020_D0.069_set005.csv
+        2022-08-22 15:06:54,884 - sim import tools - 28/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/10/0.01/traces_brightclust_Nov2020_D10_set002.csv
+        2022-08-22 15:06:58,405 - sim import tools - 29/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.6/0.01/traces_brightclust_Nov2020_D0.6_set008.csv
+        2022-08-22 15:07:01,776 - sim import tools - 30/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.4/0.01/traces_brightclust_Nov2020_D0.4_set008.csv
+      #+end_example
+
+      #+BEGIN_SRC jupyter-python
+
+
+        train_sep = isfc.separate_data_and_labels(array=train,
+                                                nsamples=nsamples_train,
+                                                col_per_example=col_per_example)
+
+        val_sep = isfc.separate_data_and_labels(array=val,
+                                                nsamples=nsamples_val,
+                                                col_per_example=col_per_example)
+
+        test_sep = isfc.separate_data_and_labels(array=test,
+                                                nsamples=nsamples_test,
+                                                col_per_example=col_per_example)
+
+        train_dirty = train_sep['0']
+        train_labels = train_sep['1']
+        train_labbool = train_labels > lab_thresh
+        train_clean = train_sep['2']
+
+        val_dirty = val_sep['0']
+        val_labels = val_sep['1']
+        val_labbool = val_labels > lab_thresh
+        val_clean = val_sep['2']
+
+        test_dirty = test_sep['0']
+        test_labels = test_sep['1']
+        test_labbool = test_labels > lab_thresh
+        test_clean = test_sep['2']
+
+        train_dirty
+      #+END_SRC
+
+      #+RESULTS:
+      :RESULTS:
+      : 2022-08-22 15:09:46,295 - sim import tools - The given DataFrame was split into 3 parts with shapes: [(16384, 4800), (16384, 4800), (16384, 4800)]
+      : 2022-08-22 15:09:46,389 - sim import tools - The given DataFrame was split into 3 parts with shapes: [(16384, 1200), (16384, 1200), (16384, 1200)]
+      : 2022-08-22 15:09:46,630 - sim import tools - The given DataFrame was split into 3 parts with shapes: [(16384, 3000), (16384, 3000), (16384, 3000)]
+      |       | trace001    | trace002    | trace003    | trace004    | trace005    | trace006    | trace007    | trace008    | trace009    | trace010    | ... | trace091    | trace092    | trace093    | trace094    | trace095    | trace096    | trace097    | trace098    | trace099    | trace100    |
+|-------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-----+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------|
+| 0     | 2087.936279 | 1859.954834 | 1258.620728 | 2111.855713 | 1154.932617 | 1681.850952 | 1902.115112 | 1953.226929 | 1493.605713 | 1824.782837 | ... | 2991.938965 | 3056.693848 | 3065.942139 | 3209.311768 | 3072.823975 | 2137.467773 | 2536.288086 | 2596.720459 | 2322.556152 | 3241.336670 |
+| 1     | 2225.077148 | 1538.099731 | 1234.391113 | 2202.052979 | 1106.553467 | 1599.424927 | 1756.183716 | 2155.242676 | 1453.128052 | 1733.415771 | ... | 2830.736816 | 2632.801514 | 2681.733887 | 3103.006836 | 2852.432373 | 2902.637939 | 2606.319336 | 2728.558350 | 2388.868164 | 2557.717041 |
+| 2     | 2283.867920 | 1672.847534 | 1297.318359 | 2068.382568 | 1088.629150 | 1539.257568 | 1730.095825 | 1944.324951 | 1615.796753 | 1677.323486 | ... | 3424.374268 | 2697.639648 | 2094.186279 | 2632.571777 | 2324.150879 | 2309.326904 | 2808.739746 | 3119.658447 | 2337.465332 | 2208.561035 |
+| 3     | 2101.477295 | 1826.694214 | 1343.309448 | 1992.692871 | 1082.352295 | 1493.574097 | 1632.583740 | 2063.340576 | 1768.437134 | 1518.847534 | ... | 3126.366455 | 2493.093018 | 1937.462158 | 2888.637939 | 2180.181396 | 2906.921631 | 2272.959717 | 2823.713379 | 2872.672607 | 3321.868408 |
+| 4     | 1987.587769 | 1914.085205 | 1294.796875 | 2188.687256 | 1047.618774 | 1740.084961 | 1642.488403 | 1969.975830 | 1540.356079 | 1479.204956 | ... | 4045.698975 | 2669.068115 | 2655.093018 | 2531.362305 | 3005.655273 | 2545.799316 | 2692.775635 | 3238.976562 | 2815.497314 | 2685.596680 |
+| ...   | ...         | ...         | ...         | ...         | ...         | ...         | ...         | ...         | ...         | ...         | ... | ...         | ...         | ...         | ...         | ...         | ...         | ...         | ...         | ...         | ...         |
+| 16379 | 2248.828369 | 1512.159180 | 2574.389893 | 2085.525146 | 5731.513672 | 1902.472778 | 1578.385742 | 1916.452393 | 1320.047119 | 1550.951904 | ... | 2291.134277 | 4845.781250 | 2534.955322 | 2397.597900 | 2810.859375 | 3058.239746 | 3012.957520 | 2055.962646 | 2597.934814 | 2275.868896 |
+| 16380 | 2194.083984 | 1545.642700 | 2921.095459 | 2010.420410 | 5787.336426 | 1907.732056 | 1580.937744 | 2172.060059 | 1421.129517 | 1479.062744 | ... | 2997.078125 | 5184.318359 | 2522.363281 | 2385.093506 | 2436.397705 | 3615.403076 | 2555.819092 | 1970.641113 | 3601.866455 | 2630.073730 |
+| 16381 | 2067.856201 | 1610.466431 | 3070.954102 | 2197.771729 | 5789.680664 | 1971.624023 | 1475.542847 | 2084.938232 | 1400.463867 | 1298.757202 | ... | 2942.168457 | 5496.346680 | 3230.807373 | 3597.340332 | 2541.044678 | 2924.228516 | 1627.710083 | 2388.055176 | 2722.604248 | 2373.275879 |
+| 16382 | 2067.812988 | 1689.094238 | 3292.006836 | 2390.899170 | 6230.407715 | 1930.711670 | 1451.472778 | 2083.847168 | 1289.194824 | 1380.650146 | ... | 2794.364746 | 5706.733887 | 2287.560303 | 3041.490723 | 2482.794189 | 3858.045654 | 2195.243896 | 2333.582764 | 2728.599365 | 2198.640869 |
+| 16383 | 2240.335205 | 1743.910645 | 3327.093018 | 2357.319092 | 5435.189453 | 1860.456299 | 1333.890869 | 2038.945801 | 1358.094727 | 1312.259766 | ... | 2627.845703 | 5518.034668 | 2491.838867 | 2519.055176 | 3319.664062 | 3653.108398 | 3334.266846 | 2495.438721 | 2713.831055 | 2330.221436 |
+
+16384 rows × 4800 columns
+      :END:
+      #+end_details
+      #+BEGIN_SRC jupyter-python
+        train_ntot = train_labbool.size
+        train_npos = train_labbool.sum().sum()
+        train_nneg = train_ntot - train_npos
+        train_perc = train_npos / train_ntot
+
+        val_ntot = val_labbool.size
+        val_npos = val_labbool.sum().sum()
+        val_nneg = val_ntot - val_npos
+        val_perc = val_npos / val_ntot
+
+        test_ntot = test_labbool.size
+        test_npos = test_labbool.sum().sum()
+        test_nneg = test_ntot - test_npos
+        test_perc = test_npos / test_ntot
+
+        print(f'Total N train: {train_ntot}, N pos train: {train_npos}, N neg train: {train_nneg}, Percent of pos: {train_perc:.2%}')
+        print(f'Total N val: {val_ntot}, N pos val: {val_npos}, N neg val: {val_nneg}, Percent of pos: {val_perc:.2%}')
+        print(f'Total N test: {test_ntot}, N pos test: {test_npos}, N neg test: {test_nneg}, Percent of pos: {test_perc:.2%}')
+
+      #+END_SRC
+
+      #+RESULTS:
+      : Total N train: 78643200, N pos train: 11969767, N neg train: 66673433, Percent of pos: 15.22%
+      : Total N val: 19660800, N pos val: 3162854, N neg val: 16497946, Percent of pos: 16.09%
+      : Total N test: 49152000, N pos test: 7556233, N neg test: 41595767, Percent of pos: 15.37%
+
 *** plots of the simulated traces by diffusion rate
     :PROPERTIES:
-    :header-args:jupyter-python: :session /jpy:localhost#9999:43e1342d-23dc-4275-bb9d-b98b5fc0a804
+    :header-args:jupyter-python: :session /jpy:localhost#8889:43e1342d-23dc-4275-bb9d-b98b5fc0a804
     :END:
+
+    - This is the plotting code:
+      #+begin_details
+      #+BEGIN_SRC jupyter-python
+        import matplotlib.pyplot as plt
+        import numpy as np
+        import pandas as pd
+
+        def plot_traces_by_diffrates(ntraces, col_per_example, diffrate_of_interest,
+																		 data_label_array, experiment_params, artifact):
+						"""A plot to examine simulated traces via
+							 fluotracify.simulations.simulate_trace_with_artifacts
+
+						Parameters
+						----------
+						ntraces : int
+								The number of traces you want to plot. It determines the size of the
+								plot as well, where columns are fixed at 6 and depending on ntraces
+								and col_per_example the number of rows is determined.
+						col_per_example : int
+								Number of columns per example, first column being a trace, and then
+								one or multiple labels
+						diffrate_of_interest : float
+								diffusion rate used to simulate the traces of interest
+						data_label_array : dict of pandas DataFrames
+								Contains one key per column in each simulated example. E.g. if the
+								simulated features comes with two labels, the key '0' will be the
+								array with the features, '1' will be the array with label A and
+								'2' will be the array with label B.
+						experiment_params : pandas DataFrame
+								Contains metadata of the files
+						artifact : {0, 1, 2, 3}
+								0 = no artifact, 1 = bright clusters, 2 = detector dropout,
+								3 = photobleaching
+
+						Returns
+						-------
+						Plot of fluorescence traces and labels from their simulations
+						"""
+						drates = experiment_params.loc[
+								'diffusion rate of molecules in micrometer^2 / s']
+						# get indices of diffusion rates of interest
+						dindices = drates.index.where(drates == str(diffrate_of_interest))
+						dindices = dindices.dropna().astype(int)
+						# get indices of first of each of the 100 traces per file as an example
+						tindices = dindices * 100
+						if artifact == 1:
+								nclusts = experiment_params.loc['number of slow clusters'][dindices]
+								dclusts = experiment_params.loc[
+										'diffusion rate of clusters in micrometer^2 / s'][dindices]
+
+						cols = 6
+						rows = int(ntraces // (cols / col_per_example) +
+											 (ntraces % (cols / col_per_example) > 0))
+						# share y axis only if col_per_example is 1
+						sharey = col_per_example == 1
+
+						fig, ax = plt.subplots(rows,
+																	 cols,
+																	 figsize=(cols * 4, rows * 4),
+																	 sharex=True,
+																	 sharey=sharey)
+						fig.add_subplot(111, frameon=False)
+						# hide tick and tick label of the big axes
+						plt.tick_params(labelcolor='none',
+														top=False,
+														bottom=False,
+														left=False,
+														right=False)
+						plt.grid(False)
+						plt.xlabel("time steps in $ms$", fontsize=20)
+						plt.ylabel('fluorescence intensity in $a.u.$', labelpad=20, fontsize=20)
+						suptitle_height = 1 - (fig.get_figheight() * 0.004)
+						plt.suptitle(t='Simulated Fluorescence Traces With D = {} '
+												 '$\\frac{{\mu m^2}}{{s}}$'.format(diffrate_of_interest),
+												 y=suptitle_height,
+												 fontsize=20)
+						traceid = 0
+						for idx in range(rows):
+								for jdx in range(0, cols, col_per_example):
+										# first plot the trace
+										try:
+												ax[idx,
+													 jdx].plot(data_label_array['0'].iloc[:, tindices[traceid]])
+										except IndexError:
+												break
+										if artifact == 1:
+												ax[idx, jdx].set_title('trace {} ({} clusters, $D_c$ = '
+																							 '{} $\\frac{{\mu m^2}}{{s}}$)'.format(
+																									 traceid + 1, nclusts.iloc[traceid],
+																									 dclusts.iloc[traceid]))
+										else:
+												ax[idx, jdx].set_title('trace {}'.format(traceid + 1))
+										ax[idx, jdx].set_ylim(0, 12000)
+										for kdx in range(1, col_per_example):
+												# then plot the labels, if they are given
+												ax[idx, jdx + kdx].plot(
+														data_label_array['{}'.format(kdx)].iloc[:,
+																																		tindices[traceid]])
+												ax[idx, jdx + kdx].set_title('label {}, type {}'.format(
+														traceid + 1, kdx))
+										traceid += 1
+						plt.show()
+
+      #+END_SRC
+      #+end_details
 
 		- the actual plotting function:
 			#+BEGIN_SRC jupyter-python

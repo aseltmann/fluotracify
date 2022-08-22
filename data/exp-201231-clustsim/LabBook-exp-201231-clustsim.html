@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <title>Lab book Fluotracify</title>
-<!-- 2022-02-20 So 12:16 -->
+<!-- 2022-08-22 Mo 16:17 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="generator" content="Org-mode">
@@ -599,7 +599,7 @@ light grey colour (#f0f0f0) and a pink color when hovering above it.
 <div class="org-src-container">
 
 <pre class="src src-sh" id="setup-tmux"><span style="color: #513f78;">rm</span> <span style="color: #7e544f;">~/.tmux-local-socket-remote-machine</span>
-<span style="color: #268bd2;">REMOTE_SOCKET</span>=$(<span style="color: #6c71c4; font-weight: bold;">ssh</span> <span style="color: #783778;">ara</span> <span style="color: #2aa198;">'tmux ls -F "#{socket_path}"'</span> | <span style="color: #4f5c7e;">head</span> <span style="color: #3f7178;">-1</span>)
+<span style="color: #268bd2;">REMOTE_SOCKET</span>=$(<span style="color: #6c71c4; font-weight: bold;">ssh ara 'tmux ls -F "#{socket_path}"' | head -1</span>)
 <span style="color: #657b83; font-weight: bold;">echo</span> $<span style="color: #268bd2;">REMOTE_SOCKET</span>
 <span style="color: #7a4f7e;">ssh</span> <span style="color: #783778;">ara</span> <span style="color: #7a4f7e;">-tfN</span> <span style="color: #b58900; font-weight: bold;">\</span>
     <span style="color: #784437;">-L</span> <span style="color: #513f78;">~/.tmux-local-socket-remote-machine:</span>$<span style="color: #268bd2;">REMOTE_SOCKET</span>
@@ -808,7 +808,7 @@ machine (note that <code>socket_path</code> was introduced in tmux version 2.2)
 
 <div class="org-src-container">
 
-<pre class="src src-sh"><span style="color: #268bd2;">REMOTE_SOCKET</span>=$(<span style="color: #6c71c4; font-weight: bold;">ssh</span> <span style="color: #783778;">ara</span> <span style="color: #2aa198;">'tmux ls -F "#{socket_path}"'</span> | <span style="color: #4f5c7e;">head</span> <span style="color: #3f7178;">-1</span>)
+<pre class="src src-sh"><span style="color: #268bd2;">REMOTE_SOCKET</span>=$(<span style="color: #6c71c4; font-weight: bold;">ssh ara 'tmux ls -F "#{socket_path}"' | head -1</span>)
 <span style="color: #657b83; font-weight: bold;">echo</span> $<span style="color: #268bd2;">REMOTE_SOCKET</span>
 <span style="color: #7a4f7e;">ssh</span> <span style="color: #783778;">ara</span> <span style="color: #7a4f7e;">-tfN</span> <span style="color: #b58900; font-weight: bold;">\</span>
     <span style="color: #784437;">-L</span> <span style="color: #513f78;">~/.tmux-local-socket-remote-machine:</span>$<span style="color: #268bd2;">REMOTE_SOCKET</span>
@@ -2214,6 +2214,649 @@ train 99 /beegfs/ye53nis/saves/firstartifact_Nov2020/0.4/traces_brightclust_Nov2
 The given DataFrame was split into 3 parts with shapes: [(16384, 10000), (16384, 10000), (16384, 10000)]
 </pre>
 </li>
+
+<li><b>added <span class="timestamp-wrapper"><span class="timestamp">&lt;2022-08-22 Mo&gt;</span></span></b>: For machine learning, we did 3 splits of data: <code>train</code>, <code>validation</code>,
+<code>test</code>. Let's load them and characterize them
+<details>
+<div class="org-src-container">
+
+<pre class="src src-jupyter-python">%<span style="color: #707e4f;">cd</span> /<span style="color: #5e7837;">beegfs</span>/<span style="color: #7a4f7e;">ye53nis</span>/<span style="color: #784437;">drmed</span>-<span style="color: #784437;">git</span>
+</pre>
+</div>
+
+<pre class="example">
+/beegfs/ye53nis/drmed-git
+</pre>
+
+
+<div class="org-src-container">
+
+<pre class="src src-jupyter-python">!<span style="color: #784437;">git</span> <span style="color: #78683f;">log</span> -1
+
+!<span style="color: #784437;">git</span> <span style="color: #374478;">status</span>
+</pre>
+</div>
+
+<pre class="example">
+commit 6def0df6b174f2f51efc279d6add74e9f809e1eb
+Author: Apoplex &lt;oligolex@vivaldi.net&gt;
+Date:   Fri Jul 15 14:36:15 2022 +0200
+
+    fix correlate_timetrace_and_save
+# On branch exp-220227-unet
+# Changes not staged for commit:
+#   (use "git add &lt;file&gt;..." to update what will be committed)
+#   (use "git checkout -- &lt;file&gt;..." to discard changes in working directory)
+#   (commit or discard the untracked or modified content in submodules)
+#
+#	modified:   src/nanosimpy (untracked content)
+#
+# Untracked files:
+#   (use "git add &lt;file&gt;..." to include in what will be committed)
+#
+#	data/0.069.svg
+#	data/exp-210204-unet/
+#	data/exp-220120-correlate-ptu/
+#	data/exp-220227-unet/2022-03-01_experimental/
+#	data/exp-220227-unet/2022-04-22_simulations/
+#	data/exp-220227-unet/2022-05-17_simulations/
+#	data/exp-220227-unet/2022-05-22_experimental/
+#	data/exp-220227-unet/2022-06-02_experimental-pex5/
+#	data/exp-220316-publication1/
+#	data/exp-devtest/
+#	data/exp-test/
+#	data/mlruns/
+#	data/tb/
+#	experiment_params.csv
+#	src/fluotracify/applications/correlate_cython.c
+#	test
+#	tramp.YDPCnB
+no changes added to commit (use "git add" and/or "git commit -a")
+</pre>
+
+<div class="org-src-container">
+
+<pre class="src src-jupyter-python"><span style="color: #859900; font-weight: bold;">import</span> <span style="color: #513f78;">sys</span>
+
+<span style="color: #859900; font-weight: bold;">import</span> <span style="color: #4f5c7e;">numpy</span> <span style="color: #859900; font-weight: bold;">as</span> <span style="color: #707e4f;">np</span>
+<span style="color: #859900; font-weight: bold;">import</span> <span style="color: #5e7837;">pandas</span> <span style="color: #859900; font-weight: bold;">as</span> <span style="color: #783778;">pd</span>
+
+
+<span style="color: #859900; font-weight: bold;">from</span> <span style="color: #43783f;">pathlib</span> <span style="color: #859900; font-weight: bold;">import</span> <span style="color: #78683f;">Path</span>
+<span style="color: #859900; font-weight: bold;">from</span> <span style="color: #4f7e67;">pprint</span> <span style="color: #859900; font-weight: bold;">import</span> <span style="color: #4f7e67;">pprint</span>
+
+<span style="color: #268bd2;">FLUOTRACIFY_PATH</span> = <span style="color: #2aa198;">'/beegfs/ye53nis/drmed-git/src/'</span>
+<span style="color: #513f78;">sys</span>.<span style="color: #513f78;">path</span>.<span style="color: #5e7837;">append</span>(<span style="color: #784437;">FLUOTRACIFY_PATH</span>)
+<span style="color: #859900; font-weight: bold;">from</span> <span style="color: #783778;">fluotracify</span>.<span style="color: #5e7837;">simulations</span> <span style="color: #859900; font-weight: bold;">import</span> (
+<span style="background-color: #eee8d5;"> </span>  <span style="color: #707e4f;">import_simulation_from_csv</span> <span style="color: #859900; font-weight: bold;">as</span> <span style="color: #4f5c7e;">isfc</span>,
+<span style="background-color: #eee8d5;"> </span>  <span style="color: #43783f;">analyze_simulations</span> <span style="color: #859900; font-weight: bold;">as</span> <span style="color: #7a4f7e;">ans</span>,
+)
+
+</pre>
+</div>
+
+<pre class="example">
+2022-08-22 14:53:59.575866: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+2022-08-22 14:53:59.575902: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+</pre>
+
+
+<div class="org-src-container">
+
+<pre class="src src-jupyter-python"><span style="color: #268bd2;">col_per_example</span> = 3
+<span style="color: #268bd2;">lab_thresh</span> = 0.04
+<span style="color: #268bd2;">artifact</span> = 0
+<span style="color: #268bd2;">model_type</span> = 1
+<span style="color: #268bd2;">fwhm</span> = 250
+
+<span style="color: #268bd2;">train_path</span> = <span style="color: #78683f;">Path</span>(<span style="color: #2aa198;">'/beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets'</span>)
+<span style="color: #268bd2;">val_path</span> = <span style="color: #78683f;">Path</span>(<span style="color: #2aa198;">'/beegfs/ye53nis/saves/firstartifact_Nov2020_val_max2sets_SORTEDIN'</span>)
+<span style="color: #268bd2;">test_path</span> = <span style="color: #78683f;">Path</span>(<span style="color: #2aa198;">'/beegfs/ye53nis/saves/firstartifact_Nov2020_test'</span>)
+
+<span style="color: #268bd2;">train</span>, <span style="color: #657b83; font-weight: bold;">_</span>, <span style="color: #268bd2;">nsamples_train</span>, <span style="color: #268bd2;">train_params</span> = <span style="color: #4f5c7e;">isfc</span>.<span style="color: #37785e;">import_from_csv</span>(
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #783f5a;">folder</span>=<span style="color: #783f5a;">train_path</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #513f78;">header</span>=12,
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #7a4f7e;">frac_train</span>=1,
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #78683f;">col_per_example</span>=<span style="color: #78683f;">col_per_example</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #707e4f;">dropindex</span>=<span style="color: #859900; font-weight: bold;">None</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #5e7837;">dropcolumns</span>=<span style="color: #859900; font-weight: bold;">None</span>)
+
+<span style="color: #268bd2;">val</span>, <span style="color: #657b83; font-weight: bold;">_</span>, <span style="color: #268bd2;">nsamples_val</span>, <span style="color: #268bd2;">val_params</span> = <span style="color: #4f5c7e;">isfc</span>.<span style="color: #37785e;">import_from_csv</span>(
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #783f5a;">folder</span>=<span style="color: #7a4f7e;">val_path</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #513f78;">header</span>=12,
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #7a4f7e;">frac_train</span>=1,
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #78683f;">col_per_example</span>=<span style="color: #78683f;">col_per_example</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #707e4f;">dropindex</span>=<span style="color: #859900; font-weight: bold;">None</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #5e7837;">dropcolumns</span>=<span style="color: #859900; font-weight: bold;">None</span>)
+
+<span style="color: #268bd2;">test</span>, <span style="color: #657b83; font-weight: bold;">_</span>, <span style="color: #268bd2;">nsamples_test</span>, <span style="color: #268bd2;">test_params</span> = <span style="color: #4f5c7e;">isfc</span>.<span style="color: #37785e;">import_from_csv</span>(
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #783f5a;">folder</span>=<span style="color: #43783f;">test_path</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #513f78;">header</span>=12,
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #7a4f7e;">frac_train</span>=1,
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #78683f;">col_per_example</span>=<span style="color: #78683f;">col_per_example</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #707e4f;">dropindex</span>=<span style="color: #859900; font-weight: bold;">None</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #5e7837;">dropcolumns</span>=<span style="color: #859900; font-weight: bold;">None</span>)
+
+</pre>
+</div>
+
+<pre class="example">
+2022-08-22 15:01:07,583 - sim import tools - 1/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/1.0/0.1/traces_brightclust_Nov2020_D1.0_set004.csv
+2022-08-22 15:01:10,900 - sim import tools - 2/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.08/0.1/traces_brightclust_Nov2020_D0.08_set002.csv
+2022-08-22 15:01:14,230 - sim import tools - 3/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.6/1.0/traces_brightclust_Nov2020_D0.6_set001.csv
+2022-08-22 15:01:24,427 - sim import tools - 4/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/1.0/0.1/traces_brightclust_Nov2020_D1.0_set007.csv
+2022-08-22 15:01:28,527 - sim import tools - 5/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/1.0/1.0/traces_brightclust_Nov2020_D1.0_set002.csv
+2022-08-22 15:01:32,186 - sim import tools - 6/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/10/1.0/traces_brightclust_Nov2020_D10_set010.csv
+2022-08-22 15:01:36,667 - sim import tools - 7/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/10/0.01/traces_brightclust_Nov2020_D10_set004.csv
+2022-08-22 15:01:40,508 - sim import tools - 8/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/3.0/0.1/traces_brightclust_Nov2020_D3.0_set010.csv
+2022-08-22 15:01:44,080 - sim import tools - 9/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.08/1.0/traces_brightclust_Nov2020_D0.08_set009.csv
+2022-08-22 15:01:49,585 - sim import tools - 10/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.1/1.0/traces_brightclust_Nov2020_D0.1_set003.csv2022-08-22 15:01:53,212 - sim import tools - 11/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.1/1.0/traces_brightclust_Nov2020_D0.1_set007.csv
+2022-08-22 15:01:56,689 - sim import tools - 12/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/1.0/1.0/traces_brightclust_Nov2020_D1.0_set001.csv
+2022-08-22 15:02:00,568 - sim import tools - 13/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/10/0.01/traces_brightclust_Nov2020_D10_set003.csv
+2022-08-22 15:02:04,222 - sim import tools - 14/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.6/1.0/traces_brightclust_Nov2020_D0.6_set002.csv
+2022-08-22 15:02:07,872 - sim import tools - 15/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/50/1.0/traces_brightclust_Nov2020_D50_set005.csv
+2022-08-22 15:02:11,754 - sim import tools - 16/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.069/1.0/traces_brightclust_Nov2020_D0.069_set009.csv
+2022-08-22 15:02:16,110 - sim import tools - 17/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/50/1.0/traces_brightclust_Nov2020_D50_set004.csv
+2022-08-22 15:02:19,635 - sim import tools - 18/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.4/0.01/traces_brightclust_Nov2020_D0.4_set010.csv
+2022-08-22 15:02:23,317 - sim import tools - 19/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.2/1.0/traces_brightclust_Nov2020_D0.2_set009.csv
+2022-08-22 15:02:26,787 - sim import tools - 20/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/1.0/0.01/traces_brightclust_Nov2020_D1.0_set010.csv
+2022-08-22 15:02:30,350 - sim import tools - 21/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.4/1.0/traces_brightclust_Nov2020_D0.4_set007.csv
+2022-08-22 15:02:38,204 - sim import tools - 22/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.2/1.0/traces_brightclust_Nov2020_D0.2_set010.csv
+2022-08-22 15:02:42,002 - sim import tools - 23/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/3.0/1.0/traces_brightclust_Nov2020_D3.0_set001.csv
+2022-08-22 15:02:47,861 - sim import tools - 24/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.4/0.1/traces_brightclust_Nov2020_D0.4_set003.csv
+2022-08-22 15:02:51,915 - sim import tools - 25/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/3.0/1.0/traces_brightclust_Nov2020_D3.0_set003.csv
+2022-08-22 15:02:55,479 - sim import tools - 26/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.1/0.01/traces_brightclust_Nov2020_D0.1_set004.csv
+2022-08-22 15:02:59,060 - sim import tools - 27/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.2/0.1/traces_brightclust_Nov2020_D0.2_set001.csv
+2022-08-22 15:03:02,729 - sim import tools - 28/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.6/0.1/traces_brightclust_Nov2020_D0.6_set005.csv
+2022-08-22 15:03:06,402 - sim import tools - 29/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.08/0.1/traces_brightclust_Nov2020_D0.08_set006.csv
+2022-08-22 15:03:10,838 - sim import tools - 30/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.4/0.01/traces_brightclust_Nov2020_D0.4_set004.csv
+2022-08-22 15:03:15,520 - sim import tools - 31/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/10/0.1/traces_brightclust_Nov2020_D10_set006.csv
+2022-08-22 15:03:19,243 - sim import tools - 32/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.2/0.1/traces_brightclust_Nov2020_D0.2_set004.csv
+2022-08-22 15:03:24,959 - sim import tools - 33/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/3.0/0.01/traces_brightclust_Nov2020_D3.0_set005.csv
+2022-08-22 15:03:28,685 - sim import tools - 34/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.069/0.1/traces_brightclust_Nov2020_D0.069_set003.csv
+2022-08-22 15:03:32,498 - sim import tools - 35/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.2/0.01/traces_brightclust_Nov2020_D0.2_set003.csv
+2022-08-22 15:03:36,044 - sim import tools - 36/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/50/0.01/traces_brightclust_Nov2020_D50_set006.csv
+2022-08-22 15:03:39,848 - sim import tools - 37/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.6/0.1/traces_brightclust_Nov2020_D0.6_set004.csv
+2022-08-22 15:03:43,605 - sim import tools - 38/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.08/1.0/traces_brightclust_Nov2020_D0.08_set004.csv
+2022-08-22 15:03:47,474 - sim import tools - 39/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.6/0.01/traces_brightclust_Nov2020_D0.6_set010.csv
+2022-08-22 15:03:51,072 - sim import tools - 40/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/10/0.1/traces_brightclust_Nov2020_D10_set007.csv
+2022-08-22 15:03:54,988 - sim import tools - 41/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.4/1.0/traces_brightclust_Nov2020_D0.4_set006.csv
+2022-08-22 15:04:01,497 - sim import tools - 42/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.4/0.1/traces_brightclust_Nov2020_D0.4_set002.csv
+2022-08-22 15:04:05,120 - sim import tools - 43/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.1/0.01/traces_brightclust_Nov2020_D0.1_set006.csv
+2022-08-22 15:04:08,664 - sim import tools - 44/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/3.0/0.01/traces_brightclust_Nov2020_D3.0_set006.csv
+2022-08-22 15:04:13,252 - sim import tools - 45/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/50/0.1/traces_brightclust_Nov2020_D50_set010.csv
+2022-08-22 15:04:16,976 - sim import tools - 46/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.08/0.01/traces_brightclust_Nov2020_D0.08_set007.csv
+2022-08-22 15:04:20,744 - sim import tools - 47/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/0.069/0.1/traces_brightclust_Nov2020_D0.069_set002.csv
+2022-08-22 15:04:24,635 - sim import tools - 48/48: /beegfs/ye53nis/saves/firstartifact_Nov2020_train_max2sets/50/0.1/traces_brightclust_Nov2020_D50_set009.csv
+2022-08-22 15:04:28,258 - sim import tools - 1/12: /beegfs/ye53nis/saves/firstartifact_Nov2020_val_max2sets_SORTEDIN/1.0/0.1/traces_brightclust_Nov2020_D1.0_set009.csv
+2022-08-22 15:04:31,883 - sim import tools - 2/12: /beegfs/ye53nis/saves/firstartifact_Nov2020_val_max2sets_SORTEDIN/50/1.0/traces_brightclust_Nov2020_D50_set007.csv
+2022-08-22 15:04:36,746 - sim import tools - 3/12: /beegfs/ye53nis/saves/firstartifact_Nov2020_val_max2sets_SORTEDIN/0.4/0.1/traces_brightclust_Nov2020_D0.4_set009.csv
+2022-08-22 15:04:40,324 - sim import tools - 4/12: /beegfs/ye53nis/saves/firstartifact_Nov2020_val_max2sets_SORTEDIN/3.0/1.0/traces_brightclust_Nov2020_D3.0_set009.csv
+2022-08-22 15:04:44,167 - sim import tools - 5/12: /beegfs/ye53nis/saves/firstartifact_Nov2020_val_max2sets_SORTEDIN/0.1/0.01/traces_brightclust_Nov2020_D0.1_set008.csv
+2022-08-22 15:04:47,733 - sim import tools - 6/12: /beegfs/ye53nis/saves/firstartifact_Nov2020_val_max2sets_SORTEDIN/10/0.01/traces_brightclust_Nov2020_D10_set008.csv
+2022-08-22 15:04:51,261 - sim import tools - 7/12: /beegfs/ye53nis/saves/firstartifact_Nov2020_val_max2sets_SORTEDIN/0.08/0.1/traces_brightclust_Nov2020_D0.08_set008.csv
+2022-08-22 15:04:54,837 - sim import tools - 8/12: /beegfs/ye53nis/saves/firstartifact_Nov2020_val_max2sets_SORTEDIN/1.0/1.0/traces_brightclust_Nov2020_D1.0_set008.csv
+2022-08-22 15:04:58,638 - sim import tools - 9/12: /beegfs/ye53nis/saves/firstartifact_Nov2020_val_max2sets_SORTEDIN/3.0/0.01/traces_brightclust_Nov2020_D3.0_set008.csv
+2022-08-22 15:05:02,079 - sim import tools - 10/12: /beegfs/ye53nis/saves/firstartifact_Nov2020_val_max2sets_SORTEDIN/0.2/0.1/traces_brightclust_Nov2020_D0.2_set006.csv
+2022-08-22 15:05:06,190 - sim import tools - 11/12: /beegfs/ye53nis/saves/firstartifact_Nov2020_val_max2sets_SORTEDIN/0.069/0.1/traces_brightclust_Nov2020_D0.069_set006.csv
+2022-08-22 15:05:09,643 - sim import tools - 12/12: /beegfs/ye53nis/saves/firstartifact_Nov2020_val_max2sets_SORTEDIN/0.6/0.1/traces_brightclust_Nov2020_D0.6_set006.csv
+2022-08-22 15:05:13,347 - sim import tools - 1/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.069/1.0/traces_brightclust_Nov2020_D0.069_set010.csv
+2022-08-22 15:05:17,852 - sim import tools - 2/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/50/0.1/traces_brightclust_Nov2020_D50_set003.csv
+2022-08-22 15:05:21,482 - sim import tools - 3/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.4/0.1/traces_brightclust_Nov2020_D0.4_set001.csv
+2022-08-22 15:05:25,196 - sim import tools - 4/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.2/0.1/traces_brightclust_Nov2020_D0.2_set007.csv
+2022-08-22 15:05:29,300 - sim import tools - 5/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/3.0/1.0/traces_brightclust_Nov2020_D3.0_set002.csv
+2022-08-22 15:05:32,904 - sim import tools - 6/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/3.0/0.01/traces_brightclust_Nov2020_D3.0_set004.csv
+2022-08-22 15:05:36,427 - sim import tools - 7/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/50/0.01/traces_brightclust_Nov2020_D50_set002.csv
+2022-08-22 15:05:42,126 - sim import tools - 8/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.2/1.0/traces_brightclust_Nov2020_D0.2_set005.csv
+2022-08-22 15:05:45,767 - sim import tools - 9/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.6/1.0/traces_brightclust_Nov2020_D0.6_set009.csv
+2022-08-22 15:05:49,081 - sim import tools - 10/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/10/0.1/traces_brightclust_Nov2020_D10_set001.csv
+2022-08-22 15:05:52,579 - sim import tools - 11/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.08/1.0/traces_brightclust_Nov2020_D0.08_set001.csv
+2022-08-22 15:05:56,075 - sim import tools - 12/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.6/0.1/traces_brightclust_Nov2020_D0.6_set003.csv
+2022-08-22 15:05:59,546 - sim import tools - 13/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.1/1.0/traces_brightclust_Nov2020_D0.1_set001.csv
+2022-08-22 15:06:03,365 - sim import tools - 14/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.4/1.0/traces_brightclust_Nov2020_D0.4_set005.csv
+2022-08-22 15:06:06,954 - sim import tools - 15/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/10/1.0/traces_brightclust_Nov2020_D10_set005.csv
+2022-08-22 15:06:10,482 - sim import tools - 16/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/1.0/1.0/traces_brightclust_Nov2020_D1.0_set005.csv
+2022-08-22 15:06:15,475 - sim import tools - 17/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.069/0.1/traces_brightclust_Nov2020_D0.069_set001.csv
+2022-08-22 15:06:19,122 - sim import tools - 18/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/50/1.0/traces_brightclust_Nov2020_D50_set001.csv
+2022-08-22 15:06:22,559 - sim import tools - 19/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.1/0.01/traces_brightclust_Nov2020_D0.1_set002.csv
+2022-08-22 15:06:26,128 - sim import tools - 20/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.08/0.1/traces_brightclust_Nov2020_D0.08_set003.csv
+2022-08-22 15:06:29,503 - sim import tools - 21/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/1.0/0.01/traces_brightclust_Nov2020_D1.0_set006.csv
+2022-08-22 15:06:32,862 - sim import tools - 22/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/1.0/0.1/traces_brightclust_Nov2020_D1.0_set003.csv
+2022-08-22 15:06:36,597 - sim import tools - 23/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.2/0.01/traces_brightclust_Nov2020_D0.2_set002.csv
+2022-08-22 15:06:40,322 - sim import tools - 24/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.1/0.1/traces_brightclust_Nov2020_D0.1_set005.csv
+2022-08-22 15:06:43,806 - sim import tools - 25/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/3.0/0.1/traces_brightclust_Nov2020_D3.0_set007.csv
+2022-08-22 15:06:47,273 - sim import tools - 26/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.08/0.01/traces_brightclust_Nov2020_D0.08_set005.csv
+2022-08-22 15:06:51,150 - sim import tools - 27/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.069/0.01/traces_brightclust_Nov2020_D0.069_set005.csv
+2022-08-22 15:06:54,884 - sim import tools - 28/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/10/0.01/traces_brightclust_Nov2020_D10_set002.csv
+2022-08-22 15:06:58,405 - sim import tools - 29/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.6/0.01/traces_brightclust_Nov2020_D0.6_set008.csv
+2022-08-22 15:07:01,776 - sim import tools - 30/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.4/0.01/traces_brightclust_Nov2020_D0.4_set008.csv
+</pre>
+
+<div class="org-src-container">
+
+<pre class="src src-jupyter-python"><span style="color: #268bd2;">train_sep</span> = <span style="color: #4f5c7e;">isfc</span>.<span style="color: #3f7178;">separate_data_and_labels</span>(<span style="color: #78683f;">array</span>=<span style="color: #7e544f;">train</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #783f5a;">nsamples</span>=<span style="color: #374478;">nsamples_train</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #78683f;">col_per_example</span>=<span style="color: #78683f;">col_per_example</span>)
+
+<span style="color: #268bd2;">val_sep</span> = <span style="color: #4f5c7e;">isfc</span>.<span style="color: #3f7178;">separate_data_and_labels</span>(<span style="color: #78683f;">array</span>=<span style="color: #707e4f;">val</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #783f5a;">nsamples</span>=<span style="color: #513f78;">nsamples_val</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #78683f;">col_per_example</span>=<span style="color: #78683f;">col_per_example</span>)
+
+<span style="color: #268bd2;">test_sep</span> = <span style="color: #4f5c7e;">isfc</span>.<span style="color: #3f7178;">separate_data_and_labels</span>(<span style="color: #78683f;">array</span>=<span style="color: #43783f;">test</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #783f5a;">nsamples</span>=<span style="color: #7a4f7e;">nsamples_test</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #78683f;">col_per_example</span>=<span style="color: #78683f;">col_per_example</span>)
+
+<span style="color: #268bd2;">train_dirty</span> = <span style="color: #783778;">train_sep</span>[<span style="color: #2aa198;">'0'</span>]
+<span style="color: #268bd2;">train_labels</span> = <span style="color: #783778;">train_sep</span>[<span style="color: #2aa198;">'1'</span>]
+<span style="color: #268bd2;">train_labbool</span> = <span style="color: #784437;">train_labels</span> &gt; <span style="color: #37785e;">lab_thresh</span>
+<span style="color: #268bd2;">train_clean</span> = <span style="color: #783778;">train_sep</span>[<span style="color: #2aa198;">'2'</span>]
+
+<span style="color: #268bd2;">val_dirty</span> = <span style="color: #43783f;">val_sep</span>[<span style="color: #2aa198;">'0'</span>]
+<span style="color: #268bd2;">val_labels</span> = <span style="color: #43783f;">val_sep</span>[<span style="color: #2aa198;">'1'</span>]
+<span style="color: #268bd2;">val_labbool</span> = <span style="color: #4f7e67;">val_labels</span> &gt; <span style="color: #37785e;">lab_thresh</span>
+<span style="color: #268bd2;">val_clean</span> = <span style="color: #43783f;">val_sep</span>[<span style="color: #2aa198;">'2'</span>]
+
+<span style="color: #268bd2;">test_dirty</span> = <span style="color: #4f5c7e;">test_sep</span>[<span style="color: #2aa198;">'0'</span>]
+<span style="color: #268bd2;">test_labels</span> = <span style="color: #4f5c7e;">test_sep</span>[<span style="color: #2aa198;">'1'</span>]
+<span style="color: #268bd2;">test_labbool</span> = <span style="color: #784437;">test_labels</span> &gt; <span style="color: #37785e;">lab_thresh</span>
+<span style="color: #268bd2;">test_clean</span> = <span style="color: #4f5c7e;">test_sep</span>[<span style="color: #2aa198;">'2'</span>]
+
+<span style="color: #7e544f;">train_dirty</span>
+</pre>
+</div>
+
+<pre class="example">
+2022-08-22 15:09:46,295 - sim import tools - The given DataFrame was split into 3 parts with shapes: [(16384, 4800), (16384, 4800), (16384, 4800)]
+2022-08-22 15:09:46,389 - sim import tools - The given DataFrame was split into 3 parts with shapes: [(16384, 1200), (16384, 1200), (16384, 1200)]
+2022-08-22 15:09:46,630 - sim import tools - The given DataFrame was split into 3 parts with shapes: [(16384, 3000), (16384, 3000), (16384, 3000)]
+</pre>
+
+<table class="table table-striped table-bordered table-hover table-condensed">
+
+
+<colgroup>
+<col  class="right">
+
+<col  class="right">
+
+<col  class="right">
+
+<col  class="right">
+
+<col  class="right">
+
+<col  class="right">
+
+<col  class="right">
+
+<col  class="right">
+
+<col  class="right">
+
+<col  class="right">
+
+<col  class="right">
+
+<col  class="left">
+
+<col  class="right">
+
+<col  class="right">
+
+<col  class="right">
+
+<col  class="right">
+
+<col  class="right">
+
+<col  class="right">
+
+<col  class="right">
+
+<col  class="right">
+
+<col  class="right">
+
+<col  class="right">
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="text-right">&#xa0;</th>
+<th scope="col" class="text-right">trace001</th>
+<th scope="col" class="text-right">trace002</th>
+<th scope="col" class="text-right">trace003</th>
+<th scope="col" class="text-right">trace004</th>
+<th scope="col" class="text-right">trace005</th>
+<th scope="col" class="text-right">trace006</th>
+<th scope="col" class="text-right">trace007</th>
+<th scope="col" class="text-right">trace008</th>
+<th scope="col" class="text-right">trace009</th>
+<th scope="col" class="text-right">trace010</th>
+<th scope="col" class="text-left">&#x2026;</th>
+<th scope="col" class="text-right">trace091</th>
+<th scope="col" class="text-right">trace092</th>
+<th scope="col" class="text-right">trace093</th>
+<th scope="col" class="text-right">trace094</th>
+<th scope="col" class="text-right">trace095</th>
+<th scope="col" class="text-right">trace096</th>
+<th scope="col" class="text-right">trace097</th>
+<th scope="col" class="text-right">trace098</th>
+<th scope="col" class="text-right">trace099</th>
+<th scope="col" class="text-right">trace100</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="text-right">0</td>
+<td class="text-right">2087.936279</td>
+<td class="text-right">1859.954834</td>
+<td class="text-right">1258.620728</td>
+<td class="text-right">2111.855713</td>
+<td class="text-right">1154.932617</td>
+<td class="text-right">1681.850952</td>
+<td class="text-right">1902.115112</td>
+<td class="text-right">1953.226929</td>
+<td class="text-right">1493.605713</td>
+<td class="text-right">1824.782837</td>
+<td class="text-left">&#x2026;</td>
+<td class="text-right">2991.938965</td>
+<td class="text-right">3056.693848</td>
+<td class="text-right">3065.942139</td>
+<td class="text-right">3209.311768</td>
+<td class="text-right">3072.823975</td>
+<td class="text-right">2137.467773</td>
+<td class="text-right">2536.288086</td>
+<td class="text-right">2596.720459</td>
+<td class="text-right">2322.556152</td>
+<td class="text-right">3241.336670</td>
+</tr>
+
+<tr>
+<td class="text-right">1</td>
+<td class="text-right">2225.077148</td>
+<td class="text-right">1538.099731</td>
+<td class="text-right">1234.391113</td>
+<td class="text-right">2202.052979</td>
+<td class="text-right">1106.553467</td>
+<td class="text-right">1599.424927</td>
+<td class="text-right">1756.183716</td>
+<td class="text-right">2155.242676</td>
+<td class="text-right">1453.128052</td>
+<td class="text-right">1733.415771</td>
+<td class="text-left">&#x2026;</td>
+<td class="text-right">2830.736816</td>
+<td class="text-right">2632.801514</td>
+<td class="text-right">2681.733887</td>
+<td class="text-right">3103.006836</td>
+<td class="text-right">2852.432373</td>
+<td class="text-right">2902.637939</td>
+<td class="text-right">2606.319336</td>
+<td class="text-right">2728.558350</td>
+<td class="text-right">2388.868164</td>
+<td class="text-right">2557.717041</td>
+</tr>
+
+<tr>
+<td class="text-right">2</td>
+<td class="text-right">2283.867920</td>
+<td class="text-right">1672.847534</td>
+<td class="text-right">1297.318359</td>
+<td class="text-right">2068.382568</td>
+<td class="text-right">1088.629150</td>
+<td class="text-right">1539.257568</td>
+<td class="text-right">1730.095825</td>
+<td class="text-right">1944.324951</td>
+<td class="text-right">1615.796753</td>
+<td class="text-right">1677.323486</td>
+<td class="text-left">&#x2026;</td>
+<td class="text-right">3424.374268</td>
+<td class="text-right">2697.639648</td>
+<td class="text-right">2094.186279</td>
+<td class="text-right">2632.571777</td>
+<td class="text-right">2324.150879</td>
+<td class="text-right">2309.326904</td>
+<td class="text-right">2808.739746</td>
+<td class="text-right">3119.658447</td>
+<td class="text-right">2337.465332</td>
+<td class="text-right">2208.561035</td>
+</tr>
+
+<tr>
+<td class="text-right">3</td>
+<td class="text-right">2101.477295</td>
+<td class="text-right">1826.694214</td>
+<td class="text-right">1343.309448</td>
+<td class="text-right">1992.692871</td>
+<td class="text-right">1082.352295</td>
+<td class="text-right">1493.574097</td>
+<td class="text-right">1632.583740</td>
+<td class="text-right">2063.340576</td>
+<td class="text-right">1768.437134</td>
+<td class="text-right">1518.847534</td>
+<td class="text-left">&#x2026;</td>
+<td class="text-right">3126.366455</td>
+<td class="text-right">2493.093018</td>
+<td class="text-right">1937.462158</td>
+<td class="text-right">2888.637939</td>
+<td class="text-right">2180.181396</td>
+<td class="text-right">2906.921631</td>
+<td class="text-right">2272.959717</td>
+<td class="text-right">2823.713379</td>
+<td class="text-right">2872.672607</td>
+<td class="text-right">3321.868408</td>
+</tr>
+
+<tr>
+<td class="text-right">4</td>
+<td class="text-right">1987.587769</td>
+<td class="text-right">1914.085205</td>
+<td class="text-right">1294.796875</td>
+<td class="text-right">2188.687256</td>
+<td class="text-right">1047.618774</td>
+<td class="text-right">1740.084961</td>
+<td class="text-right">1642.488403</td>
+<td class="text-right">1969.975830</td>
+<td class="text-right">1540.356079</td>
+<td class="text-right">1479.204956</td>
+<td class="text-left">&#x2026;</td>
+<td class="text-right">4045.698975</td>
+<td class="text-right">2669.068115</td>
+<td class="text-right">2655.093018</td>
+<td class="text-right">2531.362305</td>
+<td class="text-right">3005.655273</td>
+<td class="text-right">2545.799316</td>
+<td class="text-right">2692.775635</td>
+<td class="text-right">3238.976562</td>
+<td class="text-right">2815.497314</td>
+<td class="text-right">2685.596680</td>
+</tr>
+
+<tr>
+<td class="text-right">&#x2026;</td>
+<td class="text-right">&#x2026;</td>
+<td class="text-right">&#x2026;</td>
+<td class="text-right">&#x2026;</td>
+<td class="text-right">&#x2026;</td>
+<td class="text-right">&#x2026;</td>
+<td class="text-right">&#x2026;</td>
+<td class="text-right">&#x2026;</td>
+<td class="text-right">&#x2026;</td>
+<td class="text-right">&#x2026;</td>
+<td class="text-right">&#x2026;</td>
+<td class="text-left">&#x2026;</td>
+<td class="text-right">&#x2026;</td>
+<td class="text-right">&#x2026;</td>
+<td class="text-right">&#x2026;</td>
+<td class="text-right">&#x2026;</td>
+<td class="text-right">&#x2026;</td>
+<td class="text-right">&#x2026;</td>
+<td class="text-right">&#x2026;</td>
+<td class="text-right">&#x2026;</td>
+<td class="text-right">&#x2026;</td>
+<td class="text-right">&#x2026;</td>
+</tr>
+
+<tr>
+<td class="text-right">16379</td>
+<td class="text-right">2248.828369</td>
+<td class="text-right">1512.159180</td>
+<td class="text-right">2574.389893</td>
+<td class="text-right">2085.525146</td>
+<td class="text-right">5731.513672</td>
+<td class="text-right">1902.472778</td>
+<td class="text-right">1578.385742</td>
+<td class="text-right">1916.452393</td>
+<td class="text-right">1320.047119</td>
+<td class="text-right">1550.951904</td>
+<td class="text-left">&#x2026;</td>
+<td class="text-right">2291.134277</td>
+<td class="text-right">4845.781250</td>
+<td class="text-right">2534.955322</td>
+<td class="text-right">2397.597900</td>
+<td class="text-right">2810.859375</td>
+<td class="text-right">3058.239746</td>
+<td class="text-right">3012.957520</td>
+<td class="text-right">2055.962646</td>
+<td class="text-right">2597.934814</td>
+<td class="text-right">2275.868896</td>
+</tr>
+
+<tr>
+<td class="text-right">16380</td>
+<td class="text-right">2194.083984</td>
+<td class="text-right">1545.642700</td>
+<td class="text-right">2921.095459</td>
+<td class="text-right">2010.420410</td>
+<td class="text-right">5787.336426</td>
+<td class="text-right">1907.732056</td>
+<td class="text-right">1580.937744</td>
+<td class="text-right">2172.060059</td>
+<td class="text-right">1421.129517</td>
+<td class="text-right">1479.062744</td>
+<td class="text-left">&#x2026;</td>
+<td class="text-right">2997.078125</td>
+<td class="text-right">5184.318359</td>
+<td class="text-right">2522.363281</td>
+<td class="text-right">2385.093506</td>
+<td class="text-right">2436.397705</td>
+<td class="text-right">3615.403076</td>
+<td class="text-right">2555.819092</td>
+<td class="text-right">1970.641113</td>
+<td class="text-right">3601.866455</td>
+<td class="text-right">2630.073730</td>
+</tr>
+
+<tr>
+<td class="text-right">16381</td>
+<td class="text-right">2067.856201</td>
+<td class="text-right">1610.466431</td>
+<td class="text-right">3070.954102</td>
+<td class="text-right">2197.771729</td>
+<td class="text-right">5789.680664</td>
+<td class="text-right">1971.624023</td>
+<td class="text-right">1475.542847</td>
+<td class="text-right">2084.938232</td>
+<td class="text-right">1400.463867</td>
+<td class="text-right">1298.757202</td>
+<td class="text-left">&#x2026;</td>
+<td class="text-right">2942.168457</td>
+<td class="text-right">5496.346680</td>
+<td class="text-right">3230.807373</td>
+<td class="text-right">3597.340332</td>
+<td class="text-right">2541.044678</td>
+<td class="text-right">2924.228516</td>
+<td class="text-right">1627.710083</td>
+<td class="text-right">2388.055176</td>
+<td class="text-right">2722.604248</td>
+<td class="text-right">2373.275879</td>
+</tr>
+
+<tr>
+<td class="text-right">16382</td>
+<td class="text-right">2067.812988</td>
+<td class="text-right">1689.094238</td>
+<td class="text-right">3292.006836</td>
+<td class="text-right">2390.899170</td>
+<td class="text-right">6230.407715</td>
+<td class="text-right">1930.711670</td>
+<td class="text-right">1451.472778</td>
+<td class="text-right">2083.847168</td>
+<td class="text-right">1289.194824</td>
+<td class="text-right">1380.650146</td>
+<td class="text-left">&#x2026;</td>
+<td class="text-right">2794.364746</td>
+<td class="text-right">5706.733887</td>
+<td class="text-right">2287.560303</td>
+<td class="text-right">3041.490723</td>
+<td class="text-right">2482.794189</td>
+<td class="text-right">3858.045654</td>
+<td class="text-right">2195.243896</td>
+<td class="text-right">2333.582764</td>
+<td class="text-right">2728.599365</td>
+<td class="text-right">2198.640869</td>
+</tr>
+
+<tr>
+<td class="text-right">16383</td>
+<td class="text-right">2240.335205</td>
+<td class="text-right">1743.910645</td>
+<td class="text-right">3327.093018</td>
+<td class="text-right">2357.319092</td>
+<td class="text-right">5435.189453</td>
+<td class="text-right">1860.456299</td>
+<td class="text-right">1333.890869</td>
+<td class="text-right">2038.945801</td>
+<td class="text-right">1358.094727</td>
+<td class="text-right">1312.259766</td>
+<td class="text-left">&#x2026;</td>
+<td class="text-right">2627.845703</td>
+<td class="text-right">5518.034668</td>
+<td class="text-right">2491.838867</td>
+<td class="text-right">2519.055176</td>
+<td class="text-right">3319.664062</td>
+<td class="text-right">3653.108398</td>
+<td class="text-right">3334.266846</td>
+<td class="text-right">2495.438721</td>
+<td class="text-right">2713.831055</td>
+<td class="text-right">2330.221436</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+16384 rows × 4800 columns
+</p>
+</details>
+<div class="org-src-container">
+
+<pre class="src src-jupyter-python"><span style="color: #268bd2;">train_ntot</span> = <span style="color: #7a4f7e;">train_labbool</span>.<span style="color: #43783f;">size</span>
+<span style="color: #268bd2;">train_npos</span> = <span style="color: #7a4f7e;">train_labbool</span>.<span style="color: #7a4f7e;">sum</span>().<span style="color: #7a4f7e;">sum</span>()
+<span style="color: #268bd2;">train_nneg</span> = <span style="color: #513f78;">train_ntot</span> - <span style="color: #707e4f;">train_npos</span>
+<span style="color: #268bd2;">train_perc</span> = <span style="color: #707e4f;">train_npos</span> / <span style="color: #513f78;">train_ntot</span>
+
+<span style="color: #268bd2;">val_ntot</span> = <span style="color: #784437;">val_labbool</span>.<span style="color: #43783f;">size</span>
+<span style="color: #268bd2;">val_npos</span> = <span style="color: #784437;">val_labbool</span>.<span style="color: #7a4f7e;">sum</span>().<span style="color: #7a4f7e;">sum</span>()
+<span style="color: #268bd2;">val_nneg</span> = <span style="color: #707e4f;">val_ntot</span> - <span style="color: #707e4f;">val_npos</span>
+<span style="color: #268bd2;">val_perc</span> = <span style="color: #707e4f;">val_npos</span> / <span style="color: #707e4f;">val_ntot</span>
+
+<span style="color: #268bd2;">test_ntot</span> = <span style="color: #784437;">test_labbool</span>.<span style="color: #43783f;">size</span>
+<span style="color: #268bd2;">test_npos</span> = <span style="color: #784437;">test_labbool</span>.<span style="color: #7a4f7e;">sum</span>().<span style="color: #7a4f7e;">sum</span>()
+<span style="color: #268bd2;">test_nneg</span> = <span style="color: #7e544f;">test_ntot</span> - <span style="color: #43783f;">test_npos</span>
+<span style="color: #268bd2;">test_perc</span> = <span style="color: #43783f;">test_npos</span> / <span style="color: #7e544f;">test_ntot</span>
+
+<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #43783f;">f</span><span style="color: #2aa198;">'Total N train: </span><span style="color: #268bd2;">{train_ntot}</span><span style="color: #2aa198;">, N pos train: </span><span style="color: #268bd2;">{train_npos}</span><span style="color: #2aa198;">, N neg train: </span><span style="color: #268bd2;">{train_nneg}</span><span style="color: #2aa198;">, Percent of pos: </span><span style="color: #268bd2;">{train_perc:.2%}</span><span style="color: #2aa198;">'</span>)
+<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #43783f;">f</span><span style="color: #2aa198;">'Total N val: </span><span style="color: #268bd2;">{val_ntot}</span><span style="color: #2aa198;">, N pos val: </span><span style="color: #268bd2;">{val_npos}</span><span style="color: #2aa198;">, N neg val: </span><span style="color: #268bd2;">{val_nneg}</span><span style="color: #2aa198;">, Percent of pos: </span><span style="color: #268bd2;">{val_perc:.2%}</span><span style="color: #2aa198;">'</span>)
+<span style="color: #859900; font-weight: bold;">print</span>(<span style="color: #43783f;">f</span><span style="color: #2aa198;">'Total N test: </span><span style="color: #268bd2;">{test_ntot}</span><span style="color: #2aa198;">, N pos test: </span><span style="color: #268bd2;">{test_npos}</span><span style="color: #2aa198;">, N neg test: </span><span style="color: #268bd2;">{test_nneg}</span><span style="color: #2aa198;">, Percent of pos: </span><span style="color: #268bd2;">{test_perc:.2%}</span><span style="color: #2aa198;">'</span>)
+
+</pre>
+</div>
+
+<pre class="example">
+Total N train: 78643200, N pos train: 11969767, N neg train: 66673433, Percent of pos: 15.22%
+Total N val: 19660800, N pos val: 3162854, N neg val: 16497946, Percent of pos: 16.09%
+Total N test: 49152000, N pos test: 7556233, N neg test: 41595767, Percent of pos: 15.37%
+</pre>
+</li>
 </ul>
 </div>
 </div>
@@ -2222,6 +2865,115 @@ The given DataFrame was split into 3 parts with shapes: [(16384, 10000), (16384,
 <h4 id="sec-2-1-6"><span class="section-number-4">2.1.6</span> plots of the simulated traces by diffusion rate</h4>
 <div class="outline-text-4" id="text-2-1-6">
 <ul class="org-ul">
+<li>This is the plotting code:
+<details>
+<div class="org-src-container">
+
+<pre class="src src-jupyter-python"><span style="color: #859900; font-weight: bold;">import</span> <span style="color: #37785e;">matplotlib</span>.<span style="color: #4f7e67;">pyplot</span> <span style="color: #859900; font-weight: bold;">as</span> <span style="color: #4f7e67;">plt</span>
+<span style="color: #859900; font-weight: bold;">import</span> <span style="color: #4f5c7e;">numpy</span> <span style="color: #859900; font-weight: bold;">as</span> <span style="color: #707e4f;">np</span>
+<span style="color: #859900; font-weight: bold;">import</span> <span style="color: #5e7837;">pandas</span> <span style="color: #859900; font-weight: bold;">as</span> <span style="color: #783778;">pd</span>
+
+<span style="color: #859900; font-weight: bold;">def</span> <span style="color: #268bd2;">plot_traces_by_diffrates</span>(<span style="color: #783f5a;">ntraces</span>, <span style="color: #78683f;">col_per_example</span>, <span style="color: #7e544f;">diffrate_of_interest</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span><span style="color: #707e4f;">data_label_array</span>, <span style="color: #374478;">experiment_params</span>, <span style="color: #78683f;">artifact</span>):
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #2aa198;">"""A plot to examine simulated traces via</span>
+<span style="color: #2aa198; background-color: #eee8d5;"> </span><span style="color: #2aa198;">   </span><span style="color: #2aa198; background-color: #eee8d5;"> </span><span style="color: #2aa198;">  fluotracify.simulations.simulate_trace_with_artifacts</span>
+
+<span style="color: #2aa198; background-color: #eee8d5;"> </span><span style="color: #2aa198;">   Parameters</span>
+<span style="color: #2aa198; background-color: #eee8d5;"> </span><span style="color: #2aa198;">   ----------</span>
+<span style="color: #2aa198; background-color: #eee8d5;"> </span><span style="color: #2aa198;">   ntraces : int</span>
+<span style="color: #2aa198; background-color: #eee8d5;"> </span><span style="color: #2aa198;">   </span><span style="color: #2aa198; background-color: #eee8d5;"> </span><span style="color: #2aa198;">   The number of traces you want to plot. It determines the size of the</span>
+<span style="color: #2aa198; background-color: #eee8d5;"> </span><span style="color: #2aa198;">   </span><span style="color: #2aa198; background-color: #eee8d5;"> </span><span style="color: #2aa198;">   plot as well, where columns are fixed at 6 and depending on ntraces</span>
+<span style="color: #2aa198; background-color: #eee8d5;"> </span><span style="color: #2aa198;">   </span><span style="color: #2aa198; background-color: #eee8d5;"> </span><span style="color: #2aa198;">   and col_per_example the number of rows is determined.</span>
+<span style="color: #2aa198; background-color: #eee8d5;"> </span><span style="color: #2aa198;">   col_per_example : int</span>
+<span style="color: #2aa198; background-color: #eee8d5;"> </span><span style="color: #2aa198;">   </span><span style="color: #2aa198; background-color: #eee8d5;"> </span><span style="color: #2aa198;">   Number of columns per example, first column being a trace, and then</span>
+<span style="color: #2aa198; background-color: #eee8d5;"> </span><span style="color: #2aa198;">   </span><span style="color: #2aa198; background-color: #eee8d5;"> </span><span style="color: #2aa198;">   one or multiple labels</span>
+<span style="color: #2aa198; background-color: #eee8d5;"> </span><span style="color: #2aa198;">   diffrate_of_interest : float</span>
+<span style="color: #2aa198; background-color: #eee8d5;"> </span><span style="color: #2aa198;">   </span><span style="color: #2aa198; background-color: #eee8d5;"> </span><span style="color: #2aa198;">   diffusion rate used to simulate the traces of interest</span>
+<span style="color: #2aa198; background-color: #eee8d5;"> </span><span style="color: #2aa198;">   data_label_array : dict of pandas DataFrames</span>
+<span style="color: #2aa198; background-color: #eee8d5;"> </span><span style="color: #2aa198;">   </span><span style="color: #2aa198; background-color: #eee8d5;"> </span><span style="color: #2aa198;">   Contains one key per column in each simulated example. E.g. if the</span>
+<span style="color: #2aa198; background-color: #eee8d5;"> </span><span style="color: #2aa198;">   </span><span style="color: #2aa198; background-color: #eee8d5;"> </span><span style="color: #2aa198;">   simulated features comes with two labels, the key '0' will be the</span>
+<span style="color: #2aa198; background-color: #eee8d5;"> </span><span style="color: #2aa198;">   </span><span style="color: #2aa198; background-color: #eee8d5;"> </span><span style="color: #2aa198;">   array with the features, '1' will be the array with label A and</span>
+<span style="color: #2aa198; background-color: #eee8d5;"> </span><span style="color: #2aa198;">   </span><span style="color: #2aa198; background-color: #eee8d5;"> </span><span style="color: #2aa198;">   '2' will be the array with label B.</span>
+<span style="color: #2aa198; background-color: #eee8d5;"> </span><span style="color: #2aa198;">   experiment_params : pandas DataFrame</span>
+<span style="color: #2aa198; background-color: #eee8d5;"> </span><span style="color: #2aa198;">   </span><span style="color: #2aa198; background-color: #eee8d5;"> </span><span style="color: #2aa198;">   Contains metadata of the files</span>
+<span style="color: #2aa198; background-color: #eee8d5;"> </span><span style="color: #2aa198;">   artifact : {0, 1, 2, 3}</span>
+<span style="color: #2aa198; background-color: #eee8d5;"> </span><span style="color: #2aa198;">   </span><span style="color: #2aa198; background-color: #eee8d5;"> </span><span style="color: #2aa198;">   0 = no artifact, 1 = bright clusters, 2 = detector dropout,</span>
+<span style="color: #2aa198; background-color: #eee8d5;"> </span><span style="color: #2aa198;">   </span><span style="color: #2aa198; background-color: #eee8d5;"> </span><span style="color: #2aa198;">   3 = photobleaching</span>
+
+<span style="color: #2aa198; background-color: #eee8d5;"> </span><span style="color: #2aa198;">   Returns</span>
+<span style="color: #2aa198; background-color: #eee8d5;"> </span><span style="color: #2aa198;">   -------</span>
+<span style="color: #2aa198; background-color: #eee8d5;"> </span><span style="color: #2aa198;">   Plot of fluorescence traces and labels from their simulations</span>
+<span style="color: #2aa198; background-color: #eee8d5;"> </span><span style="color: #2aa198;">   """</span>
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #268bd2;">drates</span> = <span style="color: #374478;">experiment_params</span>.<span style="color: #783778;">loc</span>[
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #2aa198;">'diffusion rate of molecules in micrometer^2 / s'</span>]
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #93a1a1;"># get indices of diffusion rates of interest</span>
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #268bd2;">dindices</span> = <span style="color: #783778;">drates</span>.<span style="color: #43783f;">index</span>.<span style="color: #707e4f;">where</span>(<span style="color: #783778;">drates</span> == <span style="color: #657b83; font-weight: bold;">str</span>(<span style="color: #7e544f;">diffrate_of_interest</span>))
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #268bd2;">dindices</span> = <span style="color: #5e7837;">dindices</span>.<span style="color: #513f78;">dropna</span>().<span style="color: #374478;">astype</span>(<span style="color: #657b83; font-weight: bold;">int</span>)
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #93a1a1;"># get indices of first of each of the 100 traces per file as an example</span>
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #268bd2;">tindices</span> = <span style="color: #5e7837;">dindices</span> * 100
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #859900; font-weight: bold;">if</span> <span style="color: #268bd2;">artifact</span> == <span style="color: #268bd2;">1</span>:
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #268bd2;">nclusts</span> = <span style="color: #374478;">experiment_params</span>.<span style="color: #783778;">loc</span>[<span style="color: #2aa198;">'number of slow clusters'</span>][<span style="color: #5e7837;">dindices</span>]
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #268bd2;">dclusts</span> = <span style="color: #374478;">experiment_params</span>.<span style="color: #783778;">loc</span>[
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #2aa198;">'diffusion rate of clusters in micrometer^2 / s'</span>][<span style="color: #5e7837;">dindices</span>]
+
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #268bd2;">cols</span> = 6
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #268bd2;">rows</span> = <span style="color: #657b83; font-weight: bold;">int</span>(<span style="color: #783f5a;">ntraces</span> // (<span style="color: #707e4f;">cols</span> / <span style="color: #78683f;">col_per_example</span>) +
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>  (<span style="color: #783f5a;">ntraces</span> % (<span style="color: #707e4f;">cols</span> / <span style="color: #78683f;">col_per_example</span>) &gt; 0))
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #93a1a1;"># share y axis only if col_per_example is 1</span>
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #268bd2;">sharey</span> = <span style="color: #268bd2;">col_per_example</span> == 1
+
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #268bd2;">fig</span>, <span style="color: #268bd2;">ax</span> = <span style="color: #4f7e67;">plt</span>.<span style="color: #7e544f;">subplots</span>(<span style="color: #43783f;">rows</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>  <span style="color: #707e4f;">cols</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>  <span style="color: #784437;">figsize</span>=(<span style="color: #707e4f;">cols</span> * 4, <span style="color: #43783f;">rows</span> * 4),
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>  <span style="color: #3f7178;">sharex</span>=<span style="color: #859900; font-weight: bold;">True</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>  <span style="color: #783778;">sharey</span>=<span style="color: #783778;">sharey</span>)
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #4f7e67;">fig</span>.<span style="color: #784437;">add_subplot</span>(111, <span style="color: #707e4f;">frameon</span>=<span style="color: #859900; font-weight: bold;">False</span>)
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #93a1a1;"># hide tick and tick label of the big axes</span>
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #4f7e67;">plt</span>.<span style="color: #374478;">tick_params</span>(<span style="color: #783778;">labelcolor</span>=<span style="color: #2aa198;">'none'</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #783f5a;">top</span>=<span style="color: #859900; font-weight: bold;">False</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #783f5a;">bottom</span>=<span style="color: #859900; font-weight: bold;">False</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #43783f;">left</span>=<span style="color: #859900; font-weight: bold;">False</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #783f5a;">right</span>=<span style="color: #859900; font-weight: bold;">False</span>)
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #4f7e67;">plt</span>.<span style="color: #513f78;">grid</span>(<span style="color: #859900; font-weight: bold;">False</span>)
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #4f7e67;">plt</span>.<span style="color: #783f5a;">xlabel</span>(<span style="color: #2aa198;">"time steps in $ms$"</span>, <span style="color: #7a4f7e;">fontsize</span>=20)
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #4f7e67;">plt</span>.<span style="color: #707e4f;">ylabel</span>(<span style="color: #2aa198;">'fluorescence intensity in $a.u.$'</span>, <span style="color: #374478;">labelpad</span>=20, <span style="color: #7a4f7e;">fontsize</span>=20)
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #268bd2;">suptitle_height</span> = 1 - (<span style="color: #4f7e67;">fig</span>.<span style="color: #37785e;">get_figheight</span>() * 0.004)
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #4f7e67;">plt</span>.<span style="color: #4f5c7e;">suptitle</span>(<span style="color: #783f5a;">t</span>=<span style="color: #2aa198;">'Simulated Fluorescence Traces With D = {} '</span>
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span><span style="color: #2aa198;">'$\\frac{{\mu m^2}}{{s}}$'</span>.<span style="color: #78683f;">format</span>(<span style="color: #7e544f;">diffrate_of_interest</span>),
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span><span style="color: #513f78;">y</span>=<span style="color: #707e4f;">suptitle_height</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span><span style="color: #7a4f7e;">fontsize</span>=20)
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #268bd2;">traceid</span> = 0
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #859900; font-weight: bold;">for</span> <span style="color: #78683f;">idx</span> <span style="color: #859900; font-weight: bold;">in</span> <span style="color: #657b83; font-weight: bold;">range</span>(<span style="color: #43783f;">rows</span>):
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #859900; font-weight: bold;">for</span> <span style="color: #37785e;">jdx</span> <span style="color: #859900; font-weight: bold;">in</span> <span style="color: #657b83; font-weight: bold;">range</span>(0, <span style="color: #707e4f;">cols</span>, <span style="color: #78683f;">col_per_example</span>):
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #93a1a1;"># first plot the trace</span>
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #859900; font-weight: bold;">try</span>:
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #7e544f;">ax</span>[<span style="color: #78683f;">idx</span>,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>  <span style="color: #37785e;">jdx</span>].<span style="color: #43783f;">plot</span>(<span style="color: #707e4f;">data_label_array</span>[<span style="color: #2aa198;">'0'</span>].<span style="color: #4f5c7e;">iloc</span>[:, <span style="color: #4f5c7e;">tindices</span>[<span style="color: #783f5a;">traceid</span>]])
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #859900; font-weight: bold;">except</span> <span style="color: #657b83; font-weight: bold;">IndexError</span>:
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #859900; font-weight: bold;">break</span>
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #859900; font-weight: bold;">if</span> <span style="color: #268bd2;">artifact</span> == <span style="color: #268bd2;">1</span>:
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #7e544f;">ax</span>[<span style="color: #78683f;">idx</span>, <span style="color: #37785e;">jdx</span>].<span style="color: #783f5a;">set_title</span>(<span style="color: #2aa198;">'trace {} ({} clusters, $D_c$ = '</span>
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>  <span style="color: #2aa198;">'{} $\\frac{{\mu m^2}}{{s}}$)'</span>.<span style="color: #78683f;">format</span>(
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>  <span style="color: #783f5a;">traceid</span> + 1, <span style="color: #783778;">nclusts</span>.<span style="color: #4f5c7e;">iloc</span>[<span style="color: #783f5a;">traceid</span>],
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>  <span style="color: #3f7178;">dclusts</span>.<span style="color: #4f5c7e;">iloc</span>[<span style="color: #783f5a;">traceid</span>]))
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #859900; font-weight: bold;">else</span>:
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #7e544f;">ax</span>[<span style="color: #78683f;">idx</span>, <span style="color: #37785e;">jdx</span>].<span style="color: #783f5a;">set_title</span>(<span style="color: #2aa198;">'trace {}'</span>.<span style="color: #78683f;">format</span>(<span style="color: #783f5a;">traceid</span> + 1))
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #7e544f;">ax</span>[<span style="color: #78683f;">idx</span>, <span style="color: #37785e;">jdx</span>].<span style="color: #783f5a;">set_ylim</span>(0, 12000)
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #859900; font-weight: bold;">for</span> <span style="color: #37785e;">kdx</span> <span style="color: #859900; font-weight: bold;">in</span> <span style="color: #657b83; font-weight: bold;">range</span>(1, <span style="color: #78683f;">col_per_example</span>):
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #93a1a1;"># then plot the labels, if they are given</span>
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #7e544f;">ax</span>[<span style="color: #78683f;">idx</span>, <span style="color: #37785e;">jdx</span> + <span style="color: #37785e;">kdx</span>].<span style="color: #43783f;">plot</span>(
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #707e4f;">data_label_array</span>[<span style="color: #2aa198;">'{}'</span>.<span style="color: #78683f;">format</span>(<span style="color: #37785e;">kdx</span>)].<span style="color: #4f5c7e;">iloc</span>[:,
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #4f5c7e;">tindices</span>[<span style="color: #783f5a;">traceid</span>]])
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #7e544f;">ax</span>[<span style="color: #78683f;">idx</span>, <span style="color: #37785e;">jdx</span> + <span style="color: #37785e;">kdx</span>].<span style="color: #783f5a;">set_title</span>(<span style="color: #2aa198;">'label {}, type {}'</span>.<span style="color: #78683f;">format</span>(
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #783f5a;">traceid</span> + 1, <span style="color: #37785e;">kdx</span>))
+<span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="background-color: #eee8d5;"> </span>   <span style="color: #268bd2;">traceid</span> += 1
+<span style="background-color: #eee8d5;"> </span>   <span style="color: #4f7e67;">plt</span>.<span style="color: #374478;">show</span>()
+
+</pre>
+</div>
+</details>
+</li>
+
 <li>the actual plotting function:
 <div class="org-src-container">
 
@@ -2272,8 +3024,8 @@ file.
 </div></div></div>
 <footer id="postamble" class="">
 <div><p class="author">Author: Alexander Seltmann</p>
-<p class="date">Created: 2022-02-20 So 12:16</p>
-<p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 27.2 (<a href="http://orgmode.org">Org-mode</a> 9.5.2)</p>
+<p class="date">Created: 2022-08-22 Mo 16:17</p>
+<p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 28.1 (<a href="http://orgmode.org">Org-mode</a> 9.5.4)</p>
 </div>
 </footer>
 </body>
