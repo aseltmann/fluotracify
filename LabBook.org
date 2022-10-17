@@ -555,24 +555,23 @@
       #+CALL: jp-metadata(_long='True)
 
       #+RESULTS:
-      :RESULTS:
       #+begin_example
         No of CPUs in system: 4
         No of CPUs the current process can use: 4
-        load average: (0.54, 0.96, 0.87)
-        os.uname():  posix.uname_result(sysname='Linux', nodename='Topialex', release='5.13.19-2-MANJARO', version='#1 SMP PREEMPT Sun Sep 19 21:31:53 UTC 2021', machine='x86_64')
-        PID of process: 173537
-        RAM total: 16Gi, RAM used: 2,7Gi, RAM free: 8,9Gi
+        load average: (0.5380859375, 0.63232421875, 1.0)
+        os.uname():  posix.uname_result(sysname='Linux', nodename='Topialex', release='5.15.60-1-MANJARO', version='#1 SMP PREEMPT Thu Aug 11 13:14:05 UTC 2022', machine='x86_64')
+        PID of process: 196700
+        RAM total: 16Gi, RAM used: 8,6Gi, RAM free: 5,9Gi
         the current directory: /home/lex/Programme/drmed-git
         My disk usage:
         Filesystem      Size  Used Avail Use% Mounted on
         dev             3,9G     0  3,9G   0% /dev
         run             3,9G  1,5M  3,9G   1% /run
-        /dev/sda2       167G  127G   32G  81% /
-        tmpfs           3,9G  115M  3,8G   3% /dev/shm
-        tmpfs           3,9G  7,8M  3,9G   1% /tmp
+        /dev/sda2       167G  133G   26G  85% /
+        tmpfs           3,9G  197M  3,7G   6% /dev/shm
+        tmpfs           3,9G   23M  3,9G   1% /tmp
         /dev/sda1       300M  264K  300M   1% /boot/efi
-        tmpfs           784M  104K  784M   1% /run/user/1000# packages in environment at /home/lex/Programme/miniconda3/envs/tf:
+        tmpfs           784M  124K  784M   1% /run/user/1000# packages in environment at /home/lex/Programme/miniconda3/envs/tf:
         #
         # Name                    Version                   Build  Channel
         _libgcc_mutex             0.1                        main
@@ -759,9 +758,7 @@
 
         Note: you may need to restart the kernel to use updated packages.
         {'SHELL': '/bin/bash',
-         'SESSION_MANAGER': 'local/Topialex:@/tmp/.ICE-unix/982,unix/Topialex:/tmp/.ICE-unix/982',
-         'WINDOWID': '0',
-         'COLORTERM': 'truecolor',
+         'SESSION_MANAGER': 'local/Topialex:@/tmp/.ICE-unix/986,unix/Topialex:/tmp/.ICE-unix/986',
          'XDG_CONFIG_DIRS': '/home/lex/.config/kdedefaults:/etc/xdg',
          'XDG_SESSION_PATH': '/org/freedesktop/DisplayManager/Session1',
          'CONDA_EXE': '/home/lex/Programme/miniconda3/bin/conda',
@@ -770,8 +767,7 @@
          'TERMCAP': '',
          'LC_ADDRESS': 'de_DE.UTF-8',
          'LC_NAME': 'de_DE.UTF-8',
-         'INSIDE_EMACS': '27.2,comint',
-         'SHELL_SESSION_ID': '705160b4e8124043a99f47cc2610e9a5',
+         'INSIDE_EMACS': '28.1,comint',
          'DESKTOP_SESSION': 'plasma',
          'LC_MONETARY': 'de_DE.UTF-8',
          'GTK_RC_FILES': '/etc/gtk/gtkrc:/home/lex/.gtkrc:/home/lex/.config/gtkrc',
@@ -779,35 +775,30 @@
          'GTK_MODULES': 'canberra-gtk-module',
          'XDG_SEAT': 'seat0',
          'PWD': '/home/lex/Programme/drmed-git',
-         'XDG_SESSION_DESKTOP': 'KDE',
          'LOGNAME': 'lex',
+         'XDG_SESSION_DESKTOP': 'KDE',
          'XDG_SESSION_TYPE': 'x11',
          'CONDA_PREFIX': '/home/lex/Programme/miniconda3/envs/tf',
          'DSSI_PATH': '/home/lex/.dssi:/usr/lib/dssi:/usr/local/lib/dssi',
-         'SYSTEMD_EXEC_PID': '862',
+         'SYSTEMD_EXEC_PID': '877',
          'XAUTHORITY': '/home/lex/.Xauthority',
          'MOTD_SHOWN': 'pam',
          'GTK2_RC_FILES': '/etc/gtk-2.0/gtkrc:/home/lex/.gtkrc-2.0:/home/lex/.config/gtkrc-2.0',
          'HOME': '/home/lex',
-         'LC_PAPER': 'de_DE.UTF-8',
          'LANG': 'de_DE.UTF-8',
+         'LC_PAPER': 'de_DE.UTF-8',
          'VST_PATH': '/home/lex/.vst:/usr/lib/vst:/usr/local/lib/vst',
          'XDG_CURRENT_DESKTOP': 'KDE',
-         'KONSOLE_DBUS_SERVICE': ':1.33',
-         'COLUMNS': '80',
-         'KONSOLE_DBUS_SESSION': '/Sessions/2',
-         'PROFILEHOME': '',
-         'CONDA_PROMPT_MODIFIER': '(tf) ',
+         'COLUMNS': '163',
+         'CONDA_PROMPT_MODIFIER': '',
          'XDG_SEAT_PATH': '/org/freedesktop/DisplayManager/Seat0',
-         'KONSOLE_VERSION': '211202',
          'KDE_SESSION_UID': '1000',
          'XDG_SESSION_CLASS': 'user',
          'LC_IDENTIFICATION': 'de_DE.UTF-8',
          'TERM': 'xterm-color',
          '_CE_CONDA': '',
          'USER': 'lex',
-         'COLORFGBG': '15;0',
-         'CONDA_SHLVL': '2',
+         'CONDA_SHLVL': '1',
          'KDE_SESSION_VERSION': '5',
          'PAM_KWALLET5_LOGIN': '/run/user/1000/kwallet5.socket',
          'DISPLAY': ':0',
@@ -827,25 +818,22 @@
          'XDG_DATA_DIRS': '/home/lex/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share:/usr/local/share:/usr/share:/var/lib/snapd/desktop',
          'KDE_FULL_SESSION': 'true',
          'BROWSER': 'vivaldi-stable',
-         'PATH': '/home/lex/Programme/miniconda3/envs/tf/bin:/home/lex/Programme/miniconda3/condabin:/home/lex/.local/bin:/bin:/usr/bin:/usr/local/bin:/usr/local/sbin:/usr/lib/jvm/default/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/var/lib/snapd/snap/bin:/home/lex/Programme/miniconda3/bin',
+         'PATH': '/home/lex/Programme/miniconda3/envs/tf/bin:/home/lex/Programme/miniconda3/condabin:/home/lex/.local/bin:/bin:/usr/bin:/usr/local/bin:/usr/local/sbin:/usr/lib/jvm/default/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/var/lib/snapd/snap/bin',
          'DBUS_SESSION_BUS_ADDRESS': 'unix:path=/run/user/1000/bus',
          'LV2_PATH': '/home/lex/.lv2:/usr/lib/lv2:/usr/local/lib/lv2',
          'KDE_APPLICATIONS_AS_SCOPE': '1',
          'MAIL': '/var/spool/mail/lex',
-         'CONDA_PREFIX_1': '/home/lex/Programme/miniconda3',
          'LC_NUMERIC': 'de_DE.UTF-8',
          'LADSPA_PATH': '/home/lex/.ladspa:/usr/lib/ladspa:/usr/local/lib/ladspa',
          'CADENCE_AUTO_STARTED': 'true',
          '_': '/home/lex/Programme/miniconda3/envs/tf/bin/jupyter',
          'PYDEVD_USE_FRAME_EVAL': 'NO',
-         'JPY_PARENT_PID': '172531',
+         'JPY_PARENT_PID': '156430',
          'CLICOLOR': '1',
          'PAGER': 'cat',
          'GIT_PAGER': 'cat',
          'MPLBACKEND': 'module://matplotlib_inline.backend_inline'}
       #+end_example
-      : 521f8643-09b8-47dd-af7d-7f663d754c25
-      :END:
 
    4. Branch out git branch =exp-220316-publication1= from =main= (done via
       magit) and make sure you are on the correct branch
@@ -2277,6 +2265,249 @@
      #+END_SRC
 
      #+RESULTS:
+
+*** Exp: simexps - =np.nan correction=
+   :PROPERTIES:
+   :header-args:jupyter-python: :session /jpy:localhost#8888:a37e524a-8134-4d8f-b24a-367acaf1bdd3 :pandoc t
+   :END:
+
+   - at MAF2022, Thorsten Wohland mentioned my current implementation of
+     ~weight=0~ correction might be problematic. Instead of setting the part of
+     the trace to 0, I should try to set it to =nan=, and that most correlation
+     algorithms would account for these missing values. Let's try that for
+     =multipletau= and =tttr2xfcs=
+
+     #+BEGIN_SRC jupyter-python
+       %cd ~/Programme/drmed-git
+     #+END_SRC
+
+     #+RESULTS:
+     : /home/lex/Programme/drmed-git
+
+   - load modules
+     #+BEGIN_SRC jupyter-python
+       import logging
+       import os
+       import pdb
+       import sys
+
+       import matplotlib.pyplot as plt
+       import numpy as np
+       import pandas as pd
+       import seaborn as sns
+
+       from pathlib import Path
+       from pprint import pprint
+
+       FLUOTRACIFY_PATH = '/home/lex/Programme/drmed-git/src/'
+       sys.path.append(FLUOTRACIFY_PATH)
+       from fluotracify.applications import (corr_fit_object as cfo,
+                                             correlate)
+       from fluotracify.imports import ptu_utils as ptu
+       from fluotracify.simulations import (
+          import_simulation_from_csv as isfc,
+          analyze_simulations as ans,
+       )
+
+       logging.basicConfig(filename="/home/lex/Programme/drmed-git/data/exp-220316-publication1/jupyter.log",
+                           filemode='w', format='%(asctime)s - %(message)s',
+                           force=True,
+                           level=logging.DEBUG)
+
+       sns.set_theme(style="whitegrid", font_scale=2, palette='colorblind',
+                     context='paper')
+
+     #+END_SRC
+
+     #+RESULTS:
+     : 2022-09-15 09:57:27.157527: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+     : 2022-09-15 09:57:27.157569: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+
+    #+BEGIN_SRC jupyter-python
+      import importlib
+      importlib.reload(correlate)
+      importlib.reload(ans)
+    #+END_SRC
+
+    #+RESULTS:
+    : <module 'fluotracify.simulations.analyze_simulations' from '/home/lex/Programme/drmed-git/src/fluotracify/simulations/analyze_simulations.py'>
+
+   - load simulated data
+     #+BEGIN_SRC jupyter-python :pandoc t
+       col_per_example = 3
+       lab_thresh = 0.04
+       artifact = 0
+       model_type = 1
+       fwhm = 250
+       sim_path = Path('/home/lex/Programme/drmed-collections/drmed-simexps/firstartifact_Nov2020_test')
+
+       sim, _, nsamples, sim_params = isfc.import_from_csv(
+           folder=sim_path,
+           header=12,
+           frac_train=1,
+           col_per_example=col_per_example,
+           dropindex=None,
+           dropcolumns=None)
+
+       diffrates = sim_params.loc['diffusion rate of molecules in micrometer^2 / s'].astype(np.float32)
+       nmols = sim_params.loc['number of fast molecules'].astype(np.float32)
+       clusters = sim_params.loc['diffusion rate of clusters in micrometer^2 / s'].astype(np.float32)
+       sim_columns = [f'{d:.4}' for d, c in zip(
+           np.repeat(diffrates, nsamples[0]),
+           np.repeat(clusters, nsamples[0]))]
+
+       sim_sep = isfc.separate_data_and_labels(array=sim,
+                                               nsamples=nsamples,
+                                               col_per_example=col_per_example)
+       sim_dirty = sim_sep['0']
+       sim_dirty.columns = sim_columns
+
+       sim_labels = sim_sep['1']
+       sim_labels.columns = sim_columns
+       sim_labbool = sim_labels > lab_thresh
+       sim_labbool.columns = sim_columns
+       sim_clean = sim_sep['2']
+       sim_clean.columns = sim_columns
+
+       sim_dirty
+     #+END_SRC
+
+     #+RESULTS:
+     :RESULTS:
+     |       | 0.069       | 0.069       | 0.069       | 0.069      | 0.069      | 0.069       | 0.069      | 0.069       | 0.069      | 0.069      | ... | 50.0        | 50.0        | 50.0        | 50.0        | 50.0        | 50.0        | 50.0        | 50.0        | 50.0        | 50.0        |
+|-------+-------------+-------------+-------------+------------+------------+-------------+------------+-------------+------------+------------+-----+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------|
+| 0     | 1187.467896 | 907.677734  | 480.048798  | 454.669403 | 466.063232 | 384.734467  | 543.981323 | 640.921509  | 795.946167 | 410.471893 | ... | 1897.398193 | 2279.646484 | 3088.531006 | 2034.432495 | 2187.548584 | 2105.736084 | 1789.366577 | 2023.093994 | 2331.185791 | 2185.028076 |
+| 1     | 1184.055176 | 945.760315  | 471.065216  | 458.392487 | 473.306152 | 395.165527  | 558.603088 | 622.421204  | 776.199402 | 409.149170 | ... | 1499.969849 | 2199.652100 | 3207.333008 | 1650.523926 | 2122.935791 | 2791.281006 | 1661.286377 | 1111.879761 | 1853.699585 | 1926.844971 |
+| 2     | 1191.848877 | 980.117798  | 459.479706  | 426.087982 | 482.370209 | 425.123413  | 551.536072 | 624.498535  | 778.671265 | 400.971954 | ... | 1822.985229 | 2456.422607 | 2969.562500 | 1934.118286 | 1457.731812 | 2251.077393 | 1903.003662 | 2063.915527 | 2198.018066 | 2038.683105 |
+| 3     | 1199.065918 | 974.313110  | 462.205566  | 444.041809 | 463.703125 | 434.186615  | 573.044128 | 626.252502  | 747.284058 | 393.178162 | ... | 1741.839355 | 2467.149414 | 2588.980957 | 2136.627686 | 1930.263672 | 2323.700684 | 2133.313721 | 1638.169312 | 1926.058716 | 1815.259521 |
+| 4     | 1221.957397 | 968.779175  | 464.918030  | 455.205292 | 474.615540 | 437.029419  | 586.489136 | 619.319092  | 781.954102 | 406.468018 | ... | 2431.400879 | 2246.336670 | 3000.961182 | 1915.518066 | 2052.773682 | 2359.145508 | 1699.926147 | 1862.709595 | 2291.338379 | 1332.422241 |
+| ...   | ...         | ...         | ...         | ...        | ...        | ...         | ...        | ...         | ...        | ...        | ... | ...         | ...         | ...         | ...         | ...         | ...         | ...         | ...         | ...         | ...         |
+| 16379 | 506.409668  | 1012.403931 | 855.006226  | 674.470703 | 769.859192 | 2110.732178 | 799.565247 | 1981.221436 | 528.844604 | 483.055878 | ... | 1512.586548 | 3212.712891 | 1491.119995 | 1843.866943 | 1748.956665 | 2048.602051 | 1662.244385 | 2593.879639 | 1921.427856 | 1664.831909 |
+| 16380 | 536.809692  | 1022.029724 | 840.287720  | 671.095215 | 738.908997 | 2118.984863 | 807.995789 | 2624.343262 | 552.687012 | 479.768372 | ... | 1661.331055 | 3190.809570 | 1770.193970 | 2081.854248 | 2164.372803 | 2295.646729 | 1846.683594 | 2038.272339 | 2222.708252 | 2122.753662 |
+| 16381 | 570.668884  | 989.891235  | 839.180298  | 689.863586 | 695.739136 | 2033.681885 | 786.547852 | 3528.163574 | 572.166077 | 484.491211 | ... | 1643.470337 | 2564.206787 | 2025.219971 | 2104.706787 | 1792.828613 | 2106.199463 | 2087.914062 | 1457.817871 | 1874.736938 | 1683.072021 |
+| 16382 | 562.505310  | 977.029785  | 1005.927673 | 683.250183 | 661.608337 | 2566.123047 | 805.594116 | 3731.086426 | 566.710571 | 489.289673 | ... | 1556.492188 | 2783.619385 | 1312.174561 | 2378.643311 | 2466.965576 | 2160.641357 | 1691.332520 | 2013.095093 | 1632.475708 | 1352.443237 |
+| 16383 | 567.307373  | 1006.794067 | 982.376526  | 677.099854 | 657.040588 | 2545.080322 | 784.917969 | 3850.334717 | 570.241699 | 512.688232 | ... | 2127.414551 | 2448.062012 | 1398.359253 | 1665.321167 | 2241.687256 | 1823.699829 | 1340.686035 | 1972.661743 | 1550.770142 | 1727.808228 |
+
+16384 rows × 1500 columns
+     :END:
+
+
+   #+BEGIN_SRC jupyter-python
+
+     sim_nan = pd.DataFrame()
+     for i in range(len(sim_dirty.columns)):
+
+         # weight=nan
+         sim_nan_trace = np.where(sim_labbool.iloc[:, i].values == 1, np.nan,
+                                  sim_dirty.iloc[:, i].values)
+         sim_nan_trace = pd.DataFrame(sim_nan_trace)
+         sim_nan = pd.concat([sim_nan, sim_nan_trace], axis='columns')
+     sim_nan.columns = sim_columns
+
+     # log.debug('label_correct_correlate: Finished "cut and shift" correction.')
+
+     # after correction
+     # lab_str = f'{lab_thresh}'.replace(".", "dot")
+     # cas_txt = f'labthresh-{lab_str}_cutandshift'
+     # del_txt = f'labthresh-{lab_str}_delete'
+     # correlate.correlate_timetrace_and_save(df=sim_cas, out_path=out_path, out_txt=cas_txt)
+     # correlate.correlate_timetrace_and_save(df=sim_del, out_path=out_path, out_txt=del_txt)
+     sim_nan
+   #+END_SRC
+
+   #+RESULTS:
+   :RESULTS:
+   |       | 0.069       | 0.069       | 0.069       | 0.069      | 0.069      | 0.069      | 0.069      | 0.069      | 0.069      | 0.069      | ... | 50.0        | 50.0 | 50.0        | 50.0        | 50.0        | 50.0        | 50.0        | 50.0        | 50.0        | 50.0        |
+|-------+-------------+-------------+-------------+------------+------------+------------+------------+------------+------------+------------+-----+-------------+------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------|
+| 0     | 1187.467896 | 907.677734  | 480.048798  | 454.669403 | 466.063232 | 384.734467 | 543.981323 | 640.921509 | 795.946167 | 410.471893 | ... | 1897.398193 | NaN  | NaN         | 2034.432495 | 2187.548584 | 2105.736084 | 1789.366577 | 2023.093994 | 2331.185791 | 2185.028076 |
+| 1     | 1184.055176 | 945.760315  | 471.065216  | 458.392487 | 473.306152 | 395.165527 | 558.603088 | 622.421204 | 776.199402 | 409.149170 | ... | 1499.969849 | NaN  | NaN         | 1650.523926 | 2122.935791 | 2791.281006 | 1661.286377 | 1111.879761 | 1853.699585 | 1926.844971 |
+| 2     | 1191.848877 | 980.117798  | 459.479706  | 426.087982 | 482.370209 | 425.123413 | 551.536072 | 624.498535 | 778.671265 | 400.971954 | ... | 1822.985229 | NaN  | NaN         | 1934.118286 | NaN         | 2251.077393 | 1903.003662 | 2063.915527 | 2198.018066 | 2038.683105 |
+| 3     | 1199.065918 | 974.313110  | 462.205566  | 444.041809 | 463.703125 | 434.186615 | 573.044128 | 626.252502 | 747.284058 | 393.178162 | ... | 1741.839355 | NaN  | NaN         | 2136.627686 | NaN         | 2323.700684 | 2133.313721 | 1638.169312 | 1926.058716 | 1815.259521 |
+| 4     | 1221.957397 | 968.779175  | 464.918030  | 455.205292 | 474.615540 | 437.029419 | 586.489136 | 619.319092 | 781.954102 | 406.468018 | ... | 2431.400879 | NaN  | NaN         | 1915.518066 | NaN         | 2359.145508 | 1699.926147 | 1862.709595 | 2291.338379 | 1332.422241 |
+| ...   | ...         | ...         | ...         | ...        | ...        | ...        | ...        | ...        | ...        | ...        | ... | ...         | ...  | ...         | ...         | ...         | ...         | ...         | ...         | ...         | ...         |
+| 16379 | 506.409668  | 1012.403931 | 855.006226  | 674.470703 | 769.859192 | NaN        | 799.565247 | NaN        | 528.844604 | 483.055878 | ... | 1512.586548 | NaN  | 1491.119995 | 1843.866943 | NaN         | 2048.602051 | 1662.244385 | 2593.879639 | 1921.427856 | 1664.831909 |
+| 16380 | 536.809692  | 1022.029724 | 840.287720  | 671.095215 | 738.908997 | NaN        | 807.995789 | NaN        | 552.687012 | 479.768372 | ... | 1661.331055 | NaN  | 1770.193970 | 2081.854248 | NaN         | 2295.646729 | 1846.683594 | 2038.272339 | 2222.708252 | 2122.753662 |
+| 16381 | 570.668884  | 989.891235  | 839.180298  | 689.863586 | 695.739136 | NaN        | 786.547852 | NaN        | 572.166077 | 484.491211 | ... | 1643.470337 | NaN  | 2025.219971 | 2104.706787 | NaN         | 2106.199463 | 2087.914062 | 1457.817871 | 1874.736938 | 1683.072021 |
+| 16382 | 562.505310  | 977.029785  | 1005.927673 | 683.250183 | 661.608337 | NaN        | 805.594116 | NaN        | 566.710571 | 489.289673 | ... | 1556.492188 | NaN  | 1312.174561 | 2378.643311 | NaN         | 2160.641357 | 1691.332520 | 2013.095093 | 1632.475708 | 1352.443237 |
+| 16383 | 567.307373  | 1006.794067 | 982.376526  | 677.099854 | 657.040588 | NaN        | 784.917969 | NaN        | 570.241699 | 512.688232 | ... | 2127.414551 | NaN  | 1398.359253 | 1665.321167 | NaN         | 1823.699829 | 1340.686035 | 1972.661743 | 1550.770142 | 1727.808228 |
+
+16384 rows × 1500 columns
+   :END:
+
+   #+BEGIN_SRC jupyter-python
+     from multipletau import autocorrelate
+     import datetime
+
+     out_path = '/home/lex/Programme/drmed-git/data/exp-220316-publication1/220914_nan-correction'
+     # correlate.correlate_timetrace_and_save(df=sim_nan, out_path=out_path, out_txt='nan')
+
+     for idx, col in enumerate(sim_nan.columns):
+         trace = sim_nan.iloc[:, idx]
+         corr_fn = autocorrelate(
+             a=trace,
+             m=16,
+             deltat=1,
+             normalize=True,
+             compress='first')
+
+         # try:
+         #     corr_fn = autocorrelate(
+         #         a=trace,
+         #         m=16,
+         #         deltat=1,
+         #         normalize=True)
+             # autotime = corr_fn[1:, 0]
+             # autonorm = corr_fn[1:, 1]
+             # out_file_txt = f'nan_{col.replace(".", "dot")}'
+             # out_file = Path(f'{datetime.date.today()}_multipletau_'
+             #                 f'{out_file_txt}_{idx:04}_correlation.csv')
+             # out_file = out_path / out_file
+             #
+             # with open(out_file, 'w', encoding='utf-8') as out:
+             #     out.write('version,3.0\n')
+             #     out.write('numOfCh,1\n')
+             #     out.write('type,point\n')
+             #     out.write(f'parent_name,nan\n')
+             #     out.write('ch_type,1_1\n')
+             #     out.write('kcount,1\n')  # arbitrary value
+             #     out.write('numberNandB,1\n')  # arbitrary value
+             #     out.write('brightnessNandB,1\n')  # arbitrary value
+             #     out.write('carpet pos,0\n')
+             #     out.write('pc,0\n')
+             #     out.write('Time (ms),CH1 Auto-Correlation\n')
+             #     for i in range(autotime.shape[0]):
+             #         out.write(f'{autotime[i]},{autonorm[i]}\n')
+             #     out.write('end\n')
+             # logging.debug('predict_correct_correlate: Finished saving of file %s',
+             #           out_file)
+
+         # except KeyError:
+         #     logging.debug(f'skipped {col}-{idx}')
+         #     continue
+         break
+
+
+
+
+   #+END_SRC
+
+   #+RESULTS:
+
+
+   - *the Python multipletau library does not seem able to handle np.nan*
+   - let's quickly try experimental data
+
+   #+BEGIN_SRC jupyter-python
+     weight = np.nan
+     myweight = float(0) if weight is None else float(weight)
+
+     print(weight, myweight)
+   #+END_SRC
+
+   #+RESULTS:
+   : nan nan
+
+
 
 *** Exp: bioexps - prediction by threshold
     :PROPERTIES:
@@ -5025,9 +5256,9 @@
        # read af488 only (clean)
        af488_noc_1comp = pd.read_csv(af488_noc_1comp_path, sep=',').assign(bio=424*['af488',], processing=424*['Baseline control:\nno correction',])
        af488_0cd20_1comp = pd.read_csv(af488_0cd20_1comp_path, sep=',').assign(bio=424*['af488',], processing=424*['Automatic U-Net pred.\n+ cut and shift corr.:\nscaler=quantile transf.,\nlarge model (200MB)',])
-       af488_34a6d_1comp = pd.read_csv(af488_34a6d_1comp_path, sep=',').assign(bio=424*['af488',], processing=424*['Automatic U-Net pred.\n+ cut and shift corr.:\nscaler=l2,\nsmall model (7MB, 3 levels)',])
-       af488_fe81d_1comp = pd.read_csv(af488_fe81d_1comp_path, sep=',').assign(bio=424*['af488',], processing=424*['Automatic U-Net pred.\n+ cut and shift corr.:\nscaler=standard,\nlarge model (186MB, 4 levels)',])
-       af488_ff67b_1comp = pd.read_csv(af488_ff67b_1comp_path, sep=',').assign(bio=424*['af488',], processing=424*['Automatic U-Net pred.\n+ cut and shift corr.:\nscaler=minmax,\nsmall model (14MB, 5 levels)',])
+       af488_34a6d_1comp = pd.read_csv(af488_34a6d_1comp_path, sep=',').assign(bio=424*['af488',], processing=424*['Automatic U-Net pred.\n+ cut and shift corr.:\nscaler=l2,\nsmall model (7MB)',])
+       af488_fe81d_1comp = pd.read_csv(af488_fe81d_1comp_path, sep=',').assign(bio=424*['af488',], processing=424*['Automatic U-Net pred.\n+ cut and shift corr.:\nscaler=standard,\nlarge model (186MB)',])
+       af488_ff67b_1comp = pd.read_csv(af488_ff67b_1comp_path, sep=',').assign(bio=424*['af488',], processing=424*['Automatic U-Net pred.\n+ cut and shift corr.:\nscaler=minmax,\nsmall model (14MB)',])
        af488_0dot8_1comp = pd.read_csv(af488_0dot8_1comp_path, sep=',').assign(bio=420*['af488',], processing=420*['Manual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=0.8',])
        af488_1_1comp = pd.read_csv(af488_1_1comp_path, sep=',').assign(bio=424*['af488',], processing=424*['Manual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=1',])
        af488_1dot5_1comp = pd.read_csv(af488_1dot5_1comp_path, sep=',').assign(bio=422*['af488',], processing=422*['Manual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=1.5',])
@@ -5039,12 +5270,12 @@
        af488luv_noc_2comp = pd.read_csv(af488luv_noc_2comp_path, sep=',').assign(bio=440*['af488luv',], processing=440*['Baseline control:\nno correction',])
        af488luv_0cd20_1comp = pd.read_csv(af488luv_0cd20_1comp_path, sep=',').assign(bio=440*['af488luv',], processing=440*['Automatic U-Net pred.\n+ cut and shift corr.:\nscaler=quantile transf.,\nlarge model (200MB)',])
        af488luv_0cd20_2comp = pd.read_csv(af488luv_0cd20_2comp_path, sep=',').assign(bio=440*['af488luv',], processing=440*['Automatic U-Net pred.\n+ cut and shift corr.:\nscaler=quantile transf.,\nlarge model (200MB)',])
-       af488luv_34a6d_1comp = pd.read_csv(af488luv_34a6d_1comp_path, sep=',').assign(bio=440*['af488luv',], processing=440*['Automatic U-Net pred.\n+ cut and shift corr.:\nscaler=l2,\nsmall model (7MB, 3 levels)'])
-       af488luv_34a6d_2comp = pd.read_csv(af488luv_34a6d_2comp_path, sep=',').assign(bio=440*['af488luv',], processing=440*['Automatic U-Net pred.\n+ cut and shift corr.:\nscaler=l2,\nsmall model (7MB, 3 levels)'])
-       af488luv_fe81d_1comp = pd.read_csv(af488luv_fe81d_1comp_path, sep=',').assign(bio=440*['af488luv',], processing=440*['Automatic U-Net pred.\n+ cut and shift corr.:\nscaler=standard,\nlarge model (186MB, 4 levels)',])
-       af488luv_fe81d_2comp = pd.read_csv(af488luv_fe81d_2comp_path, sep=',').assign(bio=440*['af488luv',], processing=440*['Automatic U-Net pred.\n+ cut and shift corr.:\nscaler=standard,\nlarge model (186MB, 4 levels)',])
-       af488luv_ff67b_1comp = pd.read_csv(af488luv_ff67b_1comp_path, sep=',').assign(bio=440*['af488luv',], processing=440*['Automatic U-Net pred.\n+ cut and shift corr.:\nscaler=minmax,\nsmall model (14MB, 5 levels)',])
-       af488luv_ff67b_2comp = pd.read_csv(af488luv_ff67b_2comp_path, sep=',').assign(bio=440*['af488luv',], processing=440*['Automatic U-Net pred.\n+ cut and shift corr.:\nscaler=minmax,\nsmall model (14MB, 5 levels)',])
+       af488luv_34a6d_1comp = pd.read_csv(af488luv_34a6d_1comp_path, sep=',').assign(bio=440*['af488luv',], processing=440*['Automatic U-Net pred.\n+ cut and shift corr.:\nscaler=l2,\nsmall model (7MB)'])
+       af488luv_34a6d_2comp = pd.read_csv(af488luv_34a6d_2comp_path, sep=',').assign(bio=440*['af488luv',], processing=440*['Automatic U-Net pred.\n+ cut and shift corr.:\nscaler=l2,\nsmall model (7MB)'])
+       af488luv_fe81d_1comp = pd.read_csv(af488luv_fe81d_1comp_path, sep=',').assign(bio=440*['af488luv',], processing=440*['Automatic U-Net pred.\n+ cut and shift corr.:\nscaler=standard,\nlarge model (186MB)',])
+       af488luv_fe81d_2comp = pd.read_csv(af488luv_fe81d_2comp_path, sep=',').assign(bio=440*['af488luv',], processing=440*['Automatic U-Net pred.\n+ cut and shift corr.:\nscaler=standard,\nlarge model (186MB)',])
+       af488luv_ff67b_1comp = pd.read_csv(af488luv_ff67b_1comp_path, sep=',').assign(bio=440*['af488luv',], processing=440*['Automatic U-Net pred.\n+ cut and shift corr.:\nscaler=minmax,\nsmall model (14MB)',])
+       af488luv_ff67b_2comp = pd.read_csv(af488luv_ff67b_2comp_path, sep=',').assign(bio=440*['af488luv',], processing=440*['Automatic U-Net pred.\n+ cut and shift corr.:\nscaler=minmax,\nsmall model (14MB)',])
        af488luv_0dot8_1comp = pd.read_csv(af488luv_0dot8_1comp_path, sep=',').assign(bio=440*['af488luv',], processing=440*['Manual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=0.8',])
        af488luv_0dot8_2comp = pd.read_csv(af488luv_0dot8_2comp_path, sep=',').assign(bio=440*['af488luv',], processing=440*['Manual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=0.8',])
        af488luv_1_1comp = pd.read_csv(af488luv_1_1comp_path, sep=',').assign(bio=440*['af488luv',], processing=440*['Manual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=1',])
@@ -5059,8 +5290,8 @@
        # read Hs-PEX5-eGFP (clean)
        hs_noc_1comp = pd.read_csv(hs_noc_1comp_path, sep=',').assign(bio=250*['hs',], processing=250*['Baseline control:\nno correction',])
        hs_0cd20_1comp = pd.read_csv(hs_0cd20_1comp_path, sep=',').assign(bio=250*['hs',], processing=250*['Automatic U-Net pred.\n+ cut and shift corr.:\nscaler=quantile transf.,\nlarge model (200MB)',])
-       hs_fe81d_1comp = pd.read_csv(hs_fe81d_1comp_path, sep=',').assign(bio=250*['hs',], processing=250*['Automatic U-Net pred.\n+ cut and shift corr.:\nscaler=standard,\nlarge model (186MB, 4 levels)',])
-       hs_ff67b_1comp = pd.read_csv(hs_ff67b_1comp_path, sep=',').assign(bio=250*['hs',], processing=250*['Automatic U-Net pred.\n+ cut and shift corr.:\nscaler=minmax,\nsmall model (14MB, 5 levels)',])
+       hs_fe81d_1comp = pd.read_csv(hs_fe81d_1comp_path, sep=',').assign(bio=250*['hs',], processing=250*['Automatic U-Net pred.\n+ cut and shift corr.:\nscaler=standard,\nlarge model (186MB)',])
+       hs_ff67b_1comp = pd.read_csv(hs_ff67b_1comp_path, sep=',').assign(bio=250*['hs',], processing=250*['Automatic U-Net pred.\n+ cut and shift corr.:\nscaler=minmax,\nsmall model (14MB)',])
        hs_5_1comp = pd.read_csv(hs_5_1comp_path, sep=',').assign(bio=250*['hs',], processing=250*['Manual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=5',])
        hs_7_1comp = pd.read_csv(hs_7_1comp_path, sep=',').assign(bio=250*['hs',], processing=250*['Manual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=7',])
        hs_10_1comp = pd.read_csv(hs_10_1comp_path, sep=',').assign(bio=250*['hs',], processing=250*['Manual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=10',])
@@ -5069,10 +5300,10 @@
        tb_noc_2comp = pd.read_csv(tb_noc_2comp_path, sep=',').assign(bio=250*['tb',], processing=250*['Baseline control:\nno correction',])
        tb_0cd20_1comp = pd.read_csv(tb_0cd20_1comp_path, sep=',').assign(bio=250*['tb',], processing=250*['Automatic U-Net pred.\n+ cut and shift corr.:\nscaler=quantile transf.,\nlarge model (200MB)',])
        tb_0cd20_2comp = pd.read_csv(tb_0cd20_2comp_path, sep=',').assign(bio=250*['tb',], processing=250*['Automatic U-Net pred.\n+ cut and shift corr.:\nscaler=quantile transf.,\nlarge model (200MB)',])
-       tb_fe81d_1comp = pd.read_csv(tb_fe81d_1comp_path, sep=',').assign(bio=250*['tb',], processing=250*['Automatic U-Net pred.\n+ cut and shift corr.:\nscaler=standard,\nlarge model (186MB, 4 levels)',])
-       tb_fe81d_2comp = pd.read_csv(tb_fe81d_2comp_path, sep=',').assign(bio=250*['tb',], processing=250*['Automatic U-Net pred.\n+ cut and shift corr.:\nscaler=standard,\nlarge model (186MB, 4 levels)',])
-       tb_ff67b_1comp = pd.read_csv(tb_ff67b_1comp_path, sep=',').assign(bio=250*['tb',], processing=250*['Automatic U-Net pred.\n+ cut and shift corr.:\nscaler=minmax,\nsmall model (14MB, 5 levels)',])
-       tb_ff67b_2comp = pd.read_csv(tb_ff67b_2comp_path, sep=',').assign(bio=250*['tb',], processing=250*['Automatic U-Net pred.\n+ cut and shift corr.:\nscaler=minmax,\nsmall model (14MB, 5 levels)',])
+       tb_fe81d_1comp = pd.read_csv(tb_fe81d_1comp_path, sep=',').assign(bio=250*['tb',], processing=250*['Automatic U-Net pred.\n+ cut and shift corr.:\nscaler=standard,\nlarge model (186MB)',])
+       tb_fe81d_2comp = pd.read_csv(tb_fe81d_2comp_path, sep=',').assign(bio=250*['tb',], processing=250*['Automatic U-Net pred.\n+ cut and shift corr.:\nscaler=standard,\nlarge model (186MB)',])
+       tb_ff67b_1comp = pd.read_csv(tb_ff67b_1comp_path, sep=',').assign(bio=250*['tb',], processing=250*['Automatic U-Net pred.\n+ cut and shift corr.:\nscaler=minmax,\nsmall model (14MB)',])
+       tb_ff67b_2comp = pd.read_csv(tb_ff67b_2comp_path, sep=',').assign(bio=250*['tb',], processing=250*['Automatic U-Net pred.\n+ cut and shift corr.:\nscaler=minmax,\nsmall model (14MB)',])
        tb_5_1comp = pd.read_csv(tb_5_1comp_path, sep=',').assign(bio=250*['tb',], processing=250*['Manual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=5',])
        tb_5_2comp = pd.read_csv(tb_5_2comp_path, sep=',').assign(bio=250*['tb',], processing=250*['Manual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=5',])
        tb_7_1comp = pd.read_csv(tb_7_1comp_path, sep=',').assign(bio=250*['tb',], processing=250*['Manual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=7',])
@@ -5080,21 +5311,21 @@
        tb_10_1comp = pd.read_csv(tb_10_1comp_path, sep=',').assign(bio=250*['tb',], processing=250*['Manual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=10',])
        tb_10_2comp = pd.read_csv(tb_10_2comp_path, sep=',').assign(bio=250*['tb',], processing=250*['Manual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=10',])
 
-       all_param = pd.concat([af488_noc_1comp, af488_0cd20_1comp, af488_34a6d_1comp,
-                              af488_fe81d_1comp, af488_ff67b_1comp, af488_0dot8_1comp,
-                              af488_1_1comp, af488_1dot5_1comp, af488_2_1comp,
+       all_param = pd.concat([af488_noc_1comp, af488_0cd20_1comp, af488_ff67b_1comp,
+                              # af488_34a6d_1comp, af488_fe81d_1comp, af488_0dot8_1comp, af488_1_1comp,
+                              af488_1dot5_1comp, af488_2_1comp,
                               af488_2dot5_1comp, af488luv_noc_1comp, af488luv_noc_2comp,
-                              af488luv_0cd20_1comp, af488luv_0cd20_2comp, af488luv_34a6d_1comp,
-                              af488luv_34a6d_2comp, af488luv_fe81d_1comp, af488luv_fe81d_2comp,
-                              af488luv_ff67b_1comp, af488luv_ff67b_2comp, af488luv_0dot8_1comp,
-                              af488luv_0dot8_2comp, af488luv_1_1comp, af488luv_1_2comp,
+                              af488luv_0cd20_1comp, af488luv_0cd20_2comp, # af488luv_34a6d_1comp,
+                              # af488luv_34a6d_2comp, af488luv_fe81d_1comp, af488luv_fe81d_2comp,
+                              af488luv_ff67b_1comp, af488luv_ff67b_2comp, # af488luv_0dot8_1comp,
+                              # af488luv_0dot8_2comp, af488luv_1_1comp, af488luv_1_2comp,
                               af488luv_1dot5_1comp, af488luv_1dot5_2comp, af488luv_2_1comp,
                               af488luv_2_2comp, af488luv_2dot5_1comp, af488luv_2dot5_2comp,
-                              hs_noc_1comp, hs_0cd20_1comp, hs_fe81d_1comp,
+                              hs_noc_1comp, hs_0cd20_1comp, # hs_fe81d_1comp,
                               hs_ff67b_1comp, hs_5_1comp, hs_7_1comp,
                               hs_10_1comp, tb_noc_1comp, tb_noc_2comp,
-                              tb_0cd20_1comp, tb_0cd20_2comp, tb_fe81d_1comp,
-                              tb_fe81d_2comp, tb_ff67b_1comp, tb_ff67b_2comp,
+                              tb_0cd20_1comp, tb_0cd20_2comp, # tb_fe81d_1comp, tb_fe81d_2comp,
+                              tb_ff67b_1comp, tb_ff67b_2comp,
                               tb_5_1comp, tb_5_2comp, tb_7_1comp,
                               tb_7_2comp, tb_10_1comp, tb_10_2comp])
 
@@ -5137,7 +5368,7 @@
 | 248 | 2022-07-27_tttr2xfcs_CH2_BIN1dot0_TbPEX5EGFP 1-1000249_T5430s_1_DELSHIFT_correlation-CH2_2 | 2            | 0.936036  | 1.974608  | 0.046250 | 24.217742  | tb    | Manual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=10 | 0.953750 | 0.300107 |
 | 249 | 2022-07-27_tttr2xfcs_CH2_BIN1dot0_TbPEX5EGFP 1-1000250_T5451s_1_DELSHIFT_correlation-CH2_2 | 2            | 0.898454  | 1.935038  | 0.027107 | 27.336500  | tb    | Manual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=10 | 0.972893 | 0.344808 |
 
-18266 rows × 10 columns
+12304 rows × 10 columns
      :END:
 
 
@@ -5241,41 +5472,42 @@
      #+RESULTS:
      :RESULTS:
      #+begin_example
-       1750
-       4234
-       4391
-       1750
-       1750
-       4391
-       4391
-       1750
+       2631
+       2631
+       1500
+       1500
+       2631
+       2542
+       1500
+       1500
        --- now delete all t=pd.NA, which I inserted if A_fast or A_slow was 0 ---
-       1532
-       4234
-       4390
-       1721
-       1750
-       4391
-       4391
-       1750
+       2630
+       2631
+       1500
+       1493
+       2631
+       2542
+       1297
+       1500
      #+end_example
-     |       | index | name_of_plot                                                                               | processing                                                                | Diff_species | fit component | A2       | N (FCS)   | N (mom)   | bio   | A1       | txy2     | txy1       | t          | N         | legend_t                                                                       | legend_N                                                                               |
-|-------+-------+--------------------------------------------------------------------------------------------+---------------------------------------------------------------------------+--------------+---------------+----------+-----------+-----------+-------+----------+----------+------------+------------+-----------+--------------------------------------------------------------------------------+----------------------------------------------------------------------------------------|
-| 0     | 0     | 2022-05-26_tttr2xfcs_CH2_BIN1dot0_20 nM AF4881_T0s_1_correlation-CH2_2                     | Baseline control:\nno correction                                          | 1            | fast          | NaN      | 14.315572 | 75.045477 | af488 | 1.000000 | NaN      | 0.038136   | 0.038136   | 14.315572 | \nAlexaFluor488\n(n=424, no\nartifacts, $\tau_D$ from\n1 species fit)          | \nAlexaFluor488\n(n=424, no artifacts,\n$N (FCS)$ from\n1 species fit)                 |
-| 1     | 2     | 2022-05-26_tttr2xfcs_CH2_BIN1dot0_20 nM AF4882_T14s_1_correlation-CH2_2                    | Baseline control:\nno correction                                          | 1            | fast          | NaN      | 14.368362 | 73.260903 | af488 | 1.000000 | NaN      | 0.039811   | 0.039811   | 14.368362 | \nAlexaFluor488\n(n=424, no\nartifacts, $\tau_D$ from\n1 species fit)          | \nAlexaFluor488\n(n=424, no artifacts,\n$N (FCS)$ from\n1 species fit)                 |
-| 2     | 4     | 2022-05-26_tttr2xfcs_CH2_BIN1dot0_20 nM AF4883_T26s_1_correlation-CH2_2                    | Baseline control:\nno correction                                          | 1            | fast          | NaN      | 14.122089 | 73.529686 | af488 | 1.000000 | NaN      | 0.040138   | 0.040138   | 14.122089 | \nAlexaFluor488\n(n=424, no\nartifacts, $\tau_D$ from\n1 species fit)          | \nAlexaFluor488\n(n=424, no artifacts,\n$N (FCS)$ from\n1 species fit)                 |
-| 3     | 6     | 2022-05-26_tttr2xfcs_CH2_BIN1dot0_20 nM AF4884_T38s_1_correlation-CH2_2                    | Baseline control:\nno correction                                          | 1            | fast          | NaN      | 14.236361 | 72.838417 | af488 | 1.000000 | NaN      | 0.039936   | 0.039936   | 14.236361 | \nAlexaFluor488\n(n=424, no\nartifacts, $\tau_D$ from\n1 species fit)          | \nAlexaFluor488\n(n=424, no artifacts,\n$N (FCS)$ from\n1 species fit)                 |
-| 4     | 8     | 2022-05-26_tttr2xfcs_CH2_BIN1dot0_20 nM AF4885_T50s_1_correlation-CH2_2                    | Baseline control:\nno correction                                          | 1            | fast          | NaN      | 14.192151 | 70.663922 | af488 | 1.000000 | NaN      | 0.039690   | 0.03969    | 14.192151 | \nAlexaFluor488\n(n=424, no\nartifacts, $\tau_D$ from\n1 species fit)          | \nAlexaFluor488\n(n=424, no artifacts,\n$N (FCS)$ from\n1 species fit)                 |
-| ...   | ...   | ...                                                                                        | ...                                                                       | ...          | ...           | ...      | ...       | ...       | ...   | ...      | ...      | ...        | ...        | ...       | ...                                                                            | ...                                                                                    |
-| 24402 | 36527 | 2022-07-27_tttr2xfcs_CH2_BIN1dot0_TbPEX5EGFP 1-1000248_T5408s_1_DELSHIFT_correlation-CH2_2 | Manual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=10 | 2            | slow          | 0.985773 | 0.924462  | 2.050364  | tb    | 0.014227 | 0.359032 | 127.214999 | 127.214999 | 0.013152  | \nTb-PEX5-eGFP\n(n=250, peak\nartifacts, $\tau_D$ from\nslow sp. of 2 sp. fit) | \nTb-PEX5-eGFP\n(n=250, peak artifacts,\n$N (FCS)\cdot A$ from\nslow sp. of 2 sp. fit) |
-| 24403 | 36528 | 2022-07-27_tttr2xfcs_CH2_BIN1dot0_TbPEX5EGFP 1-1000249_T5430s_1_DELSHIFT_correlation-CH2_2 | Manual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=10 | 2            | fast          | 0.953750 | 0.936036  | 1.974608  | tb    | 0.046250 | 0.300107 | 24.217742  | 0.300107   | 0.892745  | \nTb-PEX5-eGFP\n(n=250, peak\nartifacts, $\tau_D$ from\nfast sp. of 2 sp. fit) | \nTb-PEX5-eGFP\n(n=250, peak artifacts,\n$N (FCS)\cdot A$ from\nfast sp. of 2 sp. fit) |
-| 24404 | 36529 | 2022-07-27_tttr2xfcs_CH2_BIN1dot0_TbPEX5EGFP 1-1000249_T5430s_1_DELSHIFT_correlation-CH2_2 | Manual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=10 | 2            | slow          | 0.953750 | 0.936036  | 1.974608  | tb    | 0.046250 | 0.300107 | 24.217742  | 24.217742  | 0.043292  | \nTb-PEX5-eGFP\n(n=250, peak\nartifacts, $\tau_D$ from\nslow sp. of 2 sp. fit) | \nTb-PEX5-eGFP\n(n=250, peak artifacts,\n$N (FCS)\cdot A$ from\nslow sp. of 2 sp. fit) |
-| 24405 | 36530 | 2022-07-27_tttr2xfcs_CH2_BIN1dot0_TbPEX5EGFP 1-1000250_T5451s_1_DELSHIFT_correlation-CH2_2 | Manual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=10 | 2            | fast          | 0.972893 | 0.898454  | 1.935038  | tb    | 0.027107 | 0.344808 | 27.336500  | 0.344808   | 0.874099  | \nTb-PEX5-eGFP\n(n=250, peak\nartifacts, $\tau_D$ from\nfast sp. of 2 sp. fit) | \nTb-PEX5-eGFP\n(n=250, peak artifacts,\n$N (FCS)\cdot A$ from\nfast sp. of 2 sp. fit) |
-| 24406 | 36531 | 2022-07-27_tttr2xfcs_CH2_BIN1dot0_TbPEX5EGFP 1-1000250_T5451s_1_DELSHIFT_correlation-CH2_2 | Manual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=10 | 2            | slow          | 0.972893 | 0.898454  | 1.935038  | tb    | 0.027107 | 0.344808 | 27.336500  | 27.3365    | 0.024355  | \nTb-PEX5-eGFP\n(n=250, peak\nartifacts, $\tau_D$ from\nslow sp. of 2 sp. fit) | \nTb-PEX5-eGFP\n(n=250, peak artifacts,\n$N (FCS)\cdot A$ from\nslow sp. of 2 sp. fit) |
+     |       | index | name_of_plot                                                                               | processing                                                                | Diff_species | fit component | txy1       | txy2     | bio   | N (mom)   | A2       | N (FCS)   | A1       | t          | N         | legend_t                                                                       | legend_N                                                                               |
+|-------+-------+--------------------------------------------------------------------------------------------+---------------------------------------------------------------------------+--------------+---------------+------------+----------+-------+-----------+----------+-----------+----------+------------+-----------+--------------------------------------------------------------------------------+----------------------------------------------------------------------------------------|
+| 0     | 0     | 2022-05-26_tttr2xfcs_CH2_BIN1dot0_20 nM AF4881_T0s_1_correlation-CH2_2                     | Baseline control:\nno correction                                          | 1            | fast          | 0.038136   | NaN      | af488 | 75.045477 | NaN      | 14.315572 | 1.000000 | 0.038136   | 14.315572 | \nAlexaFluor488\n(n=424, no\nartifacts, $\tau_D$ from\n1 species fit)          | \nAlexaFluor488\n(n=424, no artifacts,\n$N (FCS)$ from\n1 species fit)                 |
+| 1     | 2     | 2022-05-26_tttr2xfcs_CH2_BIN1dot0_20 nM AF4882_T14s_1_correlation-CH2_2                    | Baseline control:\nno correction                                          | 1            | fast          | 0.039811   | NaN      | af488 | 73.260903 | NaN      | 14.368362 | 1.000000 | 0.039811   | 14.368362 | \nAlexaFluor488\n(n=424, no\nartifacts, $\tau_D$ from\n1 species fit)          | \nAlexaFluor488\n(n=424, no artifacts,\n$N (FCS)$ from\n1 species fit)                 |
+| 2     | 4     | 2022-05-26_tttr2xfcs_CH2_BIN1dot0_20 nM AF4883_T26s_1_correlation-CH2_2                    | Baseline control:\nno correction                                          | 1            | fast          | 0.040138   | NaN      | af488 | 73.529686 | NaN      | 14.122089 | 1.000000 | 0.040138   | 14.122089 | \nAlexaFluor488\n(n=424, no\nartifacts, $\tau_D$ from\n1 species fit)          | \nAlexaFluor488\n(n=424, no artifacts,\n$N (FCS)$ from\n1 species fit)                 |
+| 3     | 6     | 2022-05-26_tttr2xfcs_CH2_BIN1dot0_20 nM AF4884_T38s_1_correlation-CH2_2                    | Baseline control:\nno correction                                          | 1            | fast          | 0.039936   | NaN      | af488 | 72.838417 | NaN      | 14.236361 | 1.000000 | 0.039936   | 14.236361 | \nAlexaFluor488\n(n=424, no\nartifacts, $\tau_D$ from\n1 species fit)          | \nAlexaFluor488\n(n=424, no artifacts,\n$N (FCS)$ from\n1 species fit)                 |
+| 4     | 8     | 2022-05-26_tttr2xfcs_CH2_BIN1dot0_20 nM AF4885_T50s_1_correlation-CH2_2                    | Baseline control:\nno correction                                          | 1            | fast          | 0.039690   | NaN      | af488 | 70.663922 | NaN      | 14.192151 | 1.000000 | 0.03969    | 14.192151 | \nAlexaFluor488\n(n=424, no\nartifacts, $\tau_D$ from\n1 species fit)          | \nAlexaFluor488\n(n=424, no artifacts,\n$N (FCS)$ from\n1 species fit)                 |
+| ...   | ...   | ...                                                                                        | ...                                                                       | ...          | ...           | ...        | ...      | ...   | ...       | ...      | ...       | ...      | ...        | ...       | ...                                                                            | ...                                                                                    |
+| 16430 | 24603 | 2022-07-27_tttr2xfcs_CH2_BIN1dot0_TbPEX5EGFP 1-1000248_T5408s_1_DELSHIFT_correlation-CH2_2 | Manual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=10 | 2            | slow          | 127.214999 | 0.359032 | tb    | 2.050364  | 0.985773 | 0.924462  | 0.014227 | 127.214999 | 0.013152  | \nTb-PEX5-eGFP\n(n=250, peak\nartifacts, $\tau_D$ from\nslow sp. of 2 sp. fit) | \nTb-PEX5-eGFP\n(n=250, peak artifacts,\n$N (FCS)\cdot A$ from\nslow sp. of 2 sp. fit) |
+| 16431 | 24604 | 2022-07-27_tttr2xfcs_CH2_BIN1dot0_TbPEX5EGFP 1-1000249_T5430s_1_DELSHIFT_correlation-CH2_2 | Manual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=10 | 2            | fast          | 24.217742  | 0.300107 | tb    | 1.974608  | 0.953750 | 0.936036  | 0.046250 | 0.300107   | 0.892745  | \nTb-PEX5-eGFP\n(n=250, peak\nartifacts, $\tau_D$ from\nfast sp. of 2 sp. fit) | \nTb-PEX5-eGFP\n(n=250, peak artifacts,\n$N (FCS)\cdot A$ from\nfast sp. of 2 sp. fit) |
+| 16432 | 24605 | 2022-07-27_tttr2xfcs_CH2_BIN1dot0_TbPEX5EGFP 1-1000249_T5430s_1_DELSHIFT_correlation-CH2_2 | Manual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=10 | 2            | slow          | 24.217742  | 0.300107 | tb    | 1.974608  | 0.953750 | 0.936036  | 0.046250 | 24.217742  | 0.043292  | \nTb-PEX5-eGFP\n(n=250, peak\nartifacts, $\tau_D$ from\nslow sp. of 2 sp. fit) | \nTb-PEX5-eGFP\n(n=250, peak artifacts,\n$N (FCS)\cdot A$ from\nslow sp. of 2 sp. fit) |
+| 16433 | 24606 | 2022-07-27_tttr2xfcs_CH2_BIN1dot0_TbPEX5EGFP 1-1000250_T5451s_1_DELSHIFT_correlation-CH2_2 | Manual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=10 | 2            | fast          | 27.336500  | 0.344808 | tb    | 1.935038  | 0.972893 | 0.898454  | 0.027107 | 0.344808   | 0.874099  | \nTb-PEX5-eGFP\n(n=250, peak\nartifacts, $\tau_D$ from\nfast sp. of 2 sp. fit) | \nTb-PEX5-eGFP\n(n=250, peak artifacts,\n$N (FCS)\cdot A$ from\nfast sp. of 2 sp. fit) |
+| 16434 | 24607 | 2022-07-27_tttr2xfcs_CH2_BIN1dot0_TbPEX5EGFP 1-1000250_T5451s_1_DELSHIFT_correlation-CH2_2 | Manual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=10 | 2            | slow          | 27.336500  | 0.344808 | tb    | 1.935038  | 0.972893 | 0.898454  | 0.027107 | 27.3365    | 0.024355  | \nTb-PEX5-eGFP\n(n=250, peak\nartifacts, $\tau_D$ from\nslow sp. of 2 sp. fit) | \nTb-PEX5-eGFP\n(n=250, peak artifacts,\n$N (FCS)\cdot A$ from\nslow sp. of 2 sp. fit) |
 
-24159 rows × 16 columns
+16224 rows × 16 columns
      :END:
-     #+BEGIN_SRC jupyter-python
+
+     #+begin_src jupyter-python
        # for all fit data of af488/af488+luv: data=af488_param, aspect=4
        # for publication choose the following and use: data=af488_plot, aspect=1
        # for all fit data of hs-pex5/tb-pex5: data=pex5_param, aspect=4
@@ -5305,7 +5537,7 @@
                ylabel = r'particle number $N[fl^{-1}]$]'
                yscale = 'linear'
                y_text = 'particle-number'
-           if aspect == 4:
+           if aspect == 3.5:
                add_text = 'all-fits'
            elif aspect == 1.5:
                add_text = 'pub'
@@ -5347,18 +5579,18 @@
                        bbox_inches='tight', dpi=300)
            os.system(f'pdf2svg {savefig}.pdf {savefig}.svg')
            plt.close('all')
-     #+END_SRC
+     #+end_src
 
      #+RESULTS:
 
 
      #+BEGIN_SRC jupyter-python
-       sns.set_theme(style="whitegrid", font_scale=2, palette='colorblind',
+       sns.set_theme(style="whitegrid", font_scale=4, palette='colorblind',
                      context='paper')
-       bioplot(af488_param, bio='af488', y='t', aspect=4)
-       bioplot(af488_param, bio='af488', y='N', aspect=4)
-       bioplot(pex5_param, bio='pex5', y='t', aspect=4)
-       bioplot(pex5_param, bio='pex5', y='N', aspect=4)
+       bioplot(af488_param, bio='af488', y='t', aspect=3.5)
+       bioplot(af488_param, bio='af488', y='N', aspect=3.5)
+       bioplot(pex5_param, bio='pex5', y='t', aspect=3.5)
+       bioplot(pex5_param, bio='pex5', y='N', aspect=3.5)
      #+END_SRC
 
 #+RESULTS:
