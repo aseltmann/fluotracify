@@ -88,7 +88,7 @@ def correlate_timetrace_and_save(df, out_path, out_txt):
             for i in range(autotime.shape[0]):
                 out.write(f'{autotime[i]},{autonorm[i]}\n')
             out.write('end\n')
-        log.debug('predict_correct_correlate: Finished saving of file %s',
+        log.debug('correlate_timetrace_and_save: Finished saving of file %s',
                   out_file)
 
 
@@ -168,6 +168,70 @@ def correlate_ptu_and_save(in_path, out_path):
                                                  output_path=out_path)
 
 
+def save_correlations(df, out_path, out_txt):
+    """Take FCS autocorrelations ordered columnwise with the index being the
+    correlation times and save each correlation as a single .csv file which
+    can then be fitted by fitting software such as D. Waithe's FOCUSpoint or
+    FCSfitJS (https://dwaithe.github.io/FCSfitJS/)
+
+    Paramters
+    ---------
+    df : pandas DataFrame
+        FCS correlations ordered columnwise
+    out_path : str or Path
+        Path where .csv files are saved
+    out_txt : str
+        Used for custom filename, the final file is saved as
+        <out_path>/<datetime>_multipletau_<out_txt>_<df-column-name>_correlation.csv
+
+    Returns
+    -------
+    Nothing, but saves files as described
+
+    Raises
+    ------
+    ValueError
+        if df is not a pd.DataFrame
+    ValueError
+        if out_path is not convertible to a pathlib.Path
+    """
+    if not isinstance(df, pd.DataFrame):
+        raise ValueError('df has to be a pandas DataFrame')
+    try:
+        out_path = Path(out_path)
+    except TypeError as exc:
+        raise ValueError(
+            'out_path has to be convertible to a pathlib.Path') from exc
+
+    for idx, col in enumerate(df.columns):
+        corr = df.iloc[:, idx].dropna()
+        autotime = corr.index
+        autonorm = corr.values
+        out_file_txt = f'{out_txt}_{col.replace(".", "dot")}'
+        out_file = Path(f'{datetime.date.today()}_multipletau_'
+                        f'{out_file_txt}_{idx:04}_correlation.csv')
+        out_file = out_path / out_file
+
+        with open(out_file, 'w', encoding='utf-8') as out:
+            out.write('version,3.0\n')
+            out.write('numOfCh,1\n')
+            out.write('type,point\n')
+            out.write(f'parent_name,{out_txt}\n')
+            out.write('ch_type,1_1\n')
+            out.write('kcount,1\n')  # arbitrary value
+            out.write('numberNandB,1\n')  # arbitrary value
+            out.write('brightnessNandB,1\n')  # arbitrary value
+            out.write('carpet pos,0\n')
+            out.write('pc,0\n')
+            out.write('Time (ms),CH1 Auto-Correlation\n')
+            for i in range(autotime.shape[0]):
+                out.write(f'{autotime[i]},{autonorm[i]}\n')
+            out.write('end\n')
+        log.debug('save_correlations: Finished saving of file %s',
+                  out_file)
+
+
+                    
 def correlate_and_fit(trace, fwhm, diffrate=None, time_step=1., verbose=True):
     """autocorrelate an FCS trace and return the calculated diffusion rate and
     transit_time. If verbose=True, plot the correlation curve and fit, and
