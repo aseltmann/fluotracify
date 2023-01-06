@@ -522,24 +522,24 @@
       #+end_src
 
       #+begin_example
-        sh-5.1$ [I 2022-03-16 15:03:56.359 ServerApp] jupyterlab | extension was successfully linked.
-        [I 2022-03-16 15:03:56.565 ServerApp] nbclassic | extension was successfully linked.
-        [I 2022-03-16 15:03:56.604 LabApp] JupyterLab extension loaded from /home/lex/Programme/miniconda3/envs/tf/lib/python3.9/site-packages/jupyterlab
-        [I 2022-03-16 15:03:56.604 LabApp] JupyterLab application directory is /home/lex/Programme/miniconda3/envs/tf/share/jupyter/lab
-        [I 2022-03-16 15:03:56.608 ServerApp] jupyterlab | extension was successfully loaded.
-        [I 2022-03-16 15:03:56.615 ServerApp] nbclassic | extension was successfully loaded.
-        [I 2022-03-16 15:03:56.615 ServerApp] Serving notebooks from local directory: /home/lex/Programme/drmed-git
-        [I 2022-03-16 15:03:56.615 ServerApp] Jupyter Server 1.4.1 is running at:
-        [I 2022-03-16 15:03:56.615 ServerApp] http://localhost:8888/lab?token=19554a9e5e286f799f4ebeb592d24f1210f639d786d16d8e
-        [I 2022-03-16 15:03:56.615 ServerApp]  or http://127.0.0.1:8888/lab?token=19554a9e5e286f799f4ebeb592d24f1210f639d786d16d8e
-        [I 2022-03-16 15:03:56.615 ServerApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
-        [C 2022-03-16 15:03:56.619 ServerApp]
+sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was successfully linked.
+[I 2023-01-03 14:36:05.738 ServerApp] nbclassic | extension was successfully linked.
+[I 2023-01-03 14:36:05.805 LabApp] JupyterLab extension loaded from /home/lex/Programme/miniconda3/envs/tf/lib/python3.9/site-packages/jupyterlab
+[I 2023-01-03 14:36:05.805 LabApp] JupyterLab application directory is /home/lex/Programme/miniconda3/envs/tf/share/jupyter/lab
+[I 2023-01-03 14:36:05.811 ServerApp] jupyterlab | extension was successfully loaded.
+[I 2023-01-03 14:36:05.823 ServerApp] nbclassic | extension was successfully loaded.
+[I 2023-01-03 14:36:05.824 ServerApp] Serving notebooks from local directory: /home/lex/Programme/drmed-git
+[I 2023-01-03 14:36:05.824 ServerApp] Jupyter Server 1.4.1 is running at:
+[I 2023-01-03 14:36:05.824 ServerApp] http://localhost:8888/lab?token=8b657ca59261218ed47d32775aa4dd87bac4e9116158bfbd
+[I 2023-01-03 14:36:05.824 ServerApp]  or http://127.0.0.1:8888/lab?token=8b657ca59261218ed47d32775aa4dd87bac4e9116158bfbd
+[I 2023-01-03 14:36:05.824 ServerApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+[C 2023-01-03 14:36:05.837 ServerApp]
 
-            To access the server, open this file in a browser:
-                file:///home/lex/.local/share/jupyter/runtime/jpserver-172531-open.html
-            Or copy and paste one of these URLs:
-                http://localhost:8888/lab?token=19554a9e5e286f799f4ebeb592d24f1210f639d786d16d8e
-             or http://127.0.0.1:8888/lab?token=19554a9e5e286f799f4ebeb592d24f1210f639d786d16d8e
+    To access the server, open this file in a browser:
+        file:///home/lex/.local/share/jupyter/runtime/jpserver-7169-open.html
+    Or copy and paste one of these URLs:
+        http://localhost:8888/lab?token=8b657ca59261218ed47d32775aa4dd87bac4e9116158bfbd
+     or http://127.0.0.1:8888/lab?token=8b657ca59261218ed47d32775aa4dd87bac4e9116158bfbd
 
       #+end_example
 
@@ -886,40 +886,41 @@
          srun -p b_standard --time=7-10:00:00 --ntasks-per-node=24 --mem-per-cpu=2000 --pty bash
        #+END_SRC
 
+
     3. Start Jupyter Lab (~#+CALL: jpt-tmux[:session jpmux]~)
        #+CALL: jpt-tmux[:session jpmux]
 
        #+RESULTS:
        #+begin_example
-         (tf) [ye53nis@node095 /]$ jupyter lab --no-browser --port=$PORT
-         [I 2022-07-26 11:20:00.040 ServerApp] jupyterlab | extension was successfully linked.
-         [I 2022-07-26 11:20:07.850 ServerApp] nbclassic | extension was successfully linked.
-         [I 2022-07-26 11:20:08.574 ServerApp] nbclassic | extension was successfully loaded.
-         [I 2022-07-26 11:20:08.577 LabApp] JupyterLab extension loaded from /home/ye53nis/.conda/envs/tf/lib/python3.9/site-packages/jupyterlab
-         [I 2022-07-26 11:20:08.577 LabApp] JupyterLab application directory is /home/ye53nis/.conda/envs/tf/share/jupyter/lab
-         [I 2022-07-26 11:20:08.587 ServerApp] jupyterlab | extension was successfully loaded.
-         [I 2022-07-26 11:20:08.588 ServerApp] Serving notebooks from local directory: /
-         [I 2022-07-26 11:20:08.588 ServerApp] Jupyter Server 1.13.5 is running at:
-         [I 2022-07-26 11:20:08.589 ServerApp] http://localhost:8889/lab?token=f6b486d80a1bea505dc07c7c752c3c847a1c57c48e57b995
-         [I 2022-07-26 11:20:08.589 ServerApp]  or http://127.0.0.1:8889/lab?token=f6b486d80a1bea505dc07c7c752c3c847a1c57c48e57b995
-         [I 2022-07-26 11:20:08.589 ServerApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
-         [C 2022-07-26 11:20:08.684 ServerApp]
+       (tf) [ye53nis@node117 /]$ jupyter lab --no-browser --port=$PORT
+         [I 2023-01-03 22:14:33.399 ServerApp] jupyterlab | extension was successfully linked.
+         [I 2023-01-03 22:14:40.846 ServerApp] nbclassic | extension was successfully linked.
+         [I 2023-01-03 22:14:41.330 ServerApp] nbclassic | extension was successfully loaded.
+         [I 2023-01-03 22:14:41.332 LabApp] JupyterLab extension loaded from /home/ye53nis/.conda/envs/tf/lib/python3.9/site-packages/jupyterlab
+         [I 2023-01-03 22:14:41.332 LabApp] JupyterLab application directory is /home/ye53nis/.conda/envs/tf/share/jupyter/lab
+         [I 2023-01-03 22:14:41.340 ServerApp] jupyterlab | extension was successfully loaded.
+         [I 2023-01-03 22:14:41.342 ServerApp] Serving notebooks from local directory: /
+         [I 2023-01-03 22:14:41.342 ServerApp] Jupyter Server 1.13.5 is running at:
+         [I 2023-01-03 22:14:41.342 ServerApp] http://localhost:8889/lab?token=2ff8ed3f281a95c2bda81a0c453699c478ee1fd2e52e8bab
+         [I 2023-01-03 22:14:41.342 ServerApp]  or http://127.0.0.1:8889/lab?token=2ff8ed3f281a95c2bda81a0c453699c478ee1fd2e52e8bab
+         [I 2023-01-03 22:14:41.342 ServerApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+         [C 2023-01-03 22:14:41.456 ServerApp]
 
              To access the server, open this file in a browser:
-                 file:///home/ye53nis/.local/share/jupyter/runtime/jpserver-187359-open.html
+                 file:///home/ye53nis/.local/share/jupyter/runtime/jpserver-158816-open.html
              Or copy and paste one of these URLs:
-                 http://localhost:8889/lab?token=f6b486d80a1bea505dc07c7c752c3c847a1c57c48e57b995
-              or http://127.0.0.1:8889/lab?token=f6b486d80a1bea505dc07c7c752c3c847a1c57c48e57b995
+                 http://localhost:8889/lab?token=2ff8ed3f281a95c2bda81a0c453699c478ee1fd2e52e8bab
+              or http://127.0.0.1:8889/lab?token=2ff8ed3f281a95c2bda81a0c453699c478ee1fd2e52e8bab
        #+end_example
 
     4. Create SSH Tunnel for jupyter lab to the local computer (e.g. ~#+CALL:
        ssh-tunnel(port="8889", node="node160")~)
-       #+CALL: ssh-tunnel(port="8889", node="node095")
+       #+CALL: ssh-tunnel(port="8889", node="node117")
        #+RESULTS:
-       |                   |           |                                        |           |    |          |      |      |             |
-       | sh-5.1$           | sh-5.1$   | ye53nis@ara-login01.rz.uni-jena.de's | password: |    |          |      |      |             |
-       | ye53nis@node095's | password: |                                        |           |    |          |      |      |             |
-       | Last              | login:    | Tue                                    | Jul       | 26 | 22:10:41 | 2022 | from | login01.ara |
+       |                   |           |                                        |           |   |          |      |      |             |
+       | sh-5.1$           | sh-5.1$   | ye53nis@ara-login01.rz.uni-jena.de's | password: |   |          |      |      |             |
+       | ye53nis@node117's | password: |                                        |           |   |          |      |      |             |
+       | Last              | login:    | Tue                                    | Jan       | 3 | 22:15:58 | 2023 | from | login01.ara |
 
     5. I started a Python3 kernel using =jupyter-server-list-kernels=. Then I
        added the kernel ID to the =:PROPERTIES:= drawer of this (and following)
@@ -1275,7 +1276,7 @@
          Fix tf_pad_trace
      #+end_src
 
-*** Exp: simexps - ~weight=0~ vs =cut and shift=
+*** Exp: simexps - ~weight=0~ vs =cut and shift= vs =avg=
     :PROPERTIES:
     :header-args:jupyter-python: :session /jpy:localhost#8889:a37e524a-8134-4d8f-b24a-367acaf1bdd3 :pandoc t
     :END:
@@ -1286,6 +1287,12 @@
        weight of 0.
      - ~cut and shift~ gives removes each time bin classified as 'dominated by
        clusters' and shifts all remaining time bins together.
+   - After re-reading a lot of literature and putting it into text
+     (<2023-01-02 Mo>), I decided to add the averaging method:
+     1. segment trace in artifactual and non-artifactual (here: given by
+        simulations)
+     2. correlate all non-artifactual segments
+     3. average correlations and fit the average
      #+BEGIN_SRC jupyter-python
        %cd /beegfs/ye53nis/drmed-git
      #+END_SRC
@@ -1299,6 +1306,7 @@
        import logging
        import multipletau
        import os
+       import scipy
        import sys
 
        import matplotlib.pyplot as plt
@@ -1312,12 +1320,13 @@
        FLUOTRACIFY_PATH = '/beegfs/ye53nis/drmed-git/src/'
        sys.path.append(FLUOTRACIFY_PATH)
 
+       from fluotracify.applications import correlate
        from fluotracify.simulations import (
           import_simulation_from_csv as isfc,
           analyze_simulations as ans,
        )
 
-       logging.basicConfig(filename="/beegfs/ye53nis/drmed-git/data/exp-220227-unet/jupyter.log",
+       logging.basicConfig(filename="/beegfs/ye53nis/drmed-git/data/exp-220316-publication1/jupyter.log",
                            filemode='w', format='%(asctime)s - %(message)s',
                            force=True,
                            level=logging.DEBUG)
@@ -1330,8 +1339,8 @@
      #+END_SRC
 
      #+RESULTS:
-     : 2022-05-17 11:25:49.663795: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
-     : 2022-05-17 11:25:49.663882: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+     : 2023-01-03 23:23:38.245766: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+     : 2023-01-03 23:23:38.245806: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
 
     #+BEGIN_SRC jupyter-python
       import importlib
@@ -1359,7 +1368,24 @@
            col_per_example=col_per_example,
            dropindex=None,
            dropcolumns=None)
+       diffrates = sim_params.loc['diffusion rate of molecules in micrometer^2 / s'].astype(np.float32)
+       nmols = sim_params.loc['number of fast molecules'].astype(np.float32)
+       clusters = sim_params.loc['diffusion rate of clusters in micrometer^2 / s'].astype(np.float32)
+       sim_columns = [f'{d:.4}-{c:.4}' for d, c in zip(
+           np.repeat(diffrates, nsamples[0]),
+           np.repeat(clusters, nsamples[0]))]
 
+       sim_sep = isfc.separate_data_and_labels(array=sim,
+                                               nsamples=nsamples,
+                                               col_per_example=col_per_example)
+       sim_dirty = sim_sep['0']
+       sim_dirty.columns = sim_columns
+
+       sim_labels = sim_sep['1']
+       sim_labels.columns = sim_columns
+
+       sim_clean = sim_sep['2']
+       sim_clean.columns = sim_columns
 
        sim
      #+END_SRC
@@ -1385,27 +1411,9 @@
 
 
      #+BEGIN_SRC jupyter-python :pandoc t
-
-       def label_correct_correlate(sim, sim_params, lab_thresh, out_path):
-           diffrates = sim_params.loc['diffusion rate of molecules in micrometer^2 / s'].astype(np.float32)
-           nmols = sim_params.loc['number of fast molecules'].astype(np.float32)
-           clusters = sim_params.loc['diffusion rate of clusters in micrometer^2 / s'].astype(np.float32)
-           sim_columns = [f'{d:.4}-{c:.4}' for d, c in zip(
-               np.repeat(diffrates, nsamples[0]),
-               np.repeat(clusters, nsamples[0]))]
-
-           sim_sep = isfc.separate_data_and_labels(array=sim,
-                                                   nsamples=nsamples,
-                                                   col_per_example=col_per_example)
-           sim_dirty = sim_sep['0']
-           sim_dirty.columns = sim_columns
-
-           sim_labels = sim_sep['1']
-           sim_labels.columns = sim_columns
+       def label_correct_correlate(sim_dirty, sim_labels, sim_columns, lab_thresh, out_path):
            sim_labbool = sim_labels > lab_thresh
            sim_labbool.columns = sim_columns
-           sim_clean = sim_sep['2']
-           sim_clean.columns = sim_columns
 
            sim_cas, sim_del = pd.DataFrame(), pd.DataFrame()
            for i in range(len(sim_dirty.columns)):
@@ -1419,9 +1427,9 @@
                                         sim_dirty.iloc[:, i].values)
                sim_del_trace = pd.DataFrame(sim_del_trace)
                sim_del = pd.concat([sim_del, sim_del_trace], axis='columns')
-           sim_cas.columns, sim_del.columns = sim_columns, sim_columns
+           sim_cas.columns, sim_del.columns = sim_dirty.columns, sim_dirty.columns
 
-           log.debug('label_correct_correlate: Finished "cut and shift" correction.')
+           log.debug('label_correct_correlate: Finished "cut and shift" and "weight=0" correction.')
 
            # after correction
            lab_str = f'{lab_thresh}'.replace(".", "dot")
@@ -1430,6 +1438,45 @@
            correlate.correlate_timetrace_and_save(df=sim_cas, out_path=out_path, out_txt=cas_txt)
            correlate.correlate_timetrace_and_save(df=sim_del, out_path=out_path, out_txt=del_txt)
 
+       def label_avg_correct_correlate(sim_dirty, sim_labels, sim_columns, lab_thresh, out_path):
+           sim_labbool = sim_labels > lab_thresh
+           sim_labbool.columns = sim_columns
+
+           sim_avg = pd.DataFrame()
+           for i in range(len(sim_dirty.columns)):
+               # sim_labbool gives False (or 0) for parts deemed non-artifactual and
+               # True (or 1) for parts deemed artifactual. Switch 0 and 1 for label() fct.
+               # Take all connected segments with value 1 (non-artifactual) and give them a distinct label
+               sim_segments = scipy.ndimage.label(~sim_labbool.iloc[:, i])
+               time_and_corrs = []
+               for u in np.unique(sim_segments[0]):
+                   # ignore all parts with value 0 (artifactual)
+                   if u == 0:
+                       continue
+                   # now get intensities for each label and correlate the parts
+                   part = np.where(sim_segments[0] == u, sim_dirty.iloc[:, i], np.nan)
+                   part = part[~np.isnan(part)]
+                   if len(part) > 32:  # minimal length for multipletau
+                       corr_fn = multipletau.autocorrelate(
+                           a=part,
+                           m=16,
+                           deltat=1,
+                           normalize=True)
+                       time_and_corrs.append(corr_fn)
+               max_autotime = max([len(c[1:, 0]) for c in time_and_corrs])
+               autotime = [c[1:, 0] for c in time_and_corrs if len(c[1:, 0]) == max_autotime][0]
+               corrs = [c[1:, 1] for c in time_and_corrs]
+               # convert to pandas dataframe to easily compute the mean
+               corr_df = pd.DataFrame(corrs)
+               corr_df.columns = autotime
+               sim_avg = pd.concat([sim_avg, corr_df.mean()], axis='columns')
+           sim_avg.columns = sim_dirty.columns
+
+           log.debug('label_avg_correct_correlate: Finished "averaging" correction.')
+
+           lab_str = f'{lab_thresh}'.replace(".", "dot")
+           avg_txt = f'labthresh-{lab_str}_avgcorrs'
+           correlate.save_correlations(sim_avg, out_path, out_txt=avg_txt)
 
      #+END_SRC
 
@@ -1438,13 +1485,14 @@
 
    - plot simulated data with label thresholds of interest
      #+BEGIN_SRC jupyter-python
-       output_path = "/beegfs/ye53nis/drmed-git/data/exp-220227-unet/2022-05-17_simulations/"
+       out_path = "/beegfs/ye53nis/drmed-git/data/exp-220316-publication1/220517_simulations/"
 
        label_correct_correlate(
-           sim=sim,
-           sim_params=sim_params,
+           sim_dirty=sim_dirty,
+           sim_labels=sim_labels,
+           sim_columns=sim_columns,
            lab_thresh=0.04,
-           out_path=output_path)
+           out_path=out_path)
      #+END_SRC
 
      #+RESULTS:
@@ -1452,7 +1500,7 @@
 
    - now order the correlations in respective folders
      #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
-       cd /beegfs/ye53nis/drmed-git/data/exp-220227-unet/2022-05-17_simulations
+       cd /beegfs/ye53nis/drmed-git/data/exp-220316-publication1/220517_simulations
        mkdir -p labthresh-0.04-cutandshift/0.069
        mkdir -p labthresh-0.04-cutandshift/0.08
        mkdir -p labthresh-0.04-cutandshift/0.1
@@ -1501,9 +1549,31 @@
 
      #+END_SRC
 
-     #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session tmux
+   - now the averaging method:
+     #+BEGIN_SRC jupyter-python
+       out_path = Path('/beegfs/ye53nis/drmed-git/data/exp-220316-publication1/230103_avg-correction')
+
+       for name in set(sim_dirty.columns):
+           out_folder = out_path / f'{name.split("-")[0]}'
+
+           %mkdir -p $out_folder
+           label_avg_correct_correlate(
+               sim_dirty=sim_dirty.loc[:, name],
+               sim_labels=sim_labels,
+               sim_columns=sim_columns,
+               lab_thresh=0.04,
+               out_path=out_folder)
 
      #+END_SRC
+
+     #+RESULTS:
+
+     #+BEGIN_SRC jupyter-python
+       set(sim_dirty.columns)
+     #+END_SRC
+
+     #+RESULTS:
+     | 0.069-0.01 | 0.069-0.1 | 0.069-1.0 | 0.08-0.01 | 0.08-0.1 | 0.08-1.0 | 0.1-0.01 | 0.1-0.1 | 0.1-1.0 | 0.2-0.01 | 0.2-0.1 | 0.2-1.0 | 0.4-0.01 | 0.4-0.1 | 0.4-1.0 | 0.6-0.01 | 0.6-0.1 | 0.6-1.0 | 1.0-0.01 | 1.0-0.1 | 1.0-1.0 | 10.0-0.01 | 10.0-0.1 | 10.0-1.0 | 3.0-0.01 | 3.0-0.1 | 3.0-1.0 | 50.0-0.01 | 50.0-0.1 | 50.0-1.0 |
 
 *** Exp: simexps - characterization of cutandshift
    :PROPERTIES:
@@ -2266,7 +2336,7 @@
 
      #+RESULTS:
 
-*** Exp: simexps - =np.nan correction=
+*** Exp: simexps - failed attempts: ~weight=np.nan correction~ and =modulation filtering=
    :PROPERTIES:
    :header-args:jupyter-python: :session /jpy:localhost#8888:a37e524a-8134-4d8f-b24a-367acaf1bdd3 :pandoc t
    :END:
@@ -2507,7 +2577,383 @@
    #+RESULTS:
    : nan nan
 
+   - modulation filtering (@persson_modulation_2009). The algorithmic approach
+     is to divide the  correlation function of the registered intensity trace
+     with that of a modulation (a square wave pattern, in this case
+     representing the peak artifacts)
+   - since I have time constraints in my project, I will try if the straight
+     forward approach
+     1. take the dirty trace and the given mask from the simulations
+     2. correlate dirty trace and mask trace (0 = no artifact, 1 = artifact)
+     3. divide correlation of dirty trace by correlation of mask
 
+
+   #+BEGIN_SRC jupyter-python
+
+
+     out_path = '/home/lex/Programme/drmed-git/data/exp-220316-publication1/230102_modulation-filtering'
+     # correlate.correlate_timetrace_and_save(df=sim_nan, out_path=out_path, out_txt='nan')
+
+     for idx, col in enumerate(sim_labbool.columns):
+         mod_trace = sim_labbool.iloc[:, idx+2].astype(np.float64)
+         dirty_trace = sim_dirty.iloc[:, idx+2].astype(np.float64)
+         mod_corr = autocorrelate(
+             a=mod_trace,
+             m=16,
+             deltat=1,
+             normalize=True)
+         dirty_corr = autocorrelate(
+             a=dirty_trace,
+             m=16,
+             deltat=1,
+             normalize=True)
+         filt_corr = dirty_corr[1:, 1] / mod_corr[1:, 1]
+         fig, ax = plt.subplots(1, 3, figsize=(16, 9))
+         sns.lineplot(mod_corr[1:, 0], filt_corr, ax=ax[0])
+         sns.lineplot(mod_corr[1:, 0], mod_corr[1:, 1], ax=ax[1])
+         sns.lineplot(dirty_corr[1:, 0], dirty_corr[1:, 1], ax=ax[2])
+         plt.setp(ax, xscale='log')
+         plt.show()
+
+         break
+
+
+
+
+   #+END_SRC
+
+   #+RESULTS:
+   :RESULTS:
+   : /home/lex/Programme/miniconda3/envs/tf/lib/python3.9/site-packages/seaborn/_decorators.py:36: FutureWarning: Pass the following variables as keyword args: x, y. From version 0.12, the only valid positional argument will be `data`, and passing other arguments without an explicit keyword will result in an error or misinterpretation.
+   :   warnings.warn(
+   : /home/lex/Programme/miniconda3/envs/tf/lib/python3.9/site-packages/seaborn/_decorators.py:36: FutureWarning: Pass the following variables as keyword args: x, y. From version 0.12, the only valid positional argument will be `data`, and passing other arguments without an explicit keyword will result in an error or misinterpretation.
+   :   warnings.warn(
+   : /home/lex/Programme/miniconda3/envs/tf/lib/python3.9/site-packages/seaborn/_decorators.py:36: FutureWarning: Pass the following variables as keyword args: x, y. From version 0.12, the only valid positional argument will be `data`, and passing other arguments without an explicit keyword will result in an error or misinterpretation.
+   :   warnings.warn(
+   [[file:./.ob-jupyter/9c5567df2c70ee9c6c25f79ac4accb4443442941.png]]
+   :END:
+   #+RESULTS:
+
+   - it seems like this simple approach does not work since it introduces at
+     least huge instabilities in the tail of the correlation curve (and the
+     start doesn't look tidy as well). In the publications by persson et al they
+     also spoke of an analytical solution to the correlation of the modulation -
+     but I have not time to figure this out at the moment
+
+*** Exp: simexps - =correlation averaging=
+   :PROPERTIES:
+   :header-args:jupyter-python: :session /jpy:localhost#8888:a37e524a-8134-4d8f-b24a-367acaf1bdd3 :pandoc t
+   :END:
+
+   - After re-reading a lot of literature and putting it into text
+     (<2023-01-02 Mo>), I decided to add the averaging method:
+     1. segment trace in artifactual and non-artifactual (here: given by
+        simulations)
+     2. correlate all non-artifactual segments
+     3. average correlations and fit the average
+
+     #+BEGIN_SRC jupyter-python
+       %cd ~/Programme/drmed-git
+     #+END_SRC
+
+     #+RESULTS:
+     : /home/lex/Programme/drmed-git
+
+   - load modules
+     #+BEGIN_SRC jupyter-python
+       import datetime
+       import logging
+       import os
+       import pdb
+       import scipy
+       import sys
+
+       import matplotlib.pyplot as plt
+       import numpy as np
+       import pandas as pd
+       import seaborn as sns
+
+       from multipletau import autocorrelate
+       from pathlib import Path
+       from pprint import pprint
+
+       FLUOTRACIFY_PATH = '/home/lex/Programme/drmed-git/src/'
+       sys.path.append(FLUOTRACIFY_PATH)
+       from fluotracify.applications import (corr_fit_object as cfo,
+                                             correlate)
+       from fluotracify.imports import ptu_utils as ptu
+       from fluotracify.simulations import (
+          import_simulation_from_csv as isfc,
+          analyze_simulations as ans,
+       )
+
+       logging.basicConfig(filename="/home/lex/Programme/drmed-git/data/exp-220316-publication1/jupyter.log",
+                           filemode='w', format='%(asctime)s - %(message)s',
+                           force=True,
+                           level=logging.DEBUG)
+
+       sns.set_theme(style="whitegrid", font_scale=2, palette='colorblind',
+                     context='paper')
+
+     #+END_SRC
+
+     #+RESULTS:
+
+    #+BEGIN_SRC jupyter-python
+      import importlib
+      importlib.reload(correlate)
+      importlib.reload(ans)
+    #+END_SRC
+
+    #+RESULTS:
+    : <module 'fluotracify.simulations.analyze_simulations' from '/home/lex/Programme/drmed-git/src/fluotracify/simulations/analyze_simulations.py'>
+
+   - load simulated data
+     #+BEGIN_SRC jupyter-python :pandoc t
+       col_per_example = 3
+       lab_thresh = 0.04
+       artifact = 0
+       model_type = 1
+       fwhm = 250
+       sim_path = Path('/home/lex/Programme/drmed-collections/drmed-simexps/firstartifact_Nov2020_test')
+
+       sim, _, nsamples, sim_params = isfc.import_from_csv(
+           folder=sim_path,
+           header=12,
+           frac_train=1,
+           col_per_example=col_per_example,
+           dropindex=None,
+           dropcolumns=None)
+
+       diffrates = sim_params.loc['diffusion rate of molecules in micrometer^2 / s'].astype(np.float32)
+       nmols = sim_params.loc['number of fast molecules'].astype(np.float32)
+       clusters = sim_params.loc['diffusion rate of clusters in micrometer^2 / s'].astype(np.float32)
+       sim_columns = [f'{d:.4}' for d, c in zip(
+           np.repeat(diffrates, nsamples[0]),
+           np.repeat(clusters, nsamples[0]))]
+
+       sim_sep = isfc.separate_data_and_labels(array=sim,
+                                               nsamples=nsamples,
+                                               col_per_example=col_per_example)
+       sim_dirty = sim_sep['0']
+       sim_dirty.columns = sim_columns
+
+       sim_labels = sim_sep['1']
+       sim_labels.columns = sim_columns
+       sim_labbool = sim_labels > lab_thresh
+       sim_labbool.columns = sim_columns
+       sim_clean = sim_sep['2']
+       sim_clean.columns = sim_columns
+
+       sim_dirty
+     #+END_SRC
+
+     #+RESULTS:
+     :RESULTS:
+     |       | 0.069       | 0.069       | 0.069       | 0.069      | 0.069      | 0.069       | 0.069      | 0.069       | 0.069      | 0.069      | ... | 50.0        | 50.0        | 50.0        | 50.0        | 50.0        | 50.0        | 50.0        | 50.0        | 50.0        | 50.0        |
+|-------+-------------+-------------+-------------+------------+------------+-------------+------------+-------------+------------+------------+-----+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------|
+| 0     | 1187.467896 | 907.677734  | 480.048798  | 454.669403 | 466.063232 | 384.734467  | 543.981323 | 640.921509  | 795.946167 | 410.471893 | ... | 1897.398193 | 2279.646484 | 3088.531006 | 2034.432495 | 2187.548584 | 2105.736084 | 1789.366577 | 2023.093994 | 2331.185791 | 2185.028076 |
+| 1     | 1184.055176 | 945.760315  | 471.065216  | 458.392487 | 473.306152 | 395.165527  | 558.603088 | 622.421204  | 776.199402 | 409.149170 | ... | 1499.969849 | 2199.652100 | 3207.333008 | 1650.523926 | 2122.935791 | 2791.281006 | 1661.286377 | 1111.879761 | 1853.699585 | 1926.844971 |
+| 2     | 1191.848877 | 980.117798  | 459.479706  | 426.087982 | 482.370209 | 425.123413  | 551.536072 | 624.498535  | 778.671265 | 400.971954 | ... | 1822.985229 | 2456.422607 | 2969.562500 | 1934.118286 | 1457.731812 | 2251.077393 | 1903.003662 | 2063.915527 | 2198.018066 | 2038.683105 |
+| 3     | 1199.065918 | 974.313110  | 462.205566  | 444.041809 | 463.703125 | 434.186615  | 573.044128 | 626.252502  | 747.284058 | 393.178162 | ... | 1741.839355 | 2467.149414 | 2588.980957 | 2136.627686 | 1930.263672 | 2323.700684 | 2133.313721 | 1638.169312 | 1926.058716 | 1815.259521 |
+| 4     | 1221.957397 | 968.779175  | 464.918030  | 455.205292 | 474.615540 | 437.029419  | 586.489136 | 619.319092  | 781.954102 | 406.468018 | ... | 2431.400879 | 2246.336670 | 3000.961182 | 1915.518066 | 2052.773682 | 2359.145508 | 1699.926147 | 1862.709595 | 2291.338379 | 1332.422241 |
+| ...   | ...         | ...         | ...         | ...        | ...        | ...         | ...        | ...         | ...        | ...        | ... | ...         | ...         | ...         | ...         | ...         | ...         | ...         | ...         | ...         | ...         |
+| 16379 | 506.409668  | 1012.403931 | 855.006226  | 674.470703 | 769.859192 | 2110.732178 | 799.565247 | 1981.221436 | 528.844604 | 483.055878 | ... | 1512.586548 | 3212.712891 | 1491.119995 | 1843.866943 | 1748.956665 | 2048.602051 | 1662.244385 | 2593.879639 | 1921.427856 | 1664.831909 |
+| 16380 | 536.809692  | 1022.029724 | 840.287720  | 671.095215 | 738.908997 | 2118.984863 | 807.995789 | 2624.343262 | 552.687012 | 479.768372 | ... | 1661.331055 | 3190.809570 | 1770.193970 | 2081.854248 | 2164.372803 | 2295.646729 | 1846.683594 | 2038.272339 | 2222.708252 | 2122.753662 |
+| 16381 | 570.668884  | 989.891235  | 839.180298  | 689.863586 | 695.739136 | 2033.681885 | 786.547852 | 3528.163574 | 572.166077 | 484.491211 | ... | 1643.470337 | 2564.206787 | 2025.219971 | 2104.706787 | 1792.828613 | 2106.199463 | 2087.914062 | 1457.817871 | 1874.736938 | 1683.072021 |
+| 16382 | 562.505310  | 977.029785  | 1005.927673 | 683.250183 | 661.608337 | 2566.123047 | 805.594116 | 3731.086426 | 566.710571 | 489.289673 | ... | 1556.492188 | 2783.619385 | 1312.174561 | 2378.643311 | 2466.965576 | 2160.641357 | 1691.332520 | 2013.095093 | 1632.475708 | 1352.443237 |
+| 16383 | 567.307373  | 1006.794067 | 982.376526  | 677.099854 | 657.040588 | 2545.080322 | 784.917969 | 3850.334717 | 570.241699 | 512.688232 | ... | 2127.414551 | 2448.062012 | 1398.359253 | 1665.321167 | 2241.687256 | 1823.699829 | 1340.686035 | 1972.661743 | 1550.770142 | 1727.808228 |
+
+16384 rows × 1500 columns
+     :END:
+
+   - let's start implementing the averaging
+     #+BEGIN_SRC jupyter-python
+       testtrace = [5, 6, 7, 8, 3, 4, 5, 6, 7, 8, 9]
+       testsegme = [0, 0, 1, 1, 1, 0, 0, 1, 1, 0, 1]
+       testlabel = scipy.ndimage.label(testsegme)
+       testparts = []
+       for u in np.unique(testlabel[0]):
+           if u == 0:
+               continue
+           part = np.where(testlabel[0] == u, testtrace, np.nan)
+           part = part[~np.isnan(part)]
+           testparts.append(part)
+       print(testparts)
+     #+END_SRC
+
+     #+RESULTS:
+     : [array([7., 8., 3.]), array([6., 7.]), array([9.])]
+
+
+   #+BEGIN_SRC jupyter-python
+     sim_avg = pd.DataFrame()
+     for i in range(len(sim_dirty.columns)):
+         # sim_labbool gives False (or 0) for parts deemed non-artifactual and
+         # True (or 1) for parts deemed artifactual. Take all connected segments
+         # with value 0 and give them a distinct label
+         sim_segments = scipy.ndimage.label(~sim_labbool.iloc[:, i])
+         time_and_corrs = []
+         for u in np.unique(sim_segments[0]):
+             if u == 0:
+                 continue
+             # now get intensities for each label and correlate the parts
+             part = np.where(sim_segments[0] == u, sim_dirty.iloc[:, i], np.nan)
+             part = part[~np.isnan(part)]
+             if len(part) > 32:
+                 corr_fn = autocorrelate(
+                     a=part,
+                     m=16,
+                     deltat=1,
+                     normalize=True)
+                 time_and_corrs.append(corr_fn)
+         max_autotime = max([len(c[1:, 0]) for c in time_and_corrs])
+         autotime = [c[1:, 0] for c in time_and_corrs if len(c[1:, 0]) == max_autotime][0]
+         corrs = [c[1:, 1] for c in time_and_corrs]
+         # convert to pandas dataframe to easily compute the mean
+         corr_df = pd.DataFrame(corrs)
+         corr_df.columns = autotime
+         sim_avg = pd.concat([sim_avg, corr_df.mean()], axis='columns')
+     sim_avg.columns = sim_dirty.columns
+   #+END_SRC
+
+   #+RESULTS:
+
+   #+BEGIN_SRC jupyter-python
+
+   #+END_SRC
+
+   #+RESULTS:
+   :RESULTS:
+   |         | 0.069    | 0.069    | 0.069    | 0.069    | 0.069    | 0.069    | 0.069    | 0.069    | 0.069    | 0.069    | ... | 50.0      | 50.0     | 50.0     | 50.0     | 50.0     | 50.0     | 50.0     | 50.0     | 50.0     | 50.0     |
+|---------+----------+----------+----------+----------+----------+----------+----------+----------+----------+----------+-----+-----------+----------+----------+----------+----------+----------+----------+----------+----------+----------|
+| 1.0     | 0.020698 | 0.019622 | 0.017920 | 0.032244 | 0.030221 | 0.025694 | 0.031892 | 0.025930 | 0.016783 | 0.039689 | ... | 0.003613  | 0.004836 | 0.004365 | 0.006933 | 0.003830 | 0.004863 | 0.005000 | 0.003529 | 0.004348 | 0.003922 |
+| 2.0     | 0.019363 | 0.018849 | 0.016405 | 0.030617 | 0.029151 | 0.023944 | 0.030052 | 0.024905 | 0.015626 | 0.039011 | ... | 0.001848  | 0.002731 | 0.002170 | 0.004099 | 0.000872 | 0.002357 | 0.001167 | 0.002220 | 0.002760 | 0.001808 |
+| 3.0     | 0.018039 | 0.018200 | 0.015337 | 0.029285 | 0.028322 | 0.022457 | 0.028391 | 0.023805 | 0.014568 | 0.038457 | ... | 0.000374  | 0.001714 | 0.002105 | 0.003783 | 0.000867 | 0.002107 | 0.000400 | 0.000521 | 0.002419 | 0.001642 |
+| 4.0     | 0.017254 | 0.017494 | 0.014444 | 0.028055 | 0.027430 | 0.021223 | 0.027185 | 0.022827 | 0.013678 | 0.037895 | ... | -0.000046 | 0.001012 | 0.001043 | 0.003233 | 0.000772 | 0.001636 | 0.000235 | 0.001065 | 0.001524 | 0.001051 |
+| 5.0     | 0.016354 | 0.016801 | 0.013631 | 0.027047 | 0.026551 | 0.020070 | 0.025930 | 0.021968 | 0.013003 | 0.037378 | ... | -0.000957 | 0.001453 | 0.001591 | 0.001492 | 0.000014 | 0.001743 | 0.000496 | 0.001033 | 0.000598 | 0.000294 |
+| ...     | ...      | ...      | ...      | ...      | ...      | ...      | ...      | ...      | ...      | ...      | ... | ...       | ...      | ...      | ...      | ...      | ...      | ...      | ...      | ...      | ...      |
+| 10240.0 | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      | ... | NaN       | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      |
+| 11264.0 | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      | ... | NaN       | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      |
+| 12288.0 | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      | ... | NaN       | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      |
+| 13312.0 | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      | ... | NaN       | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      |
+| 14336.0 | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      | ... | NaN       | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      |
+
+94 rows × 1500 columns
+   :END:
+
+
+   #+BEGIN_SRC jupyter-python
+
+
+
+
+   #+END_SRC
+
+   #+RESULTS:
+
+   #+BEGIN_SRC jupyter-python
+     x
+   #+END_SRC
+
+   #+RESULTS:
+   #+begin_example
+     1.0       0.020698
+     2.0       0.019363
+     3.0       0.018039
+     4.0       0.017254
+     5.0       0.016354
+                 ...
+     3072.0    0.007225
+     3328.0    0.002897
+     3584.0   -0.004941
+     3840.0    0.007093
+     4096.0    0.005923
+     Name: 0.069, Length: 80, dtype: float64
+   #+end_example
+
+   #+BEGIN_SRC jupyter-python
+     plt.figure(figsize=(16, 16))
+     for i, _ in enumerate(sim_avg.columns):
+         plt.subplot(5, 4, i+1).semilogx(sim_avg.index, sim_avg.iloc[:, i])
+         if i > 18:
+             break
+
+   #+END_SRC
+
+   #+RESULTS:
+   [[file:./.ob-jupyter/54100c1f50753698a7e7a3fe916bfc0c861a06d1.png]]
+
+
+
+
+   #+BEGIN_SRC jupyter-python
+
+
+     ax = sns.lineplot(x=corr_df.columns, y=corr_df.mean())
+     plt.setp(ax, xscale='log')
+     ax.fill_between(corr_df.columns, (corr_df.mean() - corr_df.std()).values, (corr_df.mean() + corr_df.std()).values, alpha=0.3)
+   #+END_SRC
+
+   #+RESULTS:
+   :RESULTS:
+   : <matplotlib.collections.PolyCollection at 0x7f64d076c5b0>
+   [[file:./.ob-jupyter/4f2647201789b4317b735291d3873b994b13439b.png]]
+   :END:
+
+
+   #+begin_src jupyter-python
+
+
+     out_path = '/home/lex/Programme/drmed-git/data/exp-220316-publication1/230102_modulation-filtering'
+     # correlate.correlate_timetrace_and_save(df=sim_nan, out_path=out_path, out_txt='nan')
+
+     for idx, col in enumerate(sim_labbool.columns):
+         mod_trace = sim_labbool.iloc[:, idx+2].astype(np.float64)
+         dirty_trace = sim_dirty.iloc[:, idx+2].astype(np.float64)
+         mod_corr = autocorrelate(
+             a=mod_trace,
+             m=16,
+             deltat=1,
+             normalize=True)
+         dirty_corr = autocorrelate(
+             a=dirty_trace,
+             m=16,
+             deltat=1,
+             normalize=True)
+         filt_corr = dirty_corr[1:, 1] / mod_corr[1:, 1]
+         fig, ax = plt.subplots(1, 3, figsize=(16, 9))
+         sns.lineplot(mod_corr[1:60, 0], filt_corr[:59], ax=ax[0])
+         sns.lineplot(mod_corr[1:, 0], mod_corr[1:, 1], ax=ax[1])
+         sns.lineplot(dirty_corr[1:, 0], dirty_corr[1:, 1], ax=ax[2])
+         plt.setp(ax, xscale='log')
+         plt.show()
+
+         break
+   #+end_src
+
+
+   #+RESULTS:
+
+   #+BEGIN_SRC jupyter-python
+     ~sim_labbool.iloc[:, i]
+   #+END_SRC
+
+   #+RESULTS:
+   #+begin_example
+     0        True
+     1        True
+     2        True
+     3        True
+     4        True
+              ...
+     16379    True
+     16380    True
+     16381    True
+     16382    True
+     16383    True
+     Name: 0.069, Length: 16384, dtype: bool
+   #+end_example
 
 *** Exp: bioexps - prediction by threshold
     :PROPERTIES:
@@ -3232,8 +3678,8 @@
      #+END_SRC
 
      #+RESULTS:
-     : 2022-08-13 16:57:36.117152: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
-     : 2022-08-13 16:57:36.117304: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+     : 2023-01-06 10:52:49.460410: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+     : 2023-01-06 10:52:49.460512: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
 
     #+BEGIN_SRC jupyter-python
       import importlib
@@ -3742,6 +4188,7 @@
 
    - let's load and plot cuts vs transit times from 3 different base molecule
      speeds (varying molecule numbers): 0.069, 0.2, and 3.0 um^2/s respectively.
+   - this time for *comparison of correction methods*
      #+BEGIN_SRC jupyter-python
        # dirty correlations - check out from  branch exp-220227-unet
        path1 = Path('/home/lex/Programme/drmed-git/data/exp-220227-unet/2022-04-25_simulations/dirty')
@@ -3798,10 +4245,16 @@
        three_labdel_1comp_path = path4 / '3.0-all-results/3dot0_lab_del_1comp_outputParam.csv'
        three_labdel_2comp_path = path4 / '3.0-all-results/3dot0_lab_del_2comp_outputParam.csv'
 
+       path5 = Path('/home/lex/Programme/drmed-git/data/exp-220316-publication1/230103_avg-correction/')
+       odot069_labavg_1comp_path = path5 / 'all-results/0dot069_lab_avg_1comp_outputParam.csv'
+       odot2_labavg_1comp_path = path5 / 'all-results/0dot2_lab_avg_1comp_outputParam.csv'
+       three_labavg_1comp_path = path5 / 'all-results/three_lab_avg_1comp_outputParam.csv'
+
+
        # load data
        odot069_clean_1comp = pd.read_csv(odot069_clean_1comp_path, sep=',').assign(sim=300*[0.069,], processing=300*['No artifacts,\nno correction',])
        odot2_clean_1comp = pd.read_csv(odot2_clean_1comp_path, sep=',').assign(sim=300*[0.2,], processing=300*['No artifacts,\nno correction',])
-       one_clean_1comp = pd.read_csv(one_clean_1comp_path, sep=',').assign(sim=300*[1,], processing=300*['No artifacts,\nno correction',])
+       # one_clean_1comp = pd.read_csv(one_clean_1comp_path, sep=',').assign(sim=300*[1,], processing=300*['No artifacts,\nno correction',])
        three_clean_1comp = pd.read_csv(three_clean_1comp_path, sep=',').assign(sim=300*[3,], processing=300*['No artifacts,\nno correction',])
        odot069_dirty_1comp = pd.read_csv(odot069_dirty_1comp_path, sep=',').assign(sim=300*[0.069,], processing=300*['Peak artifacts,\nno correction',])
        odot069_dirty_2comp = pd.read_csv(odot069_dirty_2comp_path, sep=',').assign(sim=300*[0.069,], processing=300*['Peak artifacts,\nno correction',])
@@ -3825,6 +4278,9 @@
        odot2_labcas_2comp = pd.read_csv(odot2_labcas_2comp_path, sep=',').assign(sim=300*[0.2,], processing=300*['Peak artifacts,\nsim.-based pred.\n+ cut and shift corr.',])
        three_labcas_1comp = pd.read_csv(three_labcas_1comp_path, sep=',').assign(sim=300*[3,], processing=300*['Peak artifacts,\nsim.-based pred.\n+ cut and shift corr.',])
        three_labcas_2comp = pd.read_csv(three_labcas_2comp_path, sep=',').assign(sim=300*[3,], processing=300*['Peak artifacts,\nsim.-based pred.\n+ cut and shift corr.',])
+       odot069_labavg_1comp = pd.read_csv(odot069_labavg_1comp_path, sep=',').assign(sim=300*[0.069,], processing=300*['Peak artifacts,\nsim.-based pred.\n+ averaging corr.',])
+       odot2_labavg_1comp = pd.read_csv(odot2_labavg_1comp_path, sep=',').assign(sim=300*[0.2,], processing=300*['Peak artifacts,\nsim.-based pred.\n+ averaging corr.',])
+       three_labavg_1comp = pd.read_csv(three_labavg_1comp_path, sep=',').assign(sim=300*[3,], processing=300*['Peak artifacts,\nsim.-based pred.\n+ averaging corr.',])
 
        # control with prediction threshold
        odot069_thresh2_1comp = pd.read_csv(odot069_thresh2_1comp_path, sep=',').assign(sim=300*[0.069,], processing=300*['Peak artifacts,\nmanual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=2',])
@@ -3855,6 +4311,7 @@
                               odot2_labdel_2comp, three_labdel_1comp, three_labdel_2comp,
                               odot069_labcas_1comp, odot069_labcas_2comp, odot2_labcas_1comp,
                               odot2_labcas_2comp, three_labcas_1comp, three_labcas_2comp,
+                              odot069_labavg_1comp, odot2_labavg_1comp, three_labavg_1comp,
                               odot069_thresh2_1comp, odot069_thresh2_2comp, odot2_thresh2_1comp,
                               odot2_thresh2_2comp, three_thresh2_1comp, three_thresh2_2comp,
                               odot069_0cd20_1comp, odot069_0cd20_2comp, odot2_0cd20_1comp,
@@ -3891,8 +4348,9 @@
 | 298 | 2022-04-25_multipletau_0cd20_3dot0-0dot1_2498_correlation-CH1_1 | 2            | 0.36122 | 2.884706   | 3.000 | Peak artifacts,\nautomatic U-Net pred.\n+ cut and shift corr.:\nscaler=quantile transf.,\nlarge model (200MB) | 0.63878 | 0.00001 |
 | 299 | 2022-04-25_multipletau_0cd20_3dot0-0dot1_2499_correlation-CH1_1 | 2            | 0.36122 | 2.884706   | 3.000 | Peak artifacts,\nautomatic U-Net pred.\n+ cut and shift corr.:\nscaler=quantile transf.,\nlarge model (200MB) | 0.63878 | 0.00001 |
 
-9900 rows × 8 columns
+10800 rows × 8 columns
      :END:
+
 
      #+BEGIN_SRC jupyter-python
 
@@ -3968,47 +4426,44 @@
        # with pd.option_context("max_colwidth", 1000):
        #     display(all_param[['legend', 't', 'A', 'expected transit time', 'sim', 'processing']])
        pub_param = all_param[all_param['legend'] == '\nsim. trace\nn=300, $\\tau_D$ from\n1 species fit']
-       all_param
+       compare_correction_param = all_param[(all_param['legend'] == '\nsim. trace\nn=300, $\\tau_D$ from\n1 species fit') &
+                                            ~((all_param['processing'] == 'Peak artifacts,\nmanual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=2') |
+                                              (all_param['processing'] == 'Peak artifacts,\nautomatic U-Net pred.\n+ cut and shift corr.:\nscaler=quantile transf.,\nlarge model (200MB)'))]
+       compare_correction_param
      #+END_SRC
 
      #+RESULTS:
      :RESULTS:
-     : 5400
+     : 6300
      : 4500
      : 4500
-     : 5400
+     : 6300
      : 3797
      : 4060
-     |       | legend                                            | t          | A       | expected transit time | sim   | processing                                        |
-|-------+---------------------------------------------------+------------+---------+-----------------------+-------+---------------------------------------------------|
-| 0     | \nsim. trace\nn=300, $\tau_D$ from\n1 species fit | 150.165642 | 1.0     | 163.348623            | 0.069 | No artifacts,\nno correction                      |
-| 1     | \nsim. trace\nn=300, $\tau_D$ from\n1 species fit | 133.75885  | 1.0     | 163.348623            | 0.069 | No artifacts,\nno correction                      |
-| 2     | \nsim. trace\nn=300, $\tau_D$ from\n1 species fit | 109.396491 | 1.0     | 163.348623            | 0.069 | No artifacts,\nno correction                      |
-| 3     | \nsim. trace\nn=300, $\tau_D$ from\n1 species fit | 140.176075 | 1.0     | 163.348623            | 0.069 | No artifacts,\nno correction                      |
-| 4     | \nsim. trace\nn=300, $\tau_D$ from\n1 species fit | 520.784146 | 1.0     | 163.348623            | 0.069 | No artifacts,\nno correction                      |
-| ...   | ...                                               | ...        | ...     | ...                   | ...   | ...                                               |
-| 14395 | \nsim. trace\nn=300, $\tau_D$ from\nslow sp. o... | 2.884706   | 0.36122 | 3.757018              | 3.000 | Peak artifacts,\nautomatic U-Net pred.\n+ cut ... |
-| 14396 | \nsim. trace\nn=300, $\tau_D$ from\nfast sp. o... | 0.00001    | 0.63878 | 3.757018              | 3.000 | Peak artifacts,\nautomatic U-Net pred.\n+ cut ... |
-| 14397 | \nsim. trace\nn=300, $\tau_D$ from\nslow sp. o... | 2.884706   | 0.36122 | 3.757018              | 3.000 | Peak artifacts,\nautomatic U-Net pred.\n+ cut ... |
-| 14398 | \nsim. trace\nn=300, $\tau_D$ from\nfast sp. o... | 0.00001    | 0.63878 | 3.757018              | 3.000 | Peak artifacts,\nautomatic U-Net pred.\n+ cut ... |
-| 14399 | \nsim. trace\nn=300, $\tau_D$ from\nslow sp. o... | 2.884706   | 0.36122 | 3.757018              | 3.000 | Peak artifacts,\nautomatic U-Net pred.\n+ cut ... |
+     |      | legend                                            | t          | A   | expected transit time | sim   | processing                                        |
+|------+---------------------------------------------------+------------+-----+-----------------------+-------+---------------------------------------------------|
+| 0    | \nsim. trace\nn=300, $\tau_D$ from\n1 species fit | 150.165642 | 1.0 | 163.348623            | 0.069 | No artifacts,\nno correction                      |
+| 1    | \nsim. trace\nn=300, $\tau_D$ from\n1 species fit | 133.75885  | 1.0 | 163.348623            | 0.069 | No artifacts,\nno correction                      |
+| 2    | \nsim. trace\nn=300, $\tau_D$ from\n1 species fit | 109.396491 | 1.0 | 163.348623            | 0.069 | No artifacts,\nno correction                      |
+| 3    | \nsim. trace\nn=300, $\tau_D$ from\n1 species fit | 140.176075 | 1.0 | 163.348623            | 0.069 | No artifacts,\nno correction                      |
+| 4    | \nsim. trace\nn=300, $\tau_D$ from\n1 species fit | 520.784146 | 1.0 | 163.348623            | 0.069 | No artifacts,\nno correction                      |
+| ...  | ...                                               | ...        | ... | ...                   | ...   | ...                                               |
+| 9895 | \nsim. trace\nn=300, $\tau_D$ from\n1 species fit | 6.913469   | 1.0 | 3.757018              | 3.000 | Peak artifacts,\nsim.-based pred.\n+ averaging... |
+| 9896 | \nsim. trace\nn=300, $\tau_D$ from\n1 species fit | 4.507781   | 1.0 | 3.757018              | 3.000 | Peak artifacts,\nsim.-based pred.\n+ averaging... |
+| 9897 | \nsim. trace\nn=300, $\tau_D$ from\n1 species fit | 5.638111   | 1.0 | 3.757018              | 3.000 | Peak artifacts,\nsim.-based pred.\n+ averaging... |
+| 9898 | \nsim. trace\nn=300, $\tau_D$ from\n1 species fit | 3.080655   | 1.0 | 3.757018              | 3.000 | Peak artifacts,\nsim.-based pred.\n+ averaging... |
+| 9899 | \nsim. trace\nn=300, $\tau_D$ from\n1 species fit | 6.437969   | 1.0 | 3.757018              | 3.000 | Peak artifacts,\nsim.-based pred.\n+ averaging... |
 
-13257 rows × 6 columns
+4500 rows × 6 columns
      :END:
 
 
      #+BEGIN_SRC jupyter-python
-       def simplot(data, aspect):
-           if aspect == 4:
-               add_text = 'all-fits'
-               height = 5
+       def simplot(data, height, aspect, add_text='other'):
+           if add_text == 'all-fits':
                hue = 'legend'
-           elif aspect == 5:
-               add_text = 'pub'
-               height = 5
-               hue = None
            else:
-               add_text = 'other'
+               hue = None
            g = sns.catplot(data=data,
                            y='t',
                            x='processing',
@@ -4033,8 +4488,8 @@
            g.map_dataframe(sns.stripplot,
                  y='t',
                  x='processing',
-                 hue='legend',
-                 dodge=True,
+                 hue=hue,
+                 dodge=True,  # only relevant if hue is used
                  palette=sns.color_palette(['0.3']),
                  size=4,
                  jitter=0.2)
@@ -4054,28 +4509,48 @@
            #    _ = axes.set_xticklabels(axes.get_xticklabels(), rotation=45)
 
            plt.setp(g.axes, yscale='log', xlabel='',
-                    ylabel=r'log transit time $\tau_{D}$ $[ms]$')
+                    ylabel=r'log transit time $\tau_{D}$ $[ms]$', ylim=[1, 10000])
 
            g.tight_layout()
            savefig = f'./data/exp-220316-publication1/jupyter/plot2_{add_text}_simulations-transit-times'
-           plt.savefig(f'{savefig}.pdf', bbox_inches='tight', dpi=300)
+           plt.savefig(f'{savefig}.pdf', dpi=300)
            os.system(f'pdf2svg {savefig}.pdf {savefig}.svg')
            plt.close('all')
      #+END_SRC
 
      #+RESULTS:
 
-
+   - the following constraints are given by the nanoletters template:
+     - one column: up to 240 points wide (3.33 in.)
+     - double-column: between 300 and 504 points (4.167 in. and 7 in.).
+     - maximum depth: 660 points (9.167 in.) including the caption (allow 12 pts.
+       For each line of caption text)
+     - Lettering should be no smaller than 4.5 points in the final published
+       format. The text should be legible when the graphic is viewed full-size.
+       Helvetica or Arial fonts work well for lettering. Lines should be no
+       thinner than 0.5 point.
+   - now the plotting
      #+BEGIN_SRC jupyter-python
        # sns.set_theme(style="whitegrid", font_scale=2.2, palette='colorblind',
        #               context='paper')
-       # simplot(all_param, aspect=4)
+       # simplot(all_param, aspect=4, add_text='all-fits')
        sns.set_theme(style="whitegrid", font_scale=2.6, palette='colorblind',
                      context='paper')
-       simplot(pub_param, aspect=5)
+       simplot(pub_param, aspect=5, add_text='pub')
      #+END_SRC
 
      #+RESULTS:
+
+     #+BEGIN_SRC jupyter-python
+       sns.set_theme(style="whitegrid", font_scale=1, palette='colorblind',
+                     context='paper')
+       # sns.set(rc={'figure.figsize':(3.33, 7)})
+       simplot(compare_correction_param, height=5, aspect=7/5, add_text='compare-correction')
+     #+END_SRC
+
+     #+RESULTS:
+
+
 
 
      -----copied from exp-220227-unet
@@ -4196,6 +4671,248 @@
       os.system(f'pdf2svg {plot1_file}.pdf {plot1_file}.svg')
       os.system(f'rm {plot1_file}.pdf')
     #+END_SRC
+
+   - let's load and plot cuts vs transit times from 3 different base molecule
+     speeds (varying molecule numbers): 0.069, 0.2, and 3.0 um^2/s respectively.
+   - this time for *supplementary plot of examples of individual correlations
+     and fits*
+     #+BEGIN_SRC jupyter-python
+       # dirty correlations - check out from  branch exp-220227-unet
+       path1 = Path('/home/lex/Programme/drmed-git/data/exp-220227-unet/2022-04-25_simulations/')
+       odot069_0dot01_dirty_1comp_ex_path = path1 / '0.069-all-results/0dot069_dirty_1comp_example-0dot01-2657_rawFitData.csv'
+       odot069_0dot01_dirty_1comp_av_path = path1 / '0.069-all-results/0dot069_dirty_1comp_100curves-avg-0dot01_rawFitData.csv'
+       odot069_0dot1_dirty_1comp_ex_path = path1 / '0.069-all-results/0dot069_dirty_1comp_example-0dot1-1614_rawFitData.csv'
+       odot069_0dot1_dirty_1comp_av_path = path1 / '0.069-all-results/0dot069_dirty_1comp_100curves-avg-0dot1_rawFitData.csv'
+       odot069_1dot0_dirty_1comp_ex_path = path1 / '0.069-all-results/0dot069_dirty_1comp_example-1dot0-0024_rawFitData.csv'
+       odot069_1dot0_dirty_1comp_av_path = path1 / '0.069-all-results/0dot069_dirty_1comp_100curves-avg-1dot0_rawFitData.csv'
+       odot2_0dot01_dirty_1comp_ex_path = path1 / '0.2-all-results/0dot2_dirty_1comp_example-0dot01-2219_rawFitData.csv'
+       odot2_0dot01_dirty_1comp_av_path = path1 / '0.2-all-results/0dot2_dirty_1comp_100curves-avg-0dot01_rawFitData.csv'
+       odot2_0dot1_dirty_1comp_ex_path = path1 / '0.2-all-results/0dot2_dirty_1comp_example-0dot1-0312_rawFitData.csv'
+       odot2_0dot1_dirty_1comp_av_path = path1 / '0.2-all-results/0dot2_dirty_1comp_100curves-avg-0dot1_rawFitData.csv'
+       odot2_1dot0_dirty_1comp_ex_path = path1 / '0.2-all-results/0dot2_dirty_1comp_example-1dot0-0700_rawFitData.csv'
+       odot2_1dot0_dirty_1comp_av_path = path1 / '0.2-all-results/0dot2_dirty_1comp_100curves-avg-1dot0_rawFitData.csv'
+       three_0dot01_dirty_1comp_ex_path = path1 / '3.0-all-results/3dot0_dirty_1comp_example-0dot01-0501_rawFitData.csv'
+       three_0dot01_dirty_1comp_av_path = path1 / '3.0-all-results/3dot0_dirty_1comp_100curves-avg-0dot01_rawFitData.csv'
+       three_0dot1_dirty_1comp_ex_path = path1 / '3.0-all-results/3dot0_dirty_1comp_example-0dot1-2408_rawFitData.csv'
+       three_0dot1_dirty_1comp_av_path = path1 / '3.0-all-results/3dot0_dirty_1comp_100curves-avg-0dot1_rawFitData.csv'
+       three_1dot0_dirty_1comp_ex_path = path1 / '3.0-all-results/3dot0_dirty_1comp_example-1dot0-0400_rawFitData.csv'
+       three_1dot0_dirty_1comp_av_path = path1 / '3.0-all-results/3dot0_dirty_1comp_100curves-avg-1dot0_rawFitData.csv'
+
+       # clean correlations
+       path2 = Path('/home/lex/Programme/drmed-git/data/exp-220316-publication1/220719_threshold-prediction/threshold-all-results')
+       odot069_clean_1comp_ex_path = path2 / '0dot069_clean_1comp_example-0021_rawFitData.csv'
+       odot069_clean_1comp_av_path = path2 / '0dot069_clean_1comp_300curves-avg_rawFitData.csv'
+       odot2_clean_1comp_ex_path = path2 / '0dot2_clean_1comp_example-0001_rawFitData.csv'
+       odot2_clean_1comp_av_path = path2 / '0dot2_clean_1comp_300curves-avg_rawFitData.csv'
+       three_clean_1comp_ex_path = path2 / '3dot0_clean_1comp_example-0002_rawFitData.csv'
+       three_clean_1comp_av_path = path2 / '3dot0_clean_1comp_300curves-avg_rawFitData.csv'
+
+       # load correction methods for comparison - here segmentation is given by simulations
+       path4 = Path('/home/lex/Programme/drmed-git/data/exp-220316-publication1/220517_simulations/')
+       odot069_labcas_1comp_ex_path = path4 / '0.069-all-results/0dot069_lab_cas_1comp_example-1642_rawFitData.csv'
+       odot069_labcas_1comp_av_path = path4 / '0.069-all-results/0dot069_lab_cas_1comp_300curves-avg_rawFitData.csv'
+       odot2_labcas_1comp_ex_path = path4 / '0.2-all-results/0dot2_lab_cas_1comp_example-0304_rawFitData.csv'
+       odot2_labcas_1comp_av_path = path4 / '0.2-all-results/0dot2_lab_cas_1comp_300curves-avg_rawFitData.csv'
+       three_labcas_1comp_ex_path = path4 / '3.0-all-results/3dot0_lab_cas_1comp_example-0507_rawFitData.csv'
+       three_labcas_1comp_av_path = path4 / '3.0-all-results/3dot0_lab_cas_1comp_300curves-avg_rawFitData.csv'
+
+       odot069_labdel_1comp_ex_path = path4 / '0.069-all-results/0dot069_lab_del_1comp_example-2666_rawFitData.csv'
+       odot069_labdel_1comp_av_path = path4 / '0.069-all-results/0dot069_lab_del_1comp_300curves-avg_rawFitData.csv'
+       odot2_labdel_1comp_ex_path = path4 / '0.2-all-results/0dot2_lab_del_1comp_example-0304_rawFitData.csv'
+       odot2_labdel_1comp_av_path = path4 / '0.2-all-results/0dot2_lab_del_1comp_300curves-avg_rawFitData.csv'
+       three_labdel_1comp_ex_path = path4 / '3.0-all-results/3dot0_lab_del_1comp_example-2402_rawFitData.csv'
+       three_labdel_1comp_av_path = path4 / '3.0-all-results/3dot0_lab_del_1comp_300curves-avg_rawFitData.csv'
+
+       path5 = Path('/home/lex/Programme/drmed-git/data/exp-220316-publication1/230103_avg-correction/')
+       odot069_labavg_1comp_ex_path = path5 / 'all-results/0dot069_lab_avg_1comp_example-0039_rawFitData.csv'
+       odot069_labavg_1comp_av_path = path5 / 'all-results/0dot069_lab_avg_1comp_300curves-avg_rawFitData.csv'
+       odot2_labavg_1comp_ex_path = path5 / 'all-results/0dot2_lab_avg_1comp_example-0006_rawFitData.csv'
+       odot2_labavg_1comp_av_path = path5 / 'all-results/0dot2_lab_avg_1comp_300curves-avg_rawFitData.csv'
+       three_labavg_1comp_ex_path = path5 / 'all-results/three_lab_avg_1comp_example-0002_rawFitData.csv'
+       three_labavg_1comp_av_path = path5 / 'all-results/three_lab_avg_1comp_300curves-avg_rawFitData.csv'
+
+       # load data - clean
+       odot069_clean_1comp_ex = pd.read_csv(odot069_clean_1comp_ex_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.069,], processing=3*['Ex: No artifacts,\nno correction',])
+       odot069_clean_1comp_av = pd.read_csv(odot069_clean_1comp_av_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.069,], processing=3*['Avg: No artifacts,\nno correction',])
+       odot2_clean_1comp_ex = pd.read_csv(odot2_clean_1comp_ex_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.2,], processing=3*['Ex: No artifacts,\nno correction',])
+       odot2_clean_1comp_av = pd.read_csv(odot2_clean_1comp_av_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.2,], processing=3*['Avg: No artifacts,\nno correction',])
+       three_clean_1comp_ex = pd.read_csv(three_clean_1comp_ex_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[3.0,], processing=3*['Ex: No artifacts,\nno correction',])
+       three_clean_1comp_av = pd.read_csv(three_clean_1comp_av_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[3.0,], processing=3*['Avg: No artifacts,\nno correction',])
+
+       # load data - dirty
+       odot069_0dot01_dirty_1comp_ex = pd.read_csv(odot069_0dot01_dirty_1comp_ex_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.069,], processing=3*['Ex: Peak artifacts,\nno correction',])
+       odot069_0dot1_dirty_1comp_ex = pd.read_csv(odot069_0dot1_dirty_1comp_ex_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.069,], processing=3*['Ex: Peak artifacts,\nno correction',])
+       odot069_1dot0_dirty_1comp_ex = pd.read_csv(odot069_1dot0_dirty_1comp_ex_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.069,], processing=3*['Ex: Peak artifacts,\nno correction',])
+       odot069_0dot01_dirty_1comp_av = pd.read_csv(odot069_0dot01_dirty_1comp_av_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.069,], processing=3*['Avg: Peak artifacts,\nno correction',])
+       odot069_0dot1_dirty_1comp_av = pd.read_csv(odot069_0dot1_dirty_1comp_av_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.069,], processing=3*['Avg: Peak artifacts,\nno correction',])
+       odot069_1dot0_dirty_1comp_av = pd.read_csv(odot069_1dot0_dirty_1comp_av_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.069,], processing=3*['Avg: Peak artifacts,\nno correction',])
+
+       odot2_0dot01_dirty_1comp_ex = pd.read_csv(odot2_0dot01_dirty_1comp_ex_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.2,], processing=3*['Ex: Peak artifacts,\nno correction',])
+       odot2_0dot1_dirty_1comp_ex = pd.read_csv(odot2_0dot1_dirty_1comp_ex_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.2,], processing=3*['Ex: Peak artifacts,\nno correction',])
+       odot2_1dot0_dirty_1comp_ex = pd.read_csv(odot2_1dot0_dirty_1comp_ex_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.2,], processing=3*['Ex: Peak artifacts,\nno correction',])
+       odot2_0dot01_dirty_1comp_av = pd.read_csv(odot2_0dot01_dirty_1comp_av_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.2,], processing=3*['Avg: Peak artifacts,\nno correction',])
+       odot2_0dot1_dirty_1comp_av = pd.read_csv(odot2_0dot1_dirty_1comp_av_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.2,], processing=3*['Avg: Peak artifacts,\nno correction',])
+       odot2_1dot0_dirty_1comp_av = pd.read_csv(odot2_1dot0_dirty_1comp_av_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.2,], processing=3*['Avg: Peak artifacts,\nno correction',])
+
+       three_0dot01_dirty_1comp_ex = pd.read_csv(three_0dot01_dirty_1comp_ex_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[3.0,], processing=3*['Ex: Peak artifacts,\nno correction',])
+       three_0dot1_dirty_1comp_ex = pd.read_csv(three_0dot1_dirty_1comp_ex_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[3.0,], processing=3*['Ex: Peak artifacts,\nno correction',])
+       three_1dot0_dirty_1comp_ex = pd.read_csv(three_1dot0_dirty_1comp_ex_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[3.0,], processing=3*['Ex: Peak artifacts,\nno correction',])
+       three_0dot01_dirty_1comp_av = pd.read_csv(three_0dot01_dirty_1comp_av_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[3.0,], processing=3*['Avg: Peak artifacts,\nno correction',])
+       three_0dot1_dirty_1comp_av = pd.read_csv(three_0dot1_dirty_1comp_av_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[3.0,], processing=3*['Avg: Peak artifacts,\nno correction',])
+       three_1dot0_dirty_1comp_av = pd.read_csv(three_1dot0_dirty_1comp_av_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[3.0,], processing=3*['Avg: Peak artifacts,\nno correction',])
+
+       # load correction methods
+       odot069_labcas_1comp_ex = pd.read_csv(odot069_labcas_1comp_ex_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.069,], processing=3*['Ex: Peak artifacts,\nsim.-based pred.\n+ cut and shift corr.',])
+       odot069_labcas_1comp_av = pd.read_csv(odot069_labcas_1comp_av_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.069,], processing=3*['Avg: Peak artifacts,\nsim.-based pred.\n+ cut and shift corr.',])
+       odot2_labcas_1comp_ex = pd.read_csv(odot2_labcas_1comp_ex_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.2,], processing=3*['Ex: Peak artifacts,\nsim.-based pred.\n+ cut and shift corr.',])
+       odot2_labcas_1comp_av = pd.read_csv(odot2_labcas_1comp_av_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.2,], processing=3*['Avg: Peak artifacts,\nsim.-based pred.\n+ cut and shift corr.',])
+       three_labcas_1comp_ex = pd.read_csv(three_labcas_1comp_ex_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[3,], processing=3*['Ex: Peak artifacts,\nsim.-based pred.\n+ cut and shift corr.',])
+       three_labcas_1comp_av = pd.read_csv(three_labcas_1comp_av_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[3,], processing=3*['Avg: Peak artifacts,\nsim.-based pred.\n+ cut and shift corr.',])
+
+       odot069_labdel_1comp_ex = pd.read_csv(odot069_labdel_1comp_ex_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.069,], processing=3*['Ex: Peak artifacts,\nsim.-based prediction\n+ weight=0 correction',])
+       odot069_labdel_1comp_av = pd.read_csv(odot069_labdel_1comp_av_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.069,], processing=3*['Avg: Peak artifacts,\nsim.-based prediction\n+ weight=0 correction',])
+       odot2_labdel_1comp_ex = pd.read_csv(odot2_labdel_1comp_ex_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.2,], processing=3*['Ex: Peak artifacts,\nsim.-based prediction\n+ weight=0 correction',])
+       odot2_labdel_1comp_av = pd.read_csv(odot2_labdel_1comp_av_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.2,], processing=3*['Avg: Peak artifacts,\nsim.-based prediction\n+ weight=0 correction',])
+       three_labdel_1comp_ex = pd.read_csv(three_labdel_1comp_ex_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[3,], processing=3*['Ex: Peak artifacts,\nsim.-based prediction\n+ weight=0 correction',])
+       three_labdel_1comp_av = pd.read_csv(three_labdel_1comp_av_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[3,], processing=3*['Avg: Peak artifacts,\nsim.-based prediction\n+ weight=0 correction',])
+
+       odot069_labavg_1comp_ex = pd.read_csv(odot069_labavg_1comp_ex_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.069,], processing=3*['Ex: Peak artifacts,\nsim.-based pred.\n+ averaging corr.',])
+       odot069_labavg_1comp_av = pd.read_csv(odot069_labavg_1comp_av_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.069,], processing=3*['Avg: Peak artifacts,\nsim.-based pred.\n+ averaging corr.',])
+       odot2_labavg_1comp_ex = pd.read_csv(odot2_labavg_1comp_ex_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.2,], processing=3*['Ex: Peak artifacts,\nsim.-based pred.\n+ averaging corr.',])
+       odot2_labavg_1comp_av = pd.read_csv(odot2_labavg_1comp_av_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.2,], processing=3*['Avg: Peak artifacts,\nsim.-based pred.\n+ averaging corr.',])
+       three_labavg_1comp_ex = pd.read_csv(three_labavg_1comp_ex_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[3,], processing=3*['Ex: Peak artifacts,\nsim.-based pred.\n+ averaging corr.',])
+       three_labavg_1comp_av = pd.read_csv(three_labavg_1comp_av_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[3,], processing=3*['Avg: Peak artifacts,\nsim.-based pred.\n+ averaging corr.',])
+
+
+       all_param = pd.concat([odot069_clean_1comp_ex, odot069_clean_1comp_av, odot2_clean_1comp_ex,
+                              odot2_clean_1comp_av, three_clean_1comp_ex, three_clean_1comp_av,
+                              odot069_0dot01_dirty_1comp_ex, odot069_0dot01_dirty_1comp_av, odot2_0dot01_dirty_1comp_ex,
+                              odot2_0dot01_dirty_1comp_av, three_0dot01_dirty_1comp_ex, three_0dot01_dirty_1comp_av,
+                              odot069_0dot1_dirty_1comp_ex, odot069_0dot1_dirty_1comp_av, odot2_0dot1_dirty_1comp_ex,
+                              odot2_0dot1_dirty_1comp_av, three_0dot1_dirty_1comp_ex, three_0dot1_dirty_1comp_av,
+                              odot069_1dot0_dirty_1comp_ex, odot069_1dot0_dirty_1comp_av, odot2_1dot0_dirty_1comp_ex,
+                              odot2_1dot0_dirty_1comp_av, three_1dot0_dirty_1comp_ex, three_1dot0_dirty_1comp_av,
+                              odot069_labdel_1comp_ex, odot069_labdel_1comp_av, odot2_labdel_1comp_ex,
+                              odot2_labdel_1comp_av, three_labdel_1comp_ex, three_labdel_1comp_av,
+                              odot069_labavg_1comp_ex, odot069_labavg_1comp_av, odot2_labavg_1comp_ex,
+                              odot2_labavg_1comp_av, three_labavg_1comp_ex, three_labavg_1comp_av,
+                              odot069_labcas_1comp_ex, odot069_labcas_1comp_av, odot2_labcas_1comp_ex,
+                              odot2_labcas_1comp_av, three_labcas_1comp_ex, three_labcas_1comp_av])
+
+
+       # pprint(all_param.keys())
+       # all_param = all_param[['name_of_plot', 'Diff_species', 'A1', 'txy1', 'sim', 'processing', 'A2', 'txy2']]
+       with pd.option_context("max_colwidth", 1000):
+           display(all_param)
+     #+END_SRC
+
+     #+RESULTS:
+     :RESULTS:
+     |               | 0        | 1        | 2        | 3        | 4        | 5        | 6        | 7        | 8        | 9         | ... | 86          | 87          | 88          | 89           | 90           | 91           | 92           | 93           | sim   | processing                                                    |
+|---------------+----------+----------+----------+----------+----------+----------+----------+----------+----------+-----------+-----+-------------+-------------+-------------+--------------+--------------+--------------+--------------+--------------+-------+---------------------------------------------------------------|
+| lag time [ms] | 1.000000 | 2.000000 | 3.000000 | 4.000000 | 5.000000 | 6.000000 | 7.000000 | 8.000000 | 9.000000 | 10.000000 | ... | 7680.000000 | 8192.000000 | 9216.000000 | 10240.000000 | 11264.000000 | 12288.000000 | 13312.000000 | 14336.000000 | 0.069 | Ex: No artifacts,\nno correction                              |
+| correlation   | 0.067368 | 0.066953 | 0.066546 | 0.066142 | 0.065743 | 0.065349 | 0.064963 | 0.064587 | 0.064220 | 0.063843  | ... | 0.015664    | 0.001972    | -0.005822   | -0.005455    | -0.022004    | -0.030182    | -0.018259    | -0.010153    | 0.069 | Ex: No artifacts,\nno correction                              |
+| fit           | 0.067535 | 0.067106 | 0.066683 | 0.066265 | 0.065852 | 0.065444 | 0.065041 | 0.064643 | 0.064250 | 0.063861  | ... | -0.000308   | NaN         | NaN         | NaN          | NaN          | NaN          | NaN          | NaN          | 0.069 | Ex: No artifacts,\nno correction                              |
+| lag time [ms] | 1.000000 | 2.000000 | 3.000000 | 4.000000 | 5.000000 | 6.000000 | 7.000000 | 8.000000 | 9.000000 | 10.000000 | ... | 7680.000000 | 8192.000000 | 9216.000000 | 10240.000000 | 11264.000000 | 12288.000000 | 13312.000000 | 14336.000000 | 0.069 | Avg: No artifacts,\nno correction                             |
+| correlation   | 0.060789 | 0.060399 | 0.060013 | 0.059632 | 0.059255 | 0.058882 | 0.058514 | 0.058150 | 0.057790 | 0.057436  | ... | -0.003021   | -0.003210   | -0.003099   | -0.002779    | -0.002967    | -0.003538    | -0.003753    | -0.002939    | 0.069 | Avg: No artifacts,\nno correction                             |
+| ...           | ...      | ...      | ...      | ...      | ...      | ...      | ...      | ...      | ...      | ...       | ... | ...         | ...         | ...         | ...          | ...          | ...          | ...          | ...          | ...   | ...                                                           |
+| correlation   | 0.027959 | 0.023438 | 0.020114 | 0.017743 | 0.015783 | 0.014234 | 0.012902 | 0.011955 | 0.010937 | 0.010173  | ... | -0.000660   | -0.000698   | NaN         | NaN          | NaN          | NaN          | NaN          | NaN          | 3.000 | Ex: Peak artifacts,\nsim.-based pred.\n+ cut and shift corr.  |
+| fit           | 0.028182 | 0.023471 | 0.020109 | 0.017588 | 0.015627 | 0.014059 | 0.012777 | 0.011708 | 0.010804 | 0.010029  | ... | -0.000020   | NaN         | NaN         | NaN          | NaN          | NaN          | NaN          | NaN          | 3.000 | Ex: Peak artifacts,\nsim.-based pred.\n+ cut and shift corr.  |
+| lag time [ms] | 1.000000 | 2.000000 | 3.000000 | 4.000000 | 5.000000 | 6.000000 | 7.000000 | 8.000000 | 9.000000 | 10.000000 | ... | 7680.000000 | 8192.000000 | NaN         | NaN          | NaN          | NaN          | NaN          | NaN          | 3.000 | Avg: Peak artifacts,\nsim.-based pred.\n+ cut and shift corr. |
+| correlation   | 0.019056 | 0.015692 | 0.013331 | 0.011576 | 0.010222 | 0.009149 | 0.008273 | 0.007546 | 0.006933 | 0.006411  | ... | -0.000135   | -0.000099   | NaN         | NaN          | NaN          | NaN          | NaN          | NaN          | 3.000 | Avg: Peak artifacts,\nsim.-based pred.\n+ cut and shift corr. |
+| fit           | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      | NaN       | ... | 0.002366    | NaN         | NaN         | NaN          | NaN          | NaN          | NaN          | NaN          | 3.000 | Avg: Peak artifacts,\nsim.-based pred.\n+ cut and shift corr. |
+
+126 rows × 96 columns
+     :END:
+
+     #+BEGIN_SRC jupyter-python
+       odot069_clean_1comp_ex = pd.read_csv(odot069_clean_1comp_ex_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.069,], processing=3*['Ex: No artifacts,\nno correction',])
+       odot069_clean_1comp_ex
+     #+END_SRC
+
+     #+RESULTS:
+     :RESULTS:
+     |               |        0 |        1 |        2 |        3 |        4 |        5 |        6 |        7 |       8 |         9 | ... |          86 |          87 |          88 |           89 |           90 |           91 |           92 |           93 |   sim | processing                       |
+     |---------------+----------+----------+----------+----------+----------+----------+----------+----------+---------+-----------+-----+-------------+-------------+-------------+--------------+--------------+--------------+--------------+--------------+-------+----------------------------------|
+     | lag time [ms] | 1.000000 | 2.000000 | 3.000000 | 4.000000 | 5.000000 | 6.000000 | 7.000000 | 8.000000 | 9.00000 | 10.000000 | ... | 7680.000000 | 8192.000000 | 9216.000000 | 10240.000000 | 11264.000000 | 12288.000000 | 13312.000000 | 14336.000000 | 0.069 | Ex: No artifacts,\nno correction |
+     | correlation   | 0.067368 | 0.066953 | 0.066546 | 0.066142 | 0.065743 | 0.065349 | 0.064963 | 0.064587 | 0.06422 |  0.063843 | ... |    0.015664 |    0.001972 |   -0.005822 |    -0.005455 |    -0.022004 |    -0.030182 |    -0.018259 |    -0.010153 | 0.069 | Ex: No artifacts,\nno correction |
+     | fit           | 0.067535 | 0.067106 | 0.066683 | 0.066265 | 0.065852 | 0.065444 | 0.065041 | 0.064643 | 0.06425 |  0.063861 | ... |   -0.000308 |         NaN |         NaN |          NaN |          NaN |          NaN |          NaN |          NaN | 0.069 | Ex: No artifacts,\nno correction |
+
+3 rows × 96 columns
+     :END:
+
+     #+BEGIN_SRC jupyter-python
+       def simplot(data, height, aspect, add_text='other'):
+           if add_text == 'all-fits':
+               hue = 'legend'
+           else:
+               hue = None
+           g = sns.catplot(data=data,
+                           y='t',
+                           x='processing',
+                           col='expected transit time',
+                           row='processing',
+                           hue=hue,
+                           height=height,
+                           aspect=aspect,
+                           legend_out=True,
+                           kind='boxen',
+                           showfliers=False)
+           if hue is not None:
+               g._legend.remove()
+           styles = ['--', ':', '-', '-.']
+           for i, ax in enumerate(g.axes):
+               tt = str(ax[0].title).split('= ')
+               tt = tt[1].strip("')")
+               tt = float(tt)
+               hline = ax[0].axhline(tt, lw=4, label='', ls=styles[i])
+               hline_legend = {f'\n$\\tau_{{sim}}={tt:.2f}ms$' : hline}
+               g._legend_data.update(hline_legend)
+           g.add_legend(g._legend_data)
+           g.map_dataframe(sns.stripplot,
+                 y='t',
+                 x='processing',
+                 hue=hue,
+                 dodge=True,  # only relevant if hue is used
+                 palette=sns.color_palette(['0.3']),
+                 size=4,
+                 jitter=0.2)
+           g.fig.suptitle('', size=25)
+           for ax in g.axes:
+               # ax[0].set_title('')
+               tt = str(ax[0].title).split('= ')
+               tt = tt[1].strip("')")
+               tt = float(tt)
+               ax[0].set_title(f'simulated trace $\\tau_{{sim}}={tt:.2f}ms$, $n=300$, $\\tau_D$ from 1 species fit')
+           # g._legend.set_title('')
+           # new_labels = ['424 traces of\nAlexaFluor488\n(no artifacts)\n$\\tau_D$ from\n1 species fit',
+           #               '440 traces of\nAF488 + DiO LUVs\n(peak artifacts)\n$\\tau_D$ from\nfast sp. of 2 sp. fit']
+           # for t, l in zip(g._legend.texts, new_labels):
+           #     t.set_text(l)
+           # for i, axes in enumerate(g.axes.flat):
+           #    _ = axes.set_xticklabels(axes.get_xticklabels(), rotation=45)
+
+           plt.setp(g.axes, yscale='log', xlabel='',
+                    ylabel=r'log transit time $\tau_{D}$ $[ms]$', ylim=[1, 10000])
+
+           g.tight_layout()
+           savefig = f'./data/exp-220316-publication1/jupyter/plot2_{add_text}_simulations-transit-times'
+           plt.savefig(f'{savefig}.pdf', dpi=300)
+           os.system(f'pdf2svg {savefig}.pdf {savefig}.svg')
+           plt.close('all')
+     #+END_SRC
+
+     #+RESULTS:
+     :RESULTS:
+     |                                                                           | 0        | 1        | 2        | 3        | 4        | 5        | 6        | 7        | 8       | 9         | ... | 86          | 87          | 88          | 89           | 90           | 91           | 92           | 93           | sim   | processing                       |
+|---------------------------------------------------------------------------+----------+----------+----------+----------+----------+----------+----------+----------+---------+-----------+-----+-------------+-------------+-------------+--------------+--------------+--------------+--------------+--------------+-------+----------------------------------|
+| Time (ms)                                                                 | 1.000000 | 2.000000 | 3.000000 | 4.000000 | 5.000000 | 6.000000 | 7.000000 | 8.000000 | 9.00000 | 10.000000 | ... | 7680.000000 | 8192.000000 | 9216.000000 | 10240.000000 | 11264.000000 | 12288.000000 | 13312.000000 | 14336.000000 | 0.069 | Ex: No artifacts,\nno correction |
+| 2022-07-21_multipletau_clean_0dot069_0021_correlation-CH1_1               | 0.067368 | 0.066953 | 0.066546 | 0.066142 | 0.065743 | 0.065349 | 0.064963 | 0.064587 | 0.06422 | 0.063843  | ... | 0.015664    | 0.001972    | -0.005822   | -0.005455    | -0.022004    | -0.030182    | -0.018259    | -0.010153    | 0.069 | Ex: No artifacts,\nno correction |
+| 2022-07-21_multipletau_clean_0dot069_0021_correlation-CH1_1 fitted model: | 0.067535 | 0.067106 | 0.066683 | 0.066265 | 0.065852 | 0.065444 | 0.065041 | 0.064643 | 0.06425 | 0.063861  | ... | -0.000308   | NaN         | NaN         | NaN          | NaN          | NaN          | NaN          | NaN          | 0.069 | Ex: No artifacts,\nno correction |
+
+3 rows × 96 columns
+     :END:
+
 **** Unused: further traces
      #+BEGIN_SRC jupyter-python :pandoc t
        plot1_titles = ['fast molecules and slow clusters:\nsimulations', 'fast molecules and medium clusters:\nsimulations', 'fast molecules and fast clusters:\nsimulations',
