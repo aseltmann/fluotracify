@@ -3641,10 +3641,13 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
        import pandas as pd
        import seaborn as sns
 
+       from mlflow.keras import load_model
        from pathlib import Path
        from pprint import pprint
+       from sklearn.preprocessing import MaxAbsScaler
        from tensorflow.keras.optimizers import Adam
-       from mlflow.keras import load_model
+
+
 
        FLUOTRACIFY_PATH = '/home/lex/Programme/drmed-git/src/'
        sys.path.append(FLUOTRACIFY_PATH)
@@ -3678,8 +3681,8 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
      #+END_SRC
 
      #+RESULTS:
-     : 2023-01-06 10:52:49.460410: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
-     : 2023-01-06 10:52:49.460512: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+     : 2023-01-10 13:41:02.653901: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+     : 2023-01-10 13:41:02.653993: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
 
     #+BEGIN_SRC jupyter-python
       import importlib
@@ -4740,26 +4743,26 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
        three_clean_1comp_av = pd.read_csv(three_clean_1comp_av_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[3.0,], processing=3*['Avg: No artifacts,\nno correction',])
 
        # load data - dirty
-       odot069_0dot01_dirty_1comp_ex = pd.read_csv(odot069_0dot01_dirty_1comp_ex_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.069,], processing=3*['Ex: Peak artifacts,\nno correction',])
-       odot069_0dot1_dirty_1comp_ex = pd.read_csv(odot069_0dot1_dirty_1comp_ex_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.069,], processing=3*['Ex: Peak artifacts,\nno correction',])
-       odot069_1dot0_dirty_1comp_ex = pd.read_csv(odot069_1dot0_dirty_1comp_ex_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.069,], processing=3*['Ex: Peak artifacts,\nno correction',])
-       odot069_0dot01_dirty_1comp_av = pd.read_csv(odot069_0dot01_dirty_1comp_av_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.069,], processing=3*['Avg: Peak artifacts,\nno correction',])
-       odot069_0dot1_dirty_1comp_av = pd.read_csv(odot069_0dot1_dirty_1comp_av_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.069,], processing=3*['Avg: Peak artifacts,\nno correction',])
-       odot069_1dot0_dirty_1comp_av = pd.read_csv(odot069_1dot0_dirty_1comp_av_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.069,], processing=3*['Avg: Peak artifacts,\nno correction',])
+       odot069_0dot01_dirty_1comp_ex = pd.read_csv(odot069_0dot01_dirty_1comp_ex_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.069,], processing=3*['Ex1: Peak artifacts,\nno correction',])
+       odot069_0dot1_dirty_1comp_ex = pd.read_csv(odot069_0dot1_dirty_1comp_ex_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.069,], processing=3*['Ex2: Peak artifacts,\nno correction',])
+       odot069_1dot0_dirty_1comp_ex = pd.read_csv(odot069_1dot0_dirty_1comp_ex_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.069,], processing=3*['Ex3: Peak artifacts,\nno correction',])
+       odot069_0dot01_dirty_1comp_av = pd.read_csv(odot069_0dot01_dirty_1comp_av_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.069,], processing=3*['Avg1: Peak artifacts,\nno correction',])
+       odot069_0dot1_dirty_1comp_av = pd.read_csv(odot069_0dot1_dirty_1comp_av_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.069,], processing=3*['Avg2: Peak artifacts,\nno correction',])
+       odot069_1dot0_dirty_1comp_av = pd.read_csv(odot069_1dot0_dirty_1comp_av_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.069,], processing=3*['Avg3: Peak artifacts,\nno correction',])
 
-       odot2_0dot01_dirty_1comp_ex = pd.read_csv(odot2_0dot01_dirty_1comp_ex_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.2,], processing=3*['Ex: Peak artifacts,\nno correction',])
-       odot2_0dot1_dirty_1comp_ex = pd.read_csv(odot2_0dot1_dirty_1comp_ex_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.2,], processing=3*['Ex: Peak artifacts,\nno correction',])
-       odot2_1dot0_dirty_1comp_ex = pd.read_csv(odot2_1dot0_dirty_1comp_ex_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.2,], processing=3*['Ex: Peak artifacts,\nno correction',])
-       odot2_0dot01_dirty_1comp_av = pd.read_csv(odot2_0dot01_dirty_1comp_av_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.2,], processing=3*['Avg: Peak artifacts,\nno correction',])
-       odot2_0dot1_dirty_1comp_av = pd.read_csv(odot2_0dot1_dirty_1comp_av_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.2,], processing=3*['Avg: Peak artifacts,\nno correction',])
-       odot2_1dot0_dirty_1comp_av = pd.read_csv(odot2_1dot0_dirty_1comp_av_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.2,], processing=3*['Avg: Peak artifacts,\nno correction',])
+       odot2_0dot01_dirty_1comp_ex = pd.read_csv(odot2_0dot01_dirty_1comp_ex_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.2,], processing=3*['Ex1: Peak artifacts,\nno correction',])
+       odot2_0dot1_dirty_1comp_ex = pd.read_csv(odot2_0dot1_dirty_1comp_ex_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.2,], processing=3*['Ex2: Peak artifacts,\nno correction',])
+       odot2_1dot0_dirty_1comp_ex = pd.read_csv(odot2_1dot0_dirty_1comp_ex_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.2,], processing=3*['Ex3: Peak artifacts,\nno correction',])
+       odot2_0dot01_dirty_1comp_av = pd.read_csv(odot2_0dot01_dirty_1comp_av_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.2,], processing=3*['Avg1: Peak artifacts,\nno correction',])
+       odot2_0dot1_dirty_1comp_av = pd.read_csv(odot2_0dot1_dirty_1comp_av_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.2,], processing=3*['Avg2: Peak artifacts,\nno correction',])
+       odot2_1dot0_dirty_1comp_av = pd.read_csv(odot2_1dot0_dirty_1comp_av_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.2,], processing=3*['Avg3: Peak artifacts,\nno correction',])
 
-       three_0dot01_dirty_1comp_ex = pd.read_csv(three_0dot01_dirty_1comp_ex_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[3.0,], processing=3*['Ex: Peak artifacts,\nno correction',])
-       three_0dot1_dirty_1comp_ex = pd.read_csv(three_0dot1_dirty_1comp_ex_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[3.0,], processing=3*['Ex: Peak artifacts,\nno correction',])
-       three_1dot0_dirty_1comp_ex = pd.read_csv(three_1dot0_dirty_1comp_ex_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[3.0,], processing=3*['Ex: Peak artifacts,\nno correction',])
-       three_0dot01_dirty_1comp_av = pd.read_csv(three_0dot01_dirty_1comp_av_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[3.0,], processing=3*['Avg: Peak artifacts,\nno correction',])
-       three_0dot1_dirty_1comp_av = pd.read_csv(three_0dot1_dirty_1comp_av_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[3.0,], processing=3*['Avg: Peak artifacts,\nno correction',])
-       three_1dot0_dirty_1comp_av = pd.read_csv(three_1dot0_dirty_1comp_av_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[3.0,], processing=3*['Avg: Peak artifacts,\nno correction',])
+       three_0dot01_dirty_1comp_ex = pd.read_csv(three_0dot01_dirty_1comp_ex_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[3.0,], processing=3*['Ex1: Peak artifacts,\nno correction',])
+       three_0dot1_dirty_1comp_ex = pd.read_csv(three_0dot1_dirty_1comp_ex_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[3.0,], processing=3*['Ex2: Peak artifacts,\nno correction',])
+       three_1dot0_dirty_1comp_ex = pd.read_csv(three_1dot0_dirty_1comp_ex_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[3.0,], processing=3*['Ex3: Peak artifacts,\nno correction',])
+       three_0dot01_dirty_1comp_av = pd.read_csv(three_0dot01_dirty_1comp_av_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[3.0,], processing=3*['Avg1: Peak artifacts,\nno correction',])
+       three_0dot1_dirty_1comp_av = pd.read_csv(three_0dot1_dirty_1comp_av_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[3.0,], processing=3*['Avg2: Peak artifacts,\nno correction',])
+       three_1dot0_dirty_1comp_av = pd.read_csv(three_1dot0_dirty_1comp_av_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[3.0,], processing=3*['Avg3: Peak artifacts,\nno correction',])
 
        # load correction methods
        odot069_labcas_1comp_ex = pd.read_csv(odot069_labcas_1comp_ex_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.069,], processing=3*['Ex: Peak artifacts,\nsim.-based pred.\n+ cut and shift corr.',])
@@ -4784,7 +4787,7 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
        three_labavg_1comp_av = pd.read_csv(three_labavg_1comp_av_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[3,], processing=3*['Avg: Peak artifacts,\nsim.-based pred.\n+ averaging corr.',])
 
 
-       all_param = pd.concat([odot069_clean_1comp_ex, odot069_clean_1comp_av, odot2_clean_1comp_ex,
+       all_fit = pd.concat([odot069_clean_1comp_ex, odot069_clean_1comp_av, odot2_clean_1comp_ex,
                               odot2_clean_1comp_av, three_clean_1comp_ex, three_clean_1comp_av,
                               odot069_0dot01_dirty_1comp_ex, odot069_0dot01_dirty_1comp_av, odot2_0dot01_dirty_1comp_ex,
                               odot2_0dot01_dirty_1comp_av, three_0dot01_dirty_1comp_ex, three_0dot01_dirty_1comp_av,
@@ -4798,120 +4801,263 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
                               odot2_labavg_1comp_av, three_labavg_1comp_ex, three_labavg_1comp_av,
                               odot069_labcas_1comp_ex, odot069_labcas_1comp_av, odot2_labcas_1comp_ex,
                               odot2_labcas_1comp_av, three_labcas_1comp_ex, three_labcas_1comp_av])
+       first = set(all_fit.index)
+       second = set(all_fit['sim'])
+       third = set(all_fit['processing'])
 
+       third_avg = set(['Avg1: Peak artifacts,\nno correction',
+                        'Avg2: Peak artifacts,\nno correction',
+                        'Avg3: Peak artifacts,\nno correction',
+                        'Avg: No artifacts,\nno correction',
+                        'Avg: Peak artifacts,\nsim.-based pred.\n+ averaging corr.',
+                        'Avg: Peak artifacts,\nsim.-based prediction\n+ weight=0 correction',
+                        'Avg: Peak artifacts,\nsim.-based pred.\n+ cut and shift corr.'])
+       new_index = pd.MultiIndex.from_product([first, second, third], names=['axis', 'sim', 'processing'])
+       all_fit = all_fit.reset_index()
+       all_fit = all_fit.set_index(['index', 'sim', 'processing'])
 
+       all_fit = all_fit.reindex(new_index)
        # pprint(all_param.keys())
        # all_param = all_param[['name_of_plot', 'Diff_species', 'A1', 'txy1', 'sim', 'processing', 'A2', 'txy2']]
        with pd.option_context("max_colwidth", 1000):
-           display(all_param)
+           display(all_fit)
+
+
      #+END_SRC
 
      #+RESULTS:
      :RESULTS:
-     |               | 0        | 1        | 2        | 3        | 4        | 5        | 6        | 7        | 8        | 9         | ... | 86          | 87          | 88          | 89           | 90           | 91           | 92           | 93           | sim   | processing                                                    |
-|---------------+----------+----------+----------+----------+----------+----------+----------+----------+----------+-----------+-----+-------------+-------------+-------------+--------------+--------------+--------------+--------------+--------------+-------+---------------------------------------------------------------|
-| lag time [ms] | 1.000000 | 2.000000 | 3.000000 | 4.000000 | 5.000000 | 6.000000 | 7.000000 | 8.000000 | 9.000000 | 10.000000 | ... | 7680.000000 | 8192.000000 | 9216.000000 | 10240.000000 | 11264.000000 | 12288.000000 | 13312.000000 | 14336.000000 | 0.069 | Ex: No artifacts,\nno correction                              |
-| correlation   | 0.067368 | 0.066953 | 0.066546 | 0.066142 | 0.065743 | 0.065349 | 0.064963 | 0.064587 | 0.064220 | 0.063843  | ... | 0.015664    | 0.001972    | -0.005822   | -0.005455    | -0.022004    | -0.030182    | -0.018259    | -0.010153    | 0.069 | Ex: No artifacts,\nno correction                              |
-| fit           | 0.067535 | 0.067106 | 0.066683 | 0.066265 | 0.065852 | 0.065444 | 0.065041 | 0.064643 | 0.064250 | 0.063861  | ... | -0.000308   | NaN         | NaN         | NaN          | NaN          | NaN          | NaN          | NaN          | 0.069 | Ex: No artifacts,\nno correction                              |
-| lag time [ms] | 1.000000 | 2.000000 | 3.000000 | 4.000000 | 5.000000 | 6.000000 | 7.000000 | 8.000000 | 9.000000 | 10.000000 | ... | 7680.000000 | 8192.000000 | 9216.000000 | 10240.000000 | 11264.000000 | 12288.000000 | 13312.000000 | 14336.000000 | 0.069 | Avg: No artifacts,\nno correction                             |
-| correlation   | 0.060789 | 0.060399 | 0.060013 | 0.059632 | 0.059255 | 0.058882 | 0.058514 | 0.058150 | 0.057790 | 0.057436  | ... | -0.003021   | -0.003210   | -0.003099   | -0.002779    | -0.002967    | -0.003538    | -0.003753    | -0.002939    | 0.069 | Avg: No artifacts,\nno correction                             |
-| ...           | ...      | ...      | ...      | ...      | ...      | ...      | ...      | ...      | ...      | ...       | ... | ...         | ...         | ...         | ...          | ...          | ...          | ...          | ...          | ...   | ...                                                           |
-| correlation   | 0.027959 | 0.023438 | 0.020114 | 0.017743 | 0.015783 | 0.014234 | 0.012902 | 0.011955 | 0.010937 | 0.010173  | ... | -0.000660   | -0.000698   | NaN         | NaN          | NaN          | NaN          | NaN          | NaN          | 3.000 | Ex: Peak artifacts,\nsim.-based pred.\n+ cut and shift corr.  |
-| fit           | 0.028182 | 0.023471 | 0.020109 | 0.017588 | 0.015627 | 0.014059 | 0.012777 | 0.011708 | 0.010804 | 0.010029  | ... | -0.000020   | NaN         | NaN         | NaN          | NaN          | NaN          | NaN          | NaN          | 3.000 | Ex: Peak artifacts,\nsim.-based pred.\n+ cut and shift corr.  |
-| lag time [ms] | 1.000000 | 2.000000 | 3.000000 | 4.000000 | 5.000000 | 6.000000 | 7.000000 | 8.000000 | 9.000000 | 10.000000 | ... | 7680.000000 | 8192.000000 | NaN         | NaN          | NaN          | NaN          | NaN          | NaN          | 3.000 | Avg: Peak artifacts,\nsim.-based pred.\n+ cut and shift corr. |
-| correlation   | 0.019056 | 0.015692 | 0.013331 | 0.011576 | 0.010222 | 0.009149 | 0.008273 | 0.007546 | 0.006933 | 0.006411  | ... | -0.000135   | -0.000099   | NaN         | NaN          | NaN          | NaN          | NaN          | NaN          | 3.000 | Avg: Peak artifacts,\nsim.-based pred.\n+ cut and shift corr. |
-| fit           | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      | NaN      | NaN       | ... | 0.002366    | NaN         | NaN         | NaN          | NaN          | NaN          | NaN          | NaN          | 3.000 | Avg: Peak artifacts,\nsim.-based pred.\n+ cut and shift corr. |
+     |               |       |                                                               | 0        | 1        | 2        | 3        | 4        | 5        | 6        | 7        | 8        | 9         | ... | 84          | 85          | 86          | 87          | 88          | 89           | 90           | 91           | 92           | 93           |
+|---------------+-------+---------------------------------------------------------------+----------+----------+----------+----------+----------+----------+----------+----------+----------+-----------+-----+-------------+-------------+-------------+-------------+-------------+--------------+--------------+--------------+--------------+--------------|
+| axis          | sim   | processing                                                    |          |          |          |          |          |          |          |          |          |           |     |             |             |             |             |             |              |              |              |              |              |
+| correlation   | 0.069 | Ex: No artifacts,\nno correction                              | 0.067368 | 0.066953 | 0.066546 | 0.066142 | 0.065743 | 0.065349 | 0.064963 | 0.064587 | 0.064220 | 0.063843  | ... | 0.014743    | 0.017815    | 0.015664    | 0.001972    | -0.005822   | -0.005455    | -0.022004    | -0.030182    | -0.018259    | -0.010153    |
+|               |       | Ex: Peak artifacts,\nsim.-based pred.\n+ averaging corr.      | 0.048870 | 0.047601 | 0.046439 | 0.045346 | 0.044218 | 0.043114 | 0.042083 | 0.041051 | 0.040049 | 0.039083  | ... | NaN         | NaN         | NaN         | NaN         | NaN         | NaN          | NaN          | NaN          | NaN          | NaN          |
+|               |       | Ex: Peak artifacts,\nsim.-based pred.\n+ cut and shift corr.  | 0.062425 | 0.061877 | 0.061353 | 0.060847 | 0.060359 | 0.059861 | 0.059392 | 0.058948 | 0.058517 | 0.058111  | ... | -0.005308   | -0.012228   | -0.019728   | -0.004490   | NaN         | NaN          | NaN          | NaN          | NaN          | NaN          |
+|               |       | Avg1: Peak artifacts,\nno correction                          | 0.227222 | 0.226815 | 0.226407 | 0.226002 | 0.225600 | 0.225202 | 0.224806 | 0.224413 | 0.224021 | 0.223632  | ... | -0.028989   | -0.034142   | -0.036995   | -0.037272   | -0.028963   | -0.021312    | -0.030986    | -0.034259    | -0.031788    | -0.031967    |
+|               |       | Ex2: Peak artifacts,\nno correction                           | 0.690009 | 0.681992 | 0.674783 | 0.667555 | 0.661034 | 0.654863 | 0.648856 | 0.642526 | 0.635818 | 0.629217  | ... | -0.039290   | -0.071583   | -0.019689   | -0.047476   | -0.050787   | -0.072526    | 0.140779     | 0.086342     | -0.062967    | -0.025313    |
+| ...           | ...   | ...                                                           | ...      | ...      | ...      | ...      | ...      | ...      | ...      | ...      | ...      | ...       | ... | ...         | ...         | ...         | ...         | ...         | ...          | ...          | ...          | ...          | ...          |
+| lag time [ms] | 0.200 | Avg: Peak artifacts,\nsim.-based pred.\n+ averaging corr.     | 1.000000 | 2.000000 | 3.000000 | 4.000000 | 5.000000 | 6.000000 | 7.000000 | 8.000000 | 9.000000 | 10.000000 | ... | NaN         | NaN         | NaN         | NaN         | NaN         | NaN          | NaN          | NaN          | NaN          | NaN          |
+|               |       | Avg3: Peak artifacts,\nno correction                          | 1.000000 | 2.000000 | 3.000000 | 4.000000 | 5.000000 | 6.000000 | 7.000000 | 8.000000 | 9.000000 | 10.000000 | ... | 6656.000000 | 7168.000000 | 7680.000000 | 8192.000000 | 9216.000000 | 10240.000000 | 11264.000000 | 12288.000000 | 13312.000000 | 14336.000000 |
+|               |       | Ex1: Peak artifacts,\nno correction                           | 1.000000 | 2.000000 | 3.000000 | 4.000000 | 5.000000 | 6.000000 | 7.000000 | 8.000000 | 9.000000 | 10.000000 | ... | 6656.000000 | 7168.000000 | 7680.000000 | 8192.000000 | 9216.000000 | 10240.000000 | 11264.000000 | 12288.000000 | 13312.000000 | 14336.000000 |
+|               |       | Avg: No artifacts,\nno correction                             | 1.000000 | 2.000000 | 3.000000 | 4.000000 | 5.000000 | 6.000000 | 7.000000 | 8.000000 | 9.000000 | 10.000000 | ... | 6656.000000 | 7168.000000 | 7680.000000 | 8192.000000 | 9216.000000 | 10240.000000 | 11264.000000 | 12288.000000 | 13312.000000 | 14336.000000 |
+|               |       | Avg: Peak artifacts,\nsim.-based pred.\n+ cut and shift corr. | 1.000000 | 2.000000 | 3.000000 | 4.000000 | 5.000000 | 6.000000 | 7.000000 | 8.000000 | 9.000000 | 10.000000 | ... | 6656.000000 | 7168.000000 | 7680.000000 | 8192.000000 | NaN         | NaN          | NaN          | NaN          | NaN          | NaN          |
 
-126 rows × 96 columns
+126 rows × 94 columns
      :END:
+   - I am scaling the correlation and fit of the dirty data with the
+     =sklearn.preprocessing.MaxAbsScaler= to make the final plot better
+     readable. The relevant information is the difference in lag time. The
+     particle number in the simulations was randomized, thus the amplitude of
+     the correlation function does not yield reliable information anyway.
+   - also, let's compute the residuals of correlations and fits - I use the
+     original data for all, not the scaled data
+   - here an examplary plot for 1 trace of the effect of scaling - notice the
+     difference when scaling the correlation and scaling the fit. That's why I
+     compute residuals before and also only scale the dirty data with 3 lines in
+     one plot
+     #+BEGIN_SRC jupyter-python
+       fig = plt.figure(figsize=(16,5))
+       count = 0
+       for ind in all_fit.loc['fit'].index:
+           if count < 2:
+               count += 1
+               continue
+           # lags = all_fit.loc[:, (('lag time [ms]',) + ind)]
+           lag_idx = (('lag time [ms]',) + ind)
+           corr_idx = (('correlation',) + ind)
+           fit_idx = (('fit',) + ind)
+           res_idx = (('residual',) + ind)
+           plt.subplot(141)
+           plt.semilogx(all_fit.loc[lag_idx], all_fit.loc[corr_idx],
+                         all_fit.loc[lag_idx], all_fit.loc[fit_idx])
+           fit = np.array(all_fit.loc[fit_idx])
+           corr = np.array(all_fit.loc[corr_idx])
+           residual = corr - fit
+           fit_scaled = MaxAbsScaler().fit_transform(fit.reshape(-1, 1)).flatten()
+           corr_scaled = MaxAbsScaler().fit_transform(corr.reshape(-1, 1)).flatten()
+           plt.subplot(142)
+           plt.semilogx(all_fit.loc[lag_idx], corr_scaled,
+                        all_fit.loc[lag_idx], fit_scaled)
+           all_fit.loc[fit_idx] = pd.Series(fit_scaled)
+           all_fit.loc[corr_idx] = pd.Series(corr_scaled)
+           plt.subplot(143)
+           plt.semilogx(all_fit.loc[lag_idx],
+                         all_fit.loc[corr_idx],
+                         all_fit.loc[lag_idx],
+                         all_fit.loc[fit_idx])
+
+           all_fit.loc[res_idx] = pd.Series(residual)
+           plt.subplot(144)
+           plt.semilogx(all_fit.loc[lag_idx], all_fit.loc[res_idx])
+           plt.show()
+           break
+     #+END_SRC
+
+     #+RESULTS:
+     [[file:./data/exp-220316-publication1/jupyter/4900a04aa27f09df7056038f5748703524df6c23.png]]
+
+   - now the computation of residuals and scaling
+     #+BEGIN_SRC jupyter-python
+       for ind in all_fit.loc['fit'].index:
+           lag_idx = (('lag time [ms]',) + ind)
+           corr_idx = (('correlation',) + ind)
+           fit_idx = (('fit',) + ind)
+           res_idx = (('residual',) + ind)
+           fit = np.array(all_fit.loc[fit_idx])
+           corr = np.array(all_fit.loc[corr_idx])
+           residual = corr - fit
+           if f'{ind[1]}' in list(third_avg) + ['Ex1: Peak artifacts,\nno correction',
+                              'Ex2: Peak artifacts,\nno correction',
+                              'Ex3: Peak artifacts,\nno correction']:
+               fit_scaled = MaxAbsScaler().fit_transform(fit.reshape(-1, 1)).flatten()
+               corr_scaled = MaxAbsScaler().fit_transform(corr.reshape(-1, 1)).flatten()
+               all_fit.loc[fit_idx] = pd.Series(fit_scaled)
+               all_fit.loc[corr_idx] = pd.Series(corr_scaled)
+           all_fit.loc[res_idx] = pd.Series(residual)
+
+     #+END_SRC
+
+     #+RESULTS:
+
+   - let's first plot the residuals
+     #+begin_src jupyter-python
+       fig, ax = plt.subplots(len(third-third_avg), len(second),
+                              figsize=(16, 15), sharex=True, sharey=False,
+                              tight_layout=True)
+
+
+       for i, sim in enumerate(second):
+           for j, proc in enumerate(third-third_avg):
+               if proc in ['Ex1: Peak artifacts,\nno correction',
+                          'Ex2: Peak artifacts,\nno correction',
+                          'Ex3: Peak artifacts,\nno correction']:
+                   for k in range(3):
+                       sns.lineplot(x=all_fit.loc['lag time [ms]'].loc[sim, f'Ex{k+1}: Peak artifacts,\nno correction'],
+                                    y=all_fit.loc['residual'].loc[sim, f'Ex{k+1}: Peak artifacts,\nno correction'],
+                                    color=sns.color_palette()[k+3],
+                                    # marker=['o', 'v', 's'][k], markersize=5,
+                                    ax=ax[j, i], lw=5).set(title=f'{sim}-{proc}')
+               else:
+                   lag_idx = (('lag time [ms]',) + (sim,) + (proc,))
+                   res_idx = (('residual',) + (sim,) + (proc,))
+                   sns.lineplot(x=all_fit.loc[lag_idx], y=all_fit.loc[res_idx],
+                                color=sns.color_palette()[3],
+                                # marker='o', markersize=10,
+                                ax=ax[j, i], lw=5).set(
+                                    title=f'{sim}-{proc}')
+
+
+       plt.setp(ax, xscale='log', xlabel=r'lag time $\tau$ $[ms]$',
+                ylabel=r'')  # Correlation $G(\tau)$ $[ms]$
+
+       savefig = f'./data/exp-220316-publication1/jupyter/plotsupp1_sim-correlations-fits_residuals_withylabels'
+       plt.savefig(f'{savefig}.pdf', dpi=300)
+       # os.system(f'pdf2svg {savefig}.pdf {savefig}.svg')
+       plt.close('all')
+     #+end_src
+
+     #+RESULTS:
+
+   - now plot the single correlations and plots
+     #+BEGIN_SRC jupyter-python
+       fig, ax = plt.subplots(len(third-third_avg), len(second),
+                              figsize=(16, 30), sharex=True, sharey=False,
+                              tight_layout=True)
+
+
+       for i, sim in enumerate(second):
+           for j, proc in enumerate(third-third_avg):
+               if proc in ['Ex1: Peak artifacts,\nno correction',
+                          'Ex2: Peak artifacts,\nno correction',
+                          'Ex3: Peak artifacts,\nno correction']:
+                   for k in range(3):
+                       sns.lineplot(x=all_fit.loc['lag time [ms]'].loc[sim, f'Ex{k+1}: Peak artifacts,\nno correction'],
+                                    y=all_fit.loc['correlation'].loc[sim, f'Ex{k+1}: Peak artifacts,\nno correction'],
+                                    color=sns.color_palette()[k],
+                                    lw=4, marker=['o', 'v', 's'][k], markersize=10,
+                                    ax=ax[j, i]).set(title=f'{sim}-{proc}')
+                       sns.lineplot(x=all_fit.loc['lag time [ms]'].loc[(sim, f'Ex{k+1}: Peak artifacts,\nno correction')],
+                                    y=all_fit.loc['fit'].loc[(sim, f'Ex{k+1}: Peak artifacts,\nno correction')],
+                                    color=sns.color_palette()[k+3],
+                                    lw=5,
+                                    ax=ax[j, i])
+               else:
+                   lag_idx = (('lag time [ms]',) + (sim,) + (proc,))
+                   corr_idx = (('correlation',) + (sim,) + (proc,))
+                   fit_idx = (('fit',) + (sim,) + (proc,))
+                   sns.lineplot(x=all_fit.loc[lag_idx], y=all_fit.loc[corr_idx],
+                                color=sns.color_palette()[0],
+                                lw=4, marker='o', markersize=10,
+                                ax=ax[j, i]).set(
+                                    title=f'{sim}-{proc}')
+                   sns.lineplot(x=all_fit.loc[lag_idx], y=all_fit.loc[fit_idx],
+                                color=sns.color_palette()[3],
+                                lw=5,
+                                ax=ax[j, i])
+
+
+       plt.setp(ax, xscale='log', xlabel=r'lag time $\tau$ $[ms]$',
+                ylabel=r'', yticklabels=[])  # Correlation $G(\tau)$ $[ms]$
+
+       savefig = f'./data/exp-220316-publication1/jupyter/plotsupp1_sim-correlations-fits_plots'
+       plt.savefig(f'{savefig}.pdf', dpi=300)
+       os.system(f'pdf2svg {savefig}.pdf {savefig}.svg')
+       plt.close('all')
+     #+END_SRC
+
+     #+RESULTS:
+
+   - as an inset, I want the average correlations over 100 traces (for dirty) or 300
+     traces (for clean, and corrections).
 
      #+BEGIN_SRC jupyter-python
-       odot069_clean_1comp_ex = pd.read_csv(odot069_clean_1comp_ex_path, sep=',', usecols=[0, 1, 2], na_values=' ', header=0, names=['lag time [ms]', 'correlation', 'fit']).T.assign(sim=3*[0.069,], processing=3*['Ex: No artifacts,\nno correction',])
-       odot069_clean_1comp_ex
+       sns.set_theme(style="darkgrid", font_scale=2, palette='colorblind',
+                     context='paper')
+
+       fig, ax = plt.subplots(len(third_avg), len(second),
+                              figsize=(8, 20), sharex=True, sharey=False,
+                              tight_layout=True)
+
+
+       for i, sim in enumerate(second):
+           for j, proc in enumerate(third_avg):
+               if proc in ['Avg1: Peak artifacts,\nno correction',
+                          'Avg2: Peak artifacts,\nno correction',
+                          'Avg3: Peak artifacts,\nno correction']:
+                   for k in range(3):
+                       sns.lineplot(x=all_fit.loc['lag time [ms]'].loc[sim, f'Avg{k+1}: Peak artifacts,\nno correction'],
+                                    y=all_fit.loc['correlation'].loc[sim, f'Avg{k+1}: Peak artifacts,\nno correction'],
+                                    color=sns.color_palette()[k], lw=4,
+                                    ax=ax[j, i]).set(title=f'{sim}-{proc}')
+
+               else:
+                   lag_idx = (('lag time [ms]',) + (sim,) + (proc,))
+                   corr_idx = (('correlation',) + (sim,) + (proc,))
+                   sns.lineplot(x=all_fit.loc[lag_idx], y=all_fit.loc[corr_idx],
+                                color=sns.color_palette()[0], lw=4,
+                                ax=ax[j, i]).set(
+                                    title=f'{sim}-{proc}')
+
+       plt.setp(ax, xscale='log', xlabel=r'',
+                ylabel=r'') #, yticklabels=[])  # Correlation $G(\tau)$ $[ms]$
+
+       savefig = f'./data/exp-220316-publication1/jupyter/plotsupp1_sim-correlations-fits_inset'
+       plt.savefig(f'{savefig}.pdf', dpi=300)
+       os.system(f'pdf2svg {savefig}.pdf {savefig}.svg')
+       plt.close('all')
      #+END_SRC
 
      #+RESULTS:
-     :RESULTS:
-     |               |        0 |        1 |        2 |        3 |        4 |        5 |        6 |        7 |       8 |         9 | ... |          86 |          87 |          88 |           89 |           90 |           91 |           92 |           93 |   sim | processing                       |
-     |---------------+----------+----------+----------+----------+----------+----------+----------+----------+---------+-----------+-----+-------------+-------------+-------------+--------------+--------------+--------------+--------------+--------------+-------+----------------------------------|
-     | lag time [ms] | 1.000000 | 2.000000 | 3.000000 | 4.000000 | 5.000000 | 6.000000 | 7.000000 | 8.000000 | 9.00000 | 10.000000 | ... | 7680.000000 | 8192.000000 | 9216.000000 | 10240.000000 | 11264.000000 | 12288.000000 | 13312.000000 | 14336.000000 | 0.069 | Ex: No artifacts,\nno correction |
-     | correlation   | 0.067368 | 0.066953 | 0.066546 | 0.066142 | 0.065743 | 0.065349 | 0.064963 | 0.064587 | 0.06422 |  0.063843 | ... |    0.015664 |    0.001972 |   -0.005822 |    -0.005455 |    -0.022004 |    -0.030182 |    -0.018259 |    -0.010153 | 0.069 | Ex: No artifacts,\nno correction |
-     | fit           | 0.067535 | 0.067106 | 0.066683 | 0.066265 | 0.065852 | 0.065444 | 0.065041 | 0.064643 | 0.06425 |  0.063861 | ... |   -0.000308 |         NaN |         NaN |          NaN |          NaN |          NaN |          NaN |          NaN | 0.069 | Ex: No artifacts,\nno correction |
-
-3 rows × 96 columns
-     :END:
 
      #+BEGIN_SRC jupyter-python
-       def simplot(data, height, aspect, add_text='other'):
-           if add_text == 'all-fits':
-               hue = 'legend'
-           else:
-               hue = None
-           g = sns.catplot(data=data,
-                           y='t',
-                           x='processing',
-                           col='expected transit time',
-                           row='processing',
-                           hue=hue,
-                           height=height,
-                           aspect=aspect,
-                           legend_out=True,
-                           kind='boxen',
-                           showfliers=False)
-           if hue is not None:
-               g._legend.remove()
-           styles = ['--', ':', '-', '-.']
-           for i, ax in enumerate(g.axes):
-               tt = str(ax[0].title).split('= ')
-               tt = tt[1].strip("')")
-               tt = float(tt)
-               hline = ax[0].axhline(tt, lw=4, label='', ls=styles[i])
-               hline_legend = {f'\n$\\tau_{{sim}}={tt:.2f}ms$' : hline}
-               g._legend_data.update(hline_legend)
-           g.add_legend(g._legend_data)
-           g.map_dataframe(sns.stripplot,
-                 y='t',
-                 x='processing',
-                 hue=hue,
-                 dodge=True,  # only relevant if hue is used
-                 palette=sns.color_palette(['0.3']),
-                 size=4,
-                 jitter=0.2)
-           g.fig.suptitle('', size=25)
-           for ax in g.axes:
-               # ax[0].set_title('')
-               tt = str(ax[0].title).split('= ')
-               tt = tt[1].strip("')")
-               tt = float(tt)
-               ax[0].set_title(f'simulated trace $\\tau_{{sim}}={tt:.2f}ms$, $n=300$, $\\tau_D$ from 1 species fit')
-           # g._legend.set_title('')
-           # new_labels = ['424 traces of\nAlexaFluor488\n(no artifacts)\n$\\tau_D$ from\n1 species fit',
-           #               '440 traces of\nAF488 + DiO LUVs\n(peak artifacts)\n$\\tau_D$ from\nfast sp. of 2 sp. fit']
-           # for t, l in zip(g._legend.texts, new_labels):
-           #     t.set_text(l)
-           # for i, axes in enumerate(g.axes.flat):
-           #    _ = axes.set_xticklabels(axes.get_xticklabels(), rotation=45)
-
-           plt.setp(g.axes, yscale='log', xlabel='',
-                    ylabel=r'log transit time $\tau_{D}$ $[ms]$', ylim=[1, 10000])
-
-           g.tight_layout()
-           savefig = f'./data/exp-220316-publication1/jupyter/plot2_{add_text}_simulations-transit-times'
-           plt.savefig(f'{savefig}.pdf', dpi=300)
-           os.system(f'pdf2svg {savefig}.pdf {savefig}.svg')
-           plt.close('all')
+       for i in [0.01, 0.1, 1]:
+          print(ans.convert_diffcoeff_to_transittimes(i, 250))
      #+END_SRC
 
      #+RESULTS:
-     :RESULTS:
-     |                                                                           | 0        | 1        | 2        | 3        | 4        | 5        | 6        | 7        | 8       | 9         | ... | 86          | 87          | 88          | 89           | 90           | 91           | 92           | 93           | sim   | processing                       |
-|---------------------------------------------------------------------------+----------+----------+----------+----------+----------+----------+----------+----------+---------+-----------+-----+-------------+-------------+-------------+--------------+--------------+--------------+--------------+--------------+-------+----------------------------------|
-| Time (ms)                                                                 | 1.000000 | 2.000000 | 3.000000 | 4.000000 | 5.000000 | 6.000000 | 7.000000 | 8.000000 | 9.00000 | 10.000000 | ... | 7680.000000 | 8192.000000 | 9216.000000 | 10240.000000 | 11264.000000 | 12288.000000 | 13312.000000 | 14336.000000 | 0.069 | Ex: No artifacts,\nno correction |
-| 2022-07-21_multipletau_clean_0dot069_0021_correlation-CH1_1               | 0.067368 | 0.066953 | 0.066546 | 0.066142 | 0.065743 | 0.065349 | 0.064963 | 0.064587 | 0.06422 | 0.063843  | ... | 0.015664    | 0.001972    | -0.005822   | -0.005455    | -0.022004    | -0.030182    | -0.018259    | -0.010153    | 0.069 | Ex: No artifacts,\nno correction |
-| 2022-07-21_multipletau_clean_0dot069_0021_correlation-CH1_1 fitted model: | 0.067535 | 0.067106 | 0.066683 | 0.066265 | 0.065852 | 0.065444 | 0.065041 | 0.064643 | 0.06425 | 0.063861  | ... | -0.000308   | NaN         | NaN         | NaN          | NaN          | NaN          | NaN          | NaN          | 0.069 | Ex: No artifacts,\nno correction |
-
-3 rows × 96 columns
-     :END:
+     : (1127.1055006945026, [558.1720842044252, 2275.941140099269])
+     : (112.71055006945028, [70.2697020959065, 180.78443081514223])
+     : (11.271055006945026, [8.846431364774256, 14.360217779502584])
 
 **** Unused: further traces
      #+BEGIN_SRC jupyter-python :pandoc t
