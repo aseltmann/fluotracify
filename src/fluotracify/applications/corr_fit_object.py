@@ -25,6 +25,7 @@ import lmfit
 import logging
 import multipletau
 import os
+import scipy
 import time
 
 from pathlib import Path
@@ -97,8 +98,9 @@ class PicoObject():
          self.numberNandB, self.timeSeries, self.autoNorm, self.autotime,
          self.timeSeriesScale, self.timeSeriesSize, self.predictions,
          self.subChanArr, self.trueTimeArr, self.trueTimeWeights,
-         self.photonCountBin) = ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {},
-                                 {}, {}, {}, {}, {}, {})
+         self.photonCountBin, self.trueTimeParts,
+         self.subChanParts) = ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {},
+                               {}, {}, {}, {}, {}, {}, {}, {})
 
         self.importData()
         self.prepareChannels()
@@ -433,22 +435,22 @@ class PicoObject():
         if self.numOfCH == 1:
             indices = subChanArr == channelsToUse[0]
             y = trueTimeArr[indices]
-            validPhotons = subChanArr[indices]
+            valid_photons = subChanArr[indices]
         else:
             indices0 = subChanArr == channelsToUse[0]
             indices1 = subChanArr == channelsToUse[1]
             indices = indices0 + indices1
             y = trueTimeArr[indices]
-            validPhotons = subChanArr[indices]
+            valid_photons = subChanArr[indices]
 
         log.debug('crossAndAuto: sum(indeces)=%s', sum(indices))
 
         # Creates boolean for photon events in either channel.
-        num = np.zeros((validPhotons.shape[0], 2))
-        num[:, 0] = (np.array([np.array(validPhotons) == channelsToUse[0]
+        num = np.zeros((valid_photons.shape[0], 2))
+        num[:, 0] = (np.array([np.array(valid_photons) == channelsToUse[0]
                                ])).astype(np.int32)
         if self.numOfCH > 1:
-            num[:, 1] = (np.array([np.array(validPhotons) == channelsToUse[1]
+            num[:, 1] = (np.array([np.array(valid_photons) == channelsToUse[1]
                                    ])).astype(np.int32)
 
         self.count0 = np.sum(num[:, 0])
@@ -564,7 +566,8 @@ class PicoObject():
     def correctTCSPC(self,
                      pred_thresh: float = 0.5,
                      method: Union[Literal['weights'], Literal['delete'],
-                                   Literal['delete_and_shift']] = 'weights',
+                                   Literal['delete_and_shift'],
+                                   Literal['averaging']] = 'delete_and_shift',
                      weight: Optional[Union[float, Literal['random'],
                                             Literal['1-pred']]] = None,
                      bin_after_correction: Optional[float] = None,
@@ -578,7 +581,7 @@ class PicoObject():
         pred_thresh : float between 0 and 1
             If prediction is lower than pred_thresh, the time step is assumed
             to show 'no corruption'
-        method : ['weights', 'delete', 'delete_and_shift']
+        method : ['weights', 'delete', 'delete_and_shift', 'averaging']
             'weights' : give a weight to photons which are classified as
             artifacts, see argument =weight=.
             'delete' : photons classified as artifacts are deleted and a new
@@ -590,9 +593,13 @@ class PicoObject():
             the bin size which was deleted before. The time series constructed
             from this trueTimeArr will have no drops, all ends are annealed to
             each other.
+            'averaging' : save out each unique connected non-artifactual
+            segment of the trace to self.trueTimeParts and self.subChanParts.
+            The actual correction is done with
+            `get_autocorrelation(method='tttr2xfcs_with_averaging')`
         weight = optional, float, int, 'random', '1-pred' or None
             Only used if method='weights'. Photons classified as artifacts are
-            given this weight.method=method
+            given this weight.
             'random': Each predicted bin gets a random weight between 0 and 1
             '1-pred': Each predicted bin gets a weight of 1 - prediction
             None: (or explicitly set to 0), the weight will be set to 0,
@@ -628,7 +635,7 @@ class PicoObject():
             raise ValueError(f'key={ts_name} is not a valid key for the'
                              'dictionary self.predictions. Run method'
                              'predictTimeSeries() first.')
-        methods = ['weights', 'delete', 'delete_and_shift']
+        methods = ['weights', 'delete', 'delete_and_shift', 'averaging']
         if method not in methods:
             raise ValueError(f'method has to be in {methods}.')
         if method == 'weights' and (not isinstance(weight, (float, int)) and
@@ -747,6 +754,29 @@ class PicoObject():
                     trueTimeCorrected)
                 # garbage collection
                 del photon_weights
+
+            elif method == 'averaging':
+                parts_label = scipy.ndimage.label(~photonMask)
+                trueTimeParts, subChanParts = [], []
+                for u in np.unique(parts_label[0]):
+                    if u == 0:
+                        continue
+                    tt_part = np.where(
+                        parts_label[0] == u, trueTimeCorrected, np.nan)
+                    sc_part = np.where(
+                        parts_label[0] == u, subChanCorrected, np.nan)
+                    tt_part = tt_part[~np.isnan(tt_part)]
+                    sc_part = sc_part[~np.isnan(sc_part)]
+                    trueTimeParts.append(tt_part)
+                    subChanParts.append(sc_part)
+                log.debug(
+                    'correctTCSPC: photon trace was separated in %s parts'
+                    ' and is ready for averaging correction', parts_label[1])
+                self.trueTimeParts[f'{metadata[0]}_{ts_name}'] = (
+                    trueTimeParts)
+                self.subChanParts[f'{metadata[0]}_{ts_name}'] = (
+                    subChanParts)
+
             # garbage collection
             del trueTimeCorrected
 
@@ -758,7 +788,13 @@ class PicoObject():
 
         Parameters
         ----------
-        method : ['tttr2xfcs', 'tttr2xfcs_with_weights', 'multipletau']
+        method : ['tttr2xfcs', 'tttr2xfcs_with_weights',
+                  'tttr2xfcs_with_averaging', 'multipletau']
+            the `tttr2xfcs` methods perform TCSPC correlations (see Notes)
+            `multipletau` offers correlations of time series
+            `tttr2xfcs_with_weights` performs weighted TCSPC correlations
+            `tttr2xfcs_with_averaging` performs TCSPC correlations of a list
+            of TCSPC traces, and averages the correlations afterwards
         name : string or tuple of strings
             if method='tttr2xfcs', name should be a key for the dictionaries
             self.trueTimeArr and self.subChanArr. If None, self.name is chosen
@@ -766,11 +802,26 @@ class PicoObject():
             if method='tttr2xfcs_with_weights', additionally to above there
             should be a dict self.trueTimeWeights from correctTCSPC(
             method='weights')
+            if method='tttr2xfcs_with_averaging', name should be a key for the
+            dictionaries self.trueTimeParts and self.subChanParts.
             if method='multipletau', name should be a tuple with 2 strings:
                 the first key to the dictionary self.timeSeries,
                 the second key to the dictionary self.timeSeries['first key']
+
+        Returns
+        -------
+
+        Notes
+        -----
+        `tttr2xfcs` : python version of:
+            Fast calculation of fluorescence correlation data with asynchronous
+            time-correlated single-photon counting.
+            Michael Wahl, Ingo Gregor, Matthias Patting, Jorg Enderlein
+
+
         """
-        methods = ['tttr2xfcs', 'tttr2xfcs_with_weights', 'multipletau']
+        methods = ['tttr2xfcs', 'tttr2xfcs_with_weights',
+                   'tttr2xfcs_with_averaging', 'multipletau']
         if method not in methods:
             raise ValueError(f'{method} is not a valid method from {methods}.')
 
@@ -781,7 +832,8 @@ class PicoObject():
                                  'dict self.trueTimeWeights. Run correctTCSPC('
                                  'method=\'weights\') first.')
 
-        if method in ['tttr2xfcs', 'tttr2xfcs_with_weights']:
+        if method in ['tttr2xfcs', 'tttr2xfcs_with_weights',
+                      'tttr2xfcs_with_averaging']:
             if method not in self.autoNorm:
                 self.autoNorm[f'{method}'] = {}
                 self.autotime[f'{method}'] = {}
@@ -849,6 +901,45 @@ class PicoObject():
                     autonorm = np.zeros((auto.shape))
                     autonorm[:, 0,
                              0] = ((auto[:, 0, 0] * maxY) / (count**2)) - 1
+                elif method == 'tttr2xfcs_with_averaging':
+                    key = (f'CH{self.ch_present[i]}_BIN{photon_count_bin}'
+                           f'_{name}')
+                    tt_parts = self.trueTimeParts[f'CH{chan}_{name}']
+                    sc_parts = self.subChanParts[f'CH{chan}_{name}']
+                    autonorm_parts = []
+                    for tt, sc in zip(tt_parts, sc_parts):
+                        # with this if clause very short parts could be
+                        # discarded and the correlation quality and thus the
+                        # averaging improved. Since in TCSPC data the part
+                        # length depends on the photon counts, an appropriate
+                        # part length is a subjective decision, thus it is not
+                        # used)
+                        if len(tt) > 1:
+                            # only autocorrelation
+                            indices = sc == self.ch_present[i]
+                            y, valid_photons = tt[indices], sc[indices]
+                            num = np.zeros((valid_photons.shape[0], 2))
+                            num[:, 0] = (np.array([np.array(
+                                valid_photons) == self.ch_present[i]])
+                                ).astype(np.int32)
+                            auto, autotime = correlate.tttr2xfcs(
+                                y, num, self.NcascStart, self.NcascEnd,
+                                self.Nsub)
+                            # normalization of TCSPC data
+                            # Note: the maximum photon arrival time is not
+                            # computed via max(tt), because the parts have an
+                            # arrival time offset depending on their position
+                            # in the original trace
+                            max_y = np.ceil(tt[-1] - tt[0])
+                            counts = np.sum(num[:, 0])
+                            autonorm = (
+                                (auto[:, i, i] * max_y) / counts**2) - 1
+                            autonorm_parts.append(autonorm.flatten())
+
+                    # compute the mean correlation
+                    autonorm = np.zeros((auto.shape))
+                    autonorm[:, 0, 0] = np.mean(autonorm_parts, axis=0)
+
                 self.autoNorm[f'{method}'][key] = autonorm[:, i, i].reshape(
                     1, 1, -1)
                 self.autotime[f'{method}'][key] = autotime.reshape(-1, 1)
