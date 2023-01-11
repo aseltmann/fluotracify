@@ -820,6 +820,15 @@ class PicoObject():
                                  f' key={name} Check if your desired '
                                  'autocorrelation already happened.')
 
+        if method == 'tttr2xfcs_with_averaging':
+            if method not in self.autoNorm:
+                self.autoNorm[f'{method}'] = {}
+                self.autotime[f'{method}'] = {}
+            name = f'{self.name}' if name is None else f'{name}'
+            if name not in self.trueTimeParts:
+                raise ValueError(f'key={name} is no valid key for the dict '
+                                 'self.trueTimeParts or self.subChanParts.')
+
             metadata = name.split('_')
             chan = metadata[0].strip('CH')
             chan_name = f"CH{chan}_"
