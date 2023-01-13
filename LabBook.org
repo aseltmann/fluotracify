@@ -6598,6 +6598,7 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
       : To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
       : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
 
+    #+CALL: kill-jupyter()
     #+CALL: prepare-jupyter-averaging()
 
     #+RESULTS:
@@ -6629,12 +6630,17 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
       : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
 
 
+    #+CALL: kill-jupyter()
+
+    #+RESULTS:
+    : 5b633a1b-0c54-453f-a4bf-a9d30182fdd3
+
     #+CALL: prepare-jupyter-averaging()
 
     #+RESULTS:
     : /beegfs/ye53nis/drmed-git
-    : 2023-01-12 17:28:27.364198: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
-    : 2023-01-12 17:28:27.364273: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+    : 2023-01-13 14:38:58.893878: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+    : 2023-01-13 14:38:58.893919: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
 
 
       #+begin_src jupyter-python
@@ -6650,6 +6656,14 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
             method='averaging',
             out_path=out_dir)
       #+end_src
+
+      #+RESULTS:
+      : 2023-01-13 14:39:25.593798: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcuda.so.1'; dlerror: libcuda.so.1: cannot open shared object file: No such file or directory
+      : 2023-01-13 14:39:25.593871: W tensorflow/stream_executor/cuda/cuda_driver.cc:269] failed call to cuInit: UNKNOWN ERROR (303)
+      : 2023-01-13 14:39:25.593915: I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:156] kernel driver does not appear to be running on this host (node117): /proc/driver/nvidia/version does not exist
+      : 2023-01-13 14:39:25.594445: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 FMA
+      : To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+      : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
 
 
    #+begin_src jupyter-python
