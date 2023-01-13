@@ -608,41 +608,41 @@
          srun -p b_standard --time=7-10:00:00 --ntasks-per-node=24 --mem-per-cpu=2000 --pty bash
        #+END_SRC
 
-
     3. Start Jupyter Lab (~#+CALL: jpt-tmux[:session jpmux]~)
        #+CALL: jpt-tmux[:session jpmux]
 
        #+RESULTS:
        #+begin_example
-         (tf) [ye53nis@node034 /]$ jupyter lab --no-browser --port=$PORT
-         [I 2022-06-02 15:39:07.937 ServerApp] jupyterlab | extension was successfully linked.
-         [I 2022-06-02 15:39:14.319 ServerApp] nbclassic | extension was successfully linked.
-         [I 2022-06-02 15:39:14.695 ServerApp] nbclassic | extension was successfully loaded.
-         [I 2022-06-02 15:39:14.698 LabApp] JupyterLab extension loaded from /home/ye53nis/.conda/envs/tf/lib/python3.9/site-packages/jupyterlab
-         [I 2022-06-02 15:39:14.698 LabApp] JupyterLab application directory is /home/ye53nis/.conda/envs/tf/share/jupyter/lab
-         [I 2022-06-02 15:39:14.706 ServerApp] jupyterlab | extension was successfully loaded.
-         [I 2022-06-02 15:39:14.708 ServerApp] Serving notebooks from local directory: /
-         [I 2022-06-02 15:39:14.708 ServerApp] Jupyter Server 1.13.5 is running at:
-         [I 2022-06-02 15:39:14.708 ServerApp] http://localhost:8889/lab?token=a8ddfb90daa859d13acbcdc552f881baf2b9dc0f2962cc1d
-         [I 2022-06-02 15:39:14.708 ServerApp]  or http://127.0.0.1:8889/lab?token=a8ddfb90daa859d13acbcdc552f881baf2b9dc0f2962cc1d
-         [I 2022-06-02 15:39:14.708 ServerApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
-         [C 2022-06-02 15:39:14.730 ServerApp]
+       (tf) [ye53nis@node117 /]$ jupyter lab --no-browser --port=$PORT
+       [I 2023-01-10 17:33:33.660 ServerApp] jupyterlab | extension was successfully linked.
+       [I 2023-01-10 17:33:37.483 ServerApp] nbclassic | extension was successfully linked.
+       [I 2023-01-10 17:33:38.269 ServerApp] nbclassic | extension was successfully loaded.
+       [I 2023-01-10 17:33:38.271 LabApp] JupyterLab extension loaded from /home/ye53nis/.conda/envs/tf/lib/python3.9/site-packages/jupyterlab
+       [I 2023-01-10 17:33:38.271 LabApp] JupyterLab application directory is /home/ye53nis/.conda/envs/tf/share/jupyter/lab
+       [I 2023-01-10 17:33:38.280 ServerApp] jupyterlab | extension was successfully loaded.
+       [I 2023-01-10 17:33:38.281 ServerApp] Serving notebooks from local directory: /
+       [I 2023-01-10 17:33:38.281 ServerApp] Jupyter Server 1.13.5 is running at:
+       [I 2023-01-10 17:33:38.281 ServerApp] http://localhost:8889/lab?token=89ed9341ba1c4cccb2933cd13fabff9297272c821e7200c0
+       [I 2023-01-10 17:33:38.281 ServerApp]  or http://127.0.0.1:8889/lab?token=89ed9341ba1c4cccb2933cd13fabff9297272c821e7200c0
+       [I 2023-01-10 17:33:38.281 ServerApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+       [C 2023-01-10 17:33:38.309 ServerApp]
 
-             To access the server, open this file in a browser:
-                 file:///home/ye53nis/.local/share/jupyter/runtime/jpserver-100629-open.html
-             Or copy and paste one of these URLs:
-                 http://localhost:8889/lab?token=a8ddfb90daa859d13acbcdc552f881baf2b9dc0f2962cc1d
-              or http://127.0.0.1:8889/lab?token=a8ddfb90daa859d13acbcdc552f881baf2b9dc0f2962cc1d
+           To access the server, open this file in a browser:
+               file:///home/ye53nis/.local/share/jupyter/runtime/jpserver-177250-open.html
+           Or copy and paste one of these URLs:
+               http://localhost:8889/lab?token=89ed9341ba1c4cccb2933cd13fabff9297272c821e7200c0
+            or http://127.0.0.1:8889/lab?token=89ed9341ba1c4cccb2933cd13fabff9297272c821e7200c0
+
        #+end_example
 
     4. Create SSH Tunnel for jupyter lab to the local computer (e.g. ~#+CALL:
        ssh-tunnel(port="8889", node="node160")~)
-       #+CALL: ssh-tunnel(port="8889", node="node100")
+       #+CALL: ssh-tunnel(port="8889", node="node117")
        #+RESULTS:
        |                   |           |                                        |           |    |          |      |      |             |
        | sh-5.1$           | sh-5.1$   | ye53nis@ara-login01.rz.uni-jena.de's | password: |    |          |      |      |             |
-       | ye53nis@node100's | password: |                                        |           |    |          |      |      |             |
-       | Last              | login:    | Tue                                    | Aug       | 23 | 13:46:20 | 2022 | from | login01.ara |
+       | ye53nis@node117's | password: |                                        |           |    |          |      |      |             |
+       | Last              | login:    | Thu                                    | Jan       | 12 | 12:23:11 | 2023 | from | login01.ara |
 
     5. I started a Python3 kernel using =jupyter-server-list-kernels=. Then I
        added the kernel ID to the =:PROPERTIES:= drawer of this (and following)
@@ -4759,19 +4759,19 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
 
     #+RESULTS:
     :RESULTS:
-    |       | name_of_plot                                      | fitted species (txy) | fitted species (A) | N (FCS)   | parent_name          | master_file | stdev(A1) | stdev(A2) | parent_uqid | Dimen | ... | cpm (kHz) | alpha1 | xmax   | artifact_speed | stdev(offset) | stdev(txy1) | offset    | bri (kHz) | Diff_species | A        |
-|-------+---------------------------------------------------+----------------------+--------------------+-----------+----------------------+-------------+-----------+-----------+-------------+-------+-----+-----------+--------+--------+----------------+---------------+-------------+-----------+-----------+--------------+----------|
-| 0     | 2022-04-25_multipletau_0cd20_0dot069-0dot01_26... | 1                    | 2                  | 37.523452 | 0cd20_0dot069-0dot01 | Not known   | None      | None      | 0           | 2D    | ... | 0.026650  | 1.0    | 8192.0 | 1127.0         | None          | None        | -0.001696 | 1.0       | 2            | 0.001292 |
-| 1     | 2022-04-25_multipletau_0cd20_0dot069-0dot01_26... | 1                    | 1                  | 37.523452 | 0cd20_0dot069-0dot01 | Not known   | None      | None      | 0           | 2D    | ... | 0.026650  | 1.0    | 8192.0 | 1127.0         | None          | None        | -0.001696 | 1.0       | 2            | 0.998708 |
-| 2     | 2022-04-25_multipletau_0cd20_0dot069-0dot01_26... | 1                    | 2                  | 35.394544 | 0cd20_0dot069-0dot01 | Not known   | None      | None      | 0           | 2D    | ... | 0.028253  | 1.0    | 8192.0 | 1127.0         | None          | None        | -0.001883 | 1.0       | 2            | 0.002290 |
-| 3     | 2022-04-25_multipletau_0cd20_0dot069-0dot01_26... | 1                    | 1                  | 35.394544 | 0cd20_0dot069-0dot01 | Not known   | None      | None      | 0           | 2D    | ... | 0.028253  | 1.0    | 8192.0 | 1127.0         | None          | None        | -0.001883 | 1.0       | 2            | 0.997710 |
-| 4     | 2022-04-25_multipletau_0cd20_0dot069-0dot01_26... | 1                    | 2                  | 27.754107 | 0cd20_0dot069-0dot01 | Not known   | None      | None      | 0           | 2D    | ... | 0.036031  | 1.0    | 8192.0 | 1127.0         | None          | None        | -0.008520 | 1.0       | 2            | 0.526621 |
-| ...   | ...                                               | ...                  | ...                | ...       | ...                  | ...         | ...       | ...       | ...         | ...   | ... | ...       | ...    | ...    | ...            | ...           | ...         | ...       | ...       | ...          | ...      |
-| 11995 | 2022-04-25_multipletau_0cd20_50dot0-1dot0_1797... | 2                    | 1                  | 1.000001  | 0cd20_50dot0-1dot0   | Not known   | None      | None      | 0           | 2D    | ... | 0.999999  | 1.0    | 1024.0 | 11.3           | None          | None        | -0.000090 | 1.0       | 2            | 1.000000 |
-| 11996 | 2022-04-25_multipletau_0cd20_50dot0-1dot0_1798... | 2                    | 2                  | 1.000001  | 0cd20_50dot0-1dot0   | Not known   | None      | None      | 0           | 2D    | ... | 0.999999  | 1.0    | 1024.0 | 11.3           | None          | None        | -0.000090 | 1.0       | 2            | 0.000000 |
-| 11997 | 2022-04-25_multipletau_0cd20_50dot0-1dot0_1798... | 2                    | 1                  | 1.000001  | 0cd20_50dot0-1dot0   | Not known   | None      | None      | 0           | 2D    | ... | 0.999999  | 1.0    | 1024.0 | 11.3           | None          | None        | -0.000090 | 1.0       | 2            | 1.000000 |
-| 11998 | 2022-04-25_multipletau_0cd20_50dot0-1dot0_1799... | 2                    | 2                  | 1.000001  | 0cd20_50dot0-1dot0   | Not known   | None      | None      | 0           | 2D    | ... | 0.999999  | 1.0    | 1024.0 | 11.3           | None          | None        | -0.000090 | 1.0       | 2            | 0.000000 |
-| 11999 | 2022-04-25_multipletau_0cd20_50dot0-1dot0_1799... | 2                    | 1                  | 1.000001  | 0cd20_50dot0-1dot0   | Not known   | None      | None      | 0           | 2D    | ... | 0.999999  | 1.0    | 1024.0 | 11.3           | None          | None        | -0.000090 | 1.0       | 2            | 1.000000 |
+    |       | name_of_plot                                      | fitted species (txy) | fitted species (A) |   N (FCS) | parent_name          | master_file | stdev(A1) | stdev(A2) | parent_uqid | Dimen | ... | cpm (kHz) | alpha1 |   xmax | artifact_speed | stdev(offset) | stdev(txy1) |    offset | bri (kHz) | Diff_species |        A |
+    |-------+---------------------------------------------------+----------------------+--------------------+-----------+----------------------+-------------+-----------+-----------+-------------+-------+-----+-----------+--------+--------+----------------+---------------+-------------+-----------+-----------+--------------+----------|
+    |     0 | 2022-04-25_multipletau_0cd20_0dot069-0dot01_26... |                    1 |                  2 | 37.523452 | 0cd20_0dot069-0dot01 | Not known   | None      | None      |           0 |    2D | ... |  0.026650 |    1.0 | 8192.0 |         1127.0 | None          | None        | -0.001696 |       1.0 |            2 | 0.001292 |
+    |     1 | 2022-04-25_multipletau_0cd20_0dot069-0dot01_26... |                    1 |                  1 | 37.523452 | 0cd20_0dot069-0dot01 | Not known   | None      | None      |           0 |    2D | ... |  0.026650 |    1.0 | 8192.0 |         1127.0 | None          | None        | -0.001696 |       1.0 |            2 | 0.998708 |
+    |     2 | 2022-04-25_multipletau_0cd20_0dot069-0dot01_26... |                    1 |                  2 | 35.394544 | 0cd20_0dot069-0dot01 | Not known   | None      | None      |           0 |    2D | ... |  0.028253 |    1.0 | 8192.0 |         1127.0 | None          | None        | -0.001883 |       1.0 |            2 | 0.002290 |
+    |     3 | 2022-04-25_multipletau_0cd20_0dot069-0dot01_26... |                    1 |                  1 | 35.394544 | 0cd20_0dot069-0dot01 | Not known   | None      | None      |           0 |    2D | ... |  0.028253 |    1.0 | 8192.0 |         1127.0 | None          | None        | -0.001883 |       1.0 |            2 | 0.997710 |
+    |     4 | 2022-04-25_multipletau_0cd20_0dot069-0dot01_26... |                    1 |                  2 | 27.754107 | 0cd20_0dot069-0dot01 | Not known   | None      | None      |           0 |    2D | ... |  0.036031 |    1.0 | 8192.0 |         1127.0 | None          | None        | -0.008520 |       1.0 |            2 | 0.526621 |
+    |   ... | ...                                               |                  ... |                ... |       ... | ...                  | ...         | ...       | ...       |         ... |   ... | ... |       ... |    ... |    ... |            ... | ...           | ...         |       ... |       ... |          ... |      ... |
+    | 11995 | 2022-04-25_multipletau_0cd20_50dot0-1dot0_1797... |                    2 |                  1 |  1.000001 | 0cd20_50dot0-1dot0   | Not known   | None      | None      |           0 |    2D | ... |  0.999999 |    1.0 | 1024.0 |           11.3 | None          | None        | -0.000090 |       1.0 |            2 | 1.000000 |
+    | 11996 | 2022-04-25_multipletau_0cd20_50dot0-1dot0_1798... |                    2 |                  2 |  1.000001 | 0cd20_50dot0-1dot0   | Not known   | None      | None      |           0 |    2D | ... |  0.999999 |    1.0 | 1024.0 |           11.3 | None          | None        | -0.000090 |       1.0 |            2 | 0.000000 |
+    | 11997 | 2022-04-25_multipletau_0cd20_50dot0-1dot0_1798... |                    2 |                  1 |  1.000001 | 0cd20_50dot0-1dot0   | Not known   | None      | None      |           0 |    2D | ... |  0.999999 |    1.0 | 1024.0 |           11.3 | None          | None        | -0.000090 |       1.0 |            2 | 1.000000 |
+    | 11998 | 2022-04-25_multipletau_0cd20_50dot0-1dot0_1799... |                    2 |                  2 |  1.000001 | 0cd20_50dot0-1dot0   | Not known   | None      | None      |           0 |    2D | ... |  0.999999 |    1.0 | 1024.0 |           11.3 | None          | None        | -0.000090 |       1.0 |            2 | 0.000000 |
+    | 11999 | 2022-04-25_multipletau_0cd20_50dot0-1dot0_1799... |                    2 |                  1 |  1.000001 | 0cd20_50dot0-1dot0   | Not known   | None      | None      |           0 |    2D | ... |  0.999999 |    1.0 | 1024.0 |           11.3 | None          | None        | -0.000090 |       1.0 |            2 | 1.000000 |
 
 12000 rows × 37 columns
     :END:
@@ -5025,6 +5025,8 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
 
     #+RESULTS: prepare-jupyter
     : /beegfs/ye53nis/drmed-git
+    : 2023-01-10 17:38:18.004165: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+    : 2023-01-10 17:38:18.004236: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
 
     #+NAME: kill-jupyter
     #+BEGIN_SRC jupyter-python
@@ -5430,12 +5432,12 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
     #+RESULTS:
     :RESULTS:
     # [goto error]
-    : [0;31m---------------------------------------------------------------------------[0m
-    : [0;31mNameError[0m                                 Traceback (most recent call last)
-    : Input [0;32mIn [1][0m, in [0;36m<cell line: 1>[0;34m()[0m
-    : [0;32m----> 1[0m [43mos[49m[38;5;241m.[39m_exit([38;5;241m00[39m)
+    : ---------------------------------------------------------------------------
+    : NameError                                 Traceback (most recent call last)
+    : Input In [1], in <cell line: 1>()
+    : ----> 1 os._exit(00)
     :
-    : [0;31mNameError[0m: name 'os' is not defined
+    : NameError: name 'os' is not defined
     :END:
 
     #+CALL: prepare-jupyter()
@@ -5757,12 +5759,12 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
     #+CALL: kill-jupyter()
 
     #+RESULTS:
-    : [0;31m---------------------------------------------------------------------------[0m
-    : [0;31mNameError[0m                                 Traceback (most recent call last)
-    : Input [0;32mIn [1][0m, in [0;36m<cell line: 1>[0;34m()[0m
-    : [0;32m----> 1[0m [43mos[49m[38;5;241m.[39m_exit([38;5;241m00[39m)
+    : ---------------------------------------------------------------------------
+    : NameError                                 Traceback (most recent call last)
+    : Input In [1], in <cell line: 1>()
+    : ----> 1 os._exit(00)
     :
-    : [0;31mNameError[0m: name 'os' is not defined
+    : NameError: name 'os' is not defined
     :RESULTS:
     # [goto error]
     :END:
@@ -6097,12 +6099,12 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
     #+RESULTS:
     :RESULTS:
     # [goto error]
-    : [0;31m---------------------------------------------------------------------------[0m
-    : [0;31mNameError[0m                                 Traceback (most recent call last)
-    : Input [0;32mIn [1][0m, in [0;36m<cell line: 1>[0;34m()[0m
-    : [0;32m----> 1[0m [43mos[49m[38;5;241m.[39m_exit([38;5;241m00[39m)
+    : ---------------------------------------------------------------------------
+    : NameError                                 Traceback (most recent call last)
+    : Input In [1], in <cell line: 1>()
+    : ----> 1 os._exit(00)
     :
-    : [0;31mNameError[0m: name 'os' is not defined
+    : NameError: name 'os' is not defined
     :END:
 
 
@@ -6364,12 +6366,12 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
     #+RESULTS:
     :RESULTS:
     # [goto error]
-    : [0;31m---------------------------------------------------------------------------[0m
-    : [0;31mNameError[0m                                 Traceback (most recent call last)
-    : Input [0;32mIn [1][0m, in [0;36m<cell line: 1>[0;34m()[0m
-    : [0;32m----> 1[0m [43mos[49m[38;5;241m.[39m_exit([38;5;241m00[39m)
+    : ---------------------------------------------------------------------------
+    : NameError                                 Traceback (most recent call last)
+    : Input In [1], in <cell line: 1>()
+    : ----> 1 os._exit(00)
     :
-    : [0;31mNameError[0m: name 'os' is not defined
+    : NameError: name 'os' is not defined
     :END:
 
 
@@ -6399,6 +6401,286 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
       : 2022-06-06 16:04:56.835386: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 AVX512F FMA
       : To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
       : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
+
+**** <2023-01-10 Di> Apply =averaging= correction
+    :PROPERTIES:
+    :header-args:jupyter-python: :session /jpy:localhost#8889:a37e524a-8134-4d8f-b24a-367acaf1bde3 :pandoc t
+    :END:
+    #+NAME: prepare-jupyter-averaging
+    #+BEGIN_SRC jupyter-python :var data_path="/beegfs/ye53nis/data/1911DD_atto+LUVs" :var output_path="/beegfs/ye53nis/drmed-git/data/exp-220227-unet/2023-01-10_experimental-af488-averaging/"
+      %cd /beegfs/ye53nis/drmed-git
+      import logging
+      import os
+      import sys
+
+      import matplotlib.pyplot as plt
+      import numpy as np
+      import pandas as pd
+      import seaborn as sns
+
+      from pathlib import Path
+      from pprint import pprint
+      from tensorflow.keras.optimizers import Adam
+      from mlflow.keras import load_model
+
+      FLUOTRACIFY_PATH = '/beegfs/ye53nis/drmed-git/src/'
+      sys.path.append(FLUOTRACIFY_PATH)
+      from fluotracify.applications import corr_fit_object as cfo
+      from fluotracify.training import build_model as bm
+
+      data_path = Path(data_path)
+      output_path = Path(output_path)
+      log_path = output_path.parent / f'{output_path.name}.log'
+
+      logging.basicConfig(filename=log_path,
+                          filemode='w', format='%(asctime)s - %(message)s',
+                          force=True)
+
+      log = logging.getLogger(__name__)
+      log.setLevel(logging.DEBUG)
+
+      sns.set_theme(style="whitegrid", font_scale=2, palette='colorblind',
+                    context='paper')
+      class ParameterClass():
+          """Stores parameters for correlation """
+          def __init__(self):
+              # Where the data is stored.
+              self.data = []
+              self.objectRef = []
+              self.subObjectRef = []
+              self.colors = ['blue', 'green', 'red', 'cyan', 'magenta',
+                             'yellow', 'black']
+              self.numOfLoaded = 0
+              # very fast from Ncasc ~ 14 onwards
+              self.NcascStart = 0
+              self.NcascEnd = 30  # 25
+              self.Nsub = 6  # 6
+              self.photonLifetimeBin = 10  # used for photon decay
+              self.photonCountBin = 1  # used for time series
+
+      par_obj = ParameterClass()
+
+      model_ls = ['ff67be0b68e540a9a29a36a2d0c7a5be', '347669d050f344ad9fb9e480c814f727',
+                  '714af8cd12c1441eac4ca980e8c20070', '34a6d207ac594035b1009c330fb67a65',
+                  '484af471c61943fa90e5f78e78a229f0', '0cd2023eeaf745aca0d3e8ad5e1fc653',
+                  'fe81d71c52404ed790b3a32051258da9', '19e3e786e1bc4e2b93856f5dc9de8216',
+                  'c1204e3a8a1e4c40a35b5b7b1922d1ce']
+
+      model_name_ls = [f'{s:.5}' for s in model_ls]
+
+      # scaler_ls = ['minmax', 'robust', 'maxabs', 'l2', 'standard', 'quant_g', 'standard',
+      #              'standard', 'robust']
+
+      pred_thresh = 0.5
+
+      if data_path.name == "1911DD_atto+LUVs":
+          path_clean1 = data_path / 'clean_ptu_part1/'
+          path_clean2 = data_path / 'clean_ptu_part2/'
+          path_dirty1 = data_path / 'dirty_ptu_part1/'
+          path_dirty2 = data_path / 'dirty_ptu_part2/'
+          files_clean1 = [path_clean1 / f for f in os.listdir(path_clean1) if f.endswith('.ptu')]
+          files_clean2 = [path_clean2 / f for f in os.listdir(path_clean2) if f.endswith('.ptu')]
+          files_dirty1 = [path_dirty1 / f for f in os.listdir(path_dirty1) if f.endswith('.ptu')]
+          files_dirty2 = [path_dirty2 / f for f in os.listdir(path_dirty2) if f.endswith('.ptu')]
+
+      def predict_correct_correlate_ptu(files, model_id, method, out_path):
+
+          logged_scaler = Path(f'/beegfs/ye53nis/drmed-git/data/mlruns/10/{model_ls[model_id]}/params/scaler')
+          logged_scaler = !cat $logged_scaler
+          logged_scaler = logged_scaler[0]
+
+          logged_model = Path(f'/beegfs/ye53nis/drmed-git/data/mlruns/10/{model_ls[model_id]}/artifacts/model')
+          logged_model = load_model(logged_model, compile=False)
+          logged_model.compile(loss=bm.binary_ce_dice_loss(),
+                               optimizer=Adam(),
+                               metrics = bm.unet_metrics([0.1, 0.3, 0.5, 0.7, 0.9]))
+          if method == 'delete_and_shift':
+              method_corr = 'tttr2xfcs'
+              method_str = 'DELSHIFT'
+          elif method == 'delete':
+              method_corr = 'tttr2xfcs'
+              method_str = 'DEL'
+          elif method == 'weights':
+              method_corr = 'tttr2xfcs_with_weights'
+              method_str = 'tttr2xfcs_with_weights'
+          elif method == 'averaging':
+              method_corr = 'tttr2xfcs_with_averaging'
+              method_str = 'tttr2xfcs_with_averaging'
+          for idx, myfile in enumerate(files):
+              ptufile = cfo.PicoObject(myfile, par_obj)
+              ptufile.predictTimeSeries(method='unet',
+                                        model=logged_model,
+                                        scaler=logged_scaler)
+              ptufile.correctTCSPC(method=method)
+              if method in ['delete', 'delete_and_shift', 'weights']:
+                  for key in ptufile.trueTimeArr.keys():
+                      ptufile.get_autocorrelation(method=method_corr, name=key)
+              elif method == 'averaging':
+                  for key in ptufile.trueTimeParts.keys():
+                      ptufile.get_autocorrelation(method=method_corr, name=key)
+
+              if method_corr in list(ptufile.autoNorm.keys()):
+                  for key in list(ptufile.autoNorm[method_corr].keys()):
+                      if ((method_str in key) or
+                          (method_str in ['tttr2xfcs_with_weights',
+                                          'tttr2xfcs_with_averaging'])):
+                          ptufile.save_autocorrelation(name=key, method=method_corr,
+                                                       output_path=out_path)
+
+    #+END_SRC
+
+    #+RESULTS: prepare-jupyter-averaging
+    : /beegfs/ye53nis/drmed-git
+
+    #+NAME: kill-jupyter
+    #+BEGIN_SRC jupyter-python
+      os._exit(00)
+    #+END_SRC
+
+    #+RESULTS:
+    : 7a752b61-60c1-4322-8105-e8dbd705caa0
+
+    #+CALL: prepare-jupyter-averaging()
+
+    #+RESULTS:
+    : /beegfs/ye53nis/drmed-git
+    : 2023-01-12 13:29:49.334418: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+    : 2023-01-12 13:29:49.334472: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+
+      #+begin_src jupyter-python
+        model_id = 5
+
+        out_dir = output_path / f'dirty_{model_name_ls[model_id]}/'
+
+        os.makedirs(out_dir, exist_ok=True)
+
+        ptufile = predict_correct_correlate_ptu(
+            files=files_dirty1,
+            model_id=model_id,
+            method='averaging',
+            out_path=out_dir)
+      #+end_src
+
+      #+RESULTS:
+
+    #+CALL: kill-jupyter()
+
+    #+RESULTS:
+    : 1603e9bd-2d3a-4295-ace3-d86b1cdf4f4f
+
+    #+CALL: prepare-jupyter-averaging()
+
+    #+RESULTS:
+    : /beegfs/ye53nis/drmed-git
+    : 2023-01-12 17:28:27.364198: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+    : 2023-01-12 17:28:27.364273: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+
+
+      #+begin_src jupyter-python
+        model_id = 5
+
+        out_dir = output_path / f'dirty_{model_name_ls[model_id]}/'
+
+        os.makedirs(out_dir, exist_ok=True)
+
+        ptufile = predict_correct_correlate_ptu(
+            files=files_dirty2,
+            model_id=model_id,
+            method='averaging',
+            out_path=out_dir)
+      #+end_src
+
+      #+RESULTS:
+      : 2023-01-12 17:28:58.975546: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcuda.so.1'; dlerror: libcuda.so.1: cannot open shared object file: No such file or directory
+      : 2023-01-12 17:28:58.975606: W tensorflow/stream_executor/cuda/cuda_driver.cc:269] failed call to cuInit: UNKNOWN ERROR (303)
+      : 2023-01-12 17:28:58.975643: I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:156] kernel driver does not appear to be running on this host (node117): /proc/driver/nvidia/version does not exist
+      : 2023-01-12 17:28:58.976216: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 FMA
+      : To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+      : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
+
+    #+CALL: prepare-jupyter-averaging()
+
+    #+RESULTS:
+    : /beegfs/ye53nis/drmed-git
+    : 2023-01-13 12:01:00.676480: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+    : 2023-01-13 12:01:00.676539: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+
+
+      #+begin_src jupyter-python
+        model_id = 5
+
+        out_dir = output_path / f'clean_{model_name_ls[model_id]}/'
+
+        os.makedirs(out_dir, exist_ok=True)
+
+        ptufile = predict_correct_correlate_ptu(
+            files=files_clean1,
+            model_id=model_id,
+            method='averaging',
+            out_path=out_dir)
+      #+end_src
+
+      #+RESULTS:
+      : 2023-01-13 12:07:29.082697: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcuda.so.1'; dlerror: libcuda.so.1: cannot open shared object file: No such file or directory
+      : 2023-01-13 12:07:29.082756: W tensorflow/stream_executor/cuda/cuda_driver.cc:269] failed call to cuInit: UNKNOWN ERROR (303)
+      : 2023-01-13 12:07:29.082791: I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:156] kernel driver does not appear to be running on this host (node117): /proc/driver/nvidia/version does not exist
+      : 2023-01-13 12:07:29.083227: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 FMA
+      : To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+      : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
+
+
+    #+CALL: prepare-jupyter-averaging()
+
+    #+RESULTS:
+    : /beegfs/ye53nis/drmed-git
+    : 2023-01-12 17:28:27.364198: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+    : 2023-01-12 17:28:27.364273: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+
+
+      #+begin_src jupyter-python
+        model_id = 5
+
+        out_dir = output_path / f'clean_{model_name_ls[model_id]}/'
+
+        os.makedirs(out_dir, exist_ok=True)
+
+        ptufile = predict_correct_correlate_ptu(
+            files=files_clean2,
+            model_id=model_id,
+            method='averaging',
+            out_path=out_dir)
+      #+end_src
+
+
+   #+begin_src jupyter-python
+
+
+     out_path = '/home/lex/Programme/drmed-git/data/exp-220316-publication1/230102_modulation-filtering'
+     # correlate.correlate_timetrace_and_save(df=sim_nan, out_path=out_path, out_txt='nan')
+
+     for idx, col in enumerate(sim_labbool.columns):
+         mod_trace = sim_labbool.iloc[:, idx+2].astype(np.float64)
+         dirty_trace = sim_dirty.iloc[:, idx+2].astype(np.float64)
+         mod_corr = autocorrelate(
+             a=mod_trace,
+             m=16,
+             deltat=1,
+             normalize=True)
+         dirty_corr = autocorrelate(
+             a=dirty_trace,
+             m=16,
+             deltat=1,
+             normalize=True)
+         filt_corr = dirty_corr[1:, 1] / mod_corr[1:, 1]
+         fig, ax = plt.subplots(1, 3, figsize=(16, 9))
+         sns.lineplot(mod_corr[1:60, 0], filt_corr[:59], ax=ax[0])
+         sns.lineplot(mod_corr[1:, 0], mod_corr[1:, 1], ax=ax[1])
+         sns.lineplot(dirty_corr[1:, 0], dirty_corr[1:, 1], ax=ax[2])
+         plt.setp(ax, xscale='log')
+         plt.show()
+
+         break
+   #+end_src
 
 *** Analysis 2b: plot experimental af488 data
     :PROPERTIES:
@@ -6873,52 +7155,52 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
 
      #+RESULTS:
      :RESULTS:
-     |               |          |              | count | mean      | std      | min       | 25%       | 50%       | 75%       | max       |
-|---------------+----------+--------------+-------+-----------+----------+-----------+-----------+-----------+-----------+-----------|
-| processing    | artifact | Diff_species |       |           |          |           |           |           |           |           |
-| 0cd20         | clean    | 1            | 424.0 | 14.335000 | 0.263291 | 13.412392 | 14.205747 | 14.341568 | 14.505898 | 14.988332 |
-|               | dirty    | 2            | 440.0 | 15.106186 | 1.484036 | 6.267150  | 14.334271 | 15.248202 | 16.039287 | 18.110889 |
-| 19e3e         | clean    | 1            | 424.0 | 14.329986 | 0.263853 | 13.367317 | 14.201544 | 14.336272 | 14.511038 | 14.931337 |
-|               | dirty    | 2            | 440.0 | 13.270444 | 3.181698 | 0.562121  | 11.573624 | 13.826313 | 15.704750 | 18.581205 |
-| 34766         | clean    | 1            | 424.0 | 14.684973 | 0.276662 | 13.720920 | 14.551659 | 14.702547 | 14.869845 | 15.347210 |
-|               | dirty    | 2            | 440.0 | 15.267823 | 2.476381 | 6.346636  | 13.704650 | 15.732460 | 17.068360 | 19.961155 |
-| 34a6d         | clean    | 1            | 424.0 | 14.325905 | 0.264438 | 13.365160 | 14.194973 | 14.335075 | 14.510599 | 14.933380 |
-|               | dirty    | 2            | 440.0 | 13.641062 | 2.740812 | 1.417894  | 12.297284 | 14.302934 | 15.593493 | 17.885668 |
-| 484af         | clean    | 1            | 424.0 | 14.317763 | 0.263824 | 13.365161 | 14.188180 | 14.325842 | 14.499389 | 14.919546 |
-|               | dirty    | 2            | 440.0 | 12.784654 | 3.023495 | 1.591405  | 10.908164 | 13.373178 | 15.029049 | 18.453017 |
-| 714af         | clean    | 1            | 424.0 | 14.318594 | 0.263337 | 13.365161 | 14.189044 | 14.325842 | 14.497586 | 14.919546 |
-|               | dirty    | 2            | 440.0 | 12.233933 | 2.490236 | 5.295190  | 10.570730 | 12.420635 | 14.066820 | 17.968677 |
-| No correction | clean    | 1            | 424.0 | 14.324938 | 0.264089 | 13.369703 | 14.194097 | 14.331944 | 14.503913 | 14.925030 |
-|               | dirty    | 2            | 440.0 | 1.151438  | 0.843793 | 0.112582  | 0.518223  | 0.978458  | 1.540923  | 5.476162  |
-| c1204         | clean    | 1            | 424.0 | 15.254311 | 0.321478 | 13.987100 | 15.077046 | 15.262632 | 15.475146 | 16.260415 |
-|               | dirty    | 2            | 440.0 | 15.532688 | 3.448340 | 1.815959  | 13.639535 | 15.912205 | 18.127480 | 21.748767 |
-| fe81d         | clean    | 1            | 424.0 | 14.319104 | 0.263526 | 13.365161 | 14.189106 | 14.326219 | 14.499389 | 14.919546 |
-|               | dirty    | 2            | 440.0 | 13.077269 | 3.152211 | 0.536799  | 11.056025 | 13.689452 | 15.387298 | 19.102249 |
-| ff67b         | clean    | 1            | 424.0 | 14.319636 | 0.263558 | 13.365161 | 14.189298 | 14.326219 | 14.499389 | 14.919546 |
-|               | dirty    | 2            | 440.0 | 12.894021 | 2.446790 | 4.838165  | 11.518550 | 13.089802 | 14.484227 | 18.392188 |
-     |               |          |              | count | mean       | std        | min       | 25%       | 50%       | 75%        | max         |
-|---------------+----------+--------------+-------+------------+------------+-----------+-----------+-----------+------------+-------------|
-| processing    | artifact | Diff_species |       |            |            |           |           |           |            |             |
-| 0cd20         | clean    | 1            | 424.0 | 39.574374  | 1.040061   | 37.190978 | 38.879728 | 39.575746 | 40.279227  | 42.984704   |
-|               | dirty    | 2            | 440.0 | 38.933931  | 5.459816   | 21.356080 | 35.228893 | 38.762520 | 42.262441  | 62.131261   |
-| 19e3e         | clean    | 1            | 424.0 | 39.656947  | 1.047036   | 37.102746 | 38.934719 | 39.568778 | 40.416838  | 42.501109   |
-|               | dirty    | 2            | 440.0 | 41.351740  | 4.525924   | 19.027233 | 38.362287 | 41.177209 | 43.854646  | 60.151240   |
-| 34766         | clean    | 1            | 424.0 | 35.077446  | 1.109175   | 32.086412 | 34.355154 | 35.067658 | 35.736697  | 38.864156   |
-|               | dirty    | 2            | 440.0 | 38.910032  | 3.349258   | 27.709990 | 36.625985 | 38.713203 | 41.009242  | 49.822679   |
-| 34a6d         | clean    | 1            | 424.0 | 39.707795  | 1.038806   | 36.985999 | 39.012984 | 39.667568 | 40.457557  | 42.803298   |
-|               | dirty    | 2            | 440.0 | 41.654939  | 4.707523   | 30.986888 | 38.312301 | 41.267814 | 44.652582  | 57.155144   |
-| 484af         | clean    | 1            | 424.0 | 39.854861  | 1.040952   | 37.153441 | 39.141726 | 39.854056 | 40.582409  | 42.744448   |
-|               | dirty    | 2            | 440.0 | 41.036124  | 4.307502   | 31.922451 | 38.063892 | 40.605601 | 43.505466  | 63.739400   |
-| 714af         | clean    | 1            | 424.0 | 39.838266  | 1.041757   | 37.153441 | 39.107415 | 39.835832 | 40.571805  | 42.696864   |
-|               | dirty    | 2            | 440.0 | 41.791645  | 4.068318   | 31.775699 | 38.784115 | 41.430208 | 44.084046  | 55.334179   |
-| No correction | clean    | 1            | 424.0 | 39.726486  | 1.037956   | 37.049340 | 39.010144 | 39.678008 | 40.444667  | 42.680513   |
-|               | dirty    | 2            | 440.0 | 373.284240 | 938.964455 | 9.128891  | 44.671731 | 69.978078 | 149.833895 | 9657.429422 |
-| c1204         | clean    | 1            | 424.0 | 29.247641  | 1.225078   | 25.901046 | 28.399698 | 29.177928 | 30.113028  | 32.740869   |
-|               | dirty    | 2            | 440.0 | 35.503411  | 2.690742   | 29.246945 | 33.580404 | 35.278166 | 36.865166  | 44.796158   |
-| fe81d         | clean    | 1            | 424.0 | 39.828821  | 1.044278   | 37.153441 | 39.089567 | 39.830813 | 40.555985  | 42.744448   |
-|               | dirty    | 2            | 440.0 | 40.766428  | 6.403163   | 12.890876 | 37.417914 | 40.439757 | 43.275102  | 84.641627   |
-| ff67b         | clean    | 1            | 424.0 | 39.830343  | 1.042279   | 37.153441 | 39.087859 | 39.803435 | 40.555985  | 42.744448   |
-|               | dirty    | 2            | 440.0 | 41.757214  | 4.040506   | 32.434107 | 38.893139 | 41.451285 | 44.293295  | 57.788748   |
+     |               |          |              | count |       mean |        std |       min |       25% |       50% |        75% |         max |
+     |---------------+----------+--------------+-------+------------+------------+-----------+-----------+-----------+------------+-------------|
+     | processing    | artifact | Diff_species |       |            |            |           |           |           |            |             |
+     | 0cd20         | clean    |            1 | 424.0 |  14.335000 |   0.263291 | 13.412392 | 14.205747 | 14.341568 |  14.505898 |   14.988332 |
+     |               | dirty    |            2 | 440.0 |  15.106186 |   1.484036 |  6.267150 | 14.334271 | 15.248202 |  16.039287 |   18.110889 |
+     | 19e3e         | clean    |            1 | 424.0 |  14.329986 |   0.263853 | 13.367317 | 14.201544 | 14.336272 |  14.511038 |   14.931337 |
+     |               | dirty    |            2 | 440.0 |  13.270444 |   3.181698 |  0.562121 | 11.573624 | 13.826313 |  15.704750 |   18.581205 |
+     | 34766         | clean    |            1 | 424.0 |  14.684973 |   0.276662 | 13.720920 | 14.551659 | 14.702547 |  14.869845 |   15.347210 |
+     |               | dirty    |            2 | 440.0 |  15.267823 |   2.476381 |  6.346636 | 13.704650 | 15.732460 |  17.068360 |   19.961155 |
+     | 34a6d         | clean    |            1 | 424.0 |  14.325905 |   0.264438 | 13.365160 | 14.194973 | 14.335075 |  14.510599 |   14.933380 |
+     |               | dirty    |            2 | 440.0 |  13.641062 |   2.740812 |  1.417894 | 12.297284 | 14.302934 |  15.593493 |   17.885668 |
+     | 484af         | clean    |            1 | 424.0 |  14.317763 |   0.263824 | 13.365161 | 14.188180 | 14.325842 |  14.499389 |   14.919546 |
+     |               | dirty    |            2 | 440.0 |  12.784654 |   3.023495 |  1.591405 | 10.908164 | 13.373178 |  15.029049 |   18.453017 |
+     | 714af         | clean    |            1 | 424.0 |  14.318594 |   0.263337 | 13.365161 | 14.189044 | 14.325842 |  14.497586 |   14.919546 |
+     |               | dirty    |            2 | 440.0 |  12.233933 |   2.490236 |  5.295190 | 10.570730 | 12.420635 |  14.066820 |   17.968677 |
+     | No correction | clean    |            1 | 424.0 |  14.324938 |   0.264089 | 13.369703 | 14.194097 | 14.331944 |  14.503913 |   14.925030 |
+     |               | dirty    |            2 | 440.0 |   1.151438 |   0.843793 |  0.112582 |  0.518223 |  0.978458 |   1.540923 |    5.476162 |
+     | c1204         | clean    |            1 | 424.0 |  15.254311 |   0.321478 | 13.987100 | 15.077046 | 15.262632 |  15.475146 |   16.260415 |
+     |               | dirty    |            2 | 440.0 |  15.532688 |   3.448340 |  1.815959 | 13.639535 | 15.912205 |  18.127480 |   21.748767 |
+     | fe81d         | clean    |            1 | 424.0 |  14.319104 |   0.263526 | 13.365161 | 14.189106 | 14.326219 |  14.499389 |   14.919546 |
+     |               | dirty    |            2 | 440.0 |  13.077269 |   3.152211 |  0.536799 | 11.056025 | 13.689452 |  15.387298 |   19.102249 |
+     | ff67b         | clean    |            1 | 424.0 |  14.319636 |   0.263558 | 13.365161 | 14.189298 | 14.326219 |  14.499389 |   14.919546 |
+     |               | dirty    |            2 | 440.0 |  12.894021 |   2.446790 |  4.838165 | 11.518550 | 13.089802 |  14.484227 |   18.392188 |
+     |               |          |              | count |       mean |        std |       min |       25% |       50% |        75% |         max |
+     |---------------+----------+--------------+-------+------------+------------+-----------+-----------+-----------+------------+-------------|
+     | processing    | artifact | Diff_species |       |            |            |           |           |           |            |             |
+     | 0cd20         | clean    |            1 | 424.0 |  39.574374 |   1.040061 | 37.190978 | 38.879728 | 39.575746 |  40.279227 |   42.984704 |
+     |               | dirty    |            2 | 440.0 |  38.933931 |   5.459816 | 21.356080 | 35.228893 | 38.762520 |  42.262441 |   62.131261 |
+     | 19e3e         | clean    |            1 | 424.0 |  39.656947 |   1.047036 | 37.102746 | 38.934719 | 39.568778 |  40.416838 |   42.501109 |
+     |               | dirty    |            2 | 440.0 |  41.351740 |   4.525924 | 19.027233 | 38.362287 | 41.177209 |  43.854646 |   60.151240 |
+     | 34766         | clean    |            1 | 424.0 |  35.077446 |   1.109175 | 32.086412 | 34.355154 | 35.067658 |  35.736697 |   38.864156 |
+     |               | dirty    |            2 | 440.0 |  38.910032 |   3.349258 | 27.709990 | 36.625985 | 38.713203 |  41.009242 |   49.822679 |
+     | 34a6d         | clean    |            1 | 424.0 |  39.707795 |   1.038806 | 36.985999 | 39.012984 | 39.667568 |  40.457557 |   42.803298 |
+     |               | dirty    |            2 | 440.0 |  41.654939 |   4.707523 | 30.986888 | 38.312301 | 41.267814 |  44.652582 |   57.155144 |
+     | 484af         | clean    |            1 | 424.0 |  39.854861 |   1.040952 | 37.153441 | 39.141726 | 39.854056 |  40.582409 |   42.744448 |
+     |               | dirty    |            2 | 440.0 |  41.036124 |   4.307502 | 31.922451 | 38.063892 | 40.605601 |  43.505466 |   63.739400 |
+     | 714af         | clean    |            1 | 424.0 |  39.838266 |   1.041757 | 37.153441 | 39.107415 | 39.835832 |  40.571805 |   42.696864 |
+     |               | dirty    |            2 | 440.0 |  41.791645 |   4.068318 | 31.775699 | 38.784115 | 41.430208 |  44.084046 |   55.334179 |
+     | No correction | clean    |            1 | 424.0 |  39.726486 |   1.037956 | 37.049340 | 39.010144 | 39.678008 |  40.444667 |   42.680513 |
+     |               | dirty    |            2 | 440.0 | 373.284240 | 938.964455 |  9.128891 | 44.671731 | 69.978078 | 149.833895 | 9657.429422 |
+     | c1204         | clean    |            1 | 424.0 |  29.247641 |   1.225078 | 25.901046 | 28.399698 | 29.177928 |  30.113028 |   32.740869 |
+     |               | dirty    |            2 | 440.0 |  35.503411 |   2.690742 | 29.246945 | 33.580404 | 35.278166 |  36.865166 |   44.796158 |
+     | fe81d         | clean    |            1 | 424.0 |  39.828821 |   1.044278 | 37.153441 | 39.089567 | 39.830813 |  40.555985 |   42.744448 |
+     |               | dirty    |            2 | 440.0 |  40.766428 |   6.403163 | 12.890876 | 37.417914 | 40.439757 |  43.275102 |   84.641627 |
+     | ff67b         | clean    |            1 | 424.0 |  39.830343 |   1.042279 | 37.153441 | 39.087859 | 39.803435 |  40.555985 |   42.744448 |
+     |               | dirty    |            2 | 440.0 |  41.757214 |   4.040506 | 32.434107 | 38.893139 | 41.451285 |  44.293295 |   57.788748 |
      #+begin_example
        processing     artifact  Diff_species
        0cd20          clean     1               39.575746
