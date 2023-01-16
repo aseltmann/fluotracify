@@ -859,11 +859,12 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
       #+RESULTS:
 
    6. set output directory for matplotlib plots in jupyter
+      #+NAME: jupyter-set-output-directory
       #+begin_src emacs-lisp
         (setq org-babel-jupyter-resource-directory "./data/exp-220316-publication1/jupyter")
       #+end_src
 
-      #+RESULTS:
+      #+RESULTS: jupyter-set-output-directory
       : ./data/exp-220316-publication1/jupyter
 
    7.
@@ -3628,17 +3629,12 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
    :PROPERTIES:
    :header-args:jupyter-python: :session /jpy:localhost#8888:a37e524a-8134-4d8f-b24a-367acaf1bdd3 :pandoc t
    :END:
-   - to interprete the correlations correctly, let's plot the underlying
-     experimental data.
-     #+BEGIN_SRC jupyter-python
-       %cd ~/Programme/drmed-git
-     #+END_SRC
-
-     #+RESULTS:
-     : /home/lex/Programme/drmed-git
 
    - load modules
+     #+NAME: simulations-prepare-modules
      #+BEGIN_SRC jupyter-python
+       %cd ~/Programme/drmed-git
+
        import logging
        import os
        import sys
@@ -3688,20 +3684,9 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
      #+END_SRC
 
      #+RESULTS:
-     : 2023-01-10 13:41:02.653901: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
-     : 2023-01-10 13:41:02.653993: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
-
-    #+BEGIN_SRC jupyter-python
-      import importlib
-      importlib.reload(ppd)
-      importlib.reload(isfc)
-      importlib.reload(cfo)
-    #+END_SRC
-
-    #+RESULTS:
-    : <module 'fluotracify.applications.corr_fit_object' from '/home/lex/Programme/drmed-git/src/fluotracify/applications/corr_fit_object.py'>
 
    - load simulated data
+     #+NAME: simulations-prepare-data
      #+BEGIN_SRC jupyter-python :pandoc t
        col_per_example = 3
        lab_thresh = 0.04
@@ -3760,6 +3745,58 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
 16384 rows × 1500 columns
      :END:
 
+    #+BEGIN_SRC jupyter-python
+      import importlib
+      importlib.reload(ppd)
+      importlib.reload(isfc)
+      importlib.reload(cfo)
+    #+END_SRC
+
+    #+RESULTS:
+    : <module 'fluotracify.applications.corr_fit_object' from '/home/lex/Programme/drmed-git/src/fluotracify/applications/corr_fit_object.py'>
+**** plot traces with labels
+   :PROPERTIES:
+   :header-args:jupyter-python: :session /jpy:localhost#8888:a37e524a-8134-4d8f-b24a-367acaf1bdd3 :pandoc t
+   :END:
+
+   - call =jupyter-set-output-directory=, =simulations-prepare-modules= and
+     =simulations-prepare-data=
+     #+CALL: jupyter-set-output-directory()
+
+     #+RESULTS:
+     : ./data/exp-220316-publication1/jupyter
+
+     #+CALL: simulations-prepare-modules()
+
+     #+RESULTS:
+     :RESULTS:
+     : /home/lex/Programme/drmed-git
+     : 2023-01-16 15:28:48.365303: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+     : 2023-01-16 15:28:48.365357: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+     :END:
+
+     #+CALL: simulations-prepare-data()
+
+     #+RESULTS:
+     :RESULTS:
+     |       | 0.069-0.1   | 0.069-0.1   | 0.069-0.1   | 0.069-0.1  | 0.069-0.1  | 0.069-0.1   | 0.069-0.1  | 0.069-0.1   | 0.069-0.1  | 0.069-0.1  | ... | 50.0-0.01   | 50.0-0.01   | 50.0-0.01   | 50.0-0.01   | 50.0-0.01   | 50.0-0.01   | 50.0-0.01   | 50.0-0.01   | 50.0-0.01   | 50.0-0.01   |
+|-------+-------------+-------------+-------------+------------+------------+-------------+------------+-------------+------------+------------+-----+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------|
+| 0     | 1187.467896 | 907.677734  | 480.048798  | 454.669403 | 466.063232 | 384.734467  | 543.981323 | 640.921509  | 795.946167 | 410.471893 | ... | 1897.398193 | 2279.646484 | 3088.531006 | 2034.432495 | 2187.548584 | 2105.736084 | 1789.366577 | 2023.093994 | 2331.185791 | 2185.028076 |
+| 1     | 1184.055176 | 945.760315  | 471.065216  | 458.392487 | 473.306152 | 395.165527  | 558.603088 | 622.421204  | 776.199402 | 409.149170 | ... | 1499.969849 | 2199.652100 | 3207.333008 | 1650.523926 | 2122.935791 | 2791.281006 | 1661.286377 | 1111.879761 | 1853.699585 | 1926.844971 |
+| 2     | 1191.848877 | 980.117798  | 459.479706  | 426.087982 | 482.370209 | 425.123413  | 551.536072 | 624.498535  | 778.671265 | 400.971954 | ... | 1822.985229 | 2456.422607 | 2969.562500 | 1934.118286 | 1457.731812 | 2251.077393 | 1903.003662 | 2063.915527 | 2198.018066 | 2038.683105 |
+| 3     | 1199.065918 | 974.313110  | 462.205566  | 444.041809 | 463.703125 | 434.186615  | 573.044128 | 626.252502  | 747.284058 | 393.178162 | ... | 1741.839355 | 2467.149414 | 2588.980957 | 2136.627686 | 1930.263672 | 2323.700684 | 2133.313721 | 1638.169312 | 1926.058716 | 1815.259521 |
+| 4     | 1221.957397 | 968.779175  | 464.918030  | 455.205292 | 474.615540 | 437.029419  | 586.489136 | 619.319092  | 781.954102 | 406.468018 | ... | 2431.400879 | 2246.336670 | 3000.961182 | 1915.518066 | 2052.773682 | 2359.145508 | 1699.926147 | 1862.709595 | 2291.338379 | 1332.422241 |
+| ...   | ...         | ...         | ...         | ...        | ...        | ...         | ...        | ...         | ...        | ...        | ... | ...         | ...         | ...         | ...         | ...         | ...         | ...         | ...         | ...         | ...         |
+| 16379 | 506.409668  | 1012.403931 | 855.006226  | 674.470703 | 769.859192 | 2110.732178 | 799.565247 | 1981.221436 | 528.844604 | 483.055878 | ... | 1512.586548 | 3212.712891 | 1491.119995 | 1843.866943 | 1748.956665 | 2048.602051 | 1662.244385 | 2593.879639 | 1921.427856 | 1664.831909 |
+| 16380 | 536.809692  | 1022.029724 | 840.287720  | 671.095215 | 738.908997 | 2118.984863 | 807.995789 | 2624.343262 | 552.687012 | 479.768372 | ... | 1661.331055 | 3190.809570 | 1770.193970 | 2081.854248 | 2164.372803 | 2295.646729 | 1846.683594 | 2038.272339 | 2222.708252 | 2122.753662 |
+| 16381 | 570.668884  | 989.891235  | 839.180298  | 689.863586 | 695.739136 | 2033.681885 | 786.547852 | 3528.163574 | 572.166077 | 484.491211 | ... | 1643.470337 | 2564.206787 | 2025.219971 | 2104.706787 | 1792.828613 | 2106.199463 | 2087.914062 | 1457.817871 | 1874.736938 | 1683.072021 |
+| 16382 | 562.505310  | 977.029785  | 1005.927673 | 683.250183 | 661.608337 | 2566.123047 | 805.594116 | 3731.086426 | 566.710571 | 489.289673 | ... | 1556.492188 | 2783.619385 | 1312.174561 | 2378.643311 | 2466.965576 | 2160.641357 | 1691.332520 | 2013.095093 | 1632.475708 | 1352.443237 |
+| 16383 | 567.307373  | 1006.794067 | 982.376526  | 677.099854 | 657.040588 | 2545.080322 | 784.917969 | 3850.334717 | 570.241699 | 512.688232 | ... | 2127.414551 | 2448.062012 | 1398.359253 | 1665.321167 | 2241.687256 | 1823.699829 | 1340.686035 | 1972.661743 | 1550.770142 | 1727.808228 |
+
+16384 rows × 1500 columns
+     :END:
+
+   - define plotting functions
      #+BEGIN_SRC jupyter-python
        plot1_index = ['3.0-0.01', '3.0-0.1', '3.0-1.0',
                       '0.2-0.01', '0.2-0.1', '0.2-1.0',
@@ -3926,6 +3963,26 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
      #+END_SRC
 
      #+RESULTS:
+
+**** plot transit times vs random cuts in =clean= trace
+   :PROPERTIES:
+   :header-args:jupyter-python: :session /jpy:localhost#8888:a37e524a-8134-4d8f-b24a-367acaf1bdd3 :pandoc t
+   :END:
+
+   - call =jupyter-set-output-directory= and =simulations-prepare-modules=
+     #+CALL: jupyter-set-output-directory()
+
+     #+RESULTS:
+     : ./data/exp-220316-publication1/jupyter
+
+     #+CALL: simulations-prepare-modules()
+
+     #+RESULTS:
+     :RESULTS:
+     : /home/lex/Programme/drmed-git
+     : 2023-01-16 15:28:48.365303: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+     : 2023-01-16 15:28:48.365357: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+     :END:
 
    - let's load and plot cuts vs transit times from 3 different base molecule
      speeds (varying molecule numbers): 0.069, 0.2, and 1.0 um^2/s respectively.
@@ -4195,50 +4252,59 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
 
      #+END_SRC
 
+**** comparison correction methods
+   :PROPERTIES:
+   :header-args:jupyter-python: :session /jpy:localhost#8888:a37e524a-8134-4d8f-b24a-367acaf1bdd3 :pandoc t
+   :END:
 
-   - let's load and plot cuts vs transit times from 3 different base molecule
-     speeds (varying molecule numbers): 0.069, 0.2, and 3.0 um^2/s respectively.
-   - this time for *comparison of correction methods*
+   - call =jupyter-set-output-directory= and =simulations-prepare-modules=
+     #+CALL: jupyter-set-output-directory()
+
+     #+RESULTS:
+     : ./data/exp-220316-publication1/jupyter
+
+     #+CALL: simulations-prepare-modules()
+
+     #+RESULTS:
+     :RESULTS:
+     : /home/lex/Programme/drmed-git
+     : 2023-01-16 15:28:48.365303: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+     : 2023-01-16 15:28:48.365357: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+     :END:
+
+   - let's *compare correction methods* on 3 different simulated base molecule
+     speeds (0.069, 0.2, and 3.0 um^2/s; varying molecule numbers) and af488 +
+     LUV data
      #+BEGIN_SRC jupyter-python
        # dirty correlations - check out from  branch exp-220227-unet
        path1 = Path('/home/lex/Programme/drmed-git/data/exp-220227-unet/2022-04-25_simulations/dirty')
-       odot069_dirty_1comp_path = path1 / '0.069_results/dirty_0dot069-all_1comp_outputParam.csv'
-       odot069_dirty_2comp_path = path1 / '0.069_results/dirty_0dot069-all_2comp_outputParam.csv'
-       odot2_dirty_1comp_path = path1 / '0.2_results/dirty_0dot2-all_1comp_outputParam.csv'
-       odot2_dirty_2comp_path = path1 / '0.2_results/dirty_0dot2-all_2comp_outputParam.csv'
-       # one_dirty_1comp_path = path1 / '1.0_results/dirty_1dot0-all_1comp_outputParam.csv'
-       # one_dirty_2comp_path = path1 / '1.0_results/dirty_1dot0-all_2comp_outputParam.csv'
-       three_dirty_1comp_path = path1 / '3.0_results/dirty_3dot0-all_1comp_outputParam.csv'
-       three_dirty_2comp_path = path1 / '3.0_results/dirty_3dot0-all_2comp_outputParam.csv'
+       odot069_simdirty_1comp_path = path1 / '0.069_results/dirty_0dot069-all_1comp_outputParam.csv'
+       odot069_simdirty_2comp_path = path1 / '0.069_results/dirty_0dot069-all_2comp_outputParam.csv'
+       odot2_simdirty_1comp_path = path1 / '0.2_results/dirty_0dot2-all_1comp_outputParam.csv'
+       odot2_simdirty_2comp_path = path1 / '0.2_results/dirty_0dot2-all_2comp_outputParam.csv'
+       # one_simdirty_1comp_path = path1 / '1.0_results/dirty_1dot0-all_1comp_outputParam.csv'
+       # one_simdirty_2comp_path = path1 / '1.0_results/dirty_1dot0-all_2comp_outputParam.csv'
+       three_simdirty_1comp_path = path1 / '3.0_results/dirty_3dot0-all_1comp_outputParam.csv'
+       three_simdirty_2comp_path = path1 / '3.0_results/dirty_3dot0-all_2comp_outputParam.csv'
 
        # clean correlations
        path2 = Path('/home/lex/Programme/drmed-git/data/exp-220316-publication1/220719_threshold-prediction/threshold-all-results')
-       odot069_clean_1comp_path = path2 / '0dot069_clean_1comp_outputParam.csv'
-       odot2_clean_1comp_path = path2 / '0dot2_clean_1comp_outputParam.csv'
-       # one_clean_1comp_path = path2 / '1dot0_clean_1comp_outputParam.csv'
-       three_clean_1comp_path = path2 / '3dot0_clean_1comp_outputParam.csv'
+       odot069_simclean_1comp_path = path2 / '0dot069_clean_1comp_outputParam.csv'
+       odot2_simclean_1comp_path = path2 / '0dot2_clean_1comp_outputParam.csv'
+       # one_simclean_1comp_path = path2 / '1dot0_clean_1comp_outputParam.csv'
+       three_simclean_1comp_path = path2 / '3dot0_clean_1comp_outputParam.csv'
+       #
+       # # control with prediction threshold
+       # odot069_thresh2_1comp_path = path2 / '0dot069_robust_thresh2_1comp_outputParam.csv'
+       # odot069_thresh2_2comp_path = path2 / '0dot069_robust_thresh2_2comp_outputParam.csv'
+       # odot2_thresh2_1comp_path = path2 / '0dot2_robust_thresh2_1comp_outputParam.csv'
+       # odot2_thresh2_2comp_path = path2 / '0dot2_robust_thresh2_2comp_outputParam.csv'
+       # # one_thresh2_1comp_path = path2 / '1dot0_robust_thresh2_1comp_outputParam.csv'
+       # # one_thresh2_2comp_path = path2 / '1dot0_robust_thresh2_2comp_outputParam.csv'
+       # three_thresh2_1comp_path = path2 / '3dot0_robust_thresh2_1comp_outputParam.csv'
+       # three_thresh2_2comp_path = path2 / '3dot0_robust_thresh2_2comp_outputParam.csv'
+       # # fifty_thresh2_1comp_path = path2 / '50dot0_robust_thresh2_1comp_outputParam.csv'
 
-       # control with prediction threshold
-       odot069_thresh2_1comp_path = path2 / '0dot069_robust_thresh2_1comp_outputParam.csv'
-       odot069_thresh2_2comp_path = path2 / '0dot069_robust_thresh2_2comp_outputParam.csv'
-       odot2_thresh2_1comp_path = path2 / '0dot2_robust_thresh2_1comp_outputParam.csv'
-       odot2_thresh2_2comp_path = path2 / '0dot2_robust_thresh2_2comp_outputParam.csv'
-       # one_thresh2_1comp_path = path2 / '1dot0_robust_thresh2_1comp_outputParam.csv'
-       # one_thresh2_2comp_path = path2 / '1dot0_robust_thresh2_2comp_outputParam.csv'
-       three_thresh2_1comp_path = path2 / '3dot0_robust_thresh2_1comp_outputParam.csv'
-       three_thresh2_2comp_path = path2 / '3dot0_robust_thresh2_2comp_outputParam.csv'
-       # fifty_thresh2_1comp_path = path2 / '50dot0_robust_thresh2_1comp_outputParam.csv'
-
-       # prediction by best unet 0cd20 - check out from branch exp-220227-unet
-       path3 = Path('/home/lex/Programme/drmed-git/data/exp-220227-unet/2022-04-25_simulations/0cd20')
-       odot069_0cd20_1comp_path = path3 / '0.069_results/0cd20_0dot069-all_1comp_outputParam.csv'
-       odot069_0cd20_2comp_path = path3 / '0.069_results/0cd20_0dot069-all_2comp_outputParam.csv'
-       odot2_0cd20_1comp_path = path3 / '0.2_results/0cd20_0dot2-all_1comp_outputParam.csv'
-       odot2_0cd20_2comp_path = path3 / '0.2_results/0cd20_0dot2-all_2comp_outputParam.csv'
-       # one_0cd20_1comp_path = path3 / '1.0_results/0cd20_1dot0-all_1comp_outputParam.csv'
-       # one_0cd20_2comp_path = path3 / '1.0_results/0cd20_1dot0-all_2comp_outputParam.csv'
-       three_0cd20_1comp_path = path3 / '3.0_results/0cd20_3dot0-all_1comp_outputParam.csv'
-       three_0cd20_2comp_path = path3 / '3.0_results/0cd20_3dot0-all_2comp_outputParam.csv'
 
        # load correction by label information as baseline
        path4 = Path('/home/lex/Programme/drmed-git/data/exp-220316-publication1/220517_simulations/')
@@ -4259,6 +4325,48 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
        odot069_labavg_1comp_path = path5 / 'all-results/0dot069_lab_avg_1comp_outputParam.csv'
        odot2_labavg_1comp_path = path5 / 'all-results/0dot2_lab_avg_1comp_outputParam.csv'
        three_labavg_1comp_path = path5 / 'all-results/three_lab_avg_1comp_outputParam.csv'
+
+
+       # prediction by best unet 0cd20 - check out from branch exp-220227-unet
+       # path3 = Path('/home/lex/Programme/drmed-git/data/exp-220227-unet/2022-04-25_simulations/0cd20')
+       # odot069_0cd20_1comp_path = path3 / '0.069_results/0cd20_0dot069-all_1comp_outputParam.csv'
+       # odot069_0cd20_2comp_path = path3 / '0.069_results/0cd20_0dot069-all_2comp_outputParam.csv'
+       # odot2_0cd20_1comp_path = path3 / '0.2_results/0cd20_0dot2-all_1comp_outputParam.csv'
+       # odot2_0cd20_2comp_path = path3 / '0.2_results/0cd20_0dot2-all_2comp_outputParam.csv'
+       # # one_0cd20_1comp_path = path3 / '1.0_results/0cd20_1dot0-all_1comp_outputParam.csv'
+       # # one_0cd20_2comp_path = path3 / '1.0_results/0cd20_1dot0-all_2comp_outputParam.csv'
+       # three_0cd20_1comp_path = path3 / '3.0_results/0cd20_3dot0-all_1comp_outputParam.csv'
+       # three_0cd20_2comp_path = path3 / '3.0_results/0cd20_3dot0-all_2comp_outputParam.csv'
+
+       # biological data - clean, dirty
+       path6 = Path('/home/lex/Porgramme/drmed-git/data/exp-220227-unet/2022-05-22_experimental-af488')
+       af488_noc_1comp_path = af488_path1 / 'clean-all-results/clean_no-correction_1comp_outputParam.csv'
+       af488_0cd20cas_1comp_path = af488_path1 / 'clean-all-results/clean_0cd20_1comp_outputParam.csv'
+       af488luv_noc_1comp_path = af488_path1 / 'dirty-all-results/dirty_no-correction_1comp_outputParam.csv'
+       af488luv_noc_2comp_path = af488_path1 / 'dirty-all-results/dirty_no-correction_2comp_outputParam.csv'
+       af488luv_0cd20cas_1comp_path = af488_path1 / 'dirty-all-results/dirty_0cd20_1comp_outputParam.csv'
+       af488luv_0cd20cas_2comp_path = af488_path1 / 'dirty-all-results/dirty_0cd20_2comp_outputParam.csv'
+
+
+
+
+       path6 = Path('/home/lex/Programme/drmed-git/data/exp-220227-unet/2023-01-10_experimental-af488-averaging/all-results')
+       odot069_predavg_1comp_path = path3 / 'dirty_0cd20_averaging_1comp_outputParam.csv'
+       odot069_predavg_2comp_path = path3 / 'dirty_0cd20_averaging_2comp_outputParam.csv'
+
+
+       af488_noc_1comp_path = af488_path1 / 'clean-all-results/clean_no-correction_1comp_outputParam.csv'
+       af488_0cd20_1comp_path = af488_path1 / 'clean-all-results/clean_0cd20_1comp_outputParam.csv'
+       af488luv_noc_1comp_path = af488_path1 / 'dirty-all-results/dirty_no-correction_1comp_outputParam.csv'
+       af488luv_noc_2comp_path = af488_path1 / 'dirty-all-results/dirty_no-correction_2comp_outputParam.csv'
+       af488luv_0cd20_1comp_path = af488_path1 / 'dirty-all-results/dirty_0cd20_1comp_outputParam.csv'
+       af488luv_0cd20_2comp_path = af488_path1 / 'dirty-all-results/dirty_0cd20_2comp_outputParam.csv'
+       af488_noc_1comp = pd.read_csv(af488_noc_1comp_path, sep=',').assign(bio=424*['af488',], processing=424*['Baseline control:\nno correction',])
+       af488_0cd20_1comp = pd.read_csv(af488_0cd20_1comp_path, sep=',').assign(bio=424*['af488',], processing=424*['Automatic U-Net pred.\n+ cut and shift corr.:\nscaler=quantile transf.,\nlarge model (200MB)',])
+       af488luv_noc_1comp = pd.read_csv(af488luv_noc_1comp_path, sep=',').assign(bio=440*['af488luv',], processing=440*['Baseline control:\nno correction',])
+       af488luv_noc_2comp = pd.read_csv(af488luv_noc_2comp_path, sep=',').assign(bio=440*['af488luv',], processing=440*['Baseline control:\nno correction',])
+       af488luv_0cd20_1comp = pd.read_csv(af488luv_0cd20_1comp_path, sep=',').assign(bio=440*['af488luv',], processing=440*['Automatic U-Net pred.\n+ cut and shift corr.:\nscaler=quantile transf.,\nlarge model (200MB)',])
+       af488luv_0cd20_2comp = pd.read_csv(af488luv_0cd20_2comp_path, sep=',').assign(bio=440*['af488luv',], processing=440*['Automatic U-Net pred.\n+ cut and shift corr.:\nscaler=quantile transf.,\nlarge model (200MB)',])
 
 
        # load data
@@ -4327,39 +4435,36 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
                               odot069_0cd20_1comp, odot069_0cd20_2comp, odot2_0cd20_1comp,
                               odot2_0cd20_2comp, three_0cd20_1comp, three_0cd20_2comp])
 
+       # assert set(all_param['Dimen']) == {'3D'}
+       # assert set(all_param['Diff_eq']) == {'Equation 1B'}
+       # assert set(all_param['Triplet_eq']) == {'Triplet Eq 2B', 'no triplet'}
+       # assert set(all_param['Triplet_species']) == {1}
+       # assert set(all_param['AR1']) == {5.0, 6.0}
+       # assert set(all_param[all_param['AR1'] == 5.0]['bio']) == {'af488', 'af488luv'}
+       # assert set(all_param[all_param['AR1'] == 6.0]['bio']) == {'hs', 'tb'}
+       # assert set(all_param['xmin']) == {0.001018}
+       # assert set(all_param['xmax']) == {939.52409, 100.66329, 469.762042}
+       # assert set(all_param[all_param['xmax'] == 100.66329]['bio']) == {'af488'}
+       # assert set(all_param[all_param['xmax'] == 469.762042]['bio']) == {'af488luv'}
+       # assert set(all_param[all_param['xmax'] == 939.52409]['bio']) == {'hs', 'tb'}
+       # assert set(all_param['alpha1']) == {1.0}
+       # assert set(all_param['alpha1']) == {1.0}
+       # assert set(all_param['tauT1'].dropna()) == {0.04}
 
-       pprint(all_param.keys())
-       all_param = all_param[['name_of_plot', 'Diff_species', 'A1', 'txy1', 'sim', 'processing', 'A2', 'txy2']]
-       with pd.option_context("max_colwidth", 1000):
-           display(all_param)
+       # pprint(all_param.keys())
+       # all_param = all_param[['name_of_plot', 'Diff_species', 'A1', 'txy1', 'sim', 'processing', 'A2', 'txy2']]
+       # with pd.option_context("max_colwidth", 1000):
+       #     display(all_param)
      #+END_SRC
 
      #+RESULTS:
-     :RESULTS:
-     : Index(['name_of_plot', 'master_file', 'parent_name', 'parent_uqid',
-     :        'time of fit', 'Diff_eq', 'Diff_species', 'Triplet_eq',
-     :        'Triplet_species', 'Dimen', 'xmin', 'xmax', 'offset', 'stdev(offset)',
-     :        'GN0', 'stdev(GN0)', 'N (FCS)', 'cpm (kHz)', 'A1', 'stdev(A1)', 'txy1',
-     :        'stdev(txy1)', 'alpha1', 'stdev(alpha1)', 'N (mom)', 'bri (kHz)',
-     :        'above zero', 'sim', 'processing', 'A2', 'stdev(A2)', 'txy2',
-     :        'stdev(txy2)', 'alpha2', 'stdev(alpha2)'],
-     :       dtype='object')
-     |     | name_of_plot                                                    | Diff_species | A1      | txy1       | sim   | processing                                                                                                    | A2      | txy2    |
-|-----+-----------------------------------------------------------------+--------------+---------+------------+-------+---------------------------------------------------------------------------------------------------------------+---------+---------|
-| 0   | 2022-07-21_multipletau_clean_0dot069_0000_correlation-CH1_1     | 1            | 1.00000 | 150.165642 | 0.069 | No artifacts,\nno correction                                                                                  | NaN     | NaN     |
-| 1   | 2022-07-21_multipletau_clean_0dot069_0001_correlation-CH1_1     | 1            | 1.00000 | 133.758850 | 0.069 | No artifacts,\nno correction                                                                                  | NaN     | NaN     |
-| 2   | 2022-07-21_multipletau_clean_0dot069_0002_correlation-CH1_1     | 1            | 1.00000 | 109.396491 | 0.069 | No artifacts,\nno correction                                                                                  | NaN     | NaN     |
-| 3   | 2022-07-21_multipletau_clean_0dot069_0003_correlation-CH1_1     | 1            | 1.00000 | 140.176075 | 0.069 | No artifacts,\nno correction                                                                                  | NaN     | NaN     |
-| 4   | 2022-07-21_multipletau_clean_0dot069_0004_correlation-CH1_1     | 1            | 1.00000 | 520.784146 | 0.069 | No artifacts,\nno correction                                                                                  | NaN     | NaN     |
-| ... | ...                                                             | ...          | ...     | ...        | ...   | ...                                                                                                           | ...     | ...     |
-| 295 | 2022-04-25_multipletau_0cd20_3dot0-0dot1_2495_correlation-CH1_1 | 2            | 0.36122 | 2.884706   | 3.000 | Peak artifacts,\nautomatic U-Net pred.\n+ cut and shift corr.:\nscaler=quantile transf.,\nlarge model (200MB) | 0.63878 | 0.00001 |
-| 296 | 2022-04-25_multipletau_0cd20_3dot0-0dot1_2496_correlation-CH1_1 | 2            | 0.36122 | 2.884706   | 3.000 | Peak artifacts,\nautomatic U-Net pred.\n+ cut and shift corr.:\nscaler=quantile transf.,\nlarge model (200MB) | 0.63878 | 0.00001 |
-| 297 | 2022-04-25_multipletau_0cd20_3dot0-0dot1_2497_correlation-CH1_1 | 2            | 0.36122 | 2.884706   | 3.000 | Peak artifacts,\nautomatic U-Net pred.\n+ cut and shift corr.:\nscaler=quantile transf.,\nlarge model (200MB) | 0.63878 | 0.00001 |
-| 298 | 2022-04-25_multipletau_0cd20_3dot0-0dot1_2498_correlation-CH1_1 | 2            | 0.36122 | 2.884706   | 3.000 | Peak artifacts,\nautomatic U-Net pred.\n+ cut and shift corr.:\nscaler=quantile transf.,\nlarge model (200MB) | 0.63878 | 0.00001 |
-| 299 | 2022-04-25_multipletau_0cd20_3dot0-0dot1_2499_correlation-CH1_1 | 2            | 0.36122 | 2.884706   | 3.000 | Peak artifacts,\nautomatic U-Net pred.\n+ cut and shift corr.:\nscaler=quantile transf.,\nlarge model (200MB) | 0.63878 | 0.00001 |
 
-10800 rows × 8 columns
-     :END:
+     #+BEGIN_SRC jupyter-python
+       set(all_param['Dimen'])
+     #+END_SRC
+
+     #+RESULTS:
+     | 2D |
 
 
      #+BEGIN_SRC jupyter-python
