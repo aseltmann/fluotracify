@@ -858,7 +858,14 @@ class PicoObject():
                                  'dict self.trueTimeWeights. Run correctTCSPC('
                                  'method=\'weights\') first.')
 
-        if method in ['tttr2xfcs', 'tttr2xfcs_with_weights']:
+        if method == 'tttr2xfcs_with_averaging':
+            name = f'{self.name}' if name is None else f'{name}'
+            if name not in self.trueTimeParts:
+                raise ValueError(f'key={name} is no valid key for the dict '
+                                 'self.trueTimeParts or self.subChanParts.')
+
+        if method in ['tttr2xfcs', 'tttr2xfcs_with_weights',
+                      'tttr2xfcs_with_averaging']:
             if method not in self.autoNorm:
                 self.autoNorm[f'{method}'] = {}
                 self.autotime[f'{method}'] = {}
@@ -870,15 +877,6 @@ class PicoObject():
                 raise ValueError('self.autoNorm[\'tttr2xfcs\'] already has a'
                                  f' key={name} Check if your desired '
                                  'autocorrelation already happened.')
-
-        if method == 'tttr2xfcs_with_averaging':
-            if method not in self.autoNorm:
-                self.autoNorm[f'{method}'] = {}
-                self.autotime[f'{method}'] = {}
-            name = f'{self.name}' if name is None else f'{name}'
-            if name not in self.trueTimeParts:
-                raise ValueError(f'key={name} is no valid key for the dict '
-                                 'self.trueTimeParts or self.subChanParts.')
 
             metadata = name.split('_')
             chan = metadata[0].strip('CH')
