@@ -642,7 +642,7 @@
        |                   |           |                                        |           |    |          |      |      |             |
        | sh-5.1$           | sh-5.1$   | ye53nis@ara-login01.rz.uni-jena.de's | password: |    |          |      |      |             |
        | ye53nis@node117's | password: |                                        |           |    |          |      |      |             |
-       | Last              | login:    | Thu                                    | Jan       | 12 | 12:23:11 | 2023 | from | login01.ara |
+       | Last              | login:    | Mon                                    | Jan       | 16 | 16:32:13 | 2023 | from | login01.ara |
 
     5. I started a Python3 kernel using =jupyter-server-list-kernels=. Then I
        added the kernel ID to the =:PROPERTIES:= drawer of this (and following)
@@ -6402,12 +6402,12 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
       : To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
       : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
 
-**** <2023-01-10 Di> Apply =averaging= correction
+**** <2023-01-10 Di> Apply =averaging= and =settozero= correction with =0cd20=
     :PROPERTIES:
     :header-args:jupyter-python: :session /jpy:localhost#8889:a37e524a-8134-4d8f-b24a-367acaf1bde3 :pandoc t
     :END:
     #+NAME: prepare-jupyter-averaging
-    #+BEGIN_SRC jupyter-python :var data_path="/beegfs/ye53nis/data/1911DD_atto+LUVs" :var output_path="/beegfs/ye53nis/drmed-git/data/exp-220227-unet/2023-01-10_experimental-af488-averaging/"
+    #+BEGIN_SRC jupyter-python :var data_path="/beegfs/ye53nis/data/1911DD_atto+LUVs" :var output_path="/beegfs/ye53nis/drmed-git/data/exp-220227-unet/2023-01-10_experimental-af488-averaging-delete/"
       %cd /beegfs/ye53nis/drmed-git
       import logging
       import os
@@ -6526,11 +6526,18 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
                                           'tttr2xfcs_with_averaging'])):
                           ptufile.save_autocorrelation(name=key, method=method_corr,
                                                        output_path=out_path)
-
     #+END_SRC
 
     #+RESULTS: prepare-jupyter-averaging
     : /beegfs/ye53nis/drmed-git
+
+    #+BEGIN_SRC jupyter-python
+      import importlib
+      importlib.reload(cfo)
+    #+END_SRC
+
+    #+RESULTS:
+    : <module 'fluotracify.applications.corr_fit_object' from '/beegfs/ye53nis/drmed-git/src/fluotracify/applications/corr_fit_object.py'>
 
     #+NAME: kill-jupyter
     #+BEGIN_SRC jupyter-python
@@ -6550,7 +6557,7 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
       #+begin_src jupyter-python
         model_id = 5
 
-        out_dir = output_path / f'dirty_{model_name_ls[model_id]}/'
+        out_dir = output_path / f'dirty_averaging_{model_name_ls[model_id]}/'
 
         os.makedirs(out_dir, exist_ok=True)
 
@@ -6579,7 +6586,7 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
       #+begin_src jupyter-python
         model_id = 5
 
-        out_dir = output_path / f'dirty_{model_name_ls[model_id]}/'
+        out_dir = output_path / f'dirty_averaging_{model_name_ls[model_id]}/'
 
         os.makedirs(out_dir, exist_ok=True)
 
@@ -6610,7 +6617,7 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
       #+begin_src jupyter-python
         model_id = 5
 
-        out_dir = output_path / f'clean_{model_name_ls[model_id]}/'
+        out_dir = output_path / f'clean_averaging_{model_name_ls[model_id]}/'
 
         os.makedirs(out_dir, exist_ok=True)
 
@@ -6646,7 +6653,7 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
       #+begin_src jupyter-python
         model_id = 5
 
-        out_dir = output_path / f'clean_{model_name_ls[model_id]}/'
+        out_dir = output_path / f'clean_averaging_{model_name_ls[model_id]}/'
 
         os.makedirs(out_dir, exist_ok=True)
 
@@ -6664,6 +6671,129 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
       : 2023-01-13 14:39:25.594445: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 FMA
       : To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
       : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
+
+    #+CALL: kill-jupyter()
+
+    #+RESULTS:
+    : a965cd3e-f452-4c79-9428-b5152c3ba8aa
+
+    #+CALL: prepare-jupyter-averaging()
+
+    #+RESULTS:
+    : /beegfs/ye53nis/drmed-git
+    : 2023-01-16 16:37:55.758832: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+    : 2023-01-16 16:37:55.758867: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+
+
+      #+begin_src jupyter-python
+        model_id = 5
+
+        out_dir = output_path / f'dirty_delete_{model_name_ls[model_id]}/'
+
+        os.makedirs(out_dir, exist_ok=True)
+
+        ptufile = predict_correct_correlate_ptu(
+            files=files_dirty1,
+            model_id=model_id,
+            method='delete',
+            out_path=out_dir)
+      #+end_src
+
+      #+RESULTS:
+      : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
+
+    #+CALL: kill-jupyter()
+
+    #+RESULTS:
+    : b91bd6bb-e7b8-44c1-b014-02275b3516b6
+
+    #+CALL: prepare-jupyter-averaging()
+
+    #+RESULTS:
+    : /beegfs/ye53nis/drmed-git
+    : 2023-01-16 23:53:43.486077: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+    : 2023-01-16 23:53:43.486120: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+
+
+      #+begin_src jupyter-python
+        model_id = 5
+
+        out_dir = output_path / f'dirty_delete_{model_name_ls[model_id]}/'
+
+        os.makedirs(out_dir, exist_ok=True)
+
+        ptufile = predict_correct_correlate_ptu(
+            files=files_dirty2,
+            model_id=model_id,
+            method='delete',
+            out_path=out_dir)
+      #+end_src
+
+      #+RESULTS:
+      : 2023-01-16 23:53:57.181417: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcuda.so.1'; dlerror: libcuda.so.1: cannot open shared object file: No such file or directory
+      : 2023-01-16 23:53:57.181479: W tensorflow/stream_executor/cuda/cuda_driver.cc:269] failed call to cuInit: UNKNOWN ERROR (303)
+      : 2023-01-16 23:53:57.181516: I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:156] kernel driver does not appear to be running on this host (node117): /proc/driver/nvidia/version does not exist
+      : 2023-01-16 23:53:57.181940: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 FMA
+      : To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+      : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
+
+    #+CALL: kill-jupyter()
+
+
+    #+CALL: prepare-jupyter-averaging()
+
+    #+RESULTS:
+    : /beegfs/ye53nis/drmed-git
+    : 2023-01-17 13:11:45.290135: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+    : 2023-01-17 13:11:45.290197: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+
+
+      #+begin_src jupyter-python
+        model_id = 5
+
+        out_dir = output_path / f'clean_delete_{model_name_ls[model_id]}/'
+
+        os.makedirs(out_dir, exist_ok=True)
+
+        ptufile = predict_correct_correlate_ptu(
+            files=files_clean1,
+            model_id=model_id,
+            method='delete',
+            out_path=out_dir)
+      #+end_src
+
+      #+RESULTS:
+      : 2023-01-17 13:12:04.995182: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcuda.so.1'; dlerror: libcuda.so.1: cannot open shared object file: No such file or directory
+      : 2023-01-17 13:12:04.995223: W tensorflow/stream_executor/cuda/cuda_driver.cc:269] failed call to cuInit: UNKNOWN ERROR (303)
+      : 2023-01-17 13:12:04.995253: I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:156] kernel driver does not appear to be running on this host (node117): /proc/driver/nvidia/version does not exist
+      : 2023-01-17 13:12:04.995535: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 FMA
+      : To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+      : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
+
+    #+CALL: kill-jupyter()
+
+
+    #+CALL: prepare-jupyter-averaging()
+
+    #+RESULTS:
+    : /beegfs/ye53nis/drmed-git
+    : 2023-01-17 13:11:45.290135: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+    : 2023-01-17 13:11:45.290197: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+
+
+      #+begin_src jupyter-python
+        model_id = 5
+
+        out_dir = output_path / f'clean_delete_{model_name_ls[model_id]}/'
+
+        os.makedirs(out_dir, exist_ok=True)
+
+        ptufile = predict_correct_correlate_ptu(
+            files=files_clean1,
+            model_id=model_id,
+            method='delete',
+            out_path=out_dir)
+      #+end_src
 
 
    #+begin_src jupyter-python
