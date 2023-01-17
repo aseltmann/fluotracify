@@ -4266,11 +4266,9 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
      #+CALL: simulations-prepare-modules()
 
      #+RESULTS:
-     :RESULTS:
      : /home/lex/Programme/drmed-git
-     : 2023-01-16 15:28:48.365303: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
-     : 2023-01-16 15:28:48.365357: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
-     :END:
+     : 2023-01-17 14:27:21.120178: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+     : 2023-01-17 14:27:21.120413: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
 
    - let's *compare correction methods* on 3 different simulated base molecule
      speeds (0.069, 0.2, and 3.0 um^2/s; varying molecule numbers) and af488 +
@@ -4278,21 +4276,21 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
      #+BEGIN_SRC jupyter-python
        # dirty correlations - check out from  branch exp-220227-unet
        path1 = Path('/home/lex/Programme/drmed-git/data/exp-220227-unet/2022-04-25_simulations/dirty')
-       odot069_simdirty_1comp_path = path1 / '0.069_results/dirty_0dot069-all_1comp_outputParam.csv'
-       odot069_simdirty_2comp_path = path1 / '0.069_results/dirty_0dot069-all_2comp_outputParam.csv'
-       odot2_simdirty_1comp_path = path1 / '0.2_results/dirty_0dot2-all_1comp_outputParam.csv'
-       odot2_simdirty_2comp_path = path1 / '0.2_results/dirty_0dot2-all_2comp_outputParam.csv'
-       # one_simdirty_1comp_path = path1 / '1.0_results/dirty_1dot0-all_1comp_outputParam.csv'
-       # one_simdirty_2comp_path = path1 / '1.0_results/dirty_1dot0-all_2comp_outputParam.csv'
-       three_simdirty_1comp_path = path1 / '3.0_results/dirty_3dot0-all_1comp_outputParam.csv'
-       three_simdirty_2comp_path = path1 / '3.0_results/dirty_3dot0-all_2comp_outputParam.csv'
+       odot069_dirty_1comp_path = path1 / '0.069_results/dirty_0dot069-all_1comp_outputParam.csv'
+       odot069_dirty_2comp_path = path1 / '0.069_results/dirty_0dot069-all_2comp_outputParam.csv'
+       odot2_dirty_1comp_path = path1 / '0.2_results/dirty_0dot2-all_1comp_outputParam.csv'
+       odot2_dirty_2comp_path = path1 / '0.2_results/dirty_0dot2-all_2comp_outputParam.csv'
+       # one_dirty_1comp_path = path1 / '1.0_results/dirty_1dot0-all_1comp_outputParam.csv'
+       # one_dirty_2comp_path = path1 / '1.0_results/dirty_1dot0-all_2comp_outputParam.csv'
+       three_dirty_1comp_path = path1 / '3.0_results/dirty_3dot0-all_1comp_outputParam.csv'
+       three_dirty_2comp_path = path1 / '3.0_results/dirty_3dot0-all_2comp_outputParam.csv'
 
        # clean correlations
        path2 = Path('/home/lex/Programme/drmed-git/data/exp-220316-publication1/220719_threshold-prediction/threshold-all-results')
-       odot069_simclean_1comp_path = path2 / '0dot069_clean_1comp_outputParam.csv'
-       odot2_simclean_1comp_path = path2 / '0dot2_clean_1comp_outputParam.csv'
-       # one_simclean_1comp_path = path2 / '1dot0_clean_1comp_outputParam.csv'
-       three_simclean_1comp_path = path2 / '3dot0_clean_1comp_outputParam.csv'
+       odot069_clean_1comp_path = path2 / '0dot069_clean_1comp_outputParam.csv'
+       odot2_clean_1comp_path = path2 / '0dot2_clean_1comp_outputParam.csv'
+       # one_clean_1comp_path = path2 / '1dot0_clean_1comp_outputParam.csv'
+       three_clean_1comp_path = path2 / '3dot0_clean_1comp_outputParam.csv'
        #
        # # control with prediction threshold
        # odot069_thresh2_1comp_path = path2 / '0dot069_robust_thresh2_1comp_outputParam.csv'
@@ -4338,133 +4336,183 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
        # three_0cd20_1comp_path = path3 / '3.0_results/0cd20_3dot0-all_1comp_outputParam.csv'
        # three_0cd20_2comp_path = path3 / '3.0_results/0cd20_3dot0-all_2comp_outputParam.csv'
 
-       # biological data - clean, dirty
-       path6 = Path('/home/lex/Porgramme/drmed-git/data/exp-220227-unet/2022-05-22_experimental-af488')
-       af488_noc_1comp_path = af488_path1 / 'clean-all-results/clean_no-correction_1comp_outputParam.csv'
-       af488_0cd20cas_1comp_path = af488_path1 / 'clean-all-results/clean_0cd20_1comp_outputParam.csv'
-       af488luv_noc_1comp_path = af488_path1 / 'dirty-all-results/dirty_no-correction_1comp_outputParam.csv'
-       af488luv_noc_2comp_path = af488_path1 / 'dirty-all-results/dirty_no-correction_2comp_outputParam.csv'
-       af488luv_0cd20cas_1comp_path = af488_path1 / 'dirty-all-results/dirty_0cd20_1comp_outputParam.csv'
-       af488luv_0cd20cas_2comp_path = af488_path1 / 'dirty-all-results/dirty_0cd20_2comp_outputParam.csv'
+       # biological data - clean, dirty, cut and stitch
+       path6 = Path('/home/lex/Programme/drmed-git/data/exp-220227-unet/2022-05-22_experimental-af488')
+       af488_noc_1comp_path = path6 / 'clean-all-results/clean_no-correction_1comp_outputParam.csv'
+       # af488_0cd20cas_1comp_path = path6 / 'clean-all-results/clean_0cd20_1comp_outputParam.csv'
 
+       af488luv_noc_1comp_path = path6 / 'dirty-all-results/dirty_no-correction_1comp_outputParam.csv'
+       af488luv_noc_2comp_path = path6 / 'dirty-all-results/dirty_no-correction_2comp_outputParam.csv'
+       af488luv_0cd20cas_1comp_path = path6 / 'dirty-all-results/dirty_0cd20_1comp_outputParam.csv'
+       af488luv_0cd20cas_2comp_path = path6 / 'dirty-all-results/dirty_0cd20_2comp_outputParam.csv'
 
+       # biological data - averaging, set to zero
+       path7 = Path('/home/lex/Programme/drmed-git/data/exp-220227-unet/2023-01-10_experimental-af488-averaging-delete/all-results')
+       # af488_0cd20avg_1comp_path = path7 / 'clean_0cd20_averaging_outputParam.csv'
+       # af488_0cd20del_1comp_path = path7 / 'clean_0cd20_delete_outputParam.csv'
 
-
-       path6 = Path('/home/lex/Programme/drmed-git/data/exp-220227-unet/2023-01-10_experimental-af488-averaging/all-results')
-       odot069_predavg_1comp_path = path3 / 'dirty_0cd20_averaging_1comp_outputParam.csv'
-       odot069_predavg_2comp_path = path3 / 'dirty_0cd20_averaging_2comp_outputParam.csv'
-
-
-       af488_noc_1comp_path = af488_path1 / 'clean-all-results/clean_no-correction_1comp_outputParam.csv'
-       af488_0cd20_1comp_path = af488_path1 / 'clean-all-results/clean_0cd20_1comp_outputParam.csv'
-       af488luv_noc_1comp_path = af488_path1 / 'dirty-all-results/dirty_no-correction_1comp_outputParam.csv'
-       af488luv_noc_2comp_path = af488_path1 / 'dirty-all-results/dirty_no-correction_2comp_outputParam.csv'
-       af488luv_0cd20_1comp_path = af488_path1 / 'dirty-all-results/dirty_0cd20_1comp_outputParam.csv'
-       af488luv_0cd20_2comp_path = af488_path1 / 'dirty-all-results/dirty_0cd20_2comp_outputParam.csv'
-       af488_noc_1comp = pd.read_csv(af488_noc_1comp_path, sep=',').assign(bio=424*['af488',], processing=424*['Baseline control:\nno correction',])
-       af488_0cd20_1comp = pd.read_csv(af488_0cd20_1comp_path, sep=',').assign(bio=424*['af488',], processing=424*['Automatic U-Net pred.\n+ cut and shift corr.:\nscaler=quantile transf.,\nlarge model (200MB)',])
-       af488luv_noc_1comp = pd.read_csv(af488luv_noc_1comp_path, sep=',').assign(bio=440*['af488luv',], processing=440*['Baseline control:\nno correction',])
-       af488luv_noc_2comp = pd.read_csv(af488luv_noc_2comp_path, sep=',').assign(bio=440*['af488luv',], processing=440*['Baseline control:\nno correction',])
-       af488luv_0cd20_1comp = pd.read_csv(af488luv_0cd20_1comp_path, sep=',').assign(bio=440*['af488luv',], processing=440*['Automatic U-Net pred.\n+ cut and shift corr.:\nscaler=quantile transf.,\nlarge model (200MB)',])
-       af488luv_0cd20_2comp = pd.read_csv(af488luv_0cd20_2comp_path, sep=',').assign(bio=440*['af488luv',], processing=440*['Automatic U-Net pred.\n+ cut and shift corr.:\nscaler=quantile transf.,\nlarge model (200MB)',])
-
+       af488luv_0cd20avg_1comp_path = path7 / 'dirty_0cd20_averaging_1comp_outputParam.csv'
+       af488luv_0cd20avg_2comp_path = path7 / 'dirty_0cd20_averaging_2comp_outputParam.csv'
+       af488luv_0cd20del_1comp_path = path7 / 'dirty_0cd20_delete_1comp_outputParam.csv'
+       af488luv_0cd20del_2comp_path = path7 / 'dirty_0cd20_delete_2comp_outputParam.csv'
 
        # load data
-       odot069_clean_1comp = pd.read_csv(odot069_clean_1comp_path, sep=',').assign(sim=300*[0.069,], processing=300*['No artifacts,\nno correction',])
-       odot2_clean_1comp = pd.read_csv(odot2_clean_1comp_path, sep=',').assign(sim=300*[0.2,], processing=300*['No artifacts,\nno correction',])
-       # one_clean_1comp = pd.read_csv(one_clean_1comp_path, sep=',').assign(sim=300*[1,], processing=300*['No artifacts,\nno correction',])
-       three_clean_1comp = pd.read_csv(three_clean_1comp_path, sep=',').assign(sim=300*[3,], processing=300*['No artifacts,\nno correction',])
-       odot069_dirty_1comp = pd.read_csv(odot069_dirty_1comp_path, sep=',').assign(sim=300*[0.069,], processing=300*['Peak artifacts,\nno correction',])
-       odot069_dirty_2comp = pd.read_csv(odot069_dirty_2comp_path, sep=',').assign(sim=300*[0.069,], processing=300*['Peak artifacts,\nno correction',])
-       odot2_dirty_1comp = pd.read_csv(odot2_dirty_1comp_path, sep=',').assign(sim=300*[0.2,], processing=300*['Peak artifacts,\nno correction',])
-       odot2_dirty_2comp = pd.read_csv(odot2_dirty_2comp_path, sep=',').assign(sim=300*[0.2,], processing=300*['Peak artifacts,\nno correction',])
-       # one_dirty_1comp = pd.read_csv(one_dirty_1comp_path, sep=',').assign(sim=300*[1,], processing=300*['Peak artifacts,\nno correction',])
-       # one_dirty_2comp = pd.read_csv(one_dirty_2comp_path, sep=',').assign(sim=300*[1,], processing=300*['Peak artifacts,\nno correction',])
-       three_dirty_1comp = pd.read_csv(three_dirty_1comp_path, sep=',').assign(sim=300*[3,], processing=300*['Peak artifacts,\nno correction',])
-       three_dirty_2comp = pd.read_csv(three_dirty_2comp_path, sep=',').assign(sim=300*[3,], processing=300*['Peak artifacts,\nno correction',])
+       odot069_clean_1comp = pd.read_csv(odot069_clean_1comp_path, sep=',').assign(sim=300*[0.069,], processing=300*['clean noc',])
+       odot2_clean_1comp = pd.read_csv(odot2_clean_1comp_path, sep=',').assign(sim=300*[0.2,], processing=300*['clean noc',])
+       # one_clean_1comp = pd.read_csv(one_clean_1comp_path, sep=',').assign(sim=300*[1,], processing=300*['clean noc',])
+       three_clean_1comp = pd.read_csv(three_clean_1comp_path, sep=',').assign(sim=300*[3,], processing=300*['clean noc',])
+       af488_1comp = pd.read_csv(af488_noc_1comp_path, sep=',').assign(sim=424*[280,], processing=424*['clean noc',])
+
+       odot069_dirty_1comp = pd.read_csv(odot069_dirty_1comp_path, sep=',').assign(sim=300*[0.069,], processing=300*['dirty noc',])
+       odot069_dirty_2comp = pd.read_csv(odot069_dirty_2comp_path, sep=',').assign(sim=300*[0.069,], processing=300*['dirty noc',])
+       odot2_dirty_1comp = pd.read_csv(odot2_dirty_1comp_path, sep=',').assign(sim=300*[0.2,], processing=300*['dirty noc',])
+       odot2_dirty_2comp = pd.read_csv(odot2_dirty_2comp_path, sep=',').assign(sim=300*[0.2,], processing=300*['dirty noc',])
+       # one_dirty_1comp = pd.read_csv(one_dirty_1comp_path, sep=',').assign(sim=300*[1,], processing=300*['dirty noc',])
+       # one_dirty_2comp = pd.read_csv(one_dirty_2comp_path, sep=',').assign(sim=300*[1,], processing=300*['dirty noc',])
+       three_dirty_1comp = pd.read_csv(three_dirty_1comp_path, sep=',').assign(sim=300*[3,], processing=300*['dirty noc',])
+       three_dirty_2comp = pd.read_csv(three_dirty_2comp_path, sep=',').assign(sim=300*[3,], processing=300*['dirty noc',])
+       af488luv_1comp = pd.read_csv(af488luv_noc_1comp_path, sep=',').assign(sim=440*[280,], processing=440*['dirty noc',])
+       af488luv_2comp = pd.read_csv(af488luv_noc_2comp_path, sep=',').assign(sim=440*[280,], processing=440*['dirty noc',])
+
 
        # load correction by label information as baseline
-       odot069_labdel_1comp = pd.read_csv(odot069_labdel_1comp_path, sep=',').assign(sim=300*[0.069,], processing=300*['Peak artifacts,\nsim.-based prediction\n+ weight=0 correction',])
-       odot069_labdel_2comp = pd.read_csv(odot069_labdel_2comp_path, sep=',').assign(sim=300*[0.069,], processing=300*['Peak artifacts,\nsim.-based prediction\n+ weight=0 correction',])
-       odot2_labdel_1comp = pd.read_csv(odot2_labdel_1comp_path, sep=',').assign(sim=300*[0.2,], processing=300*['Peak artifacts,\nsim.-based prediction\n+ weight=0 correction',])
-       odot2_labdel_2comp = pd.read_csv(odot2_labdel_2comp_path, sep=',').assign(sim=300*[0.2,], processing=300*['Peak artifacts,\nsim.-based prediction\n+ weight=0 correction',])
-       three_labdel_1comp = pd.read_csv(three_labdel_1comp_path, sep=',').assign(sim=300*[3,], processing=300*['Peak artifacts,\nsim.-based prediction\n+ weight=0 correction',])
-       three_labdel_2comp = pd.read_csv(three_labdel_2comp_path, sep=',').assign(sim=300*[3,], processing=300*['Peak artifacts,\nsim.-based prediction\n+ weight=0 correction',])
-       odot069_labcas_1comp = pd.read_csv(odot069_labcas_1comp_path, sep=',').assign(sim=300*[0.069,], processing=300*['Peak artifacts,\nsim.-based pred.\n+ cut and shift corr.',])
-       odot069_labcas_2comp = pd.read_csv(odot069_labcas_2comp_path, sep=',').assign(sim=300*[0.069,], processing=300*['Peak artifacts,\nsim.-based pred.\n+ cut and shift corr.',])
-       odot2_labcas_1comp = pd.read_csv(odot2_labcas_1comp_path, sep=',').assign(sim=300*[0.2,], processing=300*['Peak artifacts,\nsim.-based pred.\n+ cut and shift corr.',])
-       odot2_labcas_2comp = pd.read_csv(odot2_labcas_2comp_path, sep=',').assign(sim=300*[0.2,], processing=300*['Peak artifacts,\nsim.-based pred.\n+ cut and shift corr.',])
-       three_labcas_1comp = pd.read_csv(three_labcas_1comp_path, sep=',').assign(sim=300*[3,], processing=300*['Peak artifacts,\nsim.-based pred.\n+ cut and shift corr.',])
-       three_labcas_2comp = pd.read_csv(three_labcas_2comp_path, sep=',').assign(sim=300*[3,], processing=300*['Peak artifacts,\nsim.-based pred.\n+ cut and shift corr.',])
-       odot069_labavg_1comp = pd.read_csv(odot069_labavg_1comp_path, sep=',').assign(sim=300*[0.069,], processing=300*['Peak artifacts,\nsim.-based pred.\n+ averaging corr.',])
-       odot2_labavg_1comp = pd.read_csv(odot2_labavg_1comp_path, sep=',').assign(sim=300*[0.2,], processing=300*['Peak artifacts,\nsim.-based pred.\n+ averaging corr.',])
-       three_labavg_1comp = pd.read_csv(three_labavg_1comp_path, sep=',').assign(sim=300*[3,], processing=300*['Peak artifacts,\nsim.-based pred.\n+ averaging corr.',])
+       odot069_labdel_1comp = pd.read_csv(odot069_labdel_1comp_path, sep=',').assign(sim=300*[0.069,], processing=300*['dirty del',])
+       odot069_labdel_2comp = pd.read_csv(odot069_labdel_2comp_path, sep=',').assign(sim=300*[0.069,], processing=300*['dirty del',])
+       odot2_labdel_1comp = pd.read_csv(odot2_labdel_1comp_path, sep=',').assign(sim=300*[0.2,], processing=300*['dirty del',])
+       odot2_labdel_2comp = pd.read_csv(odot2_labdel_2comp_path, sep=',').assign(sim=300*[0.2,], processing=300*['dirty del',])
+       three_labdel_1comp = pd.read_csv(three_labdel_1comp_path, sep=',').assign(sim=300*[3,], processing=300*['dirty del',])
+       three_labdel_2comp = pd.read_csv(three_labdel_2comp_path, sep=',').assign(sim=300*[3,], processing=300*['dirty del',])
+       af488luv_0cd20del_1comp = pd.read_csv(af488luv_0cd20del_1comp_path, sep=',').assign(sim=440*[280,], processing=440*['dirty del'])
+       af488luv_0cd20del_2comp = pd.read_csv(af488luv_0cd20del_2comp_path, sep=',').assign(sim=440*[280,], processing=440*['dirty del'])
 
-       # control with prediction threshold
-       odot069_thresh2_1comp = pd.read_csv(odot069_thresh2_1comp_path, sep=',').assign(sim=300*[0.069,], processing=300*['Peak artifacts,\nmanual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=2',])
-       odot069_thresh2_2comp = pd.read_csv(odot069_thresh2_2comp_path, sep=',').assign(sim=300*[0.069,], processing=300*['Peak artifacts,\nmanual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=2',])
-       odot2_thresh2_1comp = pd.read_csv(odot2_thresh2_1comp_path, sep=',').assign(sim=300*[0.2,], processing=300*['Peak artifacts,\nmanual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=2',])
-       odot2_thresh2_2comp = pd.read_csv(odot2_thresh2_2comp_path, sep=',').assign(sim=300*[0.2,], processing=300*['Peak artifacts,\nmanual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=2',])
-       # one_thresh2_1comp = pd.read_csv(one_thresh2_1comp_path, sep=',').assign(sim=300*[1,], processing=300*['Peak artifacts,\nmanual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=2',])
-       # one_thresh2_2comp = pd.read_csv(one_thresh2_2comp_path, sep=',').assign(sim=300*[1,], processing=300*['Peak artifacts,\nmanual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=2',])
-       three_thresh2_1comp = pd.read_csv(three_thresh2_1comp_path, sep=',').assign(sim=300*[3,], processing=300*['Peak artifacts,\nmanual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=2',])
-       three_thresh2_2comp = pd.read_csv(three_thresh2_2comp_path, sep=',').assign(sim=300*[3,], processing=300*['Peak artifacts,\nmanual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=2',])
+       odot069_labcas_1comp = pd.read_csv(odot069_labcas_1comp_path, sep=',').assign(sim=300*[0.069,], processing=300*['dirty cas',])
+       odot069_labcas_2comp = pd.read_csv(odot069_labcas_2comp_path, sep=',').assign(sim=300*[0.069,], processing=300*['dirty cas',])
+       odot2_labcas_1comp = pd.read_csv(odot2_labcas_1comp_path, sep=',').assign(sim=300*[0.2,], processing=300*['dirty cas',])
+       odot2_labcas_2comp = pd.read_csv(odot2_labcas_2comp_path, sep=',').assign(sim=300*[0.2,], processing=300*['dirty cas',])
+       three_labcas_1comp = pd.read_csv(three_labcas_1comp_path, sep=',').assign(sim=300*[3,], processing=300*['dirty cas',])
+       three_labcas_2comp = pd.read_csv(three_labcas_2comp_path, sep=',').assign(sim=300*[3,], processing=300*['dirty cas',])
+       af488luv_0cd20cas_1comp = pd.read_csv(af488luv_0cd20cas_1comp_path, sep=',').assign(sim=440*[280,], processing=440*['dirty cas'])
+       af488luv_0cd20cas_2comp = pd.read_csv(af488luv_0cd20cas_2comp_path, sep=',').assign(sim=440*[280,], processing=440*['dirty cas'])
 
-       # pred. by best unet 0cd20 - check out from branch exp-220227-unet
-       odot069_0cd20_1comp = pd.read_csv(odot069_0cd20_1comp_path, sep=',').assign(sim=300*[0.069,], processing=300*['Peak artifacts,\nautomatic U-Net pred.\n+ cut and shift corr.:\nscaler=quantile transf.,\nlarge model (200MB)',])
-       odot069_0cd20_2comp = pd.read_csv(odot069_0cd20_2comp_path, sep=',').assign(sim=300*[0.069,], processing=300*['Peak artifacts,\nautomatic U-Net pred.\n+ cut and shift corr.:\nscaler=quantile transf.,\nlarge model (200MB)',])
-       odot2_0cd20_1comp = pd.read_csv(odot2_0cd20_1comp_path, sep=',').assign(sim=300*[0.2,], processing=300*['Peak artifacts,\nautomatic U-Net pred.\n+ cut and shift corr.:\nscaler=quantile transf.,\nlarge model (200MB)',])
-       odot2_0cd20_2comp = pd.read_csv(odot2_0cd20_2comp_path, sep=',').assign(sim=300*[0.2,], processing=300*['Peak artifacts,\nautomatic U-Net pred.\n+ cut and shift corr.:\nscaler=quantile transf.,\nlarge model (200MB)',])
-       # one_0cd20_1comp = pd.read_csv(one_0cd20_1comp_path, sep=',').assign(sim=300*[1,], processing=300*['Peak artifacts,\nautomatic U-Net pred.\n+ cut and shift corr.:\nscaler=quantile transf.,\nlarge model (200MB)',])
-       # one_0cd20_2comp = pd.read_csv(one_0cd20_2comp_path, sep=',').assign(sim=300*[1,], processing=300*['Peak artifacts,\nautomatic U-Net pred.\n+ cut and shift corr.:\nscaler=quantile transf.,\nlarge model (200MB)',])
-       three_0cd20_1comp = pd.read_csv(three_0cd20_1comp_path, sep=',').assign(sim=300*[3,], processing=300*['Peak artifacts,\nautomatic U-Net pred.\n+ cut and shift corr.:\nscaler=quantile transf.,\nlarge model (200MB)',])
-       three_0cd20_2comp = pd.read_csv(three_0cd20_2comp_path, sep=',').assign(sim=300*[3,], processing=300*['Peak artifacts,\nautomatic U-Net pred.\n+ cut and shift corr.:\nscaler=quantile transf.,\nlarge model (200MB)',])
+       odot069_labavg_1comp = pd.read_csv(odot069_labavg_1comp_path, sep=',').assign(sim=300*[0.069,], processing=300*['dirty avg',])
+       odot2_labavg_1comp = pd.read_csv(odot2_labavg_1comp_path, sep=',').assign(sim=300*[0.2,], processing=300*['dirty avg',])
+       three_labavg_1comp = pd.read_csv(three_labavg_1comp_path, sep=',').assign(sim=300*[3,], processing=300*['dirty avg',])
+       af488luv_0cd20avg_1comp = pd.read_csv(af488luv_0cd20avg_1comp_path, sep=',').assign(sim=440*[280,], processing=440*['dirty avg'])
+       af488luv_0cd20avg_2comp = pd.read_csv(af488luv_0cd20avg_2comp_path, sep=',').assign(sim=440*[280,], processing=440*['dirty avg'])
+
+
+       # # control with prediction threshold
+       # odot069_thresh2_1comp = pd.read_csv(odot069_thresh2_1comp_path, sep=',').assign(sim=300*[0.069,], processing=300*['Peak artifacts,\nmanual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=2',])
+       # odot069_thresh2_2comp = pd.read_csv(odot069_thresh2_2comp_path, sep=',').assign(sim=300*[0.069,], processing=300*['Peak artifacts,\nmanual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=2',])
+       # odot2_thresh2_1comp = pd.read_csv(odot2_thresh2_1comp_path, sep=',').assign(sim=300*[0.2,], processing=300*['Peak artifacts,\nmanual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=2',])
+       # odot2_thresh2_2comp = pd.read_csv(odot2_thresh2_2comp_path, sep=',').assign(sim=300*[0.2,], processing=300*['Peak artifacts,\nmanual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=2',])
+       # # one_thresh2_1comp = pd.read_csv(one_thresh2_1comp_path, sep=',').assign(sim=300*[1,], processing=300*['Peak artifacts,\nmanual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=2',])
+       # # one_thresh2_2comp = pd.read_csv(one_thresh2_2comp_path, sep=',').assign(sim=300*[1,], processing=300*['Peak artifacts,\nmanual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=2',])
+       # three_thresh2_1comp = pd.read_csv(three_thresh2_1comp_path, sep=',').assign(sim=300*[3,], processing=300*['Peak artifacts,\nmanual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=2',])
+       # three_thresh2_2comp = pd.read_csv(three_thresh2_2comp_path, sep=',').assign(sim=300*[3,], processing=300*['Peak artifacts,\nmanual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=2',])
+       #
+       # # pred. by best unet 0cd20 - check out from branch exp-220227-unet
+       # odot069_0cd20_1comp = pd.read_csv(odot069_0cd20_1comp_path, sep=',').assign(sim=300*[0.069,], processing=300*['Peak artifacts,\nautomatic U-Net pred.\n+ cut and shift corr.:\nscaler=quantile transf.,\nlarge model (200MB)',])
+       # odot069_0cd20_2comp = pd.read_csv(odot069_0cd20_2comp_path, sep=',').assign(sim=300*[0.069,], processing=300*['Peak artifacts,\nautomatic U-Net pred.\n+ cut and shift corr.:\nscaler=quantile transf.,\nlarge model (200MB)',])
+       # odot2_0cd20_1comp = pd.read_csv(odot2_0cd20_1comp_path, sep=',').assign(sim=300*[0.2,], processing=300*['Peak artifacts,\nautomatic U-Net pred.\n+ cut and shift corr.:\nscaler=quantile transf.,\nlarge model (200MB)',])
+       # odot2_0cd20_2comp = pd.read_csv(odot2_0cd20_2comp_path, sep=',').assign(sim=300*[0.2,], processing=300*['Peak artifacts,\nautomatic U-Net pred.\n+ cut and shift corr.:\nscaler=quantile transf.,\nlarge model (200MB)',])
+       # # one_0cd20_1comp = pd.read_csv(one_0cd20_1comp_path, sep=',').assign(sim=300*[1,], processing=300*['Peak artifacts,\nautomatic U-Net pred.\n+ cut and shift corr.:\nscaler=quantile transf.,\nlarge model (200MB)',])
+       # # one_0cd20_2comp = pd.read_csv(one_0cd20_2comp_path, sep=',').assign(sim=300*[1,], processing=300*['Peak artifacts,\nautomatic U-Net pred.\n+ cut and shift corr.:\nscaler=quantile transf.,\nlarge model (200MB)',])
+       # three_0cd20_1comp = pd.read_csv(three_0cd20_1comp_path, sep=',').assign(sim=300*[3,], processing=300*['Peak artifacts,\nautomatic U-Net pred.\n+ cut and shift corr.:\nscaler=quantile transf.,\nlarge model (200MB)',])
+       # three_0cd20_2comp = pd.read_csv(three_0cd20_2comp_path, sep=',').assign(sim=300*[3,], processing=300*['Peak artifacts,\nautomatic U-Net pred.\n+ cut and shift corr.:\nscaler=quantile transf.,\nlarge model (200MB)',])
 
 
 
        all_param = pd.concat([odot069_clean_1comp, odot2_clean_1comp, three_clean_1comp,
+                              af488_1comp,
                               odot069_dirty_1comp, odot069_dirty_2comp, odot2_dirty_1comp,
                               odot2_dirty_2comp, three_dirty_1comp, three_dirty_2comp,
+                              af488luv_1comp, af488luv_2comp,
                               odot069_labdel_1comp, odot069_labdel_2comp, odot2_labdel_1comp,
                               odot2_labdel_2comp, three_labdel_1comp, three_labdel_2comp,
+                              af488luv_0cd20del_1comp, af488luv_0cd20del_2comp,
                               odot069_labcas_1comp, odot069_labcas_2comp, odot2_labcas_1comp,
                               odot2_labcas_2comp, three_labcas_1comp, three_labcas_2comp,
+                              af488luv_0cd20cas_1comp, af488luv_0cd20cas_2comp,
                               odot069_labavg_1comp, odot2_labavg_1comp, three_labavg_1comp,
-                              odot069_thresh2_1comp, odot069_thresh2_2comp, odot2_thresh2_1comp,
-                              odot2_thresh2_2comp, three_thresh2_1comp, three_thresh2_2comp,
-                              odot069_0cd20_1comp, odot069_0cd20_2comp, odot2_0cd20_1comp,
-                              odot2_0cd20_2comp, three_0cd20_1comp, three_0cd20_2comp])
+                              af488luv_0cd20avg_1comp, af488luv_0cd20avg_2comp])
 
-       # assert set(all_param['Dimen']) == {'3D'}
-       # assert set(all_param['Diff_eq']) == {'Equation 1B'}
-       # assert set(all_param['Triplet_eq']) == {'Triplet Eq 2B', 'no triplet'}
-       # assert set(all_param['Triplet_species']) == {1}
-       # assert set(all_param['AR1']) == {5.0, 6.0}
-       # assert set(all_param[all_param['AR1'] == 5.0]['bio']) == {'af488', 'af488luv'}
-       # assert set(all_param[all_param['AR1'] == 6.0]['bio']) == {'hs', 'tb'}
-       # assert set(all_param['xmin']) == {0.001018}
-       # assert set(all_param['xmax']) == {939.52409, 100.66329, 469.762042}
-       # assert set(all_param[all_param['xmax'] == 100.66329]['bio']) == {'af488'}
-       # assert set(all_param[all_param['xmax'] == 469.762042]['bio']) == {'af488luv'}
-       # assert set(all_param[all_param['xmax'] == 939.52409]['bio']) == {'hs', 'tb'}
-       # assert set(all_param['alpha1']) == {1.0}
-       # assert set(all_param['alpha1']) == {1.0}
-       # assert set(all_param['tauT1'].dropna()) == {0.04}
+       #                        odot069_thresh2_1comp, odot069_thresh2_2comp, odot2_thresh2_1comp,
+       #                        odot2_thresh2_2comp, three_thresh2_1comp, three_thresh2_2comp,
+       #                        odot069_0cd20_1comp, odot069_0cd20_2comp, odot2_0cd20_1comp,
+       #                        odot2_0cd20_2comp, three_0cd20_1comp, three_0cd20_2comp])
 
-       # pprint(all_param.keys())
-       # all_param = all_param[['name_of_plot', 'Diff_species', 'A1', 'txy1', 'sim', 'processing', 'A2', 'txy2']]
-       # with pd.option_context("max_colwidth", 1000):
-       #     display(all_param)
+       # assert the following fit parameters
+       assert set(all_param['Dimen']) == {'2D', '3D'}
+       assert set(all_param[all_param['Dimen'] == '2D']['sim']) == {0.069, 0.2, 3.0}
+       assert set(all_param[all_param['Dimen'] == '3D']['sim']) == {280.0}
+       assert set(all_param[all_param['Dimen'] == '3D']['AR1']) == {5.0}
+       assert set(all_param['Diff_eq']) == {'Equation 1A', 'Equation 1B'}
+       assert set(all_param[all_param['Diff_eq'] == 'Equation 1A']['sim']) == {0.069, 0.2, 3.0}
+       assert set(all_param[all_param['Diff_eq'] == 'Equation 1B']['sim']) == {280.0}
+       assert set(all_param['Triplet_eq']) == {'no triplet'}
+       assert set(all_param['alpha1']) == {1.0}
+       assert set(all_param['xmin']) == {0.001018, 1.0}
+       assert set(all_param[all_param['xmin'] == 1.0]['sim']) == {0.069, 0.2, 3.0}
+       assert set(all_param[all_param['xmin'] == 0.001018]['sim']) == {280.0}
+       assert set(all_param['xmax']) == {0.524282, 100.66329, 469.762042, 512.0, 896.0, 1024.0, 2048.0, 4096.0, 7168.0, 8192.0}
+       # biological correlations were fitted with xmax=500 for peak artifacts, except xmax=0.5 for peak artifacts with averaging correction,
+       # and xmax=100 for correlations without peak artifacts,
+       assert set(all_param[all_param['xmax'].isin([0.524282, 100.66329, 469.762042])]['sim']) == {280.0}
+       assert set(all_param[all_param['xmax'] == 0.524282]['processing']) == {'dirty avg'}
+       assert set(all_param[all_param['xmax'] == 100.66329]['processing']) == {'clean noc'}
+       assert set(all_param[all_param['xmax'] == 469.762042]['processing']) == {'dirty cas', 'dirty del', 'dirty noc'}
+       assert set(all_param[all_param['xmax'].isin([512.0, 896.0, 1024.0, 2048.0, 4096.0, 7168.0, 8192.0])]['sim']) == {0.069, 0.2, 3.0}
+       # simulated correlations with and without peak artifacts were fitted with xmax=8192 (except see below)
+       assert set(all_param[all_param['xmax'] == 8192.0]['processing']) == {'clean noc', 'dirty cas', 'dirty del', 'dirty noc'}
+       # 294 of 300 correlations with peak artifacts and averaging correction were fitted with xmax=1024,
+       # this failed for 6 correlations which were too short and thus automatically got xmax=512 or xmax=896.0
+       assert len(set(all_param[(all_param['xmax'] == 1024.0) & (all_param['processing'] == 'dirty avg')].index)) == 294
+       assert set(all_param[all_param['xmax'].isin([512.0, 896.0])]['processing']) == {'dirty avg'}
+       assert len(set(all_param[all_param['xmax'].isin([512.0, 896.0])].index)) == 6
+       # 279, 288, or 276 of 300 correlations with peak artifacts and cut and stitch correction were fitted with xmax=8192
+       # (3 groups depending on simulated molecule speed)
+       # this failed for 55 correlations which were too short and thus automatically got xmax={1024, 2048, 4096, 7168}
+       assert len(set(all_param[(all_param['xmax'] == 8192.0) & (all_param['processing'] == 'dirty cas') & (all_param['sim'] == 0.069)].index))
+       assert len(set(all_param[(all_param['xmax'] == 8192.0) & (all_param['processing'] == 'dirty cas') & (all_param['sim'] == 0.2)].index))
+       assert len(set(all_param[(all_param['xmax'] == 8192.0) & (all_param['processing'] == 'dirty cas') & (all_param['sim'] == 3.0)].index))
+       assert set(all_param[all_param['xmax'].isin([2048.0, 4096.0, 7168.0])]['processing']) == {'dirty cas'}
+       assert len(set(all_param[(all_param['xmax'].isin([2048.0, 4096.0, 7168.0])) |
+                                ((all_param['xmax'] == 1024) & (all_param['processing'] == 'dirty cas'))].index)) == 55
+
+       pprint(all_param.keys())
+       all_param = all_param[['name_of_plot', 'Diff_species', 'A1', 'txy1', 'sim', 'processing', 'A2', 'txy2']]
+       with pd.option_context("max_colwidth", 1000):
+           display(all_param)
      #+END_SRC
 
      #+RESULTS:
+     :RESULTS:
+     : Index(['name_of_plot', 'master_file', 'parent_name', 'parent_uqid',
+     :        'time of fit', 'Diff_eq', 'Diff_species', 'Triplet_eq',
+     :        'Triplet_species', 'Dimen', 'xmin', 'xmax', 'offset', 'stdev(offset)',
+     :        'GN0', 'stdev(GN0)', 'N (FCS)', 'cpm (kHz)', 'A1', 'stdev(A1)', 'txy1',
+     :        'stdev(txy1)', 'alpha1', 'stdev(alpha1)', 'N (mom)', 'bri (kHz)',
+     :        'above zero', 'sim', 'processing', 'AR1', 'stdev(AR1)', 'A2',
+     :        'stdev(A2)', 'txy2', 'stdev(txy2)', 'alpha2', 'stdev(alpha2)', 'AR2',
+     :        'stdev(AR2)'],
+     :       dtype='object')
+     |     | name_of_plot                                                                                               | Diff_species |       A1 |       txy1 |     sim | processing |           A2 |     txy2 |
+     |-----+------------------------------------------------------------------------------------------------------------+--------------+----------+------------+---------+------------+--------------+----------|
+     |   0 | 2022-07-21_multipletau_clean_0dot069_0000_correlation-CH1_1                                                |            1 | 1.000000 | 150.165642 |   0.069 | clean noc  |          NaN |      NaN |
+     |   1 | 2022-07-21_multipletau_clean_0dot069_0001_correlation-CH1_1                                                |            1 | 1.000000 | 133.758850 |   0.069 | clean noc  |          NaN |      NaN |
+     |   2 | 2022-07-21_multipletau_clean_0dot069_0002_correlation-CH1_1                                                |            1 | 1.000000 | 109.396491 |   0.069 | clean noc  |          NaN |      NaN |
+     |   3 | 2022-07-21_multipletau_clean_0dot069_0003_correlation-CH1_1                                                |            1 | 1.000000 | 140.176075 |   0.069 | clean noc  |          NaN |      NaN |
+     |   4 | 2022-07-21_multipletau_clean_0dot069_0004_correlation-CH1_1                                                |            1 | 1.000000 | 520.784146 |   0.069 | clean noc  |          NaN |      NaN |
+     | ... | ...                                                                                                        |          ... |      ... |        ... |     ... | ...        |          ... |      ... |
+     | 435 | 2023-01-12_tttr2xfcs_with_averaging_CH2_BIN1dot0_DiO LUV 10uM in 20 nM AF488296_T3566s_1_correlation-CH2_2 |            2 | 0.685815 |   0.088592 | 280.000 | dirty avg  | 3.141851e-01 | 0.001395 |
+     | 436 | 2023-01-12_tttr2xfcs_with_averaging_CH2_BIN1dot0_DiO LUV 10uM in 20 nM AF488297_T3578s_1_correlation-CH2_2 |            2 | 1.000000 |   0.098130 | 280.000 | dirty avg  | 4.123257e-11 | 0.000100 |
+     | 437 | 2023-01-12_tttr2xfcs_with_averaging_CH2_BIN1dot0_DiO LUV 10uM in 20 nM AF488298_T3590s_1_correlation-CH2_2 |            2 | 0.253896 |   0.083285 | 280.000 | dirty avg  | 7.461043e-01 | 0.000100 |
+     | 438 | 2023-01-12_tttr2xfcs_with_averaging_CH2_BIN1dot0_DiO LUV 10uM in 20 nM AF488299_T3602s_1_correlation-CH2_2 |            2 | 0.331388 |   0.132000 | 280.000 | dirty avg  | 6.686122e-01 | 0.000100 |
+     | 439 | 2023-01-12_tttr2xfcs_with_averaging_CH2_BIN1dot0_DiO LUV 10uM in 20 nM AF488300_T3614s_1_correlation-CH2_2 |            2 | 0.595396 |   0.222392 | 280.000 | dirty avg  | 4.046043e-01 | 0.000561 |
 
-     #+BEGIN_SRC jupyter-python
-       set(all_param['Dimen'])
-     #+END_SRC
-
-     #+RESULTS:
-     | 2D |
+11144 rows × 8 columns
+     :END:
 
 
      #+BEGIN_SRC jupyter-python
@@ -7072,17 +7120,25 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
        diffcoeffs = [0.069, 0.08, 0.1, 0.2, 0.4, 0.6, 1.0, 3.0, 10, 50]
        for i in diffcoeffs:
            tt, _ = convert_diffcoeff_to_transittimes(i, 250)
-           print(i, '->', f'{tt:.2f}')
+           print(f'{i} um^2 / s -> {tt:.2f} ms')
+
+       print('----------')
+       diffcoeff, _ = convert_diffcoeff_to_transittimes(0.04, 300)
+       print(f'{0.04} ms -> {diffcoeff:.2f} um^2 / s')
      #+END_SRC
 
      #+RESULTS:
-     : 0.069 -> 163.35
-     : 0.08 -> 140.89
-     : 0.1 -> 112.71
-     : 0.2 -> 56.36
-     : 0.4 -> 28.18
-     : 0.6 -> 18.79
-     : 1.0 -> 11.27
-     : 3.0 -> 3.76
-     : 10 -> 1.13
-     : 50 -> 0.23
+     #+begin_example
+       0.069 um^2 / s -> 163.35 ms
+       0.08 um^2 / s -> 140.89 ms
+       0.1 um^2 / s -> 112.71 ms
+       0.2 um^2 / s -> 56.36 ms
+       0.4 um^2 / s -> 28.18 ms
+       0.6 um^2 / s -> 18.79 ms
+       1.0 um^2 / s -> 11.27 ms
+       3.0 um^2 / s -> 3.76 ms
+       10 um^2 / s -> 1.13 ms
+       50 um^2 / s -> 0.23 ms
+       ----------
+       0.04 ms -> 281.78 um^2 / s
+     #+end_example
