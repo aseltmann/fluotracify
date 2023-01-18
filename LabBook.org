@@ -4497,19 +4497,19 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
      :        'stdev(A2)', 'txy2', 'stdev(txy2)', 'alpha2', 'stdev(alpha2)', 'AR2',
      :        'stdev(AR2)'],
      :       dtype='object')
-     |     | name_of_plot                                                                                               | Diff_species |       A1 |       txy1 |     sim | processing |           A2 |     txy2 |
-     |-----+------------------------------------------------------------------------------------------------------------+--------------+----------+------------+---------+------------+--------------+----------|
-     |   0 | 2022-07-21_multipletau_clean_0dot069_0000_correlation-CH1_1                                                |            1 | 1.000000 | 150.165642 |   0.069 | clean noc  |          NaN |      NaN |
-     |   1 | 2022-07-21_multipletau_clean_0dot069_0001_correlation-CH1_1                                                |            1 | 1.000000 | 133.758850 |   0.069 | clean noc  |          NaN |      NaN |
-     |   2 | 2022-07-21_multipletau_clean_0dot069_0002_correlation-CH1_1                                                |            1 | 1.000000 | 109.396491 |   0.069 | clean noc  |          NaN |      NaN |
-     |   3 | 2022-07-21_multipletau_clean_0dot069_0003_correlation-CH1_1                                                |            1 | 1.000000 | 140.176075 |   0.069 | clean noc  |          NaN |      NaN |
-     |   4 | 2022-07-21_multipletau_clean_0dot069_0004_correlation-CH1_1                                                |            1 | 1.000000 | 520.784146 |   0.069 | clean noc  |          NaN |      NaN |
-     | ... | ...                                                                                                        |          ... |      ... |        ... |     ... | ...        |          ... |      ... |
-     | 435 | 2023-01-12_tttr2xfcs_with_averaging_CH2_BIN1dot0_DiO LUV 10uM in 20 nM AF488296_T3566s_1_correlation-CH2_2 |            2 | 0.685815 |   0.088592 | 280.000 | dirty avg  | 3.141851e-01 | 0.001395 |
-     | 436 | 2023-01-12_tttr2xfcs_with_averaging_CH2_BIN1dot0_DiO LUV 10uM in 20 nM AF488297_T3578s_1_correlation-CH2_2 |            2 | 1.000000 |   0.098130 | 280.000 | dirty avg  | 4.123257e-11 | 0.000100 |
-     | 437 | 2023-01-12_tttr2xfcs_with_averaging_CH2_BIN1dot0_DiO LUV 10uM in 20 nM AF488298_T3590s_1_correlation-CH2_2 |            2 | 0.253896 |   0.083285 | 280.000 | dirty avg  | 7.461043e-01 | 0.000100 |
-     | 438 | 2023-01-12_tttr2xfcs_with_averaging_CH2_BIN1dot0_DiO LUV 10uM in 20 nM AF488299_T3602s_1_correlation-CH2_2 |            2 | 0.331388 |   0.132000 | 280.000 | dirty avg  | 6.686122e-01 | 0.000100 |
-     | 439 | 2023-01-12_tttr2xfcs_with_averaging_CH2_BIN1dot0_DiO LUV 10uM in 20 nM AF488300_T3614s_1_correlation-CH2_2 |            2 | 0.595396 |   0.222392 | 280.000 | dirty avg  | 4.046043e-01 | 0.000561 |
+     |     | name_of_plot                                                                                               | Diff_species | A1       | txy1       | sim     | processing | A2           | txy2     |
+|-----+------------------------------------------------------------------------------------------------------------+--------------+----------+------------+---------+------------+--------------+----------|
+| 0   | 2022-07-21_multipletau_clean_0dot069_0000_correlation-CH1_1                                                | 1            | 1.000000 | 150.165642 | 0.069   | clean noc  | NaN          | NaN      |
+| 1   | 2022-07-21_multipletau_clean_0dot069_0001_correlation-CH1_1                                                | 1            | 1.000000 | 133.758850 | 0.069   | clean noc  | NaN          | NaN      |
+| 2   | 2022-07-21_multipletau_clean_0dot069_0002_correlation-CH1_1                                                | 1            | 1.000000 | 109.396491 | 0.069   | clean noc  | NaN          | NaN      |
+| 3   | 2022-07-21_multipletau_clean_0dot069_0003_correlation-CH1_1                                                | 1            | 1.000000 | 140.176075 | 0.069   | clean noc  | NaN          | NaN      |
+| 4   | 2022-07-21_multipletau_clean_0dot069_0004_correlation-CH1_1                                                | 1            | 1.000000 | 520.784146 | 0.069   | clean noc  | NaN          | NaN      |
+| ... | ...                                                                                                        | ...          | ...      | ...        | ...     | ...        | ...          | ...      |
+| 435 | 2023-01-12_tttr2xfcs_with_averaging_CH2_BIN1dot0_DiO LUV 10uM in 20 nM AF488296_T3566s_1_correlation-CH2_2 | 2            | 0.685815 | 0.088592   | 280.000 | dirty avg  | 3.141851e-01 | 0.001395 |
+| 436 | 2023-01-12_tttr2xfcs_with_averaging_CH2_BIN1dot0_DiO LUV 10uM in 20 nM AF488297_T3578s_1_correlation-CH2_2 | 2            | 1.000000 | 0.098130   | 280.000 | dirty avg  | 4.123257e-11 | 0.000100 |
+| 437 | 2023-01-12_tttr2xfcs_with_averaging_CH2_BIN1dot0_DiO LUV 10uM in 20 nM AF488298_T3590s_1_correlation-CH2_2 | 2            | 0.253896 | 0.083285   | 280.000 | dirty avg  | 7.461043e-01 | 0.000100 |
+| 438 | 2023-01-12_tttr2xfcs_with_averaging_CH2_BIN1dot0_DiO LUV 10uM in 20 nM AF488299_T3602s_1_correlation-CH2_2 | 2            | 0.331388 | 0.132000   | 280.000 | dirty avg  | 6.686122e-01 | 0.000100 |
+| 439 | 2023-01-12_tttr2xfcs_with_averaging_CH2_BIN1dot0_DiO LUV 10uM in 20 nM AF488300_T3614s_1_correlation-CH2_2 | 2            | 0.595396 | 0.222392   | 280.000 | dirty avg  | 4.046043e-01 | 0.000561 |
 
 11144 rows × 8 columns
      :END:
@@ -4556,11 +4556,11 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
            component = param_ls[1]
 
            if species == 1:
-               legend = '\nsim. trace\nn=300, $\\tau_D$ from\n1 species fit'
+               legend = '$\\tau_D$ from\n1 species fit'
            elif (species == 2) and (component == 'fast'):
-               legend = '\nsim. trace\nn=300, $\\tau_D$ from\nfast sp. of 2 sp. fit'
+               legend = '$\\tau_D$ from\nfast sp. of 2 sp. fit'
            elif (species == 2) and (component == 'slow'):
-               legend = '\nsim. trace\nn=300, $\\tau_D$ from\nslow sp. of 2 sp. fit'
+               legend = '$\\tau_D$ from\nslow sp. of 2 sp. fit'
            return legend
 
        all_param[['t_fast', 'A_fast', 't_slow', 'A_slow', 'expected transit time']] = all_param[['txy1', 'txy2', 'A1', 'A2', 'sim']].apply(
@@ -4577,92 +4577,111 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
 
        all_param['legend'] = all_param[['Diff_species', 'fit component']].apply(
            lambda x: sort_fit_legend(x), axis=1)
-       print(len(all_param[all_param['legend'] == '\nsim. trace\nn=300, $\\tau_D$ from\n1 species fit']))
-       print(len(all_param[all_param['legend'] == '\nsim. trace\nn=300, $\\tau_D$ from\nslow sp. of 2 sp. fit']))
-       print(len(all_param[all_param['legend'] == '\nsim. trace\nn=300, $\\tau_D$ from\nfast sp. of 2 sp. fit']))
+       print('before dropping NaNs')
+       print('1 species fit: {}'.format(len(all_param[all_param["legend"] == "$\\tau_D$ from\n1 species fit"])))
+       print('slow sp of 2 sp fit: {}'.format(len(all_param[all_param["legend"] == "$\\tau_D$ from\nslow sp. of 2 sp. fit"])))
+       print('fast sp of 2 sp fit: {}'.format(len(all_param[all_param["legend"] == "$\\tau_D$ from\nfast sp. of 2 sp. fit"])))
+
        all_param = all_param[~pd.isna(all_param['t'])]
-       print(len(all_param[all_param['legend'] == '\nsim. trace\nn=300, $\\tau_D$ from\n1 species fit']))
-       print(len(all_param[all_param['legend'] == '\nsim. trace\nn=300, $\\tau_D$ from\nslow sp. of 2 sp. fit']))
-       print(len(all_param[all_param['legend'] == '\nsim. trace\nn=300, $\\tau_D$ from\nfast sp. of 2 sp. fit']))
+       print('after dropping NaNs')
+       print('1 species fit: {}'.format(len(all_param[all_param["legend"] == "$\\tau_D$ from\n1 species fit"])))
+       print('slow sp of 2 sp fit: {}'.format(len(all_param[all_param["legend"] == "$\\tau_D$ from\nslow sp. of 2 sp. fit"])))
+       print('fast sp of 2 sp fit: {}'.format(len(all_param[all_param["legend"] == "$\\tau_D$ from\nfast sp. of 2 sp. fit"])))
 
        all_param = all_param[['legend', 't', 'A', 'expected transit time', 'sim', 'processing']]
        # with pd.option_context("max_colwidth", 1000):
        #     display(all_param[['legend', 't', 'A', 'expected transit time', 'sim', 'processing']])
-       pub_param = all_param[all_param['legend'] == '\nsim. trace\nn=300, $\\tau_D$ from\n1 species fit']
-       compare_correction_param = all_param[(all_param['legend'] == '\nsim. trace\nn=300, $\\tau_D$ from\n1 species fit') &
-                                            ~((all_param['processing'] == 'Peak artifacts,\nmanual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=2') |
-                                              (all_param['processing'] == 'Peak artifacts,\nautomatic U-Net pred.\n+ cut and shift corr.:\nscaler=quantile transf.,\nlarge model (200MB)'))]
-       compare_correction_param
+       pub_param = all_param[((all_param['legend'] == '$\\tau_D$ from\n1 species fit') &
+                              ~((all_param['processing'].isin(['dirty noc', 'dirty del', 'dirty cas', 'dirty avg'])) &
+                                (all_param['expected transit time'] == 0.040253767881946526))) |
+                              ((all_param['legend'] == '$\\tau_D$ from\nfast sp. of 2 sp. fit') &
+                               ((all_param['processing'].isin(['dirty noc', 'dirty del', 'dirty cas', 'dirty avg'])) &
+                                (all_param['expected transit time'] == 0.040253767881946526)))]
+       # compare_correction_param = all_param[(all_param['legend'] == '\nsim. trace\nn=300, $\\tau_D$ from\n1 species fit') &
+       #                                      ~((all_param['processing'] == 'Peak artifacts,\nmanual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=2') |
+       #                                        (all_param['processing'] == 'Peak artifacts,\nautomatic U-Net pred.\n+ cut and shift corr.:\nscaler=quantile transf.,\nlarge model (200MB)'))]
+       pub_param
      #+END_SRC
 
      #+RESULTS:
      :RESULTS:
-     : 6300
-     : 4500
-     : 4500
-     : 6300
-     : 3797
-     : 4060
-     |      | legend                                            | t          | A   | expected transit time | sim   | processing                                        |
-|------+---------------------------------------------------+------------+-----+-----------------------+-------+---------------------------------------------------|
-| 0    | \nsim. trace\nn=300, $\tau_D$ from\n1 species fit | 150.165642 | 1.0 | 163.348623            | 0.069 | No artifacts,\nno correction                      |
-| 1    | \nsim. trace\nn=300, $\tau_D$ from\n1 species fit | 133.75885  | 1.0 | 163.348623            | 0.069 | No artifacts,\nno correction                      |
-| 2    | \nsim. trace\nn=300, $\tau_D$ from\n1 species fit | 109.396491 | 1.0 | 163.348623            | 0.069 | No artifacts,\nno correction                      |
-| 3    | \nsim. trace\nn=300, $\tau_D$ from\n1 species fit | 140.176075 | 1.0 | 163.348623            | 0.069 | No artifacts,\nno correction                      |
-| 4    | \nsim. trace\nn=300, $\tau_D$ from\n1 species fit | 520.784146 | 1.0 | 163.348623            | 0.069 | No artifacts,\nno correction                      |
-| ...  | ...                                               | ...        | ... | ...                   | ...   | ...                                               |
-| 9895 | \nsim. trace\nn=300, $\tau_D$ from\n1 species fit | 6.913469   | 1.0 | 3.757018              | 3.000 | Peak artifacts,\nsim.-based pred.\n+ averaging... |
-| 9896 | \nsim. trace\nn=300, $\tau_D$ from\n1 species fit | 4.507781   | 1.0 | 3.757018              | 3.000 | Peak artifacts,\nsim.-based pred.\n+ averaging... |
-| 9897 | \nsim. trace\nn=300, $\tau_D$ from\n1 species fit | 5.638111   | 1.0 | 3.757018              | 3.000 | Peak artifacts,\nsim.-based pred.\n+ averaging... |
-| 9898 | \nsim. trace\nn=300, $\tau_D$ from\n1 species fit | 3.080655   | 1.0 | 3.757018              | 3.000 | Peak artifacts,\nsim.-based pred.\n+ averaging... |
-| 9899 | \nsim. trace\nn=300, $\tau_D$ from\n1 species fit | 6.437969   | 1.0 | 3.757018              | 3.000 | Peak artifacts,\nsim.-based pred.\n+ averaging... |
+     : before dropping NaNs
+     : 1 species fit: 6684
+     : slow sp of 2 sp fit: 4460
+     : fast sp of 2 sp fit: 4460
+     : after dropping NaNs
+     : 1 species fit: 6684
+     : slow sp of 2 sp fit: 3882
+     : fast sp of 2 sp fit: 4155
+     |       | legend                               | t          | A        | expected transit time | sim     | processing |
+|-------+--------------------------------------+------------+----------+-----------------------+---------+------------|
+| 0     | $\tau_D$ from\n1 species fit         | 150.165642 | 1.0      | 163.348623            | 0.069   | clean noc  |
+| 1     | $\tau_D$ from\n1 species fit         | 133.75885  | 1.0      | 163.348623            | 0.069   | clean noc  |
+| 2     | $\tau_D$ from\n1 species fit         | 109.396491 | 1.0      | 163.348623            | 0.069   | clean noc  |
+| 3     | $\tau_D$ from\n1 species fit         | 140.176075 | 1.0      | 163.348623            | 0.069   | clean noc  |
+| 4     | $\tau_D$ from\n1 species fit         | 520.784146 | 1.0      | 163.348623            | 0.069   | clean noc  |
+| ...   | ...                                  | ...        | ...      | ...                   | ...     | ...        |
+| 15592 | $\tau_D$ from\nfast sp. of 2 sp. fit | 0.0001     | 0.636181 | 0.040254              | 280.000 | dirty avg  |
+| 15594 | $\tau_D$ from\nfast sp. of 2 sp. fit | 0.001395   | 0.314185 | 0.040254              | 280.000 | dirty avg  |
+| 15598 | $\tau_D$ from\nfast sp. of 2 sp. fit | 0.0001     | 0.746104 | 0.040254              | 280.000 | dirty avg  |
+| 15600 | $\tau_D$ from\nfast sp. of 2 sp. fit | 0.0001     | 0.668612 | 0.040254              | 280.000 | dirty avg  |
+| 15602 | $\tau_D$ from\nfast sp. of 2 sp. fit | 0.000561   | 0.404604 | 0.040254              | 280.000 | dirty avg  |
 
-4500 rows × 6 columns
+6638 rows × 6 columns
      :END:
+
+     #+BEGIN_SRC jupyter-python
+       set(all_param['expected transit time'])
+     #+END_SRC
+
+     #+RESULTS:
+     | 0.040253767881946526 | 3.7570183356483424 | 56.35527503472514 | 163.34862328905834 |
 
 
      #+BEGIN_SRC jupyter-python
-       def simplot(data, height, aspect, add_text='other'):
-           if add_text == 'all-fits':
-               hue = 'legend'
-           else:
-               hue = None
+       def simplot(data, height, aspect, hue, xlim, add_text='other'):
            g = sns.catplot(data=data,
-                           y='t',
-                           x='processing',
-                           row='expected transit time',
+                           x='t',
+                           y='processing',
+                           order=['clean noc', 'dirty noc', 'dirty cas', 'dirty del', 'dirty avg'],
+                           col='expected transit time',
+                           col_wrap=3,
                            hue=hue,
                            height=height,
                            aspect=aspect,
                            legend_out=True,
                            kind='boxen',
+                           sharex=True,
                            showfliers=False)
            if hue is not None:
                g._legend.remove()
            styles = ['--', ':', '-', '-.']
            for i, ax in enumerate(g.axes):
-               tt = str(ax[0].title).split('= ')
+               tt = str(ax.title).split('= ')
                tt = tt[1].strip("')")
                tt = float(tt)
-               hline = ax[0].axhline(tt, lw=4, label='', ls=styles[i])
+               hline = ax.axvline(tt, lw=4, label='', ls=styles[i])
                hline_legend = {f'\n$\\tau_{{sim}}={tt:.2f}ms$' : hline}
                g._legend_data.update(hline_legend)
            g.add_legend(g._legend_data)
            g.map_dataframe(sns.stripplot,
-                 y='t',
-                 x='processing',
+                 x='t',
+                 y='processing',
+                 order=['clean noc', 'dirty noc', 'dirty cas', 'dirty del', 'dirty avg'],
                  hue=hue,
-                 dodge=True,  # only relevant if hue is used
+                 dodge=False,  # only relevant if hue is used
                  palette=sns.color_palette(['0.3']),
                  size=4,
-                 jitter=0.2)
+                 jitter=0.2,
+                 hue_order=['$\\tau_D$ from\n1 species fit', '$\\tau_D$ from\nfast sp. of 2 sp. fit', '$\\tau_D$ from\nslow sp. of 2 sp. fit'])
+
            g.fig.suptitle('', size=25)
            for ax in g.axes:
                # ax[0].set_title('')
-               tt = str(ax[0].title).split('= ')
+               tt = str(ax.title).split('= ')
                tt = tt[1].strip("')")
                tt = float(tt)
-               ax[0].set_title(f'simulated trace $\\tau_{{sim}}={tt:.2f}ms$, $n=300$, $\\tau_D$ from 1 species fit')
+               ax.set_title(f'simulated trace $\\tau_{{sim}}={tt:.2f}ms$, $n=300$, $\\tau_D$ from 1 species fit')
            # g._legend.set_title('')
            # new_labels = ['424 traces of\nAlexaFluor488\n(no artifacts)\n$\\tau_D$ from\n1 species fit',
            #               '440 traces of\nAF488 + DiO LUVs\n(peak artifacts)\n$\\tau_D$ from\nfast sp. of 2 sp. fit']
@@ -4671,11 +4690,11 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
            # for i, axes in enumerate(g.axes.flat):
            #    _ = axes.set_xticklabels(axes.get_xticklabels(), rotation=45)
 
-           plt.setp(g.axes, yscale='log', xlabel='',
-                    ylabel=r'log transit time $\tau_{D}$ $[ms]$', ylim=[1, 10000])
+           plt.setp(g.axes, xscale='log', ylabel='log transit time $\tau_{D}$ $[ms]$',
+                    xlabel='', xlim=xlim)
 
            g.tight_layout()
-           savefig = f'./data/exp-220316-publication1/jupyter/plot2_{add_text}_simulations-transit-times'
+           savefig = f'./data/exp-220316-publication1/jupyter/plot2_{add_text}_transit-times'
            plt.savefig(f'{savefig}.pdf', dpi=300)
            os.system(f'pdf2svg {savefig}.pdf {savefig}.svg')
            plt.close('all')
@@ -4696,10 +4715,10 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
      #+BEGIN_SRC jupyter-python
        # sns.set_theme(style="whitegrid", font_scale=2.2, palette='colorblind',
        #               context='paper')
-       # simplot(all_param, aspect=4, add_text='all-fits')
+       # simplot(all_param, aspect=4, hue='legend', add_text='all-fits')
        sns.set_theme(style="whitegrid", font_scale=2.6, palette='colorblind',
                      context='paper')
-       simplot(pub_param, aspect=5, add_text='pub')
+       simplot(pub_param, aspect=5, hue=None, add_text='pub')
      #+END_SRC
 
      #+RESULTS:
@@ -4708,13 +4727,30 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
        sns.set_theme(style="whitegrid", font_scale=1, palette='colorblind',
                      context='paper')
        # sns.set(rc={'figure.figsize':(3.33, 7)})
-       simplot(compare_correction_param, height=5, aspect=7/5, add_text='compare-correction')
+       simplot(all_param, height=5, aspect=3/5, hue='legend', add_text='compare-correction-sim-bio-allfits')
      #+END_SRC
 
      #+RESULTS:
 
+     #+BEGIN_SRC jupyter-python
+       sns.set_theme(style="whitegrid", font_scale=1, palette='colorblind',
+                     context='paper')
+       # sns.set(rc={'figure.figsize':(3.33, 7)})
+       simplot(pub_param[~(pub_param['expected transit time'] == 0.040253767881946526)],
+                height=3, aspect=3/3, hue=None, xlim=[1, 10000], add_text='compare-correction-sim')
+     #+END_SRC
 
+     #+RESULTS:
 
+     #+BEGIN_SRC jupyter-python
+       sns.set_theme(style="whitegrid", font_scale=1, palette='colorblind',
+                     context='paper')
+       # sns.set(rc={'figure.figsize':(3.33, 7)})
+       simplot(pub_param[(pub_param['expected transit time'] == 0.040253767881946526)],
+                height=3, aspect=3/2, hue=None, xlim=None, add_text='compare-correction-bio')
+     #+END_SRC
+
+     #+RESULTS:
 
      -----copied from exp-220227-unet
      #+BEGIN_SRC jupyter-python
