@@ -608,41 +608,42 @@
          srun -p b_standard --time=7-10:00:00 --ntasks-per-node=24 --mem-per-cpu=2000 --pty bash
        #+END_SRC
 
+
     3. Start Jupyter Lab (~#+CALL: jpt-tmux[:session jpmux]~)
        #+CALL: jpt-tmux[:session jpmux]
 
        #+RESULTS:
        #+begin_example
-       (tf) [ye53nis@node117 /]$ jupyter lab --no-browser --port=$PORT
-       [I 2023-01-10 17:33:33.660 ServerApp] jupyterlab | extension was successfully linked.
-       [I 2023-01-10 17:33:37.483 ServerApp] nbclassic | extension was successfully linked.
-       [I 2023-01-10 17:33:38.269 ServerApp] nbclassic | extension was successfully loaded.
-       [I 2023-01-10 17:33:38.271 LabApp] JupyterLab extension loaded from /home/ye53nis/.conda/envs/tf/lib/python3.9/site-packages/jupyterlab
-       [I 2023-01-10 17:33:38.271 LabApp] JupyterLab application directory is /home/ye53nis/.conda/envs/tf/share/jupyter/lab
-       [I 2023-01-10 17:33:38.280 ServerApp] jupyterlab | extension was successfully loaded.
-       [I 2023-01-10 17:33:38.281 ServerApp] Serving notebooks from local directory: /
-       [I 2023-01-10 17:33:38.281 ServerApp] Jupyter Server 1.13.5 is running at:
-       [I 2023-01-10 17:33:38.281 ServerApp] http://localhost:8889/lab?token=89ed9341ba1c4cccb2933cd13fabff9297272c821e7200c0
-       [I 2023-01-10 17:33:38.281 ServerApp]  or http://127.0.0.1:8889/lab?token=89ed9341ba1c4cccb2933cd13fabff9297272c821e7200c0
-       [I 2023-01-10 17:33:38.281 ServerApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
-       [C 2023-01-10 17:33:38.309 ServerApp]
+         (tf) [ye53nis@node005 /]$ jupyter lab --no-browser --port=$PORT
+         [I 2023-01-18 11:33:10.992 ServerApp] jupyterlab | extension was successfully linked.
+         [I 2023-01-18 11:33:20.469 ServerApp] nbclassic | extension was successfully linked.
+         [I 2023-01-18 11:33:20.932 ServerApp] nbclassic | extension was successfully loaded.
+         [I 2023-01-18 11:33:20.935 LabApp] JupyterLab extension loaded from /home/ye53nis/.conda/envs/tf/lib/python3.9/site-packages/jupyterlab
+         [I 2023-01-18 11:33:20.935 LabApp] JupyterLab application directory is /home/ye53nis/.conda/envs/tf/share/jupyter/lab
+         [I 2023-01-18 11:33:20.943 ServerApp] jupyterlab | extension was successfully loaded.
+         [I 2023-01-18 11:33:20.945 ServerApp] Serving notebooks from local directory: /
+         [I 2023-01-18 11:33:20.945 ServerApp] Jupyter Server 1.13.5 is running at:
+         [I 2023-01-18 11:33:20.945 ServerApp] http://localhost:8889/lab?token=f8a5db2d00721ed0a736f6a6fc2a21020172913cc2337ec0
+         [I 2023-01-18 11:33:20.945 ServerApp]  or http://127.0.0.1:8889/lab?token=f8a5db2d00721ed0a736f6a6fc2a21020172913cc2337ec0
+         [I 2023-01-18 11:33:20.945 ServerApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+         [C 2023-01-18 11:33:21.003 ServerApp]
 
-           To access the server, open this file in a browser:
-               file:///home/ye53nis/.local/share/jupyter/runtime/jpserver-177250-open.html
-           Or copy and paste one of these URLs:
-               http://localhost:8889/lab?token=89ed9341ba1c4cccb2933cd13fabff9297272c821e7200c0
-            or http://127.0.0.1:8889/lab?token=89ed9341ba1c4cccb2933cd13fabff9297272c821e7200c0
+             To access the server, open this file in a browser:
+                 file:///home/ye53nis/.local/share/jupyter/runtime/jpserver-183673-open.html
+             Or copy and paste one of these URLs:
+                 http://localhost:8889/lab?token=f8a5db2d00721ed0a736f6a6fc2a21020172913cc2337ec0
+              or http://127.0.0.1:8889/lab?token=f8a5db2d00721ed0a736f6a6fc2a21020172913cc2337ec0
 
        #+end_example
 
     4. Create SSH Tunnel for jupyter lab to the local computer (e.g. ~#+CALL:
        ssh-tunnel(port="8889", node="node160")~)
-       #+CALL: ssh-tunnel(port="8889", node="node117")
+       #+CALL: ssh-tunnel(port="8889", node="node005")
        #+RESULTS:
-       |                   |           |                                        |           |    |          |      |      |             |
-       | sh-5.1$           | sh-5.1$   | ye53nis@ara-login01.rz.uni-jena.de's | password: |    |          |      |      |             |
-       | ye53nis@node117's | password: |                                        |           |    |          |      |      |             |
-       | Last              | login:    | Mon                                    | Jan       | 16 | 16:32:13 | 2023 | from | login01.ara |
+       |                   |             |                                        |                         |         |    |     |      |    |       |          |
+       | sh-5.1$           | sh-5.1$     | ye53nis@ara-login01.rz.uni-jena.de's | password:               |         |    |     |      |    |       |          |
+       | Warning:          | Permanently | added                                  | 'node005,192.168.193.5' | (ECDSA) | to | the | list | of | known | hosts. |
+       | ye53nis@node005's | password:   |                                        |                         |         |    |     |      |    |       |          |
 
     5. I started a Python3 kernel using =jupyter-server-list-kernels=. Then I
        added the kernel ID to the =:PROPERTIES:= drawer of this (and following)
@@ -6406,153 +6407,176 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
     :PROPERTIES:
     :header-args:jupyter-python: :session /jpy:localhost#8889:a37e524a-8134-4d8f-b24a-367acaf1bde3 :pandoc t
     :END:
-    #+NAME: prepare-jupyter-averaging
-    #+BEGIN_SRC jupyter-python :var data_path="/beegfs/ye53nis/data/1911DD_atto+LUVs" :var output_path="/beegfs/ye53nis/drmed-git/data/exp-220227-unet/2023-01-10_experimental-af488-averaging-delete/"
-      %cd /beegfs/ye53nis/drmed-git
-      import logging
-      import os
-      import sys
 
-      import matplotlib.pyplot as plt
-      import numpy as np
-      import pandas as pd
-      import seaborn as sns
+    - let's first prepare the function which loads modules, the files list, and
+      provides a wrapper for the =fluotracify= correlation and correction
+      functions:
+      ~prepare-jupyter-averaging(data_path="/beegfs/ye53nis/data/1911DD_atto+LUVs",
+      output_path="/beegfs/ye53nis/drmed-git/data/exp-220227-unet/2023-01-10_experimental-averaging-delete/")~
 
-      from pathlib import Path
-      from pprint import pprint
-      from tensorflow.keras.optimizers import Adam
-      from mlflow.keras import load_model
+      #+NAME: prepare-jupyter-averaging
+      #+BEGIN_SRC jupyter-python :var data_path="/beegfs/ye53nis/data/1911DD_atto+LUVs" :var output_path="/beegfs/ye53nis/drmed-git/data/exp-220227-unet/2023-01-10_experimental-averaging-delete/"
+        %cd /beegfs/ye53nis/drmed-git
+        import logging
+        import os
+        import sys
 
-      FLUOTRACIFY_PATH = '/beegfs/ye53nis/drmed-git/src/'
-      sys.path.append(FLUOTRACIFY_PATH)
-      from fluotracify.applications import corr_fit_object as cfo
-      from fluotracify.training import build_model as bm
+        import matplotlib.pyplot as plt
+        import numpy as np
+        import pandas as pd
+        import seaborn as sns
 
-      data_path = Path(data_path)
-      output_path = Path(output_path)
-      log_path = output_path.parent / f'{output_path.name}.log'
+        from pathlib import Path
+        from pprint import pprint
+        from tensorflow.keras.optimizers import Adam
+        from mlflow.keras import load_model
 
-      logging.basicConfig(filename=log_path,
-                          filemode='w', format='%(asctime)s - %(message)s',
-                          force=True)
+        FLUOTRACIFY_PATH = '/beegfs/ye53nis/drmed-git/src/'
+        sys.path.append(FLUOTRACIFY_PATH)
+        from fluotracify.applications import corr_fit_object as cfo
+        from fluotracify.training import build_model as bm
 
-      log = logging.getLogger(__name__)
-      log.setLevel(logging.DEBUG)
+        data_path = Path(data_path)
+        output_path = Path(output_path)
+        log_path = output_path.parent / f'{output_path.name}.log'
 
-      sns.set_theme(style="whitegrid", font_scale=2, palette='colorblind',
-                    context='paper')
-      class ParameterClass():
-          """Stores parameters for correlation """
-          def __init__(self):
-              # Where the data is stored.
-              self.data = []
-              self.objectRef = []
-              self.subObjectRef = []
-              self.colors = ['blue', 'green', 'red', 'cyan', 'magenta',
-                             'yellow', 'black']
-              self.numOfLoaded = 0
-              # very fast from Ncasc ~ 14 onwards
-              self.NcascStart = 0
-              self.NcascEnd = 30  # 25
-              self.Nsub = 6  # 6
-              self.photonLifetimeBin = 10  # used for photon decay
-              self.photonCountBin = 1  # used for time series
+        logging.basicConfig(filename=log_path,
+                            filemode='w', format='%(asctime)s - %(message)s',
+                            force=True)
 
-      par_obj = ParameterClass()
+        log = logging.getLogger(__name__)
+        log.setLevel(logging.DEBUG)
 
-      model_ls = ['ff67be0b68e540a9a29a36a2d0c7a5be', '347669d050f344ad9fb9e480c814f727',
-                  '714af8cd12c1441eac4ca980e8c20070', '34a6d207ac594035b1009c330fb67a65',
-                  '484af471c61943fa90e5f78e78a229f0', '0cd2023eeaf745aca0d3e8ad5e1fc653',
-                  'fe81d71c52404ed790b3a32051258da9', '19e3e786e1bc4e2b93856f5dc9de8216',
-                  'c1204e3a8a1e4c40a35b5b7b1922d1ce']
+        sns.set_theme(style="whitegrid", font_scale=2, palette='colorblind',
+                      context='paper')
 
-      model_name_ls = [f'{s:.5}' for s in model_ls]
+        class ParameterClass():
+            """Stores parameters for correlation """
+            def __init__(self):
+                # Where the data is stored.
+                self.data = []
+                self.objectRef = []
+                self.subObjectRef = []
+                self.colors = ['blue', 'green', 'red', 'cyan', 'magenta',
+                               'yellow', 'black']
+                self.numOfLoaded = 0
+                # very fast from Ncasc ~ 14 onwards
+                self.NcascStart = 0
+                self.NcascEnd = 30  # 25
+                self.Nsub = 6  # 6
+                self.photonLifetimeBin = 10  # used for photon decay
+                self.photonCountBin = 1  # used for time series
 
-      # scaler_ls = ['minmax', 'robust', 'maxabs', 'l2', 'standard', 'quant_g', 'standard',
-      #              'standard', 'robust']
+        par_obj = ParameterClass()
 
-      pred_thresh = 0.5
+        model_ls = ['ff67be0b68e540a9a29a36a2d0c7a5be', '347669d050f344ad9fb9e480c814f727',
+                    '714af8cd12c1441eac4ca980e8c20070', '34a6d207ac594035b1009c330fb67a65',
+                    '484af471c61943fa90e5f78e78a229f0', '0cd2023eeaf745aca0d3e8ad5e1fc653',
+                    'fe81d71c52404ed790b3a32051258da9', '19e3e786e1bc4e2b93856f5dc9de8216',
+                    'c1204e3a8a1e4c40a35b5b7b1922d1ce']
 
-      if data_path.name == "1911DD_atto+LUVs":
-          path_clean1 = data_path / 'clean_ptu_part1/'
-          path_clean2 = data_path / 'clean_ptu_part2/'
-          path_dirty1 = data_path / 'dirty_ptu_part1/'
-          path_dirty2 = data_path / 'dirty_ptu_part2/'
-          files_clean1 = [path_clean1 / f for f in os.listdir(path_clean1) if f.endswith('.ptu')]
-          files_clean2 = [path_clean2 / f for f in os.listdir(path_clean2) if f.endswith('.ptu')]
-          files_dirty1 = [path_dirty1 / f for f in os.listdir(path_dirty1) if f.endswith('.ptu')]
-          files_dirty2 = [path_dirty2 / f for f in os.listdir(path_dirty2) if f.endswith('.ptu')]
+        model_name_ls = [f'{s:.5}' for s in model_ls]
 
-      def predict_correct_correlate_ptu(files, model_id, method, out_path):
+        # scaler_ls = ['minmax', 'robust', 'maxabs', 'l2', 'standard', 'quant_g', 'standard',
+        #              'standard', 'robust']
 
-          logged_scaler = Path(f'/beegfs/ye53nis/drmed-git/data/mlruns/10/{model_ls[model_id]}/params/scaler')
-          logged_scaler = !cat $logged_scaler
-          logged_scaler = logged_scaler[0]
+        pred_thresh = 0.5
 
-          logged_model = Path(f'/beegfs/ye53nis/drmed-git/data/mlruns/10/{model_ls[model_id]}/artifacts/model')
-          logged_model = load_model(logged_model, compile=False)
-          logged_model.compile(loss=bm.binary_ce_dice_loss(),
-                               optimizer=Adam(),
-                               metrics = bm.unet_metrics([0.1, 0.3, 0.5, 0.7, 0.9]))
-          if method == 'delete_and_shift':
-              method_corr = 'tttr2xfcs'
-              method_str = 'DELSHIFT'
-          elif method == 'delete':
-              method_corr = 'tttr2xfcs'
-              method_str = 'DEL'
-          elif method == 'weights':
-              method_corr = 'tttr2xfcs_with_weights'
-              method_str = 'tttr2xfcs_with_weights'
-          elif method == 'averaging':
-              method_corr = 'tttr2xfcs_with_averaging'
-              method_str = 'tttr2xfcs_with_averaging'
-          for idx, myfile in enumerate(files):
-              ptufile = cfo.PicoObject(myfile, par_obj)
-              ptufile.predictTimeSeries(method='unet',
-                                        model=logged_model,
-                                        scaler=logged_scaler)
-              ptufile.correctTCSPC(method=method)
-              if method in ['delete', 'delete_and_shift', 'weights']:
-                  for key in ptufile.trueTimeArr.keys():
-                      ptufile.get_autocorrelation(method=method_corr, name=key)
-              elif method == 'averaging':
-                  for key in ptufile.trueTimeParts.keys():
-                      ptufile.get_autocorrelation(method=method_corr, name=key)
+        if data_path.name == "1911DD_atto+LUVs":
+            path_clean1 = data_path / 'clean_ptu_part1/'
+            path_clean2 = data_path / 'clean_ptu_part2/'
+            path_dirty1 = data_path / 'dirty_ptu_part1/'
+            path_dirty2 = data_path / 'dirty_ptu_part2/'
+            files_clean1 = [path_clean1 / f for f in os.listdir(path_clean1) if f.endswith('.ptu')]
+            files_clean2 = [path_clean2 / f for f in os.listdir(path_clean2) if f.endswith('.ptu')]
+            files_dirty1 = [path_dirty1 / f for f in os.listdir(path_dirty1) if f.endswith('.ptu')]
+            files_dirty2 = [path_dirty2 / f for f in os.listdir(path_dirty2) if f.endswith('.ptu')]
 
-              if method_corr in list(ptufile.autoNorm.keys()):
-                  for key in list(ptufile.autoNorm[method_corr].keys()):
-                      if ((method_str in key) or
-                          (method_str in ['tttr2xfcs_with_weights',
-                                          'tttr2xfcs_with_averaging'])):
-                          ptufile.save_autocorrelation(name=key, method=method_corr,
-                                                       output_path=out_path)
-    #+END_SRC
+        if data_path.name == "191113_Pex5_2_structured":
+            path_clean = data_path / 'HsPEX5EGFP 1-100001'
+            path_dirty = data_path / 'TbPEX5EGFP 1-10002'
+            files_clean = [path_clean / f for f in os.listdir(path_clean) if f.endswith('.ptu')]
+            files_dirty = [path_dirty / f for f in os.listdir(path_dirty) if f.endswith('.ptu')]
 
-    #+RESULTS: prepare-jupyter-averaging
-    : /beegfs/ye53nis/drmed-git
+        def predict_correct_correlate_ptu(files, model_id, method, out_path):
 
-    #+BEGIN_SRC jupyter-python
-      import importlib
-      importlib.reload(cfo)
-    #+END_SRC
+            logged_scaler = Path(f'/beegfs/ye53nis/drmed-git/data/mlruns/10/{model_ls[model_id]}/params/scaler')
+            logged_scaler = !cat $logged_scaler
+            logged_scaler = logged_scaler[0]
 
-    #+RESULTS:
-    : <module 'fluotracify.applications.corr_fit_object' from '/beegfs/ye53nis/drmed-git/src/fluotracify/applications/corr_fit_object.py'>
+            logged_model = Path(f'/beegfs/ye53nis/drmed-git/data/mlruns/10/{model_ls[model_id]}/artifacts/model')
+            logged_model = load_model(logged_model, compile=False)
+            logged_model.compile(loss=bm.binary_ce_dice_loss(),
+                                 optimizer=Adam(),
+                                 metrics = bm.unet_metrics([0.1, 0.3, 0.5, 0.7, 0.9]))
+            if method == 'delete_and_shift':
+                method_corr = 'tttr2xfcs'
+                method_str = 'DELSHIFT'
+            elif method == 'delete':
+                method_corr = 'tttr2xfcs'
+                method_str = 'DEL'
+            elif method == 'weights':
+                method_corr = 'tttr2xfcs_with_weights'
+                method_str = 'tttr2xfcs_with_weights'
+            elif method == 'averaging':
+                method_corr = 'tttr2xfcs_with_averaging'
+                method_str = 'tttr2xfcs_with_averaging'
+            for idx, myfile in enumerate(files):
+                ptufile = cfo.PicoObject(myfile, par_obj)
+                ptufile.predictTimeSeries(method='unet',
+                                          model=logged_model,
+                                          scaler=logged_scaler)
+                ptufile.correctTCSPC(method=method)
+                if method in ['delete', 'delete_and_shift', 'weights']:
+                    for key in ptufile.trueTimeArr.keys():
+                        ptufile.get_autocorrelation(method=method_corr, name=key)
+                elif method == 'averaging':
+                    for key in ptufile.trueTimeParts.keys():
+                        ptufile.get_autocorrelation(method=method_corr, name=key)
 
-    #+NAME: kill-jupyter
-    #+BEGIN_SRC jupyter-python
-      os._exit(00)
-    #+END_SRC
+                if method_corr in list(ptufile.autoNorm.keys()):
+                    for key in list(ptufile.autoNorm[method_corr].keys()):
+                        if ((method_str in key) or
+                            (method_str in ['tttr2xfcs_with_weights',
+                                            'tttr2xfcs_with_averaging'])):
+                            ptufile.save_autocorrelation(name=key, method=method_corr,
+                                                         output_path=out_path)
+      #+END_SRC
 
-    #+RESULTS:
-    : 7a752b61-60c1-4322-8105-e8dbd705caa0
+      #+RESULTS: prepare-jupyter-averaging
+      : /beegfs/ye53nis/drmed-git
 
-    #+CALL: prepare-jupyter-averaging()
+      #+BEGIN_SRC jupyter-python
+        import importlib
+        importlib.reload(cfo)
+      #+END_SRC
 
-    #+RESULTS:
-    : /beegfs/ye53nis/drmed-git
-    : 2023-01-12 13:29:49.334418: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
-    : 2023-01-12 13:29:49.334472: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+      #+RESULTS:
+      : <module 'fluotracify.applications.corr_fit_object' from '/beegfs/ye53nis/drmed-git/src/fluotracify/applications/corr_fit_object.py'>
+
+    - let's also define a function to kill the jupyter environment. This is due
+      to the =fluotracify= correlation algorithm memory allocation problem I
+      haven't figured out yet. It will fill the memory after processing ~300
+      files of the =af488= experiments (higher count rates). Because I haven't
+      figured out how to solve this problem, I split the folders in parts and
+      restart the environment.
+      #+NAME: kill-jupyter
+      #+BEGIN_SRC jupyter-python
+        os._exit(00)
+      #+END_SRC
+
+      #+RESULTS:
+      : 7a752b61-60c1-4322-8105-e8dbd705caa0
+
+    - first: =af488luvs= and =af488= averaging  correction. We only use mode
+      =0cd20= for prediction, because this has proved to be the most robust.
+    - =#+CALL: prepare-jupyter-averaging()=
+      #+CALL: prepare-jupyter-averaging()
+
+      #+RESULTS:
+      : /beegfs/ye53nis/drmed-git
+      : 2023-01-12 13:29:49.334418: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+      : 2023-01-12 13:29:49.334472: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
 
       #+begin_src jupyter-python
         model_id = 5
@@ -6570,18 +6594,19 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
 
       #+RESULTS:
 
-    #+CALL: kill-jupyter()
+    - =#+CALL: kill-jupyter()=
+      #+CALL: kill-jupyter()
 
-    #+RESULTS:
-    : 1603e9bd-2d3a-4295-ace3-d86b1cdf4f4f
+      #+RESULTS:
+      : 1603e9bd-2d3a-4295-ace3-d86b1cdf4f4f
 
-    #+CALL: prepare-jupyter-averaging()
+    - =#+CALL: prepare-jupyter-averaging()= etc...
+      #+CALL: prepare-jupyter-averaging()
 
-    #+RESULTS:
-    : /beegfs/ye53nis/drmed-git
-    : 2023-01-12 17:28:27.364198: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
-    : 2023-01-12 17:28:27.364273: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
-
+      #+RESULTS:
+      : /beegfs/ye53nis/drmed-git
+      : 2023-01-12 17:28:27.364198: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+      : 2023-01-12 17:28:27.364273: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
 
       #+begin_src jupyter-python
         model_id = 5
@@ -6605,14 +6630,13 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
       : To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
       : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
 
-    #+CALL: kill-jupyter()
-    #+CALL: prepare-jupyter-averaging()
+      #+CALL: kill-jupyter()
+      #+CALL: prepare-jupyter-averaging()
 
-    #+RESULTS:
-    : /beegfs/ye53nis/drmed-git
-    : 2023-01-13 12:01:00.676480: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
-    : 2023-01-13 12:01:00.676539: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
-
+      #+RESULTS:
+      : /beegfs/ye53nis/drmed-git
+      : 2023-01-13 12:01:00.676480: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+      : 2023-01-13 12:01:00.676539: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
 
       #+begin_src jupyter-python
         model_id = 5
@@ -6636,19 +6660,17 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
       : To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
       : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
 
+      #+CALL: kill-jupyter()
 
-    #+CALL: kill-jupyter()
+      #+RESULTS:
+      : 5b633a1b-0c54-453f-a4bf-a9d30182fdd3
 
-    #+RESULTS:
-    : 5b633a1b-0c54-453f-a4bf-a9d30182fdd3
+      #+CALL: prepare-jupyter-averaging()
 
-    #+CALL: prepare-jupyter-averaging()
-
-    #+RESULTS:
-    : /beegfs/ye53nis/drmed-git
-    : 2023-01-13 14:38:58.893878: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
-    : 2023-01-13 14:38:58.893919: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
-
+      #+RESULTS:
+      : /beegfs/ye53nis/drmed-git
+      : 2023-01-13 14:38:58.893878: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+      : 2023-01-13 14:38:58.893919: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
 
       #+begin_src jupyter-python
         model_id = 5
@@ -6672,18 +6694,19 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
       : To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
       : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
 
-    #+CALL: kill-jupyter()
+      #+CALL: kill-jupyter()
 
-    #+RESULTS:
-    : a965cd3e-f452-4c79-9428-b5152c3ba8aa
+      #+RESULTS:
+      : a965cd3e-f452-4c79-9428-b5152c3ba8aa
 
-    #+CALL: prepare-jupyter-averaging()
+    - second: =af488luvs= and =af488= delete correction.
+    - =#+CALL: prepare-jupyter-averaging()= etc...
+      #+CALL: prepare-jupyter-averaging()
 
-    #+RESULTS:
-    : /beegfs/ye53nis/drmed-git
-    : 2023-01-16 16:37:55.758832: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
-    : 2023-01-16 16:37:55.758867: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
-
+      #+RESULTS:
+      : /beegfs/ye53nis/drmed-git
+      : 2023-01-16 16:37:55.758832: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+      : 2023-01-16 16:37:55.758867: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
 
       #+begin_src jupyter-python
         model_id = 5
@@ -6702,18 +6725,17 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
       #+RESULTS:
       : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
 
-    #+CALL: kill-jupyter()
+      #+CALL: kill-jupyter()
 
-    #+RESULTS:
-    : b91bd6bb-e7b8-44c1-b014-02275b3516b6
+      #+RESULTS:
+      : b91bd6bb-e7b8-44c1-b014-02275b3516b6
 
-    #+CALL: prepare-jupyter-averaging()
+      #+CALL: prepare-jupyter-averaging()
 
-    #+RESULTS:
-    : /beegfs/ye53nis/drmed-git
-    : 2023-01-16 23:53:43.486077: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
-    : 2023-01-16 23:53:43.486120: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
-
+      #+RESULTS:
+      : /beegfs/ye53nis/drmed-git
+      : 2023-01-16 23:53:43.486077: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+      : 2023-01-16 23:53:43.486120: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
 
       #+begin_src jupyter-python
         model_id = 5
@@ -6737,16 +6759,14 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
       : To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
       : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
 
-    #+CALL: kill-jupyter()
+      #+CALL: kill-jupyter()
 
+      #+CALL: prepare-jupyter-averaging()
 
-    #+CALL: prepare-jupyter-averaging()
-
-    #+RESULTS:
-    : /beegfs/ye53nis/drmed-git
-    : 2023-01-17 13:11:45.290135: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
-    : 2023-01-17 13:11:45.290197: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
-
+      #+RESULTS:
+      : /beegfs/ye53nis/drmed-git
+      : 2023-01-17 13:11:45.290135: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+      : 2023-01-17 13:11:45.290197: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
 
       #+begin_src jupyter-python
         model_id = 5
@@ -6770,16 +6790,17 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
       : To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
       : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
 
-    #+CALL: kill-jupyter()
+      #+CALL: kill-jupyter()
 
+      #+RESULTS:
+      : 63efbb75-e4b2-4b2c-ba46-ecf44a9d66fc
 
-    #+CALL: prepare-jupyter-averaging()
+      #+CALL: prepare-jupyter-averaging()
 
-    #+RESULTS:
-    : /beegfs/ye53nis/drmed-git
-    : 2023-01-17 13:11:45.290135: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
-    : 2023-01-17 13:11:45.290197: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
-
+      #+RESULTS:
+      : /beegfs/ye53nis/drmed-git
+      : 2023-01-17 17:20:22.162939: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+      : 2023-01-17 17:20:22.162993: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
 
       #+begin_src jupyter-python
         model_id = 5
@@ -6789,12 +6810,105 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
         os.makedirs(out_dir, exist_ok=True)
 
         ptufile = predict_correct_correlate_ptu(
-            files=files_clean1,
+            files=files_clean2,
             model_id=model_id,
             method='delete',
             out_path=out_dir)
       #+end_src
 
+      #+RESULTS:
+      : 2023-01-17 17:20:51.771891: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcuda.so.1'; dlerror: libcuda.so.1: cannot open shared object file: No such file or directory
+      : 2023-01-17 17:20:51.771954: W tensorflow/stream_executor/cuda/cuda_driver.cc:269] failed call to cuInit: UNKNOWN ERROR (303)
+      : 2023-01-17 17:20:51.771992: I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:156] kernel driver does not appear to be running on this host (node117): /proc/driver/nvidia/version does not exist
+      : 2023-01-17 17:20:51.772457: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 FMA
+      : To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+      : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
+
+      #+CALL: kill-jupyter()
+
+      #+RESULTS:
+      : 63efbb75-e4b2-4b2c-ba46-ecf44a9d66fc
+
+    - third: =tb-pex5= and =hs-pex5= with  averaging correction and set to zero
+      correction. Because these files are small and memory allocation is less of
+      a problem, we don't need to kill our jupyter session in between
+    - =#+CALL: prepare-jupyter-averaging("/beegfs/ye53nis/data/191113_Pex5_2_structured")=
+      #+CALL: prepare-jupyter-averaging("/beegfs/ye53nis/data/191113_Pex5_2_structured")
+
+      #+RESULTS:
+      :RESULTS:
+      : /beegfs/ye53nis/drmed-git
+      : 2023-01-18 11:53:14.696643: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+      : 2023-01-18 11:53:14.696707: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+      :END:
+
+      #+begin_src jupyter-python
+        model_id = 5
+
+        out_dir = output_path / f'tbpex5_averaging_{model_name_ls[model_id]}/'
+
+        os.makedirs(out_dir, exist_ok=True)
+
+        ptufile = predict_correct_correlate_ptu(
+            files=files_dirty,
+            model_id=model_id,
+            method='averaging',
+            out_path=out_dir)
+      #+end_src
+
+      #+RESULTS:
+      : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
+
+      #+begin_src jupyter-python
+        model_id = 5
+
+        out_dir = output_path / f'tbpex5_delete_{model_name_ls[model_id]}/'
+
+        os.makedirs(out_dir, exist_ok=True)
+
+        ptufile = predict_correct_correlate_ptu(
+            files=files_dirty,
+            model_id=model_id,
+            method='delete',
+            out_path=out_dir)
+      #+end_src
+
+      #+RESULTS:
+      : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
+
+      #+begin_src jupyter-python
+        model_id = 5
+
+        out_dir = output_path / f'hspex5_averaging_{model_name_ls[model_id]}/'
+
+        os.makedirs(out_dir, exist_ok=True)
+
+        ptufile = predict_correct_correlate_ptu(
+            files=files_clean,
+            model_id=model_id,
+            method='averaging',
+            out_path=out_dir)
+      #+end_src
+
+      #+RESULTS:
+      : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
+
+      #+begin_src jupyter-python
+        model_id = 5
+
+        out_dir = output_path / f'hspex5_delete_{model_name_ls[model_id]}/'
+
+        os.makedirs(out_dir, exist_ok=True)
+
+        ptufile = predict_correct_correlate_ptu(
+            files=files_clean,
+            model_id=model_id,
+            method='delete',
+            out_path=out_dir)
+      #+end_src
+
+      #+RESULTS:
+      : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
 
    #+begin_src jupyter-python
 
