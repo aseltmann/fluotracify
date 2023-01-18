@@ -813,15 +813,18 @@ class PicoObject():
                 raise ValueError(f'key={name} is no valid key for the dict '
                                  'self.trueTimeParts or self.subChanParts.')
 
+        if method in ['tttr2xfcs', 'tttr2xfcs_with_weights']:
+            name = f'{self.name}' if name is None else f'{name}'
+            if name not in self.trueTimeArr:
+                raise ValueError(f'key={name} is no valid key for the dict '
+                                 'self.trueTimeArr or self.subChanArr.')
+
         if method in ['tttr2xfcs', 'tttr2xfcs_with_weights',
                       'tttr2xfcs_with_averaging']:
             if method not in self.autoNorm:
                 self.autoNorm[f'{method}'] = {}
                 self.autotime[f'{method}'] = {}
-            name = f'{self.name}' if name is None else f'{name}'
-            if name not in self.trueTimeArr:
-                raise ValueError(f'key={name} is no valid key for the dict '
-                                 'self.trueTimeArr or self.subChanArr.')
+
             if name in self.autoNorm[f'{method}']:
                 raise ValueError('self.autoNorm[\'tttr2xfcs\'] already has a'
                                  f' key={name} Check if your desired '
