@@ -7095,6 +7095,327 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
       os.system(f'rm {plot1_file}.pdf')
     #+END_SRC
 
+**** further code
+    - now load all
+      #+begin_details
+      #+BEGIN_SRC jupyter-python
+        path = Path('data/exp-220227-unet/2022-04-25_simulations/0cd20')
+
+        odot069_0dot01_path = path / '0.069_results/0cd20_0dot069-0dot01_outputParam.csv'
+        odot069_0dot1_path = path / '0.069_results/0cd20_0dot069-0dot1_outputParam.csv'
+        odot069_1dot0_path = path / '0.069_results/0cd20_0dot069-1dot0_outputParam.csv'
+
+        odot08_0dot01_path = path / '0.08_results/0cd20_0dot08-0dot01_outputParam.csv'
+        odot08_0dot1_path = path / '0.08_results/0cd20_0dot08-0dot1_outputParam.csv'
+        odot08_1dot0_path = path / '0.08_results/0cd20_0dot08-1dot0_outputParam.csv'
+
+        odot1_0dot01_path = path / '0.1_results/0cd20_0dot1-0dot01_outputParam.csv'
+        odot1_0dot1_path = path / '0.1_results/0cd20_0dot1-0dot1_outputParam.csv'
+        odot1_1dot0_path = path / '0.1_results/0cd20_0dot1-1dot0_outputParam.csv'
+
+        odot2_0dot01_path = path / '0.2_results/0cd20_0dot2-0dot01_outputParam.csv'
+        odot2_0dot1_path = path / '0.2_results/0cd20_0dot2-0dot1_outputParam.csv'
+        odot2_1dot0_path = path / '0.2_results/0cd20_0dot2-1dot0_outputParam.csv'
+
+        odot4_0dot01_path = path / '0.4_results/0cd20_0dot4-0dot01_outputParam.csv'
+        odot4_0dot1_path = path / '0.4_results/0cd20_0dot4-0dot1_outputParam.csv'
+        odot4_1dot0_path = path / '0.4_results/0cd20_0dot4-1dot0_outputParam.csv'
+
+        odot6_0dot01_path = path / '0.6_results/0cd20_0dot6-0dot01_outputParam.csv'
+        odot6_0dot1_path = path / '0.6_results/0cd20_0dot6-0dot1_outputParam.csv'
+        odot6_1dot0_path = path / '0.6_results/0cd20_0dot6-1dot0_outputParam.csv'
+
+        one_0dot01_path = path / '1.0_results/0cd20_1dot0-0dot01_outputParam.csv'
+        one_0dot1_path = path / '1.0_results/0cd20_1dot0-0dot1_outputParam.csv'
+        one_1dot0_path = path / '1.0_results/0cd20_1dot0-1dot0_outputParam.csv'
+
+        three_0dot01_path = path / '3.0_results/0cd20_3dot0-0dot01_outputParam.csv'
+        three_0dot1_path = path / '3.0_results/0cd20_3dot0-0dot1_outputParam.csv'
+        three_1dot0_path = path / '3.0_results/0cd20_3dot0-1dot0_outputParam.csv'
+
+        ten_0dot01_path = path / '10.0_results/0cd20_10dot0-0dot01_outputParam.csv'
+        ten_0dot1_path = path / '10.0_results/0cd20_10dot0-0dot1_outputParam.csv'
+        ten_1dot0_path = path / '10.0_results/0cd20_10dot0-1dot0_outputParam.csv'
+
+        fifty_0dot01_path = path / '50.0_results/0cd20_50dot0-0dot01_outputParam.csv'
+        fifty_0dot1_path = path / '50.0_results/0cd20_50dot0-0dot1_outputParam.csv'
+        fifty_1dot0_path = path / '50.0_results/0cd20_50dot0-1dot0_outputParam.csv'
+
+      #+END_SRC
+
+      #+RESULTS:
+      #+end_details
+
+    - we load the data and combine it. We convert the simulated D [um2/s] in
+      t[ms]. Based on an exploratory plot of A1 and A2 we swap A1-A2 and
+      txy1-txy2, so that A1 and txy1 always represent the bigger fitted fraction
+      size.
+      #+begin_details
+      #+BEGIN_SRC jupyter-python
+        odot069_0dot01 = pd.read_csv(odot069_0dot01_path, sep=',').assign(
+            artifact_speed=100*[1127,], stationary_speed=100*[163,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+        odot069_0dot1 = pd.read_csv(odot069_0dot1_path, sep=',').assign(
+            artifact_speed=100*[113,], stationary_speed=100*[163,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+        odot069_1dot0 = pd.read_csv(odot069_1dot0_path, sep=',').assign(
+            artifact_speed=100*[11.3,], stationary_speed=100*[163,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+
+        odot08_0dot01 = pd.read_csv(odot08_0dot01_path, sep=',').assign(
+            artifact_speed=100*[1127,], stationary_speed=100*[141,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+        odot08_0dot01[['txy1', 'txy2']] = odot08_0dot01[['txy2', 'txy1']]
+        odot08_0dot01[['A1', 'A2']] = odot08_0dot01[['A2', 'A1']]
+        odot08_0dot1 = pd.read_csv(odot08_0dot1_path, sep=',').assign(
+            artifact_speed=100*[113,], stationary_speed=100*[141,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+        odot08_1dot0 = pd.read_csv(odot08_1dot0_path, sep=',').assign(
+            artifact_speed=100*[11.3,], stationary_speed=100*[141,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+
+        odot1_0dot01 = pd.read_csv(odot1_0dot01_path, sep=',').assign(
+            artifact_speed=100*[1127,], stationary_speed=100*[113,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+        odot1_0dot1 = pd.read_csv(odot1_0dot1_path, sep=',').assign(
+            artifact_speed=100*[113,], stationary_speed=100*[113,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+        odot1_1dot0 = pd.read_csv(odot1_1dot0_path, sep=',').assign(
+            artifact_speed=100*[11.3,], stationary_speed=100*[113,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+
+        odot2_0dot01 = pd.read_csv(odot2_0dot01_path, sep=',').assign(
+            artifact_speed=100*[1127,], stationary_speed=100*[56.4,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+        odot2_0dot1 = pd.read_csv(odot2_0dot1_path, sep=',').assign(
+            artifact_speed=100*[113,], stationary_speed=100*[56.4,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+        odot2_0dot1[['txy1', 'txy2']] = odot2_0dot1[['txy2', 'txy1']]
+        odot2_0dot1[['A1', 'A2']] = odot2_0dot1[['A2', 'A1']]
+        odot2_1dot0 = pd.read_csv(odot2_1dot0_path, sep=',').assign(
+            artifact_speed=100*[11.3,], stationary_speed=100*[56.4,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+
+        odot4_0dot01 = pd.read_csv(odot4_0dot01_path, sep=',').assign(
+            artifact_speed=100*[1127,], stationary_speed=100*[28.2,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+        odot4_0dot1 = pd.read_csv(odot4_0dot1_path, sep=',').assign(
+            artifact_speed=100*[113,], stationary_speed=100*[28.2,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+        odot4_0dot1[['txy1', 'txy2']] = odot4_0dot1[['txy2', 'txy1']]
+        odot4_0dot1[['A1', 'A2']] = odot4_0dot1[['A2', 'A1']]
+        odot4_1dot0 = pd.read_csv(odot4_1dot0_path, sep=',').assign(
+            artifact_speed=100*[11.3,], stationary_speed=100*[28.2,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+
+        odot6_0dot01 = pd.read_csv(odot6_0dot01_path, sep=',').assign(
+            artifact_speed=100*[1127,], stationary_speed=100*[18.8,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+        odot6_0dot1 = pd.read_csv(odot6_0dot1_path, sep=',').assign(
+            artifact_speed=100*[113,], stationary_speed=100*[18.8,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+        odot6_1dot0 = pd.read_csv(odot6_1dot0_path, sep=',').assign(
+            artifact_speed=100*[11.3,], stationary_speed=100*[18.8,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+
+        one_0dot01 = pd.read_csv(one_0dot01_path, sep=',').assign(
+            artifact_speed=100*[1127,], stationary_speed=100*[11.3,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+        one_0dot1 = pd.read_csv(one_0dot1_path, sep=',').assign(
+            artifact_speed=100*[113,], stationary_speed=100*[11.3,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+        one_1dot0 = pd.read_csv(one_1dot0_path, sep=',').assign(
+            artifact_speed=100*[11.3,], stationary_speed=100*[11.3,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+
+        three_0dot01 = pd.read_csv(three_0dot01_path, sep=',').assign(
+            artifact_speed=100*[1127,], stationary_speed=100*[3.76,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+        three_0dot1 = pd.read_csv(three_0dot1_path, sep=',').assign(
+            artifact_speed=100*[113,], stationary_speed=100*[3.76,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+        three_0dot1[['txy1', 'txy2']] = three_0dot1[['txy2', 'txy1']]
+        three_0dot1[['A1', 'A2']] = three_0dot1[['A2', 'A1']]
+        three_1dot0 = pd.read_csv(three_1dot0_path, sep=',').assign(
+            artifact_speed=100*[11.3,], stationary_speed=100*[3.76,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+
+        ten_0dot01 = pd.read_csv(ten_0dot01_path, sep=',').assign(
+            artifact_speed=100*[1127,], stationary_speed=100*[1.13,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+        ten_0dot1 = pd.read_csv(ten_0dot1_path, sep=',').assign(
+            artifact_speed=100*[113,], stationary_speed=100*[1.13,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+        ten_1dot0 = pd.read_csv(ten_1dot0_path, sep=',').assign(
+            artifact_speed=100*[11.3,], stationary_speed=100*[1.13,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+
+        fifty_0dot01 = pd.read_csv(fifty_0dot01_path, sep=',').assign(
+            artifact_speed=100*[1127,], stationary_speed=100*[0.23,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+        fifty_0dot1 = pd.read_csv(fifty_0dot1_path, sep=',').assign(
+            artifact_speed=100*[113,], stationary_speed=100*[0.23,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+        fifty_0dot1[['txy1', 'txy2']] = fifty_0dot1[['txy2', 'txy1']]
+        fifty_0dot1[['A1', 'A2']] = fifty_0dot1[['A2', 'A1']]
+        fifty_1dot0 = pd.read_csv(fifty_1dot0_path, sep=',').assign(
+            artifact_speed=100*[11.3,], stationary_speed=100*[0.23,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+
+        all_param = pd.concat([odot069_0dot01, odot069_0dot1, odot069_1dot0,
+                               odot08_0dot01, odot08_0dot1, odot08_1dot0,
+                               odot1_0dot01, odot1_0dot1, odot1_1dot0,
+                               odot2_0dot01, odot2_0dot1, odot2_1dot0,
+                               odot4_0dot01, odot4_0dot1, odot4_1dot0,
+                               odot6_0dot01, odot6_0dot1, odot6_1dot0,
+                               one_0dot01, one_0dot1, one_1dot0,
+                               three_0dot01, three_0dot1, three_1dot0,
+                               ten_0dot01, ten_0dot1, ten_1dot0,
+                               fifty_0dot01, fifty_0dot1, fifty_1dot0],
+                              ignore_index=True)
+
+        all_param = pd.wide_to_long(all_param, stubnames='txy',
+                                    i=['name_of_plot'],
+                                    j='fitted species (txy)')
+        all_param = all_param.reset_index()
+        all_param = pd.wide_to_long(all_param, stubnames='A',
+                                    i=['name_of_plot', 'fitted species (txy)'],
+                                    j='fitted species (A)')
+        all_param = all_param.reset_index()
+        all_param
+      #+END_SRC
+      #+end_details
+
+      #+RESULTS:
+      :RESULTS:
+      |       | name_of_plot                                      | fitted species (txy) | fitted species (A) |   N (FCS) | parent_name          | master_file | stdev(A1) | stdev(A2) | parent_uqid | Dimen | ... | cpm (kHz) | alpha1 |   xmax | artifact_speed | stdev(offset) | stdev(txy1) |    offset | bri (kHz) | Diff_species |        A |
+      |-------+---------------------------------------------------+----------------------+--------------------+-----------+----------------------+-------------+-----------+-----------+-------------+-------+-----+-----------+--------+--------+----------------+---------------+-------------+-----------+-----------+--------------+----------|
+      |     0 | 2022-04-25_multipletau_0cd20_0dot069-0dot01_26... |                    1 |                  2 | 37.523452 | 0cd20_0dot069-0dot01 | Not known   | None      | None      |           0 |    2D | ... |  0.026650 |    1.0 | 8192.0 |         1127.0 | None          | None        | -0.001696 |       1.0 |            2 | 0.001292 |
+      |     1 | 2022-04-25_multipletau_0cd20_0dot069-0dot01_26... |                    1 |                  1 | 37.523452 | 0cd20_0dot069-0dot01 | Not known   | None      | None      |           0 |    2D | ... |  0.026650 |    1.0 | 8192.0 |         1127.0 | None          | None        | -0.001696 |       1.0 |            2 | 0.998708 |
+      |     2 | 2022-04-25_multipletau_0cd20_0dot069-0dot01_26... |                    1 |                  2 | 35.394544 | 0cd20_0dot069-0dot01 | Not known   | None      | None      |           0 |    2D | ... |  0.028253 |    1.0 | 8192.0 |         1127.0 | None          | None        | -0.001883 |       1.0 |            2 | 0.002290 |
+      |     3 | 2022-04-25_multipletau_0cd20_0dot069-0dot01_26... |                    1 |                  1 | 35.394544 | 0cd20_0dot069-0dot01 | Not known   | None      | None      |           0 |    2D | ... |  0.028253 |    1.0 | 8192.0 |         1127.0 | None          | None        | -0.001883 |       1.0 |            2 | 0.997710 |
+      |     4 | 2022-04-25_multipletau_0cd20_0dot069-0dot01_26... |                    1 |                  2 | 27.754107 | 0cd20_0dot069-0dot01 | Not known   | None      | None      |           0 |    2D | ... |  0.036031 |    1.0 | 8192.0 |         1127.0 | None          | None        | -0.008520 |       1.0 |            2 | 0.526621 |
+      |   ... | ...                                               |                  ... |                ... |       ... | ...                  | ...         | ...       | ...       |         ... |   ... | ... |       ... |    ... |    ... |            ... | ...           | ...         |       ... |       ... |          ... |      ... |
+      | 11995 | 2022-04-25_multipletau_0cd20_50dot0-1dot0_1797... |                    2 |                  1 |  1.000001 | 0cd20_50dot0-1dot0   | Not known   | None      | None      |           0 |    2D | ... |  0.999999 |    1.0 | 1024.0 |           11.3 | None          | None        | -0.000090 |       1.0 |            2 | 1.000000 |
+      | 11996 | 2022-04-25_multipletau_0cd20_50dot0-1dot0_1798... |                    2 |                  2 |  1.000001 | 0cd20_50dot0-1dot0   | Not known   | None      | None      |           0 |    2D | ... |  0.999999 |    1.0 | 1024.0 |           11.3 | None          | None        | -0.000090 |       1.0 |            2 | 0.000000 |
+      | 11997 | 2022-04-25_multipletau_0cd20_50dot0-1dot0_1798... |                    2 |                  1 |  1.000001 | 0cd20_50dot0-1dot0   | Not known   | None      | None      |           0 |    2D | ... |  0.999999 |    1.0 | 1024.0 |           11.3 | None          | None        | -0.000090 |       1.0 |            2 | 1.000000 |
+      | 11998 | 2022-04-25_multipletau_0cd20_50dot0-1dot0_1799... |                    2 |                  2 |  1.000001 | 0cd20_50dot0-1dot0   | Not known   | None      | None      |           0 |    2D | ... |  0.999999 |    1.0 | 1024.0 |           11.3 | None          | None        | -0.000090 |       1.0 |            2 | 0.000000 |
+      | 11999 | 2022-04-25_multipletau_0cd20_50dot0-1dot0_1799... |                    2 |                  1 |  1.000001 | 0cd20_50dot0-1dot0   | Not known   | None      | None      |           0 |    2D | ... |  0.999999 |    1.0 | 1024.0 |           11.3 | None          | None        | -0.000090 |       1.0 |            2 | 1.000000 |
+
+  12000 rows × 37 columns
+      :END:
+
+      #+begin_details
+      #+BEGIN_SRC jupyter-python
+        # data = all_param.loc[all_param['correction'].isin(['no correction', 'delete and shift'])]
+
+        g = sns.catplot(data=all_param,
+                        y='txy',
+                        x='model',
+                        hue='fitted species (txy)',
+                        col='artifact_speed',
+                        row='stationary_speed',
+                        sharey=True,
+                        height=5,
+                        aspect=1,
+                        legend_out=True,
+                        kind='boxen',
+                        showfliers=False,
+                        margin_titles=True)
+        g.map_dataframe(sns.stripplot,
+              y='txy',
+              x='model',
+              hue="fitted species (txy)",
+              dodge=True,
+              palette=sns.color_palette(['0.3']),
+              size=4,
+              jitter=0.2)
+        # add hlines
+        artifact_speed = np.tile(sorted(set(all_param['artifact_speed'])), 10)
+        stationary_speed = np.repeat(sorted(set(all_param['stationary_speed'])), 3)
+        g.tight_layout()
+        g.fig.suptitle('Prediction and "cut and shift" correction applied on simulated test data', y=1.03, size=20)
+        for i, axes in enumerate(g.axes.flat):
+        #      _ = axes.set_xticklabels(axes.get_xticklabels(), rotation=45)
+            axes.axhline(artifact_speed[i], ls='--', lw=4, c=sns.color_palette()[1])
+            axes.axhline(stationary_speed[i], ls='--', lw=4, c=sns.color_palette()[0])
+        plt.setp(g.axes, yscale='log', # xlabel='model',
+                 ylabel=r'transit time $\tau_{D}$ (log)')
+        # plt.setp(g.legend, title='Correlator and\nfit parameter')
+        plot1_file = 'analysis1_0cd20_simulation_transit-times'
+        plt.show()
+      #+END_SRC
+      #+end_details
+
+      #+RESULTS:
+      :RESULTS:
+      : 0
+      [[file:./data/exp-220227-unet/jupyter/ca7e75f176820ccd6a0135473cc2d59ad6c30316.png]]
+      :END:
+      [[file:./data/exp-220227-unet/jupyter/analysis1_0cd20_simulation_transit-times.svg]]
+
+      #+begin_details
+      #+BEGIN_SRC jupyter-python
+              # data = all_param.loc[all_param['correction'].isin(['no correction', 'delete and shift'])]
+
+        g = sns.catplot(data=all_param,
+                        y='A',
+                        x='model',
+                        hue='fitted species (A)',
+                        col='artifact_speed',
+                        row='stationary_speed',
+                        sharey=True,
+                        height=5,
+                        aspect=1,
+                        legend_out=True,
+                        kind='boxen',
+                        showfliers=False,
+                        margin_titles=True)
+        g.map_dataframe(sns.stripplot,
+              y='A',
+              x='model',
+              hue="fitted species (A)",
+              dodge=True,
+              palette=sns.color_palette(['0.3']),
+              size=4,
+              jitter=0.2)
+        # add hlines
+        g.tight_layout()
+        g.fig.suptitle('Prediction and "cut and shift" correction applied on simulated test data', y=1.03, size=20)
+        #for i, axes in enumerate(g.axes.flat):
+        #      _ = axes.set_xticklabels(axes.get_xticklabels(), rotation=45)
+        plt.setp(g.axes, # xlabel='model',
+                 ylabel=r'relative fitted fraction size')
+        # plt.setp(g.legend, title='Correlator and\nfit parameter')
+
+        plot1_file = 'analysis1_0cd20_simulation_fraction-size'
+        plt.savefig(f'{plot1_file}.pdf', bbox_inches='tight', dpi=300)
+        os.system(f'pdf2svg {plot1_file}.pdf {plot1_file}.svg')
+        os.system(f'rm {plot1_file}.pdf')
+      #+END_SRC
+      #+end_details
+      #+RESULTS:
+
+      [[file:./data/exp-220227-unet/jupyter/analysis1_0cd20_simulation_fraction-size.png]]
+
+      #+BEGIN_SRC jupyter-python
+        all_param.keys()
+      #+END_SRC
+
+      #+RESULTS:
+      : Index(['name_of_plot', 'fitted species (txy)', 'fitted species (A)',
+      :        'stdev(alpha2)', 'GN0', 'alpha2', 'xmax', 'stdev(A2)',
+      :        'Triplet_species', 'Dimen', 'time of fit', 'above zero', 'cpm (kHz)',
+      :        'N (mom)', 'stdev(txy2)', 'parent_uqid', 'stdev(offset)', 'N (FCS)',
+      :        'stdev(A1)', 'correction', 'txy', 'Triplet_eq', 'stationary_speed',
+      :        'master_file', 'stdev(txy1)', 'parent_name', 'artifact_speed',
+      :        'stdev(GN0)', 'Diff_species', 'xmin', 'model', 'alpha1',
+      :        'stdev(alpha1)', 'bri (kHz)', 'offset', 'Diff_eq', 'A'],
+      :       dtype='object')
+
+      #+BEGIN_SRC jupyter-python
+        %cd ~/Programme/drmed-git
+      #+END_SRC
 
 *** Plot 3: all bioexps
     :PROPERTIES:
