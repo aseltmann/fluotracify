@@ -4578,7 +4578,7 @@
     :header-args:jupyter-python: :session /jpy:localhost#8888:a37e524a-8134-4d8f-b24a-367acaf1bdd3 :pandoc t
     :END:
     - load modules
-      #+begin_details
+
       #+BEGIN_SRC jupyter-python
         %cd ~/Programme/drmed-git
       #+END_SRC
@@ -4587,345 +4587,210 @@
       : /home/lex/Programme/drmed-git
 
       #+BEGIN_SRC jupyter-python
+        import datetime
+        import logging
+        import multipletau
         import os
-        import numpy as np
+        import sys
+
         import matplotlib.pyplot as plt
+        import numpy as np
         import pandas as pd
         import seaborn as sns
+        import tensorflow as tf
+
         from pathlib import Path
         from pprint import pprint
+        from tensorflow.keras.optimizers import Adam
+        from mlflow.keras import load_model
+
+        FLUOTRACIFY_PATH = '/beegfs/ye53nis/drmed-git/src/'
+        sys.path.append(FLUOTRACIFY_PATH)
+        from fluotracify.applications import (corr_fit_object as cfo,
+                                              correction,
+                                              correlate)
+        from fluotracify.imports import ptu_utils as ptu
+        from fluotracify.training import (build_model as bm,
+                                          preprocess_data as ppd)
+        from fluotracify.simulations import (
+           import_simulation_from_csv as isfc,
+           analyze_simulations as ans,
+        )
+
         # use seaborn style as default even if I just use matplotlib
 
         sns.set_theme(style="whitegrid", font_scale=2, palette='colorblind',
                       context='paper')
-        # logging.basicConfig(filename="/home/lex/Programme/drmed-git/data/exp-220316-publication1/jupyter.log",
-        #               filemode='w', format='%(asctime)s - %(message)s',
-        #               force=True,
-        #               level=logging.DEBUG)
-      #+END_SRC
 
-      #+RESULTS:
-      #+end_details
-    - all prediction and
-      #+begin_details
-      #+BEGIN_SRC jupyter-python
-        path = Path('data/exp-220227-unet/220425_simexps/0cd20')
+        logging.basicConfig(filename="/beegfs/ye53nis/drmed-git/data/exp-220227-unet/jupyter.log",
+                            format='%(asctime)s - %(message)s',
+                            filemode='w',
+                            force=True)
+        log = logging.getLogger(__name__)
+        log.setLevel(logging.DEBUG)
+        model_ls = ['ff67be0b68e540a9a29a36a2d0c7a5be', '347669d050f344ad9fb9e480c814f727',
+                    '714af8cd12c1441eac4ca980e8c20070', '34a6d207ac594035b1009c330fb67a65',
+                    '484af471c61943fa90e5f78e78a229f0', '0cd2023eeaf745aca0d3e8ad5e1fc653',
+                    'fe81d71c52404ed790b3a32051258da9', '19e3e786e1bc4e2b93856f5dc9de8216',
+                    'c1204e3a8a1e4c40a35b5b7b1922d1ce']
 
-        odot069_0dot01_path = path / '0.069_results/0cd20_0dot069-0dot01_outputParam.csv'
-        odot069_0dot1_path = path / '0.069_results/0cd20_0dot069-0dot1_outputParam.csv'
-        odot069_1dot0_path = path / '0.069_results/0cd20_0dot069-1dot0_outputParam.csv'
-
-        odot08_0dot01_path = path / '0.08_results/0cd20_0dot08-0dot01_outputParam.csv'
-        odot08_0dot1_path = path / '0.08_results/0cd20_0dot08-0dot1_outputParam.csv'
-        odot08_1dot0_path = path / '0.08_results/0cd20_0dot08-1dot0_outputParam.csv'
-
-        odot1_0dot01_path = path / '0.1_results/0cd20_0dot1-0dot01_outputParam.csv'
-        odot1_0dot1_path = path / '0.1_results/0cd20_0dot1-0dot1_outputParam.csv'
-        odot1_1dot0_path = path / '0.1_results/0cd20_0dot1-1dot0_outputParam.csv'
-
-        odot2_0dot01_path = path / '0.2_results/0cd20_0dot2-0dot01_outputParam.csv'
-        odot2_0dot1_path = path / '0.2_results/0cd20_0dot2-0dot1_outputParam.csv'
-        odot2_1dot0_path = path / '0.2_results/0cd20_0dot2-1dot0_outputParam.csv'
-
-        odot4_0dot01_path = path / '0.4_results/0cd20_0dot4-0dot01_outputParam.csv'
-        odot4_0dot1_path = path / '0.4_results/0cd20_0dot4-0dot1_outputParam.csv'
-        odot4_1dot0_path = path / '0.4_results/0cd20_0dot4-1dot0_outputParam.csv'
-
-        odot6_0dot01_path = path / '0.6_results/0cd20_0dot6-0dot01_outputParam.csv'
-        odot6_0dot1_path = path / '0.6_results/0cd20_0dot6-0dot1_outputParam.csv'
-        odot6_1dot0_path = path / '0.6_results/0cd20_0dot6-1dot0_outputParam.csv'
-
-        one_0dot01_path = path / '1.0_results/0cd20_1dot0-0dot01_outputParam.csv'
-        one_0dot1_path = path / '1.0_results/0cd20_1dot0-0dot1_outputParam.csv'
-        one_1dot0_path = path / '1.0_results/0cd20_1dot0-1dot0_outputParam.csv'
-
-        three_0dot01_path = path / '3.0_results/0cd20_3dot0-0dot01_outputParam.csv'
-        three_0dot1_path = path / '3.0_results/0cd20_3dot0-0dot1_outputParam.csv'
-        three_1dot0_path = path / '3.0_results/0cd20_3dot0-1dot0_outputParam.csv'
-
-        ten_0dot01_path = path / '10.0_results/0cd20_10dot0-0dot01_outputParam.csv'
-        ten_0dot1_path = path / '10.0_results/0cd20_10dot0-0dot1_outputParam.csv'
-        ten_1dot0_path = path / '10.0_results/0cd20_10dot0-1dot0_outputParam.csv'
-
-        fifty_0dot01_path = path / '50.0_results/0cd20_50dot0-0dot01_outputParam.csv'
-        fifty_0dot1_path = path / '50.0_results/0cd20_50dot0-0dot1_outputParam.csv'
-        fifty_1dot0_path = path / '50.0_results/0cd20_50dot0-1dot0_outputParam.csv'
-
+        model_name_ls = [f'{s:.5}' for s in model_ls]
+        pred_thresh = 0.5
       #+END_SRC
 
       #+RESULTS:
       #+end_details
 
-    - we load the data and combine it. We convert the simulated D [um2/s] in
-      t[ms]. Based on an exploratory plot of A1 and A2 we swap A1-A2 and
-      txy1-txy2, so that A1 and txy1 always represent the bigger fitted fraction
-      size.
+    - load held-out test data from simulation
       #+begin_details
       #+BEGIN_SRC jupyter-python
-        odot069_0dot01 = pd.read_csv(odot069_0dot01_path, sep=',').assign(
-            artifact_speed=100*[1127,], stationary_speed=100*[163,],
-            model=100*['0cd20',], correction=100*['cut and shift',])
-        odot069_0dot1 = pd.read_csv(odot069_0dot1_path, sep=',').assign(
-            artifact_speed=100*[113,], stationary_speed=100*[163,],
-            model=100*['0cd20',], correction=100*['cut and shift',])
-        odot069_1dot0 = pd.read_csv(odot069_1dot0_path, sep=',').assign(
-            artifact_speed=100*[11.3,], stationary_speed=100*[163,],
-            model=100*['0cd20',], correction=100*['cut and shift',])
+        col_per_example = 3
+        lab_thresh = 0.04
+        artifact = 0
+        model_type = 1
+        fwhm = 250
 
-        odot08_0dot01 = pd.read_csv(odot08_0dot01_path, sep=',').assign(
-            artifact_speed=100*[1127,], stationary_speed=100*[141,],
-            model=100*['0cd20',], correction=100*['cut and shift',])
-        odot08_0dot01[['txy1', 'txy2']] = odot08_0dot01[['txy2', 'txy1']]
-        odot08_0dot01[['A1', 'A2']] = odot08_0dot01[['A2', 'A1']]
-        odot08_0dot1 = pd.read_csv(odot08_0dot1_path, sep=',').assign(
-            artifact_speed=100*[113,], stationary_speed=100*[141,],
-            model=100*['0cd20',], correction=100*['cut and shift',])
-        odot08_1dot0 = pd.read_csv(odot08_1dot0_path, sep=',').assign(
-            artifact_speed=100*[11.3,], stationary_speed=100*[141,],
-            model=100*['0cd20',], correction=100*['cut and shift',])
+        output_path = "/beegfs/ye53nis/drmed-git/data/exp-220227-unet/2022-04-25_simulations/"
+        sim_path = Path('/beegfs/ye53nis/saves/firstartifact_Nov2020_test')
 
-        odot1_0dot01 = pd.read_csv(odot1_0dot01_path, sep=',').assign(
-            artifact_speed=100*[1127,], stationary_speed=100*[113,],
-            model=100*['0cd20',], correction=100*['cut and shift',])
-        odot1_0dot1 = pd.read_csv(odot1_0dot1_path, sep=',').assign(
-            artifact_speed=100*[113,], stationary_speed=100*[113,],
-            model=100*['0cd20',], correction=100*['cut and shift',])
-        odot1_1dot0 = pd.read_csv(odot1_1dot0_path, sep=',').assign(
-            artifact_speed=100*[11.3,], stationary_speed=100*[113,],
-            model=100*['0cd20',], correction=100*['cut and shift',])
+        sim, _, nsamples, sim_params = isfc.import_from_csv(
+            folder=sim_path,
+            header=12,
+            frac_train=1,
+            col_per_example=col_per_example,
+            dropindex=None,
+            dropcolumns=None)
 
-        odot2_0dot01 = pd.read_csv(odot2_0dot01_path, sep=',').assign(
-            artifact_speed=100*[1127,], stationary_speed=100*[56.4,],
-            model=100*['0cd20',], correction=100*['cut and shift',])
-        odot2_0dot1 = pd.read_csv(odot2_0dot1_path, sep=',').assign(
-            artifact_speed=100*[113,], stationary_speed=100*[56.4,],
-            model=100*['0cd20',], correction=100*['cut and shift',])
-        odot2_0dot1[['txy1', 'txy2']] = odot2_0dot1[['txy2', 'txy1']]
-        odot2_0dot1[['A1', 'A2']] = odot2_0dot1[['A2', 'A1']]
-        odot2_1dot0 = pd.read_csv(odot2_1dot0_path, sep=',').assign(
-            artifact_speed=100*[11.3,], stationary_speed=100*[56.4,],
-            model=100*['0cd20',], correction=100*['cut and shift',])
+        diffrates = sim_params.loc['diffusion rate of molecules in micrometer^2 / s'].astype(np.float32)
+        nmols = sim_params.loc['number of fast molecules'].astype(np.float32)
+        clusters = sim_params.loc['diffusion rate of clusters in micrometer^2 / s'].astype(np.float32)
+        sim_columns = [f'{d:.4}-{c:.4}' for d, c in zip(
+            np.repeat(diffrates, nsamples[0]),
+            np.repeat(clusters, nsamples[0]))]
+        sim_columns_idx = ['50.0-0.01', '50.0-0.1', '50.0-1.0',
+                           '0.2-0.01', '0.2-0.1', '0.2-1.0',
+                           '0.069-0.01', '0.069-0.1', '0.069-1.0']
+        sim_columns_txt = ['fast molecules and slow clusters:\nsimulations',
+                           'fast molecules and medium clusters:\nsimulations',
+                           'fast molecules and fast clusters:\nsimulations',
+                           'medium molecules and slow clusters:\nsimulations',
+                           'medium molecules and medium clusters:\nsimulations',
+                           'medium molecules and fast clusters:\nsimulations',
+                           'slow molecules and slow clusters:\nsimulations',
+                           'slow molecules and medium clusters:\nsimulations',
+                           'slow molecules and fast clusters:\nsimulations']
 
-        odot4_0dot01 = pd.read_csv(odot4_0dot01_path, sep=',').assign(
-            artifact_speed=100*[1127,], stationary_speed=100*[28.2,],
-            model=100*['0cd20',], correction=100*['cut and shift',])
-        odot4_0dot1 = pd.read_csv(odot4_0dot1_path, sep=',').assign(
-            artifact_speed=100*[113,], stationary_speed=100*[28.2,],
-            model=100*['0cd20',], correction=100*['cut and shift',])
-        odot4_0dot1[['txy1', 'txy2']] = odot4_0dot1[['txy2', 'txy1']]
-        odot4_0dot1[['A1', 'A2']] = odot4_0dot1[['A2', 'A1']]
-        odot4_1dot0 = pd.read_csv(odot4_1dot0_path, sep=',').assign(
-            artifact_speed=100*[11.3,], stationary_speed=100*[28.2,],
-            model=100*['0cd20',], correction=100*['cut and shift',])
+        sim_sep = isfc.separate_data_and_labels(array=sim,
+                                                nsamples=nsamples,
+                                                col_per_example=col_per_example)
+        sim_dirty = sim_sep['0']
+        sim_dirty.columns = sim_columns
 
-        odot6_0dot01 = pd.read_csv(odot6_0dot01_path, sep=',').assign(
-            artifact_speed=100*[1127,], stationary_speed=100*[18.8,],
-            model=100*['0cd20',], correction=100*['cut and shift',])
-        odot6_0dot1 = pd.read_csv(odot6_0dot1_path, sep=',').assign(
-            artifact_speed=100*[113,], stationary_speed=100*[18.8,],
-            model=100*['0cd20',], correction=100*['cut and shift',])
-        odot6_1dot0 = pd.read_csv(odot6_1dot0_path, sep=',').assign(
-            artifact_speed=100*[11.3,], stationary_speed=100*[18.8,],
-            model=100*['0cd20',], correction=100*['cut and shift',])
+        sim_labels = sim_sep['1']
+        sim_labels.columns = sim_columns
+        sim_labbool = sim_labels > lab_thresh
+        sim_labbool.columns = sim_columns
+        sim_clean = sim_sep['2']
+        sim_clean.columns = sim_columns
 
-        one_0dot01 = pd.read_csv(one_0dot01_path, sep=',').assign(
-            artifact_speed=100*[1127,], stationary_speed=100*[11.3,],
-            model=100*['0cd20',], correction=100*['cut and shift',])
-        one_0dot1 = pd.read_csv(one_0dot1_path, sep=',').assign(
-            artifact_speed=100*[113,], stationary_speed=100*[11.3,],
-            model=100*['0cd20',], correction=100*['cut and shift',])
-        one_1dot0 = pd.read_csv(one_1dot0_path, sep=',').assign(
-            artifact_speed=100*[11.3,], stationary_speed=100*[11.3,],
-            model=100*['0cd20',], correction=100*['cut and shift',])
-
-        three_0dot01 = pd.read_csv(three_0dot01_path, sep=',').assign(
-            artifact_speed=100*[1127,], stationary_speed=100*[3.76,],
-            model=100*['0cd20',], correction=100*['cut and shift',])
-        three_0dot1 = pd.read_csv(three_0dot1_path, sep=',').assign(
-            artifact_speed=100*[113,], stationary_speed=100*[3.76,],
-            model=100*['0cd20',], correction=100*['cut and shift',])
-        three_0dot1[['txy1', 'txy2']] = three_0dot1[['txy2', 'txy1']]
-        three_0dot1[['A1', 'A2']] = three_0dot1[['A2', 'A1']]
-        three_1dot0 = pd.read_csv(three_1dot0_path, sep=',').assign(
-            artifact_speed=100*[11.3,], stationary_speed=100*[3.76,],
-            model=100*['0cd20',], correction=100*['cut and shift',])
-
-        ten_0dot01 = pd.read_csv(ten_0dot01_path, sep=',').assign(
-            artifact_speed=100*[1127,], stationary_speed=100*[1.13,],
-            model=100*['0cd20',], correction=100*['cut and shift',])
-        ten_0dot1 = pd.read_csv(ten_0dot1_path, sep=',').assign(
-            artifact_speed=100*[113,], stationary_speed=100*[1.13,],
-            model=100*['0cd20',], correction=100*['cut and shift',])
-        ten_1dot0 = pd.read_csv(ten_1dot0_path, sep=',').assign(
-            artifact_speed=100*[11.3,], stationary_speed=100*[1.13,],
-            model=100*['0cd20',], correction=100*['cut and shift',])
-
-        fifty_0dot01 = pd.read_csv(fifty_0dot01_path, sep=',').assign(
-            artifact_speed=100*[1127,], stationary_speed=100*[0.23,],
-            model=100*['0cd20',], correction=100*['cut and shift',])
-        fifty_0dot1 = pd.read_csv(fifty_0dot1_path, sep=',').assign(
-            artifact_speed=100*[113,], stationary_speed=100*[0.23,],
-            model=100*['0cd20',], correction=100*['cut and shift',])
-        fifty_0dot1[['txy1', 'txy2']] = fifty_0dot1[['txy2', 'txy1']]
-        fifty_0dot1[['A1', 'A2']] = fifty_0dot1[['A2', 'A1']]
-        fifty_1dot0 = pd.read_csv(fifty_1dot0_path, sep=',').assign(
-            artifact_speed=100*[11.3,], stationary_speed=100*[0.23,],
-            model=100*['0cd20',], correction=100*['cut and shift',])
-
-        all_param = pd.concat([odot069_0dot01, odot069_0dot1, odot069_1dot0,
-                               odot08_0dot01, odot08_0dot1, odot08_1dot0,
-                               odot1_0dot01, odot1_0dot1, odot1_1dot0,
-                               odot2_0dot01, odot2_0dot1, odot2_1dot0,
-                               odot4_0dot01, odot4_0dot1, odot4_1dot0,
-                               odot6_0dot01, odot6_0dot1, odot6_1dot0,
-                               one_0dot01, one_0dot1, one_1dot0,
-                               three_0dot01, three_0dot1, three_1dot0,
-                               ten_0dot01, ten_0dot1, ten_1dot0,
-                               fifty_0dot01, fifty_0dot1, fifty_1dot0],
-                              ignore_index=True)
-
-        all_param = pd.wide_to_long(all_param, stubnames='txy',
-                                    i=['name_of_plot'],
-                                    j='fitted species (txy)')
-        all_param = all_param.reset_index()
-        all_param = pd.wide_to_long(all_param, stubnames='A',
-                                    i=['name_of_plot', 'fitted species (txy)'],
-                                    j='fitted species (A)')
-        all_param = all_param.reset_index()
-        all_param
+        sim_dirty
       #+END_SRC
-      #+end_details
 
       #+RESULTS:
       :RESULTS:
-      |       | name_of_plot                                      | fitted species (txy) | fitted species (A) |   N (FCS) | parent_name          | master_file | stdev(A1) | stdev(A2) | parent_uqid | Dimen | ... | cpm (kHz) | alpha1 |   xmax | artifact_speed | stdev(offset) | stdev(txy1) |    offset | bri (kHz) | Diff_species |        A |
-      |-------+---------------------------------------------------+----------------------+--------------------+-----------+----------------------+-------------+-----------+-----------+-------------+-------+-----+-----------+--------+--------+----------------+---------------+-------------+-----------+-----------+--------------+----------|
-      |     0 | 2022-04-25_multipletau_0cd20_0dot069-0dot01_26... |                    1 |                  2 | 37.523452 | 0cd20_0dot069-0dot01 | Not known   | None      | None      |           0 |    2D | ... |  0.026650 |    1.0 | 8192.0 |         1127.0 | None          | None        | -0.001696 |       1.0 |            2 | 0.001292 |
-      |     1 | 2022-04-25_multipletau_0cd20_0dot069-0dot01_26... |                    1 |                  1 | 37.523452 | 0cd20_0dot069-0dot01 | Not known   | None      | None      |           0 |    2D | ... |  0.026650 |    1.0 | 8192.0 |         1127.0 | None          | None        | -0.001696 |       1.0 |            2 | 0.998708 |
-      |     2 | 2022-04-25_multipletau_0cd20_0dot069-0dot01_26... |                    1 |                  2 | 35.394544 | 0cd20_0dot069-0dot01 | Not known   | None      | None      |           0 |    2D | ... |  0.028253 |    1.0 | 8192.0 |         1127.0 | None          | None        | -0.001883 |       1.0 |            2 | 0.002290 |
-      |     3 | 2022-04-25_multipletau_0cd20_0dot069-0dot01_26... |                    1 |                  1 | 35.394544 | 0cd20_0dot069-0dot01 | Not known   | None      | None      |           0 |    2D | ... |  0.028253 |    1.0 | 8192.0 |         1127.0 | None          | None        | -0.001883 |       1.0 |            2 | 0.997710 |
-      |     4 | 2022-04-25_multipletau_0cd20_0dot069-0dot01_26... |                    1 |                  2 | 27.754107 | 0cd20_0dot069-0dot01 | Not known   | None      | None      |           0 |    2D | ... |  0.036031 |    1.0 | 8192.0 |         1127.0 | None          | None        | -0.008520 |       1.0 |            2 | 0.526621 |
-      |   ... | ...                                               |                  ... |                ... |       ... | ...                  | ...         | ...       | ...       |         ... |   ... | ... |       ... |    ... |    ... |            ... | ...           | ...         |       ... |       ... |          ... |      ... |
-      | 11995 | 2022-04-25_multipletau_0cd20_50dot0-1dot0_1797... |                    2 |                  1 |  1.000001 | 0cd20_50dot0-1dot0   | Not known   | None      | None      |           0 |    2D | ... |  0.999999 |    1.0 | 1024.0 |           11.3 | None          | None        | -0.000090 |       1.0 |            2 | 1.000000 |
-      | 11996 | 2022-04-25_multipletau_0cd20_50dot0-1dot0_1798... |                    2 |                  2 |  1.000001 | 0cd20_50dot0-1dot0   | Not known   | None      | None      |           0 |    2D | ... |  0.999999 |    1.0 | 1024.0 |           11.3 | None          | None        | -0.000090 |       1.0 |            2 | 0.000000 |
-      | 11997 | 2022-04-25_multipletau_0cd20_50dot0-1dot0_1798... |                    2 |                  1 |  1.000001 | 0cd20_50dot0-1dot0   | Not known   | None      | None      |           0 |    2D | ... |  0.999999 |    1.0 | 1024.0 |           11.3 | None          | None        | -0.000090 |       1.0 |            2 | 1.000000 |
-      | 11998 | 2022-04-25_multipletau_0cd20_50dot0-1dot0_1799... |                    2 |                  2 |  1.000001 | 0cd20_50dot0-1dot0   | Not known   | None      | None      |           0 |    2D | ... |  0.999999 |    1.0 | 1024.0 |           11.3 | None          | None        | -0.000090 |       1.0 |            2 | 0.000000 |
-      | 11999 | 2022-04-25_multipletau_0cd20_50dot0-1dot0_1799... |                    2 |                  1 |  1.000001 | 0cd20_50dot0-1dot0   | Not known   | None      | None      |           0 |    2D | ... |  0.999999 |    1.0 | 1024.0 |           11.3 | None          | None        | -0.000090 |       1.0 |            2 | 1.000000 |
-
-  12000 rows × 37 columns
-      :END:
-
-      #+begin_details
-      #+BEGIN_SRC jupyter-python
-        # data = all_param.loc[all_param['correction'].isin(['no correction', 'delete and shift'])]
-
-        g = sns.catplot(data=all_param,
-                        y='txy',
-                        x='model',
-                        hue='fitted species (txy)',
-                        col='artifact_speed',
-                        row='stationary_speed',
-                        sharey=True,
-                        height=5,
-                        aspect=1,
-                        legend_out=True,
-                        kind='boxen',
-                        showfliers=False,
-                        margin_titles=True)
-        g.map_dataframe(sns.stripplot,
-              y='txy',
-              x='model',
-              hue="fitted species (txy)",
-              dodge=True,
-              palette=sns.color_palette(['0.3']),
-              size=4,
-              jitter=0.2)
-        # add hlines
-        artifact_speed = np.tile(sorted(set(all_param['artifact_speed'])), 10)
-        stationary_speed = np.repeat(sorted(set(all_param['stationary_speed'])), 3)
-        g.tight_layout()
-        g.fig.suptitle('Prediction and "cut and shift" correction applied on simulated test data', y=1.03, size=20)
-        for i, axes in enumerate(g.axes.flat):
-        #      _ = axes.set_xticklabels(axes.get_xticklabels(), rotation=45)
-            axes.axhline(artifact_speed[i], ls='--', lw=4, c=sns.color_palette()[1])
-            axes.axhline(stationary_speed[i], ls='--', lw=4, c=sns.color_palette()[0])
-        plt.setp(g.axes, yscale='log', # xlabel='model',
-                 ylabel=r'transit time $\tau_{D}$ (log)')
-        # plt.setp(g.legend, title='Correlator and\nfit parameter')
-        plot1_file = 'analysis1_0cd20_simulation_transit-times'
-        plt.show()
-      #+END_SRC
+      #+begin_example
+        2022-04-25 11:32:12,435 - 1/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.069/1.0/traces_brightclust_Nov2020_D0.069_set010.csv
+        2022-04-25 11:32:15,346 - 2/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/50/0.1/traces_brightclust_Nov2020_D50_set003.csv
+        2022-04-25 11:32:18,091 - 3/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.4/0.1/traces_brightclust_Nov2020_D0.4_set001.csv
+        2022-04-25 11:32:21,085 - 4/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.2/0.1/traces_brightclust_Nov2020_D0.2_set007.csv
+        2022-04-25 11:32:23,781 - 5/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/3.0/1.0/traces_brightclust_Nov2020_D3.0_set002.csv
+        2022-04-25 11:32:26,490 - 6/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/3.0/0.01/traces_brightclust_Nov2020_D3.0_set004.csv
+        2022-04-25 11:32:29,216 - 7/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/50/0.01/traces_brightclust_Nov2020_D50_set002.csv
+        2022-04-25 11:32:32,164 - 8/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.2/1.0/traces_brightclust_Nov2020_D0.2_set005.csv
+        2022-04-25 11:32:35,219 - 9/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.6/1.0/traces_brightclust_Nov2020_D0.6_set009.csv
+        2022-04-25 11:32:38,070 - 10/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/10/0.1/traces_brightclust_Nov2020_D10_set001.csv2022-04-25 11:32:40,862 - 11/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.08/1.0/traces_brightclust_Nov2020_D0.08_set001.csv
+        2022-04-25 11:32:44,030 - 12/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.6/0.1/traces_brightclust_Nov2020_D0.6_set003.csv
+        2022-04-25 11:32:46,779 - 13/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.1/1.0/traces_brightclust_Nov2020_D0.1_set001.csv
+        2022-04-25 11:32:49,564 - 14/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.4/1.0/traces_brightclust_Nov2020_D0.4_set005.csv
+        2022-04-25 11:32:52,553 - 15/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/10/1.0/traces_brightclust_Nov2020_D10_set005.csv
+        2022-04-25 11:32:55,473 - 16/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/1.0/1.0/traces_brightclust_Nov2020_D1.0_set005.csv
+        2022-04-25 11:32:58,258 - 17/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.069/0.1/traces_brightclust_Nov2020_D0.069_set001.csv
+        2022-04-25 11:33:01,043 - 18/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/50/1.0/traces_brightclust_Nov2020_D50_set001.csv
+        2022-04-25 11:33:03,986 - 19/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.1/0.01/traces_brightclust_Nov2020_D0.1_set002.csv
+        2022-04-25 11:33:06,905 - 20/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.08/0.1/traces_brightclust_Nov2020_D0.08_set003.csv
+        2022-04-25 11:33:10,236 - 21/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/1.0/0.01/traces_brightclust_Nov2020_D1.0_set006.csv
+        2022-04-25 11:33:12,972 - 22/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/1.0/0.1/traces_brightclust_Nov2020_D1.0_set003.csv
+        2022-04-25 11:33:15,879 - 23/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.2/0.01/traces_brightclust_Nov2020_D0.2_set002.csv
+        2022-04-25 11:33:18,677 - 24/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.1/0.1/traces_brightclust_Nov2020_D0.1_set005.csv
+        2022-04-25 11:33:21,515 - 25/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/3.0/0.1/traces_brightclust_Nov2020_D3.0_set007.csv
+        2022-04-25 11:33:24,287 - 26/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.08/0.01/traces_brightclust_Nov2020_D0.08_set005.csv
+        2022-04-25 11:33:27,293 - 27/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.069/0.01/traces_brightclust_Nov2020_D0.069_set005.csv
+        2022-04-25 11:33:30,137 - 28/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/10/0.01/traces_brightclust_Nov2020_D10_set002.csv
+        2022-04-25 11:33:32,952 - 29/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.6/0.01/traces_brightclust_Nov2020_D0.6_set008.csv
+        2022-04-25 11:33:35,872 - 30/30: /beegfs/ye53nis/saves/firstartifact_Nov2020_test/0.4/0.01/traces_brightclust_Nov2020_D0.4_set008.csv
+        2022-04-25 11:33:36,060 - The given DataFrame was split into 3 parts with shapes: [(16384, 3000), (16384, 3000), (16384, 3000)]
+      #+end_example
       #+end_details
 
-      #+RESULTS:
-      :RESULTS:
-      : 0
-      [[file:./data/exp-220227-unet/jupyter/ca7e75f176820ccd6a0135473cc2d59ad6c30316.png]]
+      |       |  0.069-1.0 |  0.069-1.0 |  0.069-1.0 |  0.069-1.0 |  0.069-1.0 |  0.069-1.0 |  0.069-1.0 |  0.069-1.0 |   0.069-1.0 |  0.069-1.0 | ... |    0.4-0.01 |    0.4-0.01 |    0.4-0.01 |    0.4-0.01 |    0.4-0.01 |    0.4-0.01 |    0.4-0.01 |    0.4-0.01 |    0.4-0.01 |    0.4-0.01 |
+      |-------+------------+------------+------------+------------+------------+------------+------------+------------+-------------+------------+-----+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------|
+      |     0 | 395.062347 | 542.019287 | 259.171783 | 378.006470 | 672.683350 | 422.525299 | 435.934174 | 535.840027 |  341.197662 | 546.919556 | ... | 1194.309570 | 1331.900391 | 1614.625854 | 1096.244019 | 5350.819336 | 1109.356201 | 1231.328979 | 2721.381592 | 1671.956787 | 1572.913452 |
+      |     1 | 395.732605 | 676.451477 | 263.082733 | 365.738861 | 672.841858 | 436.986450 | 408.519165 | 578.790833 |  357.324097 | 518.666321 | ... | 1226.035278 | 1348.827026 | 1727.460327 | 1040.826294 | 5548.753418 | 1241.292969 | 1197.370972 | 2785.768066 | 1749.072510 | 1544.390259 |
+      |     2 | 385.598785 | 565.850403 | 258.483124 | 350.939362 | 680.929993 | 416.969391 | 408.744873 | 572.143921 |  350.399933 | 546.654846 | ... | 1236.471436 | 1323.095703 | 1817.804810 |  949.081665 | 5418.844727 | 1285.566650 | 1229.268799 | 2961.105225 | 1643.184204 | 1486.991211 |
+      |     3 | 375.055664 | 569.737793 | 252.117035 | 364.043427 | 651.953247 | 449.630371 | 390.186218 | 521.915283 |  366.314545 | 534.204285 | ... | 1192.580566 | 1219.429932 | 1844.903687 |  888.757324 | 5756.974121 | 1303.747803 | 1190.227539 | 3127.305664 | 1713.993042 | 1427.290771 |
+      |     4 | 400.554443 | 590.014893 | 241.840240 | 376.104645 | 681.107056 | 466.177185 | 380.395752 | 531.094727 |  370.980286 | 537.930359 | ... | 1168.627441 | 1194.065186 | 1756.768799 |  887.986389 | 5481.615234 | 1324.906250 | 1268.030762 | 2997.608887 | 1744.911865 | 1426.806763 |
+      |   ... |        ... |        ... |        ... |        ... |        ... |        ... |        ... |        ... |         ... |        ... | ... |         ... |         ... |         ... |         ... |         ... |         ... |         ... |         ... |         ... |         ... |
+      | 16379 | 433.562714 | 624.462646 | 643.004944 | 518.733643 | 563.566589 | 578.520813 | 348.858429 | 330.541473 | 9484.205078 | 376.017700 | ... | 1352.349854 | 1400.204102 | 2025.719604 |  934.456665 | 2333.292725 | 1499.182251 | 1344.230347 | 1172.255371 | 1347.495239 |  756.805908 |
+      | 16380 | 462.284454 | 616.137512 | 597.266296 | 487.652924 | 572.072327 | 612.569275 | 328.044495 | 331.003693 | 8237.546875 | 373.477081 | ... | 1305.663696 | 1453.817993 | 1847.917114 | 1012.087402 | 2349.776611 | 1498.571411 | 1446.490479 | 1191.984253 | 1482.415894 |  712.499878 |
+      | 16381 | 472.551483 | 612.926758 | 615.009460 | 516.941528 | 579.562378 | 624.847717 | 308.531097 | 308.009369 | 2722.457275 | 352.414612 | ... | 1384.178711 | 1428.226440 | 1641.537109 |  975.000366 | 2291.302734 | 1541.471436 | 1334.644897 | 1173.113770 | 1520.151367 |  587.645203 |
+      | 16382 | 486.679413 | 637.962769 | 616.344116 | 502.372345 | 593.559937 | 673.262634 | 307.834229 | 322.522400 | 2823.112305 | 336.442596 | ... | 1258.534058 | 1423.324341 | 1560.817139 | 1023.877014 | 2185.760742 | 1455.700928 | 1387.281250 | 1124.065552 | 1572.194336 |  618.202820 |
+      | 16383 | 489.893646 | 614.733704 | 614.638000 | 511.408234 | 595.268982 | 673.656921 | 318.466736 | 305.981110 | 1768.038330 | 361.107300 | ... | 1114.534912 | 1386.146484 | 1548.830078 | 1009.011658 | 2117.508789 | 1569.905518 | 1396.511353 | 1070.131104 | 1602.530029 |  654.377380 |
+
+      16384 rows × 3000 columns
       :END:
-      [[file:./data/exp-220227-unet/jupyter/analysis1_0cd20_simulation_transit-times.svg]]
 
-      #+begin_details
-      #+BEGIN_SRC jupyter-python
-              # data = all_param.loc[all_param['correction'].isin(['no correction', 'delete and shift'])]
+    - save correlations before correction, then load each model, predict
+      artifacts, and correct it with the =delete and shift= method, which we
+      later renamed =cut and stitch=, then fit the correlations with Dominic
+      Waithe's =focuspoint=
+      #+BEGIN_SRC jupyter-python :pandoc t
+        # before correction
+        correlate.correlate_timetrace_and_save(
+            df=sim_dirty,
+            out_path="/beegfs/ye53nis/drmed-git/data/exp-220227-unet/2022-04-25_simulations/",
+            txt='dirty')
 
-        g = sns.catplot(data=all_param,
-                        y='A',
-                        x='model',
-                        hue='fitted species (A)',
-                        col='artifact_speed',
-                        row='stationary_speed',
-                        sharey=True,
-                        height=5,
-                        aspect=1,
-                        legend_out=True,
-                        kind='boxen',
-                        showfliers=False,
-                        margin_titles=True)
-        g.map_dataframe(sns.stripplot,
-              y='A',
-              x='model',
-              hue="fitted species (A)",
-              dodge=True,
-              palette=sns.color_palette(['0.3']),
-              size=4,
-              jitter=0.2)
-        # add hlines
-        g.tight_layout()
-        g.fig.suptitle('Prediction and "cut and shift" correction applied on simulated test data', y=1.03, size=20)
-        #for i, axes in enumerate(g.axes.flat):
-        #      _ = axes.set_xticklabels(axes.get_xticklabels(), rotation=45)
-        plt.setp(g.axes, # xlabel='model',
-                 ylabel=r'relative fitted fraction size')
-        # plt.setp(g.legend, title='Correlator and\nfit parameter')
+        for mid, mname in enumerate(model_name_ls):
+            logged_scaler = Path(f'/beegfs/ye53nis/drmed-git/data/mlruns/10/{model_ls[model_id]}/params/scaler')
+            logged_scaler = !cat $logged_scaler
+            logged_scaler = logged_scaler[0]
 
-        plot1_file = 'analysis1_0cd20_simulation_fraction-size'
-        plt.savefig(f'{plot1_file}.pdf', bbox_inches='tight', dpi=300)
-        os.system(f'pdf2svg {plot1_file}.pdf {plot1_file}.svg')
-        os.system(f'rm {plot1_file}.pdf')
-      #+END_SRC
-      #+end_details
-      #+RESULTS:
+            logged_model = Path(f'/beegfs/ye53nis/drmed-git/data/mlruns/10/{model_ls[model_id]}/artifacts/model')
+            logged_model = load_model(logged_model, compile=False)
+            logged_model.compile(loss=bm.binary_ce_dice_loss(),
+                                 optimizer=Adam(),
+                                 metrics = bm.unet_metrics([0.1, 0.3, 0.5, 0.7, 0.9]))
 
-      [[file:./data/exp-220227-unet/jupyter/analysis1_0cd20_simulation_fraction-size.png]]
+            ans.predict_correct_correlate_simulations(
+                sim_df=sim_dirty,
+                model=logged_model,
+                scaler=logged_scaler,
+                out_path="/beegfs/ye53nis/drmed-git/data/exp-220227-unet/2022-04-25_simulations/",
+                txt=mname)
 
-      #+BEGIN_SRC jupyter-python
-        all_param.keys()
       #+END_SRC
 
       #+RESULTS:
-      : Index(['name_of_plot', 'fitted species (txy)', 'fitted species (A)',
-      :        'stdev(alpha2)', 'GN0', 'alpha2', 'xmax', 'stdev(A2)',
-      :        'Triplet_species', 'Dimen', 'time of fit', 'above zero', 'cpm (kHz)',
-      :        'N (mom)', 'stdev(txy2)', 'parent_uqid', 'stdev(offset)', 'N (FCS)',
-      :        'stdev(A1)', 'correction', 'txy', 'Triplet_eq', 'stationary_speed',
-      :        'master_file', 'stdev(txy1)', 'parent_name', 'artifact_speed',
-      :        'stdev(GN0)', 'Diff_species', 'xmin', 'model', 'alpha1',
-      :        'stdev(alpha1)', 'bri (kHz)', 'offset', 'Diff_eq', 'A'],
-      :       dtype='object')
+      : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
+      : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
+      : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
+      : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
+      : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
+      : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
+      : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
+      : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
+      : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
 
-      #+BEGIN_SRC jupyter-python
-        %cd ~/Programme/drmed-git
-      #+END_SRC
 
 *** Analysis 2a: Run models on experimental data
     :PROPERTIES:
