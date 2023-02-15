@@ -654,6 +654,7 @@
 
     6. Test (~#+CALL: jp-metadata(_long='True)~) and record metadata:
        #+CALL: jp-metadata(_long='True)
+       #+begin_details
 
        #+RESULTS:
        #+begin_example
@@ -963,6 +964,8 @@
           'GIT_PAGER': 'cat',
           'MPLBACKEND': 'module://matplotlib_inline.backend_inline'}
        #+end_example
+
+       #+end_details
 *** Setup: Jupyter on local computer
     :PROPERTIES:
     :header-args:jupyter-python: :session /jpy:localhost#8888:a37e524a-8134-4d8f-b24a-367acaf1bdd3 :pandoc t
@@ -1008,7 +1011,7 @@
 
    3. Test: (~#+CALL: jp-metadata(_long='True)~)
       #+CALL: jp-metadata(_long='True)
-
+      #+begin_details
       #+RESULTS:
       :RESULTS:
       #+begin_example
@@ -1292,6 +1295,7 @@
       #+end_example
       : 5f083adb-6166-4a49-9fa5-08e37046cbfd
       :END:
+      #+end_details
 *** Setup: Node for running Mlflow UI
      1. Create mlflow tmux session and start mlflow ui
         #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session mlflowui
@@ -1308,21 +1312,21 @@
           [2021-08-08 14:47:33 +0200] [5115] [INFO] Booting worker with pid: 5115
         #+end_example
 
-     2. SHH tunnel the mflow session to the local computer (#+CALL:
-        ssh-tunnel[:session local3](port="5001", node="login01"))
+     2. SHH tunnel the mflow session to the local computer (~#+CALL: ssh-tunnel[:session local3](port="5001", node="login01")~)
         #+CALL: ssh-tunnel[:session local3](port="5001", node="login01")
 
         #+RESULTS:
         |                   |           |                                        |           |       |          |      |      |               |
         | sh-5.1$           | sh-5.1$   |
-ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |      |               |
+        |ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |      |               |
         | ye53nis@login01's | password: |                                        |           |       |          |      |      |               |
         | bind:             | Address   | already                                | in        | use
- |          |      |      |               |
+         |          |      |      |               |
         | Last              | login:    | Tue                                    | Aug       |    17 | 18:03:52 | 2021 | from | 10.231.188.20 |
 
 *** Setup: Record GPU metadata & git
    1. Current directory, last 10 git commits
+      #+begin_details
 
       #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session gpu
         pwd
@@ -1373,8 +1377,9 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
         commit 6cf2da85748ef13f2e752bea8989a6d31549ced3
         (tf) [ye53nis@node128 drmed-git]$
       #+end_example
-
+      #+end_details
    2. GPU, CPU, RAM, file system, env variables, top info
+      #+begin_details
       #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session gpu
         nvcc -V
         echo --------------------
@@ -1600,8 +1605,9 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
            10 root      20   0       0      0      0 S   0.0  0.0  43:01.62 [rcu_sched]
         (tf) [ye53nis@node128 drmed-git]$
       #+end_example
-
+      #+end_details
    3. print conda list
+      #+begin_details
       #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session gpu
         conda list
       #+END_SRC
@@ -1776,8 +1782,9 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
         zlib                      1.2.11               h7f8727e_4
         (tf) [ye53nis@node128 drmed-git]$
       #+end_example
-
+      #+end_details
    4. Show tree of input files used.
+      #+begin_details
       #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session gpu
         tree ../saves/firstartifact_Nov2020_train_max2sets
         echo --------------------
@@ -2018,6 +2025,7 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
         40 directories, 30 files
         (tf) [ye53nis@node128 drmed-git]$
       #+end_example
+      #+end_details
 *** Setup: Show all hyperparameters that worked in =exp-210807-hparams=
    :PROPERTIES:
    :header-args:jupyter-python: :session /jpy:localhost#8889:a37e524a-8134-4d8f-b24a-367acaf1bdd3 :pandoc t
@@ -2031,6 +2039,7 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
    2. open the file in jupyter, do some processing to only find the best runs,
       and display the relevant hparams (see =exp-210807-hparams= section
       =4. Analyze run 1 and 2= for explanations on the processing)
+      #+begin_details
       #+BEGIN_SRC jupyter-python
         %cd /beegfs/ye53nis/drmed-git
         import numpy as np
@@ -2084,6 +2093,7 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
         with pd.option_context('display.max_rows', None, 'display.max_columns', None):
             display(run1_2_my.loc[cond2 & cond3])
       #+END_SRC
+      #+end_details
 
       #+RESULTS: get-hparam-comparison
       :RESULTS:
@@ -2132,7 +2142,7 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
                -P n_levels=7 \
                -P pool_size=2
       #+END_SRC
-
+      #+begin_details
       #+RESULTS:
       #+begin_example
         INFO: 'exp-220227-unet' does not exist. Creating a new experiment
@@ -2271,11 +2281,21 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
         2022/02/28 04:24:58 INFO mlflow.projects: === Run (ID '484af471c61943fa90e5f78e78a229f0') succeeded ===
         (tf) [ye53nis@node128 drmed-git]$
       #+end_example
-
+      #+end_details
       - name of run: =484af471c61943fa90e5f78e78a229f0=
       - metrics after 100th epoch:
-        - val_precision0.5: 0.9091 - val_recall0.5: 0.9285 - val_f10.5: 0.9187
-        - val_auc: 0.9814
+        - precision_val,0.5: 0.9091 - recall_val,0.5: 0.9285 - f1_val,0.5: 0.9187
+        - auc_val: 0.9814
+      - a note on the metrics notation:
+        - *val* means: metrics computed on validation dataset, which was used in
+          training to e.g. ensure no overfitting occurs.
+        - *0.5* means: a threshold of 0.5 was applied to the predicted
+          output (floating point values between 0 and 1). That means we get a
+          binary classification - and this classification was compared to the
+          ground truth, which was binary as well. Then, precision, recall, f1,
+          etc were computed
+        - the *auc* function uses 100 different thresholds for computation, so
+          there no own threshold has to be set.
 
    2. run training of =(93b168c0ff7942c8a908a94129daf973,
       f243b3b742de4dbcb7ccfbd4244706f8)= with hparams from above
@@ -2294,7 +2314,7 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
                -P n_levels=6 \
                -P pool_size=4
       #+END_SRC
-
+      #+begin_details
       #+RESULTS:
       #+begin_example
         2022/02/28 14:14:59 INFO mlflow.projects.utils: === Created directory /tmp/tmpjco1jnk_ for downloading remote URIs passed to arguments of type 'path' ===
@@ -2434,11 +2454,12 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
         2022-02-28 15:49:04.737117: W tensorflow/python/util/util.cc:348] Sets are not currently considered sequences, but this may change in the future, so consider avoiding using them.
         2022/02/28 15:49:22 INFO mlflow.projects: === Run (ID '0cd2023eeaf745aca0d3e8ad5e1fc653') succeeded ===
       #+end_example
+      #+end_details
       - name of run: =0cd2023eeaf745aca0d3e8ad5e1fc653=
       - metrics after 100th epoch:
-        - loss: 0.1275 - val_loss: 0.1678
-        - val_precision0.5: 0.8955 - val_recall0.5: 0.9185 - val_f10.5: 0.9069
-        - val_auc: 0.9818
+        - loss: 0.1275 - loss_val: 0.1678
+        - precision_val,0.5: 0.8955 - recall_val,0.5: 0.9185 - f1_val,0.5: 0.9069
+        - auc_val: 0.9818
 
    3. run training of =(a5b8551144ff46e697a39cd1551e1475,
       98cf8cdef9c54b5286e277e75e2ab8c1)= with hparams from above
@@ -2457,7 +2478,7 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
                -P n_levels=4 \
                -P pool_size=4
       #+END_SRC
-
+      #+begin_details
       #+RESULTS:
       #+begin_example
         2022/02/28 17:34:45 INFO mlflow.projects.utils: === Created directory /tmp/tmpwue2ujb5 for downloading remote URIs passed to arguments of type 'path' ===
@@ -2595,11 +2616,11 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
         2022/02/28 21:13:37 INFO mlflow.projects: === Run (ID 'fe81d71c52404ed790b3a32051258da9') succeeded ===
         (tf) [ye53nis@node128 drmed-git]$
       #+end_example
-
+      #+end_details
       - name of run: =fe81d71c52404ed790b3a32051258da9=
       - metrics after 100th epoch:
-        - val_precision0.5: 0.9184 - val_recall0.5: 0.9338 - val_f10.5: 0.9260
-        - val_auc: 0.9849
+        - precision_val,0.5: 0.9184 - recall_val,0.5: 0.9338 - f1_val,0.5: 0.9260
+        - auc_val: 0.9849
 
    4. run training of =(00f2635d9fa2463c9a066722163405be,
       d0a8e1748b194f3290d471b6b44f19f8)= with hparams from above
@@ -2618,7 +2639,7 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
                -P n_levels=5 \
                -P pool_size=4
       #+END_SRC
-
+      #+begin_details
       #+RESULTS:
       #+begin_example
         2022/03/01 01:02:32 INFO mlflow.projects.utils: === Created directory /tmp/tmpscsw8dai for downloading remote URIs passed to arguments of type 'path' ===
@@ -2756,12 +2777,12 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
         2022/03/01 01:40:21 INFO mlflow.projects: === Run (ID 'ff67be0b68e540a9a29a36a2d0c7a5be') succeeded ===
 
       #+end_example
-
+      #+end_details
       - name of run: =ff67be0b68e540a9a29a36a2d0c7a5be=
       - metrics after 100th epoch:
-        - loss: 0.0890 vs val_loss: 0.1286
-        - val_precision0.5: 0.9230 - val_recall0.5: 0.9367 - val_f1: 0.9298
-        - val_auc: 0.9859
+        - loss: 0.0890 vs loss_val: 0.1286
+        - precision_val,0.5: 0.9230 - recall_val,0.5: 0.9367 - f1_val,0.5: 0.9298
+        - auc_val: 0.9859
 
    5. run training of =(5604d43c1ece461b8e6eaa0dfb65d6dc,
       3612536a77f34f22bc83d1d809140aa6)= with hparams from above
@@ -2780,7 +2801,7 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
                -P n_levels=3 \
                -P pool_size=4
       #+END_SRC
-
+      #+begin_details
       #+RESULTS:
       #+begin_example
         2022/03/01 12:32:44 INFO mlflow.projects.utils: === Created directory /tmp/tmpuaqmbl4a for downloading remote URIs passed to arguments of type 'path' ===
@@ -2918,11 +2939,11 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
         2022/03/01 18:11:48 INFO mlflow.projects: === Run (ID '19e3e786e1bc4e2b93856f5dc9de8216') succeeded ===
 
       #+end_example
-
+      #+end_details
       - name of run: =19e3e786e1bc4e2b93856f5dc9de8216=
       - metrics after 100th epoch:
-        - val_precision0.5: 0.8983 - val_recall0.5: 0.8839 - val_f10.5: 0.8911
-        - val_auc: 0.9595
+        - precision_val,0.5: 0.8983 - recall_val,0.5: 0.8839 - f1_val,0.5: 0.8911
+        - auc_val: 0.9595
 
    6. run training of =(7cafab027cdd4fc9bf20a43e989df510,
       16dff15d935f45e2a836b1f41b07b4e3)= with hparams from above
@@ -2941,7 +2962,7 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
                -P n_levels=5 \
                -P pool_size=4
       #+END_SRC
-
+      #+begin_details
       #+RESULTS:
       #+begin_example
         2022/03/01 19:36:22 INFO mlflow.projects.utils: === Created directory /tmp/tmpzbcp4g1j for downloading remote URIs passed to arguments of type 'path' ===
@@ -3079,11 +3100,11 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
         2022/03/01 20:46:47 INFO mlflow.projects: === Run (ID '347669d050f344ad9fb9e480c814f727') succeeded ===
 
       #+end_example
-
+      #+end_details
       - name of run: =347669d050f344ad9fb9e480c814f727=
       - metrics after 100th epoch:
-        - val_precision0.5: 0.9254 - val_recall0.5: 0.9238 - val_f10.5: 0.9246
-        - val_auc: 0.9848
+        - precision_val,0.5: 0.9254 - recall_val,0.5: 0.9238 - f1_val,0.5: 0.9246
+        - auc_val: 0.9848
 
    7. run training of =(0e328920e86049928202db95e8cfb7be,
       bf9d2725eb16462d9a101f0a077ce2b5)= with hparams from above
@@ -3102,7 +3123,7 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
                -P n_levels=9 \
                -P pool_size=2
       #+END_SRC
-
+      #+begin_details
       #+RESULTS:
       #+begin_example
         2022/03/01 22:12:06 INFO mlflow.projects.utils: === Created directory /tmp/tmpgcmidltj for downloading remote URIs passed to arguments of type 'path' ===
@@ -3240,11 +3261,11 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
         2022/03/02 01:03:00 INFO mlflow.projects: === Run (ID 'c1204e3a8a1e4c40a35b5b7b1922d1ce') succeeded ===
         (tf) [ye53nis@node128 drmed-git]$
       #+end_example
-
+      #+end_details
       - name of run: =c1204e3a8a1e4c40a35b5b7b1922d1ce=
       - metrics after 100th epoch:
-        - val_precision0.5: 0.9179 - val_recall0.5: 0.9234 - val_f1: 0.9207
-        - val_auc: 0.9858
+        - precision_val,0.5: 0.9179 - recall_val,0.5: 0.9234 - f1_val,0.5: 0.9207
+        - auc_val: 0.9858
 
    8. run training of =(3cbd945b62ec4634839372e403f6f377,
       458b36a70db843719d202a8eda448f17)= with hparams from above
@@ -3263,7 +3284,7 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
                -P n_levels=5 \
                -P pool_size=4
       #+END_SRC
-
+      #+begin_details
       #+RESULTS:
       #+begin_example
         2022/03/02 01:11:44 INFO mlflow.projects.utils: === Created directory /tmp/tmpx4epxfnm for downloading remote URIs passed to arguments of type 'path' ===
@@ -3401,12 +3422,13 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
         2022/03/02 04:20:52 INFO mlflow.projects: === Run (ID '714af8cd12c1441eac4ca980e8c20070') succeeded ===
 
       #+end_example
+      #+end_details
 
       - name of run: =714af8cd12c1441eac4ca980e8c20070=
       - metrics after 100th epoch:
-        - loss: 0.0724 - val_loss: 0.1303
-        - val_precision0.5: 0.9257 - val_recall0.5: 0.9352 - val_f10.5: 0.9304
-        - val_auc: 0.9843
+        - loss: 0.0724 - loss_val: 0.1303
+        - precision_val,0.5: 0.9257 - recall_val,0.5: 0.9352 - f1_val,0.5: 0.9304
+        - auc_val: 0.9843
 
    9. run training of =(3cbd945b62ec4634839372e403f6f377,
       458b36a70db843719d202a8eda448f17)= with hparams from above
@@ -3426,6 +3448,7 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
                -P pool_size=4
       #+END_SRC
 
+      #+begin_details
       #+RESULTS:
       #+begin_example
         2022/03/03 14:24:46 INFO mlflow.projects.utils: === Created directory /tmp/tmp7c_e9yu1 for downloading remote URIs passed to arguments of type 'path' ===
@@ -3563,14 +3586,15 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
         2022/03/03 15:16:13 INFO mlflow.projects: === Run (ID '34a6d207ac594035b1009c330fb67a65') succeeded ===
 
       #+end_example
+      #+end_details
 
       - name of run: =34a6d207ac594035b1009c330fb67a65=
       - metrics after 100th epoch:
-        - val_precision0.5: 0.8598 - val_recall0.5: 0.8629 - val_f1: 0.8613
-        - val_auc: 0.9652
+        - precision_val,0.5: 0.8598 - recall_val,0.5: 0.8629 - f1_val,0.5: 0.8613
+        - auc_val: 0.9652
 
    10. all metrics after 100th epoch with hparams
-       | run                              |  val_auc | val_f1 0.5 | val_prec 0.5 | val_recall 0.5 | model size | hp_batch_size | hp_first_filters | hp_input_size       | hp_lr_power |        hp_lr_start | hp_n_levels | hp_pool_size | hp_scaler |
+       | run                              |  auc_val | f1_val,0.5 | prec_val,0.5 | recall_val,0.5 | model size | hp_batch_size | hp_first_filters | hp_input_size       | hp_lr_power |        hp_lr_start | hp_n_levels | hp_pool_size | hp_scaler |
        |----------------------------------+----------+------------+--------------+----------------+------------+---------------+------------------+---------------------+-------------+--------------------+-------------+--------------+-----------|
        | 484af471c61943fa90e5f78e78a229f0 |   0.9814 |     0.9187 |       0.9091 |         0.9285 | 275 MB     |            26 |               44 | 16384 (here: 14000) |           1 | 0.0136170138242663 |           7 |            2 | standard  |
        | 0cd2023eeaf745aca0d3e8ad5e1fc653 |   0.9818 |     0.9069 |       0.8955 |         0.9185 | 200 MB     |            15 |               23 | 16384 (here: 14000) |           7 | 0.0305060808685107 |           6 |            4 | quant_g   |
@@ -3583,10 +3607,13 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
        | 34a6d207ac594035b1009c330fb67a65 |   0.9652 |     0.8613 |       0.8598 |         0.8629 | 7 MB       |            17 |               16 | 16384 (here: 14000) |           5 | 0.0101590069352232 |           3 |            4 | l2        |
       :END:
 
-*** Analysis XXX: show model architecture, loss plots, ...
+*** Analysis 1: show model architecture and loss plots
     :PROPERTIES:
     :header-args:jupyter-python: :session /jpy:localhost#8888:a37e524a-8134-4d8f-b24a-367acaf1bdd3 :pandoc t
     :END:
+    - first load modules and define model lists and dictionaries to connect
+      hparam runs and final runs.
+      #+begin_details
       #+BEGIN_SRC jupyter-python
         %cd ~/Programme/drmed-git
       #+END_SRC
@@ -3621,6 +3648,16 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
                     '484af471c61943fa90e5f78e78a229f0', '0cd2023eeaf745aca0d3e8ad5e1fc653',
                     'fe81d71c52404ed790b3a32051258da9', '19e3e786e1bc4e2b93856f5dc9de8216',
                     'c1204e3a8a1e4c40a35b5b7b1922d1ce']
+        model_dict = {
+            ('9051e32b87d84f3485b980067addec30', '61ff87bdb89b4e2ba64f8dacc774992d') :  '484af471c61943fa90e5f78e78a229f0',
+            ('93b168c0ff7942c8a908a94129daf973', 'f243b3b742de4dbcb7ccfbd4244706f8') :  '0cd2023eeaf745aca0d3e8ad5e1fc653',
+            ('a5b8551144ff46e697a39cd1551e1475', '98cf8cdef9c54b5286e277e75e2ab8c1') :  'fe81d71c52404ed790b3a32051258da9',
+            ('00f2635d9fa2463c9a066722163405be', 'd0a8e1748b194f3290d471b6b44f19f8') :  'ff67be0b68e540a9a29a36a2d0c7a5be',
+            ('5604d43c1ece461b8e6eaa0dfb65d6dc', '3612536a77f34f22bc83d1d809140aa6') :  '19e3e786e1bc4e2b93856f5dc9de8216',
+            ('7cafab027cdd4fc9bf20a43e989df510', '16dff15d935f45e2a836b1f41b07b4e3') :  '347669d050f344ad9fb9e480c814f727',
+            ('0e328920e86049928202db95e8cfb7be', 'bf9d2725eb16462d9a101f0a077ce2b5') :  'c1204e3a8a1e4c40a35b5b7b1922d1ce',
+            ('1c954fbc02b747bc813c587ac703c74a', 'ba49a80c2616407a8f1fe1fd12096fe0') :  '714af8cd12c1441eac4ca980e8c20070',
+            ('3cbd945b62ec4634839372e403f6f377', '458b36a70db843719d202a8eda448f17') :  '34a6d207ac594035b1009c330fb67a65'}
 
         model_name_ls = [f'{s:.5}' for s in model_ls]
 
@@ -3629,7 +3666,8 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
       #+end_src
 
       #+RESULTS:
-
+      #+end_details
+    - now print model details for each model where it was saved
       #+BEGIN_SRC jupyter-python
         for i in model_ls:
             print(f'model: {i}')
@@ -3638,18 +3676,19 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
                 logged_scaler = !cat $logged_scaler
                 logged_scaler = logged_scaler[0]
 
-                # logged_model = Path(f'/home/lex/Programme/drmed-git/data/mlruns/10/{i}/artifacts/model')
-                # logged_model = load_model(logged_model, compile=False)
-                # logged_model.compile(loss=bm.binary_ce_dice_loss(),
-                #                      optimizer=Adam(),
-                #                      metrics = bm.unet_metrics([0.1, 0.3, 0.5, 0.7, 0.9]))
-                # print(logged_model.summary())
+                logged_model = Path(f'/home/lex/Programme/drmed-git/data/mlruns/10/{i}/artifacts/model')
+                logged_model = load_model(logged_model, compile=False)
+                logged_model.compile(loss=bm.binary_ce_dice_loss(),
+                                     optimizer=Adam(),
+                                     metrics = bm.unet_metrics([0.1, 0.3, 0.5, 0.7, 0.9]))
+                print(logged_model.summary())
 
             except AttributeError:
                 pass
             print('----------------------------------------')
       #+END_SRC
 
+      #+begin_details
       #+RESULTS:
       #+begin_example
         model: ff67be0b68e540a9a29a36a2d0c7a5be
@@ -4048,17 +4087,148 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
         model: c1204e3a8a1e4c40a35b5b7b1922d1ce
         ----------------------------------------
       #+end_example
+      #+end_details
+
+    - plot loss vs validation loss for models in hyperparameter training.
+      Unfortunately, this info was not saved out for the final runs due to a
+      misconfiguration in mlflow. So for the final runs print the final
+      train loss and validation loss
 
       #+BEGIN_SRC jupyter-python
-        echo "time val_f1 epoch"
 
+        hparam = run1_2_my.loc[cond2 & cond3]
+        hparam.rename(index=model_dict)
+
+        fig, axs = plt.subplots(len(hparam), 2, facecolor='white', figsize=(9, len(hparam)*3),
+                                sharex=True, tight_layout=True)
+        for i, idx in enumerate(hparam.index):
+            for j in range(2):
+                print(i, idx[j], model_dict[idx])
+                try:
+                    logged_val_loss = Path(f'/beegfs/ye53nis/drmed-git/data/mlruns/8/{idx[j]}/metrics/val_loss')
+                    logged_val_loss = !cat $logged_val_loss
+                    logged_val_loss = [i.split(' ') for i in logged_val_loss]
+                    logged_val_loss = pd.DataFrame(logged_val_loss, columns=['time', 'val_loss', 'epoch']).astype(float)
+
+                    logged_train_loss = Path(f'/beegfs/ye53nis/drmed-git/data/mlruns/8/{idx[j]}/metrics/loss')
+                    logged_train_loss = !cat $logged_train_loss
+                    logged_train_loss = [i.split(' ') for i in logged_train_loss]
+                    logged_train_loss = pd.DataFrame(logged_train_loss, columns=['time', 'train_loss', 'epoch']).astype(float)
+
+                    losses = pd.DataFrame([logged_train_loss.iloc[-1, 1], logged_val_loss.iloc[-1, 1]], index=['train loss', 'val loss'],
+                                          columns=[f'{model_dict[idx]}_{j}'])
+                    display(losses)
+                    last_losses = pd.concat([last_losses, ])
+                    sns.lineplot('epoch', 'train_loss', data=logged_train_loss, ax=axs[i, j], label='train loss')
+                    sns.lineplot('epoch', 'val_loss', data=logged_val_loss, ax=axs[i, j], label='val loss')
+                    if j == 0:
+                        axs[i, j].set_title(model_dict[idx])
+                except ValueError:
+                    pass
+        plt.setp(axs, yscale='log', ylabel='')
+        fig.align_ylabels(axs)
       #+END_SRC
-*** Analysis 1a: Run models on simulated test data
+      #+begin_details
+      #+RESULTS:
+      :RESULTS:
+      : 0 9051e32b87d84f3485b980067addec30 484af471c61943fa90e5f78e78a229f0
+      |            | 484af471c61943fa90e5f78e78a229f0_0 |
+      |------------+------------------------------------|
+      | train loss |                           0.196100 |
+      | val loss   |                           0.199457 |
+      : 0 61ff87bdb89b4e2ba64f8dacc774992d 484af471c61943fa90e5f78e78a229f0
+      |            | 484af471c61943fa90e5f78e78a229f0_1 |
+      |------------+------------------------------------|
+      | train loss |                           0.194301 |
+      | val loss   |                           0.197833 |
+      : 1 93b168c0ff7942c8a908a94129daf973 0cd2023eeaf745aca0d3e8ad5e1fc653
+      |            | 0cd2023eeaf745aca0d3e8ad5e1fc653_0 |
+      |------------+------------------------------------|
+      | train loss |                           0.245977 |
+      | val loss   |                           0.250499 |
+      : 1 f243b3b742de4dbcb7ccfbd4244706f8 0cd2023eeaf745aca0d3e8ad5e1fc653
+      |            | 0cd2023eeaf745aca0d3e8ad5e1fc653_1 |
+      |------------+------------------------------------|
+      | train loss |                           0.278278 |
+      | val loss   |                           0.283107 |
+      : 2 a5b8551144ff46e697a39cd1551e1475 fe81d71c52404ed790b3a32051258da9
+      |            | fe81d71c52404ed790b3a32051258da9_0 |
+      |------------+------------------------------------|
+      | train loss |                           0.185773 |
+      | val loss   |                           0.186789 |
+      : 2 98cf8cdef9c54b5286e277e75e2ab8c1 fe81d71c52404ed790b3a32051258da9
+      |            | fe81d71c52404ed790b3a32051258da9_1 |
+      |------------+------------------------------------|
+      | train loss |                           0.183874 |
+      | val loss   |                           0.184316 |
+      : 3 00f2635d9fa2463c9a066722163405be ff67be0b68e540a9a29a36a2d0c7a5be
+      |            | ff67be0b68e540a9a29a36a2d0c7a5be_0 |
+      |------------+------------------------------------|
+      | train loss |                           0.172448 |
+      | val loss   |                           0.178439 |
+      : 3 d0a8e1748b194f3290d471b6b44f19f8 ff67be0b68e540a9a29a36a2d0c7a5be
+      : 4 5604d43c1ece461b8e6eaa0dfb65d6dc 19e3e786e1bc4e2b93856f5dc9de8216
+      |            | 19e3e786e1bc4e2b93856f5dc9de8216_0 |
+      |------------+------------------------------------|
+      | train loss |                           0.250983 |
+      | val loss   |                           0.260167 |
+      : 4 3612536a77f34f22bc83d1d809140aa6 19e3e786e1bc4e2b93856f5dc9de8216
+      |            | 19e3e786e1bc4e2b93856f5dc9de8216_1 |
+      |------------+------------------------------------|
+      | train loss |                           0.246347 |
+      | val loss   |                           0.242849 |
+      : 5 7cafab027cdd4fc9bf20a43e989df510 347669d050f344ad9fb9e480c814f727
+      |            | 347669d050f344ad9fb9e480c814f727_0 |
+      |------------+------------------------------------|
+      | train loss |                           0.194196 |
+      | val loss   |                           0.221606 |
+      : 5 16dff15d935f45e2a836b1f41b07b4e3 347669d050f344ad9fb9e480c814f727
+      |            | 347669d050f344ad9fb9e480c814f727_1 |
+      |------------+------------------------------------|
+      | train loss |                           0.196745 |
+      | val loss   |                           0.250257 |
+      : 6 0e328920e86049928202db95e8cfb7be c1204e3a8a1e4c40a35b5b7b1922d1ce
+      |            | c1204e3a8a1e4c40a35b5b7b1922d1ce_0 |
+      |------------+------------------------------------|
+      | train loss |                           0.266620 |
+      | val loss   |                           0.279587 |
+      : 6 bf9d2725eb16462d9a101f0a077ce2b5 c1204e3a8a1e4c40a35b5b7b1922d1ce
+      |            | c1204e3a8a1e4c40a35b5b7b1922d1ce_1 |
+      |------------+------------------------------------|
+      | train loss |                           0.262320 |
+      | val loss   |                           0.265113 |
+      : 7 1c954fbc02b747bc813c587ac703c74a 714af8cd12c1441eac4ca980e8c20070
+      |            | 714af8cd12c1441eac4ca980e8c20070_0 |
+      |------------+------------------------------------|
+      | train loss |                           0.310728 |
+      | val loss   |                           0.317540 |
+      : 7 ba49a80c2616407a8f1fe1fd12096fe0 714af8cd12c1441eac4ca980e8c20070
+      |            | 714af8cd12c1441eac4ca980e8c20070_1 |
+      |------------+------------------------------------|
+      | train loss |                           0.303487 |
+      | val loss   |                           0.340323 |
+      : 8 3cbd945b62ec4634839372e403f6f377 34a6d207ac594035b1009c330fb67a65
+      |            | 34a6d207ac594035b1009c330fb67a65_0 |
+      |------------+------------------------------------|
+      | train loss |                           0.189994 |
+      | val loss   |                           0.249494 |
+      : 8 458b36a70db843719d202a8eda448f17 34a6d207ac594035b1009c330fb67a65
+      |            | 34a6d207ac594035b1009c330fb67a65_1 |
+      |------------+------------------------------------|
+      | train loss |                           0.211194 |
+      | val loss   |                           0.239334 |
+      :END:
+      #+end_details
+
+      [[file:./data/exp-220227-unet/jupyter/supplementary_train-loss-vs-val-loss.png]]
+
+*** Analysis 2a: Evaluate models on simulated test data
    :PROPERTIES:
    :header-args:jupyter-python: :session /jpy:localhost#8889:d37e524a-8134-4d8f-b24a-367acaf1bdd3 :pandoc t
    :ID:       3d3f3924-b489-449e-abfd-318443f3fa94
    :END:
    1. go to correct folder, load modules
+      #+begin_details
       #+BEGIN_SRC jupyter-python
         %cd /beegfs/ye53nis/drmed-git
       #+END_SRC
@@ -4130,8 +4300,10 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
 
       #+RESULTS:
       : <module 'fluotracify.applications.corr_fit_object' from '/beegfs/ye53nis/drmed-git/src/fluotracify/applications/corr_fit_object.py'>
-
+      #+end_details
    2. Load test data from simulation experiments
+
+      #+begin_details
       #+BEGIN_SRC jupyter-python
         col_per_example = 3
         lab_thresh = 0.04
@@ -4172,6 +4344,7 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
 
         sim_dirty
       #+END_SRC
+      #+end_details
 
       #+RESULTS:
       :RESULTS:
@@ -4207,8 +4380,9 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
       : To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
       : <MapDataset element_spec=(TensorSpec(shape=(16384, 1), dtype=tf.float32, name=None), TensorSpec(shape=(16384, 1), dtype=tf.float32, name=None))>
       :END:
-
-
+    - now apply each model to the held-out test dataset and evaluate prediction
+      performance. We also get info on the inference time in total and for each
+      step.
       #+begin_src jupyter-python :pandoc t
         eva = pd.DataFrame()
         for i in model_ls:
@@ -4246,26 +4420,28 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
       : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
       : model: 347669d050f344ad9fb9e480c814f727
 
-
     - we get =run1_2_my= with a summary of the best hyperparameter training runs
-      from the code block ~#+CALL: get-hparam-comparison()~
+      from the code block ~#+CALL: get-hparam-comparison()~. This assigns among
+      others the variables =run1_2_my=, =cond2=, =cond3=
       #+CALL: get-hparam-comparison()
 
       #+RESULTS:
       :RESULTS:
-      | Run ID:                                                              | val_auc | val_recall0.5 | val_precision0.5 | hp_batch_size | hp_first_filters | hp_input_size | hp_lr_power | hp_lr_start        | hp_n_levels | hp_pool_size | hp_scaler |
-|----------------------------------------------------------------------+---------+---------------+------------------+---------------+------------------+---------------+-------------+--------------------+-------------+--------------+-----------|
-| (9051e32b87d84f3485b980067addec30, 61ff87bdb89b4e2ba64f8dacc774992d) | 0.981   | 0.8975        | 0.918            | 26            | 44               | 16384         | 1           | 0.0136170138242663 | 7           | 2            | standard  |
-| (93b168c0ff7942c8a908a94129daf973, f243b3b742de4dbcb7ccfbd4244706f8) | 0.976   | 0.893         | 0.852            | 15            | 23               | 16384         | 7           | 0.0305060808685107 | 6           | 4            | quant_g   |
-| (a5b8551144ff46e697a39cd1551e1475, 98cf8cdef9c54b5286e277e75e2ab8c1) | 0.984   | 0.916         | 0.909            | 20            | 78               | 16384         | 4           | 0.0584071108418767 | 4           | 4            | standard  |
-| (00f2635d9fa2463c9a066722163405be, d0a8e1748b194f3290d471b6b44f19f8) | 0.987   | 0.929         | 0.9065           | 28            | 6                | 16384         | 1           | 0.0553313915596308 | 5           | 4            | minmax    |
-| (5604d43c1ece461b8e6eaa0dfb65d6dc, 3612536a77f34f22bc83d1d809140aa6) | 0.9745  | 0.885         | 0.8985           | 20            | 128              | 16384         | 1           | 0.043549707353273  | 3           | 4            | standard  |
-| (7cafab027cdd4fc9bf20a43e989df510, 16dff15d935f45e2a836b1f41b07b4e3) | 0.978   | 0.8905        | 0.891            | 10            | 16               | 8192          | 1           | 0.0627676336651573 | 5           | 4            | robust    |
-| (0e328920e86049928202db95e8cfb7be, bf9d2725eb16462d9a101f0a077ce2b5) | 0.976   | 0.875         | 0.888            | 14            | 16               | 16384         | 5           | 0.0192390310290551 | 9           | 2            | robust    |
-| (1c954fbc02b747bc813c587ac703c74a, ba49a80c2616407a8f1fe1fd12096fe0) | 0.962   | 0.856         | 0.8585           | 17            | 16               | 16384         | 5           | 0.0101590069352232 | 3           | 4            | l2        |
-| (3cbd945b62ec4634839372e403f6f377, 458b36a70db843719d202a8eda448f17) | 0.972   | 0.872         | 0.9135           | 9             | 64               | 4096          | 1           | 0.0100697459464075 | 5           | 4            | maxabs    |
+      | Run ID:                                                              | val_auc | val_recall0.5 | val_precision0.5 | hp_batch_size | hp_first_filters | hp_input_size | hp_lr_power |        hp_lr_start | hp_n_levels | hp_pool_size | hp_scaler |
+      |----------------------------------------------------------------------+---------+---------------+------------------+---------------+------------------+---------------+-------------+--------------------+-------------+--------------+-----------|
+      | (9051e32b87d84f3485b980067addec30, 61ff87bdb89b4e2ba64f8dacc774992d) |   0.981 |        0.8975 |            0.918 |            26 |               44 |         16384 |           1 | 0.0136170138242663 |           7 |            2 | standard  |
+      | (93b168c0ff7942c8a908a94129daf973, f243b3b742de4dbcb7ccfbd4244706f8) |   0.976 |         0.893 |            0.852 |            15 |               23 |         16384 |           7 | 0.0305060808685107 |           6 |            4 | quant_g   |
+      | (a5b8551144ff46e697a39cd1551e1475, 98cf8cdef9c54b5286e277e75e2ab8c1) |   0.984 |         0.916 |            0.909 |            20 |               78 |         16384 |           4 | 0.0584071108418767 |           4 |            4 | standard  |
+      | (00f2635d9fa2463c9a066722163405be, d0a8e1748b194f3290d471b6b44f19f8) |   0.987 |         0.929 |           0.9065 |            28 |                6 |         16384 |           1 | 0.0553313915596308 |           5 |            4 | minmax    |
+      | (5604d43c1ece461b8e6eaa0dfb65d6dc, 3612536a77f34f22bc83d1d809140aa6) |  0.9745 |         0.885 |           0.8985 |            20 |              128 |         16384 |           1 |  0.043549707353273 |           3 |            4 | standard  |
+      | (7cafab027cdd4fc9bf20a43e989df510, 16dff15d935f45e2a836b1f41b07b4e3) |   0.978 |        0.8905 |            0.891 |            10 |               16 |          8192 |           1 | 0.0627676336651573 |           5 |            4 | robust    |
+      | (0e328920e86049928202db95e8cfb7be, bf9d2725eb16462d9a101f0a077ce2b5) |   0.976 |         0.875 |            0.888 |            14 |               16 |         16384 |           5 | 0.0192390310290551 |           9 |            2 | robust    |
+      | (1c954fbc02b747bc813c587ac703c74a, ba49a80c2616407a8f1fe1fd12096fe0) |   0.962 |         0.856 |           0.8585 |            17 |               16 |         16384 |           5 | 0.0101590069352232 |           3 |            4 | l2        |
+      | (3cbd945b62ec4634839372e403f6f377, 458b36a70db843719d202a8eda448f17) |   0.972 |         0.872 |           0.9135 |             9 |               64 |          4096 |           1 | 0.0100697459464075 |           5 |            4 | maxabs    |
       :END:
-
+    - now get hparams and metrics from final trained models. Inference times
+      and model sizes are transferred by hand from the evaluation results.
+      #+begin_details
       #+BEGIN_SRC jupyter-python
         model_dict = {
             ('9051e32b87d84f3485b980067addec30', '61ff87bdb89b4e2ba64f8dacc774992d') :  '484af471c61943fa90e5f78e78a229f0',
@@ -4363,15 +4539,15 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
       | test HPC inference time (one trace)          |                             14ms |                             22ms |                             67ms |                             15ms |                            123ms |                             32ms |                             77ms |                            120ms |                             77ms |
       | test Model size                              |                           275 MB |                           200 MB |                           186 MB |                            14 MB |                           172 MB |                            73 MB |                           312 MB |                           234 MB |                             7 MB |
       :END:
-
+      #+end_details
+    - for the final data we only take recall, precision, and f1 at a 0.5
+      prediction threshold.
       #+BEGIN_SRC jupyter-python
         final.loc[['val_auc', 'test auc', 'val_recall0.5', 'test recall0.5', 'val_precision0.5',
                    'test precision0.5', 'test f1', 'hp_batch_size', 'hp_input_size', 'hp_lr_power',
                    'hp_lr_start', 'hp_n_levels', 'hp_pool_size', 'hp_scaler',
                    'test HPC inference time (whole test dataset)', 'test HPC inference time (one trace)',
                    'test Model size']]
-
-
       #+END_SRC
 
       #+RESULTS:
@@ -4397,647 +4573,515 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
       | test Model size                              |                           200 MB |                            14 MB |                           275 MB |                           186 MB |                           172 MB |                            73 MB |                           312 MB |                           234 MB |                             7 MB |
       :END:
 
-    - plot loss vs validation loss for models in hyperparameter training
-      #+BEGIN_SRC jupyter-python
-        model_dict = {
-            ('9051e32b87d84f3485b980067addec30', '61ff87bdb89b4e2ba64f8dacc774992d') :  '484af471c61943fa90e5f78e78a229f0',
-            ('93b168c0ff7942c8a908a94129daf973', 'f243b3b742de4dbcb7ccfbd4244706f8') :  '0cd2023eeaf745aca0d3e8ad5e1fc653',
-            ('a5b8551144ff46e697a39cd1551e1475', '98cf8cdef9c54b5286e277e75e2ab8c1') :  'fe81d71c52404ed790b3a32051258da9',
-            ('00f2635d9fa2463c9a066722163405be', 'd0a8e1748b194f3290d471b6b44f19f8') :  'ff67be0b68e540a9a29a36a2d0c7a5be',
-            ('5604d43c1ece461b8e6eaa0dfb65d6dc', '3612536a77f34f22bc83d1d809140aa6') :  '19e3e786e1bc4e2b93856f5dc9de8216',
-            ('7cafab027cdd4fc9bf20a43e989df510', '16dff15d935f45e2a836b1f41b07b4e3') :  '347669d050f344ad9fb9e480c814f727',
-            ('0e328920e86049928202db95e8cfb7be', 'bf9d2725eb16462d9a101f0a077ce2b5') :  'c1204e3a8a1e4c40a35b5b7b1922d1ce',
-            ('1c954fbc02b747bc813c587ac703c74a', 'ba49a80c2616407a8f1fe1fd12096fe0') :  '714af8cd12c1441eac4ca980e8c20070',
-            ('3cbd945b62ec4634839372e403f6f377', '458b36a70db843719d202a8eda448f17') :  '34a6d207ac594035b1009c330fb67a65'}
-
-        hparam = run1_2_my.loc[cond2 & cond3]
-        hparam.rename(index=model_dict)
-
-        fig, axs = plt.subplots(len(hparam), 2, facecolor='white', figsize=(9, len(hparam)*3),
-                                sharex=True, tight_layout=True)
-        for i, idx in enumerate(hparam.index):
-            for j in range(2):
-                print(i, idx[j], model_dict[idx])
-                try:
-                    logged_val_loss = Path(f'/beegfs/ye53nis/drmed-git/data/mlruns/8/{idx[j]}/metrics/val_loss')
-                    logged_val_loss = !cat $logged_val_loss
-                    logged_val_loss = [i.split(' ') for i in logged_val_loss]
-                    logged_val_loss = pd.DataFrame(logged_val_loss, columns=['time', 'val_loss', 'epoch']).astype(float)
-
-                    logged_train_loss = Path(f'/beegfs/ye53nis/drmed-git/data/mlruns/8/{idx[j]}/metrics/loss')
-                    logged_train_loss = !cat $logged_train_loss
-                    logged_train_loss = [i.split(' ') for i in logged_train_loss]
-                    logged_train_loss = pd.DataFrame(logged_train_loss, columns=['time', 'train_loss', 'epoch']).astype(float)
-
-                    losses = pd.DataFrame([logged_train_loss.iloc[-1, 1], logged_val_loss.iloc[-1, 1]], index=['train loss', 'val loss'],
-                                          columns=[f'{model_dict[idx]}_{j}'])
-                    display(losses)
-                    last_losses = pd.concat([last_losses, ])
-                    sns.lineplot('epoch', 'train_loss', data=logged_train_loss, ax=axs[i, j], label='train loss')
-                    sns.lineplot('epoch', 'val_loss', data=logged_val_loss, ax=axs[i, j], label='val loss')
-                    if j == 0:
-                        axs[i, j].set_title(model_dict[idx])
-                except ValueError:
-                    pass
-        plt.setp(axs, yscale='log', ylabel='')
-        fig.align_ylabels(axs)
-      #+END_SRC
-
-      #+RESULTS:
-      :RESULTS:
-      : 0 9051e32b87d84f3485b980067addec30 484af471c61943fa90e5f78e78a229f0
-      |            | 484af471c61943fa90e5f78e78a229f0_0 |
-      |------------+------------------------------------|
-      | train loss |                           0.196100 |
-      | val loss   |                           0.199457 |
-      : 0 61ff87bdb89b4e2ba64f8dacc774992d 484af471c61943fa90e5f78e78a229f0
-      |            | 484af471c61943fa90e5f78e78a229f0_1 |
-      |------------+------------------------------------|
-      | train loss |                           0.194301 |
-      | val loss   |                           0.197833 |
-      : 1 93b168c0ff7942c8a908a94129daf973 0cd2023eeaf745aca0d3e8ad5e1fc653
-      |            | 0cd2023eeaf745aca0d3e8ad5e1fc653_0 |
-      |------------+------------------------------------|
-      | train loss |                           0.245977 |
-      | val loss   |                           0.250499 |
-      |            |                                    |
-      : 1 f243b3b742de4dbcb7ccfbd4244706f8 0cd2023eeaf745aca0d3e8ad5e1fc653
-      |            | 0cd2023eeaf745aca0d3e8ad5e1fc653_1 |
-      |------------+------------------------------------|
-      | train loss |                           0.278278 |
-      | val loss   |                           0.283107 |
-      : 2 a5b8551144ff46e697a39cd1551e1475 fe81d71c52404ed790b3a32051258da9
-      |            | fe81d71c52404ed790b3a32051258da9_0 |
-      |------------+------------------------------------|
-      | train loss |                           0.185773 |
-      | val loss   |                           0.186789 |
-      : 2 98cf8cdef9c54b5286e277e75e2ab8c1 fe81d71c52404ed790b3a32051258da9
-      |            | fe81d71c52404ed790b3a32051258da9_1 |
-      |------------+------------------------------------|
-      | train loss |                           0.183874 |
-      | val loss   |                           0.184316 |
-      : 3 00f2635d9fa2463c9a066722163405be ff67be0b68e540a9a29a36a2d0c7a5be
-      |            | ff67be0b68e540a9a29a36a2d0c7a5be_0 |
-      |------------+------------------------------------|
-      | train loss |                           0.172448 |
-      | val loss   |                           0.178439 |
-      |            |                                    |
-      : 3 d0a8e1748b194f3290d471b6b44f19f8 ff67be0b68e540a9a29a36a2d0c7a5be
-      : 4 5604d43c1ece461b8e6eaa0dfb65d6dc 19e3e786e1bc4e2b93856f5dc9de8216
-      |            | 19e3e786e1bc4e2b93856f5dc9de8216_0 |
-      |------------+------------------------------------|
-      | train loss |                           0.250983 |
-      | val loss   |                           0.260167 |
-      : 4 3612536a77f34f22bc83d1d809140aa6 19e3e786e1bc4e2b93856f5dc9de8216
-      |            | 19e3e786e1bc4e2b93856f5dc9de8216_1 |
-      |------------+------------------------------------|
-      | train loss |                           0.246347 |
-      | val loss   |                           0.242849 |
-      : 5 7cafab027cdd4fc9bf20a43e989df510 347669d050f344ad9fb9e480c814f727
-      |            | 347669d050f344ad9fb9e480c814f727_0 |
-      |------------+------------------------------------|
-      | train loss |                           0.194196 |
-      | val loss   |                           0.221606 |
-      : 5 16dff15d935f45e2a836b1f41b07b4e3 347669d050f344ad9fb9e480c814f727
-      |            | 347669d050f344ad9fb9e480c814f727_1 |
-      |------------+------------------------------------|
-      | train loss |                           0.196745 |
-      | val loss   |                           0.250257 |
-      : 6 0e328920e86049928202db95e8cfb7be c1204e3a8a1e4c40a35b5b7b1922d1ce
-      |            | c1204e3a8a1e4c40a35b5b7b1922d1ce_0 |
-      |------------+------------------------------------|
-      | train loss |                           0.266620 |
-      | val loss   |                           0.279587 |
-      |            |                                    |
-      : 6 bf9d2725eb16462d9a101f0a077ce2b5 c1204e3a8a1e4c40a35b5b7b1922d1ce
-      |            | c1204e3a8a1e4c40a35b5b7b1922d1ce_1 |
-      |------------+------------------------------------|
-      | train loss |                           0.262320 |
-      | val loss   |                           0.265113 |
-      |            |                                    |
-      : 7 1c954fbc02b747bc813c587ac703c74a 714af8cd12c1441eac4ca980e8c20070
-      |            | 714af8cd12c1441eac4ca980e8c20070_0 |
-      |------------+------------------------------------|
-      | train loss |                           0.310728 |
-      | val loss   |                           0.317540 |
-      |            |                                    |
-      : 7 ba49a80c2616407a8f1fe1fd12096fe0 714af8cd12c1441eac4ca980e8c20070
-      |            | 714af8cd12c1441eac4ca980e8c20070_1 |
-      |------------+------------------------------------|
-      | train loss |                           0.303487 |
-      | val loss   |                           0.340323 |
-      |            |                                    |
-      : 8 3cbd945b62ec4634839372e403f6f377 34a6d207ac594035b1009c330fb67a65
-      |            | 34a6d207ac594035b1009c330fb67a65_0 |
-      |------------+------------------------------------|
-      | train loss |                           0.189994 |
-      | val loss   |                           0.249494 |
-      : 8 458b36a70db843719d202a8eda448f17 34a6d207ac594035b1009c330fb67a65
-      |            | 34a6d207ac594035b1009c330fb67a65_1 |
-      |------------+------------------------------------|
-      | train loss |                           0.211194 |
-      | val loss   |                           0.239334 |
-      |            |                                    |
-      :END:
-      [[file:./data/exp-220227-unet/jupyter/supplementary_train-loss-vs-val-loss.png]]
-
-*** Analysis 1b: correct simulated test data
+*** Analysis 2b: correct simulated test data
     :PROPERTIES:
     :header-args:jupyter-python: :session /jpy:localhost#8888:a37e524a-8134-4d8f-b24a-367acaf1bdd3 :pandoc t
     :END:
+    - load modules
+      #+begin_details
+      #+BEGIN_SRC jupyter-python
+        %cd ~/Programme/drmed-git
+      #+END_SRC
 
-    #+BEGIN_SRC jupyter-python
-      %cd ~/Programme/drmed-git
-    #+END_SRC
+      #+RESULTS:
+      : /home/lex/Programme/drmed-git
 
-    #+RESULTS:
-    : /home/lex/Programme/drmed-git
+      #+BEGIN_SRC jupyter-python
+        import os
+        import numpy as np
+        import matplotlib.pyplot as plt
+        import pandas as pd
+        import seaborn as sns
+        from pathlib import Path
+        from pprint import pprint
+        # use seaborn style as default even if I just use matplotlib
 
-    #+BEGIN_SRC jupyter-python
-      import os
-      import numpy as np
-      import matplotlib.pyplot as plt
-      import pandas as pd
-      import seaborn as sns
-      from pathlib import Path
-      from pprint import pprint
-      # use seaborn style as default even if I just use matplotlib
+        sns.set_theme(style="whitegrid", font_scale=2, palette='colorblind',
+                      context='paper')
+        # logging.basicConfig(filename="/home/lex/Programme/drmed-git/data/exp-220316-publication1/jupyter.log",
+        #               filemode='w', format='%(asctime)s - %(message)s',
+        #               force=True,
+        #               level=logging.DEBUG)
+      #+END_SRC
 
-      sns.set_theme(style="whitegrid", font_scale=2, palette='colorblind',
-                    context='paper')
-      # logging.basicConfig(filename="/home/lex/Programme/drmed-git/data/exp-220316-publication1/jupyter.log",
-      #               filemode='w', format='%(asctime)s - %(message)s',
-      #               force=True,
-      #               level=logging.DEBUG)
-    #+END_SRC
+      #+RESULTS:
+      #+end_details
+    - all prediction and
+      #+begin_details
+      #+BEGIN_SRC jupyter-python
+        path = Path('data/exp-220227-unet/220425_simexps/0cd20')
 
-    #+RESULTS:
+        odot069_0dot01_path = path / '0.069_results/0cd20_0dot069-0dot01_outputParam.csv'
+        odot069_0dot1_path = path / '0.069_results/0cd20_0dot069-0dot1_outputParam.csv'
+        odot069_1dot0_path = path / '0.069_results/0cd20_0dot069-1dot0_outputParam.csv'
 
-    #+BEGIN_SRC jupyter-python
-      path = Path('data/exp-220227-unet/220425_simexps/0cd20')
+        odot08_0dot01_path = path / '0.08_results/0cd20_0dot08-0dot01_outputParam.csv'
+        odot08_0dot1_path = path / '0.08_results/0cd20_0dot08-0dot1_outputParam.csv'
+        odot08_1dot0_path = path / '0.08_results/0cd20_0dot08-1dot0_outputParam.csv'
 
-      odot069_0dot01_path = path / '0.069_results/0cd20_0dot069-0dot01_outputParam.csv'
-      odot069_0dot1_path = path / '0.069_results/0cd20_0dot069-0dot1_outputParam.csv'
-      odot069_1dot0_path = path / '0.069_results/0cd20_0dot069-1dot0_outputParam.csv'
+        odot1_0dot01_path = path / '0.1_results/0cd20_0dot1-0dot01_outputParam.csv'
+        odot1_0dot1_path = path / '0.1_results/0cd20_0dot1-0dot1_outputParam.csv'
+        odot1_1dot0_path = path / '0.1_results/0cd20_0dot1-1dot0_outputParam.csv'
 
-      odot08_0dot01_path = path / '0.08_results/0cd20_0dot08-0dot01_outputParam.csv'
-      odot08_0dot1_path = path / '0.08_results/0cd20_0dot08-0dot1_outputParam.csv'
-      odot08_1dot0_path = path / '0.08_results/0cd20_0dot08-1dot0_outputParam.csv'
+        odot2_0dot01_path = path / '0.2_results/0cd20_0dot2-0dot01_outputParam.csv'
+        odot2_0dot1_path = path / '0.2_results/0cd20_0dot2-0dot1_outputParam.csv'
+        odot2_1dot0_path = path / '0.2_results/0cd20_0dot2-1dot0_outputParam.csv'
 
-      odot1_0dot01_path = path / '0.1_results/0cd20_0dot1-0dot01_outputParam.csv'
-      odot1_0dot1_path = path / '0.1_results/0cd20_0dot1-0dot1_outputParam.csv'
-      odot1_1dot0_path = path / '0.1_results/0cd20_0dot1-1dot0_outputParam.csv'
+        odot4_0dot01_path = path / '0.4_results/0cd20_0dot4-0dot01_outputParam.csv'
+        odot4_0dot1_path = path / '0.4_results/0cd20_0dot4-0dot1_outputParam.csv'
+        odot4_1dot0_path = path / '0.4_results/0cd20_0dot4-1dot0_outputParam.csv'
 
-      odot2_0dot01_path = path / '0.2_results/0cd20_0dot2-0dot01_outputParam.csv'
-      odot2_0dot1_path = path / '0.2_results/0cd20_0dot2-0dot1_outputParam.csv'
-      odot2_1dot0_path = path / '0.2_results/0cd20_0dot2-1dot0_outputParam.csv'
+        odot6_0dot01_path = path / '0.6_results/0cd20_0dot6-0dot01_outputParam.csv'
+        odot6_0dot1_path = path / '0.6_results/0cd20_0dot6-0dot1_outputParam.csv'
+        odot6_1dot0_path = path / '0.6_results/0cd20_0dot6-1dot0_outputParam.csv'
 
-      odot4_0dot01_path = path / '0.4_results/0cd20_0dot4-0dot01_outputParam.csv'
-      odot4_0dot1_path = path / '0.4_results/0cd20_0dot4-0dot1_outputParam.csv'
-      odot4_1dot0_path = path / '0.4_results/0cd20_0dot4-1dot0_outputParam.csv'
+        one_0dot01_path = path / '1.0_results/0cd20_1dot0-0dot01_outputParam.csv'
+        one_0dot1_path = path / '1.0_results/0cd20_1dot0-0dot1_outputParam.csv'
+        one_1dot0_path = path / '1.0_results/0cd20_1dot0-1dot0_outputParam.csv'
 
-      odot6_0dot01_path = path / '0.6_results/0cd20_0dot6-0dot01_outputParam.csv'
-      odot6_0dot1_path = path / '0.6_results/0cd20_0dot6-0dot1_outputParam.csv'
-      odot6_1dot0_path = path / '0.6_results/0cd20_0dot6-1dot0_outputParam.csv'
+        three_0dot01_path = path / '3.0_results/0cd20_3dot0-0dot01_outputParam.csv'
+        three_0dot1_path = path / '3.0_results/0cd20_3dot0-0dot1_outputParam.csv'
+        three_1dot0_path = path / '3.0_results/0cd20_3dot0-1dot0_outputParam.csv'
 
-      one_0dot01_path = path / '1.0_results/0cd20_1dot0-0dot01_outputParam.csv'
-      one_0dot1_path = path / '1.0_results/0cd20_1dot0-0dot1_outputParam.csv'
-      one_1dot0_path = path / '1.0_results/0cd20_1dot0-1dot0_outputParam.csv'
+        ten_0dot01_path = path / '10.0_results/0cd20_10dot0-0dot01_outputParam.csv'
+        ten_0dot1_path = path / '10.0_results/0cd20_10dot0-0dot1_outputParam.csv'
+        ten_1dot0_path = path / '10.0_results/0cd20_10dot0-1dot0_outputParam.csv'
 
-      three_0dot01_path = path / '3.0_results/0cd20_3dot0-0dot01_outputParam.csv'
-      three_0dot1_path = path / '3.0_results/0cd20_3dot0-0dot1_outputParam.csv'
-      three_1dot0_path = path / '3.0_results/0cd20_3dot0-1dot0_outputParam.csv'
+        fifty_0dot01_path = path / '50.0_results/0cd20_50dot0-0dot01_outputParam.csv'
+        fifty_0dot1_path = path / '50.0_results/0cd20_50dot0-0dot1_outputParam.csv'
+        fifty_1dot0_path = path / '50.0_results/0cd20_50dot0-1dot0_outputParam.csv'
 
-      ten_0dot01_path = path / '10.0_results/0cd20_10dot0-0dot01_outputParam.csv'
-      ten_0dot1_path = path / '10.0_results/0cd20_10dot0-0dot1_outputParam.csv'
-      ten_1dot0_path = path / '10.0_results/0cd20_10dot0-1dot0_outputParam.csv'
+      #+END_SRC
 
-      fifty_0dot01_path = path / '50.0_results/0cd20_50dot0-0dot01_outputParam.csv'
-      fifty_0dot1_path = path / '50.0_results/0cd20_50dot0-0dot1_outputParam.csv'
-      fifty_1dot0_path = path / '50.0_results/0cd20_50dot0-1dot0_outputParam.csv'
-
-    #+END_SRC
-
-    #+RESULTS:
+      #+RESULTS:
+      #+end_details
 
     - we load the data and combine it. We convert the simulated D [um2/s] in
       t[ms]. Based on an exploratory plot of A1 and A2 we swap A1-A2 and
       txy1-txy2, so that A1 and txy1 always represent the bigger fitted fraction
       size.
-    #+BEGIN_SRC jupyter-python
-      odot069_0dot01 = pd.read_csv(odot069_0dot01_path, sep=',').assign(
-          artifact_speed=100*[1127,], stationary_speed=100*[163,],
-          model=100*['0cd20',], correction=100*['cut and shift',])
-      odot069_0dot1 = pd.read_csv(odot069_0dot1_path, sep=',').assign(
-          artifact_speed=100*[113,], stationary_speed=100*[163,],
-          model=100*['0cd20',], correction=100*['cut and shift',])
-      odot069_1dot0 = pd.read_csv(odot069_1dot0_path, sep=',').assign(
-          artifact_speed=100*[11.3,], stationary_speed=100*[163,],
-          model=100*['0cd20',], correction=100*['cut and shift',])
+      #+begin_details
+      #+BEGIN_SRC jupyter-python
+        odot069_0dot01 = pd.read_csv(odot069_0dot01_path, sep=',').assign(
+            artifact_speed=100*[1127,], stationary_speed=100*[163,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+        odot069_0dot1 = pd.read_csv(odot069_0dot1_path, sep=',').assign(
+            artifact_speed=100*[113,], stationary_speed=100*[163,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+        odot069_1dot0 = pd.read_csv(odot069_1dot0_path, sep=',').assign(
+            artifact_speed=100*[11.3,], stationary_speed=100*[163,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
 
-      odot08_0dot01 = pd.read_csv(odot08_0dot01_path, sep=',').assign(
-          artifact_speed=100*[1127,], stationary_speed=100*[141,],
-          model=100*['0cd20',], correction=100*['cut and shift',])
-      odot08_0dot01[['txy1', 'txy2']] = odot08_0dot01[['txy2', 'txy1']]
-      odot08_0dot01[['A1', 'A2']] = odot08_0dot01[['A2', 'A1']]
-      odot08_0dot1 = pd.read_csv(odot08_0dot1_path, sep=',').assign(
-          artifact_speed=100*[113,], stationary_speed=100*[141,],
-          model=100*['0cd20',], correction=100*['cut and shift',])
-      odot08_1dot0 = pd.read_csv(odot08_1dot0_path, sep=',').assign(
-          artifact_speed=100*[11.3,], stationary_speed=100*[141,],
-          model=100*['0cd20',], correction=100*['cut and shift',])
+        odot08_0dot01 = pd.read_csv(odot08_0dot01_path, sep=',').assign(
+            artifact_speed=100*[1127,], stationary_speed=100*[141,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+        odot08_0dot01[['txy1', 'txy2']] = odot08_0dot01[['txy2', 'txy1']]
+        odot08_0dot01[['A1', 'A2']] = odot08_0dot01[['A2', 'A1']]
+        odot08_0dot1 = pd.read_csv(odot08_0dot1_path, sep=',').assign(
+            artifact_speed=100*[113,], stationary_speed=100*[141,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+        odot08_1dot0 = pd.read_csv(odot08_1dot0_path, sep=',').assign(
+            artifact_speed=100*[11.3,], stationary_speed=100*[141,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
 
-      odot1_0dot01 = pd.read_csv(odot1_0dot01_path, sep=',').assign(
-          artifact_speed=100*[1127,], stationary_speed=100*[113,],
-          model=100*['0cd20',], correction=100*['cut and shift',])
-      odot1_0dot1 = pd.read_csv(odot1_0dot1_path, sep=',').assign(
-          artifact_speed=100*[113,], stationary_speed=100*[113,],
-          model=100*['0cd20',], correction=100*['cut and shift',])
-      odot1_1dot0 = pd.read_csv(odot1_1dot0_path, sep=',').assign(
-          artifact_speed=100*[11.3,], stationary_speed=100*[113,],
-          model=100*['0cd20',], correction=100*['cut and shift',])
+        odot1_0dot01 = pd.read_csv(odot1_0dot01_path, sep=',').assign(
+            artifact_speed=100*[1127,], stationary_speed=100*[113,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+        odot1_0dot1 = pd.read_csv(odot1_0dot1_path, sep=',').assign(
+            artifact_speed=100*[113,], stationary_speed=100*[113,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+        odot1_1dot0 = pd.read_csv(odot1_1dot0_path, sep=',').assign(
+            artifact_speed=100*[11.3,], stationary_speed=100*[113,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
 
-      odot2_0dot01 = pd.read_csv(odot2_0dot01_path, sep=',').assign(
-          artifact_speed=100*[1127,], stationary_speed=100*[56.4,],
-          model=100*['0cd20',], correction=100*['cut and shift',])
-      odot2_0dot1 = pd.read_csv(odot2_0dot1_path, sep=',').assign(
-          artifact_speed=100*[113,], stationary_speed=100*[56.4,],
-          model=100*['0cd20',], correction=100*['cut and shift',])
-      odot2_0dot1[['txy1', 'txy2']] = odot2_0dot1[['txy2', 'txy1']]
-      odot2_0dot1[['A1', 'A2']] = odot2_0dot1[['A2', 'A1']]
-      odot2_1dot0 = pd.read_csv(odot2_1dot0_path, sep=',').assign(
-          artifact_speed=100*[11.3,], stationary_speed=100*[56.4,],
-          model=100*['0cd20',], correction=100*['cut and shift',])
+        odot2_0dot01 = pd.read_csv(odot2_0dot01_path, sep=',').assign(
+            artifact_speed=100*[1127,], stationary_speed=100*[56.4,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+        odot2_0dot1 = pd.read_csv(odot2_0dot1_path, sep=',').assign(
+            artifact_speed=100*[113,], stationary_speed=100*[56.4,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+        odot2_0dot1[['txy1', 'txy2']] = odot2_0dot1[['txy2', 'txy1']]
+        odot2_0dot1[['A1', 'A2']] = odot2_0dot1[['A2', 'A1']]
+        odot2_1dot0 = pd.read_csv(odot2_1dot0_path, sep=',').assign(
+            artifact_speed=100*[11.3,], stationary_speed=100*[56.4,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
 
-      odot4_0dot01 = pd.read_csv(odot4_0dot01_path, sep=',').assign(
-          artifact_speed=100*[1127,], stationary_speed=100*[28.2,],
-          model=100*['0cd20',], correction=100*['cut and shift',])
-      odot4_0dot1 = pd.read_csv(odot4_0dot1_path, sep=',').assign(
-          artifact_speed=100*[113,], stationary_speed=100*[28.2,],
-          model=100*['0cd20',], correction=100*['cut and shift',])
-      odot4_0dot1[['txy1', 'txy2']] = odot4_0dot1[['txy2', 'txy1']]
-      odot4_0dot1[['A1', 'A2']] = odot4_0dot1[['A2', 'A1']]
-      odot4_1dot0 = pd.read_csv(odot4_1dot0_path, sep=',').assign(
-          artifact_speed=100*[11.3,], stationary_speed=100*[28.2,],
-          model=100*['0cd20',], correction=100*['cut and shift',])
+        odot4_0dot01 = pd.read_csv(odot4_0dot01_path, sep=',').assign(
+            artifact_speed=100*[1127,], stationary_speed=100*[28.2,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+        odot4_0dot1 = pd.read_csv(odot4_0dot1_path, sep=',').assign(
+            artifact_speed=100*[113,], stationary_speed=100*[28.2,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+        odot4_0dot1[['txy1', 'txy2']] = odot4_0dot1[['txy2', 'txy1']]
+        odot4_0dot1[['A1', 'A2']] = odot4_0dot1[['A2', 'A1']]
+        odot4_1dot0 = pd.read_csv(odot4_1dot0_path, sep=',').assign(
+            artifact_speed=100*[11.3,], stationary_speed=100*[28.2,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
 
-      odot6_0dot01 = pd.read_csv(odot6_0dot01_path, sep=',').assign(
-          artifact_speed=100*[1127,], stationary_speed=100*[18.8,],
-          model=100*['0cd20',], correction=100*['cut and shift',])
-      odot6_0dot1 = pd.read_csv(odot6_0dot1_path, sep=',').assign(
-          artifact_speed=100*[113,], stationary_speed=100*[18.8,],
-          model=100*['0cd20',], correction=100*['cut and shift',])
-      odot6_1dot0 = pd.read_csv(odot6_1dot0_path, sep=',').assign(
-          artifact_speed=100*[11.3,], stationary_speed=100*[18.8,],
-          model=100*['0cd20',], correction=100*['cut and shift',])
+        odot6_0dot01 = pd.read_csv(odot6_0dot01_path, sep=',').assign(
+            artifact_speed=100*[1127,], stationary_speed=100*[18.8,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+        odot6_0dot1 = pd.read_csv(odot6_0dot1_path, sep=',').assign(
+            artifact_speed=100*[113,], stationary_speed=100*[18.8,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+        odot6_1dot0 = pd.read_csv(odot6_1dot0_path, sep=',').assign(
+            artifact_speed=100*[11.3,], stationary_speed=100*[18.8,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
 
-      one_0dot01 = pd.read_csv(one_0dot01_path, sep=',').assign(
-          artifact_speed=100*[1127,], stationary_speed=100*[11.3,],
-          model=100*['0cd20',], correction=100*['cut and shift',])
-      one_0dot1 = pd.read_csv(one_0dot1_path, sep=',').assign(
-          artifact_speed=100*[113,], stationary_speed=100*[11.3,],
-          model=100*['0cd20',], correction=100*['cut and shift',])
-      one_1dot0 = pd.read_csv(one_1dot0_path, sep=',').assign(
-          artifact_speed=100*[11.3,], stationary_speed=100*[11.3,],
-          model=100*['0cd20',], correction=100*['cut and shift',])
+        one_0dot01 = pd.read_csv(one_0dot01_path, sep=',').assign(
+            artifact_speed=100*[1127,], stationary_speed=100*[11.3,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+        one_0dot1 = pd.read_csv(one_0dot1_path, sep=',').assign(
+            artifact_speed=100*[113,], stationary_speed=100*[11.3,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+        one_1dot0 = pd.read_csv(one_1dot0_path, sep=',').assign(
+            artifact_speed=100*[11.3,], stationary_speed=100*[11.3,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
 
-      three_0dot01 = pd.read_csv(three_0dot01_path, sep=',').assign(
-          artifact_speed=100*[1127,], stationary_speed=100*[3.76,],
-          model=100*['0cd20',], correction=100*['cut and shift',])
-      three_0dot1 = pd.read_csv(three_0dot1_path, sep=',').assign(
-          artifact_speed=100*[113,], stationary_speed=100*[3.76,],
-          model=100*['0cd20',], correction=100*['cut and shift',])
-      three_0dot1[['txy1', 'txy2']] = three_0dot1[['txy2', 'txy1']]
-      three_0dot1[['A1', 'A2']] = three_0dot1[['A2', 'A1']]
-      three_1dot0 = pd.read_csv(three_1dot0_path, sep=',').assign(
-          artifact_speed=100*[11.3,], stationary_speed=100*[3.76,],
-          model=100*['0cd20',], correction=100*['cut and shift',])
+        three_0dot01 = pd.read_csv(three_0dot01_path, sep=',').assign(
+            artifact_speed=100*[1127,], stationary_speed=100*[3.76,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+        three_0dot1 = pd.read_csv(three_0dot1_path, sep=',').assign(
+            artifact_speed=100*[113,], stationary_speed=100*[3.76,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+        three_0dot1[['txy1', 'txy2']] = three_0dot1[['txy2', 'txy1']]
+        three_0dot1[['A1', 'A2']] = three_0dot1[['A2', 'A1']]
+        three_1dot0 = pd.read_csv(three_1dot0_path, sep=',').assign(
+            artifact_speed=100*[11.3,], stationary_speed=100*[3.76,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
 
-      ten_0dot01 = pd.read_csv(ten_0dot01_path, sep=',').assign(
-          artifact_speed=100*[1127,], stationary_speed=100*[1.13,],
-          model=100*['0cd20',], correction=100*['cut and shift',])
-      ten_0dot1 = pd.read_csv(ten_0dot1_path, sep=',').assign(
-          artifact_speed=100*[113,], stationary_speed=100*[1.13,],
-          model=100*['0cd20',], correction=100*['cut and shift',])
-      ten_1dot0 = pd.read_csv(ten_1dot0_path, sep=',').assign(
-          artifact_speed=100*[11.3,], stationary_speed=100*[1.13,],
-          model=100*['0cd20',], correction=100*['cut and shift',])
+        ten_0dot01 = pd.read_csv(ten_0dot01_path, sep=',').assign(
+            artifact_speed=100*[1127,], stationary_speed=100*[1.13,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+        ten_0dot1 = pd.read_csv(ten_0dot1_path, sep=',').assign(
+            artifact_speed=100*[113,], stationary_speed=100*[1.13,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+        ten_1dot0 = pd.read_csv(ten_1dot0_path, sep=',').assign(
+            artifact_speed=100*[11.3,], stationary_speed=100*[1.13,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
 
-      fifty_0dot01 = pd.read_csv(fifty_0dot01_path, sep=',').assign(
-          artifact_speed=100*[1127,], stationary_speed=100*[0.23,],
-          model=100*['0cd20',], correction=100*['cut and shift',])
-      fifty_0dot1 = pd.read_csv(fifty_0dot1_path, sep=',').assign(
-          artifact_speed=100*[113,], stationary_speed=100*[0.23,],
-          model=100*['0cd20',], correction=100*['cut and shift',])
-      fifty_0dot1[['txy1', 'txy2']] = fifty_0dot1[['txy2', 'txy1']]
-      fifty_0dot1[['A1', 'A2']] = fifty_0dot1[['A2', 'A1']]
-      fifty_1dot0 = pd.read_csv(fifty_1dot0_path, sep=',').assign(
-          artifact_speed=100*[11.3,], stationary_speed=100*[0.23,],
-          model=100*['0cd20',], correction=100*['cut and shift',])
+        fifty_0dot01 = pd.read_csv(fifty_0dot01_path, sep=',').assign(
+            artifact_speed=100*[1127,], stationary_speed=100*[0.23,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+        fifty_0dot1 = pd.read_csv(fifty_0dot1_path, sep=',').assign(
+            artifact_speed=100*[113,], stationary_speed=100*[0.23,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
+        fifty_0dot1[['txy1', 'txy2']] = fifty_0dot1[['txy2', 'txy1']]
+        fifty_0dot1[['A1', 'A2']] = fifty_0dot1[['A2', 'A1']]
+        fifty_1dot0 = pd.read_csv(fifty_1dot0_path, sep=',').assign(
+            artifact_speed=100*[11.3,], stationary_speed=100*[0.23,],
+            model=100*['0cd20',], correction=100*['cut and shift',])
 
-      all_param = pd.concat([odot069_0dot01, odot069_0dot1, odot069_1dot0,
-                             odot08_0dot01, odot08_0dot1, odot08_1dot0,
-                             odot1_0dot01, odot1_0dot1, odot1_1dot0,
-                             odot2_0dot01, odot2_0dot1, odot2_1dot0,
-                             odot4_0dot01, odot4_0dot1, odot4_1dot0,
-                             odot6_0dot01, odot6_0dot1, odot6_1dot0,
-                             one_0dot01, one_0dot1, one_1dot0,
-                             three_0dot01, three_0dot1, three_1dot0,
-                             ten_0dot01, ten_0dot1, ten_1dot0,
-                             fifty_0dot01, fifty_0dot1, fifty_1dot0],
-                            ignore_index=True)
+        all_param = pd.concat([odot069_0dot01, odot069_0dot1, odot069_1dot0,
+                               odot08_0dot01, odot08_0dot1, odot08_1dot0,
+                               odot1_0dot01, odot1_0dot1, odot1_1dot0,
+                               odot2_0dot01, odot2_0dot1, odot2_1dot0,
+                               odot4_0dot01, odot4_0dot1, odot4_1dot0,
+                               odot6_0dot01, odot6_0dot1, odot6_1dot0,
+                               one_0dot01, one_0dot1, one_1dot0,
+                               three_0dot01, three_0dot1, three_1dot0,
+                               ten_0dot01, ten_0dot1, ten_1dot0,
+                               fifty_0dot01, fifty_0dot1, fifty_1dot0],
+                              ignore_index=True)
 
-      all_param = pd.wide_to_long(all_param, stubnames='txy',
-                                  i=['name_of_plot'],
-                                  j='fitted species (txy)')
-      all_param = all_param.reset_index()
-      all_param = pd.wide_to_long(all_param, stubnames='A',
-                                  i=['name_of_plot', 'fitted species (txy)'],
-                                  j='fitted species (A)')
-      all_param = all_param.reset_index()
-      all_param
-    #+END_SRC
+        all_param = pd.wide_to_long(all_param, stubnames='txy',
+                                    i=['name_of_plot'],
+                                    j='fitted species (txy)')
+        all_param = all_param.reset_index()
+        all_param = pd.wide_to_long(all_param, stubnames='A',
+                                    i=['name_of_plot', 'fitted species (txy)'],
+                                    j='fitted species (A)')
+        all_param = all_param.reset_index()
+        all_param
+      #+END_SRC
+      #+end_details
 
-    #+RESULTS:
-    :RESULTS:
-    |       | name_of_plot                                      | fitted species (txy) | fitted species (A) |   N (FCS) | parent_name          | master_file | stdev(A1) | stdev(A2) | parent_uqid | Dimen | ... | cpm (kHz) | alpha1 |   xmax | artifact_speed | stdev(offset) | stdev(txy1) |    offset | bri (kHz) | Diff_species |        A |
-    |-------+---------------------------------------------------+----------------------+--------------------+-----------+----------------------+-------------+-----------+-----------+-------------+-------+-----+-----------+--------+--------+----------------+---------------+-------------+-----------+-----------+--------------+----------|
-    |     0 | 2022-04-25_multipletau_0cd20_0dot069-0dot01_26... |                    1 |                  2 | 37.523452 | 0cd20_0dot069-0dot01 | Not known   | None      | None      |           0 |    2D | ... |  0.026650 |    1.0 | 8192.0 |         1127.0 | None          | None        | -0.001696 |       1.0 |            2 | 0.001292 |
-    |     1 | 2022-04-25_multipletau_0cd20_0dot069-0dot01_26... |                    1 |                  1 | 37.523452 | 0cd20_0dot069-0dot01 | Not known   | None      | None      |           0 |    2D | ... |  0.026650 |    1.0 | 8192.0 |         1127.0 | None          | None        | -0.001696 |       1.0 |            2 | 0.998708 |
-    |     2 | 2022-04-25_multipletau_0cd20_0dot069-0dot01_26... |                    1 |                  2 | 35.394544 | 0cd20_0dot069-0dot01 | Not known   | None      | None      |           0 |    2D | ... |  0.028253 |    1.0 | 8192.0 |         1127.0 | None          | None        | -0.001883 |       1.0 |            2 | 0.002290 |
-    |     3 | 2022-04-25_multipletau_0cd20_0dot069-0dot01_26... |                    1 |                  1 | 35.394544 | 0cd20_0dot069-0dot01 | Not known   | None      | None      |           0 |    2D | ... |  0.028253 |    1.0 | 8192.0 |         1127.0 | None          | None        | -0.001883 |       1.0 |            2 | 0.997710 |
-    |     4 | 2022-04-25_multipletau_0cd20_0dot069-0dot01_26... |                    1 |                  2 | 27.754107 | 0cd20_0dot069-0dot01 | Not known   | None      | None      |           0 |    2D | ... |  0.036031 |    1.0 | 8192.0 |         1127.0 | None          | None        | -0.008520 |       1.0 |            2 | 0.526621 |
-    |   ... | ...                                               |                  ... |                ... |       ... | ...                  | ...         | ...       | ...       |         ... |   ... | ... |       ... |    ... |    ... |            ... | ...           | ...         |       ... |       ... |          ... |      ... |
-    | 11995 | 2022-04-25_multipletau_0cd20_50dot0-1dot0_1797... |                    2 |                  1 |  1.000001 | 0cd20_50dot0-1dot0   | Not known   | None      | None      |           0 |    2D | ... |  0.999999 |    1.0 | 1024.0 |           11.3 | None          | None        | -0.000090 |       1.0 |            2 | 1.000000 |
-    | 11996 | 2022-04-25_multipletau_0cd20_50dot0-1dot0_1798... |                    2 |                  2 |  1.000001 | 0cd20_50dot0-1dot0   | Not known   | None      | None      |           0 |    2D | ... |  0.999999 |    1.0 | 1024.0 |           11.3 | None          | None        | -0.000090 |       1.0 |            2 | 0.000000 |
-    | 11997 | 2022-04-25_multipletau_0cd20_50dot0-1dot0_1798... |                    2 |                  1 |  1.000001 | 0cd20_50dot0-1dot0   | Not known   | None      | None      |           0 |    2D | ... |  0.999999 |    1.0 | 1024.0 |           11.3 | None          | None        | -0.000090 |       1.0 |            2 | 1.000000 |
-    | 11998 | 2022-04-25_multipletau_0cd20_50dot0-1dot0_1799... |                    2 |                  2 |  1.000001 | 0cd20_50dot0-1dot0   | Not known   | None      | None      |           0 |    2D | ... |  0.999999 |    1.0 | 1024.0 |           11.3 | None          | None        | -0.000090 |       1.0 |            2 | 0.000000 |
-    | 11999 | 2022-04-25_multipletau_0cd20_50dot0-1dot0_1799... |                    2 |                  1 |  1.000001 | 0cd20_50dot0-1dot0   | Not known   | None      | None      |           0 |    2D | ... |  0.999999 |    1.0 | 1024.0 |           11.3 | None          | None        | -0.000090 |       1.0 |            2 | 1.000000 |
+      #+RESULTS:
+      :RESULTS:
+      |       | name_of_plot                                      | fitted species (txy) | fitted species (A) |   N (FCS) | parent_name          | master_file | stdev(A1) | stdev(A2) | parent_uqid | Dimen | ... | cpm (kHz) | alpha1 |   xmax | artifact_speed | stdev(offset) | stdev(txy1) |    offset | bri (kHz) | Diff_species |        A |
+      |-------+---------------------------------------------------+----------------------+--------------------+-----------+----------------------+-------------+-----------+-----------+-------------+-------+-----+-----------+--------+--------+----------------+---------------+-------------+-----------+-----------+--------------+----------|
+      |     0 | 2022-04-25_multipletau_0cd20_0dot069-0dot01_26... |                    1 |                  2 | 37.523452 | 0cd20_0dot069-0dot01 | Not known   | None      | None      |           0 |    2D | ... |  0.026650 |    1.0 | 8192.0 |         1127.0 | None          | None        | -0.001696 |       1.0 |            2 | 0.001292 |
+      |     1 | 2022-04-25_multipletau_0cd20_0dot069-0dot01_26... |                    1 |                  1 | 37.523452 | 0cd20_0dot069-0dot01 | Not known   | None      | None      |           0 |    2D | ... |  0.026650 |    1.0 | 8192.0 |         1127.0 | None          | None        | -0.001696 |       1.0 |            2 | 0.998708 |
+      |     2 | 2022-04-25_multipletau_0cd20_0dot069-0dot01_26... |                    1 |                  2 | 35.394544 | 0cd20_0dot069-0dot01 | Not known   | None      | None      |           0 |    2D | ... |  0.028253 |    1.0 | 8192.0 |         1127.0 | None          | None        | -0.001883 |       1.0 |            2 | 0.002290 |
+      |     3 | 2022-04-25_multipletau_0cd20_0dot069-0dot01_26... |                    1 |                  1 | 35.394544 | 0cd20_0dot069-0dot01 | Not known   | None      | None      |           0 |    2D | ... |  0.028253 |    1.0 | 8192.0 |         1127.0 | None          | None        | -0.001883 |       1.0 |            2 | 0.997710 |
+      |     4 | 2022-04-25_multipletau_0cd20_0dot069-0dot01_26... |                    1 |                  2 | 27.754107 | 0cd20_0dot069-0dot01 | Not known   | None      | None      |           0 |    2D | ... |  0.036031 |    1.0 | 8192.0 |         1127.0 | None          | None        | -0.008520 |       1.0 |            2 | 0.526621 |
+      |   ... | ...                                               |                  ... |                ... |       ... | ...                  | ...         | ...       | ...       |         ... |   ... | ... |       ... |    ... |    ... |            ... | ...           | ...         |       ... |       ... |          ... |      ... |
+      | 11995 | 2022-04-25_multipletau_0cd20_50dot0-1dot0_1797... |                    2 |                  1 |  1.000001 | 0cd20_50dot0-1dot0   | Not known   | None      | None      |           0 |    2D | ... |  0.999999 |    1.0 | 1024.0 |           11.3 | None          | None        | -0.000090 |       1.0 |            2 | 1.000000 |
+      | 11996 | 2022-04-25_multipletau_0cd20_50dot0-1dot0_1798... |                    2 |                  2 |  1.000001 | 0cd20_50dot0-1dot0   | Not known   | None      | None      |           0 |    2D | ... |  0.999999 |    1.0 | 1024.0 |           11.3 | None          | None        | -0.000090 |       1.0 |            2 | 0.000000 |
+      | 11997 | 2022-04-25_multipletau_0cd20_50dot0-1dot0_1798... |                    2 |                  1 |  1.000001 | 0cd20_50dot0-1dot0   | Not known   | None      | None      |           0 |    2D | ... |  0.999999 |    1.0 | 1024.0 |           11.3 | None          | None        | -0.000090 |       1.0 |            2 | 1.000000 |
+      | 11998 | 2022-04-25_multipletau_0cd20_50dot0-1dot0_1799... |                    2 |                  2 |  1.000001 | 0cd20_50dot0-1dot0   | Not known   | None      | None      |           0 |    2D | ... |  0.999999 |    1.0 | 1024.0 |           11.3 | None          | None        | -0.000090 |       1.0 |            2 | 0.000000 |
+      | 11999 | 2022-04-25_multipletau_0cd20_50dot0-1dot0_1799... |                    2 |                  1 |  1.000001 | 0cd20_50dot0-1dot0   | Not known   | None      | None      |           0 |    2D | ... |  0.999999 |    1.0 | 1024.0 |           11.3 | None          | None        | -0.000090 |       1.0 |            2 | 1.000000 |
 
-12000 rows × 37 columns
-    :END:
+  12000 rows × 37 columns
+      :END:
 
-    #+BEGIN_SRC jupyter-python
-      # data = all_param.loc[all_param['correction'].isin(['no correction', 'delete and shift'])]
+      #+begin_details
+      #+BEGIN_SRC jupyter-python
+        # data = all_param.loc[all_param['correction'].isin(['no correction', 'delete and shift'])]
 
-      g = sns.catplot(data=all_param,
-                      y='txy',
-                      x='model',
-                      hue='fitted species (txy)',
-                      col='artifact_speed',
-                      row='stationary_speed',
-                      sharey=True,
-                      height=5,
-                      aspect=1,
-                      legend_out=True,
-                      kind='boxen',
-                      showfliers=False,
-                      margin_titles=True)
-      g.map_dataframe(sns.stripplot,
-            y='txy',
-            x='model',
-            hue="fitted species (txy)",
-            dodge=True,
-            palette=sns.color_palette(['0.3']),
-            size=4,
-            jitter=0.2)
-      # add hlines
-      artifact_speed = np.tile(sorted(set(all_param['artifact_speed'])), 10)
-      stationary_speed = np.repeat(sorted(set(all_param['stationary_speed'])), 3)
-      g.tight_layout()
-      g.fig.suptitle('Prediction and "cut and shift" correction applied on simulated test data', y=1.03, size=20)
-      for i, axes in enumerate(g.axes.flat):
-      #      _ = axes.set_xticklabels(axes.get_xticklabels(), rotation=45)
-          axes.axhline(artifact_speed[i], ls='--', lw=4, c=sns.color_palette()[1])
-          axes.axhline(stationary_speed[i], ls='--', lw=4, c=sns.color_palette()[0])
-      plt.setp(g.axes, yscale='log', # xlabel='model',
-               ylabel=r'transit time $\tau_{D}$ (log)')
-      # plt.setp(g.legend, title='Correlator and\nfit parameter')
-      plot1_file = 'analysis1_0cd20_simulation_transit-times'
-      plt.show()
-    #+END_SRC
+        g = sns.catplot(data=all_param,
+                        y='txy',
+                        x='model',
+                        hue='fitted species (txy)',
+                        col='artifact_speed',
+                        row='stationary_speed',
+                        sharey=True,
+                        height=5,
+                        aspect=1,
+                        legend_out=True,
+                        kind='boxen',
+                        showfliers=False,
+                        margin_titles=True)
+        g.map_dataframe(sns.stripplot,
+              y='txy',
+              x='model',
+              hue="fitted species (txy)",
+              dodge=True,
+              palette=sns.color_palette(['0.3']),
+              size=4,
+              jitter=0.2)
+        # add hlines
+        artifact_speed = np.tile(sorted(set(all_param['artifact_speed'])), 10)
+        stationary_speed = np.repeat(sorted(set(all_param['stationary_speed'])), 3)
+        g.tight_layout()
+        g.fig.suptitle('Prediction and "cut and shift" correction applied on simulated test data', y=1.03, size=20)
+        for i, axes in enumerate(g.axes.flat):
+        #      _ = axes.set_xticklabels(axes.get_xticklabels(), rotation=45)
+            axes.axhline(artifact_speed[i], ls='--', lw=4, c=sns.color_palette()[1])
+            axes.axhline(stationary_speed[i], ls='--', lw=4, c=sns.color_palette()[0])
+        plt.setp(g.axes, yscale='log', # xlabel='model',
+                 ylabel=r'transit time $\tau_{D}$ (log)')
+        # plt.setp(g.legend, title='Correlator and\nfit parameter')
+        plot1_file = 'analysis1_0cd20_simulation_transit-times'
+        plt.show()
+      #+END_SRC
+      #+end_details
 
-    #+RESULTS:
-    :RESULTS:
-    : 0
-    [[file:./data/exp-220227-unet/jupyter/ca7e75f176820ccd6a0135473cc2d59ad6c30316.png]]
-    :END:
-    [[file:./data/exp-220227-unet/jupyter/analysis1_0cd20_simulation_transit-times.svg]]
+      #+RESULTS:
+      :RESULTS:
+      : 0
+      [[file:./data/exp-220227-unet/jupyter/ca7e75f176820ccd6a0135473cc2d59ad6c30316.png]]
+      :END:
+      [[file:./data/exp-220227-unet/jupyter/analysis1_0cd20_simulation_transit-times.svg]]
 
-    #+BEGIN_SRC jupyter-python
-            # data = all_param.loc[all_param['correction'].isin(['no correction', 'delete and shift'])]
+      #+begin_details
+      #+BEGIN_SRC jupyter-python
+              # data = all_param.loc[all_param['correction'].isin(['no correction', 'delete and shift'])]
 
-      g = sns.catplot(data=all_param,
-                      y='A',
-                      x='model',
-                      hue='fitted species (A)',
-                      col='artifact_speed',
-                      row='stationary_speed',
-                      sharey=True,
-                      height=5,
-                      aspect=1,
-                      legend_out=True,
-                      kind='boxen',
-                      showfliers=False,
-                      margin_titles=True)
-      g.map_dataframe(sns.stripplot,
-            y='A',
-            x='model',
-            hue="fitted species (A)",
-            dodge=True,
-            palette=sns.color_palette(['0.3']),
-            size=4,
-            jitter=0.2)
-      # add hlines
-      g.tight_layout()
-      g.fig.suptitle('Prediction and "cut and shift" correction applied on simulated test data', y=1.03, size=20)
-      #for i, axes in enumerate(g.axes.flat):
-      #      _ = axes.set_xticklabels(axes.get_xticklabels(), rotation=45)
-      plt.setp(g.axes, # xlabel='model',
-               ylabel=r'relative fitted fraction size')
-      # plt.setp(g.legend, title='Correlator and\nfit parameter')
+        g = sns.catplot(data=all_param,
+                        y='A',
+                        x='model',
+                        hue='fitted species (A)',
+                        col='artifact_speed',
+                        row='stationary_speed',
+                        sharey=True,
+                        height=5,
+                        aspect=1,
+                        legend_out=True,
+                        kind='boxen',
+                        showfliers=False,
+                        margin_titles=True)
+        g.map_dataframe(sns.stripplot,
+              y='A',
+              x='model',
+              hue="fitted species (A)",
+              dodge=True,
+              palette=sns.color_palette(['0.3']),
+              size=4,
+              jitter=0.2)
+        # add hlines
+        g.tight_layout()
+        g.fig.suptitle('Prediction and "cut and shift" correction applied on simulated test data', y=1.03, size=20)
+        #for i, axes in enumerate(g.axes.flat):
+        #      _ = axes.set_xticklabels(axes.get_xticklabels(), rotation=45)
+        plt.setp(g.axes, # xlabel='model',
+                 ylabel=r'relative fitted fraction size')
+        # plt.setp(g.legend, title='Correlator and\nfit parameter')
 
-      plot1_file = 'analysis1_0cd20_simulation_fraction-size'
-      plt.savefig(f'{plot1_file}.pdf', bbox_inches='tight', dpi=300)
-      os.system(f'pdf2svg {plot1_file}.pdf {plot1_file}.svg')
-      os.system(f'rm {plot1_file}.pdf')
-    #+END_SRC
+        plot1_file = 'analysis1_0cd20_simulation_fraction-size'
+        plt.savefig(f'{plot1_file}.pdf', bbox_inches='tight', dpi=300)
+        os.system(f'pdf2svg {plot1_file}.pdf {plot1_file}.svg')
+        os.system(f'rm {plot1_file}.pdf')
+      #+END_SRC
+      #+end_details
+      #+RESULTS:
 
-    #+RESULTS:
+      [[file:./data/exp-220227-unet/jupyter/analysis1_0cd20_simulation_fraction-size.png]]
 
+      #+BEGIN_SRC jupyter-python
+        all_param.keys()
+      #+END_SRC
 
-    [[file:./data/exp-220227-unet/jupyter/analysis1_0cd20_simulation_fraction-size.png]]
+      #+RESULTS:
+      : Index(['name_of_plot', 'fitted species (txy)', 'fitted species (A)',
+      :        'stdev(alpha2)', 'GN0', 'alpha2', 'xmax', 'stdev(A2)',
+      :        'Triplet_species', 'Dimen', 'time of fit', 'above zero', 'cpm (kHz)',
+      :        'N (mom)', 'stdev(txy2)', 'parent_uqid', 'stdev(offset)', 'N (FCS)',
+      :        'stdev(A1)', 'correction', 'txy', 'Triplet_eq', 'stationary_speed',
+      :        'master_file', 'stdev(txy1)', 'parent_name', 'artifact_speed',
+      :        'stdev(GN0)', 'Diff_species', 'xmin', 'model', 'alpha1',
+      :        'stdev(alpha1)', 'bri (kHz)', 'offset', 'Diff_eq', 'A'],
+      :       dtype='object')
 
-    #+BEGIN_SRC jupyter-python
-      all_param.keys()
-    #+END_SRC
-
-    #+RESULTS:
-    : Index(['name_of_plot', 'fitted species (txy)', 'fitted species (A)',
-    :        'stdev(alpha2)', 'GN0', 'alpha2', 'xmax', 'stdev(A2)',
-    :        'Triplet_species', 'Dimen', 'time of fit', 'above zero', 'cpm (kHz)',
-    :        'N (mom)', 'stdev(txy2)', 'parent_uqid', 'stdev(offset)', 'N (FCS)',
-    :        'stdev(A1)', 'correction', 'txy', 'Triplet_eq', 'stationary_speed',
-    :        'master_file', 'stdev(txy1)', 'parent_name', 'artifact_speed',
-    :        'stdev(GN0)', 'Diff_species', 'xmin', 'model', 'alpha1',
-    :        'stdev(alpha1)', 'bri (kHz)', 'offset', 'Diff_eq', 'A'],
-    :       dtype='object')
-
-    #+BEGIN_SRC jupyter-python
-      %cd ~/Programme/drmed-git
-    #+END_SRC
+      #+BEGIN_SRC jupyter-python
+        %cd ~/Programme/drmed-git
+      #+END_SRC
 
 *** Analysis 2a: Run models on experimental data
     :PROPERTIES:
     :header-args:jupyter-python: :session /jpy:localhost#8889:a37e524a-8134-4d8f-b24a-367acaf1bde3 :pandoc t
     :END:
+    - this is the =prepare-jupyter= function
+      #+NAME: prepare-jupyter
+      #+BEGIN_SRC jupyter-python :var data_path="/beegfs/ye53nis/data/1911DD_atto+LUVs" :var output_path="/beegfs/ye53nis/drmed-git/data/exp-220227-unet/2022-05-22_experimental/"
+        %cd /beegfs/ye53nis/drmed-git
+        import logging
+        import os
+        import sys
 
-    #+NAME: prepare-jupyter
-    #+BEGIN_SRC jupyter-python :var data_path="/beegfs/ye53nis/data/1911DD_atto+LUVs" :var output_path="/beegfs/ye53nis/drmed-git/data/exp-220227-unet/2022-05-22_experimental/"
-      %cd /beegfs/ye53nis/drmed-git
-      import logging
-      import os
-      import sys
+        import matplotlib.pyplot as plt
+        import numpy as np
+        import pandas as pd
+        import seaborn as sns
 
-      import matplotlib.pyplot as plt
-      import numpy as np
-      import pandas as pd
-      import seaborn as sns
+        from pathlib import Path
+        from pprint import pprint
+        from tensorflow.keras.optimizers import Adam
+        from mlflow.keras import load_model
 
-      from pathlib import Path
-      from pprint import pprint
-      from tensorflow.keras.optimizers import Adam
-      from mlflow.keras import load_model
+        FLUOTRACIFY_PATH = '/beegfs/ye53nis/drmed-git/src/'
+        sys.path.append(FLUOTRACIFY_PATH)
+        from fluotracify.applications import corr_fit_object as cfo
+        from fluotracify.training import build_model as bm
 
-      FLUOTRACIFY_PATH = '/beegfs/ye53nis/drmed-git/src/'
-      sys.path.append(FLUOTRACIFY_PATH)
-      from fluotracify.applications import corr_fit_object as cfo
-      from fluotracify.training import build_model as bm
+        data_path = Path(data_path)
+        output_path = Path(output_path)
+        log_path = output_path.parent / f'{output_path.name}.log'
 
-      data_path = Path(data_path)
-      output_path = Path(output_path)
-      log_path = output_path.parent / f'{output_path.name}.log'
+        logging.basicConfig(filename=log_path,
+                            filemode='w', format='%(asctime)s - %(message)s',
+                            force=True)
 
-      logging.basicConfig(filename=log_path,
-                          filemode='w', format='%(asctime)s - %(message)s',
-                          force=True)
+        log = logging.getLogger(__name__)
+        log.setLevel(logging.DEBUG)
 
-      log = logging.getLogger(__name__)
-      log.setLevel(logging.DEBUG)
+        sns.set_theme(style="whitegrid", font_scale=2, palette='colorblind',
+                      context='paper')
+        class ParameterClass():
+            """Stores parameters for correlation """
+            def __init__(self):
+                # Where the data is stored.
+                self.data = []
+                self.objectRef = []
+                self.subObjectRef = []
+                self.colors = ['blue', 'green', 'red', 'cyan', 'magenta',
+                               'yellow', 'black']
+                self.numOfLoaded = 0
+                # very fast from Ncasc ~ 14 onwards
+                self.NcascStart = 0
+                self.NcascEnd = 30  # 25
+                self.Nsub = 6  # 6
+                self.photonLifetimeBin = 10  # used for photon decay
+                self.photonCountBin = 1  # used for time series
 
-      sns.set_theme(style="whitegrid", font_scale=2, palette='colorblind',
-                    context='paper')
-      class ParameterClass():
-          """Stores parameters for correlation """
-          def __init__(self):
-              # Where the data is stored.
-              self.data = []
-              self.objectRef = []
-              self.subObjectRef = []
-              self.colors = ['blue', 'green', 'red', 'cyan', 'magenta',
-                             'yellow', 'black']
-              self.numOfLoaded = 0
-              # very fast from Ncasc ~ 14 onwards
-              self.NcascStart = 0
-              self.NcascEnd = 30  # 25
-              self.Nsub = 6  # 6
-              self.photonLifetimeBin = 10  # used for photon decay
-              self.photonCountBin = 1  # used for time series
+        par_obj = ParameterClass()
 
-      par_obj = ParameterClass()
+        model_ls = ['ff67be0b68e540a9a29a36a2d0c7a5be', '347669d050f344ad9fb9e480c814f727',
+                    '714af8cd12c1441eac4ca980e8c20070', '34a6d207ac594035b1009c330fb67a65',
+                    '484af471c61943fa90e5f78e78a229f0', '0cd2023eeaf745aca0d3e8ad5e1fc653',
+                    'fe81d71c52404ed790b3a32051258da9', '19e3e786e1bc4e2b93856f5dc9de8216',
+                    'c1204e3a8a1e4c40a35b5b7b1922d1ce']
 
-      model_ls = ['ff67be0b68e540a9a29a36a2d0c7a5be', '347669d050f344ad9fb9e480c814f727',
-                  '714af8cd12c1441eac4ca980e8c20070', '34a6d207ac594035b1009c330fb67a65',
-                  '484af471c61943fa90e5f78e78a229f0', '0cd2023eeaf745aca0d3e8ad5e1fc653',
-                  'fe81d71c52404ed790b3a32051258da9', '19e3e786e1bc4e2b93856f5dc9de8216',
-                  'c1204e3a8a1e4c40a35b5b7b1922d1ce']
+        model_name_ls = [f'{s:.5}' for s in model_ls]
 
-      model_name_ls = [f'{s:.5}' for s in model_ls]
+        # scaler_ls = ['minmax', 'robust', 'maxabs', 'l2', 'standard', 'quant_g', 'standard',
+        #              'standard', 'robust']
 
-      # scaler_ls = ['minmax', 'robust', 'maxabs', 'l2', 'standard', 'quant_g', 'standard',
-      #              'standard', 'robust']
+        pred_thresh = 0.5
 
-      pred_thresh = 0.5
+        if data_path.name == "1911DD_atto+LUVs":
+            path_clean1 = data_path / 'clean_ptu_part1/'
+            path_clean2 = data_path / 'clean_ptu_part2/'
+            path_dirty1 = data_path / 'dirty_ptu_part1/'
+            path_dirty2 = data_path / 'dirty_ptu_part2/'
+            files_clean1 = [path_clean1 / f for f in os.listdir(path_clean1) if f.endswith('.ptu')]
+            files_clean2 = [path_clean2 / f for f in os.listdir(path_clean2) if f.endswith('.ptu')]
+            files_dirty1 = [path_dirty1 / f for f in os.listdir(path_dirty1) if f.endswith('.ptu')]
+            files_dirty2 = [path_dirty2 / f for f in os.listdir(path_dirty2) if f.endswith('.ptu')]
 
-      if data_path.name == "1911DD_atto+LUVs":
-          path_clean1 = data_path / 'clean_ptu_part1/'
-          path_clean2 = data_path / 'clean_ptu_part2/'
-          path_dirty1 = data_path / 'dirty_ptu_part1/'
-          path_dirty2 = data_path / 'dirty_ptu_part2/'
-          files_clean1 = [path_clean1 / f for f in os.listdir(path_clean1) if f.endswith('.ptu')]
-          files_clean2 = [path_clean2 / f for f in os.listdir(path_clean2) if f.endswith('.ptu')]
-          files_dirty1 = [path_dirty1 / f for f in os.listdir(path_dirty1) if f.endswith('.ptu')]
-          files_dirty2 = [path_dirty2 / f for f in os.listdir(path_dirty2) if f.endswith('.ptu')]
+        if data_path.name == "191113_Pex5_2_structured":
+            path_clean = data_path / 'HsPEX5EGFP 1-100001'
+            path_dirty = data_path / 'TbPEX5EGFP 1-10002'
+            files_clean = [path_clean / f for f in os.listdir(path_clean) if f.endswith('.ptu')]
+            files_dirty = [path_dirty / f for f in os.listdir(path_dirty) if f.endswith('.ptu')]
 
-      if data_path.name == "191113_Pex5_2_structured":
-          path_clean = data_path / 'HsPEX5EGFP 1-100001'
-          path_dirty = data_path / 'TbPEX5EGFP 1-10002'
-          files_clean = [path_clean / f for f in os.listdir(path_clean) if f.endswith('.ptu')]
-          files_dirty = [path_dirty / f for f in os.listdir(path_dirty) if f.endswith('.ptu')]
+        def predict_correct_correlate_ptu(files, model_id, method, out_path):
 
-      def predict_correct_correlate_ptu(files, model_id, method, out_path):
+            logged_scaler = Path(f'/beegfs/ye53nis/drmed-git/data/mlruns/10/{model_ls[model_id]}/params/scaler')
+            logged_scaler = !cat $logged_scaler
+            logged_scaler = logged_scaler[0]
 
-          logged_scaler = Path(f'/beegfs/ye53nis/drmed-git/data/mlruns/10/{model_ls[model_id]}/params/scaler')
-          logged_scaler = !cat $logged_scaler
-          logged_scaler = logged_scaler[0]
-
-          logged_model = Path(f'/beegfs/ye53nis/drmed-git/data/mlruns/10/{model_ls[model_id]}/artifacts/model')
-          logged_model = load_model(logged_model, compile=False)
-          logged_model.compile(loss=bm.binary_ce_dice_loss(),
-                               optimizer=Adam(),
-                               metrics = bm.unet_metrics([0.1, 0.3, 0.5, 0.7, 0.9]))
-          if method == 'delete_and_shift':
-              method_str = 'DELSHIFT'
-          elif method == 'delete':
-              method_str = 'DEL'
-          for idx, myfile in enumerate(files):
-              ptufile = cfo.PicoObject(myfile, par_obj)
-              ptufile.predictTimeSeries(model=logged_model,
-                                        scaler=logged_scaler)
-              ptufile.correctTCSPC(method=method)
-              for key in list(ptufile.trueTimeArr.keys()):
-                  if method_str in key:
-                      ptufile.get_autocorrelation(method='tttr2xfcs', name=key)
-
-
-              for m in ['multipletau', 'tttr2xfcs', 'tttr2xfcs_with_weights']:
-                  if m in list(ptufile.autoNorm.keys()):
-                      for key, item in list(ptufile.autoNorm[m].items()):
-                          if method_str in key:
-                              ptufile.save_autocorrelation(name=key, method=m,
-                                                           output_path=out_path)
+            logged_model = Path(f'/beegfs/ye53nis/drmed-git/data/mlruns/10/{model_ls[model_id]}/artifacts/model')
+            logged_model = load_model(logged_model, compile=False)
+            logged_model.compile(loss=bm.binary_ce_dice_loss(),
+                                 optimizer=Adam(),
+                                 metrics = bm.unet_metrics([0.1, 0.3, 0.5, 0.7, 0.9]))
+            if method == 'delete_and_shift':
+                method_str = 'DELSHIFT'
+            elif method == 'delete':
+                method_str = 'DEL'
+            for idx, myfile in enumerate(files):
+                ptufile = cfo.PicoObject(myfile, par_obj)
+                ptufile.predictTimeSeries(model=logged_model,
+                                          scaler=logged_scaler)
+                ptufile.correctTCSPC(method=method)
+                for key in list(ptufile.trueTimeArr.keys()):
+                    if method_str in key:
+                        ptufile.get_autocorrelation(method='tttr2xfcs', name=key)
 
 
-      def correlate_ptu(files, out_path):
-          for idx, myfile in enumerate(files):
-              ptufile = cfo.PicoObject(myfile, par_obj)
-              for key in list(ptufile.trueTimeArr.keys()):
-                  ptufile.get_autocorrelation(method='tttr2xfcs', name=key)
+                for m in ['multipletau', 'tttr2xfcs', 'tttr2xfcs_with_weights']:
+                    if m in list(ptufile.autoNorm.keys()):
+                        for key, item in list(ptufile.autoNorm[m].items()):
+                            if method_str in key:
+                                ptufile.save_autocorrelation(name=key, method=m,
+                                                             output_path=out_path)
 
 
-              for m in ['multipletau', 'tttr2xfcs', 'tttr2xfcs_with_weights']:
-                  if m in list(ptufile.autoNorm.keys()):
-                      for key, item in list(ptufile.autoNorm[m].items()):
-                          ptufile.save_autocorrelation(name=key, method=m,
-                                                       output_path=out_path)
+        def correlate_ptu(files, out_path):
+            for idx, myfile in enumerate(files):
+                ptufile = cfo.PicoObject(myfile, par_obj)
+                for key in list(ptufile.trueTimeArr.keys()):
+                    ptufile.get_autocorrelation(method='tttr2xfcs', name=key)
 
 
-    #+END_SRC
+                for m in ['multipletau', 'tttr2xfcs', 'tttr2xfcs_with_weights']:
+                    if m in list(ptufile.autoNorm.keys()):
+                        for key, item in list(ptufile.autoNorm[m].items()):
+                            ptufile.save_autocorrelation(name=key, method=m,
+                                                         output_path=out_path)
 
-    #+RESULTS: prepare-jupyter
-    : /beegfs/ye53nis/drmed-git
-    : 2023-01-10 17:38:18.004165: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
-    : 2023-01-10 17:38:18.004236: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
 
-    #+NAME: kill-jupyter
-    #+BEGIN_SRC jupyter-python
-      os._exit(00)
-    #+END_SRC
+      #+END_SRC
 
-    #+RESULTS:
-    : 7a752b61-60c1-4322-8105-e8dbd705caa0
+      #+RESULTS: prepare-jupyter
+      : /beegfs/ye53nis/drmed-git
+      : 2023-01-10 17:38:18.004165: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+      : 2023-01-10 17:38:18.004236: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
 
-    #+CALL: prepare-jupyter()
+    - this is the =kill-jupyter= function
+      #+NAME: kill-jupyter
+      #+BEGIN_SRC jupyter-python
+        os._exit(00)
+      #+END_SRC
+
+      #+RESULTS:
+      : 7a752b61-60c1-4322-8105-e8dbd705caa0
+
+    - now call the model and apply it to =af488+luv= data (with peak artifacts),
+      first with =delete_and_shift=, which we later called =cut and stitch=
+      #+begin_details
+      #+CALL: prepare-jupyter()
 
       #+begin_src jupyter-python
         model_id = 0
@@ -5060,18 +5104,17 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
       : To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
       : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
 
-    #+CALL: kill-jupyter()
+      #+CALL: kill-jupyter()
 
-    #+RESULTS:
-    : 2df4455b-0130-4b59-af50-3a85f1419fd2
+      #+RESULTS:
+      : 2df4455b-0130-4b59-af50-3a85f1419fd2
 
-    #+CALL: prepare-jupyter()
+      #+CALL: prepare-jupyter()
 
-    #+RESULTS:
-    : /beegfs/ye53nis/drmed-git
-    : 2022-05-23 19:52:48.412017: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
-    : 2022-05-23 19:52:48.412054: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
-
+      #+RESULTS:
+      : /beegfs/ye53nis/drmed-git
+      : 2022-05-23 19:52:48.412017: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+      : 2022-05-23 19:52:48.412054: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
 
       #+begin_src jupyter-python
         model_id = 0
@@ -5094,10 +5137,10 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
       : To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
       : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
 
-    #+CALL: kill-jupyter()
-    #+CALL: prepare-jupyter()
+      #+CALL: kill-jupyter()
+      #+CALL: prepare-jupyter()
 
-   - on node 2:
+    - on node 2:
       #+begin_src jupyter-python
         model_id = 1
 
@@ -5111,10 +5154,10 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
             out_path=out_dir)
       #+end_src
 
-    #+CALL: kill-jupyter()
-    #+CALL: prepare-jupyter()
+      #+CALL: kill-jupyter()
+      #+CALL: prepare-jupyter()
 
-   - on node 3:
+    - on node 3:
       #+begin_src jupyter-python
         model_id = 2
 
@@ -5128,9 +5171,9 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
             out_path=out_dir)
       #+end_src
 
-    #+CALL: kill-jupyter()
-    #+CALL: prepare-jupyter()
-   - on node 2:
+      #+CALL: kill-jupyter()
+      #+CALL: prepare-jupyter()
+    - on node 2:
       #+begin_src jupyter-python
         model_id = 3  # 34a6d
 
@@ -5144,9 +5187,9 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
             out_path=out_dir)
       #+end_src
 
-    #+CALL: kill-jupyter()
-    #+CALL: prepare-jupyter()
-   - on node 3:
+      #+CALL: kill-jupyter()
+      #+CALL: prepare-jupyter()
+    - on node 3:
       #+BEGIN_SRC jupyter-python
         model_id = 4  # 484af
 
@@ -5160,19 +5203,19 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
             out_path=out_dir)
       #+END_SRC
 
-    #+CALL: kill-jupyter()
+      #+CALL: kill-jupyter()
 
-    #+RESULTS:
-    : ea569473-6848-41cb-bae6-4f5ac1590e71
+      #+RESULTS:
+      : ea569473-6848-41cb-bae6-4f5ac1590e71
 
-    #+CALL: prepare-jupyter()
+      #+CALL: prepare-jupyter()
 
-    #+RESULTS:
-    : /beegfs/ye53nis/drmed-git
-    : 2022-05-23 21:51:34.834624: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
-    : 2022-05-23 21:51:34.834663: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+      #+RESULTS:
+      : /beegfs/ye53nis/drmed-git
+      : 2022-05-23 21:51:34.834624: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+      : 2022-05-23 21:51:34.834663: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
 
-   - on node 1:
+    - on node 1:
       #+BEGIN_SRC jupyter-python
         model_id = 5 # 0cd20
 
@@ -5194,13 +5237,13 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
       : To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
       : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
 
-    #+CALL: kill-jupyter()
-    #+CALL: prepare-jupyter()
+      #+CALL: kill-jupyter()
+      #+CALL: prepare-jupyter()
 
-    #+RESULTS:
-    : /beegfs/ye53nis/drmed-git
-    : 2022-05-24 10:12:54.289832: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
-    : 2022-05-24 10:12:54.289868: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+      #+RESULTS:
+      : /beegfs/ye53nis/drmed-git
+      : 2022-05-24 10:12:54.289832: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+      : 2022-05-24 10:12:54.289868: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
 
       #+BEGIN_SRC jupyter-python
         model_id = 5 # 0cd20
@@ -5223,10 +5266,10 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
       : To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
       : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
 
-    #+CALL: kill-jupyter()
-    #+CALL: prepare-jupyter()
+      #+CALL: kill-jupyter()
+      #+CALL: prepare-jupyter()
 
-   - on node 2:
+    - on node 2:
       #+BEGIN_SRC jupyter-python
         model_id = 6 # fe81d
 
@@ -5240,19 +5283,19 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
         out_path=out_dir)
       #+END_SRC
 
-    #+CALL: kill-jupyter()
+      #+CALL: kill-jupyter()
 
-    #+RESULTS:
-    : bf3b2ade-cc27-404c-b7bc-9db7a0583d4e
+      #+RESULTS:
+      : bf3b2ade-cc27-404c-b7bc-9db7a0583d4e
 
-    #+CALL: prepare-jupyter()
+      #+CALL: prepare-jupyter()
 
-    #+RESULTS:
-    : /beegfs/ye53nis/drmed-git
-    : 2022-05-24 13:29:48.438857: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
-    : 2022-05-24 13:29:48.438908: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+      #+RESULTS:
+      : /beegfs/ye53nis/drmed-git
+      : 2022-05-24 13:29:48.438857: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+      : 2022-05-24 13:29:48.438908: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
 
-   - on node 1:
+    - on node 1:
       #+BEGIN_SRC jupyter-python
         model_id = 7 # 19e3e
 
@@ -5274,20 +5317,19 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
       : To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
       : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
 
+      #+CALL: kill-jupyter()
 
-    #+CALL: kill-jupyter()
+      #+RESULTS:
+      : c55ec613-2fe9-4dd8-bbb0-03251a8173c2
 
-    #+RESULTS:
-    : c55ec613-2fe9-4dd8-bbb0-03251a8173c2
+      #+CALL: prepare-jupyter()
 
-    #+CALL: prepare-jupyter()
+      #+RESULTS:
+      : /beegfs/ye53nis/drmed-git
+      : 2022-05-24 17:07:04.399895: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+      : 2022-05-24 17:07:04.399949: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
 
-    #+RESULTS:
-    : /beegfs/ye53nis/drmed-git
-    : 2022-05-24 17:07:04.399895: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
-    : 2022-05-24 17:07:04.399949: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
-
-   - on node 1:
+    - on node 1:
       #+BEGIN_SRC jupyter-python
         model_id = 7 # 19e3e
 
@@ -5308,8 +5350,46 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
       : 2022-05-24 17:07:10.270792: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 FMA
       : To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
       : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
+    #+end_details
+    - now do =af488= and =af488+luvs= correlations without any correction
+    #+begin_details
+    - on node 3:
+      #+begin_src jupyter-python
+        out_dir = output_path / f'clean/'
 
-   - on node 3:
+        os.makedirs(out_dir, exist_ok=True)
+
+        correlate_ptu(
+            files=files_clean_1 and files_clean2,
+            out_path=out_dir)
+      #+end_src
+
+    - on node 1:
+      #+CALL: kill-jupyter()
+
+      #+RESULTS:
+      : a26d0ea2-4340-4437-afb6-5e931c8efe68
+
+      #+CALL: prepare-jupyter()
+
+      #+RESULTS:
+      : /beegfs/ye53nis/drmed-git
+      : 2022-05-27 13:21:04.304353: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+      : 2022-05-27 13:21:04.304423: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+
+      #+begin_src jupyter-python
+        out_dir = output_path / f'dirty/'
+
+        os.makedirs(out_dir, exist_ok=True)
+
+        correlate_ptu(
+            files=files_dirty2,
+            out_path=out_dir)
+      #+end_src
+
+      #+RESULTS:
+    #+end_details
+    - on node 3:
       #+BEGIN_SRC jupyter-python
         model_id = 8  # c1204
 
@@ -5323,7 +5403,7 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
             out_path=out_dir)
       #+END_SRC
 
-   - on node 1:
+    - on node 1:
       #+BEGIN_SRC jupyter-python
         model_id = 5 # 0cd20
 
@@ -5345,17 +5425,17 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
       : To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
       : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
 
-    #+CALL: kill-jupyter()
+      #+CALL: kill-jupyter()
 
-    #+RESULTS:
-    : 7e9aa800-f60f-4d9a-b565-722c72070338
+      #+RESULTS:
+      : 7e9aa800-f60f-4d9a-b565-722c72070338
 
-    #+CALL: prepare-jupyter()
+      #+CALL: prepare-jupyter()
 
-    #+RESULTS:
-    : /beegfs/ye53nis/drmed-git
-    : 2022-05-25 16:48:58.124680: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
-    : 2022-05-25 16:48:58.124720: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+      #+RESULTS:
+      : /beegfs/ye53nis/drmed-git
+      : 2022-05-25 16:48:58.124680: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+      : 2022-05-25 16:48:58.124720: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
 
       #+BEGIN_SRC jupyter-python
         model_id = 5 # 0cd20
@@ -5378,7 +5458,7 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
       : To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
       : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
 
-   - on node 3:
+    - on node 3:
       #+begin_src jupyter-python
         model_id = 2 # 714af
 
@@ -5392,7 +5472,7 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
             out_path=out_dir)
       #+end_src
 
-   - on node 2:
+    - on node 2:
       #+begin_src jupyter-python
         model_id = 0 # ff67b
 
@@ -5406,7 +5486,7 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
             out_path=out_dir)
       #+end_src
 
-   - on node 1:
+    - on node 1:
       #+BEGIN_SRC jupyter-python
         model_id = 1 # 34766
 
@@ -5428,25 +5508,16 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
       : To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
       : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
 
-    #+CALL: kill-jupyter()
+      #+CALL: kill-jupyter()
 
-    #+RESULTS:
-    :RESULTS:
-    # [goto error]
-    : ---------------------------------------------------------------------------
-    : NameError                                 Traceback (most recent call last)
-    : Input In [1], in <cell line: 1>()
-    : ----> 1 os._exit(00)
-    :
-    : NameError: name 'os' is not defined
-    :END:
+      #+RESULTS:
 
-    #+CALL: prepare-jupyter()
+      #+CALL: prepare-jupyter()
 
-    #+RESULTS:
-    : /beegfs/ye53nis/drmed-git
-    : 2022-05-26 11:49:10.130005: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
-    : 2022-05-26 11:49:10.130041: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+      #+RESULTS:
+      : /beegfs/ye53nis/drmed-git
+      : 2022-05-26 11:49:10.130005: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+      : 2022-05-26 11:49:10.130041: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
 
       #+BEGIN_SRC jupyter-python
         model_id = 1
@@ -5468,7 +5539,7 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
       : 2022-05-26 11:49:16.691462: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 FMA
       : To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
       : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
-   - on node 2:
+    - on node 2:
       #+begin_src jupyter-python
         model_id = 3 # 34a6d
 
@@ -5530,7 +5601,8 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
             model_id=model_id, method='delete_and_shift',
             out_path=out_dir)
       #+end_src
-   - on node 3:
+
+    - on node 3:
       #+begin_src jupyter-python
         model_id = 4 # 484af
 
@@ -5544,7 +5616,7 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
             out_path=out_dir)
       #+end_src
 
-   - on node 2:
+    - on node 2:
       #+begin_src jupyter-python
         model_id = 8 # c1204
 
@@ -5558,7 +5630,7 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
             out_path=out_dir)
       #+end_src
 
-   - on node 3:
+    - on node 3:
       #+begin_src jupyter-python
         model_id = 6 # fe81d
 
@@ -5572,46 +5644,45 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
             out_path=out_dir)
       #+end_src
 
+      #+CALL: kill-jupyter()
+      #+CALL: prepare-jupyter("/beegfs/ye53nis/data/191113_Pex5_2_structured", output_path="/beegfs/ye53nis/drmed-git/data/exp-220227-unet/2022-06-02_experimental-pex5/")
 
-    #+CALL: kill-jupyter()
-    #+CALL: prepare-jupyter("/beegfs/ye53nis/data/191113_Pex5_2_structured", output_path="/beegfs/ye53nis/drmed-git/data/exp-220227-unet/2022-06-02_experimental-pex5/")
+      #+RESULTS:
+      : /beegfs/ye53nis/drmed-git
 
-    #+RESULTS:
-    : /beegfs/ye53nis/drmed-git
+    - on node 1:
+      #+BEGIN_SRC jupyter-python
+        out_dir = output_path / f'clean/'
 
-   - on node 1:
-    #+BEGIN_SRC jupyter-python
-      out_dir = output_path / f'clean/'
+        os.makedirs(out_dir, exist_ok=True)
 
-      os.makedirs(out_dir, exist_ok=True)
+        correlate_ptu(
+            files=files_clean,
+            out_path=out_dir)
+      #+END_SRC
 
-      correlate_ptu(
-          files=files_clean,
-          out_path=out_dir)
-    #+END_SRC
+      #+RESULTS:
+      : 274c16ef-1bb8-47fd-9ac9-d83e193d2c7c
 
-    #+RESULTS:
-    : 274c16ef-1bb8-47fd-9ac9-d83e193d2c7c
+      #+CALL: kill-jupyter()
+      #+CALL: prepare-jupyter("/beegfs/ye53nis/data/191113_Pex5_2_structured", output_path="/beegfs/ye53nis/drmed-git/data/exp-220227-unet/2022-06-02_experimental-pex5/")
 
-    #+CALL: kill-jupyter()
-    #+CALL: prepare-jupyter("/beegfs/ye53nis/data/191113_Pex5_2_structured", output_path="/beegfs/ye53nis/drmed-git/data/exp-220227-unet/2022-06-02_experimental-pex5/")
+      #+RESULTS:
+      : /beegfs/ye53nis/drmed-git
+      : 2022-06-03 00:20:04.405561: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+      : 2022-06-03 00:20:04.405614: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
 
-    #+RESULTS:
-    : /beegfs/ye53nis/drmed-git
-    : 2022-06-03 00:20:04.405561: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
-    : 2022-06-03 00:20:04.405614: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+      #+BEGIN_SRC jupyter-python
+        out_dir = output_path / f'dirty/'
 
-    #+BEGIN_SRC jupyter-python
-      out_dir = output_path / f'dirty/'
+        os.makedirs(out_dir, exist_ok=True)
 
-      os.makedirs(out_dir, exist_ok=True)
+        correlate_ptu(
+            files=files_dirty,
+            out_path=out_dir)
+      #+END_SRC
 
-      correlate_ptu(
-          files=files_dirty,
-          out_path=out_dir)
-    #+END_SRC
-
-    #+RESULTS:
+      #+RESULTS:
 
       #+RESULTS:
       : 2022-06-02 16:25:02.408577: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcuda.so.1'; dlerror: libcuda.so.1: cannot open shared object file: No such file or directory
@@ -5622,7 +5693,7 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
       : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
       # [goto error]
 
-      on node 2:
+    - on node 2:
       #+begin_src jupyter-python
         model_id = 0 # ff67b
 
@@ -5636,7 +5707,7 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
             out_path=out_dir)
       #+end_src
 
-      on node 3:
+    - on node 3:
       #+begin_src jupyter-python
         model_id = 1  # 34766
 
@@ -5653,19 +5724,19 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
       #+RESULTS:
       : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
 
-    #+CALL: kill-jupyter()
+      #+CALL: kill-jupyter()
 
-    #+RESULTS:
-    : e17bafa1-336e-4ae4-9eac-2e4e754b163b
+      #+RESULTS:
+      : e17bafa1-336e-4ae4-9eac-2e4e754b163b
 
-    #+CALL: prepare-jupyter("/beegfs/ye53nis/data/191113_Pex5_2_structured", output_path="/beegfs/ye53nis/drmed-git/data/exp-220227-unet/2022-06-02_experimental-pex5/")
+      #+CALL: prepare-jupyter("/beegfs/ye53nis/data/191113_Pex5_2_structured", output_path="/beegfs/ye53nis/drmed-git/data/exp-220227-unet/2022-06-02_experimental-pex5/")
 
-    #+RESULTS:
-    : /beegfs/ye53nis/drmed-git
-    : 2022-06-03 00:35:48.794905: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
-    : 2022-06-03 00:35:48.794949: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+      #+RESULTS:
+      : /beegfs/ye53nis/drmed-git
+      : 2022-06-03 00:35:48.794905: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+      : 2022-06-03 00:35:48.794949: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
 
-      on node 1:
+    - on node 1:
       #+begin_src jupyter-python
         model_id = 2  # 714af
 
@@ -5687,17 +5758,17 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
       : To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
       : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
 
-    #+CALL: kill-jupyter()
+      #+CALL: kill-jupyter()
 
-    #+RESULTS:
-    : cb8ca215-2cec-4c8a-b57f-9e7a3fa0850a
+      #+RESULTS:
+      : cb8ca215-2cec-4c8a-b57f-9e7a3fa0850a
 
-    #+CALL: prepare-jupyter("/beegfs/ye53nis/data/191113_Pex5_2_structured", output_path="/beegfs/ye53nis/drmed-git/data/exp-220227-unet/2022-06-02_experimental-pex5/")
+      #+CALL: prepare-jupyter("/beegfs/ye53nis/data/191113_Pex5_2_structured", output_path="/beegfs/ye53nis/drmed-git/data/exp-220227-unet/2022-06-02_experimental-pex5/")
 
-    #+RESULTS:
-    : /beegfs/ye53nis/drmed-git
-    : 2022-06-03 01:03:42.934510: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
-    : 2022-06-03 01:03:42.934560: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+      #+RESULTS:
+      : /beegfs/ye53nis/drmed-git
+      : 2022-06-03 01:03:42.934510: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+      : 2022-06-03 01:03:42.934560: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
 
       #+begin_src jupyter-python
         model_id = 2  # 714af
@@ -5720,7 +5791,7 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
       : To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
       : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
 
-      on node 2:
+    - on node 2:
       #+begin_src jupyter-python
         model_id = 3 # 34a6d
 
@@ -5734,7 +5805,7 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
             out_path=out_dir)
       #+end_src
 
-      on node 1:
+    - on node 1:
       #+begin_src jupyter-python
         model_id = 4  # 484af
 
@@ -5756,28 +5827,14 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
       : To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
       : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
 
+      #+CALL: kill-jupyter()
 
-    #+CALL: kill-jupyter()
+      #+CALL: prepare-jupyter("/beegfs/ye53nis/data/191113_Pex5_2_structured", output_path="/beegfs/ye53nis/drmed-git/data/exp-220227-unet/2022-06-02_experimental-pex5/")
 
-    #+RESULTS:
-    : ---------------------------------------------------------------------------
-    : NameError                                 Traceback (most recent call last)
-    : Input In [1], in <cell line: 1>()
-    : ----> 1 os._exit(00)
-    :
-    : NameError: name 'os' is not defined
-    :RESULTS:
-    # [goto error]
-    :END:
-
-
-
-    #+CALL: prepare-jupyter("/beegfs/ye53nis/data/191113_Pex5_2_structured", output_path="/beegfs/ye53nis/drmed-git/data/exp-220227-unet/2022-06-02_experimental-pex5/")
-
-    #+RESULTS:
-    : /beegfs/ye53nis/drmed-git
-    : 2022-06-03 17:13:28.754363: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
-    : 2022-06-03 17:13:28.754407: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+      #+RESULTS:
+      : /beegfs/ye53nis/drmed-git
+      : 2022-06-03 17:13:28.754363: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+      : 2022-06-03 17:13:28.754407: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
 
       #+begin_src jupyter-python
         model_id = 4  # 484af
@@ -5800,7 +5857,7 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
       : To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
       : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
 
-      on node 3:
+    - on node 3:
       #+begin_src jupyter-python
         model_id = 5  # 0cd20
 
@@ -5814,7 +5871,7 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
             out_path=out_dir)
       #+end_src
 
-      on node 2:
+    - on node 2:
       #+begin_src jupyter-python
         model_id = 6 # fe81d
 
@@ -5828,7 +5885,7 @@ ye53nis@ara-login01.rz.uni-jena.de's | password: |       |          |      |    
             out_path=out_dir)
       #+end_src
 
-      on node 1:
+    - on node 1:
       #+begin_src jupyter-python
         model_id = 7  # 19e3e
 
