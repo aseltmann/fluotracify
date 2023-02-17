@@ -2125,6 +2125,127 @@
       - the epoch size used for training will be 100 epochs for each hparam
         configuration
 
+*** Setup: Fitting
+**** Fitting
+    - all fitting was done in Dominic Waithe's =focuspoint=. (see
+      [[https://pubmed.ncbi.nlm.nih.gov/26589275/]] and
+      https://github.com/dwaithe/FCS_point_correlator)
+    - I installed the program by cloning the github and following the setup
+      instructions there. Some packages were missing to run the program, the
+      following is the conda environment with =focuspoint= and all needed
+      packages
+      #+begin_src sh
+        conda list -n focus
+      #+end_src
+
+      #+RESULTS:
+      | #                |  packages | in             | environment | at      | /home/lex/Programme/miniconda3/envs/focus: |
+      | #                |           |                |             |         |                                            |
+      | #                |      Name | Version        | Build       | Channel |                                            |
+      | _libgcc_mutex    |       0.1 | main           |             |         |                                            |
+      | _openmp_mutex    |       4.5 | 1_gnu          |             |         |                                            |
+      | asteval          |    0.9.26 | pypi_0         | pypi        |         |                                            |
+      | blas             |       1.0 | mkl            |             |         |                                            |
+      | ca-certificates  | 2022.3.18 | h06a4308_0     |             |         |                                            |
+      | certifi          | 2021.10.8 | py39h06a4308_2 |             |         |                                            |
+      | cycler           |    0.11.0 | pypi_0         | pypi        |         |                                            |
+      | cython           |   0.29.28 | pypi_0         | pypi        |         |                                            |
+      | dbus             |   1.13.18 | hb2f20db_0     |             |         |                                            |
+      | expat            |     2.4.4 | h295c915_0     |             |         |                                            |
+      | focuspoint       |       0.1 | pypi_0         | pypi        |         |                                            |
+      | fontconfig       |    2.13.1 | h6c09931_0     |             |         |                                            |
+      | fonttools        |    4.31.2 | pypi_0         | pypi        |         |                                            |
+      | freetype         |    2.11.0 | h70c0345_0     |             |         |                                            |
+      | future           |    0.18.2 | pypi_0         | pypi        |         |                                            |
+      | glib             |    2.69.1 | h4ff587b_1     |             |         |                                            |
+      | gst-plugins-base |    1.14.0 | h8213a91_2     |             |         |                                            |
+      | gstreamer        |    1.14.0 | h28cd5cc_2     |             |         |                                            |
+      | icu              |      58.2 | he6710b0_3     |             |         |                                            |
+      | intel-openmp     |  2021.4.0 | h06a4308_3561  |             |         |                                            |
+      | jpeg             |        9d | h7f8727e_0     |             |         |                                            |
+      | kiwisolver       |     1.4.0 | pypi_0         | pypi        |         |                                            |
+      | ld_impl_linux-64 |    2.35.1 | h7274673_9     |             |         |                                            |
+      | libffi           |       3.3 | he6710b0_2     |             |         |                                            |
+      | libgcc-ng        |     9.3.0 | h5101ec6_17    |             |         |                                            |
+      | libgomp          |     9.3.0 | h5101ec6_17    |             |         |                                            |
+      | libpng           |    1.6.37 | hbc83047_0     |             |         |                                            |
+      | libstdcxx-ng     |     9.3.0 | hd4cf53a_17    |             |         |                                            |
+      | libuuid          |     1.0.3 | h7f8727e_2     |             |         |                                            |
+      | libxcb           |      1.14 | h7b6447c_0     |             |         |                                            |
+      | libxml2          |    2.9.12 | h03d6c58_0     |             |         |                                            |
+      | lmfit            |     1.0.3 | pypi_0         | pypi        |         |                                            |
+      | matplotlib       |     3.5.1 | pypi_0         | pypi        |         |                                            |
+      | mkl              |  2021.4.0 | h06a4308_640   |             |         |                                            |
+      | mkl-service      |     2.4.0 | py39h7f8727e_0 |             |         |                                            |
+      | mkl_fft          |     1.3.1 | py39hd3c417c_0 |             |         |                                            |
+      | mkl_random       |     1.2.2 | py39h51133e4_0 |             |         |                                            |
+      | ncurses          |       6.3 | h7f8727e_2     |             |         |                                            |
+      | numexpr          |     2.8.1 | pypi_0         | pypi        |         |                                            |
+      | numpy            |    1.21.2 | py39h20f2e39_0 |             |         |                                            |
+      | numpy-base       |    1.21.2 | py39h79a1101_0 |             |         |                                            |
+      | openssl          |    1.1.1n | h7f8727e_0     |             |         |                                            |
+      | packaging        |      21.3 | pypi_0         | pypi        |         |                                            |
+      | pcre             |      8.45 | h295c915_0     |             |         |                                            |
+      | pillow           |     9.0.1 | pypi_0         | pypi        |         |                                            |
+      | pip              |    21.2.4 | py39h06a4308_0 |             |         |                                            |
+      | pyparsing        |     3.0.7 | pypi_0         | pypi        |         |                                            |
+      | pyperclip        |     1.8.2 | pypi_0         | pypi        |         |                                            |
+      | pyqt             |     5.9.2 | py39h2531618_6 |             |         |                                            |
+      | python           |     3.9.7 | h12debd9_1     |             |         |                                            |
+      | python-dateutil  |     2.8.2 | pypi_0         | pypi        |         |                                            |
+      | qt               |     5.9.7 | h5867ecd_1     |             |         |                                            |
+      | readline         |     8.1.2 | h7f8727e_1     |             |         |                                            |
+      | scipy            |     1.8.0 | pypi_0         | pypi        |         |                                            |
+      | setuptools       |    58.0.4 | py39h06a4308_0 |             |         |                                            |
+      | sip              |   4.19.13 | py39h295c915_0 |             |         |                                            |
+      | six              |    1.16.0 | pyhd3eb1b0_1   |             |         |                                            |
+      | sqlite           |    3.38.0 | hc218d9a_0     |             |         |                                            |
+      | tables           |     3.7.0 | pypi_0         | pypi        |         |                                            |
+      | tifffile         | 2022.3.16 | pypi_0         | pypi        |         |                                            |
+      | tk               |    8.6.11 | h1ccaba5_0     |             |         |                                            |
+      | tzdata           |     2021e | hda174b7_0     |             |         |                                            |
+      | uncertainties    |     3.1.6 | pypi_0         | pypi        |         |                                            |
+      | wheel            |    0.37.1 | pyhd3eb1b0_0   |             |         |                                            |
+      | xz               |     5.2.5 | h7b6447c_0     |             |         |                                            |
+      | zlib             |    1.2.11 | h7f8727e_4     |             |         |                                            |
+
+    - this is how the program is started
+      #+begin_src sh
+        conda activate focus
+        python -m focuspoint.FCS_point_correlator
+      #+end_src
+
+      #+RESULTS:
+
+    - then:
+      1. go to the 'Fit Function' tab
+      2. load correlated files, e.g. from
+         =./data/exp-220227-unet/2022-05-22_experimental-af488/clean=
+      3. inside the base directory of the experiment (e.g.
+         =./data/exp-220227-unet/2022-05-22_experimental-af488=) I saved the
+         focuspoint profile file, which you can load to reproduce all my fit
+         settings.
+         1. for 1-component fit:
+            =./data/exp-220227-unet/2022-05-22_experimental-af488/af488+luvs_1comp.profile=
+         2. for 2-component fit:
+            =./data/exp-220227-unet/2022-05-22_experimental-af488/af488+luvs_2comp.profile=
+      4. the setting which is not saved in the =.profile= file is the fit range
+         (xmin, xmax). This is saved in all the =...outParam.csv= files.
+         Generally, this was
+         - for =af488= data:
+           - ~xmin=0.001~
+           - for =averaging= correction: ~xmax=0.5~
+           - for data without peak artifacts (only =af488=) and all other
+             correction methods: ~xmax=100~
+           - for data with peak artifacts (only =af488+luvs=) and all other
+             correction methods: ~xmax=500~
+         - for =pex5= data:
+           - ~xmin=0.001~
+           - ~xmax=1000~
+         - simulated data:
+           - ~xmin=1~
+
+
 *** Experiment 1: run training of 9 promising hparam combinations
    1. run training of =(9051e32b87d84f3485b980067addec30,
       61ff87bdb89b4e2ba64f8dacc774992d)= with hparams from above.
@@ -7762,11 +7883,8 @@
     #+end_details
 
 *** Analysis 3: correlations and fits of experimental data
-**** Fitting
-    - all fitting was done in Dominic Waithe's =focuspoint=. (see
-      [[https://pubmed.ncbi.nlm.nih.gov/26589275/]] and
-      https://github.com/dwaithe/FCS_point_correlator)
-    -
+
+**** Plotting
     :PROPERTIES:
     :header-args:jupyter-python: :session /jpy:localhost#8888:a37e524a-8134-4d8f-b24a-367acaf1bdd3 :pandoc t
     :END:
