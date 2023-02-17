@@ -524,7 +524,7 @@ def cut_simulations_and_shuffle_chunks(array, ncuts):
     return array_cut
 
 
-def convert_diffcoeff_to_transittimes(diff, fwhm):
+def convert_diffcoeff_to_transittimes(diff, fwhm=250):
     """Convert diffusion coefficient to transit times in FCS measurements
 
     Parameters
