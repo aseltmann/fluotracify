@@ -2126,7 +2126,6 @@
         configuration
 
 *** Setup: Fitting
-**** Fitting
     - all fitting was done in Dominic Waithe's =focuspoint=. (see
       [[https://pubmed.ncbi.nlm.nih.gov/26589275/]] and
       https://github.com/dwaithe/FCS_point_correlator)
@@ -2137,7 +2136,7 @@
       #+begin_src sh
         conda list -n focus
       #+end_src
-
+      #+begin_details
       #+RESULTS:
       | #                |  packages | in             | environment | at      | /home/lex/Programme/miniconda3/envs/focus: |
       | #                |           |                |             |         |                                            |
@@ -2208,7 +2207,7 @@
       | wheel            |    0.37.1 | pyhd3eb1b0_0   |             |         |                                            |
       | xz               |     5.2.5 | h7b6447c_0     |             |         |                                            |
       | zlib             |    1.2.11 | h7f8727e_4     |             |         |                                            |
-
+      #+end_details
     - this is how the program is started
       #+begin_src sh
         conda activate focus
@@ -2241,10 +2240,16 @@
              correction methods: ~xmax=500~
          - for =pex5= data:
            - ~xmin=0.001~
-           - ~xmax=1000~
+           - for =averaging= correction: ~xmax=0.5~
+           - for all other correction methods: ~xmax=1000~
          - simulated data:
            - ~xmin=1~
-
+           - ~xmax=8000~ - note: sometimes the correction methods did shorten
+             the traces below 8000ms. Then, the maximum correlation length was
+             automatically shortened by the program. In =exp-220227-unet=, I did
+             not plot the comparison of fit outcomes of simulated data, so for
+             details on these xmax values see the *assert* statements when
+             loading simulated data in =exp-220316-publication1=
 
 *** Experiment 1: run training of 9 promising hparam combinations
    1. run training of =(9051e32b87d84f3485b980067addec30,
@@ -7883,13 +7888,18 @@
     #+end_details
 
 *** Analysis 3: correlations and fits of experimental data
-
-**** Plotting
+**** compare model performance on =af488= data
     :PROPERTIES:
     :header-args:jupyter-python: :session /jpy:localhost#8888:a37e524a-8134-4d8f-b24a-367acaf1bdd3 :pandoc t
     :END:
+    - call ~#+CALL: jupyter-set-output-directory()~
+      #+CALL: jupyter-set-output-directory()
 
-    - first, load modules and data. Correlations were
+      #+RESULTS:
+      : ./data/exp-220227-unet/jupyter
+
+   - first, load modules and data.
+
      #+BEGIN_SRC jupyter-python
        %cd ~/Programme/drmed-git
      #+END_SRC
@@ -7980,99 +7990,99 @@
 
        # average parameters
        dirty_avg_1comp =  pd.read_csv(dirty_avg_1comp_path, sep=',').assign(
-           artifact=10*['dirty',])
+           artifact=10*['af488+luvs',])
        dirty_avg_2comp =  pd.read_csv(dirty_avg_2comp_path, sep=',').assign(
-           artifact=10*['dirty',])
+           artifact=10*['af488+luvs',])
        clean_avg_1comp =  pd.read_csv(clean_avg_1comp_path, sep=',').assign(
-           artifact=10*['clean',])
+           artifact=10*['af488',])
        clean_avg_2comp =  pd.read_csv(clean_avg_2comp_path, sep=',').assign(
-           artifact=10*['clean',])
+           artifact=10*['af488',])
 
        # dirty params
        dirty_noc_1comp = pd.read_csv(dirty_noc_1comp_path, sep=',').assign(
-           artifact=440*['dirty',], processing=440*['No correction'])
+           artifact=440*['af488+luvs',], processing=440*['No correction'])
        dirty_noc_2comp = pd.read_csv(dirty_noc_2comp_path, sep=',').assign(
-           artifact=440*['dirty',], processing=440*['No correction'])
+           artifact=440*['af488+luvs',], processing=440*['No correction'])
 
        dirty_0cd20_1comp =  pd.read_csv(dirty_0cd20_1comp_path, sep=',').assign(
-           artifact=440*['dirty',], processing=440*['0cd20'])
+           artifact=440*['af488+luvs',], processing=440*['0cd20'])
        dirty_0cd20_2comp =  pd.read_csv(dirty_0cd20_2comp_path, sep=',').assign(
-           artifact=440*['dirty',], processing=440*['0cd20'])
+           artifact=440*['af488+luvs',], processing=440*['0cd20'])
        dirty_19e3e_1comp =  pd.read_csv(dirty_19e3e_1comp_path, sep=',').assign(
-           artifact=440*['dirty',], processing=440*['19e3e'])
+           artifact=440*['af488+luvs',], processing=440*['19e3e'])
        dirty_19e3e_2comp =  pd.read_csv(dirty_19e3e_2comp_path, sep=',').assign(
-           artifact=440*['dirty',], processing=440*['19e3e'])
+           artifact=440*['af488+luvs',], processing=440*['19e3e'])
        dirty_34766_1comp =  pd.read_csv(dirty_34766_1comp_path, sep=',').assign(
-           artifact=440*['dirty',], processing=440*['34766'])
+           artifact=440*['af488+luvs',], processing=440*['34766'])
        dirty_34766_2comp =  pd.read_csv(dirty_34766_2comp_path, sep=',').assign(
-           artifact=440*['dirty',], processing=440*['34766'])
+           artifact=440*['af488+luvs',], processing=440*['34766'])
        dirty_34a6d_1comp =  pd.read_csv(dirty_34a6d_1comp_path, sep=',').assign(
-           artifact=440*['dirty',], processing=440*['34a6d'])
+           artifact=440*['af488+luvs',], processing=440*['34a6d'])
        dirty_34a6d_2comp =  pd.read_csv(dirty_34a6d_2comp_path, sep=',').assign(
-           artifact=440*['dirty',], processing=440*['34a6d'])
+           artifact=440*['af488+luvs',], processing=440*['34a6d'])
        dirty_484af_1comp =  pd.read_csv(dirty_484af_1comp_path, sep=',').assign(
-           artifact=440*['dirty',], processing=440*['484af'])
+           artifact=440*['af488+luvs',], processing=440*['484af'])
        dirty_484af_2comp =  pd.read_csv(dirty_484af_2comp_path, sep=',').assign(
-           artifact=440*['dirty',], processing=440*['484af'])
+           artifact=440*['af488+luvs',], processing=440*['484af'])
        dirty_714af_1comp =  pd.read_csv(dirty_714af_1comp_path, sep=',').assign(
-           artifact=440*['dirty',], processing=440*['714af'])
+           artifact=440*['af488+luvs',], processing=440*['714af'])
        dirty_714af_2comp =  pd.read_csv(dirty_714af_2comp_path, sep=',').assign(
-           artifact=440*['dirty',], processing=440*['714af'])
+           artifact=440*['af488+luvs',], processing=440*['714af'])
        dirty_c1204_1comp =  pd.read_csv(dirty_c1204_1comp_path, sep=',').assign(
-           artifact=440*['dirty',], processing=440*['c1204'])
+           artifact=440*['af488+luvs',], processing=440*['c1204'])
        dirty_c1204_2comp =  pd.read_csv(dirty_c1204_2comp_path, sep=',').assign(
-           artifact=440*['dirty',], processing=440*['c1204'])
+           artifact=440*['af488+luvs',], processing=440*['c1204'])
        dirty_fe81d_1comp =  pd.read_csv(dirty_fe81d_1comp_path, sep=',').assign(
-           artifact=440*['dirty',], processing=440*['fe81d'])
+           artifact=440*['af488+luvs',], processing=440*['fe81d'])
        dirty_fe81d_2comp =  pd.read_csv(dirty_fe81d_2comp_path, sep=',').assign(
-           artifact=440*['dirty',], processing=440*['fe81d'])
+           artifact=440*['af488+luvs',], processing=440*['fe81d'])
        dirty_ff67b_1comp =  pd.read_csv(dirty_ff67b_1comp_path, sep=',').assign(
-           artifact=440*['dirty',], processing=440*['ff67b'])
+           artifact=440*['af488+luvs',], processing=440*['ff67b'])
        dirty_ff67b_2comp =  pd.read_csv(dirty_ff67b_2comp_path, sep=',').assign(
-           artifact=440*['dirty',], processing=440*['ff67b'])
+           artifact=440*['af488+luvs',], processing=440*['ff67b'])
 
        # clean params
        clean_noc_1comp = pd.read_csv(clean_noc_1comp_path, sep=',').assign(
-           artifact=424*['clean',], processing=424*['No correction'])
+           artifact=424*['af488',], processing=424*['No correction'])
        clean_noc_2comp = pd.read_csv(clean_noc_2comp_path, sep=',').assign(
-           artifact=424*['clean',], processing=424*['No correction'])
+           artifact=424*['af488',], processing=424*['No correction'])
 
        clean_0cd20_1comp =  pd.read_csv(clean_0cd20_1comp_path, sep=',').assign(
-           artifact=424*['clean',], processing=424*['0cd20'])
+           artifact=424*['af488',], processing=424*['0cd20'])
        clean_0cd20_2comp =  pd.read_csv(clean_0cd20_2comp_path, sep=',').assign(
-           artifact=424*['clean',], processing=424*['0cd20'])
+           artifact=424*['af488',], processing=424*['0cd20'])
        clean_19e3e_1comp =  pd.read_csv(clean_19e3e_1comp_path, sep=',').assign(
-           artifact=424*['clean',], processing=424*['19e3e'])
+           artifact=424*['af488',], processing=424*['19e3e'])
        clean_19e3e_2comp =  pd.read_csv(clean_19e3e_2comp_path, sep=',').assign(
-           artifact=424*['clean',], processing=424*['19e3e'])
+           artifact=424*['af488',], processing=424*['19e3e'])
        clean_34766_1comp =  pd.read_csv(clean_34766_1comp_path, sep=',').assign(
-           artifact=424*['clean',], processing=424*['34766'])
+           artifact=424*['af488',], processing=424*['34766'])
        clean_34766_2comp =  pd.read_csv(clean_34766_2comp_path, sep=',').assign(
-           artifact=424*['clean',], processing=424*['34766'])
+           artifact=424*['af488',], processing=424*['34766'])
        clean_34a6d_1comp =  pd.read_csv(clean_34a6d_1comp_path, sep=',').assign(
-           artifact=424*['clean',], processing=424*['34a6d'])
+           artifact=424*['af488',], processing=424*['34a6d'])
        clean_34a6d_2comp =  pd.read_csv(clean_34a6d_2comp_path, sep=',').assign(
-           artifact=424*['clean',], processing=424*['34a6d'])
+           artifact=424*['af488',], processing=424*['34a6d'])
        clean_484af_1comp =  pd.read_csv(clean_484af_1comp_path, sep=',').assign(
-           artifact=424*['clean',], processing=424*['484af'])
+           artifact=424*['af488',], processing=424*['484af'])
        clean_484af_2comp =  pd.read_csv(clean_484af_2comp_path, sep=',').assign(
-           artifact=424*['clean',], processing=424*['484af'])
+           artifact=424*['af488',], processing=424*['484af'])
        clean_714af_1comp =  pd.read_csv(clean_714af_1comp_path, sep=',').assign(
-           artifact=424*['clean',], processing=424*['714af'])
+           artifact=424*['af488',], processing=424*['714af'])
        clean_714af_2comp =  pd.read_csv(clean_714af_2comp_path, sep=',').assign(
-           artifact=424*['clean',], processing=424*['714af'])
+           artifact=424*['af488',], processing=424*['714af'])
        clean_c1204_1comp =  pd.read_csv(clean_c1204_1comp_path, sep=',').assign(
-           artifact=424*['clean',], processing=424*['c1204'])
+           artifact=424*['af488',], processing=424*['c1204'])
        clean_c1204_2comp =  pd.read_csv(clean_c1204_2comp_path, sep=',').assign(
-           artifact=424*['clean',], processing=424*['c1204'])
+           artifact=424*['af488',], processing=424*['c1204'])
        clean_fe81d_1comp =  pd.read_csv(clean_fe81d_1comp_path, sep=',').assign(
-           artifact=424*['clean',], processing=424*['fe81d'])
+           artifact=424*['af488',], processing=424*['fe81d'])
        clean_fe81d_2comp =  pd.read_csv(clean_fe81d_2comp_path, sep=',').assign(
-           artifact=424*['clean',], processing=424*['fe81d'])
+           artifact=424*['af488',], processing=424*['fe81d'])
        clean_ff67b_1comp =  pd.read_csv(clean_ff67b_1comp_path, sep=',').assign(
-           artifact=424*['clean',], processing=424*['ff67b'])
+           artifact=424*['af488',], processing=424*['ff67b'])
        clean_ff67b_2comp =  pd.read_csv(clean_ff67b_2comp_path, sep=',').assign(
-           artifact=424*['clean',], processing=424*['ff67b'])
+           artifact=424*['af488',], processing=424*['ff67b'])
 
        avg_param = pd.concat([clean_avg_1comp, clean_avg_2comp,
                               dirty_avg_1comp, dirty_avg_2comp])
@@ -8097,21 +8107,52 @@
                               clean_c1204_1comp, clean_c1204_2comp,
                               clean_fe81d_1comp, clean_fe81d_2comp,
                               clean_ff67b_1comp, clean_ff67b_2comp])
-       avg_param.head()
+
+       avg_param = pd.concat([clean_avg_1comp, clean_avg_2comp,
+                              dirty_avg_1comp, dirty_avg_2comp])
+
+       assert set(all_param['Dimen']) == {'3D'}
+       assert set(all_param['AR1'] == {5.0})
+       assert set(all_param['Diff_eq']) == {'Equation 1B'}
+       assert set(all_param['Triplet_eq']) == {'no triplet'}
+       assert set(all_param['alpha1']) == {1.0}
+       assert set(all_param['xmin']) == {0.001018}
+       assert set(all_param['xmax']) == {100.66329, 469.762042}
+       assert set(all_param[all_param['xmax'] == 100.66329]['artifact']) == {'af488'}
+       assert set(all_param[all_param['xmax'] == 469.762042]['artifact']) == {'af488+luvs'}
+       all_param
      #+END_SRC
 
      #+RESULTS:
      :RESULTS:
-     |   | name_of_plot | master_file | parent_name  | parent_uqid  | time of fit              | Diff_eq     | Diff_species | Triplet_eq | Triplet_species | Dimen | ... | stdev(AR1) | artifact | A2  | stdev(A2) | txy2 | stdev(txy2) | alpha2 | stdev(alpha2) | AR2 | stdev(AR2) |
-|---+--------------+-------------+--------------+--------------+--------------------------+-------------+--------------+------------+-----------------+-------+-----+------------+----------+-----+-----------+------+-------------+--------+---------------+-----+------------|
-| 0 | clean        | Not known   | average_data | average_data | Mon May 30 11:34:02 2022 | Equation 1B | 1            | no triplet | 1               | 3D    | ... | 0          | clean    | NaN | NaN       | NaN  | NaN         | NaN    | NaN           | NaN | NaN        |
-| 1 | 0cd20        | Not known   | average_data | average_data | Mon May 30 11:34:02 2022 | Equation 1B | 1            | no triplet | 1               | 3D    | ... | 0          | clean    | NaN | NaN       | NaN  | NaN         | NaN    | NaN           | NaN | NaN        |
-| 2 | 19e3e        | Not known   | average_data | average_data | Mon May 30 11:34:02 2022 | Equation 1B | 1            | no triplet | 1               | 3D    | ... | 0          | clean    | NaN | NaN       | NaN  | NaN         | NaN    | NaN           | NaN | NaN        |
-| 3 | 34a6d        | Not known   | average_data | average_data | Mon May 30 11:34:02 2022 | Equation 1B | 1            | no triplet | 1               | 3D    | ... | 0          | clean    | NaN | NaN       | NaN  | NaN         | NaN    | NaN           | NaN | NaN        |
-| 4 | 484af        | Not known   | average_data | average_data | Mon May 30 11:34:02 2022 | Equation 1B | 1            | no triplet | 1               | 3D    | ... | 0          | clean    | NaN | NaN       | NaN  | NaN         | NaN    | NaN           | NaN | NaN        |
+     |     | name_of_plot                                      | master_file | parent_name | parent_uqid | time of fit              | Diff_eq     | Diff_species | Triplet_eq | Triplet_species | Dimen | ... | artifact | processing    | A2       | stdev(A2) | txy2     | stdev(txy2) | alpha2 | stdev(alpha2) | AR2 | stdev(AR2) |
+|-----+---------------------------------------------------+-------------+-------------+-------------+--------------------------+-------------+--------------+------------+-----------------+-------+-----+----------+---------------+----------+-----------+----------+-------------+--------+---------------+-----+------------|
+| 0   | 2022-05-26_tttr2xfcs_CH2_BIN1dot0_20 nM AF4881... | Not known   | tttr2xfcs   | 0           | Mon May 30 14:12:23 2022 | Equation 1B | 1            | no triplet | 1               | 3D    | ... | af488    | No correction | NaN      | NaN       | NaN      | NaN         | NaN    | NaN           | NaN | NaN        |
+| 1   | 2022-05-26_tttr2xfcs_CH2_BIN1dot0_20 nM AF4882... | Not known   | tttr2xfcs   | 0           | Mon May 30 14:12:24 2022 | Equation 1B | 1            | no triplet | 1               | 3D    | ... | af488    | No correction | NaN      | NaN       | NaN      | NaN         | NaN    | NaN           | NaN | NaN        |
+| 2   | 2022-05-26_tttr2xfcs_CH2_BIN1dot0_20 nM AF4883... | Not known   | tttr2xfcs   | 0           | Mon May 30 14:12:24 2022 | Equation 1B | 1            | no triplet | 1               | 3D    | ... | af488    | No correction | NaN      | NaN       | NaN      | NaN         | NaN    | NaN           | NaN | NaN        |
+| 3   | 2022-05-26_tttr2xfcs_CH2_BIN1dot0_20 nM AF4884... | Not known   | tttr2xfcs   | 0           | Mon May 30 14:12:24 2022 | Equation 1B | 1            | no triplet | 1               | 3D    | ... | af488    | No correction | NaN      | NaN       | NaN      | NaN         | NaN    | NaN           | NaN | NaN        |
+| 4   | 2022-05-26_tttr2xfcs_CH2_BIN1dot0_20 nM AF4885... | Not known   | tttr2xfcs   | 0           | Mon May 30 14:12:24 2022 | Equation 1B | 1            | no triplet | 1               | 3D    | ... | af488    | No correction | NaN      | NaN       | NaN      | NaN         | NaN    | NaN           | NaN | NaN        |
+| ... | ...                                               | ...         | ...         | ...         | ...                      | ...         | ...          | ...        | ...             | ...   | ... | ...      | ...           | ...      | ...       | ...      | ...         | ...    | ...           | ... | ...        |
+| 419 | 2022-05-25_tttr2xfcs_CH2_BIN1dot0_20 nM AF4882... | Not known   | tttr2xfcs   | 0           | Mon May 30 14:42:23 2022 | Equation 1B | 2            | no triplet | 1               | 3D    | ... | af488    | ff67b         | 0.488985 | None      | 0.096094 | None        | 1.0    | None          | 5.0 | None       |
+| 420 | 2022-05-25_tttr2xfcs_CH2_BIN1dot0_20 nM AF4882... | Not known   | tttr2xfcs   | 0           | Mon May 30 14:42:23 2022 | Equation 1B | 2            | no triplet | 1               | 3D    | ... | af488    | ff67b         | 0.386551 | None      | 0.112745 | None        | 1.0    | None          | 5.0 | None       |
+| 421 | 2022-05-25_tttr2xfcs_CH2_BIN1dot0_20 nM AF4882... | Not known   | tttr2xfcs   | 0           | Mon May 30 14:42:24 2022 | Equation 1B | 2            | no triplet | 1               | 3D    | ... | af488    | ff67b         | 0.658441 | None      | 0.054065 | None        | 1.0    | None          | 5.0 | None       |
+| 422 | 2022-05-25_tttr2xfcs_CH2_BIN1dot0_20 nM AF4882... | Not known   | tttr2xfcs   | 0           | Mon May 30 14:42:24 2022 | Equation 1B | 2            | no triplet | 1               | 3D    | ... | af488    | ff67b         | 0.730166 | None      | 0.060976 | None        | 1.0    | None          | 5.0 | None       |
+| 423 | 2022-05-25_tttr2xfcs_CH2_BIN1dot0_20 nM AF4882... | Not known   | tttr2xfcs   | 0           | Mon May 30 14:42:24 2022 | Equation 1B | 2            | no triplet | 1               | 3D    | ... | af488    | ff67b         | 0.461469 | None      | 0.097456 | None        | 1.0    | None          | 5.0 | None       |
 
-5 rows × 34 columns
+17280 rows × 39 columns
      :END:
+
+40 rows × 34 columns
+
+   - first, let's take a look only at =avg_param=. There, for each model all
+     curves of =af488= and =af488+luvs= were fitted, and then the correlations
+     *were averaged*. This gives us a good overview with direct comparison of
+     model fit outcome to the fit outcomes without correction. BUT this is not
+     enough to determine that the model is good enough, because in practice, we
+     rarely take 400 times the same measurement and average. So this more
+     resembles the *optimal* fit outcomes and in the final paper, I analysed the
+     success via *fit distributions* (so plotting all 400 extracted transit
+     times and comparing the distributions)
 
      #+BEGIN_SRC jupyter-python
        def sort_fit(param_ls):
@@ -8155,8 +8196,6 @@
                      f'$\\tau_D^{{slow}}={t_slow:.1f}, N\\cdot A={N_slow:.1f}$}}'
                out = out.replace('%', '\\%')
            return out
-       avg_param = pd.concat([clean_avg_1comp, clean_avg_2comp,
-                              dirty_avg_1comp, dirty_avg_2comp])
 
        avg_param['fit results'] = avg_param[['txy1', 'txy2', 'A1', 'A2', 'N (FCS)']].apply(lambda x: sort_fit(x), axis=1)
        avg_param = avg_param[['name_of_plot', 'Diff_species', 'artifact', 'fit results']]
@@ -8164,14 +8203,14 @@
                                          columns='artifact',
                                          index=['name_of_plot', 'Diff_species'],
                                          aggfunc=lambda x: '-'.join(x))
-       avg_param.loc[('clean', 1), 'dirty'] = avg_param.loc[('dirty', 1), 'dirty']
-       avg_param.loc[('clean', 2), 'dirty'] = avg_param.loc[('dirty', 2), 'dirty']
+       avg_param.loc[('clean', 1), 'af488+luvs'] = avg_param.loc[('dirty', 1), 'af488+luvs']
+       avg_param.loc[('clean', 2), 'af488+luvs'] = avg_param.loc[('dirty', 2), 'af488+luvs']
 
        avg_param = avg_param.rename(index={'clean' : 'no correction'})
        # to get all models
-       # first = ['no correction',] + model_name_ls.copy()
+       first = ['no correction',] + model_name_ls.copy()
        # just two examples
-       first = ['no correction', '0cd20', '34a6d']
+       # first = ['no correction', '0cd20', '34a6d']
        second = [1, 2]
        index_order = pd.MultiIndex.from_product([first, second],
                                                 names=[r'\makecell{type of\\processing}', 'fit'])
@@ -8181,40 +8220,64 @@
            print(avg_param.to_latex(escape=False,
                                     column_format='cccc',
                                     caption=('Experimental results')))
-       avg_param
      #+END_SRC
 
      #+RESULTS:
-     :RESULTS:
      #+begin_example
        \begin{table}
        \centering
        \caption{Experimental results}
        \begin{tabular}{cccc}
        \toprule
-             & artifact &                                                                             clean &                                                                                  dirty \\
-       \makecell{type of\\processing} & fit &                                                                                   &                                                                                        \\
+             & artifact &                                                                              af488 &                                                                             af488+luvs \\
+       \makecell{type of\\processing} & fit &                                                                                    &                                                                                        \\
        \midrule
-       no correction & 1 &                                                             $\tau_D=39.7, N=14.3$ &                                                                 $\tau_D=7355.0, N=4.7$ \\
-             & 2 &  \makecell{$\tau_D^{fast}=9.5, N\cdot A=4.9$\\$\tau_D^{slow}=69.8, N\cdot A=8.6$} &   \makecell{$\tau_D^{fast}=78.3, N\cdot A=0.7$\\$\tau_D^{slow}=11944.6, N\cdot A=3.5$} \\
-       0cd20 & 1 &                                                             $\tau_D=39.6, N=14.3$ &                                                                  $\tau_D=71.3, N=21.7$ \\
-             & 2 &  \makecell{$\tau_D^{fast}=8.9, N\cdot A=4.6$\\$\tau_D^{slow}=67.5, N\cdot A=8.8$} &   \makecell{$\tau_D^{fast}=38.8, N\cdot A=15.5$\\$\tau_D^{slow}=5823.0, N\cdot A=3.9$} \\
-       34a6d & 1 &                                                             $\tau_D=39.7, N=14.3$ &                                                                  $\tau_D=78.9, N=22.5$ \\
-             & 2 &  \makecell{$\tau_D^{fast}=9.4, N\cdot A=4.8$\\$\tau_D^{slow}=69.6, N\cdot A=8.6$} &  \makecell{$\tau_D^{fast}=41.9, N\cdot A=14.2$\\$\tau_D^{slow}=22526.1, N\cdot A=4.6$} \\
+       no correction & 1 &                                                              $\tau_D=39.7, N=14.3$ &                                                                 $\tau_D=7355.0, N=4.7$ \\
+             & 2 &   \makecell{$\tau_D^{fast}=9.5, N\cdot A=4.9$\\$\tau_D^{slow}=69.8, N\cdot A=8.6$} &   \makecell{$\tau_D^{fast}=78.3, N\cdot A=0.7$\\$\tau_D^{slow}=11944.6, N\cdot A=3.5$} \\
+       ff67b & 1 &                                                              $\tau_D=39.8, N=14.3$ &                                                                  $\tau_D=94.0, N=22.4$ \\
+             & 2 &   \makecell{$\tau_D^{fast}=9.9, N\cdot A=5.0$\\$\tau_D^{slow}=71.7, N\cdot A=8.4$} &  \makecell{$\tau_D^{fast}=41.8, N\cdot A=13.1$\\$\tau_D^{slow}=20282.4, N\cdot A=5.2$} \\
+       34766 & 1 &                                                              $\tau_D=35.1, N=14.7$ &                                                                  $\tau_D=62.5, N=23.2$ \\
+             & 2 &  \makecell{$\tau_D^{fast}=1.4, N\cdot A=2.4$\\$\tau_D^{slow}=42.0, N\cdot A=10.7$} &  \makecell{$\tau_D^{fast}=38.9, N\cdot A=15.8$\\$\tau_D^{slow}=24434.3, N\cdot A=4.1$} \\
+       714af & 1 &                                                              $\tau_D=39.8, N=14.3$ &                                                                 $\tau_D=104.2, N=22.3$ \\
+             & 2 &  \makecell{$\tau_D^{fast}=10.0, N\cdot A=5.1$\\$\tau_D^{slow}=71.9, N\cdot A=8.4$} &  \makecell{$\tau_D^{fast}=41.8, N\cdot A=12.3$\\$\tau_D^{slow}=21435.4, N\cdot A=5.5$} \\
+       34a6d & 1 &                                                              $\tau_D=39.7, N=14.3$ &                                                                  $\tau_D=78.9, N=22.5$ \\
+             & 2 &   \makecell{$\tau_D^{fast}=9.4, N\cdot A=4.8$\\$\tau_D^{slow}=69.6, N\cdot A=8.6$} &  \makecell{$\tau_D^{fast}=41.9, N\cdot A=14.2$\\$\tau_D^{slow}=22526.1, N\cdot A=4.6$} \\
+       484af & 1 &                                                              $\tau_D=39.8, N=14.3$ &                                                                  $\tau_D=91.2, N=22.5$ \\
+             & 2 &  \makecell{$\tau_D^{fast}=10.1, N\cdot A=5.1$\\$\tau_D^{slow}=72.2, N\cdot A=8.4$} &  \makecell{$\tau_D^{fast}=41.2, N\cdot A=12.8$\\$\tau_D^{slow}=23742.5, N\cdot A=5.2$} \\
+       0cd20 & 1 &                                                              $\tau_D=39.6, N=14.3$ &                                                                  $\tau_D=71.3, N=21.7$ \\
+             & 2 &   \makecell{$\tau_D^{fast}=8.9, N\cdot A=4.6$\\$\tau_D^{slow}=67.5, N\cdot A=8.8$} &   \makecell{$\tau_D^{fast}=38.8, N\cdot A=15.5$\\$\tau_D^{slow}=5823.0, N\cdot A=3.9$} \\
+       fe81d & 1 &                                                              $\tau_D=39.8, N=14.3$ &                                                                  $\tau_D=90.4, N=22.3$ \\
+             & 2 &  \makecell{$\tau_D^{fast}=10.0, N\cdot A=5.0$\\$\tau_D^{slow}=71.8, N\cdot A=8.4$} &  \makecell{$\tau_D^{fast}=42.0, N\cdot A=13.3$\\$\tau_D^{slow}=19906.1, N\cdot A=5.0$} \\
+       19e3e & 1 &                                                              $\tau_D=39.6, N=14.3$ &                                                                  $\tau_D=79.8, N=22.4$ \\
+             & 2 &   \makecell{$\tau_D^{fast}=9.2, N\cdot A=4.8$\\$\tau_D^{slow}=68.9, N\cdot A=8.7$} &  \makecell{$\tau_D^{fast}=41.7, N\cdot A=13.6$\\$\tau_D^{slow}=27489.8, N\cdot A=4.7$} \\
+       c1204 & 1 &                                                              $\tau_D=29.2, N=15.2$ &                                                                  $\tau_D=51.4, N=23.8$ \\
+             & 2 &   \makecell{$\tau_D^{fast}=0.1, N\cdot A=3.9$\\$\tau_D^{slow}=31.4, N\cdot A=5.0$} &  \makecell{$\tau_D^{fast}=35.5, N\cdot A=16.4$\\$\tau_D^{slow}=39055.9, N\cdot A=3.9$} \\
        \bottomrule
        \end{tabular}
        \end{table}
      #+end_example
-     |                                | artifact | clean                                             | dirty                                             |
-|--------------------------------+----------+---------------------------------------------------+---------------------------------------------------|
-| \makecell{type of\\processing} | fit      |                                                   |                                                   |
-| no correction                  | 1        | $\tau_D=39.7, N=14.3$                             | $\tau_D=7355.0, N=4.7$                            |
-|                                | 2        | \makecell{$\tau_D^{fast}=9.5, N\cdot A=4.9$\\$... | \makecell{$\tau_D^{fast}=78.3, N\cdot A=0.7$\\... |
-| 0cd20                          | 1        | $\tau_D=39.6, N=14.3$                             | $\tau_D=71.3, N=21.7$                             |
-|                                | 2        | \makecell{$\tau_D^{fast}=8.9, N\cdot A=4.6$\\$... | \makecell{$\tau_D^{fast}=38.8, N\cdot A=15.5$\... |
-| 34a6d                          | 1        | $\tau_D=39.7, N=14.3$                             | $\tau_D=78.9, N=22.5$                             |
-|                                | 2        | \makecell{$\tau_D^{fast}=9.4, N\cdot A=4.8$\\$... | \makecell{$\tau_D^{fast}=41.9, N\cdot A=14.2$\... |
-     :END:
+
+   - now I put latex in a simple template of the =Overleaf= online latex
+     editor like this
+
+     #+begin_example
+       \documentclass{article}
+       \usepackage{booktabs} % for \toprule and \midrule in table
+       \usepackage{makecell} % for linebreaks in table cells
+
+       \begin{document}
+       %% here the code abvoe
+       \end{document}
+
+     #+end_example
+
+   - the final rendering looks like this:
+     #+begin_export html
+     <embed src="./data/exp-220227-unet/other/analysis3_af488_cas_avg_table.pdf" width="100%" height="500px" />
+     #+end_export
+
+   - now, we work with =all_param=. Here, all single correlation curves are
+     loaded without averaging.
 
      #+BEGIN_SRC jupyter-python
 
@@ -8241,108 +8304,15 @@
                out = t_fast, N_fast, t_slow, N_slow
            return out
 
-       all_param = pd.concat([clean_noc_1comp, clean_noc_2comp,
-                              dirty_noc_1comp, dirty_noc_2comp,
-                              dirty_0cd20_1comp, dirty_0cd20_2comp,
-                              dirty_19e3e_1comp, dirty_19e3e_2comp,
-                              dirty_34766_1comp, dirty_34766_2comp,
-                              dirty_34a6d_1comp, dirty_34a6d_2comp,
-                              dirty_484af_1comp, dirty_484af_2comp,
-                              dirty_714af_1comp, dirty_714af_2comp,
-                              dirty_c1204_1comp, dirty_c1204_2comp,
-                              dirty_fe81d_1comp, dirty_fe81d_2comp,
-                              dirty_ff67b_1comp, dirty_ff67b_2comp,
-                              clean_0cd20_1comp, clean_0cd20_2comp,
-                              clean_19e3e_1comp, clean_19e3e_2comp,
-                              clean_34766_1comp, clean_34766_2comp,
-                              clean_34a6d_1comp, clean_34a6d_2comp,
-                              clean_484af_1comp, clean_484af_2comp,
-                              clean_714af_1comp, clean_714af_2comp,
-                              clean_c1204_1comp, clean_c1204_2comp,
-                              clean_fe81d_1comp, clean_fe81d_2comp,
-                              clean_ff67b_1comp, clean_ff67b_2comp])
        all_param = all_param.reset_index()
        (all_param['t_fast'], all_param['N_fast'], all_param['t_slow'],
         all_param['N_slow']) = zip(*all_param[['txy1', 'txy2', 'A1', 'A2', 'N (FCS)']].apply(
             lambda x: sort_fit_simple(x), axis=1))
        all_param = all_param[['index', 'Diff_species', 'processing', 'artifact',
                               't_fast', 'N_fast', 't_slow', 'N_slow']]
-       all_param = all_param.loc[((all_param['Diff_species'] == 1) & (all_param['artifact'] == 'clean')) | ((all_param['Diff_species'] == 2) & (all_param['artifact'] == 'dirty'))]
-       pub_param = all_param.loc[(all_param['processing'] == 'No correction') | (all_param['processing'] == '0cd20') | (all_param['processing'] == '34a6d')]
-       pub_param = pub_param.replace(['clean'], '424 traces of\nAlexaFluor488\n(no artifacts)\nN (FCS) from\n1 species fit')
-       pub_param = pub_param.replace(['dirty'], '440 traces of\nAF488 + DiO LUVs\n(peak artifacts)\nN (FCS) $\\cdot$ A from\nfast sp. of 2 sp. fit')
-       pub_param = pub_param.replace(['0cd20'], 'large model (200 MB),\n6 levels,\npool size=4,\nscaler=quantile\ntransform (Gaussian pdf)')
-       pub_param = pub_param.replace(['34a6d'], 'small model (7 MB),\n3 levels,\npool size=4,\nscaler=l2')
-       g = sns.catplot(data=pub_param,
-                       y='t_fast',
-                       x='processing',
-                       hue='artifact',
-                       sharey=True,
-                       height=10,
-                       aspect=1,
-                       legend_out=True,
-                       kind='boxen',
-                       showfliers=False)
-       g.map_dataframe(sns.stripplot,
-             y='t_fast',
-             x='processing',
-             hue='artifact',
-             dodge=True,
-             palette=sns.color_palette(['0.3']),
-             size=4,
-             jitter=0.2)
-       g.fig.suptitle('Simulation → prediction → correction pipeline\nsuccessfully restores transit times',
-                      size=25)
+       all_param = all_param.loc[((all_param['Diff_species'] == 1) & (all_param['artifact'] == 'af488')) |
+                                 ((all_param['Diff_species'] == 2) & (all_param['artifact'] == 'af488+luvs'))]
 
-       g._legend.set_title('')
-       new_labels = ['424 traces of\nAlexaFluor488\n(no artifacts)\n$\\tau_D$ from\n1 species fit',
-                     '440 traces of\nAF488 + DiO LUVs\n(peak artifacts)\n$\\tau_D$ from\nfast sp. of 2 sp. fit']
-       for t, l in zip(g._legend.texts, new_labels):
-           t.set_text(l)
-       plt.setp(g.axes, yscale='log', xlabel='',
-                ylabel=r'log transit time $\tau_{D}$ $[ms]$')
-
-       g.tight_layout()
-       plot2_file = 'analysis2_biological_0cd20+34a6d_transit-times'
-       plt.savefig(f'{plot2_file}.pdf', bbox_inches='tight', dpi=300)
-       os.system(f'pdf2svg {plot2_file}.pdf {plot2_file}.svg')
-       plt.close('all')
-
-       g = sns.catplot(data=pub_param,
-                       y='N_fast',
-                       x='processing',
-                       hue='artifact',
-                       sharey=True,
-                       height=10,
-                       aspect=1,
-                       legend_out=True,
-                       kind='boxen',
-                       showfliers=False)
-       g.map_dataframe(sns.stripplot,
-             y='N_fast',
-             x='processing',
-             hue='artifact',
-             dodge=True,
-             palette=sns.color_palette(['0.3']),
-             size=4,
-             jitter=0.2)
-       g.fig.suptitle('Simulation → prediction → correction pipeline\nsuccessfully restores particle number',
-                      size=25)
-       g._legend.set_title('')
-       plt.setp(g.axes, xlabel='',
-                ylabel=r'particle number $N$ $[fl^{-1}]$')
-
-       g.tight_layout()
-       plot2_file = 'analysis2_biological_0cd20+34a6d_particle-number'
-       plt.savefig(f'{plot2_file}.pdf', bbox_inches='tight', dpi=300)
-       os.system(f'pdf2svg {plot2_file}.pdf {plot2_file}.svg')
-       plt.close('all')
-
-     #+END_SRC
-
-     #+RESULTS:
-
-     #+begin_src jupyter-python
        N_param = all_param.pivot_table(values='N_fast',
                                        index='index',
                                        columns=['processing', 'artifact', 'Diff_species'])
@@ -8351,138 +8321,147 @@
                                        index='index',
                                        columns=['processing', 'artifact', 'Diff_species'])
        t_param = t_param * 1000
-       display(N_param.describe().T)
-       display(t_param.describe().T)
-       display(t_param.median(axis=0))
-       display(N_param.median(axis=0))
-     #+end_src
+       print('Statistics of fitted particle numbers')
+       display(pd.concat([pd.Series(N_param.median(axis=0), name='median'), N_param.describe().T], axis=1))
+       print('Statistics of fitted transit times')
+       display(pd.concat([pd.Series(t_param.median(axis=0), name='median'), t_param.describe().T], axis=1))
+     #+END_SRC
 
      #+RESULTS:
      :RESULTS:
-     |               |          |              | count |       mean |        std |       min |       25% |       50% |        75% |         max |
-     |---------------+----------+--------------+-------+------------+------------+-----------+-----------+-----------+------------+-------------|
-     | processing    | artifact | Diff_species |       |            |            |           |           |           |            |             |
-     | 0cd20         | clean    |            1 | 424.0 |  14.335000 |   0.263291 | 13.412392 | 14.205747 | 14.341568 |  14.505898 |   14.988332 |
-     |               | dirty    |            2 | 440.0 |  15.106186 |   1.484036 |  6.267150 | 14.334271 | 15.248202 |  16.039287 |   18.110889 |
-     | 19e3e         | clean    |            1 | 424.0 |  14.329986 |   0.263853 | 13.367317 | 14.201544 | 14.336272 |  14.511038 |   14.931337 |
-     |               | dirty    |            2 | 440.0 |  13.270444 |   3.181698 |  0.562121 | 11.573624 | 13.826313 |  15.704750 |   18.581205 |
-     | 34766         | clean    |            1 | 424.0 |  14.684973 |   0.276662 | 13.720920 | 14.551659 | 14.702547 |  14.869845 |   15.347210 |
-     |               | dirty    |            2 | 440.0 |  15.267823 |   2.476381 |  6.346636 | 13.704650 | 15.732460 |  17.068360 |   19.961155 |
-     | 34a6d         | clean    |            1 | 424.0 |  14.325905 |   0.264438 | 13.365160 | 14.194973 | 14.335075 |  14.510599 |   14.933380 |
-     |               | dirty    |            2 | 440.0 |  13.641062 |   2.740812 |  1.417894 | 12.297284 | 14.302934 |  15.593493 |   17.885668 |
-     | 484af         | clean    |            1 | 424.0 |  14.317763 |   0.263824 | 13.365161 | 14.188180 | 14.325842 |  14.499389 |   14.919546 |
-     |               | dirty    |            2 | 440.0 |  12.784654 |   3.023495 |  1.591405 | 10.908164 | 13.373178 |  15.029049 |   18.453017 |
-     | 714af         | clean    |            1 | 424.0 |  14.318594 |   0.263337 | 13.365161 | 14.189044 | 14.325842 |  14.497586 |   14.919546 |
-     |               | dirty    |            2 | 440.0 |  12.233933 |   2.490236 |  5.295190 | 10.570730 | 12.420635 |  14.066820 |   17.968677 |
-     | No correction | clean    |            1 | 424.0 |  14.324938 |   0.264089 | 13.369703 | 14.194097 | 14.331944 |  14.503913 |   14.925030 |
-     |               | dirty    |            2 | 440.0 |   1.151438 |   0.843793 |  0.112582 |  0.518223 |  0.978458 |   1.540923 |    5.476162 |
-     | c1204         | clean    |            1 | 424.0 |  15.254311 |   0.321478 | 13.987100 | 15.077046 | 15.262632 |  15.475146 |   16.260415 |
-     |               | dirty    |            2 | 440.0 |  15.532688 |   3.448340 |  1.815959 | 13.639535 | 15.912205 |  18.127480 |   21.748767 |
-     | fe81d         | clean    |            1 | 424.0 |  14.319104 |   0.263526 | 13.365161 | 14.189106 | 14.326219 |  14.499389 |   14.919546 |
-     |               | dirty    |            2 | 440.0 |  13.077269 |   3.152211 |  0.536799 | 11.056025 | 13.689452 |  15.387298 |   19.102249 |
-     | ff67b         | clean    |            1 | 424.0 |  14.319636 |   0.263558 | 13.365161 | 14.189298 | 14.326219 |  14.499389 |   14.919546 |
-     |               | dirty    |            2 | 440.0 |  12.894021 |   2.446790 |  4.838165 | 11.518550 | 13.089802 |  14.484227 |   18.392188 |
-     |               |          |              | count |       mean |        std |       min |       25% |       50% |        75% |         max |
-     |---------------+----------+--------------+-------+------------+------------+-----------+-----------+-----------+------------+-------------|
-     | processing    | artifact | Diff_species |       |            |            |           |           |           |            |             |
-     | 0cd20         | clean    |            1 | 424.0 |  39.574374 |   1.040061 | 37.190978 | 38.879728 | 39.575746 |  40.279227 |   42.984704 |
-     |               | dirty    |            2 | 440.0 |  38.933931 |   5.459816 | 21.356080 | 35.228893 | 38.762520 |  42.262441 |   62.131261 |
-     | 19e3e         | clean    |            1 | 424.0 |  39.656947 |   1.047036 | 37.102746 | 38.934719 | 39.568778 |  40.416838 |   42.501109 |
-     |               | dirty    |            2 | 440.0 |  41.351740 |   4.525924 | 19.027233 | 38.362287 | 41.177209 |  43.854646 |   60.151240 |
-     | 34766         | clean    |            1 | 424.0 |  35.077446 |   1.109175 | 32.086412 | 34.355154 | 35.067658 |  35.736697 |   38.864156 |
-     |               | dirty    |            2 | 440.0 |  38.910032 |   3.349258 | 27.709990 | 36.625985 | 38.713203 |  41.009242 |   49.822679 |
-     | 34a6d         | clean    |            1 | 424.0 |  39.707795 |   1.038806 | 36.985999 | 39.012984 | 39.667568 |  40.457557 |   42.803298 |
-     |               | dirty    |            2 | 440.0 |  41.654939 |   4.707523 | 30.986888 | 38.312301 | 41.267814 |  44.652582 |   57.155144 |
-     | 484af         | clean    |            1 | 424.0 |  39.854861 |   1.040952 | 37.153441 | 39.141726 | 39.854056 |  40.582409 |   42.744448 |
-     |               | dirty    |            2 | 440.0 |  41.036124 |   4.307502 | 31.922451 | 38.063892 | 40.605601 |  43.505466 |   63.739400 |
-     | 714af         | clean    |            1 | 424.0 |  39.838266 |   1.041757 | 37.153441 | 39.107415 | 39.835832 |  40.571805 |   42.696864 |
-     |               | dirty    |            2 | 440.0 |  41.791645 |   4.068318 | 31.775699 | 38.784115 | 41.430208 |  44.084046 |   55.334179 |
-     | No correction | clean    |            1 | 424.0 |  39.726486 |   1.037956 | 37.049340 | 39.010144 | 39.678008 |  40.444667 |   42.680513 |
-     |               | dirty    |            2 | 440.0 | 373.284240 | 938.964455 |  9.128891 | 44.671731 | 69.978078 | 149.833895 | 9657.429422 |
-     | c1204         | clean    |            1 | 424.0 |  29.247641 |   1.225078 | 25.901046 | 28.399698 | 29.177928 |  30.113028 |   32.740869 |
-     |               | dirty    |            2 | 440.0 |  35.503411 |   2.690742 | 29.246945 | 33.580404 | 35.278166 |  36.865166 |   44.796158 |
-     | fe81d         | clean    |            1 | 424.0 |  39.828821 |   1.044278 | 37.153441 | 39.089567 | 39.830813 |  40.555985 |   42.744448 |
-     |               | dirty    |            2 | 440.0 |  40.766428 |   6.403163 | 12.890876 | 37.417914 | 40.439757 |  43.275102 |   84.641627 |
-     | ff67b         | clean    |            1 | 424.0 |  39.830343 |   1.042279 | 37.153441 | 39.087859 | 39.803435 |  40.555985 |   42.744448 |
-     |               | dirty    |            2 | 440.0 |  41.757214 |   4.040506 | 32.434107 | 38.893139 | 41.451285 |  44.293295 |   57.788748 |
-     #+begin_example
-       processing     artifact  Diff_species
-       0cd20          clean     1               39.575746
-                      dirty     2               38.762520
-       19e3e          clean     1               39.568778
-                      dirty     2               41.177209
-       34766          clean     1               35.067658
-                      dirty     2               38.713203
-       34a6d          clean     1               39.667568
-                      dirty     2               41.267814
-       484af          clean     1               39.854056
-                      dirty     2               40.605601
-       714af          clean     1               39.835832
-                      dirty     2               41.430208
-       No correction  clean     1               39.678008
-                      dirty     2               69.978078
-       c1204          clean     1               29.177928
-                      dirty     2               35.278166
-       fe81d          clean     1               39.830813
-                      dirty     2               40.439757
-       ff67b          clean     1               39.803435
-                      dirty     2               41.451285
-       dtype: float64
-     #+end_example
-     #+begin_example
-       processing     artifact  Diff_species
-       0cd20          clean     1               14.341568
-                      dirty     2               15.248202
-       19e3e          clean     1               14.336272
-                      dirty     2               13.826313
-       34766          clean     1               14.702547
-                      dirty     2               15.732460
-       34a6d          clean     1               14.335075
-                      dirty     2               14.302934
-       484af          clean     1               14.325842
-                      dirty     2               13.373178
-       714af          clean     1               14.325842
-                      dirty     2               12.420635
-       No correction  clean     1               14.331944
-                      dirty     2                0.978458
-       c1204          clean     1               15.262632
-                      dirty     2               15.912205
-       fe81d          clean     1               14.326219
-                      dirty     2               13.689452
-       ff67b          clean     1               14.326219
-                      dirty     2               13.089802
-       dtype: float64
-     #+end_example
+     : Statistics of fitted particle numbers
+     |               |            |              | median    | count | mean      | std      | min       | 25%       | 50%       | 75%       | max       |
+|---------------+------------+--------------+-----------+-------+-----------+----------+-----------+-----------+-----------+-----------+-----------|
+| processing    | artifact   | Diff_species |           |       |           |          |           |           |           |           |           |
+| 0cd20         | af488      | 1            | 14.341568 | 424.0 | 14.335000 | 0.263291 | 13.412392 | 14.205747 | 14.341568 | 14.505898 | 14.988332 |
+|               | af488+luvs | 2            | 15.248202 | 440.0 | 15.106186 | 1.484036 | 6.267150  | 14.334271 | 15.248202 | 16.039287 | 18.110889 |
+| 19e3e         | af488      | 1            | 14.336272 | 424.0 | 14.329986 | 0.263853 | 13.367317 | 14.201544 | 14.336272 | 14.511038 | 14.931337 |
+|               | af488+luvs | 2            | 13.826313 | 440.0 | 13.270444 | 3.181698 | 0.562121  | 11.573624 | 13.826313 | 15.704750 | 18.581205 |
+| 34766         | af488      | 1            | 14.702547 | 424.0 | 14.684973 | 0.276662 | 13.720920 | 14.551659 | 14.702547 | 14.869845 | 15.347210 |
+|               | af488+luvs | 2            | 15.732460 | 440.0 | 15.267823 | 2.476381 | 6.346636  | 13.704650 | 15.732460 | 17.068360 | 19.961155 |
+| 34a6d         | af488      | 1            | 14.335075 | 424.0 | 14.325905 | 0.264438 | 13.365160 | 14.194973 | 14.335075 | 14.510599 | 14.933380 |
+|               | af488+luvs | 2            | 14.302934 | 440.0 | 13.641062 | 2.740812 | 1.417894  | 12.297284 | 14.302934 | 15.593493 | 17.885668 |
+| 484af         | af488      | 1            | 14.325842 | 424.0 | 14.317763 | 0.263824 | 13.365161 | 14.188180 | 14.325842 | 14.499389 | 14.919546 |
+|               | af488+luvs | 2            | 13.373178 | 440.0 | 12.784654 | 3.023495 | 1.591405  | 10.908164 | 13.373178 | 15.029049 | 18.453017 |
+| 714af         | af488      | 1            | 14.325842 | 424.0 | 14.318594 | 0.263337 | 13.365161 | 14.189044 | 14.325842 | 14.497586 | 14.919546 |
+|               | af488+luvs | 2            | 12.420635 | 440.0 | 12.233933 | 2.490236 | 5.295190  | 10.570730 | 12.420635 | 14.066820 | 17.968677 |
+| No correction | af488      | 1            | 14.331944 | 424.0 | 14.324938 | 0.264089 | 13.369703 | 14.194097 | 14.331944 | 14.503913 | 14.925030 |
+|               | af488+luvs | 2            | 0.928103  | 440.0 | 1.115437  | 0.832436 | 0.111298  | 0.497226  | 0.928103  | 1.475898  | 5.530194  |
+| c1204         | af488      | 1            | 15.262632 | 424.0 | 15.254311 | 0.321478 | 13.987100 | 15.077046 | 15.262632 | 15.475146 | 16.260415 |
+|               | af488+luvs | 2            | 15.912205 | 440.0 | 15.532688 | 3.448340 | 1.815959  | 13.639535 | 15.912205 | 18.127480 | 21.748767 |
+| fe81d         | af488      | 1            | 14.326219 | 424.0 | 14.319104 | 0.263526 | 13.365161 | 14.189106 | 14.326219 | 14.499389 | 14.919546 |
+|               | af488+luvs | 2            | 13.689452 | 440.0 | 13.077269 | 3.152211 | 0.536799  | 11.056025 | 13.689452 | 15.387298 | 19.102249 |
+| ff67b         | af488      | 1            | 14.326219 | 424.0 | 14.319636 | 0.263558 | 13.365161 | 14.189298 | 14.326219 | 14.499389 | 14.919546 |
+|               | af488+luvs | 2            | 13.089802 | 440.0 | 12.894021 | 2.446790 | 4.838165  | 11.518550 | 13.089802 | 14.484227 | 18.392188 |
+     : Statistics of fitted transit times
+     |               |            |              | median    | count | mean       | std        | min       | 25%       | 50%       | 75%        | max         |
+|---------------+------------+--------------+-----------+-------+------------+------------+-----------+-----------+-----------+------------+-------------|
+| processing    | artifact   | Diff_species |           |       |            |            |           |           |           |            |             |
+| 0cd20         | af488      | 1            | 39.575746 | 424.0 | 39.574374  | 1.040061   | 37.190978 | 38.879728 | 39.575746 | 40.279227  | 42.984704   |
+|               | af488+luvs | 2            | 38.762520 | 440.0 | 38.933931  | 5.459816   | 21.356080 | 35.228893 | 38.762520 | 42.262441  | 62.131261   |
+| 19e3e         | af488      | 1            | 39.568778 | 424.0 | 39.656947  | 1.047036   | 37.102746 | 38.934719 | 39.568778 | 40.416838  | 42.501109   |
+|               | af488+luvs | 2            | 41.177209 | 440.0 | 41.351740  | 4.525924   | 19.027233 | 38.362287 | 41.177209 | 43.854646  | 60.151240   |
+| 34766         | af488      | 1            | 35.067658 | 424.0 | 35.077446  | 1.109175   | 32.086412 | 34.355154 | 35.067658 | 35.736697  | 38.864156   |
+|               | af488+luvs | 2            | 38.713203 | 440.0 | 38.910032  | 3.349258   | 27.709990 | 36.625985 | 38.713203 | 41.009242  | 49.822679   |
+| 34a6d         | af488      | 1            | 39.667568 | 424.0 | 39.707795  | 1.038806   | 36.985999 | 39.012984 | 39.667568 | 40.457557  | 42.803298   |
+|               | af488+luvs | 2            | 41.267814 | 440.0 | 41.654939  | 4.707523   | 30.986888 | 38.312301 | 41.267814 | 44.652582  | 57.155144   |
+| 484af         | af488      | 1            | 39.854056 | 424.0 | 39.854861  | 1.040952   | 37.153441 | 39.141726 | 39.854056 | 40.582409  | 42.744448   |
+|               | af488+luvs | 2            | 40.605601 | 440.0 | 41.036124  | 4.307502   | 31.922451 | 38.063892 | 40.605601 | 43.505466  | 63.739400   |
+| 714af         | af488      | 1            | 39.835832 | 424.0 | 39.838266  | 1.041757   | 37.153441 | 39.107415 | 39.835832 | 40.571805  | 42.696864   |
+|               | af488+luvs | 2            | 41.430208 | 440.0 | 41.791645  | 4.068318   | 31.775699 | 38.784115 | 41.430208 | 44.084046  | 55.334179   |
+| No correction | af488      | 1            | 39.678008 | 424.0 | 39.726486  | 1.037956   | 37.049340 | 39.010144 | 39.678008 | 40.444667  | 42.680513   |
+|               | af488+luvs | 2            | 59.671435 | 440.0 | 295.128650 | 823.953683 | 4.884506  | 42.516272 | 59.671435 | 117.828320 | 9785.473007 |
+| c1204         | af488      | 1            | 29.177928 | 424.0 | 29.247641  | 1.225078   | 25.901046 | 28.399698 | 29.177928 | 30.113028  | 32.740869   |
+|               | af488+luvs | 2            | 35.278166 | 440.0 | 35.503411  | 2.690742   | 29.246945 | 33.580404 | 35.278166 | 36.865166  | 44.796158   |
+| fe81d         | af488      | 1            | 39.830813 | 424.0 | 39.828821  | 1.044278   | 37.153441 | 39.089567 | 39.830813 | 40.555985  | 42.744448   |
+|               | af488+luvs | 2            | 40.439757 | 440.0 | 40.766428  | 6.403163   | 12.890876 | 37.417914 | 40.439757 | 43.275102  | 84.641627   |
+| ff67b         | af488      | 1            | 39.803435 | 424.0 | 39.830343  | 1.042279   | 37.153441 | 39.087859 | 39.803435 | 40.555985  | 42.744448   |
+|               | af488+luvs | 2            | 41.451285 | 440.0 | 41.757214  | 4.040506   | 32.434107 | 38.893139 | 41.451285 | 44.293295  | 57.788748   |
      :END:
 
-     #+BEGIN_SRC jupyter-python
-g = sns.catplot(data=all_param,
-                y='A',
-                x='artifact-correction',
-                hue='fitted species (A)',
-                sharey=True,
-                height=5,
-                aspect=2,
-                legend_out=True,
-                kind='boxen',
-                showfliers=False)
-g.map_dataframe(sns.stripplot,
-      y='A',
-      x='artifact-correction',
-      hue='fitted species (A)',
-      dodge=True,
-      palette=sns.color_palette(['0.3']),
-      size=4,
-      jitter=0.2)
-g.tight_layout()
-g.fig.suptitle('Fraction sizes of AlexaFluor488 (clean) vs\nAlexaFluor488 + Dio LUVs (dirty) with different correction methods',
-               y=1.08, size=20)
-for axes in g.axes.flat:
-     _ = axes.set_xticklabels(axes.get_xticklabels(), rotation=45)
-plt.setp(g.axes, xlabel='biological sample - correction method',
-         ylabel='relative fraction size')
-plt.show()
-     #+END_SRC
+   #+BEGIN_SRC jupyter-python
+     pub_param = all_param.replace(['af488'], '424 traces of\nAlexaFluor488\n(no artifacts)\nN (FCS) from\n1 species fit')
+     pub_param = pub_param.replace(['af488+luvs'], '440 traces of\nAF488 + DiO LUVs\n(peak artifacts)\nN (FCS) $\\cdot$ A from\nfast sp. of 2 sp. fit')
+     pub_param = pub_param.replace(['0cd20'], '0cd20: large model\n(200 MB), 6 levels,\npool size=4, scaler\n=quantile transform\n(Gaussian pdf)')
+     pub_param = pub_param.replace(['34a6d'], '34a6d: small model\n(7 MB), 3 levels,\npool size=4, scaler=l2')
+     pub_param = pub_param.replace(['484af'], '484af: large model\n(275 MB), 7 levels,\npool_size=2, scaler\n=standard')
+     pub_param = pub_param.replace(['fe81d'], 'fe81d: large model\n(186 MB), 4 levels,\npool_size=4, scaler\n=standard')
+     pub_param = pub_param.replace(['ff67b'], 'ff67b: small model\n(14 MB), 5 levels,\npool_size=4, scaler\n=minmax')
+     pub_param = pub_param.replace(['19e3e'], '19e3e: large model\n(172 MB), 3 levels,\npool_size=4, scaler\n=standard')
+     pub_param = pub_param.replace(['34766'], '34766: middle-sized\nmodel (73 MB), 5 levels,\npool_size=4, scaler\n=robust')
+     pub_param = pub_param.replace(['c1204'], 'c1204: large model\n(312 MB), 9 levels,\npool_size=2, scaler\n=robust')
+     pub_param = pub_param.replace(['714af'], '714af: large model\n(234 MB), 5 levels,\npool_size=4, scaler\n=maxabs')
+     g = sns.catplot(data=pub_param,
+                     y='t_fast',
+                     x='processing',
+                     hue='artifact',
+                     sharey=True,
+                     height=10,
+                     aspect=3,
+                     legend_out=True,
+                     kind='boxen',
+                     showfliers=False)
+     g.map_dataframe(sns.stripplot,
+           y='t_fast',
+           x='processing',
+           hue='artifact',
+           dodge=True,
+           palette=sns.color_palette(['0.3']),
+           size=4,
+           jitter=0.2)
+     g.fig.suptitle('Simulation → prediction → correction pipeline\nsuccessfully restores transit times',
+                    size=25)
+
+     g._legend.set_title('')
+     new_labels = ['424 traces of\nAlexaFluor488\n(no artifacts)\n$\\tau_D$ from\n1 species fit',
+                   '440 traces of\nAF488 + DiO LUVs\n(peak artifacts)\n$\\tau_D$ from\nfast sp. of 2 sp. fit']
+     for t, l in zip(g._legend.texts, new_labels):
+         t.set_text(l)
+     plt.setp(g.axes, yscale='log', xlabel='',
+              ylabel=r'log transit time $\tau_{D}$ $[ms]$')
+
+     g.tight_layout()
+     plot2_file = 'analysis3_biological_transit-times'
+     plt.savefig(f'{plot2_file}.pdf', dpi=300)
+     os.system(f'pdf2svg {plot2_file}.pdf {plot2_file}.svg')
+
+
+     # g = sns.catplot(data=pub_param,
+     #                 y='N_fast',
+     #                 x='processing',
+     #                 hue='artifact',
+     #                 sharey=True,
+     #                 height=10,
+     #                 aspect=1,
+     #                 legend_out=True,
+     #                 kind='boxen',
+     #                 showfliers=False)
+     # g.map_dataframe(sns.stripplot,
+     #       y='N_fast',
+     #       x='processing',
+     #       hue='artifact',
+     #       dodge=True,
+     #       palette=sns.color_palette(['0.3']),
+     #       size=4,
+     #       jitter=0.2)
+     # g.fig.suptitle('Simulation → prediction → correction pipeline\nsuccessfully restores particle number',
+     #                size=25)
+     # g._legend.set_title('')
+     # plt.setp(g.axes, xlabel='',
+     #          ylabel=r'particle number $N$ $[fl^{-1}]$')
+     #
+     # g.tight_layout()
+     # plot2_file = 'analysis3_biological_0cd20+34a6d_particle-number'
+     # plt.savefig(f'{plot2_file}.pdf', bbox_inches='tight', dpi=300)
+     # os.system(f'pdf2svg {plot2_file}.pdf {plot2_file}.svg')
+     # plt.close('all')
+   #+END_SRC
+
+   #+RESULTS:
+   :RESULTS:
+   : 0
+   [[file:./data/exp-220227-unet/jupyter/581df54b031d050b68de8044cbfce8a4f0bd31a4.png]]
+   :END:
 
 *** Analysis 3b: plot experimental pex5 data
     :PROPERTIES:
