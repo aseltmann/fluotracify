@@ -8489,7 +8489,6 @@
      #+END_SRC
 
      #+RESULTS:
-     : /home/lex/Programme/drmed-git
 
      #+BEGIN_SRC jupyter-python
        import os
@@ -8513,34 +8512,6 @@
      #+END_SRC
 
      #+RESULTS:
-
-     #+BEGIN_SRC jupyter-python
-       pprint(sns.plotting_context("paper"))
-     #+END_SRC
-
-     #+RESULTS:
-     #+begin_example
-       {'axes.labelsize': 9.600000000000001,
-        'axes.linewidth': 1.0,
-        'axes.titlesize': 9.600000000000001,
-        'font.size': 9.600000000000001,
-        'grid.linewidth': 0.8,
-        'legend.fontsize': 8.8,
-        'legend.title_fontsize': 9.600000000000001,
-        'lines.linewidth': 1.2000000000000002,
-        'lines.markersize': 4.800000000000001,
-        'patch.linewidth': 0.8,
-        'xtick.labelsize': 8.8,
-        'xtick.major.size': 4.800000000000001,
-        'xtick.major.width': 1.0,
-        'xtick.minor.size': 3.2,
-        'xtick.minor.width': 0.8,
-        'ytick.labelsize': 8.8,
-        'ytick.major.size': 4.800000000000001,
-        'ytick.major.width': 1.0,
-        'ytick.minor.size': 3.2,
-        'ytick.minor.width': 0.8}
-     #+end_example
 
      #+BEGIN_SRC jupyter-python
        path = Path('data/exp-220227-unet/2022-06-02_experimental-pex5/')
@@ -8861,111 +8832,156 @@
        \end{table}
      #+end_example
 
-     #+begin_src jupyter-python
-       def sort_fit_simple(param_ls):
-           nfcs = list(param_ls)[-1]
-           triplet = list(param_ls)[-2]
-           array = np.array(list(param_ls)[:-2]).reshape((2, 2))
-           # sort by transit times
-           array = array[:, array[0, :].argsort()]
-           A_fast = float(array[1, 0])
-           A_slow = float(array[1, 1])
-           N_fast = A_fast * (triplet * float(nfcs))
-           N_slow = A_slow * (triplet * float(nfcs))
-           t_fast = float(array[0, 0])
-           t_slow = float(array[0, 1])
-           # for pex5: want to plot t_slow
-           if np.isnan(t_slow):
-               # 1-component fit
-               out = t_fast, N_fast, pd.NA, pd.NA
-               # out = pd.NA, pd.NA, t_fast, N_fast
-           # 2-component fits
-           elif f'{A_fast:.0%}' == '100%':
-               out = t_fast, N_fast, pd.NA, pd.NA
-               # out = pd.NA, pd.NA, t_fast, N_fast
-           elif f'{A_slow:.0%}' == '100%':
-               out = t_slow, N_slow, pd.NA, pd.NA
-               # out = pd.NA, pd.NA, t_slow, N_slow
-           else:
-               out = t_fast, N_fast, t_slow, N_slow
-           return out
 
-       all_param = pd.concat([clean_noc_1comp, clean_noc_2comp,
-                              dirty_noc_1comp, dirty_noc_2comp,
-                              dirty_0cd20_1comp, dirty_0cd20_2comp,
-                              dirty_19e3e_1comp, dirty_19e3e_2comp,
-                              dirty_34766_1comp, dirty_34766_2comp,
-                              dirty_34a6d_1comp, dirty_34a6d_2comp,
-                              dirty_484af_1comp, dirty_484af_2comp,
-                              dirty_714af_1comp, dirty_714af_2comp,
-                              dirty_c1204_1comp, dirty_c1204_2comp,
-                              dirty_fe81d_1comp, dirty_fe81d_2comp,
-                              dirty_ff67b_1comp, dirty_ff67b_2comp,
-                              clean_0cd20_1comp, clean_0cd20_2comp,
-                              clean_19e3e_1comp, clean_19e3e_2comp,
-                              clean_34766_1comp, clean_34766_2comp,
-                              clean_34a6d_1comp, clean_34a6d_2comp,
-                              clean_484af_1comp, clean_484af_2comp,
-                              clean_714af_1comp, clean_714af_2comp,
-                              clean_c1204_1comp, clean_c1204_2comp,
-                              clean_fe81d_1comp, clean_fe81d_2comp,
-                              clean_ff67b_1comp, clean_ff67b_2comp])
-       all_param = all_param.reset_index()
-       (all_param['t_fast'], all_param['N_fast'], all_param['t_slow'],
-        all_param['N_slow']) = zip(*all_param[['txy1', 'txy2', 'A1', 'A2', 'T1', 'N (FCS)']].apply(
-            lambda x: sort_fit_simple(x), axis=1))
-       all_param = all_param[['index', 'Diff_species', 'processing', 'artifact',
-                              't_fast', 'N_fast', 't_slow', 'N_slow']]
+#+begin_example
+         # with pd.option_context("max_colwidth", 1000):
+         #     display(all_param[['legend', 't', 'A', 'expected transit time', 'sim', 'processing']])
+         pub_cond1 = ((all_param['legend'] == '$\\tau_D$ from\n1 species fit') &
+                      ~((all_param['processing'].isin(['dirty noc', 'dirty del', 'dirty cas'])) &
+                        (all_param['expected transit time'] == 0.040253767881946526)) &
+                      ~((all_param['processing'] == 'dirty avg') &
+                        (all_param['expected transit time'] == 0.36358241957887183)))
+         pub_cond2 = ((all_param['legend'] == '$\\tau_D$ from\nfast sp. of 2 sp. fit') &
+                      ((all_param['processing'].isin(['dirty noc', 'dirty del', 'dirty cas'])) &
+                       (all_param['expected transit time'] == 0.040253767881946526)))
+         pub_cond3 = ((all_param['legend'] == "$\\tau_D$ from\nslow sp. of 2 sp. fit") &
+                      ((all_param['processing'] == 'dirty avg') &
+                       (all_param['expected transit time'] == 0.36358241957887183)))
+
+         pub_param = all_param[pub_cond1 | pub_cond2 | pub_cond3]
+         # compare_correction_param = all_param[(all_param['legend'] == '\nsim. trace\nn=300, $\\tau_D$ from\n1 species fit') &
+         #                                      ~((all_param['processing'] == 'Peak artifacts,\nmanual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=2') |
+         #                                        (all_param['processing'] == 'Peak artifacts,\nautomatic U-Net pred.\n+ cut and shift corr.:\nscaler=quantile transf.,\nlarge model (200MB)'))]
+         pub_param
+
+#+end_example
+
+       #+begin_src jupyter-python
+         def sort_fit(param_ls):
+             nfcs = list(param_ls)[-1]
+             triplet = list(param_ls)[-2]
+             array = np.array(list(param_ls)[:-2]).reshape((2, 2))
+             # sort by transit times
+             array = array[:, array[0, :].argsort()]
+             A_fast = float(array[1, 0])
+             A_slow = float(array[1, 1])
+             N_fast = A_fast * (triplet * float(nfcs))
+             N_slow = A_slow * (triplet * float(nfcs))
+             t_fast = float(array[0, 0])
+             t_slow = float(array[0, 1])
+             # for pex5: want to plot t_slow
+             if np.isnan(t_slow):
+                 # 1-component fit
+                 out = t_fast, N_fast, pd.NA, pd.NA
+                 # out = pd.NA, pd.NA, t_fast, N_fast
+             # 2-component fits
+             elif f'{A_fast:.0%}' == '100%':
+                 out = t_fast, N_fast, pd.NA, pd.NA
+                 # out = pd.NA, pd.NA, t_fast, N_fast
+             elif f'{A_slow:.0%}' == '100%':
+                 # out = t_slow, N_slow, pd.NA, pd.NA
+                 out = pd.NA, pd.NA, t_slow, N_slow
+             else:
+                 out = t_fast, N_fast, t_slow, N_slow
+             return out
+
+         def sort_fit_legend(param_ls):
+             species = param_ls[0]
+             component = param_ls[1]
+
+             if species == 1:
+                 legend = '$\\tau_D$ from\n1 species fit'
+             elif (species == 2) and (component == 'fast'):
+                 legend = '$\\tau_D$ from\nfast sp. of 2 sp. fit'
+             elif (species == 2) and (component == 'slow'):
+                 legend = '$\\tau_D$ from\nslow sp. of 2 sp. fit'
+             return legend
+
+         all_param[['t_fast', 'N_fast', 't_slow', 'N_slow']
+                   ]= all_param[['txy1', 'txy2', 'A1', 'A2', 'T1', 'N (FCS)']
+                                ].apply(lambda x: sort_fit(x), axis=1, result_type='expand')
+
+         all_param = pd.wide_to_long(all_param, stubnames=['t', 'N'],
+                                     i=['name_of_plot', 'Diff_species', 'processing'],
+                                     j='fit component',
+                                     sep='_', suffix=r'\w+')
+
+         all_param = all_param.reset_index()
+         # if Diff_species is 1, there is only 1 component
+         all_param = all_param[~((all_param['fit component'] == 'slow') & (all_param['Diff_species'] == 1))]
+         all_param = all_param.reset_index()
+
+         all_param['legend'] = all_param[['Diff_species', 'fit component']].apply(
+             lambda x: sort_fit_legend(x), axis=1)
+         print('before dropping NaNs')
+         print('1 species fit: {}'.format(len(all_param[all_param["legend"] == "$\\tau_D$ from\n1 species fit"])))
+         print('slow sp of 2 sp fit: {}'.format(len(all_param[all_param["legend"] == "$\\tau_D$ from\nslow sp. of 2 sp. fit"])))
+         print('fast sp of 2 sp fit: {}'.format(len(all_param[all_param["legend"] == "$\\tau_D$ from\nfast sp. of 2 sp. fit"])))
+
+         all_param = all_param[~pd.isna(all_param['t'])]
+         print('after dropping NaNs')
+         print('1 species fit: {}'.format(len(all_param[all_param["legend"] == "$\\tau_D$ from\n1 species fit"])))
+         print('slow sp of 2 sp fit: {}'.format(len(all_param[all_param["legend"] == "$\\tau_D$ from\nslow sp. of 2 sp. fit"])))
+         print('fast sp of 2 sp fit: {}'.format(len(all_param[all_param["legend"] == "$\\tau_D$ from\nfast sp. of 2 sp. fit"])))
+
+         all_param = all_param[['legend', 't', 'N', 'artifact', 'processing']]
+         all_param.loc[:, ['t', 'N']] = all_param.loc[:, ['t', 'N']].apply(pd.to_numeric)
+         all_param.loc[:, 't'] = all_param.loc[:, 't'].apply(lambda x: np.log10(x))
+         all_param
+
 
      #+end_src
 
      #+RESULTS:
-
-     #+BEGIN_SRC jupyter-python
-       pub_param
-     #+END_SRC
-
-     #+RESULTS:
      :RESULTS:
-     |      | index | Diff_species | processing                                        | artifact                                          | t_fast | N_fast |   t_slow |   N_slow |
-     |------+-------+--------------+---------------------------------------------------+---------------------------------------------------+--------+--------+----------+----------|
-     |    0 |     0 |            1 | No correction                                     | 250 traces of\nHs-PEX5-EGFP\n(no artifacts)\nN... | <NA>   | <NA>   | 0.366011 | 0.310781 |
-     |    1 |     1 |            1 | No correction                                     | 250 traces of\nHs-PEX5-EGFP\n(no artifacts)\nN... | <NA>   | <NA>   | 0.324188 | 0.373810 |
-     |    2 |     2 |            1 | No correction                                     | 250 traces of\nHs-PEX5-EGFP\n(no artifacts)\nN... | <NA>   | <NA>   | 0.338811 | 0.466857 |
-     |    3 |     3 |            1 | No correction                                     | 250 traces of\nHs-PEX5-EGFP\n(no artifacts)\nN... | <NA>   | <NA>   | 0.348767 | 0.507977 |
-     |    4 |     4 |            1 | No correction                                     | 250 traces of\nHs-PEX5-EGFP\n(no artifacts)\nN... | <NA>   | <NA>   | 0.355763 | 0.457449 |
-     |  ... |   ... |          ... | ...                                               | ...                                               | ...    | ...    |      ... |      ... |
-     | 9745 |   245 |            1 | ff67b: small model\n(14 MB), 5 levels,\npool_s... | 250 traces of\nHs-PEX5-EGFP\n(no artifacts)\nN... | <NA>   | <NA>   | 0.268775 | 0.577165 |
-     | 9746 |   246 |            1 | ff67b: small model\n(14 MB), 5 levels,\npool_s... | 250 traces of\nHs-PEX5-EGFP\n(no artifacts)\nN... | <NA>   | <NA>   | 0.220718 | 0.420764 |
-     | 9747 |   247 |            1 | ff67b: small model\n(14 MB), 5 levels,\npool_s... | 250 traces of\nHs-PEX5-EGFP\n(no artifacts)\nN... | <NA>   | <NA>   | 0.243882 | 0.470847 |
-     | 9748 |   248 |            1 | ff67b: small model\n(14 MB), 5 levels,\npool_s... | 250 traces of\nHs-PEX5-EGFP\n(no artifacts)\nN... | <NA>   | <NA>   | 0.235918 | 0.501590 |
-     | 9749 |   249 |            1 | ff67b: small model\n(14 MB), 5 levels,\npool_s... | 250 traces of\nHs-PEX5-EGFP\n(no artifacts)\nN... | <NA>   | <NA>   | 0.227603 | 0.484008 |
+     : before dropping NaNs
+     : 1 species fit: 5000
+     : slow sp of 2 sp fit: 5000
+     : fast sp of 2 sp fit: 5000
+     : after dropping NaNs
+     : 1 species fit: 5000
+     : slow sp of 2 sp fit: 4588
+     : fast sp of 2 sp fit: 4940
+     |       | legend                               | t         | N        | artifact     | processing    |
+|-------+--------------------------------------+-----------+----------+--------------+---------------|
+| 0     | $\tau_D$ from\n1 species fit         | -0.436506 | 0.310781 | Hs-PEX5-eGFP | No correction |
+| 1     | $\tau_D$ from\n1 species fit         | -0.489203 | 0.37381  | Hs-PEX5-eGFP | No correction |
+| 2     | $\tau_D$ from\n1 species fit         | -0.470043 | 0.466857 | Hs-PEX5-eGFP | No correction |
+| 3     | $\tau_D$ from\n1 species fit         | -0.457464 | 0.507977 | Hs-PEX5-eGFP | No correction |
+| 4     | $\tau_D$ from\n1 species fit         | -0.448839 | 0.457449 | Hs-PEX5-eGFP | No correction |
+| ...   | ...                                  | ...       | ...      | ...          | ...           |
+| 14995 | $\tau_D$ from\nslow sp. of 2 sp. fit | -0.701946 | 0.013702 | Hs-PEX5-eGFP | ff67b         |
+| 14996 | $\tau_D$ from\nfast sp. of 2 sp. fit | -4.000000 | 0.028513 | Hs-PEX5-eGFP | ff67b         |
+| 14997 | $\tau_D$ from\nslow sp. of 2 sp. fit | -0.692252 | 0.014343 | Hs-PEX5-eGFP | ff67b         |
+| 14998 | $\tau_D$ from\nfast sp. of 2 sp. fit | -4.000000 | 0.028513 | Hs-PEX5-eGFP | ff67b         |
+| 14999 | $\tau_D$ from\nslow sp. of 2 sp. fit | -0.692252 | 0.014343 | Hs-PEX5-eGFP | ff67b         |
 
-7500 rows × 8 columns
+14528 rows × 5 columns
      :END:
 
+
      #+BEGIN_SRC jupyter-python
-       # for plotting 1 species AND 2 species fits
-       pub_param = all_param.loc[((all_param['Diff_species'] == 1) & (all_param['artifact'] == 'Hs-PEX5-eGFP')) | (all_param['artifact'] == 'Tb-PEX5-eGFP')]
-       # for only plotting 1 species fits
-       # pub_param = all_param.loc[(all_param['Diff_species'] == 1)]
-       pub_param = pub_param.replace(
-           ['Hs-PEX5-eGFP'], '250 traces of\nHs-PEX5-EGFP\n(no artifacts)\nN (FCS) from\n1 species fit')
-       pub_param.loc[(pub_param['Diff_species'] == 1) &
-                     (pub_param['artifact'] == 'Tb-PEX5-eGFP')] = pub_param.loc[
-           (pub_param['Diff_species'] == 1) &
-           (pub_param['artifact'] == 'Tb-PEX5-eGFP')].replace(
-           ['Tb-PEX5-eGFP'], '250 traces of\nTb-PEX5-EGFP\n(peak artifacts)\nN (FCS) from\n1 species fit')
-       pub_param.loc[(pub_param['Diff_species'] == 2) &
-                     (pub_param['artifact'] == 'Tb-PEX5-eGFP')] = pub_param.loc[
-           (pub_param['Diff_species'] == 2) &
-           (pub_param['artifact'] == 'Tb-PEX5-eGFP')].replace(
-           ['Tb-PEX5-eGFP'], '250 traces of\nTb-PEX5-EGFP\n(peak artifacts)\nN (FCS) $\\cdot$ A from\nfast sp. of 2 sp. fit')
+       # # for plotting 1 species AND 2 species fits
+       # pub_param = all_param.loc[((all_param['Diff_species'] == 1) & (all_param['artifact'] == 'Hs-PEX5-eGFP')) | (all_param['artifact'] == 'Tb-PEX5-eGFP')]
+       # # for only plotting 1 species fits
+       # # pub_param = all_param.loc[(all_param['Diff_species'] == 1)]
+       # pub_param = pub_param.replace(
+       #     ['Hs-PEX5-eGFP'], '250 traces of\nHs-PEX5-EGFP\n(no artifacts)\nN (FCS) from\n1 species fit')
+       # pub_param.loc[(pub_param['Diff_species'] == 1) &
+       #               (pub_param['artifact'] == 'Tb-PEX5-eGFP')] = pub_param.loc[
+       #     (pub_param['Diff_species'] == 1) &
+       #     (pub_param['artifact'] == 'Tb-PEX5-eGFP')].replace(
+       #     ['Tb-PEX5-eGFP'], '250 traces of\nTb-PEX5-EGFP\n(peak artifacts)\nN (FCS) from\n1 species fit')
+       # pub_param.loc[(pub_param['Diff_species'] == 2) &
+       #               (pub_param['artifact'] == 'Tb-PEX5-eGFP')] = pub_param.loc[
+       #     (pub_param['Diff_species'] == 2) &
+       #     (pub_param['artifact'] == 'Tb-PEX5-eGFP')].replace(
+       #     ['Tb-PEX5-eGFP'], '250 traces of\nTb-PEX5-EGFP\n(peak artifacts)\nN (FCS) $\\cdot$ A from\nfast sp. of 2 sp. fit')
        # comparing no correction, 0cd20, fe81d, and ff67b
        # pub_param = pub_param.loc[(all_param['processing'] == 'No correction') | (all_param['processing'] == '0cd20')| (all_param['processing'] == 'fe81d')| (all_param['processing'] == 'ff67b')]
        # only no correction and 0cd20
        # pub_param = pub_param.loc[(all_param['processing'] == 'No correction') | (all_param['processing'] == '0cd20')]
-       pub_param = pub_param.replace(['0cd20'], '0cd20: large model\n(200 MB), 6 levels,\npool size=4, scaler\n=quantile transform\n(Gaussian pdf)')
+       pub_param = all_param.replace(['0cd20'], '0cd20: large model\n(200 MB), 6 levels,\npool size=4, scaler\n=quantile transform\n(Gaussian pdf)')
        pub_param = pub_param.replace(['34a6d'], '34a6d: small model\n(7 MB), 3 levels,\npool size=4, scaler=l2')
        pub_param = pub_param.replace(['484af'], '484af: large model\n(275 MB), 7 levels,\npool_size=2, scaler\n=standard')
        pub_param = pub_param.replace(['fe81d'], 'fe81d: large model\n(186 MB), 4 levels,\npool_size=4, scaler\n=standard')
@@ -8976,23 +8992,24 @@
        pub_param = pub_param.replace(['714af'], '714af: large model\n(234 MB), 5 levels,\npool_size=4, scaler\n=maxabs')
 
        g = sns.catplot(data=pub_param,
-                       y='t_fast',
+                       y='t',
                        x='processing',
-                       hue='artifact',
+                       hue='legend',
+                       row='artifact',
                        sharey=True,
                        height=10,
                        aspect=3,
                        legend_out=True,
-                       kind='boxen',
+                       kind='violin',
                        showfliers=False)
-       g.map_dataframe(sns.stripplot,
-             y='t_fast',
-             x='processing',
-             hue='artifact',
-             dodge=True,
-             palette=sns.color_palette(['0.3']),
-             size=4,
-             jitter=0.2)
+       # g.map_dataframe(sns.stripplot,
+       #       y='t_fast',
+       #       x='processing',
+       #       hue='artifact',
+       #       dodge=True,
+       #       palette=sns.color_palette(['0.3']),
+       #       size=4,
+       #       jitter=0.2)
        g.fig.suptitle('Simulation → prediction → correction pipeline\nsuccessfully restores transit times',
                       size=25)
 
@@ -9040,7 +9057,7 @@
      #+END_SRC
 
      #+RESULTS:
-     [[file:./data/exp-220227-unet/jupyter/48d7457a02708ea7efecb05cc802887574203217.png]]
+     [[file:./data/exp-220227-unet/jupyter/4a53dc5f6f36fff27b02dc78e76cc6af82dda3eb.png]]
 
      #+begin_src jupyter-python
        N_param = all_param.pivot_table(values='N_slow',
