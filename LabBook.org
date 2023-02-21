@@ -1,5 +1,5 @@
 #+TITLE: Lab book Fluotracify
-#+AUTHOR: Alexander Seltmann
+#+AUTHOR: Alex Seltmann
 #+LANGUAGE: en
 #+PROPERTY: header-args :eval never-export :exports both
 #+OPTIONS: toc:4
