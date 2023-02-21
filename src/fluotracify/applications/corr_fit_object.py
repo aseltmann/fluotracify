@@ -1,5 +1,8 @@
-"""Taken from Dominic Waithe's FCS Bulk Correlation Software FOCUSpoint
-Copyright (C) 2015  Dominic Waithe
+"""Load Fluorescence Correlation Spectroscopy files, predict and correct
+artifacts, and autocorrelate the data. Written by Alex Seltmann 2021.
+
+Loading and correlation adapted from Dominic Waithe's FCS Bulk Correlation
+Software FOCUSpoint Copyright (C) 2015  Dominic Waithe
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -22,6 +25,7 @@ import lmfit
 import logging
 import multipletau
 import os
+import scipy
 import time
 
 from pathlib import Path
@@ -38,7 +42,7 @@ from fluotracify.training import preprocess_data as ppd
 
 import numpy as np
 
-logging.basicConfig(format='%(asctime)s - %(message)s')
+logging.basicConfig(format='%(asctime)s - correlate & fit - %(message)s')
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 
@@ -94,8 +98,9 @@ class PicoObject():
          self.numberNandB, self.timeSeries, self.autoNorm, self.autotime,
          self.timeSeriesScale, self.timeSeriesSize, self.predictions,
          self.subChanArr, self.trueTimeArr, self.trueTimeWeights,
-         self.photonCountBin) = ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {},
-                                 {}, {}, {}, {}, {}, {})
+         self.photonCountBin, self.trueTimeParts,
+         self.subChanParts) = ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {},
+                               {}, {}, {}, {}, {}, {}, {}, {})
 
         self.importData()
         self.prepareChannels()
@@ -129,12 +134,12 @@ class PicoObject():
                                      out["dTimeArr"], out["resolution"])
                 # Remove Overflow and Markers; they are not handled at the
                 # moment.
-                subChanArr = np.array([i for i in subChanArrFull
-                                       if not isinstance(i, tuple)])
-                trueTimeArr = np.array([i for i in trueTimeArrFull
-                                        if not isinstance(i, tuple)])
-                dTimeArr = np.array([i for i in dTimeArrFull
-                                     if not isinstance(i, tuple)])
+                subChanArr = np.array(
+                    [i for i in subChanArrFull if not isinstance(i, tuple)])
+                trueTimeArr = np.array(
+                    [i for i in trueTimeArrFull if not isinstance(i, tuple)])
+                dTimeArr = np.array(
+                    [i for i in dTimeArrFull if not isinstance(i, tuple)])
                 self.subChanArr[key] = subChanArr
                 self.trueTimeArr[key] = trueTimeArr
                 self.dTimeArr = dTimeArr
@@ -430,22 +435,22 @@ class PicoObject():
         if self.numOfCH == 1:
             indices = subChanArr == channelsToUse[0]
             y = trueTimeArr[indices]
-            validPhotons = subChanArr[indices]
+            valid_photons = subChanArr[indices]
         else:
             indices0 = subChanArr == channelsToUse[0]
             indices1 = subChanArr == channelsToUse[1]
             indices = indices0 + indices1
             y = trueTimeArr[indices]
-            validPhotons = subChanArr[indices]
+            valid_photons = subChanArr[indices]
 
         log.debug('crossAndAuto: sum(indeces)=%s', sum(indices))
 
         # Creates boolean for photon events in either channel.
-        num = np.zeros((validPhotons.shape[0], 2))
-        num[:, 0] = (np.array([np.array(validPhotons) == channelsToUse[0]
+        num = np.zeros((valid_photons.shape[0], 2))
+        num[:, 0] = (np.array([np.array(valid_photons) == channelsToUse[0]
                                ])).astype(np.int32)
         if self.numOfCH > 1:
-            num[:, 1] = (np.array([np.array(validPhotons) == channelsToUse[1]
+            num[:, 1] = (np.array([np.array(valid_photons) == channelsToUse[1]
                                    ])).astype(np.int32)
 
         self.count0 = np.sum(num[:, 0])
@@ -485,17 +490,27 @@ class PicoObject():
         self.subChanArr[f'{self.name}'][np.invert(photonInd).astype(
             np.bool)] = 16
 
-    def predictTimeSeries(self, model, scaler, name=None):
+    def predictTimeSeries(self,
+                          method,
+                          scaler,
+                          model=None,
+                          threshold=None,
+                          name=None):
         """Takes a timetrace, performs preprocessing, and applies a compiled
         unet for artifact detection
 
         Parameters
         ----------
-        model : tf.keras.Functional model
+        method : ('threshold', 'unet')
+        model : optional, tf.keras.Functional model
+        threshold : optional, int or float
+            Every timestep above threshold is considered artifactual (useful
+            for e.g. peak artifacts)
         scaler : ('standard', 'robust', 'maxabs', 'quant_g', 'minmax', l1',
                   'l2')
-            Scales / normalizes the input trace. Check with which scaler the
-            training data of the model was scaled and use the same one.
+            Scales / normalizes the input trace. If method='threshold', the
+            threshold is applied to the scaled data. If method='unet', check
+            the scaler the unet was trained with.
 
         Returns
         -------
@@ -509,7 +524,9 @@ class PicoObject():
 
         Note
         ----
-        - The input size of the model:
+        - for method='threshold': robust scaling + threshold=2 seems to work
+          fine
+        - for method='unet': The input size of the model:
             The prediction is made with the trace padded with the median to an
             input size of at least 1024, or if bigger to the size of the next
             biggest power of 2, e.g. 2**13 (8192), 2**14 (16384), ...
@@ -520,6 +537,16 @@ class PicoObject():
         - At the moment we assume one trace (timeSeries[0])
         """
         name = f'{self.name}' if name is None else f'{name}'
+        if method == 'threshold':
+            if not isinstance(threshold, (float, int)):
+                raise ValueError('If method="threshold", the threshold'
+                                 ' parameter has to be int or float')
+        elif method == 'unet':
+            if model is None:
+                raise ValueError('If method="unet", the model parameter has to'
+                                 ' be a compiled tf.keras.Functional model')
+        else:
+            raise ValueError('method has to be "threshold" or "unet"')
         if name not in self.timeSeries:
             raise ValueError(f'name={name} is not a valid key for the'
                              'dictionary self.timeSeries')
@@ -528,14 +555,15 @@ class PicoObject():
         for key, trace in self.timeSeries[name].copy().items():
             trace = np.array(trace).astype(float)
             trace_size = trace.size
-            if trace_size < 1024:
-                input_size = 1024
-            else:
-                input_size = 2**(np.ceil(np.log2(trace_size))).astype(int)
-            pad_size = input_size - trace_size
+            if method == 'unet':
+                if trace_size < 1024:
+                    input_size = 1024
+                else:
+                    input_size = 2**(np.ceil(np.log2(trace_size))).astype(int)
+                pad_size = input_size - trace_size
 
-            # pad trace for unet input
-            trace = np.pad(trace, pad_width=(0, pad_size), mode='median')
+                # pad trace for unet input
+                trace = np.pad(trace, pad_width=(0, pad_size), mode='median')
 
             # scale trace
             trace = np.reshape(trace, newshape=(-1, 1))
@@ -545,12 +573,15 @@ class PicoObject():
                 raise ValueError('Scaling failed.') from ex
 
             # predict trace
-            trace = np.reshape(trace, newshape=(1, -1, 1))
-            try:
-                predictions = model.predict(trace, verbose=0).flatten()
-            except Exception as ex:
-                raise ValueError('The prediction failed. Double-check correct'
-                                 ' input model, input size..') from ex
+            if method == 'unet':
+                trace = np.reshape(trace, newshape=(1, -1, 1))
+                try:
+                    predictions = model.predict(trace, verbose=0).flatten()
+                except Exception as ex:
+                    raise ValueError('The prediction failed. Check correct'
+                                     ' input model, input size..') from ex
+            elif method == 'threshold':
+                predictions = trace.flatten() > threshold
 
             self.predictions[name][f'{key}'] = predictions
             self.timeSeries[name][f'{key}_PREPRO'] = trace.flatten().astype(
@@ -561,7 +592,8 @@ class PicoObject():
     def correctTCSPC(self,
                      pred_thresh: float = 0.5,
                      method: Union[Literal['weights'], Literal['delete'],
-                                   Literal['delete_and_shift']] = 'weights',
+                                   Literal['delete_and_shift'],
+                                   Literal['averaging']] = 'delete_and_shift',
                      weight: Optional[Union[float, Literal['random'],
                                             Literal['1-pred']]] = None,
                      bin_after_correction: Optional[float] = None,
@@ -575,7 +607,7 @@ class PicoObject():
         pred_thresh : float between 0 and 1
             If prediction is lower than pred_thresh, the time step is assumed
             to show 'no corruption'
-        method : ['weights', 'delete', 'delete_and_shift']
+        method : ['weights', 'delete', 'delete_and_shift', 'averaging']
             'weights' : give a weight to photons which are classified as
             artifacts, see argument =weight=.
             'delete' : photons classified as artifacts are deleted and a new
@@ -587,9 +619,13 @@ class PicoObject():
             the bin size which was deleted before. The time series constructed
             from this trueTimeArr will have no drops, all ends are annealed to
             each other.
+            'averaging' : save out each unique connected non-artifactual
+            segment of the trace to self.trueTimeParts and self.subChanParts.
+            The actual correction is done with
+            `get_autocorrelation(method='tttr2xfcs_with_averaging')`
         weight = optional, float, int, 'random', '1-pred' or None
             Only used if method='weights'. Photons classified as artifacts are
-            given this weight.method=method
+            given this weight.
             'random': Each predicted bin gets a random weight between 0 and 1
             '1-pred': Each predicted bin gets a weight of 1 - prediction
             None: (or explicitly set to 0), the weight will be set to 0,
@@ -625,7 +661,7 @@ class PicoObject():
             raise ValueError(f'key={ts_name} is not a valid key for the'
                              'dictionary self.predictions. Run method'
                              'predictTimeSeries() first.')
-        methods = ['weights', 'delete', 'delete_and_shift']
+        methods = ['weights', 'delete', 'delete_and_shift', 'averaging']
         if method not in methods:
             raise ValueError(f'method has to be in {methods}.')
         if method == 'weights' and (not isinstance(weight, (float, int)) and
@@ -680,6 +716,7 @@ class PicoObject():
                           len(self.trueTimeArr[name]) - len(trueTimeCorrected),
                           len(self.trueTimeArr[name]))
                 if method == 'delete_and_shift':
+                    method_name = 'DELSHIFT'
                     # moves the photons as if the deleted bins never existed
                     idxphot = 0
                     for nphot, artifact in zip(trace, timeSeriesMask):
@@ -691,9 +728,11 @@ class PicoObject():
                     log.debug(
                         'correctTCSPC: shifted non-deleted photon '
                         'arrival times by photonCountBin=%s', photon_count_bin)
-                self.trueTimeArr[f'{metadata[0]}_{ts_name}_CORRECTED'] = (
+                else:
+                    method_name = 'DEL'
+                self.trueTimeArr[f'{metadata[0]}_{ts_name}_{method_name}'] = (
                     trueTimeCorrected)
-                self.subChanArr[f'{metadata[0]}_{ts_name}_CORRECTED'] = (
+                self.subChanArr[f'{metadata[0]}_{ts_name}_{method_name}'] = (
                     subChanCorrected)
 
                 if bin_after_correction is not None:
@@ -703,22 +742,24 @@ class PicoObject():
                         ts_name2 = 'DELBIN'
                     self.getTimeSeries(
                         photonCountBin=float(bin_after_correction),
-                        truetime_name=f'{metadata[0]}_{ts_name}_CORRECTED',
+                        truetime_name=f'{metadata[0]}_{ts_name}_{method_name}',
                         timeseries_name=f'{ts_name}_{ts_name2}')
                     self.getPhotonCountingStats(name=f'{ts_name}_{ts_name2}')
                 else:
+                    ts_name2 = method_name
                     if method == 'delete_and_shift':
-                        ts_name2 = 'DELSHIFT'
                         ts = np.delete(trace, timeSeriesMask)
                         tss = np.delete(trace_scale, timeSeriesMask)
                     else:
-                        ts_name2 = 'DEL'
                         ts = np.where(timeSeriesMask == 1, 0, trace)
                         tss = trace_scale
-                    self.timeSeries[f'{ts_name}_{ts_name2}'][key] = ts
-                    self.timeSeriesScale[f'{ts_name}_{ts_name2}'][key] = tss
-                    self.photonCountBin = photon_count_bin
-                    self.getPhotonCountingStats(name=f'{ts_name}_{ts_name2}')
+                    tt_key = f'{ts_name}_{ts_name2}'
+                    self.timeSeries[tt_key] = sk = {}
+                    self.timeSeriesScale[tt_key] = ssk = {}
+                    self.timeSeriesSize[tt_key] = sik = {}
+                    sk[key], ssk[key], sik[key] = ts, tss, ts.size
+                    self.photonCountBin[tt_key] = photon_count_bin
+                    self.getPhotonCountingStats(name=tt_key)
 
             elif method == 'weights':
                 if weight == 'random':
@@ -739,6 +780,29 @@ class PicoObject():
                     trueTimeCorrected)
                 # garbage collection
                 del photon_weights
+
+            elif method == 'averaging':
+                parts_label = scipy.ndimage.label(~photonMask)
+                trueTimeParts, subChanParts = [], []
+                for u in np.unique(parts_label[0]):
+                    if u == 0:
+                        continue
+                    tt_part = np.where(
+                        parts_label[0] == u, trueTimeCorrected, np.nan)
+                    sc_part = np.where(
+                        parts_label[0] == u, subChanCorrected, np.nan)
+                    tt_part = tt_part[~np.isnan(tt_part)]
+                    sc_part = sc_part[~np.isnan(sc_part)]
+                    trueTimeParts.append(tt_part)
+                    subChanParts.append(sc_part)
+                log.debug(
+                    'correctTCSPC: photon trace was separated in %s parts'
+                    ' and is ready for averaging correction', parts_label[1])
+                self.trueTimeParts[f'{metadata[0]}_{ts_name}'] = (
+                    trueTimeParts)
+                self.subChanParts[f'{metadata[0]}_{ts_name}'] = (
+                    subChanParts)
+
             # garbage collection
             del trueTimeCorrected
 
@@ -750,7 +814,13 @@ class PicoObject():
 
         Parameters
         ----------
-        method : ['tttr2xfcs', 'tttr2xfcs_with_weights', 'multipletau']
+        method : ['tttr2xfcs', 'tttr2xfcs_with_weights',
+                  'tttr2xfcs_with_averaging', 'multipletau']
+            the `tttr2xfcs` methods perform TCSPC correlations (see Notes)
+            `multipletau` offers correlations of time series
+            `tttr2xfcs_with_weights` performs weighted TCSPC correlations
+            `tttr2xfcs_with_averaging` performs TCSPC correlations of a list
+            of TCSPC traces, and averages the correlations afterwards
         name : string or tuple of strings
             if method='tttr2xfcs', name should be a key for the dictionaries
             self.trueTimeArr and self.subChanArr. If None, self.name is chosen
@@ -758,11 +828,26 @@ class PicoObject():
             if method='tttr2xfcs_with_weights', additionally to above there
             should be a dict self.trueTimeWeights from correctTCSPC(
             method='weights')
+            if method='tttr2xfcs_with_averaging', name should be a key for the
+            dictionaries self.trueTimeParts and self.subChanParts.
             if method='multipletau', name should be a tuple with 2 strings:
                 the first key to the dictionary self.timeSeries,
                 the second key to the dictionary self.timeSeries['first key']
+
+        Returns
+        -------
+
+        Notes
+        -----
+        `tttr2xfcs` : python version of:
+            Fast calculation of fluorescence correlation data with asynchronous
+            time-correlated single-photon counting.
+            Michael Wahl, Ingo Gregor, Matthias Patting, Jorg Enderlein
+
+
         """
-        methods = ['tttr2xfcs', 'tttr2xfcs_with_weights', 'multipletau']
+        methods = ['tttr2xfcs', 'tttr2xfcs_with_weights',
+                   'tttr2xfcs_with_averaging', 'multipletau']
         if method not in methods:
             raise ValueError(f'{method} is not a valid method from {methods}.')
 
@@ -773,14 +858,24 @@ class PicoObject():
                                  'dict self.trueTimeWeights. Run correctTCSPC('
                                  'method=\'weights\') first.')
 
+        if method == 'tttr2xfcs_with_averaging':
+            name = f'{self.name}' if name is None else f'{name}'
+            if name not in self.trueTimeParts:
+                raise ValueError(f'key={name} is no valid key for the dict '
+                                 'self.trueTimeParts or self.subChanParts.')
+
         if method in ['tttr2xfcs', 'tttr2xfcs_with_weights']:
-            if method not in self.autoNorm:
-                self.autoNorm[f'{method}'] = {}
-                self.autotime[f'{method}'] = {}
             name = f'{self.name}' if name is None else f'{name}'
             if name not in self.trueTimeArr:
                 raise ValueError(f'key={name} is no valid key for the dict '
                                  'self.trueTimeArr or self.subChanArr.')
+
+        if method in ['tttr2xfcs', 'tttr2xfcs_with_weights',
+                      'tttr2xfcs_with_averaging']:
+            if method not in self.autoNorm:
+                self.autoNorm[f'{method}'] = {}
+                self.autotime[f'{method}'] = {}
+
             if name in self.autoNorm[f'{method}']:
                 raise ValueError('self.autoNorm[\'tttr2xfcs\'] already has a'
                                  f' key={name} Check if your desired '
@@ -789,8 +884,7 @@ class PicoObject():
             metadata = name.split('_')
             chan = metadata[0].strip('CH')
             chan_name = f"CH{chan}_"
-            pcb_name = name.removesuffix("_CORRECTED").removesuffix(
-                "_FORWEIGHTS").removeprefix(chan_name)
+            pcb_name = name.removesuffix("_FORWEIGHTS").removeprefix(chan_name)
             photon_count_bin = self.photonCountBin[f'{pcb_name}']
 
             log.debug(
@@ -820,7 +914,7 @@ class PicoObject():
                         'channels are used and continue', name)
                 if method == 'tttr2xfcs':
                     key = (f'CH{self.ch_present[i]}_BIN{photon_count_bin}'
-                           f'_{name.removesuffix("_CORRECTED")}')
+                           f'_{name}')
                     autonorm, autotime = self.crossAndAuto(
                         self.trueTimeArr[tt_key], self.subChanArr[tt_key],
                         [self.ch_present[i], self.ch_present[i]])
@@ -842,6 +936,45 @@ class PicoObject():
                     autonorm = np.zeros((auto.shape))
                     autonorm[:, 0,
                              0] = ((auto[:, 0, 0] * maxY) / (count**2)) - 1
+                elif method == 'tttr2xfcs_with_averaging':
+                    key = (f'CH{self.ch_present[i]}_BIN{photon_count_bin}'
+                           f'_{name}')
+                    tt_parts = self.trueTimeParts[f'CH{chan}_{name}']
+                    sc_parts = self.subChanParts[f'CH{chan}_{name}']
+                    autonorm_parts = []
+                    for tt, sc in zip(tt_parts, sc_parts):
+                        # with this if clause very short parts could be
+                        # discarded and the correlation quality and thus the
+                        # averaging improved. Since in TCSPC data the part
+                        # length depends on the photon counts, an appropriate
+                        # part length is a subjective decision, thus it is not
+                        # used)
+                        if len(tt) > 1:
+                            # only autocorrelation
+                            indices = sc == self.ch_present[i]
+                            y, valid_photons = tt[indices], sc[indices]
+                            num = np.zeros((valid_photons.shape[0], 2))
+                            num[:, 0] = (np.array([np.array(
+                                valid_photons) == self.ch_present[i]])
+                                ).astype(np.int32)
+                            auto, autotime = correlate.tttr2xfcs(
+                                y, num, self.NcascStart, self.NcascEnd,
+                                self.Nsub)
+                            # normalization of TCSPC data
+                            # Note: the maximum photon arrival time is not
+                            # computed via max(tt), because the parts have an
+                            # arrival time offset depending on their position
+                            # in the original trace
+                            max_y = np.ceil(tt[-1] - tt[0])
+                            counts = np.sum(num[:, 0])
+                            autonorm = (
+                                (auto[:, i, i] * max_y) / counts**2) - 1
+                            autonorm_parts.append(autonorm.flatten())
+
+                    # compute the mean correlation
+                    autonorm = np.zeros((auto.shape))
+                    autonorm[:, 0, 0] = np.mean(autonorm_parts, axis=0)
+
                 self.autoNorm[f'{method}'][key] = autonorm[:, i, i].reshape(
                     1, 1, -1)
                 self.autotime[f'{method}'][key] = autotime.reshape(-1, 1)

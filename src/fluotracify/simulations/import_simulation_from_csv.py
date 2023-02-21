@@ -1,10 +1,16 @@
 """This module contains functions to import fluorescence timetraces as training
  data which are simulated in other parts of this package."""
 
+import logging
+
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
+
+logging.basicConfig(format='%(asctime)s - sim import tools - %(message)s')
+log = logging.getLogger(__name__)
+log.setLevel(logging.DEBUG)
 
 
 def import_from_csv(folder,
@@ -63,19 +69,20 @@ def import_from_csv(folder,
     np.random.seed(0)  # for reproducible random state
     np.random.shuffle(files)
 
-    ntrainfiles = int(round(frac_train * len(files), 0))
+    nfiles = int(round(frac_train * len(files), 0))
 
     train = pd.DataFrame()
     test = pd.DataFrame()
     nsamples = []
     experiment_params = pd.DataFrame()
 
-    for idx, file in enumerate(files):
+    for idx, myfile in enumerate(files):
         try:
-            raw_dataset = pd.read_csv(file, sep=',', header=header)
-        except pd.errors.ParserError:
-            raise ValueError('Probably the header parameter is too low '
-                             'and points to the metadata. Try a higher value.')
+            raw_dataset = pd.read_csv(myfile, sep=',', header=header)
+        except pd.errors.ParserError as exc:
+            raise ValueError(
+                'Probably the header parameter is too low and points to the'
+                ' metadata. Try a higher value.') from exc
         df = raw_dataset.copy()
         try:
             df = df.drop(index=dropindex, columns=dropcolumns)
@@ -85,34 +92,34 @@ def import_from_csv(folder,
         # -> shrinks memory usage of train dataset from 2.4 GB to 1.2GB
         try:
             converted_float = df.apply(pd.to_numeric, downcast='float')
-        except ValueError:
-            raise ValueError('Probably the header parameter is too low '
-                             'and points to the metadata. Try a higher value.')
+        except ValueError as exc:
+            raise ValueError(
+                'Probably the header parameter is too low and points to the'
+                'metadata. Try a higher value.') from exc
         # save number of examples per file
         nsamples.append(round(len(converted_float.columns) / col_per_example))
         # save some parameters of the experiment from csv file
-        experiment_param = pd.read_csv(file,
+        experiment_param = pd.read_csv(myfile,
                                        sep=',',
                                        header=None,
                                        index_col=0,
                                        usecols=[0, 1],
                                        skipfooter=len(raw_dataset),
-                                       squeeze=True,
-                                       engine='python')
+                                       engine='python').squeeze('columns')
         experiment_params = pd.concat([experiment_params, experiment_param],
                                       axis=1,
                                       ignore_index=True,
                                       sort=False)
 
-        if idx < ntrainfiles:
+        if idx < nfiles:
             train = pd.concat([train, converted_float], axis=1)
             if frac_train == 1:
-                print(idx, file)
+                log.debug('%s/%s: %s', idx+1, nfiles, myfile)
             else:
-                print('train', idx, file)
+                log.debug('train file %s/%s: %s', idx+1, nfiles, myfile)
         else:
             test = pd.concat([test, converted_float], axis=1)
-            print('test', idx, file)
+            log.debug('validation file %s/%s: %s', idx+1, nfiles, myfile)
 
     return train, test, nsamples, experiment_params
 
@@ -152,11 +159,11 @@ def separate_data_and_labels(array, nsamples, col_per_example):
     array_dict = {}
 
     for i in range(col_per_example):
-        array_dict['{}'.format(i)] = array.iloc[:, i::col_per_example]
+        array_dict[f'{i}'] = array.iloc[:, i::col_per_example]
 
     array_dict_shapes = [a.shape for a in array_dict.values()]
-    print('The given DataFrame was split into {} parts with shapes:'
-          ' {}'.format(col_per_example, array_dict_shapes))
+    log.debug('The given DataFrame was split into %s parts with shapes:'
+              ' %s', col_per_example, array_dict_shapes)
 
     return array_dict
 

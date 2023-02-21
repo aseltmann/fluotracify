@@ -4,9 +4,11 @@ import logging
 import tensorflow as tf
 from tensorboard.plugins.hparams import api as hp
 
-logging.basicConfig(format='%(asctime)s - %(message)s')
+logging.basicConfig(format='%(asctime)s - build model -  %(message)s')
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
+# fix a problem with tf.experimental.numpy
+tf.experimental.numpy.experimental_enable_numpy_behavior(prefer_float32=False)
 
 
 def vgg10_1d(win_len, col_no):
@@ -375,15 +377,16 @@ def unet_1d_alt(input_size):
                                      kernel_size=1,
                                      activation='sigmoid')(y0)
 
-    print('input - shape:\t', inputs.shape)
-    print('output - shape:\t', outputs.shape)
+    log.debug('unet: input shape: %s, output shape: %s', inputs.shape,
+              outputs.shape)
 
     unet = tf.keras.Model(inputs=inputs, outputs=outputs)
     return unet
 
 
-def unet_1d_alt2(input_size, n_levels, first_filters, pool_size):
-    """U-Net as described by Ronneberger et al.
+def unet_1d_alt2(input_size, n_levels, first_filters, pool_size,
+                 metrics_thresholds):
+    """Defines compiled U-Net
 
     Parameters
     ----------
@@ -398,15 +401,12 @@ def unet_1d_alt2(input_size, n_levels, first_filters, pool_size):
     pool_size : int, Optional. Default: 2
         Pool size of the MaxPool1D layer, as well as kernel size and
         strides of the Conv1DTranspose layer
+    metrics_thresholds : list of float between 0 and 1
+        compute metrics with these prediction thresholds
 
     Returns
     -------
-    Model as described by the tensorflow.keras Functional API
-
-    Raises
-    ------
-    - ValueError: the number of filters in filters_ls has to be equal
-    to n_levels
+    Compiled Model as described by the tensorflow.keras Functional API
 
     Notes
     -----
@@ -468,33 +468,85 @@ def unet_1d_alt2(input_size, n_levels, first_filters, pool_size):
                                      kernel_size=1,
                                      activation='sigmoid')(ldict['y0'])
 
-    print('input - shape:\t', inputs.shape)
-    print('output - shape:\t', outputs.shape)
+    log.debug('unet: input shape: %s, output shape: %s', inputs.shape,
+              outputs.shape)
 
     unet = tf.keras.Model(inputs=inputs,
                           outputs=outputs,
                           name='unet_depth{}'.format(n_levels))
+
+    optimizer = tf.keras.optimizers.Adam()
+    loss = binary_ce_dice_loss()
+    metrics = unet_metrics(metrics_thresholds)
+    unet.compile(loss=loss, optimizer=optimizer, metrics=metrics)
     return unet
 
 
-class F1Score(tf.keras.metrics.Metric):
-    def __init__(self, name="f1", from_logits=False, **kwargs):
-        super(F1Score, self).__init__(name=name, **kwargs)
-        self.precision = tf.keras.metrics.Precision(from_logits)
-        self.recall = tf.keras.metrics.Recall(from_logits)
+class BinaryFBeta(tf.keras.metrics.Metric):
+    """A stateless F-beta score implementation by Jolomi Tosanwumi, see
+    https://towardsdatascience.com/f-beta-score-in-keras-part-i-86ad190a252f
 
-    def update_state(self, y_true, y_pred, sample_weight=None):
-        self.precision.update_state(y_true, y_pred, sample_weight)
-        self.recall.update_state(y_true, y_pred, sample_weight)
+    Notes
+    -----
+    - the F1-Score is an implementation of the harmonic mean of precision and
+    recall. The goal is to minimize type I and type II errors - and harmonic
+    mean penalizes lower values more than higher values, so that we don't get a
+    high score when one of precision or recall is low.
+    - FBeta makes it possible to give more weight to Precision or Recall. It
+    introduces beta_squared, which is the ratio of the weight of Recall to the
+    weight of Precision.
+      - beta > 1: Recall weighted more than Precision
+      - beta < 1: Precision weighted more than Recall
+    """
+    def __init__(self, name='binary_fbeta', beta=1, threshold=0.5,
+                 epsilon=1e-7, **kwargs):
+        # initializing an object of the super class
+        super().__init__(name=name, **kwargs)
+
+        # initializing state variables
+        self.tp = self.add_weight(name='tp', initializer='zeros')
+        self.actual_positive = self.add_weight(name='fp', initializer='zeros')
+        self.predicted_positive = self.add_weight(
+            name='fn', initializer='zeros')
+
+        # initializing other atrributes that wouldn't be changed for every
+        # object of this class
+        self.beta_squared = beta**2
+        self.threshold = threshold
+        self.epsilon = epsilon
+
+    def update_state(self, ytrue, ypred, sample_weight=None):
+        """this method is called at the end of each batch and is used to change
+        (update) the state variables."""
+        ytrue = tf.cast(ytrue, tf.float32)
+        ypred = tf.cast(ypred, tf.float32)
+
+        # setting values of ypred greater than the set threshold to 1 while
+        # those lesser to 0
+        ypred = tf.cast(tf.greater_equal(ypred, tf.constant(self.threshold)),
+                        tf.float32)
+        # updating atrributes
+        self.tp.assign_add(tf.reduce_sum(ytrue*ypred))
+        self.predicted_positive.assign_add(tf.reduce_sum(ypred))
+        self.actual_positive.assign_add(tf.reduce_sum(ytrue))
 
     def result(self):
-        p = self.precision.result()
-        r = self.recall.result()
-        return (2 * p * r) / (p + r + tf.keras.backend.epsilon())
+        """this is called at the end of each batch after states variables are
+        updated. It is used to compute and return the metric for each batch."""
+        self.precision = self.tp / (self.predicted_positive+self.epsilon)
+        self.recall = self.tp / (self.actual_positive+self.epsilon)
+
+        # calculating fbeta
+        self.fb = (1+self.beta_squared)*self.precision*self.recall / (
+            self.beta_squared*self.precision + self.recall + self.epsilon)
+        return self.fb
 
     def reset_state(self):
-        self.precision.reset_state()
-        self.recall.reset_state()
+        """this is called at the end of each epoch. It is used to clear
+        (reinitialize) the state variables."""
+        self.tp.assign(0)
+        self.predicted_positive.assign(0)
+        self.actual_positive.assign(0)
 
 
 def unet_metrics(metrics_thresholds):
@@ -534,7 +586,7 @@ def unet_metrics(metrics_thresholds):
     metrics.append(
         tf.keras.metrics.BinaryAccuracy(name='accuracy', threshold=0.5))
     metrics.append(tf.keras.metrics.AUC(name='auc', num_thresholds=100))
-    metrics.append(F1Score(name='f1'))
+    metrics.append(BinaryFBeta(name='f1'))
     return metrics
 
 
@@ -573,9 +625,9 @@ def prepare_model(model, input_size_list):
                                                       newshape=(1, -1, 1))
         try:
             predictions = model.predict(test_features, verbose=0).flatten()
-            log.debug('prepare_model: test shape %s, e.g. %s',
-                      test_features.shape, predictions[:5])
+            log.debug('test shape %s, e.g. %s', test_features.shape,
+                      predictions[:5])
         except ValueError:
-            log.debug('prepare_model: test shape %s. prediction failed '
-                      'as expected. Retry...', test_features.shape)
-    log.debug('prepare_model: UNET ready for different trace lengths')
+            log.debug('test shape %s. prediction failed as expected. Retry...',
+                      test_features.shape)
+    log.debug('UNET ready for different trace lengths')

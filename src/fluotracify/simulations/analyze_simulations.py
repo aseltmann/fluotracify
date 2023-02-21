@@ -1,12 +1,20 @@
 """This module contains functions which are used to analyze the simulated fluorescence traces"""
 
 import datetime
+import logging
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
 from fluotracify.applications import correction, correlate
+from fluotracify.training import preprocess_data as ppd
+
+logging.basicConfig(format='%(asctime)s - %(message)s')
+log = logging.getLogger(__name__)
+log.setLevel(logging.DEBUG)
+
+SEED = 42
 
 
 def correct_correlation_by_label(ntraces, traces_of_interest,
@@ -53,12 +61,13 @@ def correct_correlation_by_label(ntraces, traces_of_interest,
         if len(trace_corrected_bylabel) < 32:
             continue
 
-        diff_corrected_bylabel, trans_corrected_bylabel, _ = correlate.correlate(
-            trace=trace_corrected_bylabel.astype(np.float64),
-            fwhm=fwhm,
-            diffrate=None,
-            time_step=1.,
-            verbose=False)
+        (diff_corrected_bylabel, trans_corrected_bylabel,
+         _) = correlate.correlate_and_fit(trace=trace_corrected_bylabel.astype(
+             np.float64),
+                                          fwhm=fwhm,
+                                          diffrate=None,
+                                          time_step=1.,
+                                          verbose=False)
         diffrates_corrected_bylabel.append(diff_corrected_bylabel)
         transit_times_corrected_bylabel.append(trans_corrected_bylabel)
         tracelen_corrected_bylabel.append(len(trace_corrected_bylabel))
@@ -353,3 +362,212 @@ def correlate_simulations_corrected_by_prediction(model,
                         na_rep='NaN',
                         index=False)
     return data_out
+
+
+def predict_correct_correlate_simulations(sim_df,
+                                          model,
+                                          scaler,
+                                          out_path,
+                                          out_txt,
+                                          pred_thresh=0.5):
+    """Predict peak artifacts in columnwise ordered FCS time traces using
+    unet prediction model, then correct for peak artifacts using the
+    'cutandshift' method, correlate the resulting traces, and save out
+    the result as .csv
+
+    Parameters
+    ----------
+    sim_df : pandas DataFrame
+        FCS time traces ordered columnwise
+    model : compiled keras prediction model
+        U-Net architecture as trained in fluotracify.training.build_model.py
+    scaler : str
+        scaler which was applied to the data as part of the training pipeline
+        (will be added to the model pipeline)
+    out_path : str or pathlib.Path
+        Path where .csv files are saved
+    out_txt : str
+        Used for custom filename, the final file is saved as
+        <out_path>/<datetime>_multipletau_<out_txt>_<df-column-name>_correlation.csv
+    pred_thresh : float
+        prediction threshold applied to the resulting time-step wise prediction
+        of the unet
+
+    Returns
+    -------
+    Nothing, but saves files as described
+
+    """
+    # predict traces
+    sim_dirty_prepro = ppd.convert_to_tfds_for_unet(sim_df)
+    sim_dirty_prepro = ppd.scale_pad_and_batch_tfds_for_unet(sim_dirty_prepro,
+                                                             scaler=scaler)
+    sim_pred = model.predict(sim_dirty_prepro, verbose=0)
+    sim_pred = pd.DataFrame(sim_pred.squeeze(axis=2)).T
+    sim_pred.columns = sim_df.columns
+    sim_predbool = sim_pred > pred_thresh
+    log.debug('predict_correct_correlate: Finished prediction with model %s',
+              model.name)
+
+    # correct traces
+    sim_corr = pd.DataFrame()
+    for i in range(len(sim_df.columns)):
+        sim_corr_trace = np.delete(sim_df.iloc[:, i].values,
+                                   sim_predbool.iloc[:, i].values)
+        sim_corr_trace = pd.DataFrame(sim_corr_trace)
+        sim_corr = pd.concat([sim_corr, sim_corr_trace], axis='columns')
+    sim_corr.columns = sim_df.columns
+    log.debug('predict_correct_correlate: Finished "cut and shift" correction')
+
+    # after correction
+    correlate.correlate_timetrace_and_save(sim_corr, out_path, out_txt)
+
+
+def threshold_predict_correct_correlate_simulations(sim_df,
+                                                    out_path,
+                                                    out_txt,
+                                                    threshold=2):
+    """Predict peak artifacts in columnwise ordered FCS time traces using
+    robust scaling and thresholding, then correct for peak artifacts using
+    the 'cutandshift' method, correlate the resulting traces, and save out
+    the result as .csv
+
+    Parameters
+    ----------
+    sim_df : pandas DataFrame
+        FCS time traces ordered columnwise
+    out_path : str or pathlib.Path
+        Path where .csv files are saved
+    out_txt : str
+        Used for custom filename, the final file is saved as
+        <out_path>/<datetime>_multipletau_<out_txt>_<df-column-name>_correlation.csv
+
+    Returns
+    -------
+    Nothing, but saves files as described
+
+    Notes
+    -----
+    - Robust scaling removes the median and scales the data according to
+      the quantile range (here 25th quantile to 75th quantile). This
+      captures outliers better than mean/variance scaling.
+    - threshold=2 is a heuristical threshold which worked well with the
+      fluorescence traces with simulated peak artifacts
+    """
+
+    sim_corr = pd.DataFrame()
+    for i in range(len(sim_df.columns)):
+        trace = sim_df.iloc[:, i].to_numpy()
+        trace_pred = ppd.scale_trace(trace.reshape(-1, 1), 'robust')
+        trace_pred = trace_pred.flatten() > threshold
+        trace_corr = np.delete(trace, trace_pred)
+        trace_corr = pd.DataFrame(trace_corr)
+        sim_corr = pd.concat([sim_corr, trace_corr], axis='columns')
+    sim_corr.columns = sim_df.columns
+    log.debug('threshold_predict_correct_correlate: Finished'
+              ' "cut and shift" correction')
+
+    # after correction
+    correlate.correlate_timetrace_and_save(sim_corr, out_path, out_txt)
+
+
+def cut_simulations_and_shuffle_chunks(array, ncuts):
+    """Cut timeseries randomly and shuffle the chunks of columnwise-ordered
+    timeseries in pandas DataFrame
+
+    Parameters
+    ----------
+    array : pandas DataFrame
+        rows are steps in timeseries, columns are different traces
+    ncuts : int > 1
+        number of cuts (number of chunks = ncuts + 1)
+
+    Returns
+    -------
+    out : pandas DataFrame
+        same traces ordered columnwise, but chunks of rows are shuffled
+
+    Raises
+    ------
+    ValueError:
+        if ncuts is not a integer >= 1
+    ValueError:
+        if array is not a pandas DataFrame
+    """
+    try:
+        ncuts = int(ncuts)
+    except (ValueError, TypeError) as exc:
+        raise ValueError('ncuts has to be an integer') from exc
+    if ncuts < 1:
+        raise ValueError('ncuts has to be >= 1')
+    if not isinstance(array, pd.DataFrame):
+        raise ValueError('array has to be a pandas DataFrame')
+
+    rng = np.random.default_rng(seed=SEED)
+    array_cut = pd.DataFrame()
+    for ntrace in range(array.shape[1]):
+        pos_of_cuts = rng.choice(array.iloc[:, ntrace].index,
+                                 ncuts,
+                                 replace=False,
+                                 shuffle=False)
+        pos_of_cuts.sort()
+        # do operations on numpy array for speed
+        trace = array.iloc[:, ntrace].to_numpy()
+        # split trace at cut positions and return chunks as list of pd Series
+        trace = np.split(trace, pos_of_cuts)
+        # shuffle the list of series
+        trace = rng.permuted(trace)
+        # concatenate the series back to one whole trace and reset the index
+        trace = np.concatenate(trace)
+        trace = pd.Series(trace, name=array.iloc[:, ntrace].name)
+        array_cut = pd.concat([array_cut, trace], axis=1)
+    return array_cut
+
+
+def convert_diffcoeff_to_transittimes(diff, fwhm=250):
+    """Convert diffusion coefficient to transit times in FCS measurements
+
+    Parameters
+    ----------
+    diff : float or int
+        diffusion coefficient in um^2/s
+    fwhm : float or int
+        full width half maximum in nm
+
+    Returns
+    -------
+    tt : float
+        transit times in ms
+    tt_low_high : list of float
+        log 10% interval around expected transit times.
+
+    Notes
+    -----
+    - transit times and diffusion coefficients are log normal distributed and
+    inversely proportional to each other
+    - Derivation of conversion equation from a conventional Gaussian excitation
+    volume (by Dominic Waithe):
+      FWHM = 2*np.sqrt(2*np.log(2))*sigma
+      # FWHM to sigma conversion
+      sigma = FWHM/(2*np.sqrt(2*np.log(2)))
+      # Sigma from FWHM
+      G = np.exp(-x**2/(2*sigma**2))
+      # is conventional Gaussian
+      G = np.exp(-x**2/(2*(FWHM/(2*np.sqrt(2*np.log(2))))**2))
+      # substitute FWHM for sigma
+      G = np.exp(-x**2/(2*(FWHM**2/(4*2*np.log(2)))))
+      # open the brackets and square contents
+      G = np.exp((-x**2/(2*(FWHM**2)/8.))*(np.log(2)))
+      # decompose fraction
+      G = np.exp((np.log(2.)))**(-x**2/((FWHM**2)/4.0))
+      # power law decomposition
+      G = 2.**(-x**2/(FWHM/2.0)**2)
+      # e^(ln2) = 2 identity.
+    """
+    tt = ((fwhm / 1000)**2 * 1000) / (8 * np.log(2) * diff)
+    tt_log = np.log(tt)
+    # tt_0dot05 = 0.05 * tt_log
+    tt_0dot1 = 0.1 * tt_log
+    tt_low_high = sorted([np.exp(tt_log - tt_0dot1),
+                          np.exp(tt_log + tt_0dot1)])
+    return tt, tt_low_high

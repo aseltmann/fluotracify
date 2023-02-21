@@ -67,7 +67,8 @@ def correct_correlation_by_vgg_prediction(ntraces,
         # if len(trace_corrected_bypred) < 32:
         #     continue
 
-        diff_corrected_bypred, trans_corrected_bypred, _ = correlate.correlate(
+        (diff_corrected_bypred, trans_corrected_bypred,
+         _) = correlate.correlate_and_fit(
             trace=trace_corrected_bypred,
             fwhm=fwhm,
             diffrate=None,
@@ -102,7 +103,7 @@ def correct_correlation_by_vgg_prediction(ntraces,
                              label='Corrupted chunks (Prediction)')
             plt.subplot(222)
             print('correlation of corrupted trace:')
-            diff_corrupted, trans_corrupted, _ = correlate.correlate(
+            diff_corrupted, trans_corrupted, _ = correlate.correlate_and_fit(
                 trace=trace_corrupted,
                 fwhm=fwhm,
                 diffrate=None,
@@ -121,7 +122,8 @@ def correct_correlation_by_vgg_prediction(ntraces,
                       fontsize=16)
             plt.subplot(224)
             print('correlation of trace corrected by prediction')
-            diff_corrected_bypred, trans_corrected_bypred, _ = correlate.correlate(
+            (diff_corrected_bypred, trans_corrected_bypred,
+             _) = correlate.correlate_and_fit(
                 trace=trace_corrected_bypred,
                 fwhm=fwhm,
                 diffrate=None,
@@ -246,7 +248,8 @@ def correct_correlation_by_unet_prediction(ntraces,
         # if len(trace_corrected_bypred) < 32:
         #     continue
 
-        diff_corrected_bypred, trans_corrected_bypred, _ = correlate.correlate(
+        (diff_corrected_bypred, trans_corrected_bypred,
+         _) = correlate.correlate_and_fit(
             trace=trace_corrected_bypred,
             fwhm=fwhm,
             diffrate=None,
@@ -284,7 +287,7 @@ def correct_correlation_by_unet_prediction(ntraces,
                              label='Corrupted chunks (Prediction)')
             plt.subplot(222)
             print('correlation of corrupted trace:')
-            diff_corrupted, trans_corrupted, _ = correlate.correlate(
+            diff_corrupted, trans_corrupted, _ = correlate.correlate_and_fit(
                 trace=features_orig.astype(np.float64),
                 fwhm=fwhm,
                 diffrate=None,
@@ -303,7 +306,8 @@ def correct_correlation_by_unet_prediction(ntraces,
                       fontsize=16)
             plt.subplot(224)
             print('correlation of trace corrected by prediction')
-            diff_corrected_bypred, trans_corrected_bypred, _ = correlate.correlate(
+            (diff_corrected_bypred, trans_corrected_bypred,
+             _) = correlate.correlate_and_fit(
                 trace=trace_corrected_bypred,
                 fwhm=fwhm,
                 diffrate=None,
@@ -497,7 +501,7 @@ def correct_experimental_traces_from_ptu_by_unet_prediction(
         # Since we saved it only once, but we compute the correlation 2 times
         # (orig vs pred), we have to append the metadata here two times as well
         ptum = ptum_df.iloc[:, 1::2].T
-        for _ in range(len(pred_thresh)+1):
+        for _ in range(len(pred_thresh) + 1):
             data_metadata = pd.concat((data_metadata, ptum), axis=0)
     data_metadata = data_metadata.reset_index(drop=True)
     data_metadata.columns = ptum_list[0].iloc[:, 0].values
