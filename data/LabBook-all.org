@@ -7618,25 +7618,25 @@ Histograms of Conv1D-Kernel (final layer)
 
 **** prediction plots after each epoch
      after epoch 1:
-     [[file:./exp-210204-unet/run1_predplot/plot0.png]]
+     [[file:./exp-210204-unet/run1_plots/plot0.png]]
      epoch 2:
-     [[file:./exp-210204-unet/run1_predplot/plot1.png]]
+     [[file:./exp-210204-unet/run1_plots/plot1.png]]
      epoch 3:
-     [[file:./exp-210204-unet/run1_predplot/plot2.png]]
+     [[file:./exp-210204-unet/run1_plots/plot2.png]]
      epoch 4:
-     [[file:./exp-210204-unet/run1_predplot/plot3.png]]
+     [[file:./exp-210204-unet/run1_plots/plot3.png]]
      epoch 5:
-     [[file:./exp-210204-unet/run1_predplot/plot4.png]]
+     [[file:./exp-210204-unet/run1_plots/plot4.png]]
      epoch 10:
-     [[file:./exp-210204-unet/run1_predplot/plot9.png]]
+     [[file:./exp-210204-unet/run1_plots/plot9.png]]
      epoch 20:
-     [[file:./exp-210204-unet/run1_predplot/plot19.png]]
+     [[file:./exp-210204-unet/run1_plots/plot19.png]]
      epoch 30:
-     [[file:./exp-210204-unet/run1_predplot/plot29.png]]
+     [[file:./exp-210204-unet/run1_plots/plot29.png]]
      epoch 40:
-     [[file:./exp-210204-unet/run1_predplot/plot39.png]]
+     [[file:./exp-210204-unet/run1_plots/plot39.png]]
      epoch 50:
-     [[file:./exp-210204-unet/run1_predplot/plot49.png]]
+     [[file:./exp-210204-unet/run1_plots/plot49.png]]
 
 **** Git log after some code additions
     :PROPERTIES:
@@ -7898,7 +7898,7 @@ Histograms of Conv1D-Kernel (final layer)
       #+end_src
 
       #+RESULTS:
-      [[file:./exp-210204-unet/run1_artifact0_xunit1_corrections/210215_artifact0_xunit1_alldiffrates.png]]
+      [[file:./exp-210204-unet/run1_artifact0_xunit1_corrections/210215_artifact0_xunit1_alldiffrates.svg]]
 
     1. We see some interesting results in the *corrupted data without
        correction* (first box, in blue), can they be explained by the test data?
@@ -10543,9 +10543,9 @@ Histograms of Conv1D-Kernel (final layer)
 
        #+RESULTS:
 
-       [[file:./exp-210204-unet/run2_csv_analysis/2021-03-21_correlations_transit-times.png]]
-       [[file:./exp-210204-unet/run2_csv_analysis/2021-03-21_correlations_diffusion-rates.png]]
-       [[file:./exp-210204-unet/run2_csv_analysis/2021-03-21_correlations_trace-lengths.png]]
+       [[file:./exp-210204-unet/run2_sim_csv_analysis/2021-03-21_correlations_transit-times.png]]
+       [[file:./exp-210204-unet/run2_sim_csv_analysis/2021-03-21_correlations_diffusion-rates.png]]
+       [[file:./exp-210204-unet/run2_sim_csv_analysis/2021-03-21_correlations_trace-lengths.png]]
 
      - Now let's look at the corrections a little closer.
        #+BEGIN_SRC jupyter-python :pandoc t
@@ -10603,7 +10603,7 @@ Histograms of Conv1D-Kernel (final layer)
      - I concatenated the resulting 2 plots into 1 (left diffusion rates, right
        transit times). Here it can be nicely seen, that they are just two
        representations of the same dynamic phenomenon.
-       [[file:./exp-210204-unet/run2_csv_analysis/2021-03-21_correlations_tt-diffrate-tracelength-scatterplot.png]]
+       [[file:./exp-210204-unet/run2_sim_csv_analysis/2021-03-21_correlations_tt-diffrate-tracelength-scatterplot.png]]
 
 **** Application 3 - experimental data
     :PROPERTIES:
@@ -33492,39 +33492,39 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
 
      - model predictions
        #+begin_details
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_slow_molecules:_slow_cluster_prediction.svg
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_slow_molecules:_medium_cluster_prediction.svg
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_slow_molecules:_fast_cluster_prediction.svg
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_medium_molecules:_slow_cluster_prediction.svg
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_medium_molecules:_medium_cluster_prediction.svg
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_medium_molecules:_fast_cluster_prediction.svg
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_fast_molecules:_slow_cluster_prediction.svg
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_fast_molecules:_medium_cluster_prediction.svg
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_fast_molecules:_fast_cluster_prediction.svg
+       file:./exp-220227-unet/jupyter/analysis2_ff67b_slow_molecules:_slow_cluster_prediction.svg
+       file:./exp-220227-unet/jupyter/analysis2_ff67b_slow_molecules:_medium_cluster_prediction.svg
+       file:./exp-220227-unet/jupyter/analysis2_ff67b_slow_molecules:_fast_cluster_prediction.svg
+       file:./exp-220227-unet/jupyter/analysis2_ff67b_medium_molecules:_slow_cluster_prediction.svg
+       file:./exp-220227-unet/jupyter/analysis2_ff67b_medium_molecules:_medium_cluster_prediction.svg
+       file:./exp-220227-unet/jupyter/analysis2_ff67b_medium_molecules:_fast_cluster_prediction.svg
+       file:./exp-220227-unet/jupyter/analysis2_ff67b_fast_molecules:_slow_cluster_prediction.svg
+       file:./exp-220227-unet/jupyter/analysis2_ff67b_fast_molecules:_medium_cluster_prediction.svg
+       file:./exp-220227-unet/jupyter/analysis2_ff67b_fast_molecules:_fast_cluster_prediction.svg
        #+end_details
      - prediction-based segmentation (threshold=0.5)
        #+begin_details
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_slow_molecules_and_slow_clusters:_prediction-based_segmentation.svg
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_slow_molecules_and_medium_clusters:_prediction-based_segmentation.svg
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_slow_molecules_and_fast_clusters:_prediction-based_segmentation.svg
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_medium_molecules_and_slow_clusters:_prediction-based_segmentation.svg
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_medium_molecules_and_medium_clusters:_prediction-based_segmentation.svg
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_medium_molecules_and_fast_clusters:_prediction-based_segmentation.svg
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_fast_molecules_and_slow_clusters:_prediction-based_segmentation.svg
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_fast_molecules_and_medium_clusters:_prediction-based_segmentation.svg
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_fast_molecules_and_fast_clusters:_prediction-based_segmentation.svg
+       file:./exp-220227-unet/jupyter/analysis2_ff67b_slow_molecules_and_slow_clusters:_prediction-based_segmentation.svg
+       file:./exp-220227-unet/jupyter/analysis2_ff67b_slow_molecules_and_medium_clusters:_prediction-based_segmentation.svg
+       file:./exp-220227-unet/jupyter/analysis2_ff67b_slow_molecules_and_fast_clusters:_prediction-based_segmentation.svg
+       file:./exp-220227-unet/jupyter/analysis2_ff67b_medium_molecules_and_slow_clusters:_prediction-based_segmentation.svg
+       file:./exp-220227-unet/jupyter/analysis2_ff67b_medium_molecules_and_medium_clusters:_prediction-based_segmentation.svg
+       file:./exp-220227-unet/jupyter/analysis2_ff67b_medium_molecules_and_fast_clusters:_prediction-based_segmentation.svg
+       file:./exp-220227-unet/jupyter/analysis2_ff67b_fast_molecules_and_slow_clusters:_prediction-based_segmentation.svg
+       file:./exp-220227-unet/jupyter/analysis2_ff67b_fast_molecules_and_medium_clusters:_prediction-based_segmentation.svg
+       file:./exp-220227-unet/jupyter/analysis2_ff67b_fast_molecules_and_fast_clusters:_prediction-based_segmentation.svg
        #+end_details
      - prediction-based cut-and-stitch correction
        #+begin_details
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_slow_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_slow_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_slow_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_medium_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_medium_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_medium_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_fast_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_fast_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_fast_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
+       file:./exp-220227-unet/jupyter/analysis2_ff67b_slow_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
+       file:./exp-220227-unet/jupyter/analysis2_ff67b_slow_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
+       file:./exp-220227-unet/jupyter/analysis2_ff67b_slow_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
+       file:./exp-220227-unet/jupyter/analysis2_ff67b_medium_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
+       file:./exp-220227-unet/jupyter/analysis2_ff67b_medium_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
+       file:./exp-220227-unet/jupyter/analysis2_ff67b_medium_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
+       file:./exp-220227-unet/jupyter/analysis2_ff67b_fast_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
+       file:./exp-220227-unet/jupyter/analysis2_ff67b_fast_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
+       file:./exp-220227-unet/jupyter/analysis2_ff67b_fast_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
        #+end_details
 
    - second model: =347669d050f344ad9fb9e480c814f727=
@@ -33542,39 +33542,39 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
      #+RESULTS:
      - model predictions
        #+begin_details
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_slow_molecules:_slow_cluster_prediction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_slow_molecules:_medium_cluster_prediction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_slow_molecules:_fast_cluster_prediction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_medium_molecules:_slow_cluster_prediction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_medium_molecules:_medium_cluster_prediction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_medium_molecules:_fast_cluster_prediction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_fast_molecules:_slow_cluster_prediction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_fast_molecules:_medium_cluster_prediction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_fast_molecules:_fast_cluster_prediction.svg
+     file:./exp-220227-unet/jupyter/analysis2_34766_slow_molecules:_slow_cluster_prediction.svg
+     file:./exp-220227-unet/jupyter/analysis2_34766_slow_molecules:_medium_cluster_prediction.svg
+     file:./exp-220227-unet/jupyter/analysis2_34766_slow_molecules:_fast_cluster_prediction.svg
+     file:./exp-220227-unet/jupyter/analysis2_34766_medium_molecules:_slow_cluster_prediction.svg
+     file:./exp-220227-unet/jupyter/analysis2_34766_medium_molecules:_medium_cluster_prediction.svg
+     file:./exp-220227-unet/jupyter/analysis2_34766_medium_molecules:_fast_cluster_prediction.svg
+     file:./exp-220227-unet/jupyter/analysis2_34766_fast_molecules:_slow_cluster_prediction.svg
+     file:./exp-220227-unet/jupyter/analysis2_34766_fast_molecules:_medium_cluster_prediction.svg
+     file:./exp-220227-unet/jupyter/analysis2_34766_fast_molecules:_fast_cluster_prediction.svg
        #+end_details
      - prediction-based segmentation (threshold=0.5)
        #+begin_details
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_slow_molecules_and_slow_clusters:_prediction-based_segmentation.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_slow_molecules_and_medium_clusters:_prediction-based_segmentation.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_slow_molecules_and_fast_clusters:_prediction-based_segmentation.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_medium_molecules_and_slow_clusters:_prediction-based_segmentation.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_medium_molecules_and_medium_clusters:_prediction-based_segmentation.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_medium_molecules_and_fast_clusters:_prediction-based_segmentation.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_fast_molecules_and_slow_clusters:_prediction-based_segmentation.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_fast_molecules_and_medium_clusters:_prediction-based_segmentation.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_fast_molecules_and_fast_clusters:_prediction-based_segmentation.svg
+     file:./exp-220227-unet/jupyter/analysis2_34766_slow_molecules_and_slow_clusters:_prediction-based_segmentation.svg
+     file:./exp-220227-unet/jupyter/analysis2_34766_slow_molecules_and_medium_clusters:_prediction-based_segmentation.svg
+     file:./exp-220227-unet/jupyter/analysis2_34766_slow_molecules_and_fast_clusters:_prediction-based_segmentation.svg
+     file:./exp-220227-unet/jupyter/analysis2_34766_medium_molecules_and_slow_clusters:_prediction-based_segmentation.svg
+     file:./exp-220227-unet/jupyter/analysis2_34766_medium_molecules_and_medium_clusters:_prediction-based_segmentation.svg
+     file:./exp-220227-unet/jupyter/analysis2_34766_medium_molecules_and_fast_clusters:_prediction-based_segmentation.svg
+     file:./exp-220227-unet/jupyter/analysis2_34766_fast_molecules_and_slow_clusters:_prediction-based_segmentation.svg
+     file:./exp-220227-unet/jupyter/analysis2_34766_fast_molecules_and_medium_clusters:_prediction-based_segmentation.svg
+     file:./exp-220227-unet/jupyter/analysis2_34766_fast_molecules_and_fast_clusters:_prediction-based_segmentation.svg
        #+end_details
      - prediction-based cut-and-stitch correction
        #+begin_details
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_slow_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_slow_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_slow_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_medium_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_medium_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_medium_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_fast_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_fast_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_fast_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./exp-220227-unet/jupyter/analysis2_34766_slow_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./exp-220227-unet/jupyter/analysis2_34766_slow_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./exp-220227-unet/jupyter/analysis2_34766_slow_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./exp-220227-unet/jupyter/analysis2_34766_medium_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./exp-220227-unet/jupyter/analysis2_34766_medium_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./exp-220227-unet/jupyter/analysis2_34766_medium_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./exp-220227-unet/jupyter/analysis2_34766_fast_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./exp-220227-unet/jupyter/analysis2_34766_fast_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./exp-220227-unet/jupyter/analysis2_34766_fast_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
        #+end_details
    - third model: =714af8cd12c1441eac4ca980e8c20070=
      #+BEGIN_SRC jupyter-python
@@ -33589,39 +33589,39 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
      :   fig = plt.figure()
      - model predictions
        #+begin_details
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_slow_molecules:_slow_cluster_prediction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_slow_molecules:_medium_cluster_prediction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_slow_molecules:_fast_cluster_prediction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_medium_molecules:_slow_cluster_prediction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_medium_molecules:_medium_cluster_prediction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_medium_molecules:_fast_cluster_prediction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_fast_molecules:_slow_cluster_prediction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_fast_molecules:_medium_cluster_prediction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_fast_molecules:_fast_cluster_prediction.svg
+     file:./exp-220227-unet/jupyter/analysis2_714af_slow_molecules:_slow_cluster_prediction.svg
+     file:./exp-220227-unet/jupyter/analysis2_714af_slow_molecules:_medium_cluster_prediction.svg
+     file:./exp-220227-unet/jupyter/analysis2_714af_slow_molecules:_fast_cluster_prediction.svg
+     file:./exp-220227-unet/jupyter/analysis2_714af_medium_molecules:_slow_cluster_prediction.svg
+     file:./exp-220227-unet/jupyter/analysis2_714af_medium_molecules:_medium_cluster_prediction.svg
+     file:./exp-220227-unet/jupyter/analysis2_714af_medium_molecules:_fast_cluster_prediction.svg
+     file:./exp-220227-unet/jupyter/analysis2_714af_fast_molecules:_slow_cluster_prediction.svg
+     file:./exp-220227-unet/jupyter/analysis2_714af_fast_molecules:_medium_cluster_prediction.svg
+     file:./exp-220227-unet/jupyter/analysis2_714af_fast_molecules:_fast_cluster_prediction.svg
        #+end_details
      - prediction-based segmentation (threshold=0.5)
        #+begin_details
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_slow_molecules_and_slow_clusters:_prediction-based_segmentation.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_slow_molecules_and_medium_clusters:_prediction-based_segmentation.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_slow_molecules_and_fast_clusters:_prediction-based_segmentation.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_medium_molecules_and_slow_clusters:_prediction-based_segmentation.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_medium_molecules_and_medium_clusters:_prediction-based_segmentation.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_medium_molecules_and_fast_clusters:_prediction-based_segmentation.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_fast_molecules_and_slow_clusters:_prediction-based_segmentation.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_fast_molecules_and_medium_clusters:_prediction-based_segmentation.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_fast_molecules_and_fast_clusters:_prediction-based_segmentation.svg
+     file:./exp-220227-unet/jupyter/analysis2_714af_slow_molecules_and_slow_clusters:_prediction-based_segmentation.svg
+     file:./exp-220227-unet/jupyter/analysis2_714af_slow_molecules_and_medium_clusters:_prediction-based_segmentation.svg
+     file:./exp-220227-unet/jupyter/analysis2_714af_slow_molecules_and_fast_clusters:_prediction-based_segmentation.svg
+     file:./exp-220227-unet/jupyter/analysis2_714af_medium_molecules_and_slow_clusters:_prediction-based_segmentation.svg
+     file:./exp-220227-unet/jupyter/analysis2_714af_medium_molecules_and_medium_clusters:_prediction-based_segmentation.svg
+     file:./exp-220227-unet/jupyter/analysis2_714af_medium_molecules_and_fast_clusters:_prediction-based_segmentation.svg
+     file:./exp-220227-unet/jupyter/analysis2_714af_fast_molecules_and_slow_clusters:_prediction-based_segmentation.svg
+     file:./exp-220227-unet/jupyter/analysis2_714af_fast_molecules_and_medium_clusters:_prediction-based_segmentation.svg
+     file:./exp-220227-unet/jupyter/analysis2_714af_fast_molecules_and_fast_clusters:_prediction-based_segmentation.svg
        #+end_details
      - prediction-based cut-and-stitch correction
        #+begin_details
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_slow_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_slow_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_slow_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_medium_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_medium_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_medium_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_fast_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_fast_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_fast_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./exp-220227-unet/jupyter/analysis2_714af_slow_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./exp-220227-unet/jupyter/analysis2_714af_slow_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./exp-220227-unet/jupyter/analysis2_714af_slow_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./exp-220227-unet/jupyter/analysis2_714af_medium_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./exp-220227-unet/jupyter/analysis2_714af_medium_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./exp-220227-unet/jupyter/analysis2_714af_medium_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./exp-220227-unet/jupyter/analysis2_714af_fast_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./exp-220227-unet/jupyter/analysis2_714af_fast_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./exp-220227-unet/jupyter/analysis2_714af_fast_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
        #+end_details
    - fourth model: =34a6d207ac594035b1009c330fb67a65=
      #+BEGIN_SRC jupyter-python
@@ -33636,40 +33636,40 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
      :   fig = plt.figure()
      - model predictions
        #+begin_details
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_slow_molecules:_slow_cluster_prediction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_slow_molecules:_medium_cluster_prediction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_slow_molecules:_fast_cluster_prediction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_medium_molecules:_slow_cluster_prediction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_medium_molecules:_medium_cluster_prediction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_medium_molecules:_fast_cluster_prediction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_fast_molecules:_slow_cluster_prediction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_fast_molecules:_medium_cluster_prediction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_fast_molecules:_fast_cluster_prediction.svg
+     file:./exp-220227-unet/jupyter/analysis2_34a6d_slow_molecules:_slow_cluster_prediction.svg
+     file:./exp-220227-unet/jupyter/analysis2_34a6d_slow_molecules:_medium_cluster_prediction.svg
+     file:./exp-220227-unet/jupyter/analysis2_34a6d_slow_molecules:_fast_cluster_prediction.svg
+     file:./exp-220227-unet/jupyter/analysis2_34a6d_medium_molecules:_slow_cluster_prediction.svg
+     file:./exp-220227-unet/jupyter/analysis2_34a6d_medium_molecules:_medium_cluster_prediction.svg
+     file:./exp-220227-unet/jupyter/analysis2_34a6d_medium_molecules:_fast_cluster_prediction.svg
+     file:./exp-220227-unet/jupyter/analysis2_34a6d_fast_molecules:_slow_cluster_prediction.svg
+     file:./exp-220227-unet/jupyter/analysis2_34a6d_fast_molecules:_medium_cluster_prediction.svg
+     file:./exp-220227-unet/jupyter/analysis2_34a6d_fast_molecules:_fast_cluster_prediction.svg
        #+end_details
      - prediction-based segmentation (threshold=0.5)
 
        #+begin_details
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_slow_molecules_and_slow_clusters:_prediction-based_segmentation.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_slow_molecules_and_medium_clusters:_prediction-based_segmentation.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_slow_molecules_and_fast_clusters:_prediction-based_segmentation.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_medium_molecules_and_slow_clusters:_prediction-based_segmentation.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_medium_molecules_and_medium_clusters:_prediction-based_segmentation.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_medium_molecules_and_fast_clusters:_prediction-based_segmentation.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_fast_molecules_and_slow_clusters:_prediction-based_segmentation.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_fast_molecules_and_medium_clusters:_prediction-based_segmentation.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_fast_molecules_and_fast_clusters:_prediction-based_segmentation.svg
+     file:./exp-220227-unet/jupyter/analysis2_34a6d_slow_molecules_and_slow_clusters:_prediction-based_segmentation.svg
+     file:./exp-220227-unet/jupyter/analysis2_34a6d_slow_molecules_and_medium_clusters:_prediction-based_segmentation.svg
+     file:./exp-220227-unet/jupyter/analysis2_34a6d_slow_molecules_and_fast_clusters:_prediction-based_segmentation.svg
+     file:./exp-220227-unet/jupyter/analysis2_34a6d_medium_molecules_and_slow_clusters:_prediction-based_segmentation.svg
+     file:./exp-220227-unet/jupyter/analysis2_34a6d_medium_molecules_and_medium_clusters:_prediction-based_segmentation.svg
+     file:./exp-220227-unet/jupyter/analysis2_34a6d_medium_molecules_and_fast_clusters:_prediction-based_segmentation.svg
+     file:./exp-220227-unet/jupyter/analysis2_34a6d_fast_molecules_and_slow_clusters:_prediction-based_segmentation.svg
+     file:./exp-220227-unet/jupyter/analysis2_34a6d_fast_molecules_and_medium_clusters:_prediction-based_segmentation.svg
+     file:./exp-220227-unet/jupyter/analysis2_34a6d_fast_molecules_and_fast_clusters:_prediction-based_segmentation.svg
        #+end_details
      - prediction-based cut-and-stitch correction
        #+begin_details
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_slow_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_slow_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_slow_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_medium_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_medium_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_medium_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_fast_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_fast_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_fast_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./exp-220227-unet/jupyter/analysis2_34a6d_slow_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./exp-220227-unet/jupyter/analysis2_34a6d_slow_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./exp-220227-unet/jupyter/analysis2_34a6d_slow_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./exp-220227-unet/jupyter/analysis2_34a6d_medium_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./exp-220227-unet/jupyter/analysis2_34a6d_medium_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./exp-220227-unet/jupyter/analysis2_34a6d_medium_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./exp-220227-unet/jupyter/analysis2_34a6d_fast_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./exp-220227-unet/jupyter/analysis2_34a6d_fast_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./exp-220227-unet/jupyter/analysis2_34a6d_fast_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
        #+end_details
    - fifth model: =0cd2023eeaf745aca0d3e8ad5e1fc653=. I re-wrote the plotting
      script a bit.
@@ -33696,39 +33696,39 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
      #+end_example
      - model predictions
        #+begin_details
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_prediction__simulated_trace_tau_sim-3.76ms_0.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_prediction__simulated_trace_tau_sim-3.76ms_1.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_prediction__simulated_trace_tau_sim-3.76ms_2.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_prediction__simulated_trace_tau_sim-56.36ms_3.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_prediction__simulated_trace_tau_sim-56.36ms_4.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_prediction__simulated_trace_tau_sim-56.36ms_5.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_prediction__simulated_trace_tau_sim-163.35ms_6.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_prediction__simulated_trace_tau_sim-163.35ms_7.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_prediction__simulated_trace_tau_sim-163.35ms_8.svg
+     file:./exp-220227-unet/jupyter/analysis2_0cd20_prediction__simulated_trace_tau_sim-3.76ms_0.svg
+     file:./exp-220227-unet/jupyter/analysis2_0cd20_prediction__simulated_trace_tau_sim-3.76ms_1.svg
+     file:./exp-220227-unet/jupyter/analysis2_0cd20_prediction__simulated_trace_tau_sim-3.76ms_2.svg
+     file:./exp-220227-unet/jupyter/analysis2_0cd20_prediction__simulated_trace_tau_sim-56.36ms_3.svg
+     file:./exp-220227-unet/jupyter/analysis2_0cd20_prediction__simulated_trace_tau_sim-56.36ms_4.svg
+     file:./exp-220227-unet/jupyter/analysis2_0cd20_prediction__simulated_trace_tau_sim-56.36ms_5.svg
+     file:./exp-220227-unet/jupyter/analysis2_0cd20_prediction__simulated_trace_tau_sim-163.35ms_6.svg
+     file:./exp-220227-unet/jupyter/analysis2_0cd20_prediction__simulated_trace_tau_sim-163.35ms_7.svg
+     file:./exp-220227-unet/jupyter/analysis2_0cd20_prediction__simulated_trace_tau_sim-163.35ms_8.svg
        #+end_details
      - prediction-based segmentation (threshold=0.5)
        #+begin_details
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_predseg__simulated_trace_tau_sim-3.76ms_0.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_predseg__simulated_trace_tau_sim-3.76ms_1.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_predseg__simulated_trace_tau_sim-3.76ms_2.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_predseg__simulated_trace_tau_sim-56.36ms_3.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_predseg__simulated_trace_tau_sim-56.36ms_4.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_predseg__simulated_trace_tau_sim-56.36ms_5.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_predseg__simulated_trace_tau_sim-163.35ms_6.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_predseg__simulated_trace_tau_sim-163.35ms_7.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_predseg__simulated_trace_tau_sim-163.35ms_8.svg
+     file:./exp-220227-unet/jupyter/analysis2_0cd20_predseg__simulated_trace_tau_sim-3.76ms_0.svg
+     file:./exp-220227-unet/jupyter/analysis2_0cd20_predseg__simulated_trace_tau_sim-3.76ms_1.svg
+     file:./exp-220227-unet/jupyter/analysis2_0cd20_predseg__simulated_trace_tau_sim-3.76ms_2.svg
+     file:./exp-220227-unet/jupyter/analysis2_0cd20_predseg__simulated_trace_tau_sim-56.36ms_3.svg
+     file:./exp-220227-unet/jupyter/analysis2_0cd20_predseg__simulated_trace_tau_sim-56.36ms_4.svg
+     file:./exp-220227-unet/jupyter/analysis2_0cd20_predseg__simulated_trace_tau_sim-56.36ms_5.svg
+     file:./exp-220227-unet/jupyter/analysis2_0cd20_predseg__simulated_trace_tau_sim-163.35ms_6.svg
+     file:./exp-220227-unet/jupyter/analysis2_0cd20_predseg__simulated_trace_tau_sim-163.35ms_7.svg
+     file:./exp-220227-unet/jupyter/analysis2_0cd20_predseg__simulated_trace_tau_sim-163.35ms_8.svg
        #+end_details
      - prediction-based cut-and-stitch correction
        #+begin_details
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_predcas__simulated_trace_tau_sim-3.76ms_0.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_predcas__simulated_trace_tau_sim-3.76ms_1.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_predcas__simulated_trace_tau_sim-3.76ms_2.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_predcas__simulated_trace_tau_sim-56.36ms_3.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_predcas__simulated_trace_tau_sim-56.36ms_4.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_predcas__simulated_trace_tau_sim-56.36ms_5.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_predcas__simulated_trace_tau_sim-163.35ms_6.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_predcas__simulated_trace_tau_sim-163.35ms_7.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_predcas__simulated_trace_tau_sim-163.35ms_8.svg
+     file:./exp-220227-unet/jupyter/analysis2_0cd20_predcas__simulated_trace_tau_sim-3.76ms_0.svg
+     file:./exp-220227-unet/jupyter/analysis2_0cd20_predcas__simulated_trace_tau_sim-3.76ms_1.svg
+     file:./exp-220227-unet/jupyter/analysis2_0cd20_predcas__simulated_trace_tau_sim-3.76ms_2.svg
+     file:./exp-220227-unet/jupyter/analysis2_0cd20_predcas__simulated_trace_tau_sim-56.36ms_3.svg
+     file:./exp-220227-unet/jupyter/analysis2_0cd20_predcas__simulated_trace_tau_sim-56.36ms_4.svg
+     file:./exp-220227-unet/jupyter/analysis2_0cd20_predcas__simulated_trace_tau_sim-56.36ms_5.svg
+     file:./exp-220227-unet/jupyter/analysis2_0cd20_predcas__simulated_trace_tau_sim-163.35ms_6.svg
+     file:./exp-220227-unet/jupyter/analysis2_0cd20_predcas__simulated_trace_tau_sim-163.35ms_7.svg
+     file:./exp-220227-unet/jupyter/analysis2_0cd20_predcas__simulated_trace_tau_sim-163.35ms_8.svg
        #+end_details
    - fifth model: =fe81d71c52404ed790b3a32051258da9=
      #+BEGIN_SRC jupyter-python
@@ -33754,39 +33754,39 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
      #+end_example
      - model predictions
        #+begin_details
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_prediction__simulated_trace_tau_sim-3.76ms_0.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_prediction__simulated_trace_tau_sim-3.76ms_1.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_prediction__simulated_trace_tau_sim-3.76ms_2.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_prediction__simulated_trace_tau_sim-56.36ms_3.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_prediction__simulated_trace_tau_sim-56.36ms_4.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_prediction__simulated_trace_tau_sim-56.36ms_5.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_prediction__simulated_trace_tau_sim-163.35ms_6.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_prediction__simulated_trace_tau_sim-163.35ms_7.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_prediction__simulated_trace_tau_sim-163.35ms_8.svg
+     file:./exp-220227-unet/jupyter/analysis2_fe81d_prediction__simulated_trace_tau_sim-3.76ms_0.svg
+     file:./exp-220227-unet/jupyter/analysis2_fe81d_prediction__simulated_trace_tau_sim-3.76ms_1.svg
+     file:./exp-220227-unet/jupyter/analysis2_fe81d_prediction__simulated_trace_tau_sim-3.76ms_2.svg
+     file:./exp-220227-unet/jupyter/analysis2_fe81d_prediction__simulated_trace_tau_sim-56.36ms_3.svg
+     file:./exp-220227-unet/jupyter/analysis2_fe81d_prediction__simulated_trace_tau_sim-56.36ms_4.svg
+     file:./exp-220227-unet/jupyter/analysis2_fe81d_prediction__simulated_trace_tau_sim-56.36ms_5.svg
+     file:./exp-220227-unet/jupyter/analysis2_fe81d_prediction__simulated_trace_tau_sim-163.35ms_6.svg
+     file:./exp-220227-unet/jupyter/analysis2_fe81d_prediction__simulated_trace_tau_sim-163.35ms_7.svg
+     file:./exp-220227-unet/jupyter/analysis2_fe81d_prediction__simulated_trace_tau_sim-163.35ms_8.svg
        #+end_details
      - prediction-based segmentation (threshold=0.5)
        #+begin_details
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_predseg__simulated_trace_tau_sim-3.76ms_0.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_predseg__simulated_trace_tau_sim-3.76ms_1.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_predseg__simulated_trace_tau_sim-3.76ms_2.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_predseg__simulated_trace_tau_sim-56.36ms_3.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_predseg__simulated_trace_tau_sim-56.36ms_4.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_predseg__simulated_trace_tau_sim-56.36ms_5.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_predseg__simulated_trace_tau_sim-163.35ms_6.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_predseg__simulated_trace_tau_sim-163.35ms_7.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_predseg__simulated_trace_tau_sim-163.35ms_8.svg
+     file:./exp-220227-unet/jupyter/analysis2_fe81d_predseg__simulated_trace_tau_sim-3.76ms_0.svg
+     file:./exp-220227-unet/jupyter/analysis2_fe81d_predseg__simulated_trace_tau_sim-3.76ms_1.svg
+     file:./exp-220227-unet/jupyter/analysis2_fe81d_predseg__simulated_trace_tau_sim-3.76ms_2.svg
+     file:./exp-220227-unet/jupyter/analysis2_fe81d_predseg__simulated_trace_tau_sim-56.36ms_3.svg
+     file:./exp-220227-unet/jupyter/analysis2_fe81d_predseg__simulated_trace_tau_sim-56.36ms_4.svg
+     file:./exp-220227-unet/jupyter/analysis2_fe81d_predseg__simulated_trace_tau_sim-56.36ms_5.svg
+     file:./exp-220227-unet/jupyter/analysis2_fe81d_predseg__simulated_trace_tau_sim-163.35ms_6.svg
+     file:./exp-220227-unet/jupyter/analysis2_fe81d_predseg__simulated_trace_tau_sim-163.35ms_7.svg
+     file:./exp-220227-unet/jupyter/analysis2_fe81d_predseg__simulated_trace_tau_sim-163.35ms_8.svg
        #+end_details
      - prediction-based cut-and-stitch correction
        #+begin_details
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_predcas__simulated_trace_tau_sim-3.76ms_0.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_predcas__simulated_trace_tau_sim-3.76ms_1.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_predcas__simulated_trace_tau_sim-3.76ms_2.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_predcas__simulated_trace_tau_sim-56.36ms_3.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_predcas__simulated_trace_tau_sim-56.36ms_4.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_predcas__simulated_trace_tau_sim-56.36ms_5.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_predcas__simulated_trace_tau_sim-163.35ms_6.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_predcas__simulated_trace_tau_sim-163.35ms_7.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_predcas__simulated_trace_tau_sim-163.35ms_8.svg
+     file:./exp-220227-unet/jupyter/analysis2_fe81d_predcas__simulated_trace_tau_sim-3.76ms_0.svg
+     file:./exp-220227-unet/jupyter/analysis2_fe81d_predcas__simulated_trace_tau_sim-3.76ms_1.svg
+     file:./exp-220227-unet/jupyter/analysis2_fe81d_predcas__simulated_trace_tau_sim-3.76ms_2.svg
+     file:./exp-220227-unet/jupyter/analysis2_fe81d_predcas__simulated_trace_tau_sim-56.36ms_3.svg
+     file:./exp-220227-unet/jupyter/analysis2_fe81d_predcas__simulated_trace_tau_sim-56.36ms_4.svg
+     file:./exp-220227-unet/jupyter/analysis2_fe81d_predcas__simulated_trace_tau_sim-56.36ms_5.svg
+     file:./exp-220227-unet/jupyter/analysis2_fe81d_predcas__simulated_trace_tau_sim-163.35ms_6.svg
+     file:./exp-220227-unet/jupyter/analysis2_fe81d_predcas__simulated_trace_tau_sim-163.35ms_7.svg
+     file:./exp-220227-unet/jupyter/analysis2_fe81d_predcas__simulated_trace_tau_sim-163.35ms_8.svg
        #+end_details
 
    - I did not do these plots for models =19e3e= or =c1204=, because the did not
@@ -34208,12 +34208,12 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
     there. The rendered PDF looks like this for the beamer slide:
 
     #+begin_export html
-    <embed src="./data/exp-220227-unet/other/sim_models_beamer_table.pdf" width="100%" height="500px" />
+    <embed src="./exp-220227-unet/other/sim_models_beamer_table.pdf" width="100%" height="500px" />
     #+end_export
 
   - and here the rendered PDF of a long table
     #+begin_export html
-    <embed src="./data/exp-220227-unet/other/sim_models_longtable.pdf" width="100%" height="500px" />
+    <embed src="./exp-220227-unet/other/sim_models_longtable.pdf" width="100%" height="500px" />
     #+end_export
 
 *** Experiment 3: Run models on experimental data
@@ -36754,7 +36754,7 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
 
    - the final rendering looks like this:
      #+begin_export html
-     <embed src="./data/exp-220227-unet/other/analysis3_af488_cas_avg_table.pdf" width="100%" height="500px" />
+     <embed src="./exp-220227-unet/other/analysis3_af488_cas_avg_table.pdf" width="100%" height="500px" />
      #+end_export
 
    - now, we work with =all_param=. Here, all single correlation curves are
@@ -36976,8 +36976,8 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
    - this is the two plots as PDFs, first the comparison of transit times,
      second the comparison of particle numbers
      #+begin_export html
-     <embed src="./data/exp-220227-unet/jupyter/analysis3_af488_compare-transit-times.pdf" width="100%" height="500px" />
-     <embed src="./data/exp-220227-unet/jupyter/analysis3_af488_compare-particle-numbers.pdf" width="100%" height="500px" />
+     <embed src="./exp-220227-unet/jupyter/analysis3_af488_compare-transit-times.pdf" width="100%" height="500px" />
+     <embed src="./exp-220227-unet/jupyter/analysis3_af488_compare-particle-numbers.pdf" width="100%" height="500px" />
      #+end_export
 **** compare model performance on =pex5= data
     :PROPERTIES:
@@ -37473,7 +37473,7 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
 
    - the final rendering looks like this:
      #+begin_export html
-     <embed src="./data/exp-220227-unet/other/analysis3_pex5_cas_avg_table.pdf" width="100%" height="500px" />
+     <embed src="./exp-220227-unet/other/analysis3_pex5_cas_avg_table.pdf" width="100%" height="500px" />
      #+end_export
    - now, we work with =all_param=. Here, all single correlation curves are
      loaded without averaging.
@@ -37823,8 +37823,8 @@ sh-5.1$ [I 2022-01-25 13:54:15.779 ServerApp] jupyterlab | extension was success
    - this is the two plots as PDFs, first the comparison of transit times,
      second the comparison of particle numbers
      #+begin_export html
-     <embed src="./data/exp-220227-unet/jupyter/analysis3_pex5_transit-times.pdf" width="100%" height="500px" />
-     <embed src="./data/exp-220227-unet/jupyter/analysis3_pex5_particle-numbers.pdf" width="100%" height="500px" />
+     <embed src="./exp-220227-unet/jupyter/analysis3_pex5_transit-times.pdf" width="100%" height="500px" />
+     <embed src="./exp-220227-unet/jupyter/analysis3_pex5_particle-numbers.pdf" width="100%" height="500px" />
      #+end_export
 *** final remarks
 

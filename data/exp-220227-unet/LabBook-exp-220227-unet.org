@@ -4348,7 +4348,8 @@
       :END:
       #+end_details
 
-      [[file:./data/exp-220227-unet/jupyter/analysis1_train-loss-vs-val-loss.png]]
+      [[file:./jupyter/analysis1_train-loss-vs-val-loss.png]]
+
 
 *** Experiment 2: Evaluate models on simulated test data
    :PROPERTIES:
@@ -5113,39 +5114,39 @@
 
      - model predictions
        #+begin_details
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_slow_molecules:_slow_cluster_prediction.svg
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_slow_molecules:_medium_cluster_prediction.svg
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_slow_molecules:_fast_cluster_prediction.svg
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_medium_molecules:_slow_cluster_prediction.svg
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_medium_molecules:_medium_cluster_prediction.svg
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_medium_molecules:_fast_cluster_prediction.svg
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_fast_molecules:_slow_cluster_prediction.svg
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_fast_molecules:_medium_cluster_prediction.svg
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_fast_molecules:_fast_cluster_prediction.svg
+       file:./jupyter/analysis2_ff67b_slow_molecules:_slow_cluster_prediction.svg
+       file:./jupyter/analysis2_ff67b_slow_molecules:_medium_cluster_prediction.svg
+       file:./jupyter/analysis2_ff67b_slow_molecules:_fast_cluster_prediction.svg
+       file:./jupyter/analysis2_ff67b_medium_molecules:_slow_cluster_prediction.svg
+       file:./jupyter/analysis2_ff67b_medium_molecules:_medium_cluster_prediction.svg
+       file:./jupyter/analysis2_ff67b_medium_molecules:_fast_cluster_prediction.svg
+       file:./jupyter/analysis2_ff67b_fast_molecules:_slow_cluster_prediction.svg
+       file:./jupyter/analysis2_ff67b_fast_molecules:_medium_cluster_prediction.svg
+       file:./jupyter/analysis2_ff67b_fast_molecules:_fast_cluster_prediction.svg
        #+end_details
      - prediction-based segmentation (threshold=0.5)
        #+begin_details
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_slow_molecules_and_slow_clusters:_prediction-based_segmentation.svg
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_slow_molecules_and_medium_clusters:_prediction-based_segmentation.svg
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_slow_molecules_and_fast_clusters:_prediction-based_segmentation.svg
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_medium_molecules_and_slow_clusters:_prediction-based_segmentation.svg
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_medium_molecules_and_medium_clusters:_prediction-based_segmentation.svg
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_medium_molecules_and_fast_clusters:_prediction-based_segmentation.svg
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_fast_molecules_and_slow_clusters:_prediction-based_segmentation.svg
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_fast_molecules_and_medium_clusters:_prediction-based_segmentation.svg
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_fast_molecules_and_fast_clusters:_prediction-based_segmentation.svg
+       file:./jupyter/analysis2_ff67b_slow_molecules_and_slow_clusters:_prediction-based_segmentation.svg
+       file:./jupyter/analysis2_ff67b_slow_molecules_and_medium_clusters:_prediction-based_segmentation.svg
+       file:./jupyter/analysis2_ff67b_slow_molecules_and_fast_clusters:_prediction-based_segmentation.svg
+       file:./jupyter/analysis2_ff67b_medium_molecules_and_slow_clusters:_prediction-based_segmentation.svg
+       file:./jupyter/analysis2_ff67b_medium_molecules_and_medium_clusters:_prediction-based_segmentation.svg
+       file:./jupyter/analysis2_ff67b_medium_molecules_and_fast_clusters:_prediction-based_segmentation.svg
+       file:./jupyter/analysis2_ff67b_fast_molecules_and_slow_clusters:_prediction-based_segmentation.svg
+       file:./jupyter/analysis2_ff67b_fast_molecules_and_medium_clusters:_prediction-based_segmentation.svg
+       file:./jupyter/analysis2_ff67b_fast_molecules_and_fast_clusters:_prediction-based_segmentation.svg
        #+end_details
      - prediction-based cut-and-stitch correction
        #+begin_details
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_slow_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_slow_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_slow_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_medium_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_medium_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_medium_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_fast_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_fast_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
-       file:./data/exp-220227-unet/jupyter/analysis2_ff67b_fast_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
+       file:./jupyter/analysis2_ff67b_slow_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
+       file:./jupyter/analysis2_ff67b_slow_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
+       file:./jupyter/analysis2_ff67b_slow_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
+       file:./jupyter/analysis2_ff67b_medium_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
+       file:./jupyter/analysis2_ff67b_medium_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
+       file:./jupyter/analysis2_ff67b_medium_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
+       file:./jupyter/analysis2_ff67b_fast_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
+       file:./jupyter/analysis2_ff67b_fast_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
+       file:./jupyter/analysis2_ff67b_fast_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
        #+end_details
 
    - second model: =347669d050f344ad9fb9e480c814f727=
@@ -5163,39 +5164,39 @@
      #+RESULTS:
      - model predictions
        #+begin_details
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_slow_molecules:_slow_cluster_prediction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_slow_molecules:_medium_cluster_prediction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_slow_molecules:_fast_cluster_prediction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_medium_molecules:_slow_cluster_prediction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_medium_molecules:_medium_cluster_prediction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_medium_molecules:_fast_cluster_prediction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_fast_molecules:_slow_cluster_prediction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_fast_molecules:_medium_cluster_prediction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_fast_molecules:_fast_cluster_prediction.svg
+     file:./jupyter/analysis2_34766_slow_molecules:_slow_cluster_prediction.svg
+     file:./jupyter/analysis2_34766_slow_molecules:_medium_cluster_prediction.svg
+     file:./jupyter/analysis2_34766_slow_molecules:_fast_cluster_prediction.svg
+     file:./jupyter/analysis2_34766_medium_molecules:_slow_cluster_prediction.svg
+     file:./jupyter/analysis2_34766_medium_molecules:_medium_cluster_prediction.svg
+     file:./jupyter/analysis2_34766_medium_molecules:_fast_cluster_prediction.svg
+     file:./jupyter/analysis2_34766_fast_molecules:_slow_cluster_prediction.svg
+     file:./jupyter/analysis2_34766_fast_molecules:_medium_cluster_prediction.svg
+     file:./jupyter/analysis2_34766_fast_molecules:_fast_cluster_prediction.svg
        #+end_details
      - prediction-based segmentation (threshold=0.5)
        #+begin_details
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_slow_molecules_and_slow_clusters:_prediction-based_segmentation.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_slow_molecules_and_medium_clusters:_prediction-based_segmentation.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_slow_molecules_and_fast_clusters:_prediction-based_segmentation.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_medium_molecules_and_slow_clusters:_prediction-based_segmentation.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_medium_molecules_and_medium_clusters:_prediction-based_segmentation.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_medium_molecules_and_fast_clusters:_prediction-based_segmentation.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_fast_molecules_and_slow_clusters:_prediction-based_segmentation.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_fast_molecules_and_medium_clusters:_prediction-based_segmentation.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_fast_molecules_and_fast_clusters:_prediction-based_segmentation.svg
+     file:./jupyter/analysis2_34766_slow_molecules_and_slow_clusters:_prediction-based_segmentation.svg
+     file:./jupyter/analysis2_34766_slow_molecules_and_medium_clusters:_prediction-based_segmentation.svg
+     file:./jupyter/analysis2_34766_slow_molecules_and_fast_clusters:_prediction-based_segmentation.svg
+     file:./jupyter/analysis2_34766_medium_molecules_and_slow_clusters:_prediction-based_segmentation.svg
+     file:./jupyter/analysis2_34766_medium_molecules_and_medium_clusters:_prediction-based_segmentation.svg
+     file:./jupyter/analysis2_34766_medium_molecules_and_fast_clusters:_prediction-based_segmentation.svg
+     file:./jupyter/analysis2_34766_fast_molecules_and_slow_clusters:_prediction-based_segmentation.svg
+     file:./jupyter/analysis2_34766_fast_molecules_and_medium_clusters:_prediction-based_segmentation.svg
+     file:./jupyter/analysis2_34766_fast_molecules_and_fast_clusters:_prediction-based_segmentation.svg
        #+end_details
      - prediction-based cut-and-stitch correction
        #+begin_details
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_slow_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_slow_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_slow_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_medium_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_medium_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_medium_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_fast_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_fast_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34766_fast_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./jupyter/analysis2_34766_slow_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./jupyter/analysis2_34766_slow_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./jupyter/analysis2_34766_slow_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./jupyter/analysis2_34766_medium_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./jupyter/analysis2_34766_medium_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./jupyter/analysis2_34766_medium_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./jupyter/analysis2_34766_fast_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./jupyter/analysis2_34766_fast_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./jupyter/analysis2_34766_fast_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
        #+end_details
    - third model: =714af8cd12c1441eac4ca980e8c20070=
      #+BEGIN_SRC jupyter-python
@@ -5210,39 +5211,39 @@
      :   fig = plt.figure()
      - model predictions
        #+begin_details
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_slow_molecules:_slow_cluster_prediction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_slow_molecules:_medium_cluster_prediction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_slow_molecules:_fast_cluster_prediction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_medium_molecules:_slow_cluster_prediction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_medium_molecules:_medium_cluster_prediction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_medium_molecules:_fast_cluster_prediction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_fast_molecules:_slow_cluster_prediction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_fast_molecules:_medium_cluster_prediction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_fast_molecules:_fast_cluster_prediction.svg
+     file:./jupyter/analysis2_714af_slow_molecules:_slow_cluster_prediction.svg
+     file:./jupyter/analysis2_714af_slow_molecules:_medium_cluster_prediction.svg
+     file:./jupyter/analysis2_714af_slow_molecules:_fast_cluster_prediction.svg
+     file:./jupyter/analysis2_714af_medium_molecules:_slow_cluster_prediction.svg
+     file:./jupyter/analysis2_714af_medium_molecules:_medium_cluster_prediction.svg
+     file:./jupyter/analysis2_714af_medium_molecules:_fast_cluster_prediction.svg
+     file:./jupyter/analysis2_714af_fast_molecules:_slow_cluster_prediction.svg
+     file:./jupyter/analysis2_714af_fast_molecules:_medium_cluster_prediction.svg
+     file:./jupyter/analysis2_714af_fast_molecules:_fast_cluster_prediction.svg
        #+end_details
      - prediction-based segmentation (threshold=0.5)
        #+begin_details
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_slow_molecules_and_slow_clusters:_prediction-based_segmentation.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_slow_molecules_and_medium_clusters:_prediction-based_segmentation.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_slow_molecules_and_fast_clusters:_prediction-based_segmentation.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_medium_molecules_and_slow_clusters:_prediction-based_segmentation.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_medium_molecules_and_medium_clusters:_prediction-based_segmentation.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_medium_molecules_and_fast_clusters:_prediction-based_segmentation.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_fast_molecules_and_slow_clusters:_prediction-based_segmentation.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_fast_molecules_and_medium_clusters:_prediction-based_segmentation.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_fast_molecules_and_fast_clusters:_prediction-based_segmentation.svg
+     file:./jupyter/analysis2_714af_slow_molecules_and_slow_clusters:_prediction-based_segmentation.svg
+     file:./jupyter/analysis2_714af_slow_molecules_and_medium_clusters:_prediction-based_segmentation.svg
+     file:./jupyter/analysis2_714af_slow_molecules_and_fast_clusters:_prediction-based_segmentation.svg
+     file:./jupyter/analysis2_714af_medium_molecules_and_slow_clusters:_prediction-based_segmentation.svg
+     file:./jupyter/analysis2_714af_medium_molecules_and_medium_clusters:_prediction-based_segmentation.svg
+     file:./jupyter/analysis2_714af_medium_molecules_and_fast_clusters:_prediction-based_segmentation.svg
+     file:./jupyter/analysis2_714af_fast_molecules_and_slow_clusters:_prediction-based_segmentation.svg
+     file:./jupyter/analysis2_714af_fast_molecules_and_medium_clusters:_prediction-based_segmentation.svg
+     file:./jupyter/analysis2_714af_fast_molecules_and_fast_clusters:_prediction-based_segmentation.svg
        #+end_details
      - prediction-based cut-and-stitch correction
        #+begin_details
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_slow_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_slow_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_slow_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_medium_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_medium_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_medium_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_fast_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_fast_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_714af_fast_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./jupyter/analysis2_714af_slow_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./jupyter/analysis2_714af_slow_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./jupyter/analysis2_714af_slow_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./jupyter/analysis2_714af_medium_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./jupyter/analysis2_714af_medium_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./jupyter/analysis2_714af_medium_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./jupyter/analysis2_714af_fast_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./jupyter/analysis2_714af_fast_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./jupyter/analysis2_714af_fast_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
        #+end_details
    - fourth model: =34a6d207ac594035b1009c330fb67a65=
      #+BEGIN_SRC jupyter-python
@@ -5257,40 +5258,40 @@
      :   fig = plt.figure()
      - model predictions
        #+begin_details
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_slow_molecules:_slow_cluster_prediction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_slow_molecules:_medium_cluster_prediction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_slow_molecules:_fast_cluster_prediction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_medium_molecules:_slow_cluster_prediction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_medium_molecules:_medium_cluster_prediction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_medium_molecules:_fast_cluster_prediction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_fast_molecules:_slow_cluster_prediction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_fast_molecules:_medium_cluster_prediction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_fast_molecules:_fast_cluster_prediction.svg
+     file:./jupyter/analysis2_34a6d_slow_molecules:_slow_cluster_prediction.svg
+     file:./jupyter/analysis2_34a6d_slow_molecules:_medium_cluster_prediction.svg
+     file:./jupyter/analysis2_34a6d_slow_molecules:_fast_cluster_prediction.svg
+     file:./jupyter/analysis2_34a6d_medium_molecules:_slow_cluster_prediction.svg
+     file:./jupyter/analysis2_34a6d_medium_molecules:_medium_cluster_prediction.svg
+     file:./jupyter/analysis2_34a6d_medium_molecules:_fast_cluster_prediction.svg
+     file:./jupyter/analysis2_34a6d_fast_molecules:_slow_cluster_prediction.svg
+     file:./jupyter/analysis2_34a6d_fast_molecules:_medium_cluster_prediction.svg
+     file:./jupyter/analysis2_34a6d_fast_molecules:_fast_cluster_prediction.svg
        #+end_details
      - prediction-based segmentation (threshold=0.5)
 
        #+begin_details
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_slow_molecules_and_slow_clusters:_prediction-based_segmentation.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_slow_molecules_and_medium_clusters:_prediction-based_segmentation.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_slow_molecules_and_fast_clusters:_prediction-based_segmentation.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_medium_molecules_and_slow_clusters:_prediction-based_segmentation.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_medium_molecules_and_medium_clusters:_prediction-based_segmentation.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_medium_molecules_and_fast_clusters:_prediction-based_segmentation.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_fast_molecules_and_slow_clusters:_prediction-based_segmentation.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_fast_molecules_and_medium_clusters:_prediction-based_segmentation.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_fast_molecules_and_fast_clusters:_prediction-based_segmentation.svg
+     file:./jupyter/analysis2_34a6d_slow_molecules_and_slow_clusters:_prediction-based_segmentation.svg
+     file:./jupyter/analysis2_34a6d_slow_molecules_and_medium_clusters:_prediction-based_segmentation.svg
+     file:./jupyter/analysis2_34a6d_slow_molecules_and_fast_clusters:_prediction-based_segmentation.svg
+     file:./jupyter/analysis2_34a6d_medium_molecules_and_slow_clusters:_prediction-based_segmentation.svg
+     file:./jupyter/analysis2_34a6d_medium_molecules_and_medium_clusters:_prediction-based_segmentation.svg
+     file:./jupyter/analysis2_34a6d_medium_molecules_and_fast_clusters:_prediction-based_segmentation.svg
+     file:./jupyter/analysis2_34a6d_fast_molecules_and_slow_clusters:_prediction-based_segmentation.svg
+     file:./jupyter/analysis2_34a6d_fast_molecules_and_medium_clusters:_prediction-based_segmentation.svg
+     file:./jupyter/analysis2_34a6d_fast_molecules_and_fast_clusters:_prediction-based_segmentation.svg
        #+end_details
      - prediction-based cut-and-stitch correction
        #+begin_details
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_slow_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_slow_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_slow_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_medium_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_medium_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_medium_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_fast_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_fast_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_34a6d_fast_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./jupyter/analysis2_34a6d_slow_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./jupyter/analysis2_34a6d_slow_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./jupyter/analysis2_34a6d_slow_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./jupyter/analysis2_34a6d_medium_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./jupyter/analysis2_34a6d_medium_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./jupyter/analysis2_34a6d_medium_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./jupyter/analysis2_34a6d_fast_molecules_and_slow_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./jupyter/analysis2_34a6d_fast_molecules_and_medium_clusters:_prediction-based_cut_and_shift_correction.svg
+     file:./jupyter/analysis2_34a6d_fast_molecules_and_fast_clusters:_prediction-based_cut_and_shift_correction.svg
        #+end_details
    - fifth model: =0cd2023eeaf745aca0d3e8ad5e1fc653=. I re-wrote the plotting
      script a bit.
@@ -5317,39 +5318,39 @@
      #+end_example
      - model predictions
        #+begin_details
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_prediction__simulated_trace_tau_sim-3.76ms_0.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_prediction__simulated_trace_tau_sim-3.76ms_1.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_prediction__simulated_trace_tau_sim-3.76ms_2.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_prediction__simulated_trace_tau_sim-56.36ms_3.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_prediction__simulated_trace_tau_sim-56.36ms_4.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_prediction__simulated_trace_tau_sim-56.36ms_5.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_prediction__simulated_trace_tau_sim-163.35ms_6.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_prediction__simulated_trace_tau_sim-163.35ms_7.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_prediction__simulated_trace_tau_sim-163.35ms_8.svg
+     file:./jupyter/analysis2_0cd20_prediction__simulated_trace_tau_sim-3.76ms_0.svg
+     file:./jupyter/analysis2_0cd20_prediction__simulated_trace_tau_sim-3.76ms_1.svg
+     file:./jupyter/analysis2_0cd20_prediction__simulated_trace_tau_sim-3.76ms_2.svg
+     file:./jupyter/analysis2_0cd20_prediction__simulated_trace_tau_sim-56.36ms_3.svg
+     file:./jupyter/analysis2_0cd20_prediction__simulated_trace_tau_sim-56.36ms_4.svg
+     file:./jupyter/analysis2_0cd20_prediction__simulated_trace_tau_sim-56.36ms_5.svg
+     file:./jupyter/analysis2_0cd20_prediction__simulated_trace_tau_sim-163.35ms_6.svg
+     file:./jupyter/analysis2_0cd20_prediction__simulated_trace_tau_sim-163.35ms_7.svg
+     file:./jupyter/analysis2_0cd20_prediction__simulated_trace_tau_sim-163.35ms_8.svg
        #+end_details
      - prediction-based segmentation (threshold=0.5)
        #+begin_details
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_predseg__simulated_trace_tau_sim-3.76ms_0.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_predseg__simulated_trace_tau_sim-3.76ms_1.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_predseg__simulated_trace_tau_sim-3.76ms_2.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_predseg__simulated_trace_tau_sim-56.36ms_3.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_predseg__simulated_trace_tau_sim-56.36ms_4.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_predseg__simulated_trace_tau_sim-56.36ms_5.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_predseg__simulated_trace_tau_sim-163.35ms_6.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_predseg__simulated_trace_tau_sim-163.35ms_7.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_predseg__simulated_trace_tau_sim-163.35ms_8.svg
+     file:./jupyter/analysis2_0cd20_predseg__simulated_trace_tau_sim-3.76ms_0.svg
+     file:./jupyter/analysis2_0cd20_predseg__simulated_trace_tau_sim-3.76ms_1.svg
+     file:./jupyter/analysis2_0cd20_predseg__simulated_trace_tau_sim-3.76ms_2.svg
+     file:./jupyter/analysis2_0cd20_predseg__simulated_trace_tau_sim-56.36ms_3.svg
+     file:./jupyter/analysis2_0cd20_predseg__simulated_trace_tau_sim-56.36ms_4.svg
+     file:./jupyter/analysis2_0cd20_predseg__simulated_trace_tau_sim-56.36ms_5.svg
+     file:./jupyter/analysis2_0cd20_predseg__simulated_trace_tau_sim-163.35ms_6.svg
+     file:./jupyter/analysis2_0cd20_predseg__simulated_trace_tau_sim-163.35ms_7.svg
+     file:./jupyter/analysis2_0cd20_predseg__simulated_trace_tau_sim-163.35ms_8.svg
        #+end_details
      - prediction-based cut-and-stitch correction
        #+begin_details
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_predcas__simulated_trace_tau_sim-3.76ms_0.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_predcas__simulated_trace_tau_sim-3.76ms_1.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_predcas__simulated_trace_tau_sim-3.76ms_2.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_predcas__simulated_trace_tau_sim-56.36ms_3.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_predcas__simulated_trace_tau_sim-56.36ms_4.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_predcas__simulated_trace_tau_sim-56.36ms_5.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_predcas__simulated_trace_tau_sim-163.35ms_6.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_predcas__simulated_trace_tau_sim-163.35ms_7.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_0cd20_predcas__simulated_trace_tau_sim-163.35ms_8.svg
+     file:./jupyter/analysis2_0cd20_predcas__simulated_trace_tau_sim-3.76ms_0.svg
+     file:./jupyter/analysis2_0cd20_predcas__simulated_trace_tau_sim-3.76ms_1.svg
+     file:./jupyter/analysis2_0cd20_predcas__simulated_trace_tau_sim-3.76ms_2.svg
+     file:./jupyter/analysis2_0cd20_predcas__simulated_trace_tau_sim-56.36ms_3.svg
+     file:./jupyter/analysis2_0cd20_predcas__simulated_trace_tau_sim-56.36ms_4.svg
+     file:./jupyter/analysis2_0cd20_predcas__simulated_trace_tau_sim-56.36ms_5.svg
+     file:./jupyter/analysis2_0cd20_predcas__simulated_trace_tau_sim-163.35ms_6.svg
+     file:./jupyter/analysis2_0cd20_predcas__simulated_trace_tau_sim-163.35ms_7.svg
+     file:./jupyter/analysis2_0cd20_predcas__simulated_trace_tau_sim-163.35ms_8.svg
        #+end_details
    - fifth model: =fe81d71c52404ed790b3a32051258da9=
      #+BEGIN_SRC jupyter-python
@@ -5375,39 +5376,39 @@
      #+end_example
      - model predictions
        #+begin_details
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_prediction__simulated_trace_tau_sim-3.76ms_0.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_prediction__simulated_trace_tau_sim-3.76ms_1.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_prediction__simulated_trace_tau_sim-3.76ms_2.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_prediction__simulated_trace_tau_sim-56.36ms_3.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_prediction__simulated_trace_tau_sim-56.36ms_4.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_prediction__simulated_trace_tau_sim-56.36ms_5.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_prediction__simulated_trace_tau_sim-163.35ms_6.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_prediction__simulated_trace_tau_sim-163.35ms_7.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_prediction__simulated_trace_tau_sim-163.35ms_8.svg
+     file:./jupyter/analysis2_fe81d_prediction__simulated_trace_tau_sim-3.76ms_0.svg
+     file:./jupyter/analysis2_fe81d_prediction__simulated_trace_tau_sim-3.76ms_1.svg
+     file:./jupyter/analysis2_fe81d_prediction__simulated_trace_tau_sim-3.76ms_2.svg
+     file:./jupyter/analysis2_fe81d_prediction__simulated_trace_tau_sim-56.36ms_3.svg
+     file:./jupyter/analysis2_fe81d_prediction__simulated_trace_tau_sim-56.36ms_4.svg
+     file:./jupyter/analysis2_fe81d_prediction__simulated_trace_tau_sim-56.36ms_5.svg
+     file:./jupyter/analysis2_fe81d_prediction__simulated_trace_tau_sim-163.35ms_6.svg
+     file:./jupyter/analysis2_fe81d_prediction__simulated_trace_tau_sim-163.35ms_7.svg
+     file:./jupyter/analysis2_fe81d_prediction__simulated_trace_tau_sim-163.35ms_8.svg
        #+end_details
      - prediction-based segmentation (threshold=0.5)
        #+begin_details
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_predseg__simulated_trace_tau_sim-3.76ms_0.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_predseg__simulated_trace_tau_sim-3.76ms_1.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_predseg__simulated_trace_tau_sim-3.76ms_2.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_predseg__simulated_trace_tau_sim-56.36ms_3.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_predseg__simulated_trace_tau_sim-56.36ms_4.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_predseg__simulated_trace_tau_sim-56.36ms_5.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_predseg__simulated_trace_tau_sim-163.35ms_6.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_predseg__simulated_trace_tau_sim-163.35ms_7.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_predseg__simulated_trace_tau_sim-163.35ms_8.svg
+     file:./jupyter/analysis2_fe81d_predseg__simulated_trace_tau_sim-3.76ms_0.svg
+     file:./jupyter/analysis2_fe81d_predseg__simulated_trace_tau_sim-3.76ms_1.svg
+     file:./jupyter/analysis2_fe81d_predseg__simulated_trace_tau_sim-3.76ms_2.svg
+     file:./jupyter/analysis2_fe81d_predseg__simulated_trace_tau_sim-56.36ms_3.svg
+     file:./jupyter/analysis2_fe81d_predseg__simulated_trace_tau_sim-56.36ms_4.svg
+     file:./jupyter/analysis2_fe81d_predseg__simulated_trace_tau_sim-56.36ms_5.svg
+     file:./jupyter/analysis2_fe81d_predseg__simulated_trace_tau_sim-163.35ms_6.svg
+     file:./jupyter/analysis2_fe81d_predseg__simulated_trace_tau_sim-163.35ms_7.svg
+     file:./jupyter/analysis2_fe81d_predseg__simulated_trace_tau_sim-163.35ms_8.svg
        #+end_details
      - prediction-based cut-and-stitch correction
        #+begin_details
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_predcas__simulated_trace_tau_sim-3.76ms_0.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_predcas__simulated_trace_tau_sim-3.76ms_1.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_predcas__simulated_trace_tau_sim-3.76ms_2.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_predcas__simulated_trace_tau_sim-56.36ms_3.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_predcas__simulated_trace_tau_sim-56.36ms_4.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_predcas__simulated_trace_tau_sim-56.36ms_5.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_predcas__simulated_trace_tau_sim-163.35ms_6.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_predcas__simulated_trace_tau_sim-163.35ms_7.svg
-     file:./data/exp-220227-unet/jupyter/analysis2_fe81d_predcas__simulated_trace_tau_sim-163.35ms_8.svg
+     file:./jupyter/analysis2_fe81d_predcas__simulated_trace_tau_sim-3.76ms_0.svg
+     file:./jupyter/analysis2_fe81d_predcas__simulated_trace_tau_sim-3.76ms_1.svg
+     file:./jupyter/analysis2_fe81d_predcas__simulated_trace_tau_sim-3.76ms_2.svg
+     file:./jupyter/analysis2_fe81d_predcas__simulated_trace_tau_sim-56.36ms_3.svg
+     file:./jupyter/analysis2_fe81d_predcas__simulated_trace_tau_sim-56.36ms_4.svg
+     file:./jupyter/analysis2_fe81d_predcas__simulated_trace_tau_sim-56.36ms_5.svg
+     file:./jupyter/analysis2_fe81d_predcas__simulated_trace_tau_sim-163.35ms_6.svg
+     file:./jupyter/analysis2_fe81d_predcas__simulated_trace_tau_sim-163.35ms_7.svg
+     file:./jupyter/analysis2_fe81d_predcas__simulated_trace_tau_sim-163.35ms_8.svg
        #+end_details
 
    - I did not do these plots for models =19e3e= or =c1204=, because the did not
@@ -5829,12 +5830,12 @@
     there. The rendered PDF looks like this for the beamer slide:
 
     #+begin_export html
-    <embed src="./data/exp-220227-unet/other/sim_models_beamer_table.pdf" width="100%" height="500px" />
+    <embed src="./other/sim_models_beamer_table.pdf" width="100%" height="500px" />
     #+end_export
 
   - and here the rendered PDF of a long table
     #+begin_export html
-    <embed src="./data/exp-220227-unet/other/sim_models_longtable.pdf" width="100%" height="500px" />
+    <embed src="./other/sim_models_longtable.pdf" width="100%" height="500px" />
     #+end_export
 
 *** Experiment 3: Run models on experimental data
@@ -7906,13 +7907,13 @@
      #+begin_details
      - Averaged curves of =AF488= (no artifacts) with proceesings (no
        correction + all models, each curves is averaged from 424 correlations)
-       [[./data/exp-220227-unet/2022-05-22_experimental-af488/clean-all-results/clean_all_1comp.png]]
-       [[./data/exp-220227-unet/2022-05-22_experimental-af488/clean-all-results/clean_all_2comp.png]]
+       [[./2022-05-22_experimental-af488/clean-all-results/clean_all_1comp.png]]
+       [[./2022-05-22_experimental-af488/clean-all-results/clean_all_2comp.png]]
      - Averaged curves of =AF488 + DiO-LUVs= (peak artifacts) with proceesings
        (no correction + all models, each curves is averaged from 440
        correlations)
-       [[./data/exp-220227-unet/2022-05-22_experimental-af488/dirty-all-results/dirty_all_1comp.png]]
-       [[./data/exp-220227-unet/2022-05-22_experimental-af488/dirty-all-results/dirty_all_2comp.png]]
+       [[./2022-05-22_experimental-af488/dirty-all-results/dirty_all_1comp.png]]
+       [[./2022-05-22_experimental-af488/dirty-all-results/dirty_all_2comp.png]]
      #+end_details
 
    - Now we continue  with =AF488= - this is data without peak artifacts,
@@ -7922,35 +7923,35 @@
      - =no correction=, 1 species and 2 species fits. The 1 species fit of =no
        correction= is the gold standard all correction methods are compared
        against.
-       [[./data/exp-220227-unet/2022-05-22_experimental-af488/clean-all-results/clean_no-correction_1comp.png]]
-       [[./data/exp-220227-unet/2022-05-22_experimental-af488/clean-all-results/clean_no-correction_2comp.png]]
+       [[./2022-05-22_experimental-af488/clean-all-results/clean_no-correction_1comp.png]]
+       [[./2022-05-22_experimental-af488/clean-all-results/clean_no-correction_2comp.png]]
      - =0cd20=, 1 species and 2 species fits.
-       [[./data/exp-220227-unet/2022-05-22_experimental-af488/clean-all-results/clean_0cd20_1comp.png]]
-       [[./data/exp-220227-unet/2022-05-22_experimental-af488/clean-all-results/clean_0cd20_2comp.png]]
+       [[./2022-05-22_experimental-af488/clean-all-results/clean_0cd20_1comp.png]]
+       [[./2022-05-22_experimental-af488/clean-all-results/clean_0cd20_2comp.png]]
      - =19e3e=, 1 species and 2 species fits.
-       [[./data/exp-220227-unet/2022-05-22_experimental-af488/clean-all-results/clean_19e3e_1comp.png]]
-       [[./data/exp-220227-unet/2022-05-22_experimental-af488/clean-all-results/clean_19e3e_2comp.png]]
+       [[./2022-05-22_experimental-af488/clean-all-results/clean_19e3e_1comp.png]]
+       [[./2022-05-22_experimental-af488/clean-all-results/clean_19e3e_2comp.png]]
      - =34a6d=, 1 species and 2 species fits.
-       [[./data/exp-220227-unet/2022-05-22_experimental-af488/clean-all-results/clean_34a6d_1comp.png]]
-       [[./data/exp-220227-unet/2022-05-22_experimental-af488/clean-all-results/clean_34a6d_2comp.png]]
+       [[./2022-05-22_experimental-af488/clean-all-results/clean_34a6d_1comp.png]]
+       [[./2022-05-22_experimental-af488/clean-all-results/clean_34a6d_2comp.png]]
      - =484af=, 1 species and 2 species fits.
-       [[./data/exp-220227-unet/2022-05-22_experimental-af488/clean-all-results/clean_484af_1comp.png]]
-       [[./data/exp-220227-unet/2022-05-22_experimental-af488/clean-all-results/clean_484af_2comp.png]]
+       [[./2022-05-22_experimental-af488/clean-all-results/clean_484af_1comp.png]]
+       [[./2022-05-22_experimental-af488/clean-all-results/clean_484af_2comp.png]]
      - =714af=, 1 species and 2 species fits.
-       [[./data/exp-220227-unet/2022-05-22_experimental-af488/clean-all-results/clean_714af_1comp.png]]
-       [[./data/exp-220227-unet/2022-05-22_experimental-af488/clean-all-results/clean_714af_2comp.png]]
+       [[./2022-05-22_experimental-af488/clean-all-results/clean_714af_1comp.png]]
+       [[./2022-05-22_experimental-af488/clean-all-results/clean_714af_2comp.png]]
      - =34766=, 1 species and 2 species fits.
-       [[./data/exp-220227-unet/2022-05-22_experimental-af488/clean-all-results/clean_34766_1comp.png]]
-       [[./data/exp-220227-unet/2022-05-22_experimental-af488/clean-all-results/clean_34766_2comp.png]]
+       [[./2022-05-22_experimental-af488/clean-all-results/clean_34766_1comp.png]]
+       [[./2022-05-22_experimental-af488/clean-all-results/clean_34766_2comp.png]]
      - =c1204=, 1 species and 2 species fits.
-       [[./data/exp-220227-unet/2022-05-22_experimental-af488/clean-all-results/clean_c1204_1comp.png]]
-       [[./data/exp-220227-unet/2022-05-22_experimental-af488/clean-all-results/clean_c1204_2comp.png]]
+       [[./2022-05-22_experimental-af488/clean-all-results/clean_c1204_1comp.png]]
+       [[./2022-05-22_experimental-af488/clean-all-results/clean_c1204_2comp.png]]
      - =fe81d=, 1 species and 2 species fits.
-       [[./data/exp-220227-unet/2022-05-22_experimental-af488/clean-all-results/clean_fe81d_1comp.png]]
-       [[./data/exp-220227-unet/2022-05-22_experimental-af488/clean-all-results/clean_fe81d_2comp.png]]
+       [[./2022-05-22_experimental-af488/clean-all-results/clean_fe81d_1comp.png]]
+       [[./2022-05-22_experimental-af488/clean-all-results/clean_fe81d_2comp.png]]
      - =ff67b=, 1 species and 2 species fits.
-       [[./data/exp-220227-unet/2022-05-22_experimental-af488/clean-all-results/clean_ff67b_1comp.png]]
-       [[./data/exp-220227-unet/2022-05-22_experimental-af488/clean-all-results/clean_ff67b_2comp.png]]
+       [[./2022-05-22_experimental-af488/clean-all-results/clean_ff67b_1comp.png]]
+       [[./2022-05-22_experimental-af488/clean-all-results/clean_ff67b_2comp.png]]
 
      #+end_details
    - now illlustrative correlations and fits from =AF488 + DiO-LUVs= (data with
@@ -7958,35 +7959,35 @@
 
      #+begin_details
      - =no correction=, 1 species and 2 species fits.
-       [[./data/exp-220227-unet/2022-05-22_experimental-af488/dirty-all-results/dirty_no-correction_1comp.png]]
-       [[./data/exp-220227-unet/2022-05-22_experimental-af488/dirty-all-results/dirty_no-correction_2comp.png]]
+       [[./2022-05-22_experimental-af488/dirty-all-results/dirty_no-correction_1comp.png]]
+       [[./2022-05-22_experimental-af488/dirty-all-results/dirty_no-correction_2comp.png]]
      - =0cd20=, 1 species and 2 species fits.
-       [[./data/exp-220227-unet/2022-05-22_experimental-af488/dirty-all-results/dirty_0cd20_1comp.png]]
-       [[./data/exp-220227-unet/2022-05-22_experimental-af488/dirty-all-results/dirty_0cd20_2comp.png]]
+       [[./2022-05-22_experimental-af488/dirty-all-results/dirty_0cd20_1comp.png]]
+       [[./2022-05-22_experimental-af488/dirty-all-results/dirty_0cd20_2comp.png]]
      - =19e3e=, 1 species and 2 species fits.
-       [[./data/exp-220227-unet/2022-05-22_experimental-af488/dirty-all-results/dirty_19e3e_1comp.png]]
-       [[./data/exp-220227-unet/2022-05-22_experimental-af488/dirty-all-results/dirty_19e3e_2comp.png]]
+       [[./2022-05-22_experimental-af488/dirty-all-results/dirty_19e3e_1comp.png]]
+       [[./2022-05-22_experimental-af488/dirty-all-results/dirty_19e3e_2comp.png]]
      - =34a6d=, 1 species and 2 species fits.
-       [[./data/exp-220227-unet/2022-05-22_experimental-af488/dirty-all-results/dirty_34a6d_1comp.png]]
-       [[./data/exp-220227-unet/2022-05-22_experimental-af488/dirty-all-results/dirty_34a6d_2comp.png]]
+       [[./2022-05-22_experimental-af488/dirty-all-results/dirty_34a6d_1comp.png]]
+       [[./2022-05-22_experimental-af488/dirty-all-results/dirty_34a6d_2comp.png]]
      - =484af=, 1 species and 2 species fits.
-       [[./data/exp-220227-unet/2022-05-22_experimental-af488/dirty-all-results/dirty_484af_1comp.png]]
-       [[./data/exp-220227-unet/2022-05-22_experimental-af488/dirty-all-results/dirty_484af_2comp.png]]
+       [[./2022-05-22_experimental-af488/dirty-all-results/dirty_484af_1comp.png]]
+       [[./2022-05-22_experimental-af488/dirty-all-results/dirty_484af_2comp.png]]
      - =714af=, 1 species and 2 species fits.
-       [[./data/exp-220227-unet/2022-05-22_experimental-af488/dirty-all-results/dirty_714af_1comp.png]]
-       [[./data/exp-220227-unet/2022-05-22_experimental-af488/dirty-all-results/dirty_714af_2comp.png]]
+       [[./2022-05-22_experimental-af488/dirty-all-results/dirty_714af_1comp.png]]
+       [[./2022-05-22_experimental-af488/dirty-all-results/dirty_714af_2comp.png]]
      - =34766=, 1 species and 2 species fits.
-       [[./data/exp-220227-unet/2022-05-22_experimental-af488/dirty-all-results/dirty_34766_1comp.png]]
-       [[./data/exp-220227-unet/2022-05-22_experimental-af488/dirty-all-results/dirty_34766_2comp.png]]
+       [[./2022-05-22_experimental-af488/dirty-all-results/dirty_34766_1comp.png]]
+       [[./2022-05-22_experimental-af488/dirty-all-results/dirty_34766_2comp.png]]
      - =c1204=, 1 species and 2 species fits.
-       [[./data/exp-220227-unet/2022-05-22_experimental-af488/dirty-all-results/dirty_c1204_1comp.png]]
-       [[./data/exp-220227-unet/2022-05-22_experimental-af488/dirty-all-results/dirty_c1204_2comp.png]]
+       [[./2022-05-22_experimental-af488/dirty-all-results/dirty_c1204_1comp.png]]
+       [[./2022-05-22_experimental-af488/dirty-all-results/dirty_c1204_2comp.png]]
      - =fe81d=, 1 species and 2 species fits.
-       [[./data/exp-220227-unet/2022-05-22_experimental-af488/dirty-all-results/dirty_fe81d_1comp.png]]
-       [[./data/exp-220227-unet/2022-05-22_experimental-af488/dirty-all-results/dirty_fe81d_2comp.png]]
+       [[./2022-05-22_experimental-af488/dirty-all-results/dirty_fe81d_1comp.png]]
+       [[./2022-05-22_experimental-af488/dirty-all-results/dirty_fe81d_2comp.png]]
      - =ff67b=, 1 species and 2 species fits.
-       [[./data/exp-220227-unet/2022-05-22_experimental-af488/dirty-all-results/dirty_ff67b_1comp.png]]
-       [[./data/exp-220227-unet/2022-05-22_experimental-af488/dirty-all-results/dirty_ff67b_2comp.png]]
+       [[./2022-05-22_experimental-af488/dirty-all-results/dirty_ff67b_1comp.png]]
+       [[./2022-05-22_experimental-af488/dirty-all-results/dirty_ff67b_2comp.png]]
 
      #+end_details
 
@@ -8375,7 +8376,7 @@
 
    - the final rendering looks like this:
      #+begin_export html
-     <embed src="./data/exp-220227-unet/other/analysis3_af488_cas_avg_table.pdf" width="100%" height="500px" />
+     <embed src="./other/analysis3_af488_cas_avg_table.pdf" width="100%" height="500px" />
      #+end_export
 
    - now, we work with =all_param=. Here, all single correlation curves are
@@ -8597,8 +8598,8 @@
    - this is the two plots as PDFs, first the comparison of transit times,
      second the comparison of particle numbers
      #+begin_export html
-     <embed src="./data/exp-220227-unet/jupyter/analysis3_af488_compare-transit-times.pdf" width="100%" height="500px" />
-     <embed src="./data/exp-220227-unet/jupyter/analysis3_af488_compare-particle-numbers.pdf" width="100%" height="500px" />
+     <embed src="./jupyter/analysis3_af488_compare-transit-times.pdf" width="100%" height="500px" />
+     <embed src="./jupyter/analysis3_af488_compare-particle-numbers.pdf" width="100%" height="500px" />
      #+end_export
 **** compare model performance on =pex5= data
     :PROPERTIES:
@@ -8615,12 +8616,12 @@
      #+begin_details
      - Averaged curves of =Hs-PEX5-eGFP= (no artifacts) with proceesings (no
        correction + all models, each curves is averaged from 250 correlations)
-       [[./data/exp-220227-unet/2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_avg_cas_1comp.png]]
-       [[./data/exp-220227-unet/2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_avg_cas_2comp.png]]
+       [[./2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_avg_cas_1comp.png]]
+       [[./2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_avg_cas_2comp.png]]
      - Averaged curves of =Tb-PEX5-eGFP= (peak artifacts) with proceesings (no
        correction + all models, each curves is averaged from 250 correlations)
-       [[./data/exp-220227-unet/2022-06-02_experimental-pex5/dirty-all-results/Tb-PEX5-eGFP_avg_cas_1comp.png]]
-       [[./data/exp-220227-unet/2022-06-02_experimental-pex5/dirty-all-results/Tb-PEX5-eGFP_avg_cas_2comp.png]]
+       [[./2022-06-02_experimental-pex5/dirty-all-results/Tb-PEX5-eGFP_avg_cas_1comp.png]]
+       [[./2022-06-02_experimental-pex5/dirty-all-results/Tb-PEX5-eGFP_avg_cas_2comp.png]]
      #+end_details
 
    - Now we continue  with =Hs-PEX5-eGFP= - this is data without peak artifacts,
@@ -8630,57 +8631,57 @@
      - =no correction=, 1 species and 2 species fits. The 1 species fit of =no
        correction= is the gold standard all correction methods are compared
        against.
-       [[./data/exp-220227-unet/2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_no-correction_1comp.png]]
-       [[./data/exp-220227-unet/2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_no-correction_2comp.png]]
+       [[./2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_no-correction_1comp.png]]
+       [[./2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_no-correction_2comp.png]]
        - As can be noticed, the amplitudes vary widely. There probably was an
          instability in the measurement. Here the curves 1-25
-         [[./data/exp-220227-unet/2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_no-correction-curves1-25_1comp.png]]
+         [[./2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_no-correction-curves1-25_1comp.png]]
        - curves 26-50
-         [[./data/exp-220227-unet/2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_no-correction-curves26-50_1comp.png]]
+         [[./2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_no-correction-curves26-50_1comp.png]]
        - curves 51-75
-         [[./data/exp-220227-unet/2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_no-correction-curves51-75_1comp.png]]
+         [[./2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_no-correction-curves51-75_1comp.png]]
        - curves 76-100
-         [[./data/exp-220227-unet/2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_no-correction-curves76-100_1comp.png]]
+         [[./2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_no-correction-curves76-100_1comp.png]]
        - curves 101-125
-         [[./data/exp-220227-unet/2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_no-correction-curves101-125_1comp.png]]
+         [[./2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_no-correction-curves101-125_1comp.png]]
        - curves 126-150
-         [[./data/exp-220227-unet/2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_no-correction-curves126-150_1comp.png]]
+         [[./2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_no-correction-curves126-150_1comp.png]]
        - curves 151-175
-         [[./data/exp-220227-unet/2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_no-correction-curves151-175_1comp.png]]
+         [[./2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_no-correction-curves151-175_1comp.png]]
        - curves 176-200
-         [[./data/exp-220227-unet/2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_no-correction-curves176-200_1comp.png]]
+         [[./2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_no-correction-curves176-200_1comp.png]]
        - curves 201-225
-         [[./data/exp-220227-unet/2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_no-correction-curves201-225_1comp.png]]
+         [[./2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_no-correction-curves201-225_1comp.png]]
        - curves 226-250
-         [[./data/exp-220227-unet/2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_no-correction-curves226-250_1comp.png]]
+         [[./2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_no-correction-curves226-250_1comp.png]]
 
      - =0cd20=, 1 species and 2 species fits.
-       [[./data/exp-220227-unet/2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_0cd20_1comp.png]]
-       [[./data/exp-220227-unet/2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_0cd20_2comp.png]]
+       [[./2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_0cd20_1comp.png]]
+       [[./2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_0cd20_2comp.png]]
      - =19e3e=, 1 species and 2 species fits.
-       [[./data/exp-220227-unet/2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_19e3e_1comp.png]]
-       [[./data/exp-220227-unet/2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_19e3e_2comp.png]]
+       [[./2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_19e3e_1comp.png]]
+       [[./2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_19e3e_2comp.png]]
      - =34a6d=, 1 species and 2 species fits.
-       [[./data/exp-220227-unet/2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_34a6d_1comp.png]]
-       [[./data/exp-220227-unet/2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_34a6d_2comp.png]]
+       [[./2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_34a6d_1comp.png]]
+       [[./2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_34a6d_2comp.png]]
      - =484af=, 1 species and 2 species fits.
-       [[./data/exp-220227-unet/2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_484af_1comp.png]]
-       [[./data/exp-220227-unet/2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_484af_2comp.png]]
+       [[./2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_484af_1comp.png]]
+       [[./2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_484af_2comp.png]]
      - =714af=, 1 species and 2 species fits.
-       [[./data/exp-220227-unet/2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_714af_1comp.png]]
-       [[./data/exp-220227-unet/2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_714af_2comp.png]]
+       [[./2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_714af_1comp.png]]
+       [[./2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_714af_2comp.png]]
      - =34766=, 1 species and 2 species fits.
-       [[./data/exp-220227-unet/2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_34766_1comp.png]]
-       [[./data/exp-220227-unet/2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_34766_2comp.png]]
+       [[./2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_34766_1comp.png]]
+       [[./2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_34766_2comp.png]]
      - =c1204=, 1 species and 2 species fits.
-       [[./data/exp-220227-unet/2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_c1204_1comp.png]]
-       [[./data/exp-220227-unet/2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_c1204_2comp.png]]
+       [[./2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_c1204_1comp.png]]
+       [[./2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_c1204_2comp.png]]
      - =fe81d=, 1 species and 2 species fits.
-       [[./data/exp-220227-unet/2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_fe81d_1comp.png]]
-       [[./data/exp-220227-unet/2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_fe81d_2comp.png]]
+       [[./2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_fe81d_1comp.png]]
+       [[./2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_fe81d_2comp.png]]
      - =ff67b=, 1 species and 2 species fits.
-       [[./data/exp-220227-unet/2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_ff67b_1comp.png]]
-       [[./data/exp-220227-unet/2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_ff67b_2comp.png]]
+       [[./2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_ff67b_1comp.png]]
+       [[./2022-06-02_experimental-pex5/clean-all-results/Hs-PEX5-eGFP_ff67b_2comp.png]]
 
      #+end_details
    - now illlustrative correlations and fits from =AF488 + DiO-LUVs= (data with
@@ -8688,35 +8689,35 @@
 
      #+begin_details
      - =no correction=, 1 species and 2 species fits.
-       [[./data/exp-220227-unet/2022-06-02_experimental-pex5/dirty-all-results/Tb-PEX5-eGFP_no-correction_1comp.png]]
-       [[./data/exp-220227-unet/2022-06-02_experimental-pex5/dirty-all-results/Tb-PEX5-eGFP_no-correction_2comp.png]]
+       [[./2022-06-02_experimental-pex5/dirty-all-results/Tb-PEX5-eGFP_no-correction_1comp.png]]
+       [[./2022-06-02_experimental-pex5/dirty-all-results/Tb-PEX5-eGFP_no-correction_2comp.png]]
      - =0cd20=, 1 species and 2 species fits.
-       [[./data/exp-220227-unet/2022-06-02_experimental-pex5/dirty-all-results/Tb-PEX5-eGFP_0cd20_1comp.png]]
-       [[./data/exp-220227-unet/2022-06-02_experimental-pex5/dirty-all-results/Tb-PEX5-eGFP_0cd20_2comp.png]]
+       [[./2022-06-02_experimental-pex5/dirty-all-results/Tb-PEX5-eGFP_0cd20_1comp.png]]
+       [[./2022-06-02_experimental-pex5/dirty-all-results/Tb-PEX5-eGFP_0cd20_2comp.png]]
      - =19e3e=, 1 species and 2 species fits.
-       [[./data/exp-220227-unet/2022-06-02_experimental-pex5/dirty-all-results/Tb-PEX5-eGFP_19e3e_1comp.png]]
-       [[./data/exp-220227-unet/2022-06-02_experimental-pex5/dirty-all-results/Tb-PEX5-eGFP_19e3e_2comp.png]]
+       [[./2022-06-02_experimental-pex5/dirty-all-results/Tb-PEX5-eGFP_19e3e_1comp.png]]
+       [[./2022-06-02_experimental-pex5/dirty-all-results/Tb-PEX5-eGFP_19e3e_2comp.png]]
      - =34a6d=, 1 species and 2 species fits.
-       [[./data/exp-220227-unet/2022-06-02_experimental-pex5/dirty-all-results/Tb-PEX5-eGFP_34a6d_1comp.png]]
-       [[./data/exp-220227-unet/2022-06-02_experimental-pex5/dirty-all-results/Tb-PEX5-eGFP_34a6d_2comp.png]]
+       [[./2022-06-02_experimental-pex5/dirty-all-results/Tb-PEX5-eGFP_34a6d_1comp.png]]
+       [[./2022-06-02_experimental-pex5/dirty-all-results/Tb-PEX5-eGFP_34a6d_2comp.png]]
      - =484af=, 1 species and 2 species fits.
-       [[./data/exp-220227-unet/2022-06-02_experimental-pex5/dirty-all-results/Tb-PEX5-eGFP_484af_1comp.png]]
-       [[./data/exp-220227-unet/2022-06-02_experimental-pex5/dirty-all-results/Tb-PEX5-eGFP_484af_2comp.png]]
+       [[./2022-06-02_experimental-pex5/dirty-all-results/Tb-PEX5-eGFP_484af_1comp.png]]
+       [[./2022-06-02_experimental-pex5/dirty-all-results/Tb-PEX5-eGFP_484af_2comp.png]]
      - =714af=, 1 species and 2 species fits.
-       [[./data/exp-220227-unet/2022-06-02_experimental-pex5/dirty-all-results/Tb-PEX5-eGFP_714af_1comp.png]]
-       [[./data/exp-220227-unet/2022-06-02_experimental-pex5/dirty-all-results/Tb-PEX5-eGFP_714af_2comp.png]]
+       [[./2022-06-02_experimental-pex5/dirty-all-results/Tb-PEX5-eGFP_714af_1comp.png]]
+       [[./2022-06-02_experimental-pex5/dirty-all-results/Tb-PEX5-eGFP_714af_2comp.png]]
      - =34766=, 1 species and 2 species fits.
-       [[./data/exp-220227-unet/2022-06-02_experimental-pex5/dirty-all-results/Tb-PEX5-eGFP_34766_1comp.png]]
-       [[./data/exp-220227-unet/2022-06-02_experimental-pex5/dirty-all-results/Tb-PEX5-eGFP_34766_2comp.png]]
+       [[./2022-06-02_experimental-pex5/dirty-all-results/Tb-PEX5-eGFP_34766_1comp.png]]
+       [[./2022-06-02_experimental-pex5/dirty-all-results/Tb-PEX5-eGFP_34766_2comp.png]]
      - =c1204=, 1 species and 2 species fits.
-       [[./data/exp-220227-unet/2022-06-02_experimental-pex5/dirty-all-results/Tb-PEX5-eGFP_c1204_1comp.png]]
-       [[./data/exp-220227-unet/2022-06-02_experimental-pex5/dirty-all-results/Tb-PEX5-eGFP_c1204_2comp.png]]
+       [[./2022-06-02_experimental-pex5/dirty-all-results/Tb-PEX5-eGFP_c1204_1comp.png]]
+       [[./2022-06-02_experimental-pex5/dirty-all-results/Tb-PEX5-eGFP_c1204_2comp.png]]
      - =fe81d=, 1 species and 2 species fits.
-       [[./data/exp-220227-unet/2022-06-02_experimental-pex5/dirty-all-results/Tb-PEX5-eGFP_fe81d_1comp.png]]
-       [[./data/exp-220227-unet/2022-06-02_experimental-pex5/dirty-all-results/Tb-PEX5-eGFP_fe81d_2comp.png]]
+       [[./2022-06-02_experimental-pex5/dirty-all-results/Tb-PEX5-eGFP_fe81d_1comp.png]]
+       [[./2022-06-02_experimental-pex5/dirty-all-results/Tb-PEX5-eGFP_fe81d_2comp.png]]
      - =ff67b=, 1 species and 2 species fits.
-       [[./data/exp-220227-unet/2022-06-02_experimental-pex5/dirty-all-results/Tb-PEX5-eGFP_ff67b_1comp.png]]
-       [[./data/exp-220227-unet/2022-06-02_experimental-pex5/dirty-all-results/Tb-PEX5-eGFP_ff67b_2comp.png]]
+       [[./2022-06-02_experimental-pex5/dirty-all-results/Tb-PEX5-eGFP_ff67b_1comp.png]]
+       [[./2022-06-02_experimental-pex5/dirty-all-results/Tb-PEX5-eGFP_ff67b_2comp.png]]
 
      #+end_details
 
@@ -9094,7 +9095,7 @@
 
    - the final rendering looks like this:
      #+begin_export html
-     <embed src="./data/exp-220227-unet/other/analysis3_pex5_cas_avg_table.pdf" width="100%" height="500px" />
+     <embed src="./other/analysis3_pex5_cas_avg_table.pdf" width="100%" height="500px" />
      #+end_export
    - now, we work with =all_param=. Here, all single correlation curves are
      loaded without averaging.
@@ -9444,8 +9445,8 @@
    - this is the two plots as PDFs, first the comparison of transit times,
      second the comparison of particle numbers
      #+begin_export html
-     <embed src="./data/exp-220227-unet/jupyter/analysis3_pex5_transit-times.pdf" width="100%" height="500px" />
-     <embed src="./data/exp-220227-unet/jupyter/analysis3_pex5_particle-numbers.pdf" width="100%" height="500px" />
+     <embed src="./jupyter/analysis3_pex5_transit-times.pdf" width="100%" height="500px" />
+     <embed src="./jupyter/analysis3_pex5_particle-numbers.pdf" width="100%" height="500px" />
      #+end_export
 *** final remarks
 
