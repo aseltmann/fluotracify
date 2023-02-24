@@ -7655,3 +7655,33 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
        af488: 0.04 ms -> 281.78 um^2 / s
        hspex5: 0.36 ms -> 31.31 um^2 / s
      #+end_example
+
+**** notes on data publishing
+
+   - I decided to contact the =ZeroCostDL4Mic= team. There, I can present the
+     whole workflow in an interactive Colab Notebook (similar to Jupyter
+     notebooks, hosted by Google, free access to computation power including
+     GPUs). This facilitates:
+     - easy model sharing
+     - re-training of model
+     - own simulations
+     - applying the correction method after prediction
+   - An unsolved problem is data storage. I have the following data which are
+     directly used for this peak artifacts:
+     - simulated training data =firstartifact_Nov2020_train_max2sets=: 5.5G
+     - simulated validation data =firstartifact_Nov2020_val_max2sets_SORTEDIN=: 1.4G
+     - simulated test data =firstartifact_Nov2020_test=: 3.5G
+     - biological af488 data 1 =1911DD_atto+LUVs/clean_ptu_part1=: 3.0G
+     - biological af488 data 2 =1911DD_atto+LUVs/clean_ptu_part2=: 3.2G
+     - biological af488+Dio-LUVs data 1 =1911DD_atto+LUVs/dirty_ptu_part1=: 5.8G
+     - biological af488+Dio-LUVs data 2 =1911DD_atto+LUVs/dirty_ptu_part2=: 3.6G
+     - biological PEX5 data: =191113_Pex5_2_structured/=: 1.1G
+   - I have the following unused data which also deal with artifacts in FCS
+     measurements:
+     - simulated data with detector dropout =secondartefact_Aug2019_rand/=: 9.4G
+     - simulated data with photobleaching =thirdartefact_Sep2019=: 9.4G
+     - biological =e24-HeLa-GFP-SNAP= data with detector dropout
+       =190327_detectordropout=: 4.7G
+   - Also, I have the following data from the Analyses of different branches in
+     the experiments which have to be stored somewhere due to their size:
+     -
