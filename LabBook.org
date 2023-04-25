@@ -2393,6 +2393,8 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
      #+END_SRC
 
      #+RESULTS:
+     : 2023-03-14 19:06:28.236698: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+     : 2023-03-14 19:06:28.236839: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
 
     #+BEGIN_SRC jupyter-python
       import importlib
@@ -2559,206 +2561,239 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
 
 
 
-   #+END_SRC
+             #+END_SRC
 
-   #+RESULTS:
+#+RESULTS:
 
 
    - *the Python multipletau library does not seem able to handle np.nan*
    - let's quickly try experimental data
 
-   #+BEGIN_SRC jupyter-python
-     weight = np.nan
-     myweight = float(0) if weight is None else float(weight)
+#+BEGIN_SRC jupyter-python
+  weight = np.nan
+  myweight = float(0) if weight is None else float(weight)
 
-     print(weight, myweight)
-   #+END_SRC
+  print(weight, myweight)
+#+END_SRC
 
-   #+RESULTS:
-   : nan nan
+#+RESULTS:
+: nan nan
 
-   - modulation filtering (@persson_modulation_2009). The algorithmic approach
-     is to divide the  correlation function of the registered intensity trace
-     with that of a modulation (a square wave pattern, in this case
-     representing the peak artifacts)
-   - since I have time constraints in my project, I will try if the straight
-     forward approach
-     1. take the dirty trace and the given mask from the simulations
-     2. correlate dirty trace and mask trace (0 = no artifact, 1 = artifact)
-     3. divide correlation of dirty trace by correlation of mask
-
-
-   #+BEGIN_SRC jupyter-python
+- modulation filtering (@persson_modulation_2009). The algorithmic approach
+  is to divide the  correlation function of the registered intensity trace
+  with that of a modulation (a square wave pattern, in this case
+  representing the peak artifacts)
+- since I have time constraints in my project, I will try if the straight
+  forward approach
+  1. take the dirty trace and the given mask from the simulations
+  2. correlate dirty trace and mask trace (0 = no artifact, 1 = artifact)
+  3. divide correlation of dirty trace by correlation of mask
 
 
-     out_path = '/home/lex/Programme/drmed-git/data/exp-220316-publication1/230102_modulation-filtering'
-     # correlate.correlate_timetrace_and_save(df=sim_nan, out_path=out_path, out_txt='nan')
-
-     for idx, col in enumerate(sim_labbool.columns):
-         mod_trace = sim_labbool.iloc[:, idx+1].astype(np.float64)
-         dirty_trace = sim_dirty.iloc[:, idx+1].astype(np.float64)
-         mod_corr = autocorrelate(
-             a=mod_trace,
-             m=16,
-             deltat=1,
-             normalize=True)
-         dirty_corr = autocorrelate(
-             a=dirty_trace,
-             m=16,
-             deltat=1,
-             normalize=False)
-         mod_corr[:, 1] += 1
-         dirty_corr[:, 1] += 1
-         filt_corr_to1 = dirty_corr[1:, 1] / mod_corr[1:, 1]
-         filt_corr_to0 = filt_corr_to1 - 1
-         fig, ax = plt.subplots(2, 2, figsize=(16, 9))
-         sns.lineplot(mod_corr[1:, 0], filt_corr_to1, ax=ax[1, 0]).set(title='filtered, offset=1')
-         sns.lineplot(mod_corr[1:, 0], filt_corr_to0, ax=ax[1, 1]).set(title='filtered, offset=0')
-         sns.lineplot(mod_corr[1:, 0], mod_corr[1:, 1], ax=ax[0, 1]).set(title='modulation')
-         sns.lineplot(dirty_corr[1:, 0], dirty_corr[1:, 1], ax=ax[0, 0]).set(title='dirty')
-         plt.setp(ax, xscale='log')
-         # plt.setp(ax[1, :], ylim=[-1, 5])
-         plt.tight_layout()
-         plt.show()
-
-         break
+  sim_labbool.columns
 
 
+#+BEGIN_SRC jupyter-python
+  set(sim_labbool.columns)
+#+END_SRC
+
+#+RESULTS:
+| 0.069 | 0.2 | 1.0 | 3.0 | 50.0 |
 
 
-   #+END_SRC
+#+BEGIN_SRC jupyter-python
 
-   #+RESULTS:
-   :RESULTS:
-   : /home/lex/Programme/miniconda3/envs/tf/lib/python3.9/site-packages/seaborn/_decorators.py:36: FutureWarning: Pass the following variables as keyword args: x, y. From version 0.12, the only valid positional argument will be `data`, and passing other arguments without an explicit keyword will result in an error or misinterpretation.
-   :   warnings.warn(
-   : /home/lex/Programme/miniconda3/envs/tf/lib/python3.9/site-packages/seaborn/_decorators.py:36: FutureWarning: Pass the following variables as keyword args: x, y. From version 0.12, the only valid positional argument will be `data`, and passing other arguments without an explicit keyword will result in an error or misinterpretation.
-   :   warnings.warn(
-   : /home/lex/Programme/miniconda3/envs/tf/lib/python3.9/site-packages/seaborn/_decorators.py:36: FutureWarning: Pass the following variables as keyword args: x, y. From version 0.12, the only valid positional argument will be `data`, and passing other arguments without an explicit keyword will result in an error or misinterpretation.
-   :   warnings.warn(
-   : /home/lex/Programme/miniconda3/envs/tf/lib/python3.9/site-packages/seaborn/_decorators.py:36: FutureWarning: Pass the following variables as keyword args: x, y. From version 0.12, the only valid positional argument will be `data`, and passing other arguments without an explicit keyword will result in an error or misinterpretation.
-   :   warnings.warn(
-   [[file:./.ob-jupyter/0e82b92ededa286a61e214b31634c4f7d93263e0.png]]
-   :END:
-   #+RESULTS:
 
-   - it seems like this simple approach does not work since it introduces at
-     least huge instabilities in the tail of the correlation curve (and the
-     start doesn't look tidy as well). In the publications by persson et al they
-     also spoke of an analytical solution to the correlation of the modulation -
-     but I have not time to figure this out at the moment
+  out_path = '/home/lex/Programme/drmed-git/data/exp-220316-publication1/230102_modulation-filtering'
+  # correlate.correlate_timetrace_and_save(df=sim_nan, out_path=out_path, out_txt='nan')
+
+  for idx, col in enumerate(set(sim_labbool.columns)):
+      print(idx, col)
+
+      dirty_trace = sim_dirty.iloc[:, idx].astype(np.float64)
+      clean_trace = sim_clean.iloc[:, idx].astype(np.float64)
+      mod_trace = (~sim_labbool.iloc[:, idx]).astype(np.float64)
+
+      # adjusting the amplitude of the modulation trace makes no difference,
+      # because the correlation normalization in autocorrelate()
+      # dirty_amp = np.max(dirty_trace) - np.min(dirty_trace)
+      # mod_trace *= dirty_amp
+
+      mod_corr = autocorrelate(
+          a=mod_trace,
+          m=16,
+          deltat=1,
+          normalize=True)
+      dirty_corr = autocorrelate(
+          a=dirty_trace,
+          m=16,
+          deltat=1,
+          normalize=True)
+      clean_corr = autocorrelate(
+          a=clean_trace,
+          m=16,
+          deltat=1,
+          normalize=True)
+      mod_corr[:, 1] += 1
+      dirty_corr[:, 1] += 1
+      filt_corr = dirty_corr[1:, 1] / mod_corr[1:, 1]
+      filt_corr -= 1
+      fig, ax = plt.subplots(3, 2, figsize=(16, 9))
+      ax2 = plt.twinx(ax=ax[2, 1])
+      ax2.set_prop_cycle(color=[sns.color_palette()[1]])
+      sns.lineplot(x=clean_trace.index, y=clean_trace, ax=ax[2, 0]).set(title='clean')
+      line1 = sns.lineplot(x=mod_corr[1:, 0], y=filt_corr, ax=ax[2, 1], label='filtered', legend=False).set(title='clean vs filtered (dirty corr / modulation corr)')
+      line2 = sns.lineplot(x=mod_corr[1:, 0], y=clean_corr[1:, 1], ax=ax2, label='clean', legend=False)
+      sns.lineplot(x=mod_trace.index, y=mod_trace, ax=ax[1, 0]).set(title='modulation')
+      sns.lineplot(x=mod_corr[1:, 0], y=mod_corr[1:, 1], ax=ax[1, 1]).set(title='modulation corr')
+      sns.lineplot(x=dirty_trace.index, y=dirty_trace, ax=ax[0, 0]).set(title='dirty')
+      sns.lineplot(x=dirty_corr[1:, 0], y=dirty_corr[1:, 1], ax=ax[0, 1]).set(title='dirty corr')
+      plt.setp(ax[:, 1], xscale='log')
+      fig.legend(loc='lower right')
+      # plt.setp(ax[1, :], ylim=[-1, 5])
+      # lns = lns1 + lns2 + lns3
+      # labs = [l.get_label() for l in lns]
+      # ax.legend(lns, labs, loc=0)
+      plt.tight_layout()
+      plt.show()
+
+
+
+
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+: 0 0.069
+[[file:./.ob-jupyter/c90d86df313eeeff9f7fdaef7c3ab3ab200c62fe.png]]
+: 1 1.0
+[[file:./.ob-jupyter/ab5ef300156dbccdc62681dc9365a8caa05b0228.png]]
+: 2 3.0
+[[file:./.ob-jupyter/378011b7a16aadd59f514e6b06ae9ffb48cc81d8.png]]
+: 3 0.2
+[[file:./.ob-jupyter/b5e6ae518a69fa0cc83708abfac4f42834355d09.png]]
+: 4 50.0
+[[file:./.ob-jupyter/a55f28d5fe54ba2c0771a06a4b267a0f9354f050.png]]
+:END:
+
+
+- it seems like this simple approach does not work since it introduces at
+  least huge instabilities in the tail of the correlation curve (and the
+  start doesn't look tidy as well). In the publications by persson et al they
+  also spoke of an analytical solution to the correlation of the modulation -
+  but I have not time to figure this out at the moment
 
 *** Exp: simexps - =correlation averaging=
-   :PROPERTIES:
-   :header-args:jupyter-python: :session /jpy:localhost#8888:a37e524a-8134-4d8f-b24a-367acaf1bdd3 :pandoc t
-   :END:
+:PROPERTIES:
+:header-args:jupyter-python: :session /jpy:localhost#8888:a37e524a-8134-4d8f-b24a-367acaf1bdd3 :pandoc t
+:END:
 
-   - After re-reading a lot of literature and putting it into text
-     (<2023-01-02 Mo>), I decided to add the averaging method:
-     1. segment trace in artifactual and non-artifactual (here: given by
-        simulations)
-     2. correlate all non-artifactual segments
-     3. average correlations and fit the average
+- After re-reading a lot of literature and putting it into text
+  (<2023-01-02 Mo>), I decided to add the averaging method:
+  1. segment trace in artifactual and non-artifactual (here: given by
+     simulations)
+  2. correlate all non-artifactual segments
+  3. average correlations and fit the average
 
-     #+BEGIN_SRC jupyter-python
-       %cd ~/Programme/drmed-git
-     #+END_SRC
+  #+BEGIN_SRC jupyter-python
+    %cd ~/Programme/drmed-git
+  #+END_SRC
 
-     #+RESULTS:
-     : /home/lex/Programme/drmed-git
+  #+RESULTS:
+  : /home/lex/Programme/drmed-git
 
-   - load modules
-     #+BEGIN_SRC jupyter-python
-       import datetime
-       import logging
-       import os
-       import pdb
-       import scipy
-       import sys
+- load modules
+  #+BEGIN_SRC jupyter-python
+    import datetime
+    import logging
+    import os
+    import pdb
+    import scipy
+    import sys
 
-       import matplotlib.pyplot as plt
-       import numpy as np
-       import pandas as pd
-       import seaborn as sns
+    import matplotlib.pyplot as plt
+    import numpy as np
+    import pandas as pd
+    import seaborn as sns
 
-       from multipletau import autocorrelate
-       from pathlib import Path
-       from pprint import pprint
+    from multipletau import autocorrelate
+    from pathlib import Path
+    from pprint import pprint
 
-       FLUOTRACIFY_PATH = '/home/lex/Programme/drmed-git/src/'
-       sys.path.append(FLUOTRACIFY_PATH)
-       from fluotracify.applications import (corr_fit_object as cfo,
-                                             correlate)
-       from fluotracify.imports import ptu_utils as ptu
-       from fluotracify.simulations import (
-          import_simulation_from_csv as isfc,
-          analyze_simulations as ans,
-       )
+    FLUOTRACIFY_PATH = '/home/lex/Programme/drmed-git/src/'
+    sys.path.append(FLUOTRACIFY_PATH)
+    from fluotracify.applications import (corr_fit_object as cfo,
+                                          correlate)
+    from fluotracify.imports import ptu_utils as ptu
+    from fluotracify.simulations import (
+       import_simulation_from_csv as isfc,
+       analyze_simulations as ans,
+    )
 
-       logging.basicConfig(filename="/home/lex/Programme/drmed-git/data/exp-220316-publication1/jupyter.log",
-                           filemode='w', format='%(asctime)s - %(message)s',
-                           force=True,
-                           level=logging.DEBUG)
+    logging.basicConfig(filename=/home/lex/Programme/drmed-git/data/exp-220316-publication1/jupyter.",log
+                        filemode='w', format='%(asctime)s - %(message)s',
+                        force=True,
+                        level=logging.DEBUG)
 
-       sns.set_theme(style="whitegrid", font_scale=2, palette='colorblind',
-                     context='paper')
+    sns.set_theme(style="whitegrid", font_scale=2, palette='colorblind',
+                  context='paper')
 
-     #+END_SRC
+  #+END_SRC
 
-     #+RESULTS:
+  #+RESULTS:
 
-    #+BEGIN_SRC jupyter-python
-      import importlib
-      importlib.reload(correlate)
-      importlib.reload(ans)
-    #+END_SRC
+  #+BEGIN_SRC jupyter-python
+    import importlib
+    importlib.reload(correlate)
+    importlib.reload(ans)
+  #+END_SRC
 
-    #+RESULTS:
-    : <module 'fluotracify.simulations.analyze_simulations' from '/home/lex/Programme/drmed-git/src/fluotracify/simulations/analyze_simulations.py'>
+  #+RESULTS:
+  : <module 'fluotracify.simulations.analyze_simulations'" from '/home/lex/Programme/drmed-git/src/fluotracify/simulations/analyze_simulations.py'>
 
-   - load simulated data
-     #+BEGIN_SRC jupyter-python :pandoc t
-       col_per_example = 3
-       lab_thresh = 0.04
-       artifact = 0
-       model_type = 1
-       fwhm = 250
-       sim_path = Path('/home/lex/Programme/drmed-collections/drmed-simexps/firstartifact_Nov2020_test')
+- load simulated data
+  #+BEGIN_SRC jupyter-python :pandoc t
+    col_per_example = 3
+    lab_thresh = 0.04
+    artifact = 0
+    model_type = 1
+    fwhm = 250
+    sim_path = Path('/home/lex/Programme/drmed-collections/drmed-simexps/firstartifact_Nov2020_test')
 
-       sim, _, nsamples, sim_params = isfc.import_from_csv(
-           folder=sim_path,
-           header=12,
-           frac_train=1,
-           col_per_example=col_per_example,
-           dropindex=None,
-           dropcolumns=None)
+    sim, _, nsamples, sim_params = isfc.import_from_csv(
+        folder=sim_path,
+        header=12,
+        frac_train=1,
+        col_per_example=col_per_example,
+        dropindex=None,
+        dropcolumns=None)
 
-       diffrates = sim_params.loc['diffusion rate of molecules in micrometer^2 / s'].astype(np.float32)
-       nmols = sim_params.loc['number of fast molecules'].astype(np.float32)
-       clusters = sim_params.loc['diffusion rate of clusters in micrometer^2 / s'].astype(np.float32)
-       sim_columns = [f'{d:.4}' for d, c in zip(
-           np.repeat(diffrates, nsamples[0]),
-           np.repeat(clusters, nsamples[0]))]
+    diffrates = sim_params.loc['diffusion rate of molecules in micrometer^2 / s'].astype(np.float32)
+    nmols = sim_params.loc['number of fast molecules'].astype(np.float32)
+    clusters = sim_params.loc['diffusion rate of clusters in micrometer^2 / s'].astype(np.float32)
+    sim_columns = [f'{d:.4}' for d, c in zip(
+        np.repeat(diffrates, nsamples[0]),
+        np.repeat(clusters, nsamples[0]))]
 
-       sim_sep = isfc.separate_data_and_labels(array=sim,
-                                               nsamples=nsamples,
-                                               col_per_example=col_per_example)
-       sim_dirty = sim_sep['0']
-       sim_dirty.columns = sim_columns
+    sim_sep = isfc.separate_data_and_labels(array=sim,
+                                            nsamples=nsamples,
+                                            col_per_example=col_per_example)
+    sim_dirty = sim_sep['0']
+    sim_dirty.columns = sim_columns
 
-       sim_labels = sim_sep['1']
-       sim_labels.columns = sim_columns
-       sim_labbool = sim_labels > lab_thresh
-       sim_labbool.columns = sim_columns
-       sim_clean = sim_sep['2']
-       sim_clean.columns = sim_columns
+    sim_labels = sim_sep['1']
+    sim_labels.columns = sim_columns
+    sim_labbool = sim_labels > lab_thresh
+    sim_labbool.columns = sim_columns
+    sim_clean = sim_sep['2']
+    sim_clean.columns = sim_columns
 
-       sim_dirty
-     #+END_SRC
+    sim_dirty
+  #+END_SRC
 
-     #+RESULTS:
-     :RESULTS:
-     |       | 0.069       | 0.069       | 0.069       | 0.069      | 0.069      | 0.069       | 0.069      | 0.069       | 0.069      | 0.069      | ... | 50.0        | 50.0        | 50.0        | 50.0        | 50.0        | 50.0        | 50.0        | 50.0        | 50.0        | 50.0        |
+  #+RESULTS:
+  :RESULTS:
+  |       | 0.069       | 0.069       | 0.069       | 0.069      | 0.069      | 0.069       | 0.069      | 0.069       | 0.069      | 0.069      | ... | 50.0        | 50.0        | 50.0        | 50.0        | 50.0        | 50.0        | 50.0        | 50.0        | 50.0        | 50.0        |
 |-------+-------------+-------------+-------------+------------+------------+-------------+------------+-------------+------------+------------+-----+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------+-------------|
 | 0     | 1187.467896 | 907.677734  | 480.048798  | 454.669403 | 466.063232 | 384.734467  | 543.981323 | 640.921509  | 795.946167 | 410.471893 | ... | 1897.398193 | 2279.646484 | 3088.531006 | 2034.432495 | 2187.548584 | 2105.736084 | 1789.366577 | 2023.093994 | 2331.185791 | 2185.028076 |
 | 1     | 1184.055176 | 945.760315  | 471.065216  | 458.392487 | 473.306152 | 395.165527  | 558.603088 | 622.421204  | 776.199402 | 409.149170 | ... | 1499.969849 | 2199.652100 | 3207.333008 | 1650.523926 | 2122.935791 | 2791.281006 | 1661.286377 | 1111.879761 | 1853.699585 | 1926.844971 |
@@ -2773,25 +2808,25 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
 | 16383 | 567.307373  | 1006.794067 | 982.376526  | 677.099854 | 657.040588 | 2545.080322 | 784.917969 | 3850.334717 | 570.241699 | 512.688232 | ... | 2127.414551 | 2448.062012 | 1398.359253 | 1665.321167 | 2241.687256 | 1823.699829 | 1340.686035 | 1972.661743 | 1550.770142 | 1727.808228 |
 
 16384 rows × 1500 columns
-     :END:
+  :END:
 
-   - let's start implementing the averaging
-     #+BEGIN_SRC jupyter-python
-       testtrace = [5, 6, 7, 8, 3, 4, 5, 6, 7, 8, 9]
-       testsegme = [0, 0, 1, 1, 1, 0, 0, 1, 1, 0, 1]
-       testlabel = scipy.ndimage.label(testsegme)
-       testparts = []
-       for u in np.unique(testlabel[0]):
-           if u == 0:
-               continue
-           part = np.where(testlabel[0] == u, testtrace, np.nan)
-           part = part[~np.isnan(part)]
-           testparts.append(part)
-       print(testparts)
-     #+END_SRC
+- let's start implementing the averaging
+  #+BEGIN_SRC jupyter-python
+    testtrace = [5, 6, 7, 8, 3, 4, 5, 6, 7, 8, 9]
+    testsegme = [0, 0, 1, 1, 1, 0, 0, 1, 1, 0, 1]
+    testlabel = scipy.ndimage.label(testsegme)
+    testparts = []
+    for u in np.unique(testlabel[0]):
+        if u == 0:
+            continue
+        part = np.where(testlabel[0] == u, testtrace, np.nan)
+        part = part[~np.isnan(part)]
+        testparts.append(part)
+    print(testparts)
+  #+END_SRC
 
-     #+RESULTS:
-     : [array([7., 8., 3.]), array([6., 7.]), array([9.])]
+  #+RESULTS:
+  : [array([7., 8., 3.]), array([6., 7.]), array([9.])]
 
 
    #+BEGIN_SRC jupyter-python
