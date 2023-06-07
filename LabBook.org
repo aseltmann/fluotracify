@@ -3238,7 +3238,7 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
        correction_method = 'delete_and_shift'
        threshold_ls = [5, 7, 10]
 
-       for thr in threshold_ls[2:]:
+       for thr in threshold_ls:
            out_folder = out_dir / f'robust_thresh-{thr}'
            %mkdir -p $out_folder
            threshold_predict_correct_correlate_ptu(
@@ -3248,6 +3248,186 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
                correction_method=correction_method,
                out_path=out_folder)
      #+END_SRC
+
+      #+RESULTS:
+      : 2022-07-27 12:54:02.705997: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcuda.so.1'; dlerror: libcuda.so.1: cannot open shared object file: No such file or directory
+      : 2022-07-27 12:54:02.706040: W tensorflow/stream_executor/cuda/cuda_driver.cc:269] failed call to cuInit: UNKNOWN ERROR (303)
+      : 2022-07-27 12:54:02.706062: I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:156] kernel driver does not appear to be running on this host (node159): /proc/driver/nvidia/version does not exist
+      : 2022-07-27 12:54:02.706560: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 AVX512F FMA
+      : To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+
+    #+CALL: kill-jupyter()
+
+    #+RESULTS:
+    :RESULTS:
+    # [goto error]
+    : ---------------------------------------------------------------------------
+    : NameError                                 Traceback (most recent call last)
+    : Input In [1], in <cell line: 1>()
+    : ----> 1 os._exit(00)
+    :
+    : NameError: name 'os' is not defined
+    :END:
+
+
+    #+CALL: prepare-jupyter("/beegfs/ye53nis/data/191113_Pex5_2_structured", output_path="/beegfs/ye53nis/drmed-git/data/exp-220227-unet/2022-06-02_experimental-pex5/")
+
+    #+RESULTS:
+    : /beegfs/ye53nis/drmed-git
+    : 2022-06-06 11:31:31.271711: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+    : 2022-06-06 11:31:31.271745: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+
+      #+begin_src jupyter-python
+        model_id = 4  # 484af
+
+        out_dir = output_path / f'clean_delete_{model_name_ls[model_id]}/'
+
+        os.makedirs(out_dir, exist_ok=True)
+
+        predict_correct_correlate_ptu(
+            files=files_clean,
+            model_id=model_id,
+            method='delete',
+            out_path=out_dir)
+      #+end_src
+
+      #+RESULTS:
+      : 2022-06-06 11:31:39.219733: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcuda.so.1'; dlerror: libcuda.so.1: cannot open shared object file: No such file or directory
+      : 2022-06-06 11:31:39.219776: W tensorflow/stream_executor/cuda/cuda_driver.cc:269] failed call to cuInit: UNKNOWN ERROR (303)
+      : 2022-06-06 11:31:39.219797: I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:156] kernel driver does not appear to be running on this host (node152): /proc/driver/nvidia/version does not exist
+      : 2022-06-06 11:31:39.220117: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 AVX512F FMA
+      : To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+      : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `
+
+**** node 3
+    :PROPERTIES:
+    :header-args:jupyter-python: :session /jpy:localhost#8891:b37e524a-8134-4d8f-b24a-367acaf1bdd5
+    :END:
+    1. Set up tmux (if we haven't done that before) (=#+CALL:
+       setup-tmux[:session local]=)
+       #+CALL: setup-tmux[:session local]
+
+       #+RESULTS:
+       |         |                                        |           |
+       | sh-5.1$ | ye53nis@ara-login01.rz.uni-jena.de's | password: |
+       | >       | ye53nis@ara-login01.rz.uni-jena.de's | password:   |
+
+    2. Request compute node
+       #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session jpmux3
+         cd /
+         srun -p s_standard --time=7-10:00:00 --ntasks-per-node=24 --mem-per-cpu=2000 --pty bash
+       #+END_SRC
+
+    3. Start Jupyter Lab (~#+CALL: jpt-tmux[:session jpmux]~)
+       #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine :session jpmux3
+       conda activate tf
+       export PORT=8891
+       export XDG_RUNTIME_DIR=''
+       export XDG_RUNTIME_DIR=""
+       jupyter lab --no-browser --port=$PORT
+       #+END_SRC
+
+       #+RESULTS:
+       #+begin_example
+         (tf) [ye53nis@node313 /]$ jupyter lab --no-browser --port=$PORT
+         [I 2022-07-26 15:41:17.402 ServerApp] jupyterlab | extension was successfully linked.
+         [I 2022-07-26 15:41:18.325 ServerApp] nbclassic | extension was successfully linked.
+         [I 2022-07-26 15:41:18.431 ServerApp] nbclassic | extension was successfully loaded.
+         [I 2022-07-26 15:41:18.434 LabApp] JupyterLab extension loaded from /home/ye53nis/.conda/envs/tf/lib/python3.9/site-packages/jupyterlab
+         [I 2022-07-26 15:41:18.434 LabApp] JupyterLab application directory is /home/ye53nis/.conda/envs/tf/share/jupyter/lab
+         [I 2022-07-26 15:41:18.443 ServerApp] jupyterlab | extension was successfully loaded.
+         [I 2022-07-26 15:41:18.444 ServerApp] Serving notebooks from local directory: /
+         [I 2022-07-26 15:41:18.444 ServerApp] Jupyter Server 1.13.5 is running at:
+         [I 2022-07-26 15:41:18.444 ServerApp] http://localhost:8891/lab?token=9471873c7815b3b2691a44102251c64823a1fb61f5076036
+         [I 2022-07-26 15:41:18.444 ServerApp]  or http://127.0.0.1:8891/lab?token=9471873c7815b3b2691a44102251c64823a1fb61f5076036
+         [I 2022-07-26 15:41:18.444 ServerApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+         [C 2022-07-26 15:41:18.460 ServerApp]
+
+             To access the server, open this file in a browser:
+                 file:///home/ye53nis/.local/share/jupyter/runtime/jpserver-94844-open.html
+             Or copy and paste one of these URLs:
+                 http://localhost:8891/lab?token=9471873c7815b3b2691a44102251c64823a1fb61f5076036
+              or http://127.0.0.1:8891/lab?token=9471873c7815b3b2691a44102251c64823a1fb61f5076036
+       #+end_example
+
+    4. Create SSH Tunnel for jupyter lab to the local computer (e.g. ~#+CALL:
+       ssh-tunnel(port="8889", node="node160")~)
+       #+CALL: ssh-tunnel[:session jpmux3](port="8891", node="node313")
+
+       #+RESULTS:
+       |                   |           |                                        |           |    |          |      |      |             |
+       | sh-5.1$           | sh-5.1$   | ye53nis@ara-login01.rz.uni-jena.de's | password: |    |          |      |      |             |
+       | ye53nis@node313's | password: |                                        |           |    |          |      |      |             |
+       | Last              | login:    | Tue                                    | Jul       | 26 | 22:11:17 | 2022 | from | login01.ara |
+
+
+
+    #+CALL: prepare-jupyter()
+
+    #+RESULTS:
+    : /beegfs/ye53nis/drmed-git
+    : 2022-07-27 12:31:19.642954: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+    : 2022-07-27 12:31:19.643031: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+
+      #+BEGIN_SRC jupyter-python
+
+        out_dir = output_path / f'af488'
+        pred_method = 'threshold'
+        correction_method = 'delete_and_shift'
+        threshold_ls = [0.8, 1, 1.5, 2, 2.5]
+
+        for thr in threshold_ls[4:]:
+            out_folder = out_dir / f'robust_thresh-{thr}'
+            # %mkdir -p $out_folder
+            threshold_predict_correct_correlate_ptu(
+                files=files_clean2,
+                pred_method=pred_method,
+                pred_threshold=thr,
+                correction_method=correction_method,
+                out_path=out_folder)
+            break
+      #+END_SRC
+
+      #+RESULTS:
+      : 2022-07-27 12:31:40.270292: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcuda.so.1'; dlerror: libcuda.so.1: cannot open shared object file: No such file or directory
+      : 2022-07-27 12:31:40.270377: W tensorflow/stream_executor/cuda/cuda_driver.cc:269] failed call to cuInit: UNKNOWN ERROR (303)
+      : 2022-07-27 12:31:40.270427: I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:156] kernel driver does not appear to be running on this host (node313): /proc/driver/nvidia/version does not exist
+      : 2022-07-27 12:31:40.271076: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 AVX512F FMA
+      : To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+
+    #+CALL: kill-jupyter()
+
+    #+RESULTS:
+    : 6c6240a9-a9d6-4fac-936c-a02553ce2158
+
+
+    #+CALL: prepare-jupyter("/beegfs/ye53nis/data/191113_Pex5_2_structured", output_path="/beegfs/ye53nis/drmed-git/data/exp-220227-unet/2022-06-02_experimental-pex5/")
+
+    #+RESULTS:
+    : /beegfs/ye53nis/drmed-git
+
+      #+begin_src jupyter-python
+        model_id = 5  # 0cd20
+
+        out_dir = output_path / f'clean_delete_{model_name_ls[model_id]}/'
+
+        os.makedirs(out_dir, exist_ok=True)
+
+        predict_correct_correlate_ptu(
+            files=files_clean,
+            model_id=model_id,
+            method='delete',
+            out_path=out_dir)
+      #+end_src
+
+      #+RESULTS:
+      : 2022-06-06 16:04:56.835044: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcuda.so.1'; dlerror: libcuda.so.1: cannot open shared object file: No such file or directory
+      : 2022-06-06 16:04:56.835085: W tensorflow/stream_executor/cuda/cuda_driver.cc:269] failed call to cuInit: UNKNOWN ERROR (303)
+      : 2022-06-06 16:04:56.835105: I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:156] kernel driver does not appear to be running on this host (node155): /proc/driver/nvidia/version does not exist
+      : 2022-06-06 16:04:56.835386: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 AVX512F FMA
+      : To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+      : WARNING:tensorflow:Unable to restore custom metric. Please ensure that the layer implements `get_config` and `from_config` when saving. In addition, please use the `custom_objects` arg when calling `load_model()`.
+
 *** Exp: bioexps - example traces
    :PROPERTIES:
    :header-args:jupyter-python: :session /jpy:localhost#8888:a37e524a-8134-4d8f-b24a-367acaf1bdd3 :pandoc t
