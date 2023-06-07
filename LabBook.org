@@ -3714,14 +3714,200 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
 
        pred_thresh = 0.5
 
+       def sort_fit(param_ls):
+           sim = param_ls[-1]
+           nfcs = param_ls[-2]
+
+           tt, tt_low_high = ans.convert_diffcoeff_to_transittimes(sim, fwhm=250)
+
+           array = np.array(list(param_ls)[:-2]).reshape((2, 2))
+           # sort by transit times
+           array = array[:, array[0, :].argsort()]
+           A_fast = array[1, 0]
+           A_slow = array[1, 1]
+           N_fast = A_fast * nfcs
+           N_slow = A_slow * nfcs
+           t_fast = array[0, 0]
+           t_slow = array[0, 1]
+           if np.isnan(t_slow):
+               # if tt_low_high[0] <= t_fast <= tt_low_high[1]:
+               #     out =
+
+               out = t_fast, nfcs, pd.NA, pd.NA, tt
+
+           elif f'{A_fast:.0%}' == '100%':
+               # if tt_low_high[0] <= t_fast <= tt_low_high[1]:
+               #     out =
+
+               out = t_fast, N_fast, pd.NA, pd.NA, tt
+           elif f'{A_slow:.0%}' == '100%':
+               # if tt_low_high[0] <= t_slow <= tt_low_high[1]:
+               #     out =
+               out = pd.NA, pd.NA, t_slow, N_slow, tt
+           else:
+               # if (tt_low_high[0] <= t_fast <= tt_low_high[1]) or (
+               #     tt_low_high[0] <= t_slow <= tt_low_high[1]):
+               #     out =
+               out = t_fast, N_fast, t_slow, N_slow, tt
+
+           return out
+
+       def sort_fit_legend(param_ls):
+           species = param_ls[0]
+           component = param_ls[1]
+
+           if species == 1:
+               legend = '$\\tau_D$ from\n1 species fit'
+           elif (species == 2) and (component == 'fast'):
+               legend = '$\\tau_D$ from\nfast sp. of 2 sp. fit'
+           elif (species == 2) and (component == 'slow'):
+               legend = '$\\tau_D$ from\nslow sp. of 2 sp. fit'
+           return legend
+
+       def prepare_all_param(all_param):
+           all_param[['t_fast', 'N_fast', 't_slow', 'N_slow', 'expected transit time']
+                     ] = all_param[['txy1', 'txy2', 'A1', 'A2', 'N (FCS)', 'sim']].apply(
+                         lambda x: sort_fit(x), axis=1, result_type='expand')
+           all_param = pd.wide_to_long(all_param, stubnames=['t', 'N'],
+                                       i=['name_of_plot', 'Diff_species', 'processing'],
+                                       j='fit component',
+                                       sep='_', suffix=r'\w+')
+
+           all_param = all_param.reset_index()
+           # if Diff_species is 1, there is only 1 component
+           all_param = all_param[~((all_param['fit component'] == 'slow') &
+                                   (all_param['Diff_species'] == 1))]
+           all_param = all_param.reset_index()
+
+           all_param['legend'] = all_param[['Diff_species', 'fit component']].apply(
+               lambda x: sort_fit_legend(x), axis=1)
+           print('before dropping NaNs')
+           print('1 species fit: {}'.format(len(
+               all_param[all_param["legend"] == "$\\tau_D$ from\n1 species fit"])))
+           print('slow sp of 2 sp fit: {}'.format(len(
+               all_param[all_param["legend"] == "$\\tau_D$ from\nslow sp. of 2 sp. fit"])))
+           print('fast sp of 2 sp fit: {}'.format(len(
+               all_param[all_param["legend"] == "$\\tau_D$ from\nfast sp. of 2 sp. fit"])))
+
+           all_param = all_param[~pd.isna(all_param['t'])]
+           print('after dropping NaNs')
+           print('1 species fit: {}'.format(len(
+               all_param[all_param["legend"] == "$\\tau_D$ from\n1 species fit"])))
+           print('slow sp of 2 sp fit: {}'.format(len(
+               all_param[all_param["legend"] == "$\\tau_D$ from\nslow sp. of 2 sp. fit"])))
+           print('fast sp of 2 sp fit: {}'.format(len(
+               all_param[all_param["legend"] == "$\\tau_D$ from\nfast sp. of 2 sp. fit"])))
+
+           all_param = all_param[
+               ['legend', 't', 'N', 'expected transit time', 'sim', 'processing']]
+           all_param.loc[:, ['t', 'N']] = all_param.loc[:, ['t', 'N']].apply(pd.to_numeric)
+           all_param.loc[:, 't'] = all_param.loc[:, 't'].apply(lambda x: np.log10(x))
+           return all_param
+
+       def simplot(data, x, order, height, aspect, hue, xlim, kind='boxen',
+                   add_text='other'):
+           if kind == 'violin':
+               kwargs = dict(showfliers=True, scale='width', cut=0)
+           elif kind == 'boxen':
+               kwargs = dict(showfliers=False, scale='exponential')
+           g = sns.catplot(data=data,
+                           x=x,
+                           y='processing',
+                           order=order,
+                           col='expected transit time',
+                           col_wrap=3,
+                           hue=hue,
+                           height=height,
+                           aspect=aspect,
+                           legend_out=True,
+                           kind=kind,
+                           sharex=True,
+                           **kwargs)
+           if hue is not None:
+               g._legend.remove()
+           styles = ['--', ':', '-', '-.', (0, (3, 1, 1, 1, 1, 1)),
+                     (0, (3, 1, 1, 1, 1, 1, 1, 1))]
+           for i, ax in enumerate(g.axes):
+               tt = str(ax.title).split('= ')
+               tt = tt[1].strip("')")
+               tt = float(tt)
+               clean = data[(data['processing'] == 'clean noc') &
+                            (data['expected transit time'] == tt)]
+               median = clean[x].median()
+               if x == 'N':
+                   line = ax.axvline(median, lw=4, label='', ls=styles[::-1][i])
+                   line_legend = {f'\n$N{{exp}}={median:.2f}$' : line}
+               else:
+                   line = ax.axvline(median, lw=4, label='', ls=styles[i])
+                   median = np.round(10**clean[x].median(), decimals=2)
+                   line_legend = {f'\n$\\tau_{{exp}}={median:.2f}ms$' : line}
+           g._legend_data.update(line_legend)
+           g.add_legend(g._legend_data)
+           if hue is None:
+               dodge = False
+           else:
+               dodge = True
+           if kind == 'boxen':
+               g.map_dataframe(sns.stripplot,
+                               x=x,
+                               y='processing',
+                               order=order,
+                               hue=hue,
+                               dodge=dodge,
+                               palette=sns.color_palette(['0.3']),
+                               size=2,
+                               jitter=0.05,
+                               hue_order=['$\\tau_D$ from\n1 species fit',
+                                          '$\\tau_D$ from\nfast sp. of 2 sp. fit',
+                                          '$\\tau_D$ from\nslow sp. of 2 sp. fit'])
+           g.fig.suptitle('', size=25)
+           for ax in g.axes:
+               # ax[0].set_title('')
+               tt = str(ax.title).split('= ')
+               tt = tt[1].strip("')")
+               tt = float(tt)
+               clean = data[(data['processing'] == 'clean noc') &
+                            (data['expected transit time'] == tt)]
+               if x == 'N':
+                   median = clean[x].median()
+                   ax.set_title(f'$N_{{exp}}={median:.2f}$')
+               else:
+                   median = np.round(10**clean[x].median(), decimals=2)
+                   ax.set_title(f'$\\tau_{{exp}}={median:.2f}ms$')
+
+           if x == 't':
+               plt.setp(g.axes, xlabel='log transit time $\\tau_{D}$ $[ms]$',
+                        ylabel='', xlim=xlim)
+           else:
+               plt.setp(g.axes, xlabel='particle number $N$',
+                        ylabel='', xlim=xlim)
+
+           g.tight_layout()
+           if x == 't':
+               for i, ax in enumerate(g.axes):
+                   xlab = ax.get_xticklabels()
+                   # because seaborns violinplot does not support kde calculation in log values,
+                   # I have to do this manually, by first log-transforming the data, now
+                   # extracting the xticklabels and manually transforming them
+                   xlab_power = [lab.get_position()[0] for lab in xlab]
+                   xlab_power = sorted(xlab_power)
+                   print(i, xlab_power)
+                   xlab_power = [10**lab for lab in xlab_power]
+                   xlab_power = [np.round(lab, decimals=4) for lab in xlab_power]
+                   print(xlab_power)
+                   ax.set_xticklabels(xlab_power)
+
+           g.tight_layout()
+           savefig = f'./data/exp-220316-publication1/jupyter/{add_text}'
+           plt.savefig(f'{savefig}.pdf', dpi=300)
+           os.system(f'pdf2svg {savefig}.pdf {savefig}.svg')
+           plt.close('all')
      #+END_SRC
 
      #+RESULTS: simulations-prepare-modules
      : /home/lex/Programme/drmed-git
-     : 2023-02-10 12:42:18.096925: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
-     : 2023-02-10 12:42:18.096952: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
-
-     #+RESULTS:
+     : 2023-06-07 17:52:24.777919: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+     : 2023-06-07 17:52:24.777960: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
 
    - load simulated data
      #+NAME: simulations-prepare-data
@@ -3763,6 +3949,63 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
 
        sim_dirty
      #+END_SRC
+
+     #+RESULTS: simulations-prepare-data
+     #+be                                                                                         gin_example
+              0.069-0.1    0.069-0.1    0.069-0.1   0.069-0.1   0.069-0.1  \
+     0      1187.467896   907.677734   480.048798  454.669403  466.063232
+     1      1184.055176   945.760315   471.065216  458.392487  473.306152
+     2      1191.848877   980.117798   459.479706  426.087982  482.370209
+     3      1199.065918   974.313110   462.205566  444.041809  463.703125
+     4      1221.957397   968.779175   464.918030  455.205292  474.615540
+     ...            ...          ...          ...         ...         ...
+     16379   506.409668  1012.403931   855.006226  674.470703  769.859192
+     16380   536.809692  1022.029724   840.287720  671.095215  738.908997
+     16381   570.668884   989.891235   839.180298  689.863586  695.739136
+     16382   562.505310   977.029785  1005.927673  683.250183  661.608337
+     16383   567.307373  1006.794067   982.376526  677.099854  657.040588
+
+              0.069-0.1   0.069-0.1    0.069-0.1   0.069-0.1   0.069-0.1  ...  \
+     0       384.734467  543.981323   640.921509  795.946167  410.471893  ...
+     1       395.165527  558.603088   622.421204  776.199402  409.149170  ...
+     2       425.123413  551.536072   624.498535  778.671265  400.971954  ...
+     3       434.186615  573.044128   626.252502  747.284058  393.178162  ...
+     4       437.029419  586.489136   619.319092  781.954102  406.468018  ...
+     ...            ...         ...          ...         ...         ...  ...
+     16379  2110.732178  799.565247  1981.221436  528.844604  483.055878  ...
+     16380  2118.984863  807.995789  2624.343262  552.687012  479.768372  ...
+     16381  2033.681885  786.547852  3528.163574  572.166077  484.491211  ...
+     16382  2566.123047  805.594116  3731.086426  566.710571  489.289673  ...
+     16383  2545.080322  784.917969  3850.334717  570.241699  512.688232  ...
+
+              50.0-0.01    50.0-0.01    50.0-0.01    50.0-0.01    50.0-0.01  \
+     0      1897.398193  2279.646484  3088.531006  2034.432495  2187.548584
+     1      1499.969849  2199.652100  3207.333008  1650.523926  2122.935791
+     2      1822.985229  2456.422607  2969.562500  1934.118286  1457.731812
+     3      1741.839355  2467.149414  2588.980957  2136.627686  1930.263672
+     4      2431.400879  2246.336670  3000.961182  1915.518066  2052.773682
+     ...            ...          ...          ...          ...          ...
+     16379  1512.586548  3212.712891  1491.119995  1843.866943  1748.956665
+     16380  1661.331055  3190.809570  1770.193970  2081.854248  2164.372803
+     16381  1643.470337  2564.206787  2025.219971  2104.706787  1792.828613
+     16382  1556.492188  2783.619385  1312.174561  2378.643311  2466.965576
+     16383  2127.414551  2448.062012  1398.359253  1665.321167  2241.687256
+
+              50.0-0.01    50.0-0.01    50.0-0.01    50.0-0.01    50.0-0.01
+     0      2105.736084  1789.366577  2023.093994  2331.185791  2185.028076
+     1      2791.281006  1661.286377  1111.879761  1853.699585  1926.844971
+     2      2251.077393  1903.003662  2063.915527  2198.018066  2038.683105
+     3      2323.700684  2133.313721  1638.169312  1926.058716  1815.259521
+     4      2359.145508  1699.926147  1862.709595  2291.338379  1332.422241
+     ...            ...          ...          ...          ...          ...
+     16379  2048.602051  1662.244385  2593.879639  1921.427856  1664.831909
+     16380  2295.646729  1846.683594  2038.272339  2222.708252  2122.753662
+     16381  2106.199463  2087.914062  1457.817871  1874.736938  1683.072021
+     16382  2160.641357  1691.332520  2013.095093  1632.475708  1352.443237
+     16383  1823.699829  1340.686035  1972.661743  1550.770142  1727.808228
+
+     [16384 rows x 1500 columns]
+     #+end_example
 
      #+RESULTS:
      :RESULTS:
@@ -3911,11 +4154,7 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
      #+CALL: simulations-prepare-modules()
 
      #+RESULTS:
-     :RESULTS:
      : /home/lex/Programme/drmed-git
-     : 2023-01-16 15:28:48.365303: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
-     : 2023-01-16 15:28:48.365357: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
-     :END:
 
    - let's load and plot cuts vs transit times from 3 different base molecule
      speeds (varying molecule numbers): 0.069, 0.2, and 1.0 um^2/s respectively.
@@ -4125,9 +4364,9 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
                            height=5,
                            aspect=2,
                            legend_out=True,
-                           kind='boxen',
-                           showfliers=False,
-                           sharey=False)
+                           kind=kind,
+                           sharey=False,
+                           ,**kwargs)
            styles = ['--', ':', '-', '-.']
            for i, ax in enumerate(g.axes):
                tt = str(ax[0].title).split('= ')
@@ -4137,20 +4376,22 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
                hline_legend = {f'\n$\\tau_{{sim}}={tt:.2f}ms$' : hline}
                g._legend_data.update(hline_legend)
            g.add_legend(g._legend_data)
-           g.map_dataframe(sns.stripplot,
-                 y='txy1',
-                 x='cuts',
-                 dodge=True,
-                 palette=sns.color_palette(['0.3']),
-                 size=4,
-                 jitter=0.2)
+           if kind == 'boxen':
+                g.map_dataframe(sns.stripplot,
+                                y='txy1',
+                                x='cuts',
+                                dodge=True,
+                                palette=sns.color_palette(['0.3']),
+                                size=4,
+                                jitter=0.2)
            g.fig.suptitle('', size=25)
            for ax in g.axes:
                # ax[0].set_title('')
                tt = str(ax[0].title).split('= ')
                tt = tt[1].strip("')")
                tt = float(tt)
-               ax[0].set_title(f'sim. trace $\\tau_{{sim}}={tt:.2f}ms$,\nno artifacts, $n=300$, $\\tau_D$ from 1 sp. fit')
+               ax[0].set_title(f'sim. trace $\\tau_{{sim}}={tt:.2f}ms$,\nno '
+                               'artifacts, $n=300$, $\\tau_D$ from 1 sp. fit')
 
            # g._legend.set_title('')
            # new_labels = ['424 traces of\nAlexaFluor488\n(no artifacts)\n$\\tau_D$ from\n1 species fit',
@@ -4165,7 +4406,7 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
            g.fig.align_ylabels()
            g.tight_layout()
 
-           savefig = './data/exp-220316-publication1/jupyter/plot2_transit-times-vs-cuts'
+           savefig = f'./data/exp-220316-publication1/jupyter/{add_text}'
            plt.savefig(f'{savefig}.pdf', bbox_inches='tight', dpi=300)
            os.system(f'pdf2svg {savefig}.pdf {savefig}.svg')
            plt.close('all')
@@ -4173,17 +4414,24 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
 
      #+RESULTS:
 
+   - first version: boxen + strip plot
      #+BEGIN_SRC jupyter-python
        sns.set_theme(style="whitegrid", font_scale=2.4, palette='colorblind',
                      context='paper')
-       simcuts(all_param)
+       simcuts(all_param, add_text='plot2_transit-times-vs-cuts_BOXEN')
      #+END_SRC
 
      #+RESULTS:
 
+   - second version: violin plot
      #+BEGIN_SRC jupyter-python
-
+       sns.set_theme(style="whitegrid", font_scale=2.4, palette='colorblind',
+                     context='paper')
+       simcuts(all_param, kind='violin',
+               add_text='plot2_transit-times-vs-cuts')
      #+END_SRC
+
+     #+RESULTS:
 
 **** comparison correction methods - fit outcomes
    :PROPERTIES:
@@ -4200,6 +4448,8 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
 
      #+RESULTS:
      : /home/lex/Programme/drmed-git
+     : 2023-06-06 15:42:28.749119: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+     : 2023-06-06 15:42:28.749152: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
 
    - let's *compare correction methods* on 3 different simulated base molecule
      speeds (0.069, 0.2, and 3.0 um^2/s; varying molecule numbers) and af488 vs
@@ -4530,103 +4780,24 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
      :END:
 
      #+BEGIN_SRC jupyter-python
-       def sort_fit(param_ls):
-           sim = param_ls[-1]
-           nfcs = param_ls[-2]
-
-           tt, tt_low_high = ans.convert_diffcoeff_to_transittimes(sim, fwhm=250)
-
-           array = np.array(list(param_ls)[:-2]).reshape((2, 2))
-           # sort by transit times
-           array = array[:, array[0, :].argsort()]
-           A_fast = array[1, 0]
-           A_slow = array[1, 1]
-           N_fast = A_fast * nfcs
-           N_slow = A_slow * nfcs
-           t_fast = array[0, 0]
-           t_slow = array[0, 1]
-           if np.isnan(t_slow):
-               # if tt_low_high[0] <= t_fast <= tt_low_high[1]:
-               #     out =
-
-               out = t_fast, nfcs, pd.NA, pd.NA, tt
-
-           elif f'{A_fast:.0%}' == '100%':
-               # if tt_low_high[0] <= t_fast <= tt_low_high[1]:
-               #     out =
-
-               out = t_fast, N_fast, pd.NA, pd.NA, tt
-           elif f'{A_slow:.0%}' == '100%':
-               # if tt_low_high[0] <= t_slow <= tt_low_high[1]:
-               #     out =
-               out = pd.NA, pd.NA, t_slow, N_slow, tt
-           else:
-               # if (tt_low_high[0] <= t_fast <= tt_low_high[1]) or (
-               #     tt_low_high[0] <= t_slow <= tt_low_high[1]):
-               #     out =
-               out = t_fast, N_fast, t_slow, N_slow, tt
-
-           return out
-
-       def sort_fit_legend(param_ls):
-           species = param_ls[0]
-           component = param_ls[1]
-
-           if species == 1:
-               legend = '$\\tau_D$ from\n1 species fit'
-           elif (species == 2) and (component == 'fast'):
-               legend = '$\\tau_D$ from\nfast sp. of 2 sp. fit'
-           elif (species == 2) and (component == 'slow'):
-               legend = '$\\tau_D$ from\nslow sp. of 2 sp. fit'
-           return legend
-
-       all_param[['t_fast', 'N_fast', 't_slow', 'N_slow', 'expected transit time']] = all_param[['txy1', 'txy2', 'A1', 'A2', 'N (FCS)', 'sim']].apply(
-           lambda x: sort_fit(x), axis=1, result_type='expand')
-       all_param = pd.wide_to_long(all_param, stubnames=['t', 'N'],
-                                   i=['name_of_plot', 'Diff_species'],
-                                   j='fit component',
-                                   sep='_', suffix=r'\w+')
-
-       all_param = all_param.reset_index()
-       # if Diff_species is 1, there is only 1 component
-       all_param = all_param[~((all_param['fit component'] == 'slow') & (all_param['Diff_species'] == 1))]
-       all_param = all_param.reset_index()
-
-       all_param['legend'] = all_param[['Diff_species', 'fit component']].apply(
-           lambda x: sort_fit_legend(x), axis=1)
-       print('before dropping NaNs')
-       print('1 species fit: {}'.format(len(all_param[all_param["legend"] == "$\\tau_D$ from\n1 species fit"])))
-       print('slow sp of 2 sp fit: {}'.format(len(all_param[all_param["legend"] == "$\\tau_D$ from\nslow sp. of 2 sp. fit"])))
-       print('fast sp of 2 sp fit: {}'.format(len(all_param[all_param["legend"] == "$\\tau_D$ from\nfast sp. of 2 sp. fit"])))
-
-       all_param = all_param[~pd.isna(all_param['t'])]
-       print('after dropping NaNs')
-       print('1 species fit: {}'.format(len(all_param[all_param["legend"] == "$\\tau_D$ from\n1 species fit"])))
-       print('slow sp of 2 sp fit: {}'.format(len(all_param[all_param["legend"] == "$\\tau_D$ from\nslow sp. of 2 sp. fit"])))
-       print('fast sp of 2 sp fit: {}'.format(len(all_param[all_param["legend"] == "$\\tau_D$ from\nfast sp. of 2 sp. fit"])))
-
-       all_param = all_param[['legend', 't', 'N', 'expected transit time', 'sim', 'processing']]
-       all_param.loc[:, ['t', 'N']] = all_param.loc[:, ['t', 'N']].apply(pd.to_numeric)
-       all_param.loc[:, 't'] = all_param.loc[:, 't'].apply(lambda x: np.log10(x))
-
+       all_param = prepare_all_param(all_param)
        # with pd.option_context("max_colwidth", 1000):
        #     display(all_param[['legend', 't', 'A', 'expected transit time', 'sim', 'processing']])
        pub_cond1 = ((all_param['legend'] == '$\\tau_D$ from\n1 species fit') &
-                    ~((all_param['processing'].isin(['dirty noc', 'dirty del', 'dirty cas'])) &
+                    ~((all_param['processing'].isin(
+                        ['dirty noc', 'dirty del', 'dirty cas'])) &
                       (all_param['expected transit time'] == 0.040253767881946526)) &
                     ~((all_param['processing'] == 'dirty avg') &
                       (all_param['expected transit time'] == 0.36358241957887183)))
        pub_cond2 = ((all_param['legend'] == '$\\tau_D$ from\nfast sp. of 2 sp. fit') &
-                    ((all_param['processing'].isin(['dirty noc', 'dirty del', 'dirty cas'])) &
+                    ((all_param['processing'].isin(
+                        ['dirty noc', 'dirty del', 'dirty cas'])) &
                      (all_param['expected transit time'] == 0.040253767881946526)))
        pub_cond3 = ((all_param['legend'] == "$\\tau_D$ from\nslow sp. of 2 sp. fit") &
                     ((all_param['processing'] == 'dirty avg') &
                      (all_param['expected transit time'] == 0.36358241957887183)))
 
        pub_param = all_param[pub_cond1 | pub_cond2 | pub_cond3]
-       # compare_correction_param = all_param[(all_param['legend'] == '\nsim. trace\nn=300, $\\tau_D$ from\n1 species fit') &
-       #                                      ~((all_param['processing'] == 'Peak artifacts,\nmanual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=2') |
-       #                                        (all_param['processing'] == 'Peak artifacts,\nautomatic U-Net pred.\n+ cut and shift corr.:\nscaler=quantile transf.,\nlarge model (200MB)'))]
        pub_param
      #+END_SRC
 
@@ -4640,127 +4811,36 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
      : 1 species fit: 7934
      : slow sp of 2 sp fit: 5459
      : fast sp of 2 sp fit: 5812
-     |       | legend                               | t         | N         | expected transit time | sim    | processing |
-|-------+--------------------------------------+-----------+-----------+-----------------------+--------+------------|
-| 0     | $\tau_D$ from\n1 species fit         | 2.176571  | 13.940974 | 163.348623            | 0.069  | clean noc  |
-| 1     | $\tau_D$ from\n1 species fit         | 2.126323  | 16.272292 | 163.348623            | 0.069  | clean noc  |
-| 2     | $\tau_D$ from\n1 species fit         | 2.039003  | 17.590156 | 163.348623            | 0.069  | clean noc  |
-| 3     | $\tau_D$ from\n1 species fit         | 2.146674  | 13.739355 | 163.348623            | 0.069  | clean noc  |
-| 4     | $\tau_D$ from\n1 species fit         | 2.716658  | 10.985121 | 163.348623            | 0.069  | clean noc  |
-| ...   | ...                                  | ...       | ...       | ...                   | ...    | ...        |
-| 20645 | $\tau_D$ from\nslow sp. of 2 sp. fit | -0.456913 | 0.764745  | 0.363582              | 31.000 | dirty avg  |
-| 20647 | $\tau_D$ from\nslow sp. of 2 sp. fit | -0.456913 | 0.764745  | 0.363582              | 31.000 | dirty avg  |
-| 20649 | $\tau_D$ from\nslow sp. of 2 sp. fit | -0.456913 | 0.764745  | 0.363582              | 31.000 | dirty avg  |
-| 20651 | $\tau_D$ from\nslow sp. of 2 sp. fit | -0.456913 | 0.764745  | 0.363582              | 31.000 | dirty avg  |
-| 20653 | $\tau_D$ from\nslow sp. of 2 sp. fit | -0.456913 | 0.764745  | 0.363582              | 31.000 | dirty avg  |
-
-7934 rows × 6 columns
-     :END:
-
-     #+BEGIN_SRC jupyter-python
-       list(set(all_param['expected transit time']))[::-1]
-       all_param.loc[:, 't'].apply(lambda x: np.log10(x))
-     #+END_SRC
-
-     #+RESULTS:
      #+begin_example
-       0        2.176571
-       1        2.126323
-       2        2.039003
-       3        2.146674
-       4        2.716658
-                  ...
-       20649   -0.456913
-       20650   -2.135192
-       20651   -0.456913
-       20652   -2.135192
-       20653   -0.456913
-       Name: t, Length: 19205, dtype: float64
+                                          legend         t          N  \
+     0              $\tau_D$ from\n1 species fit  2.176571  13.940974
+     1              $\tau_D$ from\n1 species fit  2.126323  16.272292
+     2              $\tau_D$ from\n1 species fit  2.039003  17.590156
+     3              $\tau_D$ from\n1 species fit  2.146674  13.739355
+     4              $\tau_D$ from\n1 species fit  2.716658  10.985121
+     ...                                     ...       ...        ...
+     20645  $\tau_D$ from\nslow sp. of 2 sp. fit -0.456913   0.764745
+     20647  $\tau_D$ from\nslow sp. of 2 sp. fit -0.456913   0.764745
+     20649  $\tau_D$ from\nslow sp. of 2 sp. fit -0.456913   0.764745
+     20651  $\tau_D$ from\nslow sp. of 2 sp. fit -0.456913   0.764745
+     20653  $\tau_D$ from\nslow sp. of 2 sp. fit -0.456913   0.764745
+
+            expected transit time     sim processing
+     0                 163.348623   0.069  clean noc
+     1                 163.348623   0.069  clean noc
+     2                 163.348623   0.069  clean noc
+     3                 163.348623   0.069  clean noc
+     4                 163.348623   0.069  clean noc
+     ...                      ...     ...        ...
+     20645               0.363582  31.000  dirty avg
+     20647               0.363582  31.000  dirty avg
+     20649               0.363582  31.000  dirty avg
+     20651               0.363582  31.000  dirty avg
+     20653               0.363582  31.000  dirty avg
+
+     [7934 rows x 6 columns]
      #+end_example
-
-     #+BEGIN_SRC jupyter-python
-       def simplot(data, x, height, aspect, hue, xlim, add_text='other'):
-           g = sns.catplot(data=data,
-                           x=x,
-                           y='processing',
-                           order=['clean noc', 'dirty noc', 'dirty cas', 'dirty del', 'dirty avg'],
-                           col='expected transit time',
-                           col_wrap=3,
-                           hue=hue,
-                           height=height,
-                           aspect=aspect,
-                           legend_out=True,
-                           kind='violin',
-                           sharex=True,
-                           showfliers=False,
-                           scale='width')
-           if hue is not None:
-               g._legend.remove()
-           styles = ['--', ':', '-', '-.', (0, (3, 1, 1, 1, 1, 1)), (0, (3, 1, 1, 1, 1, 1, 1, 1))]
-           for i, ax in enumerate(g.axes):
-               tt = str(ax.title).split('= ')
-               tt = tt[1].strip("')")
-               tt = float(tt)
-               clean = data[(data['processing'] == 'clean noc') & (data['expected transit time'] == tt)]
-               median = clean[x].median()
-               if x == 'N':
-                   line = ax.axvline(median, lw=4, label='', ls=styles[::-1][i])
-                   line_legend = {f'\n$N{{exp}}={median:.2f}$' : line}
-               else:
-                   line = ax.axvline(median, lw=4, label='', ls=styles[i])
-                   line_legend = {f'\n$\\tau_{{exp}}={median:.2f}ms$' : line}
-               g._legend_data.update(line_legend)
-           g.add_legend(g._legend_data)
-           if hue is None:
-               dodge = False
-           else:
-               dodge = True
-           g.map_dataframe(sns.stripplot,
-                 x=x,
-                 y='processing',
-                 order=['clean noc', 'dirty noc', 'dirty cas', 'dirty del', 'dirty avg'],
-                 hue=hue,
-                 dodge=dodge,
-                 palette=sns.color_palette(['0.3']),
-                 size=3,
-                 jitter=0.1,
-                 hue_order=['$\\tau_D$ from\n1 species fit', '$\\tau_D$ from\nfast sp. of 2 sp. fit', '$\\tau_D$ from\nslow sp. of 2 sp. fit'])
-
-           g.fig.suptitle('', size=25)
-           for ax in g.axes:
-               # ax[0].set_title('')
-               tt = str(ax.title).split('= ')
-               tt = tt[1].strip("')")
-               tt = float(tt)
-               clean = data[(data['processing'] == 'clean noc') & (data['expected transit time'] == tt)]
-               median = clean[x].median()
-               if x == 'N':
-                   ax.set_title(f'$N_{{exp}}={median:.2f}$')
-               else:
-                   ax.set_title(f'$\\tau_{{exp}}={median:.2f}ms$')
-
-           if x == 't':
-               xscale = 'linear'
-           else:
-               xscale = 'linear'
-
-           plt.setp(g.axes, xscale=xscale, xlabel='log transit time $\tau_{D}$ $[ms]$',
-                    ylabel='', xlim=xlim)
-           for i, ax in enumerate(g.axes):
-               xlab = ax.get_xticklabels()
-               # because seaborns violinplot does not support kde calculation in log values,
-               # I have to do this manually, by first log-transforming the data, now
-               # extracting the xticklabels and manually transforming them back.
-               xlab_power = [10**lab.get_position()[0] for lab in xlab]
-               ax.set_xticklabels(xlab_power)
-           g.tight_layout()
-           savefig = f'./data/exp-220316-publication1/jupyter/plot2_{add_text}'
-           plt.savefig(f'{savefig}.pdf', dpi=300)
-           os.system(f'pdf2svg {savefig}.pdf {savefig}.svg')
-           plt.close('all')
-     #+END_SRC
-
-     #+RESULTS:
+     :END:
 
    - the following constraints are given by the nanoletters template:
      - one column: up to 240 points wide (3.33 in.)
@@ -4772,13 +4852,16 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
        Helvetica or Arial fonts work well for lettering. Lines should be no
        thinner than 0.5 point.
 
+***** Version 1: boxen + strip plots
    - plot simulated data - transit times
      #+BEGIN_SRC jupyter-python
        sns.set_theme(style="whitegrid", font_scale=1, palette='colorblind',
                      context='paper')
        # sns.set(rc={'figure.figsize':(3.33, 7)})
        simplot(pub_param[~(pub_param['expected transit time'].isin([0.040253767881946526, 0.36358241957887183]))],
-               x='t', height=3, aspect=3/3, hue=None, xlim=[1, 10000], add_text='compare-correction-sim_transit-times')
+               order=['clean noc', 'dirty noc', 'dirty cas', 'dirty del', 'dirty avg'],
+               x='t', height=3, aspect=3/3, hue=None, xlim=[1, 10000], kind='boxen',
+               add_text='plot2_compare-correction-sim_transit-times')
      #+END_SRC
 
      #+RESULTS:
@@ -4789,7 +4872,9 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
                      context='paper')
        # sns.set(rc={'figure.figsize':(3.33, 7)})
        simplot(pub_param[(pub_param['expected transit time'] == 0.040253767881946526)],
-               x='t', height=3, aspect=3/3, hue=None, xlim=None, add_text='compare-correction-af488_transit-times')
+               order=['clean noc', 'dirty noc', 'dirty cas', 'dirty del', 'dirty avg'],
+               x='t', height=3, aspect=3/3, hue=None, xlim=None, kind='boxen',
+               add_text='plot2_compare-correction-af488_transit-times')
      #+END_SRC
 
      #+RESULTS:
@@ -4800,7 +4885,9 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
                      context='paper')
        # sns.set(rc={'figure.figsize':(3.33, 7)})
        simplot(pub_param[(pub_param['expected transit time'] == 0.040253767881946526)],
-               x='N', height=3, aspect=3/3, hue=None, xlim=None, add_text='compare-correction-af488_particle-numbers')
+               order=['clean noc', 'dirty noc', 'dirty cas', 'dirty del', 'dirty avg'],
+               x='N', height=3, aspect=3/3, hue=None, xlim=None, kind='boxen',
+               add_text='plot2_compare-correction-af488_particle-numbers')
      #+END_SRC
 
      #+RESULTS:
@@ -4811,7 +4898,9 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
                      context='paper')
        # sns.set(rc={'figure.figsize':(3.33, 7)})
        simplot(pub_param[(pub_param['expected transit time'] == 0.36358241957887183)],
-               x='t', height=3, aspect=3/3, hue=None, xlim=[0.1, 10], add_text='compare-correction-pex5_transit-times')
+               order=['clean noc', 'dirty noc', 'dirty cas', 'dirty del', 'dirty avg'],
+               x='t', height=3, aspect=3/3, hue=None, xlim=[0.1, 10], kind='boxen',
+               add_text='plot2_compare-correction-pex5_transit-times')
      #+END_SRC
 
      #+RESULTS:
@@ -4821,7 +4910,9 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
                      context='paper')
        # sns.set(rc={'figure.figsize':(3.33, 7)})
        simplot(pub_param[(pub_param['expected transit time'] == 0.36358241957887183)],
-               x='N', height=3, aspect=3/3, hue=None, xlim=[0, 2], add_text='compare-correction-pex5_particle-numbers')
+               order=['clean noc', 'dirty noc', 'dirty cas', 'dirty del', 'dirty avg'],
+               x='N', height=3, aspect=3/3, hue=None, xlim=[0, 2], kind='boxen',
+               add_text='plot2_compare-correction-pex5_particle-numbers')
      #+END_SRC
 
      #+RESULTS:
@@ -4832,7 +4923,9 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
                      context='paper')
        # sns.set(rc={'figure.figsize':(3.33, 7)})
        simplot(all_param,
-               x='t', height=4, aspect=3/4, hue='legend', xlim=None, add_text='compare-correction-sim-bio-allfits')
+               order=['clean noc', 'dirty noc', 'dirty cas', 'dirty del', 'dirty avg'],
+               x='t', height=4, aspect=3/4, hue='legend', xlim=None, kind='boxen',
+               add_text='plot2_compare-correction-sim-bio-allfits')
      #+END_SRC
 
      #+RESULTS:
@@ -4843,7 +4936,9 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
                      context='paper')
        # sns.set(rc={'figure.figsize':(3.33, 7)})
        simplot(all_param[~(all_param['expected transit time'].isin([0.040253767881946526, 0.36358241957887183]))],
-               x='t', height=4, aspect=3/4, hue='legend', xlim=None, add_text='compare-correction-sim_transit-times-allfits')
+               order=['clean noc', 'dirty noc', 'dirty cas', 'dirty del', 'dirty avg'],
+               x='t', height=4, aspect=3/4, hue='legend', xlim=None, kind='boxen',
+               add_text='plot2_compare-correction-sim_transit-times-allfits')
      #+END_SRC
 
      #+RESULTS:
@@ -4854,7 +4949,9 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
                      context='paper')
        # sns.set(rc={'figure.figsize':(3.33, 7)})
        simplot(all_param[all_param['expected transit time'] == 0.040253767881946526],
-               x='N', height=4, aspect=3/4, hue='legend', xlim=None, add_text='compare-correction-af488_particle-numbers-allfits')
+               order=['clean noc', 'dirty noc', 'dirty cas', 'dirty del', 'dirty avg'],
+               x='N', height=4, aspect=3/4, hue='legend', xlim=None, kind='boxen',
+               add_text='plot2_compare-correction-af488_particle-numbers-allfits')
      #+END_SRC
 
      #+RESULTS:
@@ -4865,7 +4962,9 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
                      context='paper')
        # sns.set(rc={'figure.figsize':(3.33, 7)})
        simplot(all_param[all_param['expected transit time'] == 0.040253767881946526],
-               x='t', height=4, aspect=3/4, hue='legend', xlim=None, add_text='compare-correction-af488_transit-times-allfits')
+               order=['clean noc', 'dirty noc', 'dirty cas', 'dirty del', 'dirty avg'],
+               x='t', height=4, aspect=3/4, hue='legend', xlim=None, kind='boxen',
+               add_text='plot2_compare-correction-af488_transit-times-allfits')
      #+END_SRC
 
      #+RESULTS:
@@ -4876,7 +4975,9 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
                      context='paper')
        # sns.set(rc={'figure.figsize':(3.33, 7)})
        simplot(all_param[(all_param['expected transit time'] == 0.36358241957887183)],
-               x='t', height=4, aspect=3/4, hue='legend', xlim=None, add_text='compare-correction-pex5_transit-times-allfits')
+               order=['clean noc', 'dirty noc', 'dirty cas', 'dirty del', 'dirty avg'],
+               x='t', height=4, aspect=3/4, hue='legend', xlim=None, kind='boxen',
+               add_text='plot2_compare-correction-pex5_transit-times-allfits')
      #+END_SRC
 
      #+RESULTS:
@@ -4887,82 +4988,244 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
                      context='paper')
        # sns.set(rc={'figure.figsize':(3.33, 7)})
        simplot(all_param[(all_param['expected transit time'] == 0.36358241957887183)],
-               x='N', height=4, aspect=3/4, hue='legend', xlim=[0, 3], add_text='compare-correction-pex5_particle-numbers-allfits')
+               order=['clean noc', 'dirty noc', 'dirty cas', 'dirty del', 'dirty avg'],
+               x='N', height=4, aspect=3/4, hue='legend', xlim=[0, 3], kind='boxen',
+               add_text='plot2_compare-correction-pex5_particle-numbers-allfits')
      #+END_SRC
 
      #+RESULTS:
-
+***** Version 2: violin plots
    - try violin plots
      #+BEGIN_SRC jupyter-python
+       print(f'change xlim=0.1 to {np.log10(0.1)}')
+       print(f'change xlim=1 to {np.log10(1)}')
+       print(f'change xlim=2 to {np.log10(2)}')
+       print(f'change xlim=3 to {np.log10(3)}')
+       print(f'change xlim=10 to {np.log10(10)}')
+       print(f'change xlim=10000 to {np.log10(10000)}')
+       print()
        pub_param.loc[:, ['t', 'N']].info()
      #+END_SRC
 
      #+RESULTS:
-     : <class 'pandas.core.frame.DataFrame'>
-     : Int64Index: 7934 entries, 0 to 20653
-     : Data columns (total 2 columns):
-     :  #   Column  Non-Null Count  Dtype
-     : ---  ------  --------------  -----
-     :  0   t       7934 non-null   float64
-     :  1   N       7934 non-null   float64
-     : dtypes: float64(2)
-     : memory usage: 186.0 KB
+     #+begin_example
+     change xlim=0.1 to -1.0
+     change xlim=1 to 0.0
+     change xlim=2 to 0.3010299956639812
+     change xlim=3 to 0.47712125471966244
+     change xlim=10 to 1.0
+     change xlim=10000 to 4.0
+
+     <class 'pandas.core.frame.DataFrame'>
+     Int64Index: 7934 entries, 0 to 20653
+     Data columns (total 2 columns):
+      #   Column  Non-Null Count  Dtype
+     ---  ------  --------------  -----
+      0   t       7934 non-null   float64
+      1   N       7934 non-null   float64
+     dtypes: float64(2)
+     memory usage: 186.0 KB
+     #+end_example
+
+   - plot simulated data - transit times
 
      #+BEGIN_SRC jupyter-python
        sns.set_theme(style="whitegrid", font_scale=1, palette='colorblind',
                      context='paper')
        # sns.set(rc={'figure.figsize':(3.33, 7)})
-       simplot(pub_param[~(pub_param['expected transit time'].isin([0.040253767881946526, 0.36358241957887183]))],
-               x='t', height=3, aspect=3/3, hue=None, xlim=[-1, 5], add_text='violin-fliers')
-     #+END_SRC
-
-     #+RESULTS:
-     : /tmp/ipykernel_54954/3269630507.py:74: UserWarning: FixedFormatter should only be used together with FixedLocator
-     :   ax.set_xticklabels(xlab_power)
-
-     #+BEGIN_SRC jupyter-python
-       g = sns.violinplot(data=pub_param[(pub_param['expected transit time'].isin([0.040253767881946526]))],
-                          x='t', y='processing', order=['clean noc', 'dirty noc', 'dirty cas', 'dirty del', 'dirty avg'],
-                          scale='width', cut=0)
-       plt.setp(g.axes, xscale='log', xlabel='log transit time $\tau_{D}$ $[ms]$',
-                          ylabel='', xlim=None)
-     #+END_SRC
-
-     #+RESULTS:
-     :RESULTS:
-          | hline | Text | (0.5 0 log transit time $\tau_{D}$ $[ms]$) | Text | (0 0.5 ) | 0.003219436230485522 | 1.3012831561711415 |
-     [[file:./data/exp-220316-publication1/jupyter/1507278416c74d578e0f3ab34027fff1c21786d0.png]]
-     :END:
-
-     #+BEGIN_SRC jupyter-python
-       pub_param[(pub_param['expected transit time'].isin([0.040253767881946526]))].loc[:, 't']
+       g = simplot(pub_param[~(pub_param['expected transit time'].isin([0.040253767881946526, 0.36358241957887183]))],
+               order=['clean noc', 'dirty noc', 'dirty cas', 'dirty del', 'dirty avg'],
+               x='t', height=3, aspect=3/3, hue=None, xlim=None, kind='violin',
+               add_text='plot2_compare-correction-sim_transit-times')
      #+END_SRC
 
      #+RESULTS:
      #+begin_example
-       900      0.038136
-       901      0.039811
-       902      0.040138
-       903      0.039936
-       904      0.039690
-                  ...
-       19019    0.047309
-       19020    0.098125
-       19021    0.052949
-       19022    0.091594
-       19023    0.096936
-       Name: t, Length: 2184, dtype: float64
+     0 [Text(-6.0, 0, '−6'), Text(-4.0, 0, '−4'), Text(-2.0, 0, '−2'), Text(0.0, 0, '0'), Text(2.0, 0, '2'), Text(4.0, 0, '4'), Text(6.0, 0, '6')]
+     [-6.0, -4.0, -2.0, 0.0, 2.0, 4.0, 6.0]
+     [1e-06, 0.0001, 0.01, 1.0, 100.0, 10000.0, 1000000.0]
+     [0.0, 0.0001, 0.01, 1.0, 100.0, 10000.0, 1000000.0]
+     1 [Text(-6.0, 0, '−6'), Text(-4.0, 0, '−4'), Text(-2.0, 0, '−2'), Text(0.0, 0, '0'), Text(2.0, 0, '2'), Text(4.0, 0, '4'), Text(6.0, 0, '6')]
+     [-6.0, -4.0, -2.0, 0.0, 2.0, 4.0, 6.0]
+     [1e-06, 0.0001, 0.01, 1.0, 100.0, 10000.0, 1000000.0]
+     [0.0, 0.0001, 0.01, 1.0, 100.0, 10000.0, 1000000.0]
+     2 [Text(-6.0, 0, '−6'), Text(-4.0, 0, '−4'), Text(-2.0, 0, '−2'), Text(0.0, 0, '0'), Text(2.0, 0, '2'), Text(4.0, 0, '4'), Text(6.0, 0, '6')]
+     [-6.0, -4.0, -2.0, 0.0, 2.0, 4.0, 6.0]
+     [1e-06, 0.0001, 0.01, 1.0, 100.0, 10000.0, 1000000.0]
+     [0.0, 0.0001, 0.01, 1.0, 100.0, 10000.0, 1000000.0]
+     /tmp/ipykernel_25877/3331635801.py:86: UserWarning: FixedFormatter should only be used together with FixedLocator
+       ax.set_xticklabels(xlab_power)
      #+end_example
 
+   - plot biological af488 data - transit times
      #+BEGIN_SRC jupyter-python
-
-       plt.violinplot(dataset=pub_param[(pub_param['expected transit time'].isin([0.040253767881946526]))].loc[:, 't'])
-       plt.yscale('log')
-
+       sns.set_theme(style="whitegrid", font_scale=1, palette='colorblind',
+                     context='paper')
+       # sns.set(rc={'figure.figsize':(3.33, 7)})
+       simplot(pub_param[(pub_param['expected transit time'] == 0.040253767881946526)],
+               order=['clean noc', 'dirty noc', 'dirty cas', 'dirty del', 'dirty avg'],
+               x='t', height=3, aspect=3/3, hue=None, xlim=None, kind='violin',
+               add_text='plot2_compare-correction-af488_transit-times')
      #+END_SRC
 
      #+RESULTS:
-     [[file:./data/exp-220316-publication1/jupyter/650ee6794d085196b2af7ab48d88cd6154621177.png]]
+     : 0 [Text(-3.0, 0, '−3'), Text(-2.0, 0, '−2'), Text(-1.0, 0, '−1'), Text(0.0, 0, '0'), Text(1.0, 0, '1'), Text(2.0, 0, '2')]
+     : [-3.0, -2.0, -1.0, 0.0, 1.0, 2.0]
+     : [0.001, 0.01, 0.1, 1.0, 10.0, 100.0]
+     : [0.001, 0.01, 0.1, 1.0, 10.0, 100.0]
+     : /tmp/ipykernel_25877/3331635801.py:86: UserWarning: FixedFormatter should only be used together with FixedLocator
+     :   ax.set_xticklabels(xlab_power)
+
+   - plot biological af488 data - particle numbers
+     #+BEGIN_SRC jupyter-python
+       sns.set_theme(style="whitegrid", font_scale=1, palette='colorblind',
+                     context='paper')
+       # sns.set(rc={'figure.figsize':(3.33, 7)})
+       simplot(pub_param[(pub_param['expected transit time'] == 0.040253767881946526)],
+               order=['clean noc', 'dirty noc', 'dirty cas', 'dirty del', 'dirty avg'],
+               x='N', height=3, aspect=3/3, hue=None, xlim=None, kind='violin',
+               add_text='plot2_compare-correction-af488_particle-numbers')
+     #+END_SRC
+
+   - plot biological pex5 data - transit times
+     #+BEGIN_SRC jupyter-python
+       sns.set_theme(style="whitegrid", font_scale=1, palette='colorblind',
+                     context='paper')
+       # sns.set(rc={'figure.figsize':(3.33, 7)})
+       simplot(pub_param[(pub_param['expected transit time'] == 0.36358241957887183)],
+               order=['clean noc', 'dirty noc', 'dirty cas', 'dirty del', 'dirty avg'],
+               x='t', height=2.5, aspect=2.5/3, hue=None, xlim=[-1, 0], kind='violin',
+               add_text='plot2_compare-correction-pex5_transit-times')
+     #+END_SRC
+
+     #+RESULTS:
+     : 0 [Text(-1.0, 0, '−1.00'), Text(-0.75, 0, '−0.75'), Text(-0.5, 0, '−0.50'), Text(-0.25, 0, '−0.25'), Text(0.0, 0, '0.00')]
+     : {0.1, 0.5623, 0.3162, 0.1778, 1.0}
+     : /tmp/ipykernel_38203/1869914210.py:86: UserWarning: FixedFormatter should only be used together with FixedLocator
+     :   ax.set_xticklabels(xlab_power)
+
+   - for supplementary, plot 1 and 2 species fits for every category for transit times
+     #+BEGIN_SRC jupyter-python
+       sns.set_theme(style="whitegrid", font_scale=1, palette='colorblind',
+                     context='paper')
+       # sns.set(rc={'figure.figsize':(3.33, 7)})
+       simplot(all_param,
+               order=['clean noc', 'dirty noc', 'dirty cas', 'dirty del', 'dirty avg'],
+               x='t', height=4, aspect=3/4, hue='legend', xlim=None, kind='violin',
+               add_text='plot2_compare-correction-sim-bio-allfits')
+     #+END_SRC
+
+     #+RESULTS:
+     #+begin_example
+     0 []
+     []
+     1 []
+     []
+     2 [Text(-6.0, 0, '−6'), Text(-4.0, 0, '−4'), Text(-2.0, 0, '−2'), Text(0.0, 0, '0'), Text(2.0, 0, '2'), Text(4.0, 0, '4'), Text(6.0, 0, '6')]
+     [0.0, 0.0001, 0.01, 1.0, 100.0, 10000.0, 1000000.0]
+     3 [Text(-6.0, 0, '−6'), Text(-4.0, 0, '−4'), Text(-2.0, 0, '−2'), Text(0.0, 0, '0'), Text(2.0, 0, '2'), Text(4.0, 0, '4'), Text(6.0, 0, '6')]
+     [0.0, 0.0001, 0.01, 1.0, 100.0, 10000.0, 1000000.0]
+     4 [Text(-6.0, 0, '−6'), Text(-4.0, 0, '−4'), Text(-2.0, 0, '−2'), Text(0.0, 0, '0'), Text(2.0, 0, '2'), Text(4.0, 0, '4'), Text(6.0, 0, '6')]
+     [0.0, 0.0001, 0.01, 1.0, 100.0, 10000.0, 1000000.0]
+     /tmp/ipykernel_25877/3410783254.py:84: UserWarning: FixedFormatter should only be used together with FixedLocator
+       ax.set_xticklabels(xlab_power)
+     #+end_example
+
+   - for supplementary, plot 1 and 2 species fits for simulated data - transit times
+     #+BEGIN_SRC jupyter-python
+       sns.set_theme(style="whitegrid", font_scale=1, palette='colorblind',
+                     context='paper')
+       # sns.set(rc={'figure.figsize':(3.33, 7)})
+       simplot(all_param[~(all_param['expected transit time']
+                           .isin([0.040253767881946526, 0.36358241957887183]))],
+               order=['clean noc', 'dirty noc', 'dirty cas', 'dirty del', 'dirty avg'],
+               x='t', height=4, aspect=3/4, hue='legend', xlim=None, kind='violin',
+               add_text='plot2_compare-correction-sim_transit-times-allfits')
+     #+END_SRC
+
+     #+RESULTS:
+     : 0 [Text(-6.0, 0, '−6'), Text(-4.0, 0, '−4'), Text(-2.0, 0, '−2'), Text(0.0, 0, '0'), Text(2.0, 0, '2'), Text(4.0, 0, '4'), Text(6.0, 0, '6')]
+     : [0.0, 0.0001, 0.01, 1.0, 100.0, 10000.0, 1000000.0]
+     : 1 [Text(-6.0, 0, '−6'), Text(-4.0, 0, '−4'), Text(-2.0, 0, '−2'), Text(0.0, 0, '0'), Text(2.0, 0, '2'), Text(4.0, 0, '4'), Text(6.0, 0, '6')]
+     : [0.0, 0.0001, 0.01, 1.0, 100.0, 10000.0, 1000000.0]
+     : 2 [Text(-6.0, 0, '−6'), Text(-4.0, 0, '−4'), Text(-2.0, 0, '−2'), Text(0.0, 0, '0'), Text(2.0, 0, '2'), Text(4.0, 0, '4'), Text(6.0, 0, '6')]
+     : [0.0, 0.0001, 0.01, 1.0, 100.0, 10000.0, 1000000.0]
+     : /tmp/ipykernel_25877/1072788822.py:85: UserWarning: FixedFormatter should only be used together with FixedLocator
+     :   ax.set_xticklabels(xlab_power)
+
+   - for supplementary, plot 1 and 2 species fits for af488 particle numbers
+     #+BEGIN_SRC jupyter-python
+       sns.set_theme(style="whitegrid", font_scale=1, palette='colorblind',
+                     context='paper')
+       # sns.set(rc={'figure.figsize':(3.33, 7)})
+       simplot(all_param[all_param['expected transit time'] == 0.040253767881946526],
+               order=['clean noc', 'dirty noc', 'dirty cas', 'dirty del', 'dirty avg'],
+               x='N', height=4, aspect=3/4, hue='legend', xlim=None, kind='violin',
+               add_text='plot2_compare-correction-af488_particle-numbers-allfits')
+     #+END_SRC
+
+     #+RESULTS:
+
+   - for supplementary, plot 1 and 2 species fits for af488 transit times
+     #+BEGIN_SRC jupyter-python
+       sns.set_theme(style="whitegrid", font_scale=1, palette='colorblind',
+                     context='paper')
+       # sns.set(rc={'figure.figsize':(3.33, 7)})
+       # here a version for the plot, but with corrupt xlabels
+       simplot(all_param[all_param['expected transit time'] == 0.040253767881946526],
+               order=['clean noc', 'dirty noc', 'dirty cas', 'dirty del', 'dirty avg'],
+               x='t', height=4, aspect=3/4, hue='legend', xlim=None, kind='violin',
+               add_text='plot2_compare-correction-af488_transit-times-allfits')
+       # here a version only to extract correct xlabels
+       simplot(all_param[all_param['expected transit time'] == 0.040253767881946526],
+               order=['clean noc', 'dirty noc', 'dirty cas', 'dirty del', 'dirty avg'],
+               x='t', height=4, aspect=4/3, hue='legend', xlim=None, kind='violin',
+               add_text='plot2_compare-correction-af488_transit-times-allfits_XLABELS')
+     #+END_SRC
+
+     #+RESULTS:
+     : 0 [Text(-6.0, 0, '−6'), Text(-4.0, 0, '−4'), Text(-2.0, 0, '−2'), Text(0.0, 0, '0'), Text(2.0, 0, '2'), Text(4.0, 0, '4'), Text(1.0, 0, '1'), Text(2.0, 0, '2'), Text(3.0, 0, '3'), Text(4.0, 0, '4')]
+     : [-6.0, -4.0, -2.0, 0.0, 1.0, 2.0, 2.0, 3.0, 4.0, 4.0]
+     : [0.0, 0.0001, 0.01, 1.0, 10.0, 100.0, 100.0, 1000.0, 10000.0, 10000.0]
+     : /tmp/ipykernel_38203/1673237170.py:87: UserWarning: FixedFormatter should only be used together with FixedLocator
+     :   ax.set_xticklabels(xlab_power)
+     : 0 [Text(-5.0, 0, '−5'), Text(-4.0, 0, '−4'), Text(-3.0, 0, '−3'), Text(-2.0, 0, '−2'), Text(-1.0, 0, '−1'), Text(0.0, 0, '0'), Text(1.0, 0, '1'), Text(2.0, 0, '2'), Text(3.0, 0, '3'), Text(4.0, 0, '4')]
+     : [-5.0, -4.0, -3.0, -2.0, -1.0, 0.0, 1.0, 2.0, 3.0, 4.0]
+     : [0.0, 0.0001, 0.001, 0.01, 0.1, 1.0, 10.0, 100.0, 1000.0, 10000.0]
+     : /tmp/ipykernel_38203/1673237170.py:87: UserWarning: FixedFormatter should only be used together with FixedLocator
+     :   ax.set_xticklabels(xlab_power)
+
+   - for supplementary, plot 1 and 2 species fits for pex5 transit times
+     #+BEGIN_SRC jupyter-python
+       sns.set_theme(style="whitegrid", font_scale=1, palette='colorblind',
+                     context='paper')
+       # sns.set(rc={'figure.figsize':(3.33, 7)})
+       simplot(all_param[(all_param['expected transit time'] == 0.36358241957887183)],
+               order=['clean noc', 'dirty noc', 'dirty cas', 'dirty del', 'dirty avg'],
+               x='t', height=4, aspect=3/4, hue='legend', xlim=None, kind='violin',
+               add_text='plot2_compare-correction-pex5_transit-times-allfits')
+     #+END_SRC
+
+     #+RESULTS:
+     : 0 [Text(-6.0, 0, '−6'), Text(-4.0, 0, '−4'), Text(-2.0, 0, '−2'), Text(0.0, 0, '0'), Text(2.0, 0, '2'), Text(4.0, 0, '4')]
+     : [-6.0, -4.0, -2.0, 0.0, 2.0, 4.0]
+     : [0.0, 0.0001, 0.01, 1.0, 100.0, 10000.0]
+     : /tmp/ipykernel_38203/1673237170.py:87: UserWarning: FixedFormatter should only be used together with FixedLocator
+     :   ax.set_xticklabels(xlab_power)
+
+   - for supplementary, plot 1 and 2 species fits for pex5 particle numbers
+     #+BEGIN_SRC jupyter-python
+       sns.set_theme(style="whitegrid", font_scale=1, palette='colorblind',
+                     context='paper')
+       # sns.set(rc={'figure.figsize':(3.33, 7)})
+       # setting a xlim becaues the figure is unreadable otherwise
+       simplot(all_param[(all_param['expected transit time'] == 0.36358241957887183)],
+               order=['clean noc', 'dirty noc', 'dirty cas', 'dirty del', 'dirty avg'],
+               x='N', height=4, aspect=3/4, hue='legend', xlim=[0, 3], kind='violin',
+               add_text='plot2_compare-correction-pex5_particle-numbers-allfits')
+     #+END_SRC
+
+     #+RESULTS:
 
 **** comparison correction methods - corr&fit examples
    :PROPERTIES:
@@ -5366,7 +5629,6 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
      : (112.71055006945028, [70.2697020959065, 180.78443081514223])
      : (11.271055006945026, [8.846431364774256, 14.360217779502584])
 
-
 **** comparison prediction methods
    :PROPERTIES:
    :header-args:jupyter-python: :session /jpy:localhost#8888:a37e524a-8134-4d8f-b24a-367acaf1bdd3 :pandoc t
@@ -5382,8 +5644,8 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
 
      #+RESULTS:
      : /home/lex/Programme/drmed-git
-     : 2023-01-25 10:58:57.948217: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
-     : 2023-01-25 10:58:57.948249: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+     : 2023-06-07 13:38:59.911954: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+     : 2023-06-07 13:38:59.912138: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
 
    - let's *compare correction methods* on 3 different simulated base molecule
      speeds (0.069, 0.2, and 3.0 um^2/s; varying molecule numbers) and af488 vs
@@ -5679,231 +5941,35 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
            display(all_param)
      #+END_SRC
 
-     :RESULTS:
-     : Index(['name_of_plot', 'master_file', 'parent_name', 'parent_uqid',
-     :        'time of fit', 'Diff_eq', 'Diff_species', 'Triplet_eq',
-     :        'Triplet_species', 'Dimen', 'xmin', 'xmax', 'offset', 'stdev(offset)',
-     :        'GN0', 'stdev(GN0)', 'N (FCS)', 'cpm (kHz)', 'A1', 'stdev(A1)', 'txy1',
-     :        'stdev(txy1)', 'alpha1', 'stdev(alpha1)', 'N (mom)', 'bri (kHz)',
-     :        'above zero', 'sim', 'processing', 'AR1', 'stdev(AR1)', 'T1',
-     :        'stdev(T1)', 'tauT1', 'stdev(tauT1)', 'A2', 'stdev(A2)', 'txy2',
-     :        'stdev(txy2)', 'alpha2', 'stdev(alpha2)', 'AR2', 'stdev(AR2)'],
-     :       dtype='object')
-     |     | name_of_plot                                                                               | Diff_species | N (FCS)   | A1       | txy1       | sim    | processing | A2       | txy2     |
-|-----+--------------------------------------------------------------------------------------------+--------------+-----------+----------+------------+--------+------------+----------+----------|
-| 0   | 2022-07-21_multipletau_clean_0dot069_0000_correlation-CH1_1                                | 1            | 13.940974 | 1.000000 | 150.165642 | 0.069  | clean noc  | NaN      | NaN      |
-| 1   | 2022-07-21_multipletau_clean_0dot069_0001_correlation-CH1_1                                | 1            | 16.272292 | 1.000000 | 133.758850 | 0.069  | clean noc  | NaN      | NaN      |
-| 2   | 2022-07-21_multipletau_clean_0dot069_0002_correlation-CH1_1                                | 1            | 17.590156 | 1.000000 | 109.396491 | 0.069  | clean noc  | NaN      | NaN      |
-| 3   | 2022-07-21_multipletau_clean_0dot069_0003_correlation-CH1_1                                | 1            | 13.739355 | 1.000000 | 140.176075 | 0.069  | clean noc  | NaN      | NaN      |
-| 4   | 2022-07-21_multipletau_clean_0dot069_0004_correlation-CH1_1                                | 1            | 10.985121 | 1.000000 | 520.784146 | 0.069  | clean noc  | NaN      | NaN      |
-| ... | ...                                                                                        | ...          | ...       | ...      | ...        | ...    | ...        | ...      | ...      |
-| 245 | 2022-07-27_tttr2xfcs_CH2_BIN1dot0_TbPEX5EGFP 1-1000246_T5364s_1_DELSHIFT_correlation-CH2_2 | 2            | 0.984319  | 0.052588 | 12.537737  | 31.000 | dirty thr3 | 0.947412 | 0.317513 |
-| 246 | 2022-07-27_tttr2xfcs_CH2_BIN1dot0_TbPEX5EGFP 1-1000247_T5386s_1_DELSHIFT_correlation-CH2_2 | 2            | 0.962060  | 0.054851 | 18.316749  | 31.000 | dirty thr3 | 0.945149 | 0.344213 |
-| 247 | 2022-07-27_tttr2xfcs_CH2_BIN1dot0_TbPEX5EGFP 1-1000248_T5408s_1_DELSHIFT_correlation-CH2_2 | 2            | 0.924462  | 0.014227 | 127.214999 | 31.000 | dirty thr3 | 0.985773 | 0.359032 |
-| 248 | 2022-07-27_tttr2xfcs_CH2_BIN1dot0_TbPEX5EGFP 1-1000249_T5430s_1_DELSHIFT_correlation-CH2_2 | 2            | 0.936036  | 0.046250 | 24.217742  | 31.000 | dirty thr3 | 0.953750 | 0.300107 |
-| 249 | 2022-07-27_tttr2xfcs_CH2_BIN1dot0_TbPEX5EGFP 1-1000250_T5451s_1_DELSHIFT_correlation-CH2_2 | 2            | 0.898454  | 0.027107 | 27.336500  | 31.000 | dirty thr3 | 0.972893 | 0.344808 |
-
-18604 rows × 9 columns
-     :END:
-
      #+BEGIN_SRC jupyter-python
-       def sort_fit(param_ls):
-           sim = param_ls[-1]
-           nfcs = param_ls[-2]
 
-           tt, tt_low_high = ans.convert_diffcoeff_to_transittimes(sim, fwhm=250)
-
-           array = np.array(list(param_ls)[:-2]).reshape((2, 2))
-           # sort by transit times
-           array = array[:, array[0, :].argsort()]
-           A_fast = array[1, 0]
-           A_slow = array[1, 1]
-           N_fast = A_fast * nfcs
-           N_slow = A_slow * nfcs
-           t_fast = array[0, 0]
-           t_slow = array[0, 1]
-           if np.isnan(t_slow):
-               # if tt_low_high[0] <= t_fast <= tt_low_high[1]:
-               #     out =
-
-               out = t_fast, nfcs, pd.NA, pd.NA, tt
-
-           elif f'{A_fast:.0%}' == '100%':
-               # if tt_low_high[0] <= t_fast <= tt_low_high[1]:
-               #     out =
-
-               out = t_fast, N_fast, pd.NA, pd.NA, tt
-           elif f'{A_slow:.0%}' == '100%':
-               # if tt_low_high[0] <= t_slow <= tt_low_high[1]:
-               #     out =
-               out = pd.NA, pd.NA, t_slow, N_slow, tt
-           else:
-               # if (tt_low_high[0] <= t_fast <= tt_low_high[1]) or (
-               #     tt_low_high[0] <= t_slow <= tt_low_high[1]):
-               #     out =
-               out = t_fast, N_fast, t_slow, N_slow, tt
-
-           return out
-
-       def sort_fit_legend(param_ls):
-           species = param_ls[0]
-           component = param_ls[1]
-
-           if species == 1:
-               legend = '$\\tau_D$ from\n1 species fit'
-           elif (species == 2) and (component == 'fast'):
-               legend = '$\\tau_D$ from\nfast sp. of 2 sp. fit'
-           elif (species == 2) and (component == 'slow'):
-               legend = '$\\tau_D$ from\nslow sp. of 2 sp. fit'
-           return legend
-
-       all_param[['t_fast', 'N_fast', 't_slow', 'N_slow', 'expected transit time']] = all_param[['txy1', 'txy2', 'A1', 'A2', 'N (FCS)', 'sim']].apply(
-           lambda x: sort_fit(x), axis=1, result_type='expand')
-       all_param = pd.wide_to_long(all_param, stubnames=['t', 'N'],
-                                   i=['name_of_plot', 'Diff_species', 'processing'],
-                                   j='fit component',
-                                   sep='_', suffix=r'\w+')
-
-       all_param = all_param.reset_index()
-       # if Diff_species is 1, there is only 1 component
-       all_param = all_param[~((all_param['fit component'] == 'slow') & (all_param['Diff_species'] == 1))]
-       all_param = all_param.reset_index()
-
-       all_param['legend'] = all_param[['Diff_species', 'fit component']].apply(
-           lambda x: sort_fit_legend(x), axis=1)
-       print('before dropping NaNs')
-       print('1 species fit: {}'.format(len(all_param[all_param["legend"] == "$\\tau_D$ from\n1 species fit"])))
-       print('slow sp of 2 sp fit: {}'.format(len(all_param[all_param["legend"] == "$\\tau_D$ from\nslow sp. of 2 sp. fit"])))
-       print('fast sp of 2 sp fit: {}'.format(len(all_param[all_param["legend"] == "$\\tau_D$ from\nfast sp. of 2 sp. fit"])))
-
-       all_param = all_param[~pd.isna(all_param['t'])]
-       print('after dropping NaNs')
-       print('1 species fit: {}'.format(len(all_param[all_param["legend"] == "$\\tau_D$ from\n1 species fit"])))
-       print('slow sp of 2 sp fit: {}'.format(len(all_param[all_param["legend"] == "$\\tau_D$ from\nslow sp. of 2 sp. fit"])))
-       print('fast sp of 2 sp fit: {}'.format(len(all_param[all_param["legend"] == "$\\tau_D$ from\nfast sp. of 2 sp. fit"])))
-
-       all_param = all_param[['legend', 't', 'N', 'expected transit time', 'sim', 'processing']]
+       all_param = prepare_all_param(all_param)
        # with pd.option_context("max_colwidth", 1000):
        #     display(all_param[['legend', 't', 'A', 'expected transit time', 'sim', 'processing']])
        pub_cond1 = ((all_param['legend'] == '$\\tau_D$ from\n1 species fit') &
-                    (all_param['processing'].isin(['clean noc', 'clean 0cd20', 'clean thr2', 'dirty noc', 'dirty 0cd20', 'dirty thr2'])) &
-                    ~((all_param['processing'].isin(['dirty noc', 'dirty 0cd20', 'dirty thr2'])) &
+                    (all_param['processing'].isin(
+                        ['clean noc', 'clean 0cd20', 'clean thr2', 'dirty noc',
+                         'dirty 0cd20', 'dirty thr2'])) &
+                    ~((all_param['processing'].isin(
+                        ['dirty noc', 'dirty 0cd20', 'dirty thr2'])) &
                       (all_param['expected transit time'] == 0.040253767881946526)))
        pub_cond2 = ((all_param['legend'] == '$\\tau_D$ from\nfast sp. of 2 sp. fit') &
-                    ((all_param['processing'].isin(['dirty noc', 'dirty 0cd20', 'dirty thr2'])) &
+                    ((all_param['processing'].isin(
+                        ['dirty noc', 'dirty 0cd20', 'dirty thr2'])) &
                      (all_param['expected transit time'] == 0.040253767881946526)))
 
        pub_param = all_param[pub_cond1 | pub_cond2]
        pub_param
      #+END_SRC
 
-     #+RESULTS:
-     :RESULTS:
-     : before dropping NaNs
-     : 1 species fit: 11773
-     : slow sp of 2 sp fit: 6831
-     : fast sp of 2 sp fit: 6831
-     : after dropping NaNs
-     : 1 species fit: 11773
-     : slow sp of 2 sp fit: 6228
-     : fast sp of 2 sp fit: 6577
-     |       | legend                               | t          | N         | expected transit time | sim     | processing |
-|-------+--------------------------------------+------------+-----------+-----------------------+---------+------------|
-| 0     | $\tau_D$ from\n1 species fit         | 150.165642 | 13.940974 | 163.348623            | 0.069   | clean noc  |
-| 1     | $\tau_D$ from\n1 species fit         | 133.75885  | 16.272292 | 163.348623            | 0.069   | clean noc  |
-| 2     | $\tau_D$ from\n1 species fit         | 109.396491 | 17.590156 | 163.348623            | 0.069   | clean noc  |
-| 3     | $\tau_D$ from\n1 species fit         | 140.176075 | 13.739355 | 163.348623            | 0.069   | clean noc  |
-| 4     | $\tau_D$ from\n1 species fit         | 520.784146 | 10.985121 | 163.348623            | 0.069   | clean noc  |
-| ...   | ...                                  | ...        | ...       | ...                   | ...     | ...        |
-| 22882 | $\tau_D$ from\nfast sp. of 2 sp. fit | 0.045014   | 10.206993 | 0.040254              | 280.000 | dirty thr2 |
-| 22884 | $\tau_D$ from\nfast sp. of 2 sp. fit | 0.053724   | 11.11189  | 0.040254              | 280.000 | dirty thr2 |
-| 22886 | $\tau_D$ from\nfast sp. of 2 sp. fit | 0.046132   | 10.239869 | 0.040254              | 280.000 | dirty thr2 |
-| 22888 | $\tau_D$ from\nfast sp. of 2 sp. fit | 0.039516   | 15.640813 | 0.040254              | 280.000 | dirty thr2 |
-| 22890 | $\tau_D$ from\nfast sp. of 2 sp. fit | 0.0381     | 14.548366 | 0.040254              | 280.000 | dirty thr2 |
-
-6792 rows × 6 columns
-     :END:
-
      #+BEGIN_SRC jupyter-python
        list(set(all_param['expected transit time']))[::-1]
      #+END_SRC
 
      #+RESULTS:
-     : 56.35527503472514
+     | 56.35527503472514 | 3.7570183356483424 | 163.34862328905834 | 0.040253767881946526 | 0.36358241957887183 |
 
      #+BEGIN_SRC jupyter-python
-       def simplot(data, x, order, height, aspect, hue, xlim, add_text='other'):
-           g = sns.catplot(data=data,
-                           x=x,
-                           y='processing',
-                           order=order,
-                           col='expected transit time',
-                           col_wrap=3,
-                           hue=hue,
-                           height=height,
-                           aspect=aspect,
-                           legend_out=True,
-                           kind='boxen',
-                           sharex=True,
-                           showfliers=False)
-           if hue is not None:
-               g._legend.remove()
-           styles = ['--', ':', '-', '-.', (0, (3, 1, 1, 1, 1, 1)), (0, (3, 1, 1, 1, 1, 1, 1, 1))]
-           for i, ax in enumerate(g.axes):
-               tt = str(ax.title).split('= ')
-               tt = tt[1].strip("')")
-               tt = float(tt)
-               clean = data[(data['processing'] == 'clean noc') & (data['expected transit time'] == tt)]
-               median = clean[x].median()
-               if x == 'N':
-                   line = ax.axvline(median, lw=4, label='', ls=styles[::-1][i])
-                   line_legend = {f'\n$N{{exp}}={median:.2f}$' : line}
-               else:
-                   line = ax.axvline(median, lw=4, label='', ls=styles[i])
-                   line_legend = {f'\n$\\tau_{{exp}}={median:.2f}ms$' : line}
-               g._legend_data.update(line_legend)
-           g.add_legend(g._legend_data)
-           if hue is None:
-               dodge = False
-           else:
-               dodge = True
-           g.map_dataframe(sns.stripplot,
-                 x=x,
-                 y='processing',
-                 order=order,
-                 hue=hue,
-                 dodge=dodge,
-                 palette=sns.color_palette(['0.3']),
-                 size=2,
-                 jitter=0.05,
-                 hue_order=['$\\tau_D$ from\n1 species fit', '$\\tau_D$ from\nfast sp. of 2 sp. fit', '$\\tau_D$ from\nslow sp. of 2 sp. fit'])
-
-           g.fig.suptitle('', size=25)
-           for ax in g.axes:
-               # ax[0].set_title('')
-               tt = str(ax.title).split('= ')
-               tt = tt[1].strip("')")
-               tt = float(tt)
-               clean = data[(data['processing'] == 'clean noc') & (data['expected transit time'] == tt)]
-               median = clean[x].median()
-               if x == 'N':
-                   ax.set_title(f'$N_{{exp}}={median:.2f}$')
-               else:
-                   ax.set_title(f'$\\tau_{{exp}}={median:.2f}ms$')
-
-           if x == 't':
-               xscale = 'log'
-           else:
-               xscale = 'linear'
-
-           plt.setp(g.axes, xscale=xscale, xlabel='log transit time $\tau_{D}$ $[ms]$',
-                    ylabel='', xlim=xlim)
-
-           g.tight_layout()
-           savefig = f'./data/exp-220316-publication1/jupyter/{add_text}'
-           plt.savefig(f'{savefig}.pdf', dpi=300)
-           os.system(f'pdf2svg {savefig}.pdf {savefig}.svg')
-           plt.close('all')
      #+END_SRC
 
      #+RESULTS:
@@ -5917,7 +5983,7 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
        format. The text should be legible when the graphic is viewed full-size.
        Helvetica or Arial fonts work well for lettering. Lines should be no
        thinner than 0.5 point.
-
+***** version 1: boxen + strip plots
    - plot biological af488 data - transit times
      #+BEGIN_SRC jupyter-python
        sns.set_theme(style="whitegrid", font_scale=1, palette='colorblind',
@@ -6027,7 +6093,163 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
      :   hue_mask = self.plot_hues[i] == hue_level
      : /home/lex/Programme/miniconda3/envs/tf/lib/python3.9/site-packages/seaborn/categorical.py:1143: FutureWarning: elementwise comparison failed; returning scalar instead, but in the future will perform elementwise comparison
      :   hue_mask = self.plot_hues[i] == hue_level
+***** version 2: violin plots
+   - plot biological af488 data - transit times
+     #+BEGIN_SRC jupyter-python
+       sns.set_theme(style="whitegrid", font_scale=1, palette='colorblind',
+                     context='paper')
 
+       simplot(pub_param[(pub_param['expected transit time'] == 0.040253767881946526)],
+               order=['clean noc', 'clean 0cd20', 'clean thr2', 'dirty noc',
+                      'dirty 0cd20', 'dirty thr2'],
+               x='t', height=3, aspect=3/3, hue=None, xlim=None, kind='violin',
+               add_text='plot4_compare-prediction-af488_transit-times')
+     #+END_SRC
+
+     #+RESULTS:
+     : 0 [-3.0, -2.0, -1.0, 0.0, 1.0, 2.0]
+     : [0.001, 0.01, 0.1, 1.0, 10.0, 100.0]
+     : /tmp/ipykernel_15333/2452455692.py:230: UserWarning: FixedFormatter should only be used together with FixedLocator
+     :   ax.set_xticklabels(xlab_power)
+
+   - plot biological af488 data - particle numbers
+     #+BEGIN_SRC jupyter-python
+       sns.set_theme(style="whitegrid", font_scale=1, palette='colorblind',
+                     context='paper')
+
+       simplot(pub_param[(pub_param['expected transit time'] == 0.040253767881946526)],
+               order=['clean noc', 'clean 0cd20', 'clean thr2', 'dirty noc',
+                      'dirty 0cd20', 'dirty thr2'],
+               x='N', height=3, aspect=3/3, hue=None, xlim=None, kind='violin',
+               add_text='plot4_compare-prediction-af488_particle-numbers')
+     #+END_SRC
+
+     #+RESULTS:
+
+   - plot biological pex5 data - transit times
+     #+BEGIN_SRC jupyter-python
+       sns.set_theme(style="whitegrid", font_scale=1, palette='colorblind',
+                     context='paper')
+       # sns.set(rc={'figure.figsize':(3.33, 7)})
+       # one plot with the correct ratio
+       simplot(pub_param[(pub_param['expected transit time'] == 0.36358241957887183)],
+               order=['clean noc', 'clean 0cd20', 'clean thr2', 'dirty noc',
+                      'dirty 0cd20', 'dirty thr2'],
+               x='t', height=3, aspect=3/3, hue=None, xlim=[-1, 0], kind='violin',
+               add_text='plot4_compare-prediction-pex5_transit-times')
+       # one plot to extract xlabels label positions
+       simplot(pub_param[(pub_param['expected transit time'] == 0.36358241957887183)],
+               order=['clean noc', 'clean 0cd20', 'clean thr2', 'dirty noc',
+                      'dirty 0cd20', 'dirty thr2'],
+               x='t', height=2.5, aspect=2.5/3, hue=None, xlim=[-1, 0], kind='violin',
+               add_text='plot4_compare-prediction-pex5_transit-times_XLABELS')
+     #+END_SRC
+
+     #+RESULTS:
+     : 0 [-1.0, -0.8, -0.6, -0.3999999999999999, -0.19999999999999996, 0.0]
+     : [0.1, 0.1585, 0.2512, 0.3981, 0.631, 1.0]
+     : /tmp/ipykernel_15333/2452455692.py:230: UserWarning: FixedFormatter should only be used together with FixedLocator
+     :   ax.set_xticklabels(xlab_power)
+     : 0 [-1.0, -0.75, -0.5, -0.25, 0.0]
+     : [0.1, 0.1778, 0.3162, 0.5623, 1.0]
+     : /tmp/ipykernel_15333/2452455692.py:230: UserWarning: FixedFormatter should only be used together with FixedLocator
+     :   ax.set_xticklabels(xlab_power)
+
+   - for supplementary, plot 1 and 2 species fits, as well as additional
+     prediction methods, for biological af488 data - transit times
+     #+BEGIN_SRC jupyter-python
+       sns.set_theme(style="whitegrid", font_scale=1, palette='colorblind',
+                     context='paper')
+
+       simplot(all_param[(all_param['expected transit time'] == 0.040253767881946526)],
+               order=['clean noc', 'clean 0cd20', 'clean ff67b', 'clean thr1',
+                      'clean thr2', 'clean thr3', 'dirty noc', 'dirty 0cd20',
+                      'dirty ff67b', 'dirty thr1', 'dirty thr2', 'dirty thr3'],
+               x='t', height=5, aspect=3/5, hue='legend', xlim=None, kind='violin',
+               add_text='plot4_compare-prediction-af488_transit-times_allfits')
+     #+END_SRC
+
+     #+RESULTS:
+     : 0 [-3.0, -2.0, -1.0, 0.0, 1.0, 2.0, 3.0, 4.0]
+     : [0.001, 0.01, 0.1, 1.0, 10.0, 100.0, 1000.0, 10000.0]
+     : /tmp/ipykernel_15333/2452455692.py:230: UserWarning: FixedFormatter should only be used together with FixedLocator
+     :   ax.set_xticklabels(xlab_power)
+
+   - for supplementary, plot 1 and 2 species fits, as well as additional
+     prediction methods, for biological af488 data - particle numbers
+     #+BEGIN_SRC jupyter-python
+       sns.set_theme(style="whitegrid", font_scale=1, palette='colorblind',
+                     context='paper')
+
+       simplot(all_param[(all_param['expected transit time'] == 0.040253767881946526)],
+               order=['clean noc', 'clean 0cd20', 'clean ff67b', 'clean thr1',
+                      'clean thr2', 'clean thr3', 'dirty noc', 'dirty 0cd20',
+                      'dirty ff67b', 'dirty thr1', 'dirty thr2', 'dirty thr3'],
+               x='N', height=5, aspect=3/5, hue='legend', xlim=None, kind='violin',
+               add_text='plot4_compare-prediction-af488_particle-numbers_allfits')
+     #+END_SRC
+
+   - for supplementary, plot 1 and 2 species fits, as well as additional
+     prediction methods, for biological pex5 data - transit times
+     #+BEGIN_SRC jupyter-python
+       sns.set_theme(style="whitegrid", font_scale=1, palette='colorblind',
+                     context='paper')
+
+       simplot(all_param[(all_param['expected transit time'] == 0.36358241957887183)],
+               order=['clean noc', 'clean 0cd20', 'clean ff67b', 'clean thr1',
+                      'clean thr2', 'clean thr3', 'dirty noc', 'dirty 0cd20',
+                      'dirty ff67b', 'dirty thr1', 'dirty thr2', 'dirty thr3'],
+               x='t', height=5, aspect=3/5, hue='legend', xlim=None, kind='violin',
+               add_text='plot4_compare-prediction-pex5_transit-times_allfits')
+     #+END_SRC
+
+     #+RESULTS:
+     : 0 [-6.0, -4.0, -2.0, 0.0, 2.0, 4.0]
+     : [0.0, 0.0001, 0.01, 1.0, 100.0, 10000.0]
+     : /tmp/ipykernel_15333/2452455692.py:230: UserWarning: FixedFormatter should only be used together with FixedLocator
+     :   ax.set_xticklabels(xlab_power)
+
+   - for supplementary, plot 1 and 2 species fits, as well as additional
+     prediction methods, for biological pex5 data - particle numbers
+     #+BEGIN_SRC jupyter-python
+       sns.set_theme(style="whitegrid", font_scale=1, palette='colorblind',
+                     context='paper')
+
+       simplot(all_param[(all_param['expected transit time'] == 0.36358241957887183)],
+               order=['clean noc', 'clean 0cd20', 'clean ff67b', 'clean thr1',
+                      'clean thr2', 'clean thr3', 'dirty noc', 'dirty 0cd20',
+                      'dirty ff67b', 'dirty thr1', 'dirty thr2', 'dirty thr3'],
+               x='N', height=5, aspect=3/5, hue='legend', xlim=None, kind='violin',
+               add_text='plot4_compare-prediction-pex5_particle-numbers_allfits')
+     #+END_SRC
+
+     #+RESULTS:
+
+   - I decided not to use simulated plots for this figure, that's why I stopped
+     doing the correlations midway. As can be seen be the incomplete data, the
+     automated and manual approaches worked in simulated data as well.
+     #+BEGIN_SRC jupyter-python
+       sns.set_theme(style="whitegrid", font_scale=1, palette='colorblind',
+                     context='paper')
+       # sns.set(rc={'figure.figsize':(3.33, 7)})
+       simplot(all_param[~(all_param['expected transit time']
+                           .isin([0.040253767881946526, 0.36358241957887183]))],
+               order=['clean noc', 'clean 0cd20', 'clean ff67b', 'clean thr1',
+                      'clean thr2', 'clean thr3', 'dirty noc', 'dirty 0cd20',
+                      'dirty ff67b', 'dirty thr1', 'dirty thr2', 'dirty thr3'],
+               x='t', height=5, aspect=3/5, hue='legend', xlim=None, kind='violin',
+               add_text='plot4_compare-prediction-sim_transit-times')
+     #+END_SRC
+
+     #+RESULTS:
+     : 0 [-6.0, -4.0, -2.0, 0.0, 2.0, 4.0, 6.0]
+     : [0.0, 0.0001, 0.01, 1.0, 100.0, 10000.0, 1000000.0]
+     : 1 [-6.0, -4.0, -2.0, 0.0, 2.0, 4.0, 6.0]
+     : [0.0, 0.0001, 0.01, 1.0, 100.0, 10000.0, 1000000.0]
+     : 2 [-6.0, -4.0, -2.0, 0.0, 2.0, 4.0, 6.0]
+     : [0.0, 0.0001, 0.01, 1.0, 100.0, 10000.0, 1000000.0]
+     : /tmp/ipykernel_15333/2452455692.py:230: UserWarning: FixedFormatter should only be used together with FixedLocator
+     :   ax.set_xticklabels(xlab_power)
 **** Unused: further traces
      #+BEGIN_SRC jupyter-python :pandoc t
        plot1_index = ['3.0-0.01', '3.0-0.1', '3.0-1.0',
@@ -6321,7 +6543,6 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
      #+RESULTS:
 
      [[file:./data/exp-220316-publication1/jupyter/edf056e7749bf85f1d2b663fea4e3e33b4ece5f7.png]]
-
 
 **** Unused: other
 
@@ -6759,8 +6980,8 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
       :        'stdev(A1)', 'correction', 'txy', 'Triplet_eq', 'stationary_speed',
       :        'master_file', 'stdev(txy1)', 'parent_name', 'artifact_speed',
       :        'stdev(GN0)', 'Diff_species', 'xmin', 'model', 'alpha1',
-      :        'stdev(alpha1)', 'bri (kHz)', 'offset', 'Diff_eq', 'A'],
-      :       dtype='object')
+      :        'stdev(alpha1)', 'bri (kHz)', 'offset', 'Diff_eq',],) 'A'
+      :       dtype='object'
 
       #+BEGIN_SRC jupyter-python
         %cd ~/Programme/drmed-git
@@ -6768,9 +6989,8 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
 
 *** Plot 3: all bioexps
     :PROPERTIES:
-    :header-args:jupyter-python: :session /jpy:localhost#8888:137e524a-8134-4d8f-b24a-367acaf1bdd3 :pandoc t
+    :header-args:jupyter-python: :session /jpy:localhost#8888:5a120ef6-9d66-4862-aa20-ac019c75a0ef :pandoc t
     :END:
-
      #+BEGIN_SRC jupyter-python
        %cd ~/Programme/drmed-git
      #+END_SRC
@@ -6802,6 +7022,7 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
        model_name_ls = [f'{s:.5}' for s in model_ls]
 
        pred_thresh = 0.5
+
      #+END_SRC
 
      #+RESULTS:
@@ -6863,6 +7084,19 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
      #+END_SRC
 
      #+RESULTS:
+     :RESULTS:
+     # [goto error]
+     : ---------------------------------------------------------------------------
+     : NameError                                 Traceback (most recent call last)
+     : /tmp/ipykernel_7084/2257368777.py in <module>
+     : ----> 1 corr_af488 = pd.read_csv(Path(output_path) / 'clean_nocorrection_3D-AR5_1spec_rawFitData.csv',
+     :       2                          index_col=0, usecols=[0, 1, 3, 5], na_values=' ')
+     :       3 fit_af488 = pd.read_csv(Path(output_path) / 'clean_nocorrection_3D-AR5_1spec_rawFitData.csv',
+     :       4                         index_col=0, usecols=[0, 2, 4, 6], na_values=' ')
+     :       5 param_af488 = pd.read_csv(Path(output_path) / 'clean_nocorrection_3D-AR5_1spec_outputParam.csv',
+     :
+     : NameError: name 'output_path' is not defined
+     :END:
 
      #+BEGIN_SRC jupyter-python
        def plot_bio_traces(df, txt):
@@ -7028,8 +7262,6 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
                os.system(f'rm {plot1_file}.pdf')
            plt.close('all')
      #+END_SRC
-
-     #+RESULTS:
 
      #+BEGIN_SRC jupyter-python
        plot_bio_traces(traces_af488, txt='AlexaFluor488\n(n=1,\nno artifacts,\nno correction)')
@@ -7472,44 +7704,6 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
            display(all_param)
      #+END_SRC
 
-     #+RESULTS:
-     :RESULTS:
-     #+begin_example
-       2631
-       2631
-       1500
-       1500
-       2631
-       2542
-       1500
-       1500
-       --- now delete all t=pd.NA, which I inserted if A_fast or A_slow was 0 ---
-       2630
-       2631
-       1500
-       1493
-       2631
-       2542
-       1297
-       1500
-     #+end_example
-     |       | index | name_of_plot                                                                               | processing                                                                | Diff_species | fit component | txy1       | txy2     | bio   | N (mom)   | A2       | N (FCS)   | A1       | t          | N         | legend_t                                                                       | legend_N                                                                               |
-|-------+-------+--------------------------------------------------------------------------------------------+---------------------------------------------------------------------------+--------------+---------------+------------+----------+-------+-----------+----------+-----------+----------+------------+-----------+--------------------------------------------------------------------------------+----------------------------------------------------------------------------------------|
-| 0     | 0     | 2022-05-26_tttr2xfcs_CH2_BIN1dot0_20 nM AF4881_T0s_1_correlation-CH2_2                     | Baseline control:\nno correction                                          | 1            | fast          | 0.038136   | NaN      | af488 | 75.045477 | NaN      | 14.315572 | 1.000000 | 0.038136   | 14.315572 | \nAlexaFluor488\n(n=424, no\nartifacts, $\tau_D$ from\n1 species fit)          | \nAlexaFluor488\n(n=424, no artifacts,\n$N (FCS)$ from\n1 species fit)                 |
-| 1     | 2     | 2022-05-26_tttr2xfcs_CH2_BIN1dot0_20 nM AF4882_T14s_1_correlation-CH2_2                    | Baseline control:\nno correction                                          | 1            | fast          | 0.039811   | NaN      | af488 | 73.260903 | NaN      | 14.368362 | 1.000000 | 0.039811   | 14.368362 | \nAlexaFluor488\n(n=424, no\nartifacts, $\tau_D$ from\n1 species fit)          | \nAlexaFluor488\n(n=424, no artifacts,\n$N (FCS)$ from\n1 species fit)                 |
-| 2     | 4     | 2022-05-26_tttr2xfcs_CH2_BIN1dot0_20 nM AF4883_T26s_1_correlation-CH2_2                    | Baseline control:\nno correction                                          | 1            | fast          | 0.040138   | NaN      | af488 | 73.529686 | NaN      | 14.122089 | 1.000000 | 0.040138   | 14.122089 | \nAlexaFluor488\n(n=424, no\nartifacts, $\tau_D$ from\n1 species fit)          | \nAlexaFluor488\n(n=424, no artifacts,\n$N (FCS)$ from\n1 species fit)                 |
-| 3     | 6     | 2022-05-26_tttr2xfcs_CH2_BIN1dot0_20 nM AF4884_T38s_1_correlation-CH2_2                    | Baseline control:\nno correction                                          | 1            | fast          | 0.039936   | NaN      | af488 | 72.838417 | NaN      | 14.236361 | 1.000000 | 0.039936   | 14.236361 | \nAlexaFluor488\n(n=424, no\nartifacts, $\tau_D$ from\n1 species fit)          | \nAlexaFluor488\n(n=424, no artifacts,\n$N (FCS)$ from\n1 species fit)                 |
-| 4     | 8     | 2022-05-26_tttr2xfcs_CH2_BIN1dot0_20 nM AF4885_T50s_1_correlation-CH2_2                    | Baseline control:\nno correction                                          | 1            | fast          | 0.039690   | NaN      | af488 | 70.663922 | NaN      | 14.192151 | 1.000000 | 0.03969    | 14.192151 | \nAlexaFluor488\n(n=424, no\nartifacts, $\tau_D$ from\n1 species fit)          | \nAlexaFluor488\n(n=424, no artifacts,\n$N (FCS)$ from\n1 species fit)                 |
-| ...   | ...   | ...                                                                                        | ...                                                                       | ...          | ...           | ...        | ...      | ...   | ...       | ...      | ...       | ...      | ...        | ...       | ...                                                                            | ...                                                                                    |
-| 16430 | 24603 | 2022-07-27_tttr2xfcs_CH2_BIN1dot0_TbPEX5EGFP 1-1000248_T5408s_1_DELSHIFT_correlation-CH2_2 | Manual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=10 | 2            | slow          | 127.214999 | 0.359032 | tb    | 2.050364  | 0.985773 | 0.924462  | 0.014227 | 127.214999 | 0.013152  | \nTb-PEX5-eGFP\n(n=250, peak\nartifacts, $\tau_D$ from\nslow sp. of 2 sp. fit) | \nTb-PEX5-eGFP\n(n=250, peak artifacts,\n$N (FCS)\cdot A$ from\nslow sp. of 2 sp. fit) |
-| 16431 | 24604 | 2022-07-27_tttr2xfcs_CH2_BIN1dot0_TbPEX5EGFP 1-1000249_T5430s_1_DELSHIFT_correlation-CH2_2 | Manual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=10 | 2            | fast          | 24.217742  | 0.300107 | tb    | 1.974608  | 0.953750 | 0.936036  | 0.046250 | 0.300107   | 0.892745  | \nTb-PEX5-eGFP\n(n=250, peak\nartifacts, $\tau_D$ from\nfast sp. of 2 sp. fit) | \nTb-PEX5-eGFP\n(n=250, peak artifacts,\n$N (FCS)\cdot A$ from\nfast sp. of 2 sp. fit) |
-| 16432 | 24605 | 2022-07-27_tttr2xfcs_CH2_BIN1dot0_TbPEX5EGFP 1-1000249_T5430s_1_DELSHIFT_correlation-CH2_2 | Manual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=10 | 2            | slow          | 24.217742  | 0.300107 | tb    | 1.974608  | 0.953750 | 0.936036  | 0.046250 | 24.217742  | 0.043292  | \nTb-PEX5-eGFP\n(n=250, peak\nartifacts, $\tau_D$ from\nslow sp. of 2 sp. fit) | \nTb-PEX5-eGFP\n(n=250, peak artifacts,\n$N (FCS)\cdot A$ from\nslow sp. of 2 sp. fit) |
-| 16433 | 24606 | 2022-07-27_tttr2xfcs_CH2_BIN1dot0_TbPEX5EGFP 1-1000250_T5451s_1_DELSHIFT_correlation-CH2_2 | Manual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=10 | 2            | fast          | 27.336500  | 0.344808 | tb    | 1.935038  | 0.972893 | 0.898454  | 0.027107 | 0.344808   | 0.874099  | \nTb-PEX5-eGFP\n(n=250, peak\nartifacts, $\tau_D$ from\nfast sp. of 2 sp. fit) | \nTb-PEX5-eGFP\n(n=250, peak artifacts,\n$N (FCS)\cdot A$ from\nfast sp. of 2 sp. fit) |
-| 16434 | 24607 | 2022-07-27_tttr2xfcs_CH2_BIN1dot0_TbPEX5EGFP 1-1000250_T5451s_1_DELSHIFT_correlation-CH2_2 | Manual thresh. pred.\n+ cut and shift corr.:\nscaler=robust\nthreshold=10 | 2            | slow          | 27.336500  | 0.344808 | tb    | 1.935038  | 0.972893 | 0.898454  | 0.027107 | 27.3365    | 0.024355  | \nTb-PEX5-eGFP\n(n=250, peak\nartifacts, $\tau_D$ from\nslow sp. of 2 sp. fit) | \nTb-PEX5-eGFP\n(n=250, peak artifacts,\n$N (FCS)\cdot A$ from\nslow sp. of 2 sp. fit) |
-
-16224 rows × 16 columns
-     :END:
-
      #+begin_src jupyter-python
        # for all fit data of af488/af488+luv: data=af488_param, aspect=4
        # for publication choose the following and use: data=af488_plot, aspect=1
@@ -7583,8 +7777,6 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
            os.system(f'pdf2svg {savefig}.pdf {savefig}.svg')
            plt.close('all')
      #+end_src
-
-     #+RESULTS:
 
 
      #+BEGIN_SRC jupyter-python
