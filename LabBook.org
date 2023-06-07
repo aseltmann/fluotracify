@@ -4281,13 +4281,13 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
        af488luv_0cd20cas_2comp_path = path6 / 'dirty-all-results/dirty_0cd20_2comp_outputParam.csv'
 
        path7 = Path('/home/lex/Programme/drmed-git/data/exp-220227-unet/2022-06-02_experimental-pex5')
-       hspex5_noc_1comp_path = path7 / 'clean-all-results/Hs-PEX5-eGFP_no-correction_triplet-0.04_1comp_outputParam.csv'
-       # hspex5_0cd20cas_1comp_path = path7 / 'clean-all-results/Hs-PEX5-eGFP_no-correction_triplet-0.04_1comp_outputParam.csv'
+       hspex5_noc_1comp_path = path7 / 'clean-all-results/Hs-PEX5-eGFP_no-correction_1comp_outputParam.csv'
+       # hspex5_0cd20cas_1comp_path = path7 / 'clean-all-results/Hs-PEX5-eGFP_no-correction_1comp_outputParam.csv'
 
-       tbpex5_noc_1comp_path = path7 / 'dirty-all-results/Tb-PEX5-eGFP_no-correction_triplet-0.04_1comp_outputParam.csv'
-       tbpex5_noc_2comp_path = path7 / 'dirty-all-results/Tb-PEX5-eGFP_no-correction_triplet-0.04_2comp_outputParam.csv'
-       tbpex5_0cd20cas_1comp_path = path7 / 'dirty-all-results/Tb-PEX5-eGFP_0cd20_triplet-0.04_1comp_outputParam.csv'
-       tbpex5_0cd20cas_2comp_path = path7 / 'dirty-all-results/Tb-PEX5-eGFP_0cd20_triplet-0.04_2comp_outputParam.csv'
+       tbpex5_noc_1comp_path = path7 / 'dirty-all-results/Tb-PEX5-eGFP_no-correction_1comp_outputParam.csv'
+       tbpex5_noc_2comp_path = path7 / 'dirty-all-results/Tb-PEX5-eGFP_no-correction_2comp_outputParam.csv'
+       tbpex5_0cd20cas_1comp_path = path7 / 'dirty-all-results/Tb-PEX5-eGFP_0cd20_1comp_outputParam.csv'
+       tbpex5_0cd20cas_2comp_path = path7 / 'dirty-all-results/Tb-PEX5-eGFP_0cd20_2comp_outputParam.csv'
 
        # biological data - averaging, set to zero
        path8 = Path('/home/lex/Programme/drmed-git/data/exp-220227-unet/2023-01-10_experimental-averaging-delete/all-results')
@@ -4415,48 +4415,88 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
 
        # assert the following fit parameters
        assert set(all_param['Dimen']) == {'2D', '3D'}
-       assert set(all_param[all_param['Dimen'] == '2D']['sim']) == {0.069, 0.2, 3.0}
-       assert set(all_param[all_param['Dimen'] == '3D']['sim']) == {31.0, 280.0}
-       assert set(all_param[(all_param['Dimen'] == '3D') & (all_param['sim'] == 31.0)]['AR1']) == {6.0}
-       assert set(all_param[(all_param['Dimen'] == '3D') & (all_param['sim'] == 280.0)]['AR1']) == {5.0}
+       assert set(all_param[all_param['Dimen'] == '2D']['sim']
+                  ) == {0.069, 0.2, 3.0}
+       assert set(all_param[all_param['Dimen'] == '3D']['sim']
+                  ) == {31.0, 280.0}
+       assert set(all_param[(all_param['Dimen'] == '3D') &
+                            (all_param['sim'] == 31.0)]['AR1']) == {6.0}
+       assert set(all_param[(all_param['Dimen'] == '3D') &
+                            (all_param['sim'] == 280.0)]['AR1']) == {5.0}
        assert set(all_param['Diff_eq']) == {'Equation 1A', 'Equation 1B'}
-       assert set(all_param[all_param['Diff_eq'] == 'Equation 1A']['sim']) == {0.069, 0.2, 3.0}
-       assert set(all_param[all_param['Diff_eq'] == 'Equation 1B']['sim']) == {31.0, 280.0}
+       assert set(all_param[all_param['Diff_eq'] == 'Equation 1A']['sim']
+                  ) == {0.069, 0.2, 3.0}
+       assert set(all_param[all_param['Diff_eq'] == 'Equation 1B']['sim']
+                  ) == {31.0, 280.0}
        assert set(all_param['Triplet_eq']) == {'Triplet Eq 2B', 'no triplet'}
-       assert set(all_param[all_param['Triplet_eq'] == 'no triplet']['sim']) == {0.069, 0.2, 3.0, 280.0}
-       assert set(all_param[all_param['Triplet_eq'] == 'Triplet Eq 2B']['sim']) == {31.0}
+       assert set(all_param[all_param['Triplet_eq'] == 'no triplet']['sim']
+                  ) == {0.069, 0.2, 3.0, 280.0}
+       assert set(all_param[all_param['Triplet_eq'] == 'Triplet Eq 2B']['sim']
+                  ) == {31.0}
        assert set(all_param['alpha1']) == {1.0}
        assert set(all_param['xmin']) == {0.001018, 1.0}
-       assert set(all_param[all_param['xmin'] == 1.0]['sim']) == {0.069, 0.2, 3.0}
-       assert set(all_param[all_param['xmin'] == 0.001018]['sim']) == {31.0, 280.0}
-       assert set(all_param['xmax']) == {0.524282, 100.66329, 469.762042, 512.0, 896.0, 939.52409, 1024.0, 2048.0, 4096.0, 7168.0, 8192.0}
-       # biological af488 correlations were fitted with xmax=500 for peak artifacts, except xmax=0.5 for peak artifacts with averaging correction,
+       assert set(all_param[all_param['xmin'] == 1.0]['sim']
+                  ) == {0.069, 0.2, 3.0}
+       assert set(all_param[all_param['xmin'] == 0.001018]['sim']
+                  ) == {31.0, 280.0}
+       assert set(all_param['xmax']) == {0.524282, 100.66329, 469.762042, 512.0,
+                                         896.0, 939.52409, 1024.0, 2048.0,
+                                         4096.0, 7168.0, 8192.0}
+       # biological af488 correlations were fitted with xmax=500 for peak
+       # artifacts, except xmax=0.5 for peak artifacts with averaging correction,
        # and xmax=100 for correlations without peak artifacts,
-       assert set(all_param[all_param['xmax'] == 0.524282]['sim']) == {31.0, 280.0}
-       assert set(all_param[all_param['xmax'] == 0.524282]['processing']) == {'dirty avg'}
-       assert set(all_param[all_param['xmax'].isin([100.66329, 469.762042])]['sim']) == {280.0}
-       assert set(all_param[all_param['xmax'] == 100.66329]['processing']) == {'clean noc'}
-       assert set(all_param[all_param['xmax'] == 469.762042]['processing']) == {'dirty cas', 'dirty del', 'dirty noc'}
-       assert set(all_param[all_param['xmax'].isin([512.0, 896.0, 1024.0, 2048.0, 4096.0, 7168.0, 8192.0])]['sim']) == {0.069, 0.2, 3.0}
-       # simulated correlations with and without peak artifacts were fitted with xmax=8192 (except see below)
-       assert set(all_param[all_param['xmax'] == 8192.0]['processing']) == {'clean noc', 'dirty cas', 'dirty del', 'dirty noc'}
-       # 294 of 300 correlations with peak artifacts and averaging correction were fitted with xmax=1024,
-       # this failed for 6 correlations which were too short and thus automatically got xmax=512 or xmax=896.0
-       assert len(set(all_param[(all_param['xmax'] == 1024.0) & (all_param['processing'] == 'dirty avg')].index)) == 294
-       assert set(all_param[all_param['xmax'].isin([512.0, 896.0])]['processing']) == {'dirty avg'}
-       assert len(set(all_param[all_param['xmax'].isin([512.0, 896.0])].index)) == 6
-       # 279, 288, or 276 of 300 correlations with peak artifacts and cut and stitch correction were fitted with xmax=8192
+       assert set(all_param[all_param['xmax'] == 0.524282]['sim']
+                  ) == {31.0, 280.0}
+       assert set(all_param[all_param['xmax'] == 0.524282]['processing']
+                  ) == {'dirty avg'}
+       assert set(all_param[all_param['xmax'].isin(
+           [100.66329, 469.762042])]['sim']) == {280.0}
+       assert set(all_param[all_param['xmax'] == 100.66329]['processing']
+                  ) == {'clean noc'}
+       assert set(all_param[all_param['xmax'] == 469.762042]['processing']
+                  ) == {'dirty cas', 'dirty del', 'dirty noc'}
+       assert set(all_param[all_param['xmax'].isin(
+           [512.0, 896.0, 1024.0, 2048.0, 4096.0, 7168.0, 8192.0])]['sim']
+                  ) == {0.069, 0.2, 3.0}
+       # simulated correlations with and without peak artifacts were fitted
+       # with xmax=8192 (except see below)
+       assert set(all_param[all_param['xmax'] == 8192.0]['processing']
+                  ) == {'clean noc', 'dirty cas', 'dirty del', 'dirty noc'}
+       # 294 of 300 correlations with peak artifacts and averaging correction
+       # were fitted with xmax=1024,
+       # this failed for 6 correlations which were too short and thus
+       # automatically got xmax=512 or xmax=896.0
+       assert len(set(all_param[(all_param['xmax'] == 1024.0) &
+                                (all_param['processing'] == 'dirty avg')].index)
+                  ) == 294
+       assert set(all_param[all_param['xmax'].isin(
+           [512.0, 896.0])]['processing']) == {'dirty avg'}
+       assert len(set(all_param[all_param['xmax'].isin(
+           [512.0, 896.0])].index)) == 6
+       # 279, 288, or 276 of 300 correlations with peak artifacts and cut and
+       # stitch correction were fitted with xmax=8192
        # (3 groups depending on simulated molecule speed)
-       # this failed for 55 correlations which were too short and thus automatically got xmax={1024, 2048, 4096, 7168}
-       assert len(set(all_param[(all_param['xmax'] == 8192.0) & (all_param['processing'] == 'dirty cas') & (all_param['sim'] == 0.069)].index))
-       assert len(set(all_param[(all_param['xmax'] == 8192.0) & (all_param['processing'] == 'dirty cas') & (all_param['sim'] == 0.2)].index))
-       assert len(set(all_param[(all_param['xmax'] == 8192.0) & (all_param['processing'] == 'dirty cas') & (all_param['sim'] == 3.0)].index))
-       assert set(all_param[all_param['xmax'].isin([2048.0, 4096.0, 7168.0])]['processing']) == {'dirty cas'}
-       assert len(set(all_param[(all_param['xmax'].isin([2048.0, 4096.0, 7168.0])) |
-                                ((all_param['xmax'] == 1024) & (all_param['processing'] == 'dirty cas'))].index)) == 55
+       # this failed for 55 correlations which were too short and thus
+       # automatically got xmax={1024, 2048, 4096, 7168}
+       assert len(set(all_param[(all_param['xmax'] == 8192.0) &
+                                (all_param['processing'] == 'dirty cas') &
+                                (all_param['sim'] == 0.069)].index))
+       assert len(set(all_param[(all_param['xmax'] == 8192.0) &
+                                (all_param['processing'] == 'dirty cas') &
+                                (all_param['sim'] == 0.2)].index))
+       assert len(set(all_param[(all_param['xmax'] == 8192.0) &
+                                (all_param['processing'] == 'dirty cas') &
+                                (all_param['sim'] == 3.0)].index))
+       assert set(all_param[all_param['xmax'].isin(
+           [2048.0, 4096.0, 7168.0])]['processing']) == {'dirty cas'}
+       assert len(set(all_param[
+           (all_param['xmax'].isin([2048.0, 4096.0, 7168.0])) |
+           ((all_param['xmax'] == 1024) &
+            (all_param['processing'] == 'dirty cas'))].index)) == 55
 
        pprint(all_param.keys())
-       all_param = all_param[['name_of_plot', 'Diff_species', 'N (FCS)', 'A1', 'txy1', 'sim', 'processing', 'A2', 'txy2']]
+       all_param = all_param[['name_of_plot', 'Diff_species', 'N (FCS)', 'A1',
+                              'txy1', 'sim', 'processing', 'A2', 'txy2']]
        with pd.option_context("max_colwidth", 1000):
            display(all_param)
      #+END_SRC
@@ -5412,27 +5452,27 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
        path9 = Path('/home/lex/Programme/drmed-git/data/exp-220227-unet/2022-06-02_experimental-pex5')
        path10 = Path('/home/lex/Programme/drmed-git/data/exp-220316-publication1/220726_bioexps/Hs-PEX5-eGFP')
        path11 = Path('/home/lex/Programme/drmed-git/data/exp-220316-publication1/220726_bioexps/Tb-PEX5-eGFP/')
-       hspex5_noc_1comp_path = path9 / 'clean-all-results/Hs-PEX5-eGFP_no-correction_triplet-0.04_1comp_outputParam.csv'
-       hspex5_0cd20cas_1comp_path = path9 / 'clean-all-results/Hs-PEX5-eGFP_0cd20_triplet-0.04_1comp_outputParam.csv'
-       hspex5_ff67bcas_1comp_path = path9 / 'clean-all-results/Hs-PEX5-eGFP_ff67b_triplet-0.04_1comp_outputParam.csv'
+       hspex5_noc_1comp_path = path9 / 'clean-all-results/Hs-PEX5-eGFP_no-correction_1comp_outputParam.csv'
+       hspex5_0cd20cas_1comp_path = path9 / 'clean-all-results/Hs-PEX5-eGFP_0cd20_1comp_outputParam.csv'
+       hspex5_ff67bcas_1comp_path = path9 / 'clean-all-results/Hs-PEX5-eGFP_ff67b_1comp_outputParam.csv'
 
-       hspex5_5cas_1comp_path = path10 / 'Hs-PEX5-eGFP-all-results/Hs-PEX5-eGFP_thresh-5_triplet-0.04_1comp_outputParam.csv'
-       hspex5_7cas_1comp_path = path10 / 'Hs-PEX5-eGFP-all-results/Hs-PEX5-eGFP_thresh-7_triplet-0.04_1comp_outputParam.csv'
-       hspex5_10cas_1comp_path = path10 / 'Hs-PEX5-eGFP-all-results/Hs-PEX5-eGFP_thresh-10_triplet-0.04_1comp_outputParam.csv'
+       hspex5_5cas_1comp_path = path10 / 'Hs-PEX5-eGFP-all-results/Hs-PEX5-eGFP_thresh-5_1comp_outputParam.csv'
+       hspex5_7cas_1comp_path = path10 / 'Hs-PEX5-eGFP-all-results/Hs-PEX5-eGFP_thresh-7_1comp_outputParam.csv'
+       hspex5_10cas_1comp_path = path10 / 'Hs-PEX5-eGFP-all-results/Hs-PEX5-eGFP_thresh-10_1comp_outputParam.csv'
 
-       tbpex5_noc_1comp_path = path9 / 'dirty-all-results/Tb-PEX5-eGFP_no-correction_triplet-0.04_1comp_outputParam.csv'
-       tbpex5_noc_2comp_path = path9 / 'dirty-all-results/Tb-PEX5-eGFP_no-correction_triplet-0.04_2comp_outputParam.csv'
-       tbpex5_0cd20cas_1comp_path = path9 / 'dirty-all-results/Tb-PEX5-eGFP_0cd20_triplet-0.04_1comp_outputParam.csv'
-       tbpex5_0cd20cas_2comp_path = path9 / 'dirty-all-results/Tb-PEX5-eGFP_0cd20_triplet-0.04_2comp_outputParam.csv'
-       tbpex5_ff67bcas_1comp_path = path9 / 'dirty-all-results/Tb-PEX5-eGFP_ff67b_triplet-0.04_1comp_outputParam.csv'
-       tbpex5_ff67bcas_2comp_path = path9 / 'dirty-all-results/Tb-PEX5-eGFP_ff67b_triplet-0.04_2comp_outputParam.csv'
+       tbpex5_noc_1comp_path = path9 / 'dirty-all-results/Tb-PEX5-eGFP_no-correction_1comp_outputParam.csv'
+       tbpex5_noc_2comp_path = path9 / 'dirty-all-results/Tb-PEX5-eGFP_no-correction_2comp_outputParam.csv'
+       tbpex5_0cd20cas_1comp_path = path9 / 'dirty-all-results/Tb-PEX5-eGFP_0cd20_1comp_outputParam.csv'
+       tbpex5_0cd20cas_2comp_path = path9 / 'dirty-all-results/Tb-PEX5-eGFP_0cd20_2comp_outputParam.csv'
+       tbpex5_ff67bcas_1comp_path = path9 / 'dirty-all-results/Tb-PEX5-eGFP_ff67b_1comp_outputParam.csv'
+       tbpex5_ff67bcas_2comp_path = path9 / 'dirty-all-results/Tb-PEX5-eGFP_ff67b_2comp_outputParam.csv'
 
-       tbpex5_5cas_1comp_path = path11 / 'Tb-PEX5-eGFP-all-results/Tb-PEX5-eGFP_thresh-5_triplet-0.04_1comp_outputParam.csv'
-       tbpex5_5cas_2comp_path = path11 / 'Tb-PEX5-eGFP-all-results/Tb-PEX5-eGFP_thresh-5_triplet-0.04_2comp_outputParam.csv'
-       tbpex5_7cas_1comp_path = path11 / 'Tb-PEX5-eGFP-all-results/Tb-PEX5-eGFP_thresh-7_triplet-0.04_1comp_outputParam.csv'
-       tbpex5_7cas_2comp_path = path11 / 'Tb-PEX5-eGFP-all-results/Tb-PEX5-eGFP_thresh-7_triplet-0.04_2comp_outputParam.csv'
-       tbpex5_10cas_1comp_path = path11 / 'Tb-PEX5-eGFP-all-results/Tb-PEX5-eGFP_thresh-10_triplet-0.04_1comp_outputParam.csv'
-       tbpex5_10cas_2comp_path = path11 / 'Tb-PEX5-eGFP-all-results/Tb-PEX5-eGFP_thresh-10_triplet-0.04_2comp_outputParam.csv'
+       tbpex5_5cas_1comp_path = path11 / 'Tb-PEX5-eGFP-all-results/Tb-PEX5-eGFP_thresh-5_1comp_outputParam.csv'
+       tbpex5_5cas_2comp_path = path11 / 'Tb-PEX5-eGFP-all-results/Tb-PEX5-eGFP_thresh-5_2comp_outputParam.csv'
+       tbpex5_7cas_1comp_path = path11 / 'Tb-PEX5-eGFP-all-results/Tb-PEX5-eGFP_thresh-7_1comp_outputParam.csv'
+       tbpex5_7cas_2comp_path = path11 / 'Tb-PEX5-eGFP-all-results/Tb-PEX5-eGFP_thresh-7_2comp_outputParam.csv'
+       tbpex5_10cas_1comp_path = path11 / 'Tb-PEX5-eGFP-all-results/Tb-PEX5-eGFP_thresh-10_1comp_outputParam.csv'
+       tbpex5_10cas_2comp_path = path11 / 'Tb-PEX5-eGFP-all-results/Tb-PEX5-eGFP_thresh-10_2comp_outputParam.csv'
 
        # hspex5_0cd20avg_1comp_path = path / 'hspex5_0cd20_averaging_1comp_outputParam.csv'
        # hspex5_0cd20del_1comp_path = path / 'hspex5_0cd20_delete_1comp_outputParam.csv'
@@ -5569,47 +5609,76 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
 
        # assert the following fit parameters
        assert set(all_param['Dimen']) == {'2D', '3D'}
-       assert set(all_param[all_param['Dimen'] == '2D']['sim']) == {0.069, 0.2, 3.0}
-       assert set(all_param[all_param['Dimen'] == '3D']['sim']) == {31.0, 280.0}
-       assert set(all_param[(all_param['Dimen'] == '3D') & (all_param['sim'] == 31.0)]['AR1']) == {6.0}
-       assert set(all_param[(all_param['Dimen'] == '3D') & (all_param['sim'] == 280.0)]['AR1']) == {5.0}
+       assert set(all_param[all_param['Dimen'] == '2D']['sim']
+                  ) == {0.069, 0.2, 3.0}
+       assert set(all_param[all_param['Dimen'] == '3D']['sim']
+                  ) == {31.0, 280.0}
+       assert set(all_param[(all_param['Dimen'] == '3D') &
+                            (all_param['sim'] == 31.0)]['AR1']) == {6.0}
+       assert set(all_param[(all_param['Dimen'] == '3D') &
+                            (all_param['sim'] == 280.0)]['AR1']) == {5.0}
        assert set(all_param['Diff_eq']) == {'Equation 1A', 'Equation 1B'}
-       assert set(all_param[all_param['Diff_eq'] == 'Equation 1A']['sim']) == {0.069, 0.2, 3.0}
-       assert set(all_param[all_param['Diff_eq'] == 'Equation 1B']['sim']) == {31.0, 280.0}
+       assert set(all_param[all_param['Diff_eq'] == 'Equation 1A']['sim']
+                  ) == {0.069, 0.2, 3.0}
+       assert set(all_param[all_param['Diff_eq'] == 'Equation 1B']['sim']
+                  ) == {31.0, 280.0}
        assert set(all_param['Triplet_eq']) == {'Triplet Eq 2B', 'no triplet'}
-       assert set(all_param[all_param['Triplet_eq'] == 'no triplet']['sim']) == {0.069, 0.2, 3.0, 280.0}
-       assert set(all_param[all_param['Triplet_eq'] == 'Triplet Eq 2B']['sim']) == {31.0}
+       assert set(all_param[all_param['Triplet_eq'] == 'no triplet']['sim']
+                  ) == {0.069, 0.2, 3.0, 280.0}
+       assert set(all_param[all_param['Triplet_eq'] == 'Triplet Eq 2B']['sim']
+                  ) == {31.0}
        assert set(all_param['alpha1']) == {1.0}
        assert set(all_param['xmin']) == {0.001018, 1.0}
-       assert set(all_param[all_param['xmin'] == 1.0]['sim']) == {0.069, 0.2, 3.0}
-       assert set(all_param[all_param['xmin'] == 0.001018]['sim']) == {31.0, 280.0}
-       assert set(all_param['xmax']) == {100.66329, 469.762042, 939.52409, 3584.0, 4096.0, 7168.0, 8192.0}
+       assert set(all_param[all_param['xmin'] == 1.0]['sim']
+                  ) == {0.069, 0.2, 3.0}
+       assert set(all_param[all_param['xmin'] == 0.001018]['sim']
+                  ) == {31.0, 280.0}
+       assert set(all_param['xmax']) == {100.66329, 469.762042, 939.52409,
+                                         3584.0, 4096.0, 7168.0, 8192.0}
        # biological pex5 correlations were fitted with xmax=1000
        assert set(all_param[all_param['xmax'] == 939.52409]['sim']) == {31.0}
        # biological af488 correlations were fitted with xmax=500 for peak artifacts,
        # and xmax=100 for correlations without peak artifacts,
-       assert set(all_param[all_param['xmax'].isin([100.66329, 469.762042])]['sim']) == {280.0}
-       assert set(all_param[all_param['xmax'] == 100.66329]['processing']) == {'clean 0cd20', 'clean ff67b', 'clean noc', 'clean thr1', 'clean thr2', 'clean thr3'}
-       assert set(all_param[all_param['xmax'] == 469.762042]['processing']) == {'dirty 0cd20', 'dirty ff67b', 'dirty noc', 'dirty thr1', 'dirty thr2', 'dirty thr3'}
-       # simulated correlations with and without peak artifacts were fitted with xmax=8192 (except see below)
-       assert set(all_param[all_param['xmax'].isin([3584.0, 4096.0, 7168.0, 8192.0])]['sim']) == {0.069, 0.2, 3.0}
-       assert set(all_param[all_param['xmax'] == 8192.0]['processing']) == {'clean noc', 'dirty 0cd20', 'dirty noc', 'dirty thr1'}
-       # 283, 293, or 282 of 300 correlations with peak artifacts and 0cd20 prediction and cut and stitch correction were fitted with xmax=8192
+       assert set(all_param[all_param['xmax'].isin(
+           [100.66329, 469.762042])]['sim']) == {280.0}
+       assert set(all_param[all_param['xmax'] == 100.66329]['processing']
+                  ) == {'clean 0cd20', 'clean ff67b', 'clean noc', 'clean thr1',
+                        'clean thr2', 'clean thr3'}
+       assert set(all_param[all_param['xmax'] == 469.762042]['processing']
+                  ) == {'dirty 0cd20', 'dirty ff67b', 'dirty noc', 'dirty thr1',
+                        'dirty thr2', 'dirty thr3'}
+       # simulated correlations with and without peak artifacts were fitted with
+       # xmax=8192 (except see below)
+       assert set(all_param[all_param['xmax'].isin(
+           [3584.0, 4096.0, 7168.0, 8192.0])]['sim']) == {0.069, 0.2, 3.0}
+       assert set(all_param[all_param['xmax'] == 8192.0]['processing']
+                  ) == {'clean noc', 'dirty 0cd20', 'dirty noc', 'dirty thr1'}
+       # 283, 293, or 282 of 300 correlations with peak artifacts and 0cd20
+       # prediction and cut and stitch correction were fitted with xmax=8192
        # (3 groups depending on simulated molecule speed)
-       # this failed for 41 correlations which were too short and thus automatically got xmax={3584, 4096, 7168}
-       assert len(set(all_param[(all_param['xmax'] == 8192.0) & (all_param['processing'] == 'dirty 0cd20') & (all_param['sim'] == 0.069)].index)) == 283
-       assert len(set(all_param[(all_param['xmax'] == 8192.0) & (all_param['processing'] == 'dirty 0cd20') & (all_param['sim'] == 0.2)].index)) == 293
-       assert len(set(all_param[(all_param['xmax'] == 8192.0) & (all_param['processing'] == 'dirty 0cd20') & (all_param['sim'] == 3.0)].index)) == 282
-       assert set(all_param[all_param['xmax'].isin([3584.0, 4096.0, 7168.0])]['processing']) == {'dirty 0cd20'}
-       assert len(set(all_param[all_param['xmax'].isin([3584.0, 4096.0, 7168.0])]['processing'].index)) == 41
+       # this failed for 41 correlations which were too short and thus
+       # automatically got xmax={3584, 4096, 7168}
+       assert len(set(all_param[(all_param['xmax'] == 8192.0) &
+                                (all_param['processing'] == 'dirty 0cd20') &
+                                (all_param['sim'] == 0.069)].index)) == 283
+       assert len(set(all_param[(all_param['xmax'] == 8192.0) &
+                                (all_param['processing'] == 'dirty 0cd20') &
+                                (all_param['sim'] == 0.2)].index)) == 293
+       assert len(set(all_param[(all_param['xmax'] == 8192.0) &
+                                (all_param['processing'] == 'dirty 0cd20') &
+                                (all_param['sim'] == 3.0)].index)) == 282
+       assert set(all_param[all_param['xmax'].isin(
+           [3584.0, 4096.0, 7168.0])]['processing']) == {'dirty 0cd20'}
+       assert len(set(all_param[all_param['xmax'].isin(
+           [3584.0, 4096.0, 7168.0])]['processing'].index)) == 41
 
        pprint(all_param.keys())
-       all_param = all_param[['name_of_plot', 'Diff_species', 'N (FCS)', 'A1', 'txy1', 'sim', 'processing', 'A2', 'txy2']]
+       all_param = all_param[['name_of_plot', 'Diff_species', 'N (FCS)', 'A1',
+                              'txy1', 'sim', 'processing', 'A2', 'txy2']]
        with pd.option_context("max_colwidth", 1000):
            display(all_param)
      #+END_SRC
 
-     #+RESULTS:
      :RESULTS:
      : Index(['name_of_plot', 'master_file', 'parent_name', 'parent_uqid',
      :        'time of fit', 'Diff_eq', 'Diff_species', 'Triplet_eq',
@@ -7163,29 +7232,29 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
        # Hs-PEX5-eGFP (clean), only 1comp fits, with triplets fixed to 0.04ms (triplet fraction floating)
        # see https://www.sciencedirect.com/science/article/pii/S266707472200012X#bib35 for 0.04 reference
        # Tb-PEX5-eGFP (dirty), 1comp and 2comp fits, with triplets fixed to 0.04
-       hs_noc_1comp_path = pex5_path1 / 'clean-all-results/Hs-PEX5-eGFP_no-correction_triplet-0.04_1comp_outputParam.csv'
-       hs_0cd20_1comp_path = pex5_path1 / 'clean-all-results/Hs-PEX5-eGFP_0cd20_triplet-0.04_1comp_outputParam.csv'
-       hs_fe81d_1comp_path = pex5_path1 / 'clean-all-results/Hs-PEX5-eGFP_fe81d_triplet-0.04_1comp_outputParam.csv'
-       hs_ff67b_1comp_path = pex5_path1 / 'clean-all-results/Hs-PEX5-eGFP_ff67b_triplet-0.04_1comp_outputParam.csv'
-       hs_5_1comp_path = pex5_path2 / 'Hs-PEX5-eGFP-all-results/Hs-PEX5-eGFP_thresh-5_triplet-0.04_1comp_outputParam.csv'
-       hs_7_1comp_path = pex5_path2 / 'Hs-PEX5-eGFP-all-results/Hs-PEX5-eGFP_thresh-7_triplet-0.04_1comp_outputParam.csv'
-       hs_10_1comp_path = pex5_path2 / 'Hs-PEX5-eGFP-all-results/Hs-PEX5-eGFP_thresh-10_triplet-0.04_1comp_outputParam.csv'
+       hs_noc_1comp_path = pex5_path1 / 'clean-all-results/Hs-PEX5-eGFP_no-correction_1comp_outputParam.csv'
+       hs_0cd20_1comp_path = pex5_path1 / 'clean-all-results/Hs-PEX5-eGFP_0cd20_1comp_outputParam.csv'
+       hs_fe81d_1comp_path = pex5_path1 / 'clean-all-results/Hs-PEX5-eGFP_fe81d_1comp_outputParam.csv'
+       hs_ff67b_1comp_path = pex5_path1 / 'clean-all-results/Hs-PEX5-eGFP_ff67b_1comp_outputParam.csv'
+       hs_5_1comp_path = pex5_path2 / 'Hs-PEX5-eGFP-all-results/Hs-PEX5-eGFP_thresh-5_1comp_outputParam.csv'
+       hs_7_1comp_path = pex5_path2 / 'Hs-PEX5-eGFP-all-results/Hs-PEX5-eGFP_thresh-7_1comp_outputParam.csv'
+       hs_10_1comp_path = pex5_path2 / 'Hs-PEX5-eGFP-all-results/Hs-PEX5-eGFP_thresh-10_1comp_outputParam.csv'
 
 
-       tb_noc_1comp_path = pex5_path1 / 'dirty-all-results/Tb-PEX5-eGFP_no-correction_triplet-0.04_1comp_outputParam.csv'
-       tb_noc_2comp_path = pex5_path1 / 'dirty-all-results/Tb-PEX5-eGFP_no-correction_triplet-0.04_2comp_outputParam.csv'
-       tb_0cd20_1comp_path = pex5_path1 / 'dirty-all-results/Tb-PEX5-eGFP_0cd20_triplet-0.04_1comp_outputParam.csv'
-       tb_0cd20_2comp_path = pex5_path1 / 'dirty-all-results/Tb-PEX5-eGFP_0cd20_triplet-0.04_2comp_outputParam.csv'
-       tb_fe81d_1comp_path = pex5_path1 / 'dirty-all-results/Tb-PEX5-eGFP_fe81d_triplet-0.04_1comp_outputParam.csv'
-       tb_fe81d_2comp_path = pex5_path1 / 'dirty-all-results/Tb-PEX5-eGFP_fe81d_triplet-0.04_2comp_outputParam.csv'
-       tb_ff67b_1comp_path = pex5_path1 / 'dirty-all-results/Tb-PEX5-eGFP_ff67b_triplet-0.04_1comp_outputParam.csv'
-       tb_ff67b_2comp_path = pex5_path1 / 'dirty-all-results/Tb-PEX5-eGFP_ff67b_triplet-0.04_2comp_outputParam.csv'
-       tb_5_1comp_path = pex5_path3 / 'Tb-PEX5-eGFP-all-results/Tb-PEX5-eGFP_thresh-5_triplet-0.04_1comp_outputParam.csv'
-       tb_5_2comp_path = pex5_path3 / 'Tb-PEX5-eGFP-all-results/Tb-PEX5-eGFP_thresh-5_triplet-0.04_2comp_outputParam.csv'
-       tb_7_1comp_path = pex5_path3 / 'Tb-PEX5-eGFP-all-results/Tb-PEX5-eGFP_thresh-7_triplet-0.04_1comp_outputParam.csv'
-       tb_7_2comp_path = pex5_path3 / 'Tb-PEX5-eGFP-all-results/Tb-PEX5-eGFP_thresh-7_triplet-0.04_2comp_outputParam.csv'
-       tb_10_1comp_path = pex5_path3 / 'Tb-PEX5-eGFP-all-results/Tb-PEX5-eGFP_thresh-10_triplet-0.04_1comp_outputParam.csv'
-       tb_10_2comp_path = pex5_path3 / 'Tb-PEX5-eGFP-all-results/Tb-PEX5-eGFP_thresh-10_triplet-0.04_2comp_outputParam.csv'
+       tb_noc_1comp_path = pex5_path1 / 'dirty-all-results/Tb-PEX5-eGFP_no-correction_1comp_outputParam.csv'
+       tb_noc_2comp_path = pex5_path1 / 'dirty-all-results/Tb-PEX5-eGFP_no-correction_2comp_outputParam.csv'
+       tb_0cd20_1comp_path = pex5_path1 / 'dirty-all-results/Tb-PEX5-eGFP_0cd20_1comp_outputParam.csv'
+       tb_0cd20_2comp_path = pex5_path1 / 'dirty-all-results/Tb-PEX5-eGFP_0cd20_2comp_outputParam.csv'
+       tb_fe81d_1comp_path = pex5_path1 / 'dirty-all-results/Tb-PEX5-eGFP_fe81d_1comp_outputParam.csv'
+       tb_fe81d_2comp_path = pex5_path1 / 'dirty-all-results/Tb-PEX5-eGFP_fe81d_2comp_outputParam.csv'
+       tb_ff67b_1comp_path = pex5_path1 / 'dirty-all-results/Tb-PEX5-eGFP_ff67b_1comp_outputParam.csv'
+       tb_ff67b_2comp_path = pex5_path1 / 'dirty-all-results/Tb-PEX5-eGFP_ff67b_2comp_outputParam.csv'
+       tb_5_1comp_path = pex5_path3 / 'Tb-PEX5-eGFP-all-results/Tb-PEX5-eGFP_thresh-5_1comp_outputParam.csv'
+       tb_5_2comp_path = pex5_path3 / 'Tb-PEX5-eGFP-all-results/Tb-PEX5-eGFP_thresh-5_2comp_outputParam.csv'
+       tb_7_1comp_path = pex5_path3 / 'Tb-PEX5-eGFP-all-results/Tb-PEX5-eGFP_thresh-7_1comp_outputParam.csv'
+       tb_7_2comp_path = pex5_path3 / 'Tb-PEX5-eGFP-all-results/Tb-PEX5-eGFP_thresh-7_2comp_outputParam.csv'
+       tb_10_1comp_path = pex5_path3 / 'Tb-PEX5-eGFP-all-results/Tb-PEX5-eGFP_thresh-10_1comp_outputParam.csv'
+       tb_10_2comp_path = pex5_path3 / 'Tb-PEX5-eGFP-all-results/Tb-PEX5-eGFP_thresh-10_2comp_outputParam.csv'
 
        # read af488 only (clean)
        af488_noc_1comp = pd.read_csv(af488_noc_1comp_path, sep=',').assign(bio=424*['af488',], processing=424*['Baseline control:\nno correction',])
