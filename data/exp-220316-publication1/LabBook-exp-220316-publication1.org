@@ -2830,233 +2830,223 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
       some memory allocation issue, I restart the jupyter kernel after each new
       threshold for each dataset. First, we start with the =AlexaFluor488+LUVs=
       data
-    #+begin_details
-      #+BEGIN_SRC jupyter-python
-        # threshold[0]: node1
-        # threshold[1]: node2
-        # threshold[2]: node3
-        # threshold[3]: node2
-        # threshold[4]: node3
-        for thr in threshold_ls:
+      #+begin_details
+        #+BEGIN_SRC jupyter-python
+          # threshold[0]: node1
+          # threshold[1]: node2
+          # threshold[2]: node3
+          # threshold[3]: node2
+          # threshold[4]: node3
+            for thr in threshold_ls:
             out_folder = out_dir / f'robust_thresh-{thr}'
+              %mkdir -p $out_folder
+              threshold_predict_correct_correlate_ptu(
+                  files=files_dirty1,
+                  pred_method=pred_method,
+                  pred_threshold=thr,
+                  correction_method=correction_method,
+                  out_path=out_folder)
+              break
+        #+END_SRC
+
+        #+RESULTS:
+        : 2022-07-26 15:38:12.573339: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcuda.so.1'; dlerror: libcuda.so.1: cannot open shared object file: No such file or directory
+        : 2022-07-26 15:38:12.573387: W tensorflow/stream_executor/cuda/cuda_driver.cc:269] failed call to cuInit: UNKNOWN ERROR (303)
+        : 2022-07-26 15:38:12.573411: I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:156] kernel driver does not appear to be running on this host (node095): /proc/driver/nvidia/version does not exist
+        : 2022-07-26 15:38:12.574336: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 FMA
+        : To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+
+      - =#+CALL: kill-jupyter()=
+        #+CALL: kill-jupyter()
+
+      - =#+CALL: prepare-jupyter()=
+        #+CALL: prepare-jupyter()
+
+        #+RESULTS:
+        : /beegfs/ye53nis/drmed-git
+        : 2022-07-27 10:44:51.957570: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+        : 2022-07-27 10:44:51.957621: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+
+        #+BEGIN_SRC jupyter-python
+          # threshold[0]: node1
+          # threshold[1]: node1
+          # threshold[2]: node2
+          # threshold[3]: node3
+          # threshold[4]: node1  # just 431
+          out_dir = output_path / f'af488+luvs'
+          pred_method = 'threshold'
+          correction_method = 'delete_and_shift'
+          threshold_ls = [0.8, 1, 1.5, 2, 2.5]
+
+          for thr in threshold_ls[4:]:
+                out_folder = out_dir / f'robust_thresh-{thr}'
+                # %mkdir -p $out_folder
+                threshold_predict_correct_correlate_ptu(
+                      files=files_dirty2,
+                  pred_method=pred_method,
+                    pred_threshold=thr,
+                    correction_method=correction_method,
+                    out_path=out_folder)
+                break
+        #+END_SRC
+
+        #+RESULTS:
+        : 2022-07-27 00:18:27.343506: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcuda.so.1'; dlerror: libcuda.so.1: cannot open shared object file: No such file or directory
+        : 2022-07-27 00:18:27.343564: W tensorflow/stream_executor/cuda/cuda_driver.cc:269] failed call to cuInit: UNKNOWN ERROR (303)
+        : 2022-07-27 00:18:27.343589: I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:156] kernel driver does not appear to be running on this host (node095): /proc/driver/nvidia/version does not exist
+        : 2022-07-27 00:18:27.344160: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 FMA
+        : To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+
+      - =#+CALL: kill-jupyter()=
+        #+CALL: kill-jupyter()
+
+      - now, let's do =AlexaFluor488= (clean) data
+      - =#+CALL: prepare-jupyter()=
+        #+CALL: prepare-jupyter()
+
+        #+BEGIN_SRC jupyter-python
+          # threshold[0]: node2
+          # threshold[1]: node3
+          # threshold[2]: node2
+          # threshold[3]: node3
+          # threshold[4]: node1
+          out_dir = output_path / f'af488'
+          pred_method = 'threshold'
+          correction_method = 'delete_and_shift'
+          threshold_ls = [0.8, 1, 1.5, 2, 2.5]
+
+          for thr in threshold_ls[4:]:
+                out_folder = out_dir / f'robust_thresh-{thr}'
             %mkdir -p $out_folder
-            threshold_predict_correct_correlate_ptu(
-                files=files_dirty1,
-                pred_method=pred_method,
-                pred_threshold=thr,
-                correction_method=correction_method,
-                out_path=out_folder)
-            break
-      #+END_SRC
+              threshold_predict_correct_correlate_ptu(
+                  files=files_clean1,
+                  pred_method=pred_method,
+                  pred_threshold=thr,
+                  correction_method=correction_method,
+                  out_path=out_folder)
+              break
+        #+END_SRC
 
-      #+RESULTS:
-      : 2022-07-26 15:38:12.573339: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcuda.so.1'; dlerror: libcuda.so.1: cannot open shared object file: No such file or directory
-      : 2022-07-26 15:38:12.573387: W tensorflow/stream_executor/cuda/cuda_driver.cc:269] failed call to cuInit: UNKNOWN ERROR (303)
-      : 2022-07-26 15:38:12.573411: I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:156] kernel driver does not appear to be running on this host (node095): /proc/driver/nvidia/version does not exist
-      : 2022-07-26 15:38:12.574336: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 FMA
-      : To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+        #+RESULTS:
+        : 2022-07-27 03:54:07.972324: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcuda.so.1'; dlerror: libcuda.so.1: cannot open shared object file: No such file or directory
+        : 2022-07-27 03:54:07.972364: W tensorflow/stream_executor/cuda/cuda_driver.cc:269] failed call to cuInit: UNKNOWN ERROR (303)
+        : 2022-07-27 03:54:07.972390: I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:156] kernel driver does not appear to be running on this host (node095): /proc/driver/nvidia/version does not exist
+        : 2022-07-27 03:54:07.972933: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 FMA
+        : To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
 
-    - =#+CALL: kill-jupyter()=
-      #+CALL: kill-jupyter()
+      - =#+CALL: kill-jupyter()=
+        #+CALL: kill-jupyter()
 
-    - =#+CALL: prepare-jupyter()=
-      #+CALL: prepare-jupyter()
+      - =#+CALL: prepare-jupyter()=
+        #+CALL: prepare-jupyter()
 
-      #+RESULTS:
-      : /beegfs/ye53nis/drmed-git
-      : 2022-07-27 10:44:51.957570: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
-      : 2022-07-27 10:44:51.957621: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+        #+BEGIN_SRC jupyter-python
+          # threshold[0]: node2  # just 420
+          # threshold[1]: node3
+          # threshold[2]: node1  # just 422
+          # threshold[3]: node3
+          # threshold[4]: node3
+          out_dir = output_path / f'af488'
+          pred_method = 'threshold'
+          correction_method = 'delete_and_shift'
+          threshold_ls = [0.8, 1, 1.5, 2, 2.5]
 
-      #+BEGIN_SRC jupyter-python
-        # threshold[0]: node1
-        # threshold[1]: node1
-        # threshold[2]: node2
-        # threshold[3]: node3
-        # threshold[4]: node1  # just 431
-        out_dir = output_path / f'af488+luvs'
-        pred_method = 'threshold'
-        correction_method = 'delete_and_shift'
-        threshold_ls = [0.8, 1, 1.5, 2, 2.5]
+          for thr in threshold_ls[2:]:
+                out_folder = out_dir / f'robust_thresh-{thr}'
+                # %mkdir -p $out_folder
+                threshold_predict_correct_correlate_ptu(
+                      files=files_clean2,
+                  pred_method=pred_method,
+                    pred_threshold=thr,
+                    correction_method=correction_method,
+                    out_path=out_folder)
+                break
+        #+END_SRC
 
-        for thr in threshold_ls[4:]:
-            out_folder = out_dir / f'robust_thresh-{thr}'
-            # %mkdir -p $out_folder
-            threshold_predict_correct_correlate_ptu(
-                files=files_dirty2,
-                pred_method=pred_method,
-                pred_threshold=thr,
-                correction_method=correction_method,
-                out_path=out_folder)
-            break
-      #+END_SRC
+        #+RESULTS:
+        : 2022-07-27 10:45:14.050433: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcuda.so.1'; dlerror: libcuda.so.1: cannot open shared object file: No such file or directory
+        : 2022-07-27 10:45:14.050526: W tensorflow/stream_executor/cuda/cuda_driver.cc:269] failed call to cuInit: UNKNOWN ERROR (303)
+        : 2022-07-27 10:45:14.050552: I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:156] kernel driver does not appear to be running on this host (node095): /proc/driver/nvidia/version does not exist
+        : 2022-07-27 10:45:14.051164: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 FMA
+        : To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
 
-      #+RESULTS:
-      : 2022-07-27 00:18:27.343506: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcuda.so.1'; dlerror: libcuda.so.1: cannot open shared object file: No such file or directory
-      : 2022-07-27 00:18:27.343564: W tensorflow/stream_executor/cuda/cuda_driver.cc:269] failed call to cuInit: UNKNOWN ERROR (303)
-      : 2022-07-27 00:18:27.343589: I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:156] kernel driver does not appear to be running on this host (node095): /proc/driver/nvidia/version does not exist
-      : 2022-07-27 00:18:27.344160: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 FMA
-      : To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+      - =#+CALL: kill-jupyter()=
+        #+CALL: kill-jupyter()
 
-    - =#+CALL: kill-jupyter()=
-      #+CALL: kill-jupyter()
-
-    - now, let's do =AlexaFluor488= (clean) data
-    - =#+CALL: prepare-jupyter()=
-      #+CALL: prepare-jupyter()
-
-      #+BEGIN_SRC jupyter-python
-        # threshold[0]: node2
-        # threshold[1]: node3
-        # threshold[2]: node2
-        # threshold[3]: node3
-        # threshold[4]: node1
-        out_dir = output_path / f'af488'
-        pred_method = 'threshold'
-        correction_method = 'delete_and_shift'
-        threshold_ls = [0.8, 1, 1.5, 2, 2.5]
-
-        for thr in threshold_ls[4:]:
-            out_folder = out_dir / f'robust_thresh-{thr}'
-            %mkdir -p $out_folder
-            threshold_predict_correct_correlate_ptu(
-                files=files_clean1,
-                pred_method=pred_method,
-                pred_threshold=thr,
-                correction_method=correction_method,
-                out_path=out_folder)
-            break
-      #+END_SRC
-
-      #+RESULTS:
-      : 2022-07-27 03:54:07.972324: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcuda.so.1'; dlerror: libcuda.so.1: cannot open shared object file: No such file or directory
-      : 2022-07-27 03:54:07.972364: W tensorflow/stream_executor/cuda/cuda_driver.cc:269] failed call to cuInit: UNKNOWN ERROR (303)
-      : 2022-07-27 03:54:07.972390: I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:156] kernel driver does not appear to be running on this host (node095): /proc/driver/nvidia/version does not exist
-      : 2022-07-27 03:54:07.972933: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 FMA
-      : To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
-
-    - =#+CALL: kill-jupyter()=
-      #+CALL: kill-jupyter()
-
-    - =#+CALL: prepare-jupyter()=
-      #+CALL: prepare-jupyter()
-
-      #+BEGIN_SRC jupyter-python
-        # threshold[0]: node2  # just 420
-        # threshold[1]: node3
-        # threshold[2]: node1  # just 422
-        # threshold[3]: node3
-        # threshold[4]: node3
-        out_dir = output_path / f'af488'
-        pred_method = 'threshold'
-        correction_method = 'delete_and_shift'
-        threshold_ls = [0.8, 1, 1.5, 2, 2.5]
-
-        for thr in threshold_ls[2:]:
-            out_folder = out_dir / f'robust_thresh-{thr}'
-            # %mkdir -p $out_folder
-            threshold_predict_correct_correlate_ptu(
-                files=files_clean2,
-                pred_method=pred_method,
-                pred_threshold=thr,
-                correction_method=correction_method,
-                out_path=out_folder)
-            break
-      #+END_SRC
-
-      #+RESULTS:
-      : 2022-07-27 10:45:14.050433: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcuda.so.1'; dlerror: libcuda.so.1: cannot open shared object file: No such file or directory
-      : 2022-07-27 10:45:14.050526: W tensorflow/stream_executor/cuda/cuda_driver.cc:269] failed call to cuInit: UNKNOWN ERROR (303)
-      : 2022-07-27 10:45:14.050552: I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:156] kernel driver does not appear to be running on this host (node095): /proc/driver/nvidia/version does not exist
-      : 2022-07-27 10:45:14.051164: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 FMA
-      : To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
-
-    - =#+CALL: kill-jupyter()=
-      #+CALL: kill-jupyter()
-
-      #+RESULTS:
-      :RESULTS:
-     # [goto error]
-     : ---------------------------------------------------------------------------
-     : NameError                                 Traceback (most recent call last)
-     : Input In [1], in <cell line: 1>()
-     : ----> 1 os._exit(00)
-     :
-     : NameError: name 'os' is not defined
-     :END:
-    #+end_details
+        #+RESULTS:
+      #+end_details
 
     - now, let's do =human pex5= data. First, we plot again example plots (images
       not saved)
-    #+begin_details
-    - ~#+CALL: prepare-jupyter(data_path="/beegfs/ye53nis/data/191113_Pex5_2_structured")~
-      #+CALL: prepare-jupyter(data_path="/beegfs/ye53nis/data/191113_Pex5_2_structured")
+      #+begin_details
+      - ~#+CALL: prepare-jupyter(data_path="/beegfs/ye53nis/data/191113_Pex5_2_structured")~
+        #+CALL: prepare-jupyter(data_path="/beegfs/ye53nis/data/191113_Pex5_2_structured")
 
-      #+RESULTS:
-      : /beegfs/ye53nis/drmed-git
-      : 2022-07-27 12:50:42.718757: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
-      : 2022-07-27 12:50:42.718819: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+        #+RESULTS:
+        : /beegfs/ye53nis/drmed-git
+        : 2022-07-27 12:50:42.718757: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libcudart.so.11.0'; dlerror: libcudart.so.11.0: cannot open shared object file: No such file or directory
+        : 2022-07-27 12:50:42.718819: I tensorflow/stream_executor/cuda/cudart_stub.cc:29] Ignore above cudart dlerror if you do not have a GPU set up on your machine.
+      - compute
+        #+BEGIN_SRC jupyter-python
+          threshold_ls = [5, 7, 10]
+          for thr in threshold_ls:
+              plot_threshold_predict_correct_ptu(
+                  files=files_clean3, pred_threshold=thr, out_dir=out_dir,
+                  ylim=ylim_clean)
+        #+END_SRC
 
-      #+BEGIN_SRC jupyter-python
-        threshold_ls = [5, 7, 10]
-        for thr in threshold_ls:
-            plot_threshold_predict_correct_ptu(
-                files=files_clean3, pred_threshold=thr, out_dir=out_dir,
-                ylim=ylim_clean)
-      #+END_SRC
+        #+RESULTS:
 
-      #+RESULTS:
+        #+BEGIN_SRC jupyter-python
+          threshold_ls = [5, 7, 10]
+          for thr in threshold_ls:
+              plot_threshold_predict_correct_ptu(
+                  files=files_dirty3[5:], pred_threshold=thr, out_dir=out_dir,
+                  ylim=ylim_dirty)
+        #+END_SRC
 
-      #+BEGIN_SRC jupyter-python
-        threshold_ls = [5, 7, 10]
-        for thr in threshold_ls:
-            plot_threshold_predict_correct_ptu(
-                files=files_dirty3[5:], pred_threshold=thr, out_dir=out_dir,
-                ylim=ylim_dirty)
-      #+END_SRC
+        #+RESULTS:
 
-      #+RESULTS:
+        #+BEGIN_SRC jupyter-python
+          # threshold[0]:
+          # threshold[1]:
+          # threshold[2]: node1
+          out_dir = output_path / 'Hs-PEX5-eGFP'
+          pred_method = 'threshold'
+          correction_method = 'delete_and_shift'
+          threshold_ls = [5, 7, 10]
 
-      #+BEGIN_SRC jupyter-python
-        # threshold[0]:
-        # threshold[1]:
-        # threshold[2]: node1
-        out_dir = output_path / 'Hs-PEX5-eGFP'
-        pred_method = 'threshold'
-        correction_method = 'delete_and_shift'
-        threshold_ls = [5, 7, 10]
+          for thr in threshold_ls[:2]:
+              out_folder = out_dir / f'robust_thresh-{thr}'
+              %mkdir -p $out_folder
+              threshold_predict_correct_correlate_ptu(
+                  files=files_clean3,
+                  pred_method=pred_method,
+                  pred_threshold=thr,
+                  correction_method=correction_method,
+                  out_path=out_folder)
+        #+END_SRC
 
-        for thr in threshold_ls[:2]:
-            out_folder = out_dir / f'robust_thresh-{thr}'
-            %mkdir -p $out_folder
-            threshold_predict_correct_correlate_ptu(
-                files=files_clean3,
-                pred_method=pred_method,
-                pred_threshold=thr,
-                correction_method=correction_method,
-                out_path=out_folder)
-      #+END_SRC
+        #+BEGIN_SRC jupyter-python
+          # threshold[0]: node2
+          # threshold[1]: node2
+          # threshold[2]: node2
+          out_dir = output_path / 'Tb-PEX5-eGFP'
+          pred_method = 'threshold'
+          correction_method = 'delete_and_shift'
+          threshold_ls = [5, 7, 10]
 
-
-     #+BEGIN_SRC jupyter-python
-       # threshold[0]: node2
-       # threshold[1]: node2
-       # threshold[2]: node2
-       out_dir = output_path / 'Tb-PEX5-eGFP'
-       pred_method = 'threshold'
-       correction_method = 'delete_and_shift'
-       threshold_ls = [5, 7, 10]
-
-       for thr in threshold_ls[2:]:
-           out_folder = out_dir / f'robust_thresh-{thr}'
-           %mkdir -p $out_folder
-           threshold_predict_correct_correlate_ptu(
-               files=files_dirty3,
-               pred_method=pred_method,
-               pred_threshold=thr,
-               correction_method=correction_method,
-               out_path=out_folder)
-     #+END_SRC
-   #+end_details
+          for thr in threshold_ls[2:]:
+              out_folder = out_dir / f'robust_thresh-{thr}'
+              %mkdir -p $out_folder
+              threshold_predict_correct_correlate_ptu(
+                  files=files_dirty3,
+                  pred_method=pred_method,
+                  pred_threshold=thr,
+                  correction_method=correction_method,
+                  out_path=out_folder)
+        #+END_SRC
+      #+end_details
 **** node 2
     :PROPERTIES:
     :header-args:jupyter-python: :session /jpy:localhost#8890:c37e524a-8134-4d8f-b24a-367acaf1bdd5
@@ -6560,7 +6550,7 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
      #+END_SRC
      #+end_details
 
-     [[file:./data/exp-220316-publication1/jupyter/plotE-example.png]]
+     [[./jupyter/plotE-example.png]]
 
    - now the computation of residuals and scaling
      #+begin_details
