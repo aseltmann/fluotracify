@@ -19,7 +19,7 @@ def import_from_csv(folder,
                     col_per_example,
                     dropindex=None,
                     dropcolumns=None):
-    """Import CSV files containing data from flotracify.simulations
+    """Import CSV files containing data from fluotracify.simulations
 
     Import a directory of CSV files created by one of the
     fluotracify.simulations methods and output two pandas DataFrames containing

@@ -121,7 +121,7 @@ def tfds_replace_nan(trace):
     return trace
 
 
-def tfds_crop_trace_and_labels(trace, label, length_delimiter):
+def tfds_crop_trace_and_label(trace, label, length_delimiter):
     """Part of tf.data pipeline. Crop trace and label to a maximum length of
     length_delimiter
     """

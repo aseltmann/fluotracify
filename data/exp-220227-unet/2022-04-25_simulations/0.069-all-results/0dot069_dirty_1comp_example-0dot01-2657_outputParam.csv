@@ -1,0 +1,2 @@
+name_of_plot,master_file,parent_name,parent_uqid,time of fit,Diff_eq,Diff_species,Triplet_eq,Triplet_species,Dimen,xmin,xmax,offset,stdev(offset),GN0,stdev(GN0),N (FCS),cpm (kHz),A1,stdev(A1),txy1,stdev(txy1),alpha1,stdev(alpha1),N (mom),bri (kHz),above zero
+2022-04-25_multipletau_dirty_0dot069-0dot01_2657_correlation-CH1_1,Not known,dirty_0dot069-0dot01,0,Thu Jan  5 20:26:23 2023,Equation 1A,1,no triplet,1,2D,1.0,8192.0,-0.096444,0.00712730509030512,0.492005,0.006806659361113249,2.0324996697188036,0.492005,1.0,0,933.362528,46.32853823796909,1.0,0,1.0,1.0,0.7978723404255319

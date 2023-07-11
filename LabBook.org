@@ -1,5 +1,5 @@
 #+TITLE: Lab book Fluotracify
-#+AUTHOR: Alexander Seltmann
+#+AUTHOR: Alex Seltmann
 #+LANGUAGE: en
 # If exporting the existing code and execution to html or pdf etc, the
 # following properties will hinder org-babel to execute the code blocks again;
@@ -512,3 +512,4 @@
 **** 2020-03-30
     - set up lab book and form git repo accoring to setup by Luka Stanisic et al
 *** Changes in src/fluotracify
+
