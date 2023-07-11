@@ -1956,13 +1956,13 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
    - here the examplary plots:
      #+begin_details
      - example for diffusion coefficient D=0.069:
-       [[./data/exp-220316-publication1/jupyter/plotX_0dot069_robust-control-pred.png]]
+       [[./jupyter/plotX_0dot069_robust-control-pred.png]]
      - example for D=0.2:
-       [[./data/exp-220316-publication1/jupyter/plotX_0dot2_robust-control-pred.png]]
+       [[./jupyter/plotX_0dot2_robust-control-pred.png]]
      - example for D=1.0:
-       [[./data/exp-220316-publication1/jupyter/plotX_1_robust-control-pred.png]]
+       [[./jupyter/plotX_1_robust-control-pred.png]]
      - example for D=50.0
-       [[./data/exp-220316-publication1/jupyter/plotX_50_robust-control-pred.png]]
+       [[./jupyter/plotX_50_robust-control-pred.png]]
      #+end_details
 
    - now let's save correlations and fit them with FOCUSpoint
@@ -2211,11 +2211,11 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
    - here the plots:
      #+begin_details
      - diffusion coefficient D=3.0
-     [[./data/exp-220316-publication1/jupyter/plotX_3_modulation-filtering.png]]
+     [[./jupyter/plotX_3_modulation-filtering.png]]
      - D=0.069
-     [[./data/exp-220316-publication1/jupyter/plotX_0dot069_modulation-filtering.png]]
+     [[./jupyter/plotX_0dot069_modulation-filtering.png]]
      - D=0.2
-     [[./data/exp-220316-publication1/jupyter/plotX_0dot2_modulation-filtering.png]]
+     [[./jupyter/plotX_0dot2_modulation-filtering.png]]
      #+end_details
 
    - it seems like this simple approach does not work since it introduces at
@@ -2580,7 +2580,7 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
   #+END_SRC
 
   #+RESULTS:
-  [[./data/exp-220316-publication1/jupyter/plotX_averaging_6examples.png]]
+  [[./jupyter/plotX_averaging_6examples.png]]
 
 - also plot the error margins:
   #+BEGIN_SRC jupyter-python
@@ -2591,7 +2591,7 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
   #+END_SRC
 
   #+RESULTS:
-  [[./data/exp-220316-publication1/jupyter/plotX_averaging_1example.png]]
+  [[./jupyter/plotX_averaging_1example.png]]
 
 - now the averaging method:
   #+BEGIN_SRC jupyter-python
@@ -3960,18 +3960,18 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
      #+RESULTS:
 
      #+begin_details
-     [[./data/exp-220316-publication1/jupyter/plotA_labseg__simulated_trace_tau_sim-11.27_0.svg]]
-     [[./data/exp-220316-publication1/jupyter/plotA_labseg__simulated_trace_tau_sim-11.27_1.svg]]
-     [[./data/exp-220316-publication1/jupyter/plotA_labseg__simulated_trace_tau_sim-11.27_2.svg]]
-     [[./data/exp-220316-publication1/jupyter/plotA_labseg__simulated_trace_tau_sim-163.35ms_6.svg]]
-     [[./data/exp-220316-publication1/jupyter/plotA_labseg__simulated_trace_tau_sim-163.35ms_7.svg]]
-     [[./data/exp-220316-publication1/jupyter/plotA_labseg__simulated_trace_tau_sim-163.35ms_8.svg]]
-     [[./data/exp-220316-publication1/jupyter/plotA_labseg__simulated_trace_tau_sim-3.76ms_0.svg]]
-     [[./data/exp-220316-publication1/jupyter/plotA_labseg__simulated_trace_tau_sim-3.76ms_1.svg]]
-     [[./data/exp-220316-publication1/jupyter/plotA_labseg__simulated_trace_tau_sim-3.76ms_2.svg]]
-     [[./data/exp-220316-publication1/jupyter/plotA_labseg__simulated_trace_tau_sim-56.36ms_3.svg]]
-     [[./data/exp-220316-publication1/jupyter/plotA_labseg__simulated_trace_tau_sim-56.36ms_4.svg]]
-     [[./data/exp-220316-publication1/jupyter/plotA_labseg__simulated_trace_tau_sim-56.36ms_5.svg]]
+     [[./jupyter/plotA_labseg__simulated_trace_tau_sim-11.27_0.svg]]
+     [[./jupyter/plotA_labseg__simulated_trace_tau_sim-11.27_1.svg]]
+     [[./jupyter/plotA_labseg__simulated_trace_tau_sim-11.27_2.svg]]
+     [[./jupyter/plotA_labseg__simulated_trace_tau_sim-163.35ms_6.svg]]
+     [[./jupyter/plotA_labseg__simulated_trace_tau_sim-163.35ms_7.svg]]
+     [[./jupyter/plotA_labseg__simulated_trace_tau_sim-163.35ms_8.svg]]
+     [[./jupyter/plotA_labseg__simulated_trace_tau_sim-3.76ms_0.svg]]
+     [[./jupyter/plotA_labseg__simulated_trace_tau_sim-3.76ms_1.svg]]
+     [[./jupyter/plotA_labseg__simulated_trace_tau_sim-3.76ms_2.svg]]
+     [[./jupyter/plotA_labseg__simulated_trace_tau_sim-56.36ms_3.svg]]
+     [[./jupyter/plotA_labseg__simulated_trace_tau_sim-56.36ms_4.svg]]
+     [[./jupyter/plotA_labseg__simulated_trace_tau_sim-56.36ms_5.svg]]
      #+end_details
 
 **** Plot B: transit times vs random cuts in =clean= trace
@@ -4237,7 +4237,7 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
      #+RESULTS:
 
      #+begin_export html
-     <embed src="./data/exp-220316-publication1/jupyter/plotB_transit-times-vs-cuts_BOXEN.pdf" width="100%" height="500px" />
+     <embed src="./jupyter/plotB_transit-times-vs-cuts_BOXEN.pdf" width="100%" height="500px" />
      #+end_export
 
    - second version: violin plot
@@ -4250,7 +4250,7 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
 
      #+RESULTS:
 
-     [[./data/exp-220316-publication1/jupyter/plotB_transit-times-vs-cuts.svg]]
+     [[./jupyter/plotB_transit-times-vs-cuts.svg]]
 
 **** Plot C: correction methods fit outcomes
    :PROPERTIES:
@@ -5231,7 +5231,7 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
    #+end_details
    - here is the example of the simulated transit times:
      #+begin_export html
-     <embed src="./data/exp-220316-publication1/jupyter/plotC_BOXEN_compare-correction-sim_transit-times.pdf" width="100%" height="500px" />
+     <embed src="./jupyter/plotC_BOXEN_compare-correction-sim_transit-times.pdf" width="100%" height="500px" />
      #+end_export
 ***** Plot C v2: violin plots
    - try violin plots - first just take a look at the log values for different
@@ -5285,7 +5285,7 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
      :   ax.set_xticklabels(xlab_power)
      #+end_details
 
-     [[./data/exp-220316-publication1/jupyter/plotC_compare-correction-sim_transit-times.svg]]
+     [[./jupyter/plotC_compare-correction-sim_transit-times.svg]]
 
    - plot biological af488 data - transit times
      #+begin_details
@@ -5300,7 +5300,7 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
      #+END_SRC
      #+end_details
 
-     [[./data/exp-220316-publication1/jupyter/plotC_compare-correction-af488_transit-times.svg]]
+     [[./jupyter/plotC_compare-correction-af488_transit-times.svg]]
 
    - plot biological af488 data - particle numbers
      #+begin_details
@@ -5315,7 +5315,7 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
      #+END_SRC
      #+end_details
 
-     [[./data/exp-220316-publication1/jupyter/plotC_compare-correction-af488_particle-numbers.svg]]
+     [[./jupyter/plotC_compare-correction-af488_particle-numbers.svg]]
 
    - plot biological pex5 data - transit times
      #+begin_details
@@ -5336,7 +5336,7 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
      :   ax.set_xticklabels(xlab_power)
      #+end_details
 
-     [[./data/exp-220316-publication1/jupyter/plotC_compare-correction-pex5_transit-times.svg]]
+     [[./jupyter/plotC_compare-correction-pex5_transit-times.svg]]
 
    - for supplementary, plot 1 and 2 species fits for every category for transit times
      #+begin_details
@@ -5367,7 +5367,7 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
      #+end_example
      #+end_details
 
-     [[./data/exp-220316-publication1/jupyter/plotC_compare-correction-sim-bio-allfits.svg]]
+     [[./jupyter/plotC_compare-correction-sim-bio-allfits.svg]]
 
    - for supplementary, plot 1 and 2 species fits for simulated data - transit times
      #+begin_details
@@ -5393,7 +5393,7 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
      :   ax.set_xticklabels(xlab_power)
      #+end_details
 
-     [[./data/exp-220316-publication1/jupyter/plotC_compare-correction-sim_transit-times-allfits.svg]]
+     [[./jupyter/plotC_compare-correction-sim_transit-times-allfits.svg]]
 
    - for supplementary, plot 1 and 2 species fits for af488 particle numbers
      #+begin_details
@@ -5410,7 +5410,7 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
      #+RESULTS:
      #+end_details
 
-     [[./data/exp-220316-publication1/jupyter/plotC_compare-correction-af488_particle-numbers-allfits.svg]]
+     [[./jupyter/plotC_compare-correction-af488_particle-numbers-allfits.svg]]
 
    - for supplementary, plot 1 and 2 species fits for af488 transit times
      #+begin_details
@@ -5443,8 +5443,8 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
      :   ax.set_xticklabels(xlab_power)
      #+end_details
 
-     [[./data/exp-220316-publication1/jupyter/plotC_compare-correction-af488_transit-times-allfits.svg]]
-     [[./data/exp-220316-publication1/jupyter/plotC_compare-correction-af488_transit-times-allfits_XLABELS.svg]]
+     [[./jupyter/plotC_compare-correction-af488_transit-times-allfits.svg]]
+     [[./jupyter/plotC_compare-correction-af488_transit-times-allfits_XLABELS.svg]]
 
    - for supplementary, plot 1 and 2 species fits for pex5 transit times
      #+begin_details
@@ -5466,7 +5466,7 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
      :   ax.set_xticklabels(xlab_power)
      #+end_details
 
-     [[./data/exp-220316-publication1/jupyter/plotC_compare-correction-pex5_transit-times-allfits.svg]]
+     [[./jupyter/plotC_compare-correction-pex5_transit-times-allfits.svg]]
 
    - for supplementary, plot 1 and 2 species fits for pex5 particle numbers
      #+begin_details
@@ -5484,7 +5484,7 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
      #+RESULTS:
      #+end_details
 
-     [[./data/exp-220316-publication1/jupyter/plotC_compare-correction-pex5_particle-numbers-allfits.svg]]
+     [[./jupyter/plotC_compare-correction-pex5_particle-numbers-allfits.svg]]
 
 **** Plot D: prediction methods fit outcomes
    :PROPERTIES:
@@ -6145,7 +6145,7 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
    #+end_details
    - the exemplary plot:
      #+begin_export html
-     <embed src="./data/exp-220316-publication1/jupyter/plotD_BOXEN_compare-prediction-af488_particle-numbers.pdf" width="100%" height="500px" />
+     <embed src="./jupyter/plotD_BOXEN_compare-prediction-af488_particle-numbers.pdf" width="100%" height="500px" />
      #+end_export
 
 ***** Plot D v2: violin plots
@@ -6172,7 +6172,7 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
      :   ax.set_xticklabels(xlab_power)
      #+end_details
 
-     [[./data/exp-220316-publication1/jupyter/plotD_compare-prediction-af488_transit-times.svg]]
+     [[./jupyter/plotD_compare-prediction-af488_transit-times.svg]]
 
    - plot biological af488 data - particle numbers
      #+begin_details
@@ -6190,7 +6190,7 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
      #+RESULTS:
      #+end_details
 
-     [[./data/exp-220316-publication1/jupyter/plotD_compare-prediction-af488_particle-numbers.svg]]
+     [[./jupyter/plotD_compare-prediction-af488_particle-numbers.svg]]
 
    - plot biological pex5 data - transit times
      #+begin_details
@@ -6223,8 +6223,8 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
      :   ax.set_xticklabels(xlab_power)
      #+end_details
 
-     [[./data/exp-220316-publication1/jupyter/plotD_compare-prediction-pex5_transit-times.svg]]
-     [[./data/exp-220316-publication1/jupyter/plotD_compare-prediction-pex5_transit-times_XLABELS.svg]]
+     [[./jupyter/plotD_compare-prediction-pex5_transit-times.svg]]
+     [[./jupyter/plotD_compare-prediction-pex5_transit-times_XLABELS.svg]]
 
    - for supplementary, plot 1 and 2 species fits, as well as additional
      prediction methods, for biological af488 data - transit times
@@ -6248,7 +6248,7 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
      :   ax.set_xticklabels(xlab_power)
      #+end_details
 
-     [[./data/exp-220316-publication1/jupyter/plotD_compare-prediction-af488_transit-times_allfits.svg]]
+     [[./jupyter/plotD_compare-prediction-af488_transit-times_allfits.svg]]
 
    - for supplementary, plot 1 and 2 species fits, as well as additional
      prediction methods, for biological af488 data - particle numbers
@@ -6266,7 +6266,7 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
      #+END_SRC
      #+end_details
 
-     [[./data/exp-220316-publication1/jupyter/plotD_compare-prediction-af488_particle-numbers_allfits.svg]]
+     [[./jupyter/plotD_compare-prediction-af488_particle-numbers_allfits.svg]]
 
    - for supplementary, plot 1 and 2 species fits, as well as additional
      prediction methods, for biological pex5 data - transit times
@@ -6290,7 +6290,7 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
      :   ax.set_xticklabels(xlab_power)
      #+end_details
 
-     [[./data/exp-220316-publication1/jupyter/plotD_compare-prediction-pex5_transit-times_allfits.svg]]
+     [[./jupyter/plotD_compare-prediction-pex5_transit-times_allfits.svg]]
 
    - for supplementary, plot 1 and 2 species fits, as well as additional
      prediction methods, for biological pex5 data - particle numbers
@@ -6310,7 +6310,7 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
      #+RESULTS:
      #+end_details
 
-     [[./data/exp-220316-publication1/jupyter/plotD_compare-prediction-pex5_particle-numbers_allfits.svg]]
+     [[./jupyter/plotD_compare-prediction-pex5_particle-numbers_allfits.svg]]
 
    - I decided not to use simulated plots for this figure, that's why I stopped
      doing the correlations midway. As can be seen be the incomplete data, the
@@ -6340,7 +6340,7 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
      :   ax.set_xticklabels(xlab_power)
      #+end_details
 
-     [[./data/exp-220316-publication1/jupyter/plotD_compare-prediction-sim_transit-times.svg]]
+     [[./jupyter/plotD_compare-prediction-sim_transit-times.svg]]
 
 **** Plot E: correction methods corr&fit examples
    :PROPERTIES:
@@ -6630,7 +6630,7 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
      #+RESULTS:
      #+end_details
 
-     [[./data/exp-220316-publication1/jupyter/plotE_sim-correlations-fits_residuals.svg]]
+     [[./jupyter/plotE_sim-correlations-fits_residuals.svg]]
 
    - now plot the single correlations and plots
      #+begin_details
@@ -6686,7 +6686,7 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
      #+end_details
 
      #+begin_export html
-     <embed src="./data/exp-220316-publication1/jupyter/plotE_sim-correlations-fits_plots.pdf" width="100%" height="500px" />
+     <embed src="./jupyter/plotE_sim-correlations-fits_plots.pdf" width="100%" height="500px" />
      #+end_export
 
    - as an inset, I want the average correlations over 100 traces (for dirty) or 300
@@ -6735,7 +6735,7 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
 
    - here the plot:
      #+begin_details
-     [[./data/exp-220316-publication1/jupyter/plotE_sim-correlations-fits_inset.svg]]
+     [[./jupyter/plotE_sim-correlations-fits_inset.svg]]
      #+end_details
 
 **** Plot F: Unused further traces
@@ -6818,24 +6818,24 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
 
    - and here are the plots
      #+begin_details
-     [[./data/exp-220316-publication1/jupyter/plotF_slow_molecules_and_slow_clusters:_simulations.svg]]
-     [[./data/exp-220316-publication1/jupyter/plotF_slow_molecules:_slow_cluster_labels.svg]]
-     [[./data/exp-220316-publication1/jupyter/plotF_slow_molecules_and_medium_clusters:_simulations.svg]]
-     [[./data/exp-220316-publication1/jupyter/plotF_slow_molecules:_medium_cluster_labels.svg]]
-     [[./data/exp-220316-publication1/jupyter/plotF_slow_molecules_and_fast_clusters:_simulations.svg]]
-     [[./data/exp-220316-publication1/jupyter/plotF_slow_molecules:_fast_cluster_labels.svg]]
-     [[./data/exp-220316-publication1/jupyter/plotF_medium_molecules_and_slow_clusters:_simulations.svg]]
-     [[./data/exp-220316-publication1/jupyter/plotF_medium_molecules:_slow_cluster_labels.svg]]
-     [[./data/exp-220316-publication1/jupyter/plotF_medium_molecules_and_medium_clusters:_simulations.svg]]
-     [[./data/exp-220316-publication1/jupyter/plotF_medium_molecules:_medium_cluster_labels.svg]]
-     [[./data/exp-220316-publication1/jupyter/plotF_medium_molecules_and_fast_clusters:_simulations.svg]]
-     [[./data/exp-220316-publication1/jupyter/plotF_medium_molecules:_fast_cluster_labels.svg]]
-     [[./data/exp-220316-publication1/jupyter/plotF_fast_molecules_and_slow_clusters:_simulations.svg]]
-     [[./data/exp-220316-publication1/jupyter/plotF_fast_molecules:_slow_cluster_labels.svg]]
-     [[./data/exp-220316-publication1/jupyter/plotF_fast_molecules_and_medium_clusters:_simulations.svg]]
-     [[./data/exp-220316-publication1/jupyter/plotF_fast_molecules:_medium_cluster_labels.svg]]
-     [[./data/exp-220316-publication1/jupyter/plotF_fast_molecules_and_fast_clusters:_simulations.svg]]
-     [[./data/exp-220316-publication1/jupyter/plotF_fast_molecules:_fast_cluster_labels.svg]]
+     [[./jupyter/plotF_slow_molecules_and_slow_clusters:_simulations.svg]]
+     [[./jupyter/plotF_slow_molecules:_slow_cluster_labels.svg]]
+     [[./jupyter/plotF_slow_molecules_and_medium_clusters:_simulations.svg]]
+     [[./jupyter/plotF_slow_molecules:_medium_cluster_labels.svg]]
+     [[./jupyter/plotF_slow_molecules_and_fast_clusters:_simulations.svg]]
+     [[./jupyter/plotF_slow_molecules:_fast_cluster_labels.svg]]
+     [[./jupyter/plotF_medium_molecules_and_slow_clusters:_simulations.svg]]
+     [[./jupyter/plotF_medium_molecules:_slow_cluster_labels.svg]]
+     [[./jupyter/plotF_medium_molecules_and_medium_clusters:_simulations.svg]]
+     [[./jupyter/plotF_medium_molecules:_medium_cluster_labels.svg]]
+     [[./jupyter/plotF_medium_molecules_and_fast_clusters:_simulations.svg]]
+     [[./jupyter/plotF_medium_molecules:_fast_cluster_labels.svg]]
+     [[./jupyter/plotF_fast_molecules_and_slow_clusters:_simulations.svg]]
+     [[./jupyter/plotF_fast_molecules:_slow_cluster_labels.svg]]
+     [[./jupyter/plotF_fast_molecules_and_medium_clusters:_simulations.svg]]
+     [[./jupyter/plotF_fast_molecules:_medium_cluster_labels.svg]]
+     [[./jupyter/plotF_fast_molecules_and_fast_clusters:_simulations.svg]]
+     [[./jupyter/plotF_fast_molecules:_fast_cluster_labels.svg]]
      #+end_details
 
 **** Plot G: bio example traces
@@ -7191,25 +7191,25 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
      #+RESULTS:
 
      - AlexaFluor 488 in solution (used for publication):
-       [[./data/exp-220316-publication1/jupyter/plotG_AlexaFluor488_n=1,_no_artifacts,_no_correction_0.svg]]
+       [[./jupyter/plotG_AlexaFluor488_n=1,_no_artifacts,_no_correction_0.svg]]
      - AF488 + DiO-LUVs (used for publication):
-       [[./data/exp-220316-publication1/jupyter/plotG_AF488_+_DiO_LUVs_n=1,_peak_artifacts,_no_correction_2.svg]]
+       [[./jupyter/plotG_AF488_+_DiO_LUVs_n=1,_peak_artifacts,_no_correction_2.svg]]
      - Hs-PEX5-eGFP (used for publication):
-       [[./data/exp-220316-publication1/jupyter/plotG_Hs-PEX5-eGFP_n=1,_no_artifacts,_no_correction_0.svg]]
+       [[./jupyter/plotG_Hs-PEX5-eGFP_n=1,_no_artifacts,_no_correction_0.svg]]
      - Tb-PEX5-eGFP (used for publication):
-       [[./data/exp-220316-publication1/jupyter/plotG_Tb-PEX5-eGFP_n=1,_peak_artifacts,_no_correction_2.svg]]
+       [[./jupyter/plotG_Tb-PEX5-eGFP_n=1,_peak_artifacts,_no_correction_2.svg]]
      - AlexaFluor488 in solution, automated correction pipeline was used (U-Net
        prediction and /cut and stitch/ correction). Not used in publication.
-       [[./data/exp-220316-publication1/jupyter/plotG_AlexaFluor488_n=1,_no_artifacts,_autom._corr._0.svg]]
+       [[./jupyter/plotG_AlexaFluor488_n=1,_no_artifacts,_autom._corr._0.svg]]
      - AF488 + DiO-LUVs, automated correction pipeline was used (U-Net prediction
        and /cut and stitch/ correction). Not used in publication.
-       [[./data/exp-220316-publication1/jupyter/plotG_AF488_+_DiO_LUVs_n=1,_peak_artifacts,_autom._corr._2.svg]]
+       [[./jupyter/plotG_AF488_+_DiO_LUVs_n=1,_peak_artifacts,_autom._corr._2.svg]]
      - Hs-PEX5-eGFP, automated correction pipeline was used (U-Net
        prediction and /cut and stitch/ correction). Not used in publication.
-       [[./data/exp-220316-publication1/jupyter/plotG_Hs-PEX5-eGFP_n=1,_no_artifacts,_autom._corr._0.svg]]
+       [[./jupyter/plotG_Hs-PEX5-eGFP_n=1,_no_artifacts,_autom._corr._0.svg]]
      - Tb-PEX5-eGFP, automated correction pipeline was used (U-Net prediction
        and /cut and stitch/ correction). Not used in publication.
-       [[./data/exp-220316-publication1/jupyter/plotG_Tb-PEX5-eGFP_n=1,_peak_artifacts,_autom._corr._2.svg]]
+       [[./jupyter/plotG_Tb-PEX5-eGFP_n=1,_peak_artifacts,_autom._corr._2.svg]]
 
      #+BEGIN_SRC jupyter-python
        plot_bio_cluster_prediction(
@@ -7224,10 +7224,10 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
 
      - Output of U-Net model when applied to AlexaFluor 488 in solution + the
        prediction threshold used for all correlation analyses
-       [[./data/exp-220316-publication1/jupyter/plotG_AlexaFluor_488_in_solution_clean:_LUV_prediction_preds_0.svg]]
+       [[./jupyter/plotG_AlexaFluor_488_in_solution_clean:_LUV_prediction_preds_0.svg]]
      - Output of U-Net model when applied to AF488 + DiO-LUVs + the prediction
        threshold used for all correlation analyses
-       [[./data/exp-220316-publication1/jupyter/plotG_AlexaFluor_488_+_DiO_LUVs_in_solution_dirty:_LUV_prediction_preds_2.svg]]
+       [[./jupyter/plotG_AlexaFluor_488_+_DiO_LUVs_in_solution_dirty:_LUV_prediction_preds_2.svg]]
 
      #+BEGIN_SRC jupyter-python
        plot_bio_prediction_based_segmentation(
@@ -7248,17 +7248,17 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
 
      - Segmentation based on U-Net model (+ fixed 0.5 thresholding) when applied
        to AlexaFluor 488 in solution
-       [[./data/exp-220316-publication1/jupyter/plotG_AlexaFluor488_n=1,_no_artifacts,_no_correction_seg_0.svg]]
+       [[./jupyter/plotG_AlexaFluor488_n=1,_no_artifacts,_no_correction_seg_0.svg]]
      - Segmentation based on U-Net model (+ fixed 0.5 thresholding) when applied
        to AF488 + DiO-LUVs. Here 2 versions, because I used both:
-       [[./data/exp-220316-publication1/jupyter/plotG_AF488_+_DiO_LUVs_n=1,_peak_artifacts,_no_correction_seg_2.svg]]
-       [[./data/exp-220316-publication1/jupyter/plotG_AF488_+_DiO_LUVs_n=1,_peak_artifacts,_no_correction_seg_1.svg]]
+       [[./jupyter/plotG_AF488_+_DiO_LUVs_n=1,_peak_artifacts,_no_correction_seg_2.svg]]
+       [[./jupyter/plotG_AF488_+_DiO_LUVs_n=1,_peak_artifacts,_no_correction_seg_1.svg]]
      - Segmentation based on U-Net model (+ fixed 0.5 thresholding) when applied
        to Hs-PEX5-eGFP
-       [[./data/exp-220316-publication1/jupyter/plotG_Hs-PEX5-eGFP_n=1,_no_artifacts,_no_correction_seg_0.svg]]
+       [[./jupyter/plotG_Hs-PEX5-eGFP_n=1,_no_artifacts,_no_correction_seg_0.svg]]
      - Segmentation based on U-Net model (+ fixed 0.5 thresholding) when applied
        to Tb-PEX5-eGFP
-       [[./data/exp-220316-publication1/jupyter/plotG_Tb-PEX5-eGFP_n=1,_peak_artifacts,_no_correction_seg_2.svg]]
+       [[./jupyter/plotG_Tb-PEX5-eGFP_n=1,_peak_artifacts,_no_correction_seg_2.svg]]
 
      #+BEGIN_SRC jupyter-python
        plot_bio_clean_corr_and_fit(
@@ -7273,9 +7273,9 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
      #+RESULTS:
 
      - 1-component correlation and fit of AlexaFluor 488 in solution
-       [[./data/exp-220316-publication1/jupyter/plotG_AlexaFluor_488_in_solution_clean:_Correlation_and_1-component_Fit_0.svg]]
+       [[./jupyter/plotG_AlexaFluor_488_in_solution_clean:_Correlation_and_1-component_Fit_0.svg]]
      - 2-component correlation and fit of AF488 + DiO-LUVs
-       [[./data/exp-220316-publication1/jupyter/plotG_AlexaFluor_488_+_DiO_LUVs_in_solution_dirty:_Correlations_and_2-component_Fits_2.svg]]
+       [[./jupyter/plotG_AlexaFluor_488_+_DiO_LUVs_in_solution_dirty:_Correlations_and_2-component_Fits_2.svg]]
 
      #+BEGIN_SRC jupyter-python
        plot_all_bio_corrs(all_af488_corr, all_af488_param, 'af488')
@@ -7286,11 +7286,11 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
 
      - Comparison of averged correlations of AF488 (no correction, automated
        correction) and AF488 in solution (no correction, automated correction)
-       [[./data/exp-220316-publication1/jupyter/plotG_bioexps_af488_avg-correlations.svg]]
+       [[./jupyter/plotG_bioexps_af488_avg-correlations.svg]]
      - Comparison of averaged correlations of Hs-PEX5-eGFP (no correction,
        automated correction) and Tb-PEX5-eGFP (no correction, automated
        correction)
-       [[./data/exp-220316-publication1/jupyter/plotG_bioexps_pex5_avg-correlations.svg]]
+       [[./jupyter/plotG_bioexps_pex5_avg-correlations.svg]]
      #+end_details
 
 *** Plots: inkscape
@@ -7304,12 +7304,12 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
 - the segmented time-series was taken from [[*Plot G: bio example traces][Plot G: bio example traces]] (a cropped
   version)
 - here is the plot:
-  [[./data/exp-220316-publication1/inkscape/plotX_graphic_toc.svg]]
+  [[./inkscape/plotX_graphic_toc.svg]]
 **** Fig 2: /cut and stitch/ viz
 
 - using data from [[*Exp: bioexps - example traces][Exp: bioexps - example traces]], I created a small visualization
   of how /cut and stitch/ works with TCSPC data:
-  [[./data/exp-220316-publication1/inkscape/plot2_correction-ptu.svg]]
+  [[./inkscape/plot2_correction-ptu.svg]]
 
 **** Fig 6: prediction methods
 - done by myself in inkscape.
@@ -7321,13 +7321,13 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
 - the "zero values" in /set to zero/ and overlaying the segmentation over the
   trace in /cut and stitch/ and /averaging/ were done in inkscape.
 - here is the plot:
-  [[./data/exp-220316-publication1/inkscape/plot6_correction-method-principles.svg]]
+  [[./inkscape/plot6_correction-method-principles.svg]]
 **** Fig 7: prediction methods
 - done by myself in inkscape. Only the time-series and segmentation vector are
   taken from [[*Plot F: Unused further traces][Plot F: Unused further traces]] (specifically, a cropped, segmented
   version of "fast molecules and fast clusters")
 - here is the plot:
-  [[./data/exp-220316-publication1/inkscape/plot7_prediction-method-principles.svg]]
+  [[./inkscape/plot7_prediction-method-principles.svg]]
 
 **** Fig 9: simexps for publication
 - a combination of plots of simulated data from [[*Plot A: traces with labels][Plot A: traces with labels]] and
@@ -7337,7 +7337,7 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
   figure-size-to-text-size proportions correct
 - here is the figure:
   #+begin_export html
-  <embed src="./data/exp-220316-publication1/inkscape/plot9-simulation-experiments.pdf" width="100%" height="500px" />
+  <embed src="./inkscape/plot9-simulation-experiments.pdf" width="100%" height="500px" />
   #+end_export
 
 **** Fig 10: AF488 for publication
@@ -7348,7 +7348,7 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
   figure-size-to-text-size proportions correct
 - here is the figure:
   #+begin_export html
-  <embed src="./data/exp-220316-publication1/inkscape/plot10-applied-experiments-af488.pdf" width="100%" height="500px" />
+  <embed src="./inkscape/plot10-applied-experiments-af488.pdf" width="100%" height="500px" />
   #+end_export
 
 **** Fig 11: PEX5 for publication
@@ -7359,14 +7359,14 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
   figure-size-to-text-size proportions correct
 - here is the figure:
   #+begin_export html
-  <embed src="./data/exp-220316-publication1/inkscape/plot11-applied-experiments-pex5.pdf" width="100%" height="500px" />
+  <embed src="./inkscape/plot11-applied-experiments-pex5.pdf" width="100%" height="500px" />
   #+end_export
 
 **** Supp Fig 1: corr&fit examples
 - This combines plots from [[*Plot E: correction methods corr&fit examples][Plot E: correction methods corr&fit examples]] into one
   figure in inkscape:
   #+begin_export html
-  <embed src="./data/exp-220316-publication1/inkscape/plotsupp1_sim-correlations-fits.pdf" width="100%" height="500px" />
+  <embed src="./inkscape/plotsupp1_sim-correlations-fits.pdf" width="100%" height="500px" />
   #+end_export
 
 **** Supp Fig 2: stitching artifacts
@@ -7374,19 +7374,19 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
   [[*Plot B: transit times vs random cuts in =clean= trace][Plot B: transit times vs random cuts in =clean= trace]]
   into one figure in inkscape:
   #+begin_export html
-  <embed src="./data/exp-220316-publication1/inkscape/plotsupp2_stitching-artifacts.pdf" width="100%" height="500px" />
+  <embed src="./inkscape/plotsupp2_stitching-artifacts.pdf" width="100%" height="500px" />
   #+end_export
 
 **** Supp Fig 4: compare corrections
 - This combines plots from [[*Plot C v2: violin plots][Plot C v2: violin plots]] into one figure in inkscape:
   #+begin_export html
-  <embed src="./data/exp-220316-publication1/inkscape/plotsupp4_compare-corrections-allfits.pdf" width="100%" height="500px" />
+  <embed src="./inkscape/plotsupp4_compare-corrections-allfits.pdf" width="100%" height="500px" />
   #+end_export
 
 **** Supp Fig 5: compare predictions
 - This combines plots from [[*Plot D v2: violin plots][Plot D v2: violin plots]] into one figure in inkscape:
   #+begin_export html
-  <embed src="./data/exp-220316-publication1/inkscape/plotsupp5_compare-predictions-allfits.pdf" width="100%" height="500px" />
+  <embed src="./inkscape/plotsupp5_compare-predictions-allfits.pdf" width="100%" height="500px" />
   #+end_export
 
 *** some additional useful computations and notes
