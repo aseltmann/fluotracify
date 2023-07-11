@@ -1,0 +1,511 @@
+#+TITLE: Lab book Fluotracify
+#+AUTHOR: Alex Seltmann
+#+LANGUAGE: en
+#+PROPERTY: header-args :eval never-export :exports both
+#+OPTIONS: toc:4
+#+OPTIONS: H:4
+#+HTML_HEAD_EXTRA: <style type="text/css">.example {background-color: #FBFBBF;}</style>
+#+HTML_HEAD_EXTRA: <style type="text/css">pre.src-emacs-lisp {background-color: #F7ECFB;}</style>
+#+HTML_HEAD_EXTRA: <style type="text/css">pre.src-sh {background-color: #F0FBE9;}</style>
+#+HTML_HEAD_EXTRA: <style type="text/css">pre.src-tmux {background-color: #E1EED8;}</style>
+#+HTML_HEAD_EXTRA: <style type="text/css">pre.src-python {background-color: #E6EDF4;}</style>
+#+HTML_HEAD_EXTRA: <style type="text/css">pre.src-jupyter-python {background-color: #FAEAE1;}</style>
+#+HTML_HEAD_EXTRA: <style type="text/css">details {padding: 1em; background-color: #f0f0f0; border-radius: 15px; color: hsl(157 75% 20%); font-size: 0.9em; box-shadow: 0.05em 0.1em 5px 0.01em  #00000057;}</style>
+#+HTML_HEAD_EXTRA: <style type="text/css">details:hover {background:pink;}</style>
+#+HTML_HEAD_EXTRA: <style type="text/css">table {display: block; overflow-x: auto; white-space: nowrap;}</style>
+
+
+* Technical Notes
+** README
+*** General:
+   - This file corresponds to my lab book for my doctoral thesis tackling
+     artifact correction in Fluorescence Correlation Spectroscopy (FCS)
+     measurements using Deep Neural Networks. It also contains notes taken
+     during the process of setting up this workflow for reproducible research.
+   - This file contains explanations of how things are organized, of the
+     workflow for doing experiments, changes made to the code, and the observed
+     behavior in the "* Data" section.
+   - The branching model used is described in [[http://starpu-simgrid.gforge.inria.fr/misc/SIGOPS_paper.pdf][this paper]]. Therefore: if you
+     are interested in the "* Data" section, you have to =git clone= the /data/
+     branch of the repository. The /main/ branch is clean from any results, it
+     contains only source code and the analysis.
+   - This project is my take on [[https://en.wikipedia.org/wiki/Open-notebook_science][Open-notebook science]]. The idea was postulated in
+     a blog post in 2006:
+     #+BEGIN_QUOTE
+     ... there is a URL to a laboratory notebook that is freely available and
+     indexed on common search engines. It does not necessarily have to look like
+     a paper notebook but it is essential that all of the information available
+     to the researchers to make their conclusions is equally available to the
+     rest of the world ---Jean-Claude Bradley
+     #+END_QUOTE
+   - Proposal on how to deal with truly private data (e.g. notes from a
+     confidential meeting with a colleague), which might otherwise be noted in a
+     normal Lab notebook: do not include them here. Only notes relevant to the
+     current project should be taken
+*** Code block languages used in this document
+
+   #+BEGIN_SRC sh
+     # This is a sh block for shell / bash scripting. In the context of this file,
+     # these blocks are mainly used for operations on my local computer.
+     # In the LabBook.html rendering of this document, these blocks will have a
+     # light green colour (#F0FBE9)
+   #+END_SRC
+
+   #+BEGIN_SRC tmux
+     # This block can open and access tmux sessions, used for shell scripting on
+     # remote computing clusters.
+     # In the LabBook.html rendering of this document, these blocks will have a
+     # distinct light green colour (#E1EED8)
+   #+END_SRC
+
+   #+BEGIN_SRC python
+     # This is a python block. In the context of this file, it is seldomly used
+     # (only for examplary scripts.)
+     # In the LabBook.html rendering of this document, these blocks will have a
+     # light blue colour (#E6EDF4)
+   #+END_SRC
+
+   #+BEGIN_SRC jupyter-python :session /jpy:localhost#8889:704d35be-572a-4268-a70b-565164b8620f
+     # This is a jupyter-python block. The code is sent to a jupyter kernel running
+     # on a remote high performance computing cluster. Most of my jupyter code is
+     # executed this way.
+     # In the LabBook.html rendering of this document, these blocks will have a
+     # light orange colour (#FAEAE1)
+   #+END_SRC
+
+   #+BEGIN_SRC emacs-lisp
+     ;; This is a emacs-lisp block, the language used to customize Emacs, which is
+     ;; sometimes necessary, since the reproducible workflow of this LabBook is
+     ;; tightly integrated with Emacs and org-mode.
+     ;; In the LabBook.html rendering of this document, these blocks will have a
+     ;; light violet colour (#F7ECFB)
+   #+END_SRC
+
+   #+begin_example
+     This is a literal example block. It can be used very flexibly - in the context
+     of this document the output of most code blocks is displayed this way.
+     In the LabBook.html rendering of this document, these blocks will have a light
+     yellow colour (#FBFBBF)
+   #+end_example
+
+   #+begin_details
+   #+begin_example
+     This is a literal example block enclosed in a details block. This is useful to
+     make the page more readable by collapsing large amounts of output.
+     In the Labbook.html rendering of this document, the details block will have a
+     light grey colour (#f0f0f0) and a pink color when hovering above it.
+   #+end_example
+   #+end_details
+
+*** Experiments workflow:
+   1) Create a new branch from =main=
+   2) Print out the git log from the latest commit and the metadata
+   3) Call the analysis scripts, follow the principles outlined in
+      [[* Organization of code]]
+   4) All machine learning runs are saved in =data/mlruns=, all other data in
+      =data/#experiment-name=
+   5) Add a ~** exp-<date>-<name>~" section to this file under [[* Data]]
+   6) Commit/push the results of this separate branch
+   7) Merge this new branch with the remote =data= branch
+*** Example for experimental setup procedure
+
+**** Setting starting a jupyter kernel from a remote jupyter session using =emacs-jupyter= in =org babel=
+    :PROPERTIES:
+    :CUSTOM_ID: sec-jupyter-setup
+    :END:
+
+*** tools used (notes)
+**** Emacs =magit=
+   - =gitflow-avh= (=magit-flow=) to follow the flow
+   - possibly https://github.com/magit/magit-annex for large files. Follow this:
+     https://git-annex.branchable.com/walkthrough/
+   - maybe check out git-toolbelt at some point
+     https://github.com/nvie/git-toolbelt#readme with
+     https://nvie.com/posts/git-power-tools/
+**** jupyter
+   - emacs jupyter for running and connecting to kernel on server:
+     https://github.com/dzop/emacs-jupyter
+   - if I actually still would use .ipynb files, these might come handy:
+     + jupytext: https://github.com/mwouts/jupytext
+     + nbstripout: https://github.com/kynan/nbstripout
+**** mlflow
+   - https://docs.faculty.ai/user-guide/experiments/index.html and
+     https://docs.microsoft.com/en-us/azure/databricks/_static/notebooks/hls-image-processing/02-image-segmentation-dl.html
+**** tensorflow
+   - https://www.tensorflow.org/tensorboard/image_summaries
+
+** Template for data entry and setup notes:
+*** exp-#date-#title
+**** git:
+
+    #+begin_src sh
+    git log -1
+    #+end_src
+
+**** System Metadata:
+
+    #+NAME: jp-metadata
+    #+BEGIN_SRC jupyter-python :var _long="true"
+      import os
+      import pprint
+
+      ramlist = os.popen('free -th').readlines()[-1].split()[1:]
+
+      print('No of CPUs in system:', os.cpu_count())
+      print('No of CPUs the current process can use:',
+            len(os.sched_getaffinity(0)))
+      print('load average:', os.getloadavg())
+      print('os.uname(): ', os.uname())
+      print('PID of process:', os.getpid())
+      print('RAM total: {}, RAM used: {}, RAM free: {}'.format(
+          ramlist[0], ramlist[1], ramlist[2]))
+
+      !echo the current directory: $PWD
+      !echo My disk usage:
+      !df -h
+      if _long:
+          %conda list
+          pprint.pprint(dict(os.environ), sort_dicts=False)
+
+    #+END_SRC
+
+**** Tmux setup and scripts
+    :PROPERTIES:
+    :CUSTOM_ID: scripts-tmux
+    :END:
+
+    #+NAME: setup-tmux
+    #+BEGIN_SRC sh :session local
+    rm ~/.tmux-local-socket-remote-machine
+    REMOTE_SOCKET=$(ssh ara 'tmux ls -F "#{socket_path}"' | head -1)
+    echo $REMOTE_SOCKET
+    ssh ara -tfN \
+        -L ~/.tmux-local-socket-remote-machine:$REMOTE_SOCKET
+    #+END_SRC
+
+    #+RESULTS: setup-tmux
+    | rm:                                  | cannot                               | remove    | '/home/lex/.tmux-local-socket-remote-machine': | No | such | file | or | directory |
+    | ye53nis@ara-login01.rz.uni-jena.de's | password:                            |           |                                                |    |      |      |    |           |
+    | /tmp/tmux-67339/default              |                                      |           |                                                |    |      |      |    |           |
+    | >                                    | ye53nis@ara-login01.rz.uni-jena.de's | password: |                                                |    |      |      |    |           |
+
+**** SSH tunneling
+    :PROPERTIES:
+    :CUSTOM_ID: ssh-tunneling
+    :END:
+
+    Different applications can be run on the remote compute node. If I want to
+    access them at the local machine, and open them with the browser, I use this
+    tunneling script.
+
+    #+NAME: ssh-tunnel
+    #+BEGIN_SRC sh :session org-tunnel :var port="8889" :var node="node001"
+    ssh -t -t ara -L $port:localhost:$port ssh $node -L $port:Localhost:$port
+    #+END_SRC
+
+    Apps I use that way:
+    - Jupyter lab for running Python 3-Kernels
+    - TensorBoard
+    - Mlflow ui
+
+**** jupyter scripts
+    :PROPERTIES:
+    :CUSTOM_ID: scripts-jp
+    :END:
+
+    Starting a jupyter instance on a server where the necessary libraries are
+    installed is easy using this script:
+
+    #+NAME: jpt-tmux
+    #+BEGIN_SRC tmux :socket ~/.tmux-local-socket-remote-machine
+    conda activate tf
+    export PORT=8889
+    export XDG_RUNTIME_DIR=''
+    export XDG_RUNTIME_DIR=""
+    jupyter lab --no-browser --port=$PORT
+    #+END_SRC
+
+    On the compute node of the HPC, the users' environment is managed through
+    module files using the system [[https://lmod.readthedocs.io][Lmod]]. The =export XDG_RUNTIME_DIR= statements
+    are needed because of a jupyter bug which did not let it start. Right now,
+    =ob-tmux= does not support a =:var= header like normal =org-babel= does. So
+    the =$port= variable has to be set here in the template.
+
+    Now this port has to be tunnelled on our local computer (See
+    [[#ssh-tunneling]]). While the tmux session above keeps running, no matter if
+    Emacs is running or not, this following ssh tunnel needs to be active
+    locally to connect to the notebook. If you close Emacs, it would need to be
+    reestablished
+
+*** Setup notes
+**** Setting up a tmux connection from using =ob-tmux= in =org-babel=
+    :PROPERTIES:
+    :CUSTOM_ID: sec-tmux-setup
+    :END:
+    - prerequisite: tmux versions need to be the same locally and on the server.
+      Let's verify that now.
+      - the local tmux version:
+
+        #+BEGIN_SRC sh
+        tmux -V
+        #+END_SRC
+
+        #+RESULTS:
+        : tmux 3.0a
+
+      - the remote tmux version:
+
+       #+BEGIN_SRC sh :session local
+        ssh ara tmux -V
+      #+END_SRC
+
+        #+RESULTS:
+        | ye53nis@ara-login01.rz.uni-jena.de's | password: |
+        | tmux                                 | 3.0a      |
+
+    - as is described in [[https://github.com/ahendriksen/ob-tmux][the ob-tmux readme]], the following code snippet creates
+      a socket on the remote machine and forwards this socket to the local
+      machine (note that =socket_path= was introduced in tmux version 2.2)
+
+      #+BEGIN_SRC sh :session local
+      REMOTE_SOCKET=$(ssh ara 'tmux ls -F "#{socket_path}"' | head -1)
+      echo $REMOTE_SOCKET
+      ssh ara -tfN \
+          -L ~/.tmux-local-socket-remote-machine:$REMOTE_SOCKET
+      #+END_SRC
+
+      #+RESULTS:
+      | ye53nis@ara-login01.rz.uni-jena.de's | password:                            |           |
+      | /tmp/tmux-67339/default              |                                      |           |
+      | >                                    | ye53nis@ara-login01.rz.uni-jena.de's | password: |
+
+    - now a new tmux session with name =ob-NAME= is created when using a code
+      block which looks like this: =#+BEGIN_SRC tmux :socket
+      ~/.tmux-local-socket-remote-machine :session NAME=
+    - Commands can be sent now to the remote tmux session, BUT note that the
+      output is not printed yet
+    - there is a workaround for getting output back to our LabBook.org: A [[#scripts-tmux][script]]
+      which allows to print the output from the tmux session in an
+      =#+begin_example=-Block below the tmux block by pressing =C-c C-o= or =C-c
+      C-v C-o= when the pointer is inside the tmux block.
+
+**** =emacs-jupyter= Setup
+
+    =Emacs-jupyter= aims to be an API for a lot of functionalities of the
+    =jupyter= project. The documentation can be found on [[https://github.com/dzop/emacs-jupyter][GitHub]].
+
+    1. For the *whole document*: connect to a running jupyter instance
+       1. =M-x jupyter-server-list-kernels=
+          1. set server URL, e.g. =http://localhost:8889=
+          2. set websocket URL, e.g. =http://localhost:8889=
+       2. two possibilities
+          1. kernel already exists $\to$ list of kernels and =kernel-ID= is displayed
+          2. kernel does not exist $\to$ prompt asks if you want to start one $\to$
+             *yes* $\to$ type kernel you want to start, e.g. =Python 3=
+    2. In the *subtree* where you want to use =jupyter-python= blocks with =org
+       babel=
+       1. set the =:header-args:jupyter-python :session
+          /jpy:localhost#kernel:8889-ID=
+       2. customize the output folder using the following org-mode variable:
+          #+BEGIN_SRC  emacs-lisp
+            (setq org-babel-jupyter-resource-directory "./data/exp-test/plots")
+          #+END_SRC
+
+          #+RESULTS:
+          : ./data/exp-test/plots
+    3. For each *individual block*, the following customizations might be useful
+       1. jupyter kernels can return multiple kinds of rich output (images,
+          html, ...) or scalar data (plain text, numbers, lists, ...). To force
+          a plain output, use =:results scalar=. To show the output in the
+          minibuffer only, use =:results silent=
+       2. to change the priority of different rich outputs, use =:display=
+          header argument, e.g. =:display text/plain text/html= prioritizes
+          plain text over html. All supported mimetypes in default order:
+          1. text/org
+          2. image/svg+xml, image/jpeg, image/png
+          3. text/html
+          4. text/markdown
+          5. text/latex
+          6. text/plain
+       3. We can set jupyter to output pandas DataFrames as org tables
+          automatically using the source block header argument =:pandoc t=
+       4. useful keybindings
+          - =M-i= to open the documentation for wherever your pointer is (like
+            pressing =Shift-TAB= in Jupyter notebooks)
+          - =C-c C-i= to interrupt the kernel, =C-c C-r= to restart the kernel
+
+*** Notes on archiving
+**** Exporting the LabBook.org to html in a twbs style
+     - I am partial to the twitter bootstrap theme of html, since I like it's
+       simple design, but clear structure with a nice table of contents at the
+       side → the following org mode extension supports a seemless export to
+       twitter bootstrap html: https://github.com/marsmining/ox-twbs
+     - when installed, the export can be triggered via the command
+       =(org-twbs-export-as-html)= or via the keyboard shortcut for export =C-c
+       C-e= followed by =w= for Twitter bootstrap and =h= for saving the .html
+     - _Things to configure:_
+       - in general, there are multiple export options:
+         https://orgmode.org/manual/Export-Settings.html
+       - E.g. I set 2 =#+OPTIONS= keywords at the begin of the file: =toc:4= and
+         =H:4= which make sure that in my export my sidebar table of contents
+         will show numbered headings till a depth of 4.
+       - I configured my code blocks so that they will not be evaluated when
+         exporting (I would recommend this especially if you only export for
+         archiving) and that both the code block and the output will be exported
+         with the keyword: =#+PROPERTY: header-args :eval never-export :exports
+         both=
+       - To discriminate between code blocks for different languages I gave each
+         of them a distinct colour using =#+HTML_HEAD_EXTRA: <style...= (see
+         above)
+       - I had to configure a style for =table=, so that the
+         - =display: block; overflow-x: auto;= gets the table to be restricted
+           to the width of the text and if it is larger, activates scrolling
+         - =white-space: nowrap;= makes it that there is no wrap in a column, so
+           it might be broader, but better readable if you have scrolling anyway
+     - _Things to do before exporting / Troubleshooting while exporting:_
+       - when using a dark theme for you emacs, the export of the code blocks
+         might show some ugly dark backgrounds from the theme. If this becomes
+         an issue, change to a light theme for the export with =M-x
+         (load-theme)= and choose =solarized-light=
+       - only in the =data= branch you set the git tags after merging. If you
+         want to show them here, execute the corresponding function in [[Git TAGs]]
+       - make sure your file links work properly! I recommend referencing your
+         files relatively (e.g. [ [ f ile:./data/exp-XXXXXX-test/test.png]]
+         without spaces). Otherwise there will be errors in your /*Messages*/
+         buffer
+       - There might be errors with your code blocks
+         - e.g. the export function expects you to assign a default variable to
+           your functions
+         - if you call a function via the =#+CALL= mechanism, it wants you to
+           include two parentheses for the function, e.g. =#+CALL: test()=
+       - check indentation of code blocks inside lists
+       - add a =details= block around large output cells. This makes them
+         expandable. I added some =#+HTML_HEAD_EXTRA: <style...= inspired by
+         [[https://alhassy.github.io/org-special-block-extras/#Folded-Details][alhassy]]. That's how the =details= block looks like:
+         #+begin_example
+         #+begin_details
+
+         #+end_details
+         #+end_example
+       - If you reference a parameter with an underscore in the name, use the
+         org markdown tricks to style them like code (~==~ or =~~=), otherwise
+         the part after the underscore will be rendered like a subscript:
+         =under_score= vs under_score
+     - _Things to do after exporting:_
+       - In my workflow, the exported =LabBook.html= with the overview of all
+         experiments is in the =data= folder. If you move the file, you will
+         have to fix the file links for the new location, e.g. via "Find and
+         replace" =M-%=:
+         - if you move the org file → in the org file find =[[file:./data/= and
+           replace with =[[file:./= → then export with =C-c C-e w h=
+         - if you export first with =C-c C-e w h= and move the html file to
+           =data= → in the html file find =./data= and replace with =.=
+** Organization of git
+
+*** remote/origin/main branch:
+  - contains all the source code in folder **src/** which is used for experiments.
+  - contains the **LabBook.org** template
+  - contains setup- and metadata files such as **MLproject** or **conda.yaml**
+  - the log contains only lasting alterations on the folders and files mentioned
+    above, which are e.g. used for conducting experiments or which introduce new
+    features. Day-to-day changes in code
+*** remote/origin/exp### branches:
+  - if an experiment is done, the code and templates will be branched out from
+    *main* in an *#experiment-name* branch, ### meaning some meaningful
+    descriptor.
+  - all data generated during the experiment (e.g. .csv files, plots, images,
+    etc), is stored in a folder with the name **data/#experiment-name**, except
+    machine learning-specific data and metadata from `mlflow` runs, which are
+    saved under **data/mlruns** (this allows easily comparing machine learning
+    runs with different experimental settings)
+  - The **LabBook.org** file is essential
+    - If possible, all code is executed from inside this file (meaning analysis
+      scripts or calling the code from the **scr/** directory).
+    - All other steps taken during an experiment are noted down, as well as
+      conclusions or my thought process while conducting the experiment
+    - Provenance data, such as Metadata about the environment the code was
+      executed in, the command line output of the code, and some
+*** remote/origin/develop branch:
+  - this is the branch I use for day to day work on features and exploration.
+    All of my current activity can be followed here.
+*** remote/origin/data branch:
+  - contains a full cronicle of the whole research process
+  - all *#experiment-name* branches are merged here. Afterwards the original
+    branch is deleted and on the data branch there is a *Git tag* which shows
+    the merge commit to make accessing single experiments easy.
+  - the *develop* branch is merged here as well.
+
+*** Git TAGs
+**** Stable versions:
+**** All tags from git:
+   #+begin_src sh :results output
+    git push origin --tags
+    git tag -n1
+   #+end_src
+
+   #+RESULTS:
+   : exp-200402-test Merge branch 'exp-200402-test' into data
+   : exp-200520-unet Merge branch 'exp-310520-unet' into data
+   : exp-200531-unet Merge branch 'heads/exp-310520-unet' into data
+   : exp-201231-clustsim exp-201231-clustsim
+   : exp-210204-unet Add exp-210204-unet LabBook part 3
+   : exp-310520-unet move exp-310520-unet to data branch manually
+** Organization of code
+*** scripts:
+*** src/
+**** fluotracify/
+***** imports/
+***** simulations/
+***** training/
+***** applications/
+***** doc/
+    - use Sphinx
+      - follow this: https://daler.github.io/sphinxdoc-test/includeme.html
+      - evtl export org-mode Readme to rst via https://github.com/msnoigrs/ox-rst
+      - possibly heavily use
+        http://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html
+    - for examples sphinx-galleries could be useful
+      https://sphinx-gallery.github.io/stable/getting_started.html
+
+**** nanosimpy/
+    - cloned from dwaithe with refactoring for Python 3-compatibility
+
+** Changes in this repository (without "* Data" in this file)
+*** Changes in LabBook.org (without "* Data")
+**** 2022-02-19
+     - Add =#+HTML_HEAD_EXTRA: <style...= for =table= to enable scrolling if the
+       table overflows
+**** 2021-12-16
+     - Add =details= blocks, corresponding =#+HTML_HEAD_EXTRA: <style...= and
+       documentation in  [[Notes on archiving]]
+**** 2021-08-05
+     - Rename =master= branch to =main= branch
+**** 2021-04-04
+     - Add =#+OPTIONS: H:4= and =#+OPTIONS: toc:4= to show up to 4 levels of
+       depth in the html (twbs) export of this LabBook in the table of contents
+       at the side
+     - I added [[Notes on archiving]]
+**** 2020-11-04
+    - update "jupyter scripts" in [[Template for data entry and setup notes:]]
+      for new conda environment on server (now =conda activate tf-nightly=)
+**** 2020-05-31
+    - extend general documentation in README
+    - Add code block examples
+    - extend documentation on experiment workflow
+    - move setup notes from README to "Template for data entry and setup notes"
+    - remove emacs-lisp code for custom tmux block functions (not relevant
+      enough)
+    - change named "jpt-tmux" from starting a jupyter notebook to starting
+      jupyter lab. Load a conda environment instead of using Lmod's =module
+      load=
+**** 2020-05-07
+    - extend documentation on git model
+    - extend documentation on jupyter setup
+**** 2020-04-22
+    - added parts of README which describe the experimental process
+    - added templates for system metadata, tmux, jupyter setup
+    - added organization of code
+**** 2020-03-30
+    - set up lab book and form git repo accoring to setup by Luka Stanisic et al
+*** Changes in src/fluotracify
+
