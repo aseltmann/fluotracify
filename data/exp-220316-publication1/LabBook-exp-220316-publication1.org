@@ -5080,7 +5080,7 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
    - the following was the first version of plots done with boxen plots and
      overlayed strip plots. I later shifted to violin plots. I only archive one
      of those plots just as an example.
-   #+begin_details
+     #+begin_details
    - plot simulated data - transit times
      #+BEGIN_SRC jupyter-python
        sns.set_theme(style="whitegrid", font_scale=1, palette='colorblind',
@@ -5218,7 +5218,7 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
      #+END_SRC
 
      #+RESULTS:
-   #+end_details
+     #+end_details
    - here is the example of the simulated transit times:
      #+begin_export html
      <embed src="./jupyter/plotC_BOXEN_compare-correction-sim_transit-times.pdf" width="100%" height="500px" />
@@ -6006,7 +6006,7 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
    - the following was the first version of plots done with boxen plots and
      overlayed strip plots. I later shifted to violin plots. I only archive one
      of those plots just as an example.
-   #+begin_details
+     #+begin_details
    - plot biological af488 data - transit times
      #+BEGIN_SRC jupyter-python
        sns.set_theme(style="whitegrid", font_scale=1, palette='colorblind',
@@ -6132,7 +6132,7 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
      :   hue_mask = self.plot_hues[i] == hue_level
      : /home/lex/Programme/miniconda3/envs/tf/lib/python3.9/site-packages/seaborn/categorical.py:1143: FutureWarning: elementwise comparison failed; returning scalar instead, but in the future will perform elementwise comparison
      :   hue_mask = self.plot_hues[i] == hue_level
-   #+end_details
+     #+end_details
    - the exemplary plot:
      #+begin_export html
      <embed src="./jupyter/plotD_BOXEN_compare-prediction-af488_particle-numbers.pdf" width="100%" height="500px" />
