@@ -1,0 +1,2 @@
+name_of_plot,master_file,parent_name,parent_uqid,time of fit,Diff_eq,Diff_species,Triplet_eq,Triplet_species,Dimen,xmin,xmax,offset,stdev(offset),GN0,stdev(GN0),N (FCS),A1,stdev(A1),txy1,stdev(txy1),alpha1,stdev(alpha1)
+average_data,Not known,average_data,average_data,Wed May 11 12:42:12 2022,Equation 1A,1,no triplet,1,2D,1.0,14336.0,-0.001675,0.0016824439211867092,0.227995,0.0035473895342528943,4.386061097831092,1.0,0,57.831263,3.4398584045333926,1.0,0
