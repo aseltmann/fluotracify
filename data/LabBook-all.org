@@ -44838,6 +44838,14 @@ sh-5.1$ [I 2023-01-03 14:36:05.432 ServerApp] jupyterlab | extension was success
          in any of these analyses.
          - =2019-11-FCS-TCSPC-no-artifacts-AF488-secondary-data.zip=
          - =2019-11-FCS-TCSPC-peak-artifacts-AF488-and-DiO-LUVs-secondary-data.zip=
+     - the mlflow models of =exp-220227-unet= were partly larger than 100MB and
+       thus reached Github's file size limit. They are archived here:
+       https://doi.org/10.5281/zenodo.8137129
+       - this is a =.zip= file with the =mlruns= directory with only experiment
+         =10= (= =exp-220227-unet=) and there the experiments =0cd20=, =34163=,
+         =714af=, =34766=, =fe81d=, =ff67b= and the =10= folder with all it's
+         contents should be put in =data/mlruns= to load the models as done in
+         e.g. =exp-220227-unet=
 
    - move and rename PEX5 folders for Zenodo upload
      #+begin_src sh :session pex5 :results scalar
