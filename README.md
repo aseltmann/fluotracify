@@ -1,4 +1,5 @@
 # fluotracify - doctoral research project done in a reproducible way
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8137220.svg)](https://doi.org/10.5281/zenodo.8137220) 
 
 This work is a collection of experiments about Fluorescence Correlation
 Spectroscopy (FCS) time-series artifacts. In multiple experiments, we simulated
@@ -10,10 +11,14 @@ interactive `org-mode` files describing the work I've done during my time in the
 2023 (after working on the same project since ~ April 2019). 
 
 ## Connected paper and licenses
-The following paper is currently under review:
-Seltmann, A.; Carravilla, P.; Reglinski, K.; Eggeling, E.; Waithe, D. Neural
+Please cite this repository in it's Zenodo version: *Seltmann, Alexander.
+(2023). Fluotracify - doctoral research project done in a reproducible way
+(2.0.0). Zenodo. https://doi.org/10.5281/zenodo.8137220*
+
+And please additionally cite the following paper:
+*Seltmann, A.; Carravilla, P.; Reglinski, K.; Eggeling, E.; Waithe, D. Neural
 Network Informed Photon Filtering Reduces Artifacts in Fluorescence Correlation
-Spectroscopy Data. 2023 (currently under review)
+Spectroscopy Data. 2023 (currently under review)*
 
 The nanosimpy module found under `src/nanosimpy` is a fork of Dominic Waithe's
 original nanosimpy library - here the original licensing applies.
@@ -27,7 +32,8 @@ All non-software components of this repository, e.g. plots, figures,
 correlated FCS files, reports on correlation fits, and the non-software
 components of the LabBooks, are licensed under a 
 [Creative Commons Attribution 4.0 International License][cc-by] - see the
-[LICENSE-CC-BY](LICENSE-CC-BY) file for details.
+[LICENSE-CC-BY](LICENSE-CC-BY) file for details. For attribution please cite as
+described above.
 
 [![CC BY 4.0][cc-by-image]][cc-by]
 
@@ -129,3 +135,22 @@ branches of this `git` repository:
   commit to make accessing single experiments easy. The `LabBook.org` file with
   all experimental processes is moved to `data/exp-#/LabBook-exp-#.org` and a
   copy to `data/LabBook-all.org` for archiving.
+
+## Connected Data
+
+- Seltmann, Alexander. (2023). Neural network informed photon filtering reduces
+  artifacts in fluorescence correlation spectropscopy data - mlflow records
+  (1.0.0). 
+  [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8137129.svg)](https://doi.org/10.5281/zenodo.8137129) 
+- Seltmann, Alexander. (2023). Fluorescence correlation spectroscopy time-series
+  data with and without peak artifacts - simulated data (1.0.0) [Data set].
+  [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8074408.svg)](https://doi.org/10.5281/zenodo.8074408) 
+- Seltmann, Alexander, & Carravilla, Pablo. (2023). Fluorescence correlation
+  spectroscopy TCSPC data with and without peak artifacts - AlexaFluor 488
+  applied experiment (1.0.0) [Data set].
+  [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8082558.svg)](https://doi.org/10.5281/zenodo.8082558) 
+- Seltmann, Alexander, Carravilla, Pablo, & Reglinski, Katharina. (2023).
+  Fluorescence correlation spectroscopy TCSPC data with and without peak
+  artifacts - PEX5 applied experiment (1.0.0) [Data set]. 
+  [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8109282.svg)](https://doi.org/10.5281/zenodo.8109282) 
+ 
