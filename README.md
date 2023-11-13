@@ -40,6 +40,14 @@ described above.
 [cc-by]: http://creativecommons.org/licenses/by/4.0/
 [cc-by-image]: https://i.creativecommons.org/l/by/4.0/88x31.png
 
+## Using the published models for your own FCS research
+
+We provide a interactive, cloud-based notebook which provides easy access to 
+apply models to FCS data to find peak artifacts and perform the `cut and stitch`,
+`averaging`, and `set to zero` correction methods on published data or on your
+own data. It currently is available 
+[here](https://github.com/aseltmann/colabs-for-fcs/blob/main/notebooks/1D_UNet_for_FCS_ZeroCostDL4Mic.ipynb).
+
 ## Quickly viewing experiments
 
 Quickly view a rendered version of the full LabBook
