@@ -98,9 +98,9 @@ class PicoObject():
          self.numberNandB, self.timeSeries, self.autoNorm, self.autotime,
          self.timeSeriesScale, self.timeSeriesSize, self.predictions,
          self.subChanArr, self.trueTimeArr, self.trueTimeWeights,
-         self.photonCountBin, self.trueTimeParts,
+         self.photonCountBin, self.trueTimeParts, self.modulations,
          self.subChanParts) = ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {},
-                               {}, {}, {}, {}, {}, {}, {}, {})
+                               {}, {}, {}, {}, {}, {}, {}, {}, {})
 
         self.importData()
         self.prepareChannels()
@@ -661,7 +661,8 @@ class PicoObject():
             raise ValueError(f'key={ts_name} is not a valid key for the'
                              'dictionary self.predictions. Run method'
                              'predictTimeSeries() first.')
-        methods = ['weights', 'delete', 'delete_and_shift', 'averaging']
+        methods = ['weights', 'delete', 'delete_and_shift', 'averaging',
+                   'modulation_filtering']
         if method not in methods:
             raise ValueError(f'method has to be in {methods}.')
         if method == 'weights' and (not isinstance(weight, (float, int)) and
@@ -708,7 +709,7 @@ class PicoObject():
                 'photonMask %s, channelMask %s', subChanCorrected.size,
                 trueTimeCorrected.size, photonMask.size, np.size(channelMask))
 
-            if method in ['delete', 'delete_and_shift']:
+            if method in ['delete', 'delete_and_shift', 'modulation_filtering']:
                 # delete photons classified as artifactual
                 trueTimeCorrected = np.delete(trueTimeCorrected, photonMask)
                 subChanCorrected = np.delete(subChanCorrected, photonMask)
@@ -728,6 +729,10 @@ class PicoObject():
                     log.debug(
                         'correctTCSPC: shifted non-deleted photon '
                         'arrival times by photonCountBin=%s', photon_count_bin)
+                elif method == 'modulation_filtering':
+                    method_name = 'MOD'
+                    self.modulations[ts_name] = mod = {}
+                    mod[f'{key}'] = photonMask.astype(np.float64)
                 else:
                     method_name = 'DEL'
                 self.trueTimeArr[f'{metadata[0]}_{ts_name}_{method_name}'] = (
