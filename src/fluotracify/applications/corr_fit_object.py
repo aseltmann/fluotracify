@@ -593,6 +593,7 @@ class PicoObject():
                      pred_thresh: float = 0.5,
                      method: Union[Literal['weights'], Literal['delete'],
                                    Literal['delete_and_shift'],
+                                   Literal['modulation_filtering'],
                                    Literal['averaging']] = 'delete_and_shift',
                      weight: Optional[Union[float, Literal['random'],
                                             Literal['1-pred']]] = None,
@@ -623,6 +624,12 @@ class PicoObject():
             segment of the trace to self.trueTimeParts and self.subChanParts.
             The actual correction is done with
             `get_autocorrelation(method='tttr2xfcs_with_averaging')`
+            `modulation_filtering` : save out 2 arrays: 1) photon array where
+            photons which are classified as artifacts are set to zero. 2) a
+            modulation array, which is the inverse of the boolean artifact
+            prediction and later used to correct the correlation
+            The actual correction is done with
+            `get_autocorrelation(method='tttr2xfcs_with_modulation_filtering')`
         weight = optional, float, int, 'random', '1-pred' or None
             Only used if method='weights'. Photons classified as artifacts are
             given this weight.
@@ -731,8 +738,17 @@ class PicoObject():
                         'arrival times by photonCountBin=%s', photon_count_bin)
                 elif method == 'modulation_filtering':
                     method_name = 'MOD'
-                    self.modulations[ts_name] = mod = {}
-                    mod[f'{key}'] = photonMask.astype(np.float64)
+                    self.modulations[
+                        f'{metadata[0]}_{ts_name}_{method_name}'] = (
+                            (~photonMask).astype(np.float64)
+                        )
+                    # for correlating the modulations with tttr2xfcs, we need
+                    # a weights vector as well, which in this case will only
+                    # contain ones
+                    # self.modWeights[
+                    #     f'{metadata[0]}_{ts_name}_{method_name}'] = (
+                    #         np.ones((subChanCorrected.shape[0], 2))
+                    #     )
                 else:
                     method_name = 'DEL'
                 self.trueTimeArr[f'{metadata[0]}_{ts_name}_{method_name}'] = (
@@ -820,12 +836,16 @@ class PicoObject():
         Parameters
         ----------
         method : ['tttr2xfcs', 'tttr2xfcs_with_weights',
-                  'tttr2xfcs_with_averaging', 'multipletau']
+                  'tttr2xfcs_with_averaging', 'multipletau',
+                  'tttr2xfcs_with_modulation_filtering']
             the `tttr2xfcs` methods perform TCSPC correlations (see Notes)
             `multipletau` offers correlations of time series
             `tttr2xfcs_with_weights` performs weighted TCSPC correlations
             `tttr2xfcs_with_averaging` performs TCSPC correlations of a list
             of TCSPC traces, and averages the correlations afterwards
+            `tttr2xfcs_with_modulation_filtering` performs TCSPC correlation of
+            the measurement and a modulation based on the predictions, then it
+            divides the modulation by the
         name : string or tuple of strings
             if method='tttr2xfcs', name should be a key for the dictionaries
             self.trueTimeArr and self.subChanArr. If None, self.name is chosen
@@ -833,6 +853,9 @@ class PicoObject():
             if method='tttr2xfcs_with_weights', additionally to above there
             should be a dict self.trueTimeWeights from correctTCSPC(
             method='weights')
+            if method='tttr2xfcs_with_modulation_filtering', additionally to
+            above there should be a dict self.modulations from correctTCSPC(
+            method='modulation_filtering')
             if method='tttr2xfcs_with_averaging', name should be a key for the
             dictionaries self.trueTimeParts and self.subChanParts.
             if method='multipletau', name should be a tuple with 2 strings:
@@ -852,7 +875,8 @@ class PicoObject():
 
         """
         methods = ['tttr2xfcs', 'tttr2xfcs_with_weights',
-                   'tttr2xfcs_with_averaging', 'multipletau']
+                   'tttr2xfcs_with_averaging',
+                   'tttr2xfcs_with_modulation_filtering', 'multipletau']
         if method not in methods:
             raise ValueError(f'{method} is not a valid method from {methods}.')
 
@@ -869,14 +893,16 @@ class PicoObject():
                 raise ValueError(f'key={name} is no valid key for the dict '
                                  'self.trueTimeParts or self.subChanParts.')
 
-        if method in ['tttr2xfcs', 'tttr2xfcs_with_weights']:
+        if method in ['tttr2xfcs', 'tttr2xfcs_with_weights',
+                      'tttr2xfcs_with_modulation_filtering']:
             name = f'{self.name}' if name is None else f'{name}'
             if name not in self.trueTimeArr:
                 raise ValueError(f'key={name} is no valid key for the dict '
                                  'self.trueTimeArr or self.subChanArr.')
 
         if method in ['tttr2xfcs', 'tttr2xfcs_with_weights',
-                      'tttr2xfcs_with_averaging']:
+                      'tttr2xfcs_with_averaging',
+                      'tttr2xfcs_with_modulation_filtering']:
             if method not in self.autoNorm:
                 self.autoNorm[f'{method}'] = {}
                 self.autotime[f'{method}'] = {}
@@ -917,13 +943,18 @@ class PicoObject():
                         'Given key %s of trueTimeArr does not include a '
                         'hint on which channel was used. Assume all '
                         'channels are used and continue', name)
-                if method == 'tttr2xfcs':
+                if method in ['tttr2xfcs',
+                              'tttr2xfcs_with_modulation_filtering']:
                     key = (f'CH{self.ch_present[i]}_BIN{photon_count_bin}'
                            f'_{name}')
                     autonorm, autotime = self.crossAndAuto(
                         self.trueTimeArr[tt_key], self.subChanArr[tt_key],
                         [self.ch_present[i], self.ch_present[i]])
-
+                    if method == 'tttr2xfcs_with_modulation_filtering':
+                        autonorm_mod, autotime_mod = self.crossAndAuto(
+                            self.modulations[tt_key], self.subChanArr[tt_key],
+                            [self.ch_present[i], self.ch_present[i]]
+                        )
                 elif method == 'tttr2xfcs_with_weights':
                     key = (f'CH{chan}_BIN{photon_count_bin}_'
                            f'{name.removesuffix("_FORWEIGHTS")}')
@@ -983,6 +1014,9 @@ class PicoObject():
                 self.autoNorm[f'{method}'][key] = autonorm[:, i, i].reshape(
                     1, 1, -1)
                 self.autotime[f'{method}'][key] = autotime.reshape(-1, 1)
+                if method == 'tttr2xfcs_with_modulation_filtering':
+                    self.autoNorm[f'{method}']['test'] = autonorm_mod[:, i, i].reshape(1, 1, -1)
+                    self.autotime[f'{method}']['test'] = autotime_mod.reshape(-1, 1)
         elif method == 'multipletau':
             if not isinstance(name, tuple) or len(name) != 2:
                 raise ValueError(f'For method={method}, name={name} has to be'
