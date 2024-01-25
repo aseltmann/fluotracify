@@ -740,7 +740,7 @@ class PicoObject():
                     method_name = 'MOD'
                     mod = np.arange(start=1,
                                     stop=photonMask.size + 1,
-                                    dtype=np.float64) * 100
+                                    dtype=np.float64) * 1000
                     mod = mod[~photonMask]
                     self.modulations[
                         f'{metadata[0]}_{ts_name}_{method_name}'] = mod
