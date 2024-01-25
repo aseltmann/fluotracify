@@ -738,17 +738,12 @@ class PicoObject():
                         'arrival times by photonCountBin=%s', photon_count_bin)
                 elif method == 'modulation_filtering':
                     method_name = 'MOD'
+                    mod = np.arange(start=1,
+                                    stop=photonMask.size + 1,
+                                    dtype=np.float64) * 1000
+                    mod = mod[~photonMask]
                     self.modulations[
-                        f'{metadata[0]}_{ts_name}_{method_name}'] = (
-                            (~photonMask).astype(np.float64)
-                        )
-                    # for correlating the modulations with tttr2xfcs, we need
-                    # a weights vector as well, which in this case will only
-                    # contain ones
-                    # self.modWeights[
-                    #     f'{metadata[0]}_{ts_name}_{method_name}'] = (
-                    #         np.ones((subChanCorrected.shape[0], 2))
-                    #     )
+                        f'{metadata[0]}_{ts_name}_{method_name}'] = mod
                 else:
                     method_name = 'DEL'
                 self.trueTimeArr[f'{metadata[0]}_{ts_name}_{method_name}'] = (
@@ -892,6 +887,12 @@ class PicoObject():
             if name not in self.trueTimeParts:
                 raise ValueError(f'key={name} is no valid key for the dict '
                                  'self.trueTimeParts or self.subChanParts.')
+
+        if method == 'tttr2xfcs_with_modulation_filtering':
+            name = f'{self.name}' if name is None else f'{name}'
+            if name not in self.modulations:
+                raise ValueError(f'key={name} is no valid key for the dict '
+                                 'self.modulations')
 
         if method in ['tttr2xfcs', 'tttr2xfcs_with_weights',
                       'tttr2xfcs_with_modulation_filtering']:
