@@ -1,35 +1,74 @@
 # fluotracify - doctoral research project done in a reproducible way
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8137220.svg)](https://doi.org/10.5281/zenodo.8137220) 
 
-This repository contains all code, most of the data, and a LabBook describing
-the work I've done during my time in the Eggeling lab from January 2020 (after
-working on the same project since ~ April 2019).
+This work is a collection of experiments about Fluorescence Correlation
+Spectroscopy (FCS) time-series artifacts. In multiple experiments, we simulated
+such artifacts, trained U-Net machine learning models to predict them, and found
+methods to optimize FCS time-series or Time-Correlated Single Photon Counting
+(TCSPC) data. This repository contains all code, most of the data, and
+interactive `org-mode` files describing the work I've done during my time in the
+[Eggeling lab](https://www.biophysical-imaging.com) from January 2020 til Summer
+2023 (after working on the same project since ~ April 2019). 
 
-**This repository is still actively used and altered on a daily basis.**
+## Connected paper and licenses
+Please cite this repository in it's Zenodo version: *Seltmann, Alexander.
+(2023). Fluotracify - doctoral research project done in a reproducible way
+(2.0.0). Zenodo. https://doi.org/10.5281/zenodo.8137220*
+
+And please additionally cite the following paper:
+*Seltmann, A.; Carravilla, P.; Reglinski, K.; Eggeling, E.; Waithe, D. Neural
+Network Informed Photon Filtering Reduces Artifacts in Fluorescence Correlation
+Spectroscopy Data. 2023 (currently under review)*
+
+The nanosimpy module found under `src/nanosimpy` is a fork of Dominic Waithe's
+original nanosimpy library - here the original licensing applies.
+
+All software components (code) of this repository, e.g. the rest of the `src`
+directory, the `data/mlruns` directory, or python functions defined in the
+`LabBook` files, are licensed under the Apache-2.0 License - see the
+[LICENSE](LICENSE) file for details.
+
+All non-software components of this repository, e.g. plots, figures,
+correlated FCS files, reports on correlation fits, and the non-software
+components of the LabBooks, are licensed under a 
+[Creative Commons Attribution 4.0 International License][cc-by] - see the
+[LICENSE-CC-BY](LICENSE-CC-BY) file for details. For attribution please cite as
+described above.
+
+[![CC BY 4.0][cc-by-image]][cc-by]
+
+[cc-by]: http://creativecommons.org/licenses/by/4.0/
+[cc-by-image]: https://i.creativecommons.org/l/by/4.0/88x31.png
+
+## Using the published models for your own FCS research
+
+We provide a interactive, cloud-based notebook which provides easy access to 
+apply models to FCS data to find peak artifacts and perform the `cut and stitch`,
+`averaging`, and `set to zero` correction methods on published data or on your
+own data. It currently is available 
+[here](https://github.com/aseltmann/colabs-for-fcs/blob/main/notebooks/1D_UNet_for_FCS_ZeroCostDL4Mic.ipynb).
+
+## Quickly viewing experiments
+
+Quickly view a rendered version of the full LabBook
+[here](https://aseltmann.github.io/fluotracify/data/LabBook-all.html). 
 
 ## Getting started
 
-### Viewing the electronic LabBook
+### Viewing the electronic LabBook on Github
 
-#### On Github
+The `.org` files can be viewed with markdown-like rendering here on Github.
+Github is not rendering the full information of these files yet, this is why
+displaying the raw file is recommended.
 
-The `LabBook.org` file can be viewed with markdown-like rendering here on
-Github.
+Note that the file looks different depending on the branch you are on. The
+`main` branch does only include a barebones file without experiments, the `data`
+branch includes a record of all experiments (saved under
+`data/LabBook-all.org`). 
 
-Note that the file looks different depending on the branch you are on, so
-you might for example want to take a look at `LabBook.org` on the `develop`
-branch for insight into ongoing exploratory research.
+### Viewving the electronic LabBook on your computer
 
-Note also that some elements of the file get lost while rendering and some
-formatting errors might happen - viewing the *Raw* version of the file will show
-you how it actually looks like.
-
-#### On your computer
-
-You can [download the develop
-repository](https://github.com/aseltmann/fluotracify/archive/develop.zip) and
-open `LabBook.html`as a nice html export of the LabBook.
-
-Alternatively, you can open `LabBook.org` using any text editor. The file is
+You can open `.org` files in any text editor. The file is
 written in [org-mode](https://orgmode.org/), so leverage org-mode's
 possibilities of easy viewing, navigating and editing the file, you need a text
 editor which understands org-mode ([Emacs](https://www.gnu.org/software/emacs/)
@@ -44,16 +83,10 @@ can do. It inspired me to use it.
 
 ### Using the source code
 
-Download this repository or use [git](https://git-scm.com/) to clone a local
-copy of for yourself:
-
-``` sh
-git clone https://github.com/aseltmann/fluotracify
-```
-
-The **src/fluotracify** folder is a python package which I will probably share
-at some point in a dedicated way (e.g. pip). At the moment, you can add the
-package to your own Python environment using a small, dirty hack:
+This electronic notebook contains a lot of code, and even though the
+**src/fluotracify** folder is prepared to be a python package, possible useful
+modules will be released in a separate project if needed. Currently, the
+internal use of this package is done with a dirty hack:
 
 ``` python
 import sys
@@ -66,45 +99,30 @@ Then you can import the fluotracify modules e.g. like this:
 from fluotracify.training import build_model as bm
 ```
 
-### Repeating the experiment or using the reproducible workflow for yourself
-
-If you have a running git and Emacs setup (or an alternative editor who speaks
-`org-mode`), then first get a local copy for yourself:
-
-``` sh
-git clone https://github.com/aseltmann/fluotracify
-```
-
-The `LabBook.org` file will guide you through the further process on how the
-actual experiments were conducted.
-
-Using the reproducible worklfow described here - and based on
-[this paper by Stanisic et al.](https://hal.inria.fr/hal-01112795/document) -
-has quite a steep learning curve. There is a
-[free online
-course](https://www.fun-mooc.fr/courses/course-v1:inria+41016+self-paced/5d99aa3742e34d6f87eed84b71fdde74/)
-on reproducible research organized in part by the authors of the paper, which
-might be the way to go, if you are not a fluent `git` and/or `Emacs` user.
-
 ## Organization of this repository - A reproducible workflow
 
-**This description shows the ideal state of the repository. As of May 2020 I
-still do a lot of exploratory work, so the "develop" branch will give you most
-insight on ongoing experimental work.**
+This repository follows a worklfow which is aimed to assure reproducibility
+based on [this paper by Stanisic et
+al.](https://hal.inria.fr/hal-01112795/document). There is a [free online
+course](https://www.fun-mooc.fr/courses/course-v1:inria+41016+self-paced/5d99aa3742e34d6f87eed84b71fdde74/)
+on reproducible research organized in part by the authors of the paper, which 
+might be the way to go, if you want to learn more about this approach. The
+following gives a short overview on the intended meaning of the most important
+branches of this `git` repository:
 
-### master branch:
+### `main` branch:
 
 - contains all the source code in folder `src/` which is used for experiments.
 - contains the `LabBook.org` template
 - contains setup- and metadata files such as `MLproject` or `conda.yaml`
 - the log contains only lasting alterations on the folders and files mentioned
   above, which are e.g. used for conducting experiments or which introduce new
-  features. Day-to-day changes in code
+  features. 
 
-### exp# branches:
+### `exp-#` branches:
 
-- if an experiment is done, the code and templates will be branched out from
-  *master* in an *exp#* branch, # substituting some meaningful descriptor.
+- if one starts an experiment, the code and templates will be branched out from
+  `main` in an `exp-#` branch, # substituting some meaningful descriptor.
 - all data generated during the experiment (e.g. .csv files, plots, images,
   etc), is stored in a folder with the name `data/exp-#`, except machine
   learning-specific data and metadata from `mlflow` runs, which are saved
@@ -115,26 +133,32 @@ insight on ongoing experimental work.**
     scripts or calling the code from the `scr/` directory).
   - All other steps taken during an experiment are noted down, as well as
     conclusions or my thought process while conducting the experiment
-  - Provenance data, such as Metadata about the environment the code was
-    executed in, the command line output of the code, and some
+  - Provenance data, such as metadata about the environment the code was
+    executed in, or the command line output of the code, are saved.
 
-### remote/origin/develop branch:
-
-- this is the branch I use for day to day work on features and exploration.
-  All of my current activity can be followed here.
-
-### remote/origin/data branch:
+### `data` branch:
 
 - contains a full cronicle of the whole research process
-- all *exp#* branches are merged here. Afterwards the original branch is
-  deleted and on the data branch there is a *Git tag* which shows the merge
-  commit to make accessing single experiments easy.
-- the *develop* branch is merged here as well.
+- all `exp-#` branches are merged here. A *Git tag* shows the merge
+  commit to make accessing single experiments easy. The `LabBook.org` file with
+  all experimental processes is moved to `data/exp-#/LabBook-exp-#.org` and a
+  copy to `data/LabBook-all.org` for archiving.
 
-## License
+## Connected Data
 
-The nanosimpy module found under `src/nanosimpy` is a fork of Dominic Waithe's
-original nanosimpy library - here the original licensing applies.
-
-All other content are free in the sense of freedom and licensed under the
-Apache-2.0 License - see the [LICENSE](LICENSE) file for details.
+- Seltmann, Alexander. (2023). Neural network informed photon filtering reduces
+  artifacts in fluorescence correlation spectropscopy data - mlflow records
+  (1.0.0). 
+  [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8137129.svg)](https://doi.org/10.5281/zenodo.8137129) 
+- Seltmann, Alexander. (2023). Fluorescence correlation spectroscopy time-series
+  data with and without peak artifacts - simulated data (1.0.0) [Data set].
+  [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8074408.svg)](https://doi.org/10.5281/zenodo.8074408) 
+- Seltmann, Alexander, & Carravilla, Pablo. (2023). Fluorescence correlation
+  spectroscopy TCSPC data with and without peak artifacts - AlexaFluor 488
+  applied experiment (1.0.0) [Data set].
+  [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8082558.svg)](https://doi.org/10.5281/zenodo.8082558) 
+- Seltmann, Alexander, Carravilla, Pablo, & Reglinski, Katharina. (2023).
+  Fluorescence correlation spectroscopy TCSPC data with and without peak
+  artifacts - PEX5 applied experiment (1.0.0) [Data set]. 
+  [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8109282.svg)](https://doi.org/10.5281/zenodo.8109282) 
+ 
