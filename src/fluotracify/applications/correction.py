@@ -523,3 +523,37 @@ def correct_experimental_traces_from_ptu_by_unet_prediction(
                         index=False)
 
     return data_out
+
+
+def modulation_filtering(sig_corr, mod_corr):
+    """perform modulation filtering by dividing a correlation of a signal
+    by a correlation of a modulation.
+
+    Parameters
+    ----------
+    sig_corr, mod_corr : np.array with shape=(None, 2)
+        [:, 0] contains the lag times tau
+        [:, 1] contains the correlations G(tau)
+
+    Returns
+    -------
+    filt_corr : np.array with shape=(None, 2)
+        [:, 0] contains the lag time tau
+        [:, 1] contains the correlations G(tau) corrected by modulation
+        filtering
+
+    Note
+    ----
+    - The correlations come from the python package multipletau.autocorrelate()
+    - This package gives as a first lag time the value zero. This has led to
+      problems in FCS fitting programs such as FoCuSpoint and FCS-fit-js. Thus
+      the first lag time is dropped while performing modulation filtering
+    """
+    filt_corr = np.zeros(shape=(sig_corr.shape[0] - 1, 2))
+    filt_corr[:, 0] = sig_corr[1:, 0]
+    mod_corr[:, 1] += 1
+    sig_corr[:, 1] += 1
+    filt_corr[:, 1] = sig_corr[1:, 1] / mod_corr[1:, 1]
+    filt_corr[:, 1] -= 1
+
+    return filt_corr

@@ -30,7 +30,7 @@ import time
 
 from pathlib import Path
 from typing import Literal, Optional, Union
-from fluotracify.applications import correlate, correlate_cython
+from fluotracify.applications import correction, correlate, correlate_cython
 from fluotracify.applications import (fitting_methods_SE as SE,
                                       fitting_methods_GS as GS,
                                       fitting_methods_VD as VD,
@@ -715,17 +715,17 @@ class PicoObject():
                 'correctTCSPC: some samples: subChan %s, truetime %s,'
                 'photonMask %s, channelMask %s', subChanCorrected.size,
                 trueTimeCorrected.size, photonMask.size, np.size(channelMask))
-            if method == 'modulation_filtering':
-                method_name = 'MOD'
-                mod = np.arange(start=1,
-                                stop=photonMask.size + 1,
-                                dtype=np.float64) * 1000
-                mod = mod[~photonMask]
-                modch = subChanCorrected[~photonMask]
-                self.trueTimeArr[
-                    f'{metadata[0]}_{ts_name}_{method_name}_modulation'] = mod
-                self.subChanArr[
-                    f'{metadata[0]}_{ts_name}_{method_name}_modulation'] = modch
+            # if method == 'modulation_filtering':
+            #     method_name = 'MOD'
+            #     mod = np.arange(start=1,
+            #                     stop=photonMask.size + 1,
+            #                     dtype=np.float64) * 1000
+            #     mod = mod[~photonMask]
+            #     modch = subChanCorrected[~photonMask]
+            #     self.trueTimeArr[
+            #         f'{metadata[0]}_{ts_name}_{method_name}_modulation'] = mod
+            #     self.subChanArr[
+            #         f'{metadata[0]}_{ts_name}_{method_name}_modulation'] = modch
 
 
             if method in ['delete', 'delete_and_shift', 'modulation_filtering']:
@@ -761,20 +761,28 @@ class PicoObject():
                     if method == 'delete_and_shift':
                         ts_name2 = 'DELSHIFTBIN'
                     else:
+                        # also for modulation filtering we want DELBIN. The
+                        # modulation trace is saved as MODBIN
                         ts_name2 = 'DELBIN'
+                    tt_key = f'{ts_name}_{ts_name2}'
                     self.getTimeSeries(
                         photonCountBin=float(bin_after_correction),
                         truetime_name=f'{metadata[0]}_{ts_name}_{method_name}',
-                        timeseries_name=f'{ts_name}_{ts_name2}')
-                    self.getPhotonCountingStats(name=f'{ts_name}_{ts_name2}')
+                        timeseries_name=tt_key)
+                    self.getPhotonCountingStats(name=tt_key)
                     if method == 'modulation_filtering':
-                        ts_name3 = 'MODBIN'
-                        self.getTimeSeries(
-                            photonCountBin=float(bin_after_correction),
-                            truetime_name=f'{metadata[0]}_{ts_name}_{method_name}_modulation',
-                            timeseries_name=f'{ts_name}_{ts_name3}'
-                        )
-                        self.getPhotonCountingStats(name=f'{ts_name}_{ts_name3}')
+                        key = f'CH{chan}_BIN{bin_after_correction}'
+                        sig = self.timeSeries[tt_key][key]
+                        # create modulation trace
+                        tt_key2 = f'{ts_name}_MODBIN'
+                        mod = np.repeat(~timeSeriesMask,
+                                        int(1 / bin_after_correction))
+                        mod = mod[:sig.size].astype(np.float64)
+                        self.timeSeries[tt_key2] = sk = {}
+                        self.timeSeriesSize[tt_key2] = sik = {}
+                        sk[key], sik[key] = mod, mod.size
+                        self.photonCountBin[tt_key2] = bin_after_correction
+                        self.getPhotonCountingStats(name=tt_key2)
                 else:
                     ts_name2 = method_name
                     if method == 'delete_and_shift':
@@ -889,7 +897,8 @@ class PicoObject():
         """
         methods = ['tttr2xfcs', 'tttr2xfcs_with_weights',
                    'tttr2xfcs_with_averaging',
-                   'tttr2xfcs_with_modulation_filtering', 'multipletau']
+                   'tttr2xfcs_with_modulation_filtering', 'multipletau',
+                   'multipletau_with_modulation_filtering']
         if method not in methods:
             raise ValueError(f'{method} is not a valid method from {methods}.')
 
@@ -919,12 +928,13 @@ class PicoObject():
                 raise ValueError(f'key={name} is no valid key for the dict '
                                  'self.trueTimeArr or self.subChanArr.')
 
+        if method not in self.autoNorm:
+            self.autoNorm[f'{method}'] = {}
+            self.autotime[f'{method}'] = {}
+
         if method in ['tttr2xfcs', 'tttr2xfcs_with_weights',
                       'tttr2xfcs_with_averaging',
                       'tttr2xfcs_with_modulation_filtering']:
-            if method not in self.autoNorm:
-                self.autoNorm[f'{method}'] = {}
-                self.autotime[f'{method}'] = {}
 
             if name in self.autoNorm[f'{method}']:
                 raise ValueError('self.autoNorm[\'tttr2xfcs\'] already has a'
@@ -1037,16 +1047,13 @@ class PicoObject():
                 if method == 'tttr2xfcs_with_modulation_filtering':
                     self.autoNorm[f'{method}']['test'] = autonorm_mod[:, i, i].reshape(1, 1, -1)
                     self.autotime[f'{method}']['test'] = autotime_mod.reshape(-1, 1)
-        elif method in ['multipletau', 'multipletau_with_modulation_filtering']:
+        elif method == 'multipletau':
             if not isinstance(name, tuple) or len(name) != 2:
                 raise ValueError(f'For method={method}, name={name} has to be'
                                  ' a tuple of length 2.')
             if name[1] not in self.timeSeries[name[0]]:
                 raise ValueError(f'self.timeSeries[{name[0]}][{name[1]}] does'
                                  ' not exist')
-            if 'multipletau' not in self.autoNorm:
-                self.autoNorm['multipletau'] = {}
-                self.autotime['multipletau'] = {}
 
             corr_fn = multipletau.autocorrelate(
                 a=self.timeSeries[f'{name[0]}'][f'{name[1]}'],
@@ -1055,17 +1062,30 @@ class PicoObject():
                 normalize=True)
             # multipletau outputs autotime=0 as first correlation step, which
             # leads to problems with focus-fit-js
-            self.autotime['multipletau'][f'{name[1]}_{name[0]}'] = (corr_fn[1:, 0])
-            self.autoNorm['multipletau'][f'{name[1]}_{name[0]}'] = (corr_fn[1:, 1])
-            if method == 'multipletau_with_modulation_filtering':
-                corr_fn_mod = multipletau.autocorrelate(
-                    a=self.timeSeries[f'{name[0]}'][f'{name[1]}_MOD'],
-                    m=16,
-                    deltat=self.photonCountBin[f'{name[0]}'],
-                    normalize=True
-                )
-                self.autotime['multipletau'][f'{name[1]}_{name[0]}_MOD'] = (corr_fn_mod[1:, 0])
-                self.autoNorm['multipletau'][f'{name[1]}_{name[0]}_MOD'] = (corr_fn_mod[1:, 1])
+            self.autotime[f'{method}'][f'{name[1]}_{name[0]}'] = (corr_fn[1:, 0])
+            self.autoNorm[f'{method}'][f'{name[1]}_{name[0]}'] = (corr_fn[1:, 1])
+        elif method == 'multipletau_with_modulation_filtering':
+            if not isinstance(name, tuple) or len(name) != 3:
+                raise ValueError(f'For method={method}, name={name} has to be'
+                                 ' a tuple of length 3.')
+            if name[2] not in self.timeSeries[name[0]]:
+                raise ValueError(f'self.timeSeries[{name[0]}][{name[2]}] does'
+                                 ' not exist (should contain signal)')
+            if name[2] not in self.timeSeries[name[1]]:
+                raise ValueError(f'self.timeSeries[{name[1]}][{name[2]}] does'
+                                 ' not exist (should contain modulation)')
+
+            sig = self.timeSeries[f'{name[0]}'][f'{name[2]}']
+            mod = self.timeSeries[f'{name[1]}'][f'{name[2]}']
+            pcb = self.photonCountBin[f'{name[1]}']
+
+            sig_corr = multipletau.autocorrelate(sig, deltat=pcb, normalize=True)
+            mod_corr = multipletau.autocorrelate(mod, deltat=pcb, normalize=True)
+            # perform modulation filtering
+            filt_corr = correction.modulation_filtering(sig_corr, mod_corr)
+
+            self.autotime[f'{method}'][f'{name[1]}_{name[0]}_MOD'] = (filt_corr[:, 0])
+            self.autoNorm[f'{method}'][f'{name[1]}_{name[0]}_MOD'] = (filt_corr[:, 1])
         log.debug('Finished get_autocorrelation() with method=%s, name=%s',
                   method, name)
 
