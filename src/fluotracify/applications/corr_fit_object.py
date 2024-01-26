@@ -715,6 +715,18 @@ class PicoObject():
                 'correctTCSPC: some samples: subChan %s, truetime %s,'
                 'photonMask %s, channelMask %s', subChanCorrected.size,
                 trueTimeCorrected.size, photonMask.size, np.size(channelMask))
+            if method == 'modulation_filtering':
+                method_name = 'MOD'
+                mod = np.arange(start=1,
+                                stop=photonMask.size + 1,
+                                dtype=np.float64) * 1000
+                mod = mod[~photonMask]
+                self.trueTimeArr[
+                    f'{metadata[0]}_{ts_name}_{method_name}_modulation'] = mod
+                self.subChanArr[
+                    f'{metadata[0]}_{ts_name}_{method_name}_modulation'] = (
+                        subChanCorrected)
+
 
             if method in ['delete', 'delete_and_shift', 'modulation_filtering']:
                 # delete photons classified as artifactual
@@ -738,12 +750,6 @@ class PicoObject():
                         'arrival times by photonCountBin=%s', photon_count_bin)
                 elif method == 'modulation_filtering':
                     method_name = 'MOD'
-                    mod = np.arange(start=1,
-                                    stop=photonMask.size + 1,
-                                    dtype=np.float64) * 1000
-                    mod = mod[~photonMask]
-                    self.modulations[
-                        f'{metadata[0]}_{ts_name}_{method_name}'] = mod
                 else:
                     method_name = 'DEL'
                 self.trueTimeArr[f'{metadata[0]}_{ts_name}_{method_name}'] = (
@@ -761,14 +767,26 @@ class PicoObject():
                         truetime_name=f'{metadata[0]}_{ts_name}_{method_name}',
                         timeseries_name=f'{ts_name}_{ts_name2}')
                     self.getPhotonCountingStats(name=f'{ts_name}_{ts_name2}')
+                    if method == 'modulation_filtering':
+                        ts_name3 = 'MODBIN'
+                        self.getTimeSeries(
+                            photonCountBin=float(bin_after_correction),
+                            truetime_name=f'{metadata[0]}_{ts_name}_{method_name}_modulation',
+                            timeseries_name=f'{ts_name}_{ts_name3}'
+                        )
+                        self.getPhotonCountingStats(name=f'{ts_name}_{ts_name3}')
                 else:
                     ts_name2 = method_name
                     if method == 'delete_and_shift':
                         ts = np.delete(trace, timeSeriesMask)
                         tss = np.delete(trace_scale, timeSeriesMask)
-                    else:
+                    elif method == 'delete':
                         ts = np.where(timeSeriesMask == 1, 0, trace)
                         tss = trace_scale
+                    else:
+                        raise NotImplementedError(
+                            'Currently, modulation filtering is only implemented'
+                            'if bin_after_correction is not None.')
                     tt_key = f'{ts_name}_{ts_name2}'
                     self.timeSeries[tt_key] = sk = {}
                     self.timeSeriesScale[tt_key] = ssk = {}
@@ -952,8 +970,9 @@ class PicoObject():
                         self.trueTimeArr[tt_key], self.subChanArr[tt_key],
                         [self.ch_present[i], self.ch_present[i]])
                     if method == 'tttr2xfcs_with_modulation_filtering':
+                        tt_key2 = f'{tt_key}_modulation'
                         autonorm_mod, autotime_mod = self.crossAndAuto(
-                            self.modulations[tt_key], self.subChanArr[tt_key],
+                            self.trueTimeArr[tt_key2], self.subChanArr[tt_key2],
                             [self.ch_present[i], self.ch_present[i]]
                         )
                 elif method == 'tttr2xfcs_with_weights':
@@ -1018,7 +1037,7 @@ class PicoObject():
                 if method == 'tttr2xfcs_with_modulation_filtering':
                     self.autoNorm[f'{method}']['test'] = autonorm_mod[:, i, i].reshape(1, 1, -1)
                     self.autotime[f'{method}']['test'] = autotime_mod.reshape(-1, 1)
-        elif method == 'multipletau':
+        elif method in ['multipletau', 'multipletau_with_modulation_filtering']:
             if not isinstance(name, tuple) or len(name) != 2:
                 raise ValueError(f'For method={method}, name={name} has to be'
                                  ' a tuple of length 2.')
@@ -1036,11 +1055,17 @@ class PicoObject():
                 normalize=True)
             # multipletau outputs autotime=0 as first correlation step, which
             # leads to problems with focus-fit-js
-            self.autotime['multipletau'][f'{name[1]}_{name[0]}'] = (corr_fn[1:,
-                                                                            0])
-            self.autoNorm['multipletau'][f'{name[1]}_{name[0]}'] = (corr_fn[1:,
-                                                                            1])
-
+            self.autotime['multipletau'][f'{name[1]}_{name[0]}'] = (corr_fn[1:, 0])
+            self.autoNorm['multipletau'][f'{name[1]}_{name[0]}'] = (corr_fn[1:, 1])
+            if method == 'multipletau_with_modulation_filtering':
+                corr_fn_mod = multipletau.autocorrelate(
+                    a=self.timeSeries[f'{name[0]}'][f'{name[1]}_MOD'],
+                    m=16,
+                    deltat=self.photonCountBin[f'{name[0]}'],
+                    normalize=True
+                )
+                self.autotime['multipletau'][f'{name[1]}_{name[0]}_MOD'] = (corr_fn_mod[1:, 0])
+                self.autoNorm['multipletau'][f'{name[1]}_{name[0]}_MOD'] = (corr_fn_mod[1:, 1])
         log.debug('Finished get_autocorrelation() with method=%s, name=%s',
                   method, name)
 
