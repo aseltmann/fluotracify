@@ -1105,6 +1105,9 @@ class PicoObject():
         truetime_name = '_'.join(metadata[2:])
         chan = metadata[0].strip('CH')
 
+        if method == 'multipletau_with_modulation_filtering':
+            truetime_name = truetime_name.replace('MODBIN', 'DELBIN')
+
         if truetime_name not in self.kcount:
             raise ValueError(f'self.kcount[{truetime_name}][{timeseries_name}]'
                              'does not exist. Run getTimeSeries and '
