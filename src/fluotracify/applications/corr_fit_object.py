@@ -1083,9 +1083,9 @@ class PicoObject():
             # perform modulation filtering
             filt_corr = correction.modulation_filtering(sig_corr, mod_corr)
 
-            self.autotime[f'{method}'][f'{name[2]}_{name[0]}'] = filt_corr[:, 0]
-            self.autoNorm[f'{method}'][f'{name[2]}_{name[0]}'] = filt_corr[:, 1]
-        log.debug('Finished get_autocorrelation() with method=%s, name=%s',
+            self.autotime[f'{method}'][f'{name[2]}_{name[1]}'] = filt_corr[:, 0]
+            self.autoNorm[f'{method}'][f'{name[2]}_{name[1]}'] = filt_corr[:, 1]
+        log.debug('Finished get_autocorrelation() with met1od=%s, name=%s',
                   method, name)
 
     def save_autocorrelation(self, name, method, output_path='pwd'):
