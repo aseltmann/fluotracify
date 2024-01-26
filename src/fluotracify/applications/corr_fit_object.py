@@ -782,7 +782,6 @@ class PicoObject():
                         self.timeSeriesSize[tt_key2] = sik = {}
                         sk[key], sik[key] = mod, mod.size
                         self.photonCountBin[tt_key2] = bin_after_correction
-                        self.getPhotonCountingStats(name=tt_key2)
                 else:
                     ts_name2 = method_name
                     if method == 'delete_and_shift':
