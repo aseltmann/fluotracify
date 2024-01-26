@@ -721,6 +721,7 @@ class PicoObject():
                                 stop=photonMask.size + 1,
                                 dtype=np.float64) * 1000
                 mod = mod[~photonMask]
+                print(mod.shape, subChanCorrected.shape)
                 self.trueTimeArr[
                     f'{metadata[0]}_{ts_name}_{method_name}_modulation'] = mod
                 self.subChanArr[
