@@ -721,12 +721,11 @@ class PicoObject():
                                 stop=photonMask.size + 1,
                                 dtype=np.float64) * 1000
                 mod = mod[~photonMask]
-                print(mod.shape, subChanCorrected.shape)
+                modch = subChanCorrected[~photonMask]
                 self.trueTimeArr[
                     f'{metadata[0]}_{ts_name}_{method_name}_modulation'] = mod
                 self.subChanArr[
-                    f'{metadata[0]}_{ts_name}_{method_name}_modulation'] = (
-                        subChanCorrected)
+                    f'{metadata[0]}_{ts_name}_{method_name}_modulation'] = modch
 
 
             if method in ['delete', 'delete_and_shift', 'modulation_filtering']:
