@@ -3,7 +3,7 @@
 #+LANGUAGE: en
 #+PROPERTY: header-args:sh :results verbatim
 #+PROPERTY: header-args:jupyter-python :session /jpy:localhost#8888:a37e524a-8134-4d8f-b24a-367acaf1bdd3 :pandoc t :async yes :kernel python3
-#+PROPERTY: header-args :eval never-export :exports both
+#+PROPERTY: header-args :eval never-export :exports both :results org replace value
 #+OPTIONS: toc:4
 #+OPTIONS: H:4
 #+HTML_HEAD_EXTRA: <style type="text/css">.example {background-color: #FBFBBF;}</style>
