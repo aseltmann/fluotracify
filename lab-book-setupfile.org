@@ -1,0 +1,15 @@
+#+TITLE: Lab book Fluotracify
+#+AUTHOR: Alva Seltmann
+#+LANGUAGE: en
+#+PROPERTY: header-args :eval never-export :exports both
+#+OPTIONS: toc:4
+#+OPTIONS: H:4
+#+HTML_HEAD_EXTRA: <style type="text/css">.example {background-color: #FBFBBF;}</style>
+#+HTML_HEAD_EXTRA: <style type="text/css">pre.src-emacs-lisp {background-color: #F7ECFB;}</style>
+#+HTML_HEAD_EXTRA: <style type="text/css">pre.src-sh {background-color: #F0FBE9;}</style>
+#+HTML_HEAD_EXTRA: <style type="text/css">pre.src-tmux {background-color: #E1EED8;}</style>
+#+HTML_HEAD_EXTRA: <style type="text/css">pre.src-python {background-color: #E6EDF4;}</style>
+#+HTML_HEAD_EXTRA: <style type="text/css">pre.src-jupyter-python {background-color: #FAEAE1;}</style>
+#+HTML_HEAD_EXTRA: <style type="text/css">details {padding: 1em; background-color: #f0f0f0; border-radius: 15px; color: hsl(157 75% 20%); font-size: 0.9em; box-shadow: 0.05em 0.1em 5px 0.01em  #00000057;}</style>
+#+HTML_HEAD_EXTRA: <style type="text/css">details:hover {background:pink;}</style>
+#+HTML_HEAD_EXTRA: <style type="text/css">table {display: block; overflow-x: auto; white-space: nowrap;}</style>
