@@ -2,17 +2,178 @@
 artifacts at scale"""
 
 import copy
+import datetime
 import os
 import uuid
 from pathlib import Path
+from typing import Any
 
 import numpy as np
+import numpy.typing as npt
 
-from fluotracify.simulations.simulation_methods import (
-    brownian_only_numpy,
-    calculate_psf,
-    integrate_over_psf,
-)
+from fluotracify import fcsdc
+import fluotracify.simulations.simulation_methods as sm
+
+
+def simulate_clean_trace(
+        params: fcsdc.FCSSimParams,
+        rng: np.random._generator.Generator
+) -> tuple[dict[int, npt.NDArray[np.float64]], npt.NDArray[np.float64],
+           dict[str, Any]]:
+    clean_psf = sm.calculate_psf(
+        [params.psf_fwhm], params.psf_distance
+    )
+    clean_track = sm.brownian_only_numpy(
+        params, dmol=params.clean_dmol, nmol=params.clean_nmol, rng=rng
+    )
+    clean_trace_dict = sm.integrate_over_psf(
+        copy.deepcopy(clean_psf), clean_track, params.clean_nmol,
+        pos_y=params.pos_y, pos_x=params.pos_x
+    )
+    clean_trace: npt.NDArray[np.float64] = clean_trace_dict["trace"][0] * 100
+    # add random shot noise
+    clean_trace += rng.poisson(1, clean_trace.shape[0])
+    return clean_track, clean_trace, clean_psf
+
+
+def apply_photobleaching(
+        bleach_times: npt.NDArray[np.float64], params: fcsdc.FCSSimParams,
+        track_arr: dict[int, npt.NDArray[np.float64]], clean_psf: dict[str, Any]
+) -> npt.NDArray[np.float64]:
+    for mol_idx, dropout_idx in zip(range(params.clean_nmol), bleach_times):
+        # set fluorescence of each molecule to zero starting from bleach
+        # time for each respective molecule
+        track_tmp = track_arr[mol_idx]
+        track_tmp[:, int(dropout_idx):] = 0
+
+    bleach_trace_dict = sm.integrate_over_psf(
+        psf=clean_psf, track_arr=track_arr, nmol=params.clean_nmol,
+        pos_y=params.pos_y, pos_x=params.pos_x
+    )
+    bleach_trace: npt.NDArray[np.float64] = bleach_trace_dict['trace'][0]
+    return bleach_trace
+
+
+def simulate_photobleaching(
+        clean_trace: npt.NDArray[np.float64],
+        clean_track: dict[int, npt.NDArray[np.float64]],
+        clean_psf: dict[str, Any],
+        params: fcsdc.FCSSimParams,
+        rng: np.random._generator.Generator
+) -> fcsdc.SimulatedFCSTimeSeries:
+    params.bleach_exp_scale = (
+        float(rng.integers(20) * 0.01 * params.total_sim_time / 20_000)
+    )
+    # scales between 0.01 and 0.2 seem to work nicely for a distribution
+    # of total_sim_time=20000.  lower scale means faster bleaching,
+    # higher scale means slower bleaching
+    bleach_dist = rng.exponential(scale=params.bleach_exp_scale,
+                                  size=params.clean_nmol)
+    bleach_times = bleach_dist * params.total_sim_time
+    bleach_times = np.clip(bleach_times, a_min=0, a_max=params.total_sim_time)
+    # simulate brownian motion of mobilized and immobilized molecules
+    bleach_trace = []
+    if params.bleach_type in ["immobile", "both"]:
+        d_immobile = 0.001
+        track_arr_immob = sm.brownian_only_numpy(
+            params=params, nmol=params.clean_nmol, dmol=d_immobile, rng=rng
+        )
+        ibleach_trace = apply_photobleaching(
+            bleach_times=bleach_times, params=params, track_arr=track_arr_immob,
+            clean_psf=clean_psf
+        )
+        bleach_trace.append(ibleach_trace)
+    if params.bleach_type in ["mobile", "both"]:
+        mbleach_trace = apply_photobleaching(
+            bleach_times=bleach_times, params=params,
+            track_arr=copy.deepcopy(clean_track), clean_psf=clean_psf
+        )
+        bleach_trace.append(mbleach_trace)
+    bleach_trace = np.sum(bleach_trace, axis=0)
+    out = get_simulated_fcsts_record(
+        params, clean_trace, bleach_trace * 100 + clean_trace, bleach_trace
+    )
+    return out
+
+
+def simulate_detector_dropout(
+        clean_trace: npt.NDArray[np.float64],
+        params: fcsdc.FCSSimParams,
+        rng: np.random._generator.Generator
+) -> fcsdc.SimulatedFCSTimeSeries:
+    params.dropout_n = int(rng.integers(50) * params.total_sim_time / 20_000)
+    detdrop_mask = np.zeros(clean_trace.shape[0])
+    for _ in range(params.dropout_n):
+        length_of_dropout = rng.integers(25)
+        start = int(rng.random() * clean_trace.shape[0])
+        end = int(start + length_of_dropout)
+        for mid in range(end - start):
+            depth_of_dropout = rng.random()
+            detdrop_mask[start + mid:start + mid +
+                         1] = (-np.amin(clean_trace)) * depth_of_dropout
+    params.dropout_maxdrop = -np.amin(detdrop_mask)
+    out = get_simulated_fcsts_record(
+        params, clean_trace, clean_trace + detdrop_mask, detdrop_mask
+    )
+    return out
+
+
+def simulate_peak_artifacts(
+        clean_trace: npt.NDArray[np.float64], params: fcsdc.FCSSimParams,
+        clean_psf: dict[str, Any],
+        rng: np.random._generator.Generator
+) -> fcsdc.SimulatedFCSTimeSeries:
+    assert params.peak_dmol is not None
+    assert params.peak_nmol is not None
+    params.peak_brightness = int(rng.integers(5, 10) * 1000)
+    # simulate brownian motion of slow clusters
+    peak_track = sm.brownian_only_numpy(
+        params=params, dmol=params.peak_dmol, nmol=params.peak_nmol,
+        rng=rng
+    )
+    peak_trace_dict = sm.integrate_over_psf(
+        psf=copy.deepcopy(clean_psf), track_arr=peak_track,
+        nmol=params.peak_nmol, pos_y=params.pos_y, pos_x=params.pos_x,
+    )
+    peak_trace = peak_trace_dict["trace"][0]
+    out = get_simulated_fcsts_record(
+        params, clean_trace, clean_trace + peak_trace * params.peak_brightness,
+        peak_trace
+    )
+    return out
+
+
+def get_simulated_fcsts_record(
+        params: fcsdc.FCSSimParams,
+        clean_trace: npt.NDArray[np.float64],
+        artifact_trace: npt.NDArray[np.float64],
+        label_trace: npt.NDArray[np.float64]
+) -> fcsdc.SimulatedFCSTimeSeries:
+    namestem = f"{datetime.date.today()}-{params.sim_artifact}"
+    record = {}
+    record["feature"] = fcsdc.FCSTimeSeries(
+        name=f"{namestem}-feature", trace=artifact_trace,
+        scale=np.arange(0, clean_trace.size, params.time_step),
+        channel=1, bin=float(params.time_step), size=clean_trace.size,
+    )
+    if params.sim_label_for in ["restoration", "both"]:
+        record["label_restoration"] = fcsdc.FCSTimeSeriesLabel(
+            name=f"{namestem}-label-restoration", trace=clean_trace,
+            scale=np.arange(0, clean_trace.size, params.time_step),
+            channel=1, bin=float(params.time_step), size=clean_trace.size,
+        )
+    if params.sim_label_for in ["segmentation", "both"]:
+        record["label_segmentation"] = fcsdc.FCSTimeSeriesLabel(
+            name=f"{namestem}-label-segmentation", trace=label_trace,
+            scale=np.arange(0, clean_trace.size, params.time_step),
+            channel=1, bin=float(params.time_step), size=clean_trace.size,
+        )
+    out = fcsdc.SimulatedFCSTimeSeries(
+        uuid = uuid.uuid4(),
+        sim_params = params,
+        record = record
+    )
+    return out
 
 
 def simulate_trace_array(artifact,

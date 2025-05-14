@@ -1,14 +1,27 @@
 # This module copies functions of Dominic Waithe's nanosimpy module
 # https://github.com/dwaithe/nanosimpy
 import copy
-import sys
+import logging
 
 import numpy as np
+import numpy.typing as npt
 import scipy.stats as sst
 
+from typing import Any
 
-def brownian_only_numpy(total_sim_time, time_step, num_of_mol, D, width,
-                        height):
+from fluotracify import fcsdc
+
+logging.basicConfig(format="%(asctime)s - nanosimpy - %(message)s")
+log = logging.getLogger(__name__)
+log.setLevel(logging.DEBUG)
+
+
+def brownian_only_numpy(
+        params: fcsdc.FCSSimParams,
+        dmol: float,
+        nmol: int,
+        rng: np.random._generator.Generator
+) -> dict[int, npt.NDArray[np.float64]]:
     """Simulate brownian motion / random walk of a given number of molecules
 
     Parameters
@@ -25,6 +38,8 @@ def brownian_only_numpy(total_sim_time, time_step, num_of_mol, D, width,
         The width of the simulation area
     height : int
         The height of the simulation area
+    rng: np.random._generator.Generator
+        Random Generator to pass to random functions for reproducibility
 
     Returns
     -------
@@ -33,37 +48,39 @@ def brownian_only_numpy(total_sim_time, time_step, num_of_mol, D, width,
         track data with y-coordinates [0,:] and x-coordinates [1,:]
     """
 
-    # Number of steps.
-    num_of_steps = int(round(float(total_sim_time) / float(time_step), 0))
 
-    print('num_of_steps', num_of_steps)
+    # Number of steps.
+    num_of_steps = int(round(float(params.total_sim_time) /
+                             float(params.time_step), 0))
+
+    log.debug(f"Simulating {params.clean_nmol} molecules with {num_of_steps} steps")
     # Calculates length scales
-    scale_in = np.sqrt(2.0 * (float(D) * 1e3) * float(time_step))
+    scale_in = np.sqrt(2.0 * (float(dmol) * 1e3) * float(params.time_step))
 
     # Randomly generates start locations
-    start_coord_x = (np.random.uniform(0.0, 1.0, num_of_mol)) * width
-    start_coord_y = (np.random.uniform(0.0, 1.0, num_of_mol)) * height
+    start_coord_x = (rng.uniform(0.0, 1.0, nmol)) * params.box_width
+    start_coord_y = (rng.uniform(0.0, 1.0, nmol)) * params.box_height
 
     track_arr = {}
     # This can be done as one big matrix, but can crash system if large so
     # I break it up by molecule.
-    for b in range(0, num_of_mol):
-        per = int((float(b) / float(num_of_mol)) * 100)
-        sys.stdout.write("\rProcessing tracks: [{:20}] {}% complete".format(
-            '=' * int(per / 5), per))
-        sys.stdout.flush()
+    for b in range(0, nmol):
+        # per = int((float(b) / float(num_of_mol)) * 100)
+        # sys.stdout.write("\rProcessing tracks: [{:20}] {}% complete".format(
+        #     '=' * int(per / 5), per))
+        # sys.stdout.flush()
         track = np.zeros((2, num_of_steps))
         track[0, 0] = start_coord_y[b]
         track[1, 0] = start_coord_x[b]
-        rand_in = sst.norm.rvs(size=[2, num_of_steps]) * scale_in
+        rand_in = sst.norm.rvs(size=[2, num_of_steps], random_state=rng) * scale_in
         track[:, 1:] += rand_in[:, 1:]
         track = np.cumsum(track, 1)
         out = track
         mod = np.zeros((out.shape))
-        mod[0, :] = np.floor(track[0, :].astype(np.float64) / height)
-        mod[1, :] = np.floor(track[1, :].astype(np.float64) / width)
-        track_arr[b] = np.array(out -
-                                ([mod[0, :] * height, mod[1, :] * width]))
+        mod[0, :] = np.floor(track[0, :].astype(np.float64) / params.box_height)
+        mod[1, :] = np.floor(track[1, :].astype(np.float64) / params.box_width)
+        track_arr[b] = np.array(out - ([mod[0, :] * params.box_height, mod[1, :]
+                                * params.box_width]))
 
         # We go through and make sure our particles wrap around.
         # for b in range(0,num_of_mol):
@@ -85,7 +102,9 @@ def brownian_only_numpy(total_sim_time, time_step, num_of_mol, D, width,
     return track_arr
 
 
-def calculate_psf(fwhms, distance):
+def calculate_psf(
+        fwhms: list[int | float], distance: int | float
+) -> dict[str, Any]:
     """Calculates Gaussian of particular FWHM
 
     Parameters
@@ -139,7 +158,10 @@ def calculate_psf(fwhms, distance):
     return psf
 
 
-def integrate_over_psf(psf, track_arr, num_of_mol, psy, psx):
+def integrate_over_psf(
+        psf: dict[str, Any], track_arr: dict[int, npt.NDArray[np.float64]],
+        nmol: int, pos_y: int, pos_x: int
+):
     """Pass an array of Brownian motion tracks through the PSF function
 
     Parameters
@@ -155,9 +177,9 @@ def integrate_over_psf(psf, track_arr, num_of_mol, psy, psx):
     track_arr : dict of lists of numpy arrays
         A dictionary where each track number (e.g. track_arr[0]) contains the
         track data with y-coordinates [0,:] and x-coordinates [1,:]
-    num_of_mol : int
+    nmol : int
         The number of molecules in the simulation.
-    psy, psx : int
+    pos_y, pos_x : int
         The location of the focal volume in the simulated area.
 
     Returns
@@ -183,15 +205,15 @@ def integrate_over_psf(psf, track_arr, num_of_mol, psy, psx):
          according to the simulated psf from `calculate_psf`
     """
     psf['trace'] = {}
-    sys.stdout.write('\n')
+    # sys.stdout.write('\n')
     for ki in range(0, psf['number_FWHMs']):
-        sys.stdout.write("\rProcessing FWHM {}, ".format(psf['FWHMs'][ki]))
-        sys.stdout.flush()
+        # sys.stdout.write("\rProcessing FWHM {}, ".format(psf['FWHMs'][ki]))
+        # sys.stdout.flush()
         trace = 0
-        for b in range(0, num_of_mol):
+        for b in range(0, nmol):
             b_dist = np.round(
-                np.sqrt((track_arr[b][1] - psx)**2 +
-                        (track_arr[b][0] - psy)**2), 0).astype(np.int32)
+                np.sqrt((track_arr[b][1] - pos_x)**2 +
+                        (track_arr[b][0] - pos_y)**2), 0).astype(np.int32)
             b_trace = psf['V'][ki][b_dist]
             trace += b_trace
         psf['trace'][ki] = copy.deepcopy(trace)

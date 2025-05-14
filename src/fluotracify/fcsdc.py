@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import logging
 import numpy as np
+import uuid
 
 from dataclasses import dataclass, field, astuple
 from typing import Literal, Any
@@ -156,6 +157,12 @@ class FCSTimeSeries:
             self.number_nandb,
         )
 
+class FCSTimeSeriesLabel(FCSTimeSeries):
+    kcount: int | float | None = None
+    brightness_nandb: int | float | None = None
+    number_nandb: int | float | None = None
+    def __post_init__(self):
+        pass
 
 @dataclass
 class ProcessedFCSTimeSeries(FCSTimeSeries):
@@ -187,9 +194,16 @@ class FCSSimParams:
     sim_artifact: Literal[
         "none", "peak_artifacts", "detector_dropout", "photobleaching"
     ] = "none"
-    sim_label_for: Literal["none", "unet", "both"] = "none"
+    sim_label_for: Literal["none", "restoration", "segmentation", "both"] = "none"
     pos_x: int = field(init=False)
     pos_y: int = field(init=False)
+    bleach_type: Literal["immobile", "mobile", "both"] | None = None
+    bleach_exp_scale: float | None = None
+    dropout_n: int | None = None
+    dropout_maxdrop: float | None = None
+    peak_dmol: float | None = None
+    peak_nmol: int | None = None
+    peak_brightness: int | None = None
 
     def __post_init__(self):
         self.pos_x = int(self.box_width // 2)
@@ -197,14 +211,14 @@ class FCSSimParams:
 
 
 @dataclass
-class SimulatedFCSTimeSeries(FCSTimeSeries):
+class SimulatedFCSTimeSeries():
     """Simulated FCS time-series based on brownian motion / random walk of a
     given number of molecules. Also supports artifacts
     """
-
+    uuid: uuid.UUID
     sim_params: FCSSimParams
-    uuid: str
-    record: dict[Literal["feature_trace", "label_unet", "label_vae"], FCSTimeSeries] = (
+    record: dict[Literal["feature", "label_restoration", "label_segmentation"],
+                 FCSTimeSeries | FCSTimeSeriesLabel] = (
         field(default_factory=dict, compare=False)
     )
 
