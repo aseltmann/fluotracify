@@ -1,0 +1,25 @@
+name: tf
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - conda-forge::click=8.1.8
+  - conda-forge::cython=3.0.12
+  - conda-forge::ipykernel=6.29.5
+  - conda-forge::ipywidgets=8.1.7
+  - conda-forge::lmfit=1.3.3
+  - conda-forge::matplotlib=3.10.1
+  - conda-forge::mlcroissant=1.0.17
+  - conda-forge::mlflow=2.21.3
+  - conda-forge::numpy=2.2.5
+  - conda-forge::pandas=2.2.3
+  - conda-forge::python=3.12.10
+  - conda-forge::scikit-image=0.25.2
+  - conda-forge::scikit-learn=1.6.1
+  - conda-forge::seaborn=0.13.2
+  - conda-forge::tqdm=4.67.1
+  - conda-forge::pip=25.0.1:
+    - multipletau=0.4.1
+    - tensorflow=2.19.0
+
+prefix: "/home/lea/Programs/miniconda3/envs/tf"

@@ -1,0 +1,942 @@
+#+setupfile: ../../lab-book-setupfile.org
+# #+include: ../../lab-book-technical.org
+# * Data
+** exp-250327-masters
+*** Setup: Jupyter on local computer
+1. on our local machine we don't need tmux. A simple sh command is enough. So
+   let's start the conda environment in the sh session =local= and start
+   jupterlab there.
+   #+begin_src sh :session local
+     conda activate tf
+     jupyter lab --no-browser --port=8888
+   #+end_src
+
+   #+begin_example
+   [I 2022-05-22 14:24:33.496 ServerApp] jupyterlab | extension was successfully linked.
+   [I 2022-05-22 14:24:33.745 ServerApp] nbclassic | extension was successfully linked.
+   [I 2022-05-22 14:24:33.786 LabApp] JupyterLab extension loaded from /home/lex/Programme/miniconda3/envs/tf/lib/python3.9/site-packages/jupyterlab
+   [I 2022-05-22 14:24:33.786 LabApp] JupyterLab application directory is /home/lex/Programme/miniconda3/envs/tf/share/jupyter/lab
+   [I 2022-05-22 14:24:33.790 ServerApp] jupyterlab | extension was successfully loaded.
+   [I 2022-05-22 14:24:33.799 ServerApp] nbclassic | extension was successfully loaded.
+   [I 2022-05-22 14:24:33.800 ServerApp] Serving notebooks from local directory: /home/lex/Programme/drmed-git
+   [I 2022-05-22 14:24:33.800 ServerApp] Jupyter Server 1.4.1 is running at:
+   [I 2022-05-22 14:24:33.800 ServerApp] http://localhost:8888/lab?token=1d0362f7e2280b0060620c901abee258910e16c879bc0870
+   [I 2022-05-22 14:24:33.800 ServerApp]  or http://127.0.0.1:8888/lab?token=1d0362f7e2280b0060620c901abee258910e16c879bc0870
+   [I 2022-05-22 14:24:33.800 ServerApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+   [C 2022-05-22 14:24:33.804 ServerApp]
+
+       To access the server, open this file in a browser:
+           file:///home/lex/.local/share/jupyter/runtime/jpserver-1749996-open.html
+       Or copy and paste one of these URLs:
+           http://localhost:8888/lab?token=1d0362f7e2280b0060620c901abee258910e16c879bc0870
+        or http://127.0.0.1:8888/lab?token=1d0362f7e2280b0060620c901abee258910e16c879bc0870
+
+   #+end_example
+
+2. I started a Python3 kernel using =jupyter-server-list-kernels=. Then I
+   added the kernel ID to the =:PROPERTIES:= drawer of this (and following)
+   subtrees.
+
+   #+begin_example
+   python3           03038b73-b2b5-49ce-a1dc-21afb6247d0f   a few seconds ago    starting   0
+   #+end_example
+
+3. Print metadata
+   #+transclude: [[../../src/scripts/setup-jupyter.py]]  :src jupyter-python
+
+   #+RESULTS:
+   #+begin_example
+   No of CPUs in system: 12
+   No of CPUs the current process can use: 12
+   load average: (1.697265625, 2.05029296875, 2.072265625)
+   os.uname():  posix.uname_result(sysname='Linux', nodename='topialea', release='6.13.7-1-MANJARO', version='#1 SMP PREEMPT_DYNAMIC Thu, 13 Mar 2025 14:03:23 +0000', machine='x86_64')
+   PID of process: 14388
+   RAM total: 62Gi, RAM used: 8,3Gi, RAM free: 44Gi
+   The current directory: /home/lea
+   Filesystem      Size  Used Avail Use% Mounted on
+   dev              16G     0   16G   0% /dev
+   run              16G  2,8M   16G   1% /run
+   efivarfs        438K  357K   77K  83% /sys/firmware/efi/efivars
+   /dev/nvme0n1p6  257G  237G  6,5G  98% /
+   tmpfs            16G   55M   16G   1% /dev/shm
+   tmpfs           1,0M     0  1,0M   0% /run/credentials/systemd-journald.service
+   tmpfs            16G  5,9M   16G   1% /tmp
+   /dev/nvme0n1p7  511M  300K  511M   1% /boot/efi
+   tmpfs           3,1G  160K  3,1G   1% /run/user/1000
+   My disk usage: CompletedProcess(args=['df', '-h'], returncode=0)# packages in environment at /home/lea/Programs/miniconda3/envs/tf:
+   #
+   # Name                    Version                   Build  Channel
+   _libgcc_mutex             0.1                        main
+   _openmp_mutex             5.1                       1_gnu
+   absl-py                   2.2.1                    pypi_0    pypi
+   alembic                   1.4.1                    pypi_0    pypi
+   anyio                     3.5.0            py39h06a4308_0
+   argon2-cffi               21.3.0             pyhd3eb1b0_0
+   argon2-cffi-bindings      21.2.0           py39h5eee18b_1
+   asteval                   1.0.6                    pypi_0    pypi
+   asttokens                 2.0.5              pyhd3eb1b0_0
+   astunparse                1.6.3                    pypi_0    pypi
+   attrs                     24.3.0           py39h06a4308_0
+   babel                     2.16.0           py39h06a4308_0
+   backcall                  0.2.0              pyhd3eb1b0_0
+   beautifulsoup4            4.12.3           py39h06a4308_0
+   bleach                    6.2.0            py39h06a4308_0
+   brotli-python             1.0.9            py39h6a678d5_9
+   ca-certificates           2025.2.25            h06a4308_0
+   certifi                   2025.1.31        py39h06a4308_0
+   cffi                      1.15.1           py39h74dc2b5_0
+   charset-normalizer        3.3.2              pyhd3eb1b0_0
+   click                     8.0.3                    pypi_0    pypi
+   cloudpickle               3.1.1                    pypi_0    pypi
+   comm                      0.2.1            py39h06a4308_0
+   cycler                    0.12.1                   pypi_0    pypi
+   cython                    0.29.26                  pypi_0    pypi
+   databricks-cli            0.18.0                   pypi_0    pypi
+   debugpy                   1.8.11           py39h6a678d5_0
+   decorator                 5.1.1              pyhd3eb1b0_0
+   defusedxml                0.7.1              pyhd3eb1b0_0
+   docker                    7.1.0                    pypi_0    pypi
+   entrypoints               0.4                      pypi_0    pypi
+   exceptiongroup            1.2.0            py39h06a4308_0
+   executing                 0.8.3              pyhd3eb1b0_0
+   fcsfiles                  2021.6.6                 pypi_0    pypi
+   flask                     2.2.5                    pypi_0    pypi
+   flatbuffers               2.0.7                    pypi_0    pypi
+   fonttools                 4.56.0                   pypi_0    pypi
+   gast                      0.4.0                    pypi_0    pypi
+   gitdb                     4.0.12                   pypi_0    pypi
+   gitpython                 3.1.44                   pypi_0    pypi
+   google-pasta              0.2.0                    pypi_0    pypi
+   greenlet                  3.1.1                    pypi_0    pypi
+   grpcio                    1.71.0                   pypi_0    pypi
+   gunicorn                  23.0.0                   pypi_0    pypi
+   h5py                      3.13.0                   pypi_0    pypi
+   idna                      3.7              py39h06a4308_0
+   importlib-metadata        8.5.0            py39h06a4308_0
+   importlib_metadata        8.5.0                hd3eb1b0_0
+   ipykernel                 6.29.5           py39h06a4308_1
+   ipython                   8.15.0           py39h06a4308_0
+   ipython_genutils          0.2.0              pyhd3eb1b0_1
+   itsdangerous              2.2.0                    pypi_0    pypi
+   jedi                      0.19.2           py39h06a4308_0
+   jinja2                    3.1.6            py39h06a4308_0
+   joblib                    1.4.2                    pypi_0    pypi
+   json5                     0.9.25           py39h06a4308_0
+   jsonschema                4.23.0           py39h06a4308_0
+   jsonschema-specifications 2023.7.1         py39h06a4308_0
+   jupyter_client            8.6.3            py39h06a4308_0
+   jupyter_core              5.7.2            py39h06a4308_0
+   jupyter_server            1.23.4           py39h06a4308_0
+   jupyterlab                3.2.1              pyhd3eb1b0_1
+   jupyterlab_pygments       0.2.2            py39h06a4308_0
+   jupyterlab_server         2.27.3           py39h06a4308_0
+   keras                     2.7.0                    pypi_0    pypi
+   keras-preprocessing       1.1.2                    pypi_0    pypi
+   kiwisolver                1.4.7                    pypi_0    pypi
+   ld_impl_linux-64          2.40                 h12ee557_0
+   libclang                  18.1.1                   pypi_0    pypi
+   libffi                    3.3                  he6710b0_2
+   libgcc-ng                 11.2.0               h1234567_1
+   libgomp                   11.2.0               h1234567_1
+   libsodium                 1.0.18               h7b6447c_0
+   libstdcxx-ng              11.2.0               h1234567_1
+   lmfit                     1.0.3                    pypi_0    pypi
+   mako                      1.3.9                    pypi_0    pypi
+   markdown                  3.7                      pypi_0    pypi
+   markupsafe                3.0.2            py39h5eee18b_0
+   matplotlib                3.5.1                    pypi_0    pypi
+   matplotlib-inline         0.1.6            py39h06a4308_0
+   mistune                   3.1.2            py39h06a4308_0
+   mlflow                    1.22.0                   pypi_0    pypi
+   multipletau               0.3.3                    pypi_0    pypi
+   nbclassic                 0.5.5            py39h06a4308_0
+   nbclient                  0.10.2           py39h06a4308_0
+   nbconvert                 7.16.6           py39h06a4308_0
+   nbconvert-core            7.16.6           py39h06a4308_0
+   nbconvert-pandoc          7.16.6           py39h06a4308_0
+   nbformat                  5.10.4           py39h06a4308_0
+   ncurses                   6.4                  h6a678d5_0
+   nest-asyncio              1.6.0            py39h06a4308_0
+   notebook-shim             0.2.4            py39h06a4308_0
+   numpy                     1.21.5                   pypi_0    pypi
+   oauthlib                  3.2.2                    pypi_0    pypi
+   openssl                   1.1.1w               h7f8727e_0
+   opt-einsum                3.4.0                    pypi_0    pypi
+   packaging                 24.2             py39h06a4308_0
+   pandas                    1.3.5                    pypi_0    pypi
+   pandoc                    2.12                 h06a4308_3
+   pandocfilters             1.5.0              pyhd3eb1b0_0
+   parso                     0.8.4            py39h06a4308_0
+   pexpect                   4.8.0              pyhd3eb1b0_3
+   pickleshare               0.7.5           pyhd3eb1b0_1003
+   pillow                    11.1.0                   pypi_0    pypi
+   pip                       21.2.4           py39h06a4308_0
+   platformdirs              3.10.0           py39h06a4308_0
+   prometheus-flask-exporter 0.23.2                   pypi_0    pypi
+   prometheus_client         0.21.0           py39h06a4308_0
+   prompt-toolkit            3.0.43           py39h06a4308_0
+   protobuf                  6.30.2                   pypi_0    pypi
+   psutil                    5.9.0            py39h5eee18b_1
+   ptyprocess                0.7.0              pyhd3eb1b0_2
+   pure_eval                 0.2.2              pyhd3eb1b0_0
+   pycparser                 2.21               pyhd3eb1b0_0
+   pygments                  2.15.1           py39h06a4308_1
+   pyjwt                     2.10.1                   pypi_0    pypi
+   pyparsing                 3.2.3                    pypi_0    pypi
+   pysocks                   1.7.1            py39h06a4308_0
+   python                    3.9.7                h12debd9_1
+   python-dateutil           2.9.0post0       py39h06a4308_2
+   python-editor             1.0.4                    pypi_0    pypi
+   python-fastjsonschema     2.20.0           py39h06a4308_0
+   pytz                      2025.2                   pypi_0    pypi
+   pyyaml                    6.0.2                    pypi_0    pypi
+   pyzmq                     26.2.0           py39h6a678d5_0
+   querystring-parser        1.2.4                    pypi_0    pypi
+   readline                  8.2                  h5eee18b_0
+   referencing               0.30.2           py39h06a4308_0
+   requests                  2.32.3           py39h06a4308_1
+   rpds-py                   0.22.3           py39h4aa5aa6_0
+   scikit-learn              1.0.2                    pypi_0    pypi
+   scipy                     1.10.1                   pypi_0    pypi
+   seaborn                   0.11.2                   pypi_0    pypi
+   send2trash                1.8.2            py39h06a4308_1
+   setuptools                75.8.0           py39h06a4308_0
+   six                       1.16.0             pyhd3eb1b0_1
+   smmap                     5.0.2                    pypi_0    pypi
+   sniffio                   1.3.0            py39h06a4308_0
+   soupsieve                 2.5              py39h06a4308_0
+   sqlalchemy                2.0.39                   pypi_0    pypi
+   sqlite                    3.45.3               h5eee18b_0
+   sqlparse                  0.5.3                    pypi_0    pypi
+   stack_data                0.2.0              pyhd3eb1b0_0
+   tabulate                  0.9.0                    pypi_0    pypi
+   tensorboard               2.19.0                   pypi_0    pypi
+   tensorboard-data-server   0.7.2                    pypi_0    pypi
+   tensorflow                2.7.0                    pypi_0    pypi
+   tensorflow-estimator      2.7.0                    pypi_0    pypi
+   tensorflow-io-gcs-filesystem 0.37.1                   pypi_0    pypi
+   termcolor                 2.5.0                    pypi_0    pypi
+   terminado                 0.17.1           py39h06a4308_0
+   threadpoolctl             3.6.0                    pypi_0    pypi
+   tinycss2                  1.4.0            py39h06a4308_0
+   tk                        8.6.14               h39e8969_0
+   tornado                   6.4.2            py39h5eee18b_0
+   traitlets                 5.14.3           py39h06a4308_0
+   typing-extensions         4.12.2           py39h06a4308_0
+   typing_extensions         4.12.2           py39h06a4308_0
+   tzdata                    2025a                h04d1e81_0
+   uncertainties             3.2.2                    pypi_0    pypi
+   urllib3                   2.3.0            py39h06a4308_0
+   wcwidth                   0.2.5              pyhd3eb1b0_0
+   webencodings              0.5.1            py39h06a4308_1
+   websocket-client          1.8.0            py39h06a4308_0
+   werkzeug                  3.1.3                    pypi_0    pypi
+   wheel                     0.45.1           py39h06a4308_0
+   wrapt                     1.17.2                   pypi_0    pypi
+   xz                        5.6.4                h5eee18b_1
+   zeromq                    4.3.5                h6a678d5_0
+   zipp                      3.21.0           py39h06a4308_0
+   zlib                      1.2.13               h5eee18b_1
+   My conda environment: CompletedProcess(args=['conda', 'list'], returncode=0)
+   {'SHELL': '/bin/bash',
+    'SESSION_MANAGER': 'local/topialea:@/tmp/.ICE-unix/1119,unix/topialea:/tmp/.ICE-unix/1119',
+    'WINDOWID': '0',
+    'COLORTERM': 'truecolor',
+    'XDG_CONFIG_DIRS': '/home/lea/.config/kdedefaults:/etc/xdg:/usr/share/manjaro-kde-settings/xdg',
+    'LESS': '-R',
+    'XDG_SESSION_PATH': '/org/freedesktop/DisplayManager/Session1',
+    'XDG_MENU_PREFIX': 'plasma-',
+    'CONDA_EXE': '/home/lea/Programs/miniconda3/bin/conda',
+    '_CE_M': '',
+    'ICEAUTHORITY': '/run/user/1000/iceauth_TDpKZa',
+    'LANGUAGE': '',
+    '_P9K_TTY': '/dev/pts/2',
+    'LESS_TERMCAP_se': '\x1b[0m',
+    'LESS_TERMCAP_so': '\x1b[01;47;34m',
+    'LC_ADDRESS': 'de_DE.UTF-8',
+    'LC_NAME': 'de_DE.UTF-8',
+    'P9K_TTY': 'old',
+    'SHELL_SESSION_ID': '6d40111df8df46eabbfb49876d91f254',
+    'MEMORY_PRESSURE_WRITE': 'c29tZSAyMDAwMDAgMjAwMDAwMAA=',
+    'DESKTOP_SESSION': 'plasmawayland',
+    'LC_MONETARY': 'de_DE.UTF-8',
+    'GTK_RC_FILES': '/etc/gtk/gtkrc:/home/lea/.gtkrc:/home/lea/.config/gtkrc',
+    'XDG_SEAT': 'seat0',
+    'PWD': '/home/lea',
+    'XDG_SESSION_DESKTOP': 'KDE',
+    'LOGNAME': 'lea',
+    'XDG_SESSION_TYPE': 'wayland',
+    'CONDA_PREFIX': '/home/lea/Programs/miniconda3/envs/tf',
+    'SYSTEMD_EXEC_PID': '1399',
+    'XAUTHORITY': '/run/user/1000/xauth_SgHuYy',
+    'LS_OPTIONS': '--color=auto',
+    'RESTIC_REPOSITORY': '/run/media/lea/bluey/00_BACKUP',
+    'MOTD_SHOWN': 'pam',
+    'GTK2_RC_FILES': '/etc/gtk-2.0/gtkrc:/home/lea/.gtkrc-2.0:/home/lea/.config/gtkrc-2.0',
+    'HOME': '/home/lea',
+    'LC_PAPER': 'de_DE.UTF-8',
+    'LANG': 'en_GB.UTF-8',
+    'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=00:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.7z=01;31:*.ace=01;31:*.alz=01;31:*.apk=01;31:*.arc=01;31:*.arj=01;31:*.bz=01;31:*.bz2=01;31:*.cab=01;31:*.cpio=01;31:*.crate=01;31:*.deb=01;31:*.drpm=01;31:*.dwm=01;31:*.dz=01;31:*.ear=01;31:*.egg=01;31:*.esd=01;31:*.gz=01;31:*.jar=01;31:*.lha=01;31:*.lrz=01;31:*.lz=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.lzo=01;31:*.pyz=01;31:*.rar=01;31:*.rpm=01;31:*.rz=01;31:*.sar=01;31:*.swm=01;31:*.t7z=01;31:*.tar=01;31:*.taz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tgz=01;31:*.tlz=01;31:*.txz=01;31:*.tz=01;31:*.tzo=01;31:*.tzst=01;31:*.udeb=01;31:*.war=01;31:*.whl=01;31:*.wim=01;31:*.xz=01;31:*.z=01;31:*.zip=01;31:*.zoo=01;31:*.zst=01;31:*.avif=01;35:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:*~=00;90:*#=00;90:*.bak=00;90:*.crdownload=00;90:*.dpkg-dist=00;90:*.dpkg-new=00;90:*.dpkg-old=00;90:*.dpkg-tmp=00;90:*.old=00;90:*.orig=00;90:*.part=00;90:*.rej=00;90:*.rpmnew=00;90:*.rpmorig=00;90:*.rpmsave=00;90:*.swp=00;90:*.tmp=00;90:*.ucf-dist=00;90:*.ucf-new=00;90:*.ucf-old=00;90:',
+    'XDG_CURRENT_DESKTOP': 'KDE',
+    'KONSOLE_DBUS_SERVICE': ':1.59',
+    'MEMORY_PRESSURE_WATCH': '/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/app-org.kde.yakuake@autostart.service/memory.pressure',
+    'WAYLAND_DISPLAY': 'wayland-0',
+    'KONSOLE_DBUS_SESSION': '/Sessions/2',
+    'PROFILEHOME': '',
+    'CONDA_PROMPT_MODIFIER': '(tf) ',
+    'XDG_SEAT_PATH': '/org/freedesktop/DisplayManager/Seat0',
+    'INVOCATION_ID': 'ff98d80703844539b21990bc9851f7f5',
+    'KONSOLE_VERSION': '241203',
+    'MANAGERPID': '903',
+    'KDE_SESSION_UID': '1000',
+    'XKB_DEFAULT_LAYOUT': 'de',
+    'JPY_PARENT_PID': '13581',
+    'XDG_SESSION_CLASS': 'user',
+    'TERM': 'xterm-color',
+    'LC_IDENTIFICATION': 'de_DE.UTF-8',
+    'LESS_TERMCAP_mb': '\x1b[01;32m',
+    'LESS_TERMCAP_me': '\x1b[0m',
+    'LESS_TERMCAP_md': '\x1b[01;32m',
+    '_CE_CONDA': '',
+    'USER': 'lea',
+    'COLORFGBG': '15;0',
+    'CONDA_SHLVL': '2',
+    'QT_WAYLAND_RECONNECT': '1',
+    'KDE_SESSION_VERSION': '6',
+    'PAM_KWALLET5_LOGIN': '/run/user/1000/kwallet5.socket',
+    'DISPLAY': ':1',
+    'LESS_TERMCAP_ue': '\x1b[0m',
+    'SHLVL': '1',
+    'MOZ_ENABLE_WAYLAND': '1',
+    'LESS_TERMCAP_us': '\x1b[01;36m',
+    'LC_TELEPHONE': 'de_DE.UTF-8',
+    '_P9K_SSH_TTY': '/dev/pts/2',
+    'LC_MEASUREMENT': 'de_DE.UTF-8',
+    'XDG_VTNR': '1',
+    'XDG_SESSION_ID': '2',
+    'QT_LINUX_ACCESSIBILITY_ALWAYS_ON': '1',
+    'CONDA_PYTHON_EXE': '/home/lea/Programs/miniconda3/bin/python',
+    'XDG_RUNTIME_DIR': '/run/user/1000',
+    'CONDA_DEFAULT_ENV': 'tf',
+    'DEBUGINFOD_URLS': 'https://debuginfod.archlinux.org ',
+    'LC_TIME': 'de_DE.UTF-8',
+    'P9K_SSH': '0',
+    'QT_AUTO_SCREEN_SCALE_FACTOR': '0',
+    'JOURNAL_STREAM': '9:16696',
+    'XDG_DATA_DIRS': '/home/lea/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share:/usr/local/share:/usr/share',
+    'KDE_FULL_SESSION': 'true',
+    'PATH': '/home/lea/Programs/miniconda3/envs/tf/bin:/home/lea/Programs/miniconda3/condabin:/home/lea/.config/emacs/bin:/home/lea/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:/var/lib/flatpak/exports/bin:/usr/lib/jvm/default/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/home/lea/.local/share/JetBrains/Toolbox/scripts',
+    'DBUS_SESSION_BUS_ADDRESS': 'unix:path=/run/user/1000/bus',
+    'KDE_APPLICATIONS_AS_SCOPE': '1',
+    'MAIL': '/var/spool/mail/lea',
+    'CONDA_PREFIX_1': '/home/lea/Programs/miniconda3',
+    'LC_NUMERIC': 'de_DE.UTF-8',
+    'OLDPWD': '/home/lea',
+    'PYDEVD_USE_FRAME_EVAL': 'NO',
+    'CLICOLOR': '1',
+    'FORCE_COLOR': '1',
+    'CLICOLOR_FORCE': '1',
+    'PAGER': 'cat',
+    'GIT_PAGER': 'cat',
+    'MPLBACKEND': 'module://matplotlib_inline.backend_inline'}
+   #+end_example
+
+*** Plot simulated detector dropout
+#+transclude: [[src-python/plot-sim.py]] :lines 1-72 :src jupyter-python
+
+#+RESULTS:
+:RESULTS:
+[[file:./.ob-jupyter/79b739335743a769470af3f83ee21e9d01c67d19.png]]
+[[file:./.ob-jupyter/267a96d6b40c5580903b01085aba867c2cc4e1ab.png]]
+#+begin_example
+0.5    15
+2.0    12
+4.5    11
+3.0    10
+1.5    10
+2.5    10
+1.0     9
+4.0     8
+5.0     8
+3.5     7
+Name: diffusion rate of molecules, dtype: int64
+#+end_example
+:END:
+
+#+transclude: [[src-python/plot-sim.py]] :lines 74-79 :src jupyter-python
+
+#+RESULTS:
+:RESULTS:
+: 0.5
+|    | path and file name             | number of fast molecules |
+|----+--------------------------------+--------------------------|
+| 0  | traces_rand_Aug2019_set010.csv | 3000                     |
+| 1  | traces_rand_Aug2019_set015.csv | 5000                     |
+| 2  | traces_rand_Aug2019_set032.csv | 3000                     |
+| 13 | traces_rand_Aug2019_set047.csv | 6000                     |
+| 15 | traces_rand_Aug2019_set065.csv | 3000                     |
+| 26 | traces_rand_Aug2019_set022.csv | 8000                     |
+| 36 | traces_rand_Aug2019_set050.csv | 8000                     |
+| 37 | traces_rand_Aug2019_set013.csv | 19000                    |
+| 58 | traces_rand_Aug2019_set066.csv | 2000                     |
+| 59 | traces_rand_Aug2019_set060.csv | 6000                     |
+| 70 | traces_rand_Aug2019_set088.csv | 1000                     |
+| 74 | traces_rand_Aug2019_set076.csv | 6000                     |
+| 88 | traces_rand_Aug2019_set055.csv | 1000                     |
+| 90 | traces_rand_Aug2019_set046.csv | 1000                     |
+| 99 | traces_rand_Aug2019_set082.csv | 15000                    |
+: 1.0
+|    | path and file name             | number of fast molecules |
+|----+--------------------------------+--------------------------|
+| 8  | traces_rand_Aug2019_set059.csv | 17000                    |
+| 11 | traces_rand_Aug2019_set024.csv | 18000                    |
+| 14 | traces_rand_Aug2019_set039.csv | 7000                     |
+| 30 | traces_rand_Aug2019_set072.csv | 2000                     |
+| 46 | traces_rand_Aug2019_set070.csv | 9000                     |
+| 50 | traces_rand_Aug2019_set043.csv | 11000                    |
+| 66 | traces_rand_Aug2019_set090.csv | 4000                     |
+| 85 | traces_rand_Aug2019_set048.csv | 15000                    |
+| 86 | traces_rand_Aug2019_set053.csv | 7000                     |
+: 1.5
+|    | path and file name             | number of fast molecules |
+|----+--------------------------------+--------------------------|
+| 9  | traces_rand_Aug2019_set002.csv | 15000                    |
+| 29 | traces_rand_Aug2019_set098.csv | 6000                     |
+| 35 | traces_rand_Aug2019_set064.csv | 13000                    |
+| 39 | traces_rand_Aug2019_set020.csv | 8000                     |
+| 47 | traces_rand_Aug2019_set033.csv | 13000                    |
+| 51 | traces_rand_Aug2019_set042.csv | 6000                     |
+| 64 | traces_rand_Aug2019_set049.csv | 12000                    |
+| 65 | traces_rand_Aug2019_set092.csv | 18000                    |
+| 71 | traces_rand_Aug2019_set012.csv | 15000                    |
+| 79 | traces_rand_Aug2019_set009.csv | 18000                    |
+: 2.0
+|    | path and file name             | number of fast molecules |
+|----+--------------------------------+--------------------------|
+| 4  | traces_rand_Aug2019_set080.csv | 6000                     |
+| 6  | traces_rand_Aug2019_set071.csv | 4000                     |
+| 7  | traces_rand_Aug2019_set011.csv | 10000                    |
+| 16 | traces_rand_Aug2019_set018.csv | 5000                     |
+| 17 | traces_rand_Aug2019_set099.csv | 17000                    |
+| 24 | traces_rand_Aug2019_set077.csv | 1000                     |
+| 27 | traces_rand_Aug2019_set079.csv | 5000                     |
+| 32 | traces_rand_Aug2019_set016.csv | 7000                     |
+| 81 | traces_rand_Aug2019_set038.csv | 10000                    |
+| 83 | traces_rand_Aug2019_set040.csv | 6000                     |
+| 84 | traces_rand_Aug2019_set019.csv | 8000                     |
+| 98 | traces_rand_Aug2019_set097.csv | 16000                    |
+: 2.5
+|    | path and file name             | number of fast molecules |
+|----+--------------------------------+--------------------------|
+| 10 | traces_rand_Aug2019_set095.csv | 16000                    |
+| 25 | traces_rand_Aug2019_set044.csv | 17000                    |
+| 31 | traces_rand_Aug2019_set041.csv | 3000                     |
+| 34 | traces_rand_Aug2019_set094.csv | 12000                    |
+| 54 | traces_rand_Aug2019_set063.csv | 10000                    |
+| 69 | traces_rand_Aug2019_set083.csv | 11000                    |
+| 78 | traces_rand_Aug2019_set087.csv | 17000                    |
+| 89 | traces_rand_Aug2019_set057.csv | 20000                    |
+| 91 | traces_rand_Aug2019_set006.csv | 5000                     |
+| 93 | traces_rand_Aug2019_set067.csv | 4000                     |
+: 3.0
+|    | path and file name             | number of fast molecules |
+|----+--------------------------------+--------------------------|
+| 5  | traces_rand_Aug2019_set062.csv | 15000                    |
+| 19 | traces_rand_Aug2019_set034.csv | 18000                    |
+| 28 | traces_rand_Aug2019_set078.csv | 18000                    |
+| 41 | traces_rand_Aug2019_set052.csv | 2000                     |
+| 44 | traces_rand_Aug2019_set081.csv | 5000                     |
+| 48 | traces_rand_Aug2019_set061.csv | 9000                     |
+| 60 | traces_rand_Aug2019_set096.csv | 8000                     |
+| 77 | traces_rand_Aug2019_set068.csv | 10000                    |
+| 87 | traces_rand_Aug2019_set074.csv | 5000                     |
+| 92 | traces_rand_Aug2019_set091.csv | 3000                     |
+: 3.5
+|    | path and file name             | number of fast molecules |
+|----+--------------------------------+--------------------------|
+| 20 | traces_rand_Aug2019_set028.csv | 20000                    |
+| 33 | traces_rand_Aug2019_set007.csv | 10000                    |
+| 40 | traces_rand_Aug2019_set058.csv | 15000                    |
+| 57 | traces_rand_Aug2019_set084.csv | 15000                    |
+| 80 | traces_rand_Aug2019_set008.csv | 11000                    |
+| 82 | traces_rand_Aug2019_set054.csv | 3000                     |
+| 97 | traces_rand_Aug2019_set075.csv | 17000                    |
+: 4.0
+|    | path and file name             | number of fast molecules |
+|----+--------------------------------+--------------------------|
+| 3  | traces_rand_Aug2019_set001.csv | 11000                    |
+| 18 | traces_rand_Aug2019_set023.csv | 7000                     |
+| 49 | traces_rand_Aug2019_set051.csv | 20000                    |
+| 63 | traces_rand_Aug2019_set014.csv | 6000                     |
+| 68 | traces_rand_Aug2019_set031.csv | 10000                    |
+| 72 | traces_rand_Aug2019_set073.csv | 8000                     |
+| 73 | traces_rand_Aug2019_set100.csv | 7000                     |
+| 95 | traces_rand_Aug2019_set005.csv | 14000                    |
+: 4.5
+|    | path and file name             | number of fast molecules |
+|----+--------------------------------+--------------------------|
+| 21 | traces_rand_Aug2019_set089.csv | 12000                    |
+| 42 | traces_rand_Aug2019_set021.csv | 16000                    |
+| 52 | traces_rand_Aug2019_set030.csv | 18000                    |
+| 53 | traces_rand_Aug2019_set045.csv | 9000                     |
+| 55 | traces_rand_Aug2019_set017.csv | 15000                    |
+| 56 | traces_rand_Aug2019_set093.csv | 3000                     |
+| 62 | traces_rand_Aug2019_set004.csv | 2000                     |
+| 67 | traces_rand_Aug2019_set026.csv | 6000                     |
+| 76 | traces_rand_Aug2019_set037.csv | 16000                    |
+| 94 | traces_rand_Aug2019_set086.csv | 5000                     |
+| 96 | traces_rand_Aug2019_set003.csv | 20000                    |
+: 5.0
+|    | path and file name             | number of fast molecules |
+|----+--------------------------------+--------------------------|
+| 12 | traces_rand_Aug2019_set085.csv | 14000                    |
+| 22 | traces_rand_Aug2019_set025.csv | 19000                    |
+| 23 | traces_rand_Aug2019_set069.csv | 11000                    |
+| 38 | traces_rand_Aug2019_set036.csv | 12000                    |
+| 43 | traces_rand_Aug2019_set056.csv | 20000                    |
+| 45 | traces_rand_Aug2019_set035.csv | 12000                    |
+| 61 | traces_rand_Aug2019_set027.csv | 5000                     |
+| 75 | traces_rand_Aug2019_set029.csv | 16000                    |
+:END:
+
+#+transclude: [[src-python/plot-sim.py]] :lines 81-106 :src jupyter-python
+
+#+RESULTS:
+: 2025-03-27 17:02:30,352 - 1/2: ../drmed-collections/2019-08-sim-detector-dropout/d5p0-nmol5000/traces_rand_Aug2019_set027.csv
+: 2025-03-27 17:02:31,483 - 2/2: ../drmed-collections/2019-08-sim-detector-dropout/d0p5-nmol5000/traces_rand_Aug2019_set015.csv
+: 2025-03-27 17:02:31,495 - The given DataFrame was split into 2 parts with shapes: [(20000, 200), (20000, 200)]
+
+#+transclude: [[src-python/plot-sim.py]] :lines 108-133 :src jupyter-python
+
+#+RESULTS:
+:RESULTS:
+[[file:./.ob-jupyter/9bdaffcc64be4b8ca9f2f41ab6e725c240a76e6e.png]]
+[[file:./.ob-jupyter/7cd19184da0385e8d53f71dd9de4c757ced42ea0.png]]
+:END:
+
+*** Plot simulated photobleaching
+import libraries if not done before
+#+transclude: [[src-python/plot-sim.py]] :lines 1-34 :src jupyter-python
+
+#+RESULTS:
+
+:RESULTS:
+: 0.5
+|    | path and file name             | number of fast molecules | number of bleached molecules |
+|----+--------------------------------+--------------------------+------------------------------|
+| 13 | traces_rand_Sep2019_set036.csv | 7000                     | 14000                        |
+| 64 | traces_rand_Sep2019_set042.csv | 5000                     | 10000                        |
+| 84 | traces_rand_Sep2019_set062.csv | 10000                    | 20000                        |
+| 92 | traces_rand_Sep2019_set023.csv | 3000                     | 6000                         |
+: 1.0
+|    | path and file name             | number of fast molecules | number of bleached molecules |
+|----+--------------------------------+--------------------------+------------------------------|
+| 2  | traces_rand_Sep2019_set073.csv | 5000                     | 10000                        |
+| 8  | traces_rand_Sep2019_set053.csv | 7000                     | 14000                        |
+| 19 | traces_rand_Sep2019_set030.csv | 4000                     | 8000                         |
+| 23 | traces_rand_Sep2019_set015.csv | 6000                     | 12000                        |
+|
+#+end_example
+# [goto error]
+:END:
+
+#+transclude: [[src-python/plot-sim.py]] :lines 127-157 :src jupyter-python
+
+#+RESULTS:
+:RESULTS:
+[[file:./.ob-jupyter/5aaaa8d209958b83b43f665d7abadbcde8dbac4b.png]]
+[[file:./.ob-jupyter/e557f5de469c22e8fc3217e32481d05d84f58a4d.png]]
+[[file:./.ob-jupyter/7ae3b83d28c8ee3b77dfd3af5661be8dff1571ee.png]]
+#+begin_example
+2.0    17
+3.0    12
+4.5    12
+1.5    11
+4.0    11
+5.0    11
+1.0    10
+2.5     7
+3.5     5
+0.5     4
+Name: diffusion rate of molecules, dtype: int64
+#+end_example
+:END:
+
+#+transclude: [[src-python/plot-sim.py]] :lines 159-165 :src jupyter-python
+
+#+RESULTS:
+:RESULTS:
+: 0.5
+|    | path and file name             | number of fast molecules | number of bleached molecules |
+|----+--------------------------------+--------------------------+------------------------------|
+| 13 | traces_rand_Sep2019_set036.csv | 7000                     | 14000                        |
+| 64 | traces_rand_Sep2019_set042.csv | 5000                     | 10000                        |
+| 84 | traces_rand_Sep2019_set062.csv | 10000                    | 20000                        |
+| 92 | traces_rand_Sep2019_set023.csv | 3000                     | 6000                         |
+: 1.0
+|    | path and file name             | number of fast molecules | number of bleached molecules |
+|----+--------------------------------+--------------------------+------------------------------|
+| 2  | traces_rand_Sep2019_set073.csv | 5000                     | 10000                        |
+| 8  | traces_rand_Sep2019_set053.csv | 7000                     | 14000                        |
+| 19 | traces_rand_Sep2019_set030.csv | 4000                     | 8000                         |
+| 23 | traces_rand_Sep2019_set015.csv | 6000                     | 12000                        |
+| 33 | traces_rand_Sep2019_set052.csv | 7000                     | 14000                        |
+| 35 | traces_rand_Sep2019_set099.csv | 10000                    | 20000                        |
+| 57 | traces_rand_Sep2019_set026.csv | 10000                    | 20000                        |
+| 61 | traces_rand_Sep2019_set077.csv | 10000                    | 20000                        |
+| 87 | traces_rand_Sep2019_set085.csv | 2000                     | 4000                         |
+| 90 | traces_rand_Sep2019_set055.csv | 5000                     | 10000                        |
+: 1.5
+|    | path and file name             | number of fast molecules | number of bleached molecules |
+|----+--------------------------------+--------------------------+------------------------------|
+| 3  | traces_rand_Sep2019_set071.csv | 7000                     | 14000                        |
+| 7  | traces_rand_Sep2019_set022.csv | 6000                     | 12000                        |
+| 45 | traces_rand_Sep2019_set024.csv | 3000                     | 6000                         |
+| 48 | traces_rand_Sep2019_set019.csv | 1000                     | 2000                         |
+| 52 | traces_rand_Sep2019_set056.csv | 1000                     | 2000                         |
+| 53 | traces_rand_Sep2019_set076.csv | 5000                     | 10000                        |
+| 66 | traces_rand_Sep2019_set064.csv | 3000                     | 6000                         |
+| 71 | traces_rand_Sep2019_set021.csv | 4000                     | 8000                         |
+| 76 | traces_rand_Sep2019_set004.csv | 6000                     | 12000                        |
+| 79 | traces_rand_Sep2019_set013.csv | 2000                     | 4000                         |
+| 93 | traces_rand_Sep2019_set080.csv | 8000                     | 16000                        |
+: 2.0
+|    | path and file name             | number of fast molecules | number of bleached molecules |
+|----+--------------------------------+--------------------------+------------------------------|
+| 0  | traces_rand_Sep2019_set092.csv | 2000                     | 4000                         |
+| 1  | traces_rand_Sep2019_set079.csv | 3000                     | 6000                         |
+| 9  | traces_rand_Sep2019_set010.csv | 8000                     | 16000                        |
+| 11 | traces_rand_Sep2019_set038.csv | 4000                     | 8000                         |
+| 17 | traces_rand_Sep2019_set043.csv | 4000                     | 8000                         |
+| 22 | traces_rand_Sep2019_set069.csv | 5000                     | 10000                        |
+| 31 | traces_rand_Sep2019_set037.csv | 7000                     | 14000                        |
+| 34 | traces_rand_Sep2019_set091.csv | 7000                     | 14000                        |
+| 39 | traces_rand_Sep2019_set066.csv | 9000                     | 18000                        |
+| 40 | traces_rand_Sep2019_set078.csv | 7000                     | 14000                        |
+| 50 | traces_rand_Sep2019_set057.csv | 7000                     | 14000                        |
+| 62 | traces_rand_Sep2019_set001.csv | 7000                     | 14000                        |
+| 63 | traces_rand_Sep2019_set065.csv | 1000                     | 2000                         |
+| 75 | traces_rand_Sep2019_set095.csv | 8000                     | 16000                        |
+| 86 | traces_rand_Sep2019_set006.csv | 4000                     | 8000                         |
+| 88 | traces_rand_Sep2019_set044.csv | 7000                     | 14000                        |
+| 89 | traces_rand_Sep2019_set034.csv | 3000                     | 6000                         |
+: 2.5
+|    | path and file name             | number of fast molecules | number of bleached molecules |
+|----+--------------------------------+--------------------------+------------------------------|
+| 10 | traces_rand_Sep2019_set028.csv | 4000                     | 8000                         |
+| 44 | traces_rand_Sep2019_set047.csv | 1000                     | 2000                         |
+| 46 | traces_rand_Sep2019_set041.csv | 5000                     | 10000                        |
+| 51 | traces_rand_Sep2019_set067.csv | 3000                     | 6000                         |
+| 67 | traces_rand_Sep2019_set098.csv | 5000                     | 10000                        |
+| 78 | traces_rand_Sep2019_set072.csv | 6000                     | 12000                        |
+| 85 | traces_rand_Sep2019_set007.csv | 5000                     | 10000                        |
+: 3.0
+|    | path and file name             | number of fast molecules | number of bleached molecules |
+|----+--------------------------------+--------------------------+------------------------------|
+| 5  | traces_rand_Sep2019_set039.csv | 9000                     | 18000                        |
+| 20 | traces_rand_Sep2019_set014.csv | 1000                     | 2000                         |
+| 26 | traces_rand_Sep2019_set082.csv | 10000                    | 20000                        |
+| 27 | traces_rand_Sep2019_set016.csv | 10000                    | 20000                        |
+| 28 | traces_rand_Sep2019_set070.csv | 8000                     | 16000                        |
+| 29 | traces_rand_Sep2019_set063.csv | 2000                     | 4000                         |
+| 37 | traces_rand_Sep2019_set087.csv | 9000                     | 18000                        |
+| 59 | traces_rand_Sep2019_set097.csv | 10000                    | 20000                        |
+| 80 | traces_rand_Sep2019_set027.csv | 6000                     | 12000                        |
+| 83 | traces_rand_Sep2019_set011.csv | 5000                     | 10000                        |
+| 97 | traces_rand_Sep2019_set054.csv | 6000                     | 12000                        |
+| 99 | traces_rand_Sep2019_set093.csv | 9000                     | 18000                        |
+: 3.5
+|    | path and file name             | number of fast molecules | number of bleached molecules |
+|----+--------------------------------+--------------------------+------------------------------|
+| 18 | traces_rand_Sep2019_set061.csv | 6000                     | 12000                        |
+| 25 | traces_rand_Sep2019_set048.csv | 8000                     | 16000                        |
+| 74 | traces_rand_Sep2019_set081.csv | 6000                     | 12000                        |
+| 82 | traces_rand_Sep2019_set088.csv | 4000                     | 8000                         |
+| 94 | traces_rand_Sep2019_set090.csv | 9000                     | 18000                        |
+: 4.0
+|    | path and file name             | number of fast molecules | number of bleached molecules |
+|----+--------------------------------+--------------------------+------------------------------|
+| 4  | traces_rand_Sep2019_set005.csv | 1000                     | 2000                         |
+| 6  | traces_rand_Sep2019_set100.csv | 5000                     | 10000                        |
+| 16 | traces_rand_Sep2019_set045.csv | 9000                     | 18000                        |
+| 30 | traces_rand_Sep2019_set008.csv | 1000                     | 2000                         |
+| 32 | traces_rand_Sep2019_set035.csv | 3000                     | 6000                         |
+| 41 | traces_rand_Sep2019_set060.csv | 3000                     | 6000                         |
+| 47 | traces_rand_Sep2019_set049.csv | 1000                     | 2000                         |
+| 54 | traces_rand_Sep2019_set017.csv | 4000                     | 8000                         |
+| 69 | traces_rand_Sep2019_set033.csv | 5000                     | 10000                        |
+| 81 | traces_rand_Sep2019_set086.csv | 5000                     | 10000                        |
+| 96 | traces_rand_Sep2019_set096.csv | 10000                    | 20000                        |
+: 4.5
+|    | path and file name             | number of fast molecules | number of bleached molecules |
+|----+--------------------------------+--------------------------+------------------------------|
+| 14 | traces_rand_Sep2019_set040.csv | 1000                     | 2000                         |
+| 24 | traces_rand_Sep2019_set025.csv | 6000                     | 12000                        |
+| 38 | traces_rand_Sep2019_set089.csv | 3000                     | 6000                         |
+| 43 | traces_rand_Sep2019_set031.csv | 10000                    | 20000                        |
+| 56 | traces_rand_Sep2019_set029.csv | 2000                     | 4000                         |
+| 65 | traces_rand_Sep2019_set074.csv | 6000                     | 12000                        |
+| 68 | traces_rand_Sep2019_set058.csv | 7000                     | 14000                        |
+| 70 | traces_rand_Sep2019_set059.csv | 3000                     | 6000                         |
+| 72 | traces_rand_Sep2019_set009.csv | 6000                     | 12000                        |
+| 73 | traces_rand_Sep2019_set002.csv | 9000                     | 18000                        |
+| 77 | traces_rand_Sep2019_set083.csv | 4000                     | 8000                         |
+| 98 | traces_rand_Sep2019_set094.csv | 4000                     | 8000                         |
+: 5.0
+|    | path and file name             | number of fast molecules | number of bleached molecules |
+|----+--------------------------------+--------------------------+------------------------------|
+| 12 | traces_rand_Sep2019_set046.csv | 8000                     | 16000                        |
+| 15 | traces_rand_Sep2019_set075.csv | 7000                     | 14000                        |
+| 21 | traces_rand_Sep2019_set051.csv | 1000                     | 2000                         |
+| 36 | traces_rand_Sep2019_set068.csv | 9000                     | 18000                        |
+| 42 | traces_rand_Sep2019_set050.csv | 7000                     | 14000                        |
+| 49 | traces_rand_Sep2019_set018.csv | 9000                     | 18000                        |
+| 55 | traces_rand_Sep2019_set020.csv | 1000                     | 2000                         |
+| 58 | traces_rand_Sep2019_set012.csv | 1000                     | 2000                         |
+| 60 | traces_rand_Sep2019_set003.csv | 1000                     | 2000                         |
+| 91 | traces_rand_Sep2019_set032.csv | 2000                     | 4000                         |
+| 95 | traces_rand_Sep2019_set084.csv | 7000                     | 14000                        |
+:END:
+
+#+transclude: [[src-python/plot-sim.py]] :lines 167-194 :src jupyter-python
+
+#+RESULTS:
+: 2025-03-27 16:56:43,119 - 1/4: ../drmed-collections/2019-09-sim-photobleaching/d5p0-nmol1000-nbleach2000/traces_rand_Sep2019_set020.csv
+: 2025-03-27 16:56:44,219 - 2/4: ../drmed-collections/2019-09-sim-photobleaching/d5p0-nmol7000-nbleach14000/traces_rand_Sep2019_set075.csv
+: 2025-03-27 16:56:45,333 - 3/4: ../drmed-collections/2019-09-sim-photobleaching/d0p5-nmol7000-nbleach14000/traces_rand_Sep2019_set036.csv
+: 2025-03-27 16:56:46,475 - 4/4: ../drmed-collections/2019-09-sim-photobleaching/d0p5-nmol3000-nbleach6000/traces_rand_Sep2019_set023.csv
+: 2025-03-27 16:56:46,503 - The given DataFrame was split into 2 parts with shapes: [(20000, 400), (20000, 400)]
+
+#+transclude: [[src-python/plot-sim.py]] :lines 196-221 :src jupyter-python
+
+#+RESULTS:
+:RESULTS:
+[[file:./.ob-jupyter/cf870f52448af6a4678d940a670a8a3a712588ae.png]]
+[[file:./.ob-jupyter/8280a70e3d995f31c3d79312cd8442f67b03a8f4.png]]
+[[file:./.ob-jupyter/d4c13a249716b3534a6a953f0475991d65dcb041.png]]
+[[file:./.ob-jupyter/1c7fd5e5a4817449fd2d1e9d22e750d62907c4df.png]]
+:END:
+
+*** Simulate photobleaching
+#+begin_src jupyter-python
+import importlib
+importlib.reload(fcsdc)
+importlib.reload(stwa)
+importlib.reload(sm)
+#+end_src
+
+#+RESULTS:
+: <module 'fluotracify.simulations.simulation_methods' from '/home/lea/Programs/drmed-git/src/fluotracify/simulations/simulation_methods.py'>
+
+
+#+begin_src jupyter-python
+import copy
+import datetime
+import logging
+import os
+import sys
+import uuid
+
+import matplotlib.pyplot as plt
+import numpy as np
+import numpy.typing as npt
+import pandas as pd
+import seaborn as sns
+import scipy.stats as sst
+
+from dataclasses import dataclass, replace, field, astuple
+from pathlib import Path
+from pprint import pprint
+from typing import Literal, Any
+from tqdm.auto import tqdm, trange
+
+os.chdir("/home/lea/Programs/drmed-git")
+FLUOTRACIFY_PATH = Path("/home/lea/Programs/drmed-git/src/")
+sys.path.append(FLUOTRACIFY_PATH)
+
+from fluotracify import fcsdc
+from fluotracify.simulations import (
+    simulate_trace_with_artifact as stwa,
+    simulation_methods as sm,
+)
+
+sns.set_theme(style="whitegrid", font_scale=2, palette='colorblind',
+              context='paper')
+
+logging.basicConfig(format="%(asctime)s - %(message)s")
+log = logging.getLogger(__name__)
+log.setLevel(logging.DEBUG)
+
+def save_simulated_fcsts_record(
+        fcsts: fcsdc.SimulatedFCSTimeSeries
+) -> None:
+
+
+#+end_src
+
+
+
+#+RESULTS:
+
+#+begin_src jupyter-python
+rng = np.random.default_rng(seed=42)
+sim_params = fcsdc.FCSSimParams(
+    total_sim_time=16384, time_step=1., psf_fwhm=250, psf_distance=4000,
+    box_width=3000, box_height=3000, clean_dmol=0.5, clean_nmol=100,
+    sim_artifact="photobleaching", sim_label_for="both", bleach_type="both",
+)
+
+new_params = replace(sim_params, sim_artifact="none")
+for i in range(1):
+    clean_track, clean_trace, clean_psf = stwa.simulate_clean_trace(sim_params, rng)
+    # art_dc = stwa.simulate_detector_dropout(clean_trace, sim_params, rng)
+    new_params = replace(sim_params, peak_dmol=0.069, peak_nmol=7)
+    art_dc = stwa.simulate_peak_artifacts(clean_trace, new_params, clean_psf, rng)
+    if i == 0:
+        plt.plot(art_dc.record["feature"].trace)
+        plt.show()
+        plt.plot(art_dc.record["label_segmentation"].trace)
+        plt.show()
+        plt.plot(art_dc.record["label_restoration"].trace)
+# pprint(bleach_dc)
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+: 2025-05-14 16:18:59,183 - fcsdc - Simulating 100 molecules with 16384 steps
+: 2025-05-14 16:18:59,250 - fcsdc - Simulating 100 molecules with 16384 steps
+: 2025-05-14 16:18:59,255 - fcsdc - FCSTimeSeries: kcount: 325.3494954055399, brightness: 2332.3819644593455, number: 0.13950088764742483
+[[file:./.ob-jupyter/5d6ac6c0f05cf48cf5d8ababe0065cb054841305.png]]
+[[file:./.ob-jupyter/08a906acd692d2408bd3309ae39d4c593ae4acb8.png]]
+[[file:./.ob-jupyter/6f89656f83566c2746e4beaa16001868ad52b7ac.png]]
+:END:
+
+#+begin_src jupyter-python
+# plt.plot(clean_trace)
+plt.plot(bleach_dc)
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+| <matplotlib.lines.Line2D | at | 0x7e3808a9bce0> |
+[[file:./.ob-jupyter/c4e509537d98c0cc39f6d1703dd24b8cb901bd83.png]]
+:END:
+
+
+
+#+begin_src jupyter-python
+uuid.UUID(int=rng.getrandbits(128), version=4)
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+# [goto error]
+: ---------------------------------------------------------------------------
+: AttributeError                            Traceback (most recent call last)
+: Cell In[109], line 1
+: ----> 1 uuid.UUID(int=rng.getrandbits(128), version=4)
+:
+: AttributeError: 'numpy.random._generator.Generator' object has no attribute 'getrandbits'
+:END:
+
+
+#+begin_src jupyter-python
+# folder = '/beegfs/ye53nis/saves/firstartifact_Nov2020/'
+folder = "/tmp"
+file_name = "traces_brightclust_Nov2020"
+# d_mol_arr = [0.069, 0.08, 0.1, 0.2, 0.4, 0.6, 1.0, 3.0, 10, 50]
+d_mol_arr = [1]
+number_of_sets = 1
+traces_per_set = 3
+rng = np.random.default_rng(seed=42)
+
+p = Path(folder)
+if not p.is_dir():
+    raise NotADirectoryError("Parameter folder should be a directory.")
+
+sim_params = fcsdc.FCSSimParams(
+    total_sim_time=16384, time_step=1., psf_fwhm=250, psf_distance=4000,
+    box_width=3000, box_height=3000, clean_dmol=1, clean_nmol=10,
+    sim_artifact="photobleaching", sim_label_for="both", bleach_type="both"
+)
+
+log.debug("D = %s um^2 / s", sim_params.clean_dmol)
+# define the name of the directory to be created
+pdir = p / f"{sim_params.clean_dmol}"
+try:
+    os.mkdir(pdir)
+except FileExistsError:
+    log.debug(f"Directory {pdir} already exists!")
+else:
+    log.debug(f"Successfully created the directory {pdir}")
+for idx in range(number_of_sets):
+    log.debug(f"Set {idx + 1} ------------------------")
+    file_name_ext = f"_D{sim_params.clean_dmol}_set{(idx + 1):0>3}.csv"
+    file = "".join([file_name, file_name_ext])
+    f = Path(file)
+    path_and_file_name = pdir / f
+    log.debug(f"{path_and_file_name}")
+
+    for i in range(traces_per_set):
+        print(i)
+        clean_track, clean_trace, clean_psf = get_clean_trace(params=sim_params, rng=rng)
+        # photobleaching
+        bleach_dc = stwa.simulate_photobleaching(clean_trace, clean_track, clean_psf,
+                                                 sim_params, rng)
+        log.debug(
+            f"Trace {i + 1}: Nmol: {sim_params.clean_nmol} d_mol: "
+            f"{sim_params.clean_dmol} scale parameter: "
+            f"{sim_params.bleach_exp_scale:.4f}"
+        )
+#+end_src
+
+
+#+begin_src jupyter-python
+f"{traces_per_set=}"
+#+end_src
+
+#+RESULTS:
+: traces_per_set=3
+
+*** test croissant
+
+#+begin_src jupyter-python
+import pandas as pd
+
+splits = {'validation': 'validation-00000-of-00001-1e6afe3f9b61a726.parquet'}
+df = pd.read_parquet("~/Downloads/" + splits["validation"])
+
+#+end_src
+
+#+RESULTS:
+
+#+begin_src jupyter-python
+df
+#+end_src
+
+#+RESULTS:
+
+#+begin_src jupyter-python
+df.loc[0]
+#+end_src
+
+#+RESULTS:
+
+#+begin_src jupyter-python
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+import io
+df.head()
+#+end_src
+
+
+#+RESULTS:
+:RESULTS:
+|   | image                                             | segmentation_mask                                 |
+|---+---------------------------------------------------+---------------------------------------------------|
+| 0 | {'bytes': b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHD... | {'bytes': b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHD... |
+| 1 | {'bytes': b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHD... | {'bytes': b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHD... |
+| 2 | {'bytes': b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHD... | {'bytes': b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHD... |
+| 3 | {'bytes': b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHD... | {'bytes': b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHD... |
+| 4 | {'bytes': b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHD... | {'bytes': b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHD... |
+:END:
