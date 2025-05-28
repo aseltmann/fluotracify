@@ -55,15 +55,15 @@ def apply_photobleaching(
 
 
 def simulate_photobleaching(
+        params: fcsdc.FCSSimParams,
         clean_trace: npt.NDArray[np.float64],
         clean_track: dict[int, npt.NDArray[np.float64]],
         clean_psf: dict[str, Any],
-        params: fcsdc.FCSSimParams,
         rng: np.random._generator.Generator
 ) -> fcsdc.SimulatedFCSTimeSeries:
-    params.bleach_exp_scale = (
-        float(rng.integers(20) * 0.01 * params.total_sim_time / 20_000)
-    )
+    # params.bleach_exp_scale = (
+    #     float(rng.integers(20) * 0.01 * params.total_sim_time / 20_000)
+    # )
     # scales between 0.01 and 0.2 seem to work nicely for a distribution
     # of total_sim_time=20000.  lower scale means faster bleaching,
     # higher scale means slower bleaching
@@ -97,8 +97,8 @@ def simulate_photobleaching(
 
 
 def simulate_detector_dropout(
-        clean_trace: npt.NDArray[np.float64],
         params: fcsdc.FCSSimParams,
+        clean_trace: npt.NDArray[np.float64],
         rng: np.random._generator.Generator
 ) -> fcsdc.SimulatedFCSTimeSeries:
     params.dropout_n = int(rng.integers(50) * params.total_sim_time / 20_000)
@@ -119,13 +119,18 @@ def simulate_detector_dropout(
 
 
 def simulate_peak_artifacts(
-        clean_trace: npt.NDArray[np.float64], params: fcsdc.FCSSimParams,
+        params: fcsdc.FCSSimParams,
+        clean_trace: npt.NDArray[np.float64],
         clean_psf: dict[str, Any],
         rng: np.random._generator.Generator
 ) -> fcsdc.SimulatedFCSTimeSeries:
     assert params.peak_dmol is not None
     assert params.peak_nmol is not None
-    params.peak_brightness = int(rng.integers(5, 10) * 1000)
+    if np.mean(clean_trace) < 500:
+        multiplier = np.mean(clean_trace)
+    else:
+        multiplier = 500
+    params.peak_brightness = int(rng.integers(10, 20) * multiplier)
     # simulate brownian motion of slow clusters
     peak_track = sm.brownian_only_numpy(
         params=params, dmol=params.peak_dmol, nmol=params.peak_nmol,
@@ -173,6 +178,39 @@ def get_simulated_fcsts_record(
         sim_params = params,
         record = record
     )
+    return out
+
+
+def perform_simulation(
+        params: fcsdc.FCSSimParams,
+        rng: np.random._generator.Generator
+) -> fcsdc.SimulatedFCSTimeSeries:
+    clean_track, clean_trace, clean_psf = simulate_clean_trace(
+        params, rng
+    )
+    if params.sim_artifact == "none":
+        out = get_simulated_fcsts_record(
+            params=params, clean_trace=clean_trace, artifact_trace=clean_trace,
+            label_trace=np.zeros(clean_trace.shape),
+        )
+    elif params.sim_artifact == "peak_artifacts":
+        out = simulate_peak_artifacts(
+            params=params, clean_trace=clean_trace, clean_psf=clean_psf, rng=rng
+        )
+    elif params.sim_artifact == "detector_dropout":
+        out = simulate_detector_dropout(
+            params=params, clean_trace=clean_trace, rng=rng
+        )
+    elif params.sim_artifact == "photobleaching":
+        out = simulate_photobleaching(
+            params=params, clean_trace=clean_trace, clean_track=clean_track,
+            clean_psf=clean_psf, rng=rng
+        )
+    else:
+        raise ValueError(
+            "sim_artifact has to be either 'none', 'peak_artifacts', 'detector_"
+            "dropout' or 'photobleaching'."
+        )
     return out
 
 

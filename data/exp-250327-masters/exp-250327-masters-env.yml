@@ -13,6 +13,7 @@ dependencies:
   - conda-forge::mlflow=2.21.3
   - conda-forge::numpy=2.2.5
   - conda-forge::pandas=2.2.3
+  - conda-forge::polars=1.29.0
   - conda-forge::python=3.12.10
   - conda-forge::scikit-image=0.25.2
   - conda-forge::scikit-learn=1.6.1

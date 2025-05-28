@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 import logging
 import numpy as np
+import polars as pl
 import uuid
 
-from dataclasses import dataclass, field, astuple
+from dataclasses import dataclass, field, astuple, asdict
 from typing import Literal, Any
 
 logging.basicConfig(format="%(asctime)s - fcsdc - %(message)s")
@@ -209,6 +210,9 @@ class FCSSimParams:
         self.pos_x = int(self.box_width // 2)
         self.pos_y = int(self.box_height // 2)
 
+    def to_dict(self):
+        return {k: str(v) for k, v in asdict(self).items()}
+
 
 @dataclass
 class SimulatedFCSTimeSeries():
@@ -221,6 +225,15 @@ class SimulatedFCSTimeSeries():
                  FCSTimeSeries | FCSTimeSeriesLabel] = (
         field(default_factory=dict, compare=False)
     )
+    def to_polars(self):
+        out = pl.DataFrame(
+            {"uuid": str(self.uuid)} |
+            {k: [v.trace] for k, v in self.record.items()} |
+            {"sim_params": self.sim_params.to_dict()}
+        )
+        return out
+
+
 
 
 @dataclass
