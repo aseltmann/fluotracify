@@ -67,6 +67,7 @@ def simulate_photobleaching(
     # scales between 0.01 and 0.2 seem to work nicely for a distribution
     # of total_sim_time=20000.  lower scale means faster bleaching,
     # higher scale means slower bleaching
+    assert params.bleach_exp_scale is not None
     bleach_dist = rng.exponential(scale=params.bleach_exp_scale,
                                   size=params.clean_nmol)
     bleach_times = bleach_dist * params.total_sim_time
