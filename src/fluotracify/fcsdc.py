@@ -211,7 +211,7 @@ class FCSSimParams:
         self.pos_y = int(self.box_height // 2)
 
     def to_dict(self):
-        return {k: str(v) for k, v in asdict(self).items()}
+        return {k: v for k, v in asdict(self).items()}
 
 
 @dataclass
@@ -226,10 +226,31 @@ class SimulatedFCSTimeSeries():
         field(default_factory=dict, compare=False)
     )
     def to_polars(self):
+        ts_schema = {}
+        for key, rec in self.record.items():
+            ts_schema = ts_schema | {
+                key: pl.Array(pl.Float32, shape=(rec.size))
+            }
+
         out = pl.DataFrame(
             {"uuid": str(self.uuid)} |
             {k: [v.trace] for k, v in self.record.items()} |
-            {"sim_params": self.sim_params.to_dict()}
+            {"sim_params": self.sim_params.to_dict()},
+            schema={
+                "uuid": pl.String
+            } | ts_schema | {
+                "sim_params": pl.Struct({
+                    "total_sim_time": pl.Float32, "time_step": pl.Float32,
+                    "psf_fwhm": pl.Float32, "box_width": pl.UInt32,
+                    "box_height": pl.UInt32, "clean_dmol": pl.Float32,
+                    "clean_nmol": pl.UInt32, "sim_artifact": pl.String,
+                    "sim_label_for": pl.String, "pos_x": pl.UInt32,
+                    "pos_y": pl.UInt32, "bleach_type": pl.String,
+                    "bleach_exp_scale": pl.Float32, "dropout_n": pl.UInt32,
+                    "dropout_maxdrop": pl.Float32, "peak_dmol": pl.Float32,
+                    "peak_nmol": pl.UInt32, "peak_brightness": pl.UInt32,
+                })
+            }
         )
         return out
 

@@ -717,10 +717,8 @@ Name: diffusion rate of molecules, dtype: int64
 [[file:./.ob-jupyter/1c7fd5e5a4817449fd2d1e9d22e750d62907c4df.png]]
 :END:
 
-*** Simulate photobleaching
-:LOGBOOK:
-CLOCK: [2025-05-28 Mi 11:22]
-:END:
+*** Simulate peak artifacts, photobleaching and detector dropout
+
 #+begin_src jupyter-python
 import importlib
 importlib.reload(fcsdc)
@@ -1146,6 +1144,178 @@ pprint(df.row(mytrace)[4])
  'total_sim_time': '16384'}
 #+end_example
 :END:
+
+- [2025-08-06 Wed]: I noticed that I did not use a good schema for the polars
+  conversion in =SimulatedFCSTimeSeries=, and decided to change the datatypes:
+  - all arrays in =record= should be =pl.Float32= instead of =pl.Float64= (will half
+    the disk space needed for the parquet files)
+  - =sim_params= were all typed as =pl.String= - this is inconvenient, since most
+    metadata are numerical values. Convert to =pl.Float32= or =pl.UInt32= as needed
+
+- The old schema:
+
+ #+begin_src jupyter-python
+dt_schema = pl.read_parquet_schema(
+    f"data/exp-250327-masters/parquet/2025-05-28-detector-dropout-testing.parquet"
+)
+pprint({k: v for k, v in dt_schema.items() if not k == "sim_params"})
+pprint(list(dt_schema["sim_params"]))
+
+ #+end_src
+
+ #+RESULTS:
+ #+begin_example
+ {'feature': Array(Float64, shape=(16384,)),
+  'label_restoration': Array(Float64, shape=(16384,)),
+  'label_segmentation': Array(Float64, shape=(16384,)),
+  'uuid': String}
+ [('total_sim_time', String),
+  ('time_step', String),
+  ('psf_fwhm', String),
+  ('psf_distance', String),
+  ('box_width', String),
+  ('box_height', String),
+  ('clean_dmol', String),
+  ('clean_nmol', String),
+  ('sim_artifact', String),
+  ('sim_label_for', String),
+  ('pos_x', String),
+  ('pos_y', String),
+  ('bleach_type', String),
+  ('bleach_exp_scale', String),
+  ('dropout_n', String),
+  ('dropout_maxdrop', String),
+  ('peak_dmol', String),
+  ('peak_nmol', String),
+  ('peak_brightness', String)]
+ #+end_example
+
+
+- The new schema is as follows. I hard-coded the shape and =feature=,
+  =label_restoration=, and =label_segmentation= because this is just used to convert
+  my specific last simulations, but in =fcsdc.py= the schema is constructed
+  according to what the simulation yields
+
+#+begin_src jupyter-python
+ts_schema = pl.Array(pl.Float32, shape=(16384,))
+whole_schema={
+    "uuid": pl.String,
+    "feature": ts_schema,
+    "label_restoration": ts_schema,
+    "label_segmentation": ts_schema,
+    "sim_params": pl.Struct({
+        "total_sim_time": pl.Float32, "time_step": pl.Float32,
+        "psf_fwhm": pl.Float32, "psf_distance": pl.Float32,
+        "box_width": pl.UInt32, "box_height": pl.UInt32,
+        "clean_dmol": pl.Float32, "clean_nmol": pl.UInt32,
+        "sim_artifact": pl.String, "sim_label_for": pl.String,
+        "pos_x": pl.UInt32, "pos_y": pl.UInt32,
+        "bleach_type": pl.String, "bleach_exp_scale": pl.Float32,
+        "dropout_n": pl.UInt32, "dropout_maxdrop": pl.Float32,
+        "peak_dmol": pl.Float32, "peak_nmol": pl.UInt32,
+        "peak_brightness": pl.UInt32,
+    })
+}
+
+#+end_src
+
+#+RESULTS:
+
+Now read in the simulated files, cast according to the new schema, print the MB
+saved, and override the old files. The =parquet= files will be around half of the
+printed MB values smaller due to optimizations in the data format.
+
+#+begin_src jupyter-python
+
+
+for myfile in [
+        "2025-05-28-detector-dropout-testing.parquet",
+        "2025-05-28-detector-dropout-training.parquet",
+        "2025-05-28-detector-dropout-validation.parquet",
+        "2025-05-28-peak-artifacts-testing.parquet",
+        "2025-05-28-peak-artifacts-training.parquet",
+        "2025-05-28-peak-artifacts-validation.parquet",
+        "2025-05-28-photobleaching-testing.parquet",
+        "2025-05-28-photobleaching-training.parquet",
+        "2025-05-28-photobleaching-validation.parquet",
+]:
+    print(f"Casting {myfile} to new schema...")
+    df = pl.read_parquet(f"data/exp-250327-masters/parquet/{myfile}")
+    print(f"old size: {df.estimated_size() / 1_000_000} MB")
+    df_new = df.cast(whole_schema)
+    print(f"new size: {df_new.estimated_size() / 1_000_000} MB")
+    df_new.write_parquet(f"data/exp-250327-masters/parquet/{myfile}")
+
+
+#+end_src
+
+#+RESULTS:
+#+begin_example
+Casting 2025-05-28-detector-dropout-testing.parquet to new schema...
+old size: 113.31792 MB
+new size: 113.31792 MB
+Casting 2025-05-28-detector-dropout-training.parquet to new schema...
+old size: 679.706539 MB
+new size: 339.95376 MB
+Casting 2025-05-28-detector-dropout-validation.parquet to new schema...
+old size: 226.56863 MB
+new size: 113.31792 MB
+Casting 2025-05-28-peak-artifacts-testing.parquet to new schema...
+old size: 453.117036 MB
+new size: 226.633392 MB
+Casting 2025-05-28-peak-artifacts-training.parquet to new schema...
+old size: 1359.351291 MB
+new size: 679.900176 MB
+Casting 2025-05-28-peak-artifacts-validation.parquet to new schema...
+old size: 453.117805 MB
+new size: 226.633392 MB
+Casting 2025-05-28-photobleaching-testing.parquet to new schema...
+old size: 453.12396 MB
+new size: 226.635984 MB
+Casting 2025-05-28-photobleaching-training.parquet to new schema...
+old size: 1359.372456 MB
+new size: 679.907952 MB
+Casting 2025-05-28-photobleaching-validation.parquet to new schema...
+old size: 453.124728 MB
+new size: 226.635984 MB
+#+end_example
+
+- Test if the file from before now uses the new schema:
+ #+begin_src jupyter-python
+dt_schema = pl.read_parquet_schema(
+    f"data/exp-250327-masters/parquet/2025-05-28-detector-dropout-testing.parquet"
+)
+pprint({k: v for k, v in dt_schema.items() if not k == "sim_params"})
+pprint(list(dt_schema["sim_params"]))
+
+ #+end_src
+
+ #+RESULTS:
+ #+begin_example
+ {'feature': Array(Float32, shape=(16384,)),
+  'label_restoration': Array(Float32, shape=(16384,)),
+  'label_segmentation': Array(Float32, shape=(16384,)),
+  'uuid': String}
+ [('total_sim_time', Float32),
+  ('time_step', Float32),
+  ('psf_fwhm', Float32),
+  ('psf_distance', Float32),
+  ('box_width', UInt32),
+  ('box_height', UInt32),
+  ('clean_dmol', Float32),
+  ('clean_nmol', UInt32),
+  ('sim_artifact', String),
+  ('sim_label_for', String),
+  ('pos_x', UInt32),
+  ('pos_y', UInt32),
+  ('bleach_type', String),
+  ('bleach_exp_scale', Float32),
+  ('dropout_n', UInt32),
+  ('dropout_maxdrop', Float32),
+  ('peak_dmol', Float32),
+  ('peak_nmol', UInt32),
+  ('peak_brightness', UInt32)]
+ #+end_example
 
 
 *** test croissant
