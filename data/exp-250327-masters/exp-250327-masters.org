@@ -1317,6 +1317,510 @@ pprint(list(dt_schema["sim_params"]))
   ('peak_brightness', UInt32)]
  #+end_example
 
+*** Load and plot simulated datasets for research internship report
+
+#+begin_src jupyter-python
+import logging
+import os
+import sys
+
+import lmfit
+
+import matplotlib.pyplot as plt
+import numpy as np
+import polars as pl
+import seaborn as sns
+
+from multipletau import autocorrelate
+from pathlib import Path
+from pprint import pprint
+
+
+os.chdir("/home/lea/Programs/drmed-git")
+FLUOTRACIFY_PATH = Path("/home/lea/Programs/drmed-git/src/")
+sys.path.append(FLUOTRACIFY_PATH.as_posix())
+
+from fluotracify import fcsdc
+from fluotracify.simulations import simulate_trace_with_artifact as stwa
+from fluotracify.applications import equations_to_fit as eq, correlate
+
+logging.basicConfig(format="%(asctime)s - %(message)s")
+log = logging.getLogger(__name__)
+log.setLevel(logging.DEBUG)
+
+# correlation parameters
+cor_options = fcsdc.FCSCorParams(
+    method="multipletau", multipletau_m=16, multipletau_deltat=1.,
+    multipletau_norm=True, multipetau_compress="average"
+)
+
+# fit 2D, no triplet, 1 species
+options_1sp = {"Dimen": 1, "Diff_species": 1, "Triplet_eq": 1}
+param_1sp = lmfit.Parameters()
+param_1sp.add("offset", value=0.01, min=-0.5, max=1.5, vary=True)
+param_1sp.add("GN0", value=1., min=-0.0001, max=3000., vary=True)
+param_1sp.add("A1", value=1., min=0.0001, max=1., vary=False)
+param_1sp.add("txy1", value=1., min=0.001, max=2000., vary=True)
+param_1sp.add("alpha1", value=1., min=0.6, max=2., vary=False)
+
+# fit 2D, no triplet, 2 species
+options_2sp = {"Dimen": 1, "Diff_species": 2, "Triplet_eq": 1}
+param_2sp = lmfit.Parameters()
+param_2sp.add("offset", value=0.01, min=-0.5, max=1.5, vary=True)
+param_2sp.add("GN0", value=1., min=-0.0001, max=3000.0, vary=True)
+param_2sp.add("A1", value=1., min=0.0001, max=1.0000, vary=True)
+param_2sp.add("A2", value=1., min=0.0001, max=1.0000, vary=True)
+param_2sp.add("txy1", value=1., min=0.001, max=2000.0, vary=True)
+param_2sp.add("txy2", value=1., min=0.001, max=2000.0, vary=True)
+param_2sp.add("alpha1", value=1., min=0.6, max=2., vary=False)
+param_2sp.add("alpha2", value=1., min=0.6, max=2., vary=False)
+
+
+def autocorrelate_and_fit(
+        data, cor_options: fcsdc.FCSCorParams, fit_options: dict,
+        param: lmfit.Parameters
+):
+    cor = autocorrelate(
+        data, m=cor_options["m"], deltat=cor_options["deltat"],
+        normalize=cor_options["normalize"], compress=cor_options["compress"])
+    res = lmfit.minimize(
+        eq.residual, param, args=(cor[:, 0], cor[:, 1], options)
+    )
+    fit = eq.equation_(res.params, cor[:, 0], options)
+    return cor, res, fit
+
+
+def plot_sim_example_with_corr_fit(
+        data, idx: int, param: lmfit.Parameters, options, artifact: str,
+        title: str
+) -> None:
+    gs_kw = dict(width_ratios=[1.5, 1, 1], height_ratios=[3, 1])
+    fig, axd = plt.subplot_mosaic(
+        [['left', 'cor1', 'cor2'],
+        ['left', 'res1', 'res2']],
+        gridspec_kw=gs_kw, figsize=(9, 4), layout="tight"
+    )
+    axd["cor1"].sharey(axd["cor2"])
+    axd["res1"].sharey(axd["res2"])
+    cor1, res1, fit1 = autocorrelate_and_fit(
+        data[idx, "label_restoration"], param, options
+    )
+    cor2, res2, fit2 = autocorrelate_and_fit(
+        data[idx, "feature"], param, options
+    )
+    tau1 = round(res1.params['txy1'].value, 2)
+    tau1 = f"No artifact\n$\\tau_{{\\mathrm{{diff}}}}$ = {tau1} ms"
+    tau2 = round(res2.params['txy1'].value, 2)
+    tau2 = f"{artifact}\n$\\tau_{{\\mathrm{{diff}}}}$ = {tau2} ms"
+    cory = r"$G(\tau)$"
+    corx = r"lag time [$\tau$]"
+    sns.lineplot(data=data[idx, "label_restoration"], ax=axd["left"],
+                 label="No artifact")
+    sns.lineplot(data=data[idx, "feature"], alpha=0.7, ax=axd["left"],
+                 label=artifact)
+    plt.setp(axd["left"], xlabel=r"macrotime [$ms$]", ylabel="intensity [a.u.]",
+             title=title)
+
+    sns.lineplot(x=cor1[1:, 0], y=cor1[1:, 1], ax=axd["cor1"])
+    sns.lineplot(x=cor1[1:, 0], y=fit1[1:], ax=axd["cor1"])
+    plt.setp(axd["cor1"], xlabel=corx, ylabel=cory, title=tau1, xscale="log")
+
+    sns.lineplot(x=cor1[1:, 0], y=res1.residual[1:], ax=axd["res1"])
+    plt.setp(axd["res1"], xlabel=r'residual', xscale="log")
+
+    sns.lineplot(x=cor2[1:, 0], y=cor2[1:, 1], ax=axd["cor2"])
+    sns.lineplot(x=cor2[1:, 0], y=fit2[1:], ax=axd["cor2"])
+    plt.setp(axd["cor2"], xlabel=corx, ylabel=cory, title=tau2, xscale="log")
+
+    sns.lineplot(x=cor2[1:, 0], y=res2.residual[1:], ax=axd["res2"])
+    plt.setp(axd["res2"], xlabel=r'residual', xscale="log")
+
+    plt.show()
+#+end_src
+
+#+RESULTS:
+
+#+begin_src jupyter-python
+test = fcsdc.FCSFitParams(
+    method="lmfit", equation_dim="2D", equation_dspecies=1,
+    equation_triplet="none", lmfit_params=param_1sp,
+    offset=0.01, offset_min=-0.5, offset_max=1.5, offset_vary=True,
+    gn0=1., gn0_min=-0.0001, gn0_max=3000., gn0_vary=True,
+    a1=1., a1_min=0.0001, a1_max=1., a1_vary=False,
+    txy1=1., txy1_min=0.001, txy1_max=2000., txy1_vary=True,
+    alpha1=1., alpha1_min=0.6, alpha1_max=2., alpha1_vary=False,
+)
+
+res = lmfit.minimize(
+    test.get_residual, test.lmfit_params, args=(cor[:, 0], cor[:, 1])
+)
+# fit = eq.equation_(res.params, cor[:, 0], options)
+# equ = test.get_equation(cor[1:, 0])
+# res = cor[1:, 0] - equ
+# test
+# res
+# print(lmfit.fit_report(res.params))
+# param_1sp["A1"].value
+pprint(dict(param_1sp)["A1"])
+#+end_src
+
+#+RESULTS:
+: <Parameter 'A1', value=1.0 (fixed), bounds=[0.0001:1.0]>
+:RESULTS:
+** Fit Result
+:PROPERTIES:
+:CUSTOM_ID: fit-result
+:END:
+| fitting method      | leastsq     |
+| ​# function evals    | 4           |
+| ​# data points       | 95          |
+| ​# variables         | 3           |
+| chi-square          | 6.62174551  |
+| reduced chi-square  | 0.07197549  |
+| Akaike info crit.   | -247.034199 |
+| Bayesian info crit. | -239.372568 |
+#+caption: Fit Statistics
+
+| name   | value      | initial value | min         | max        | vary  |
+|--------+------------+---------------+-------------+------------+-------|
+| offset | 0.01000000 | 0.01          | -0.50000000 | 1.50000000 | True  |
+| GN0    | 1.00000000 | 1.0           | -1.0000e-04 | 3000.00000 | True  |
+| A1     | 1.00000000 | 1.0           | 1.0000e-04  | 1.00000000 | False |
+| txy1   | 1.00000000 | 1.0           | 1.0000e-03  | 2000.00000 | True  |
+| alpha1 | 1.00000000 | 1.0           | 0.60000000  | 2.00000000 | False |
+#+caption: Parameters
+:END:
+
+
+#+begin_src jupyter-python
+plt.semilogx(cor[1:, 0], eq.equation_(param_1sp, cor[1:, 0], options_1sp))
+#+end_src
+
+
+#+begin_src jupyter-python
+from importlib import reload
+
+reload(fcsdc)
+#+end_src
+
+#+RESULTS:
+: <module 'fluotracify.fcsdc' from '/home/lea/Programs/drmed-git/src/fluotracify/fcsdc.py'>
+
+#+begin_src jupyter-python
+cor, res, fit = autocorrelate_and_fit(
+    test[11], param_1sp, options_1sp
+)
+test = fcsdc.FCSCorParams(method="multipletau", multipletau_m=16)
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+# [goto error]
+#+begin_example
+---------------------------------------------------------------------------
+ValueError                                Traceback (most recent call last)
+Cell In[459], line 4
+      1 cor, res, fit = autocorrelate_and_fit(
+      2     test[11], param_1sp, options_1sp
+      3 )
+----> 4 test = fcsdc.FCSCorParams(method="multipletau", multipletau_m=16)
+
+File <string>:11, in __init__(self, method, multipletau_m, multipletau_deltat, multipletau_norm, multipletau_compress, tttr2xfcs_ncascstart, tttr2xfcs_ncascend, tttr2xfcs_nsub)
+
+File ~/Programs/drmed-git/src/fluotracify/fcsdc.py:273, in FCSCorParams.__post_init__(self)
+    269 def __post_init__(self):
+    270     if ((self.method == "multipletau") &
+    271         ((self.multipletau_m is None) or
+    272          (self.multipletau_deltat is None) or
+--> 273          (self.multipletau_norm is None) or
+    274          (self.multipletau_compress is None))):
+    275         raise ValueError(
+    276             f"if {self.method=}, the multipletau options can not be None."
+    277         )
+    278     elif ((self.method == "tttr2xfcs") &
+    279         ((self.tttr2xfcs_ncascstart is None) or
+    280          (self.tttr2xfcs_ncascend is None) or
+    281          (self.tttr2xfcs_nsub is None))):
+
+ValueError: if self.method='multipletau', the multipletau options can not be None.
+#+end_example
+:END:
+
+
+#+begin_src jupyter-python
+df_pa = pl.read_parquet(f"data/exp-250327-masters/parquet/"
+                        "2025-05-28-peak-artifacts-testing.parquet")
+df_pb = pl.read_parquet(f"data/exp-250327-masters/parquet/"
+                        "2025-05-28-photobleaching-testing.parquet")
+df_dd = pl.read_parquet(f"data/exp-250327-masters/parquet/"
+                        "2025-05-28-detector-dropout-testing.parquet")
+pa_meta = df_pa.select(["uuid", "sim_params"])
+pb_meta = df_pb.select(["uuid", "sim_params"])
+dd_meta = df_dd.select(["uuid", "sim_params"])
+#+end_src
+
+#+RESULTS:
+
+plot clean example with autocorrelation and fit of
+- few (250) slow (0.075) molecules vs many (2000) fast (25) molecules
+- for peak artifacts: broad (0.01) vs sharp (3)
+
+#+begin_src jupyter-python
+def pa_filter(clean_dmol: float, clean_nmol: int, peak_dmol: float) -> pl.Expr:
+    return (pl.col("sim_params").struct.field("clean_dmol").eq(clean_dmol) &
+            pl.col("sim_params").struct.field("clean_nmol").eq(clean_nmol) &
+            pl.col("sim_params").struct.field("peak_dmol").eq(peak_dmol))
+
+def pb_filter(clean_dmol: float, clean_nmol: int, bleach_type: str) -> pl.Expr:
+    return (pl.col("sim_params").struct.field("clean_dmol").eq(clean_dmol) &
+            pl.col("sim_params").struct.field("clean_nmol").eq(clean_nmol) &
+            pl.col("sim_params").struct.field("bleach_type").eq(bleach_type))
+
+def dd_filter1(clean_dmol: float, clean_nmol: int, dropout_n: int) -> pl.Expr:
+    return (pl.col("sim_params").struct.field("clean_dmol").eq(clean_dmol) &
+            pl.col("sim_params").struct.field("clean_nmol").eq(clean_nmol) &
+            pl.col("sim_params").struct.field("dropout_n").eq(dropout_n))
+
+def dd_filter2(
+        clean_dmol: float, clean_nmol: int, dropout_n: str = "few"
+) -> pl.Expr:
+    if dropout_n == "few":
+        dropout_expr = pl.col("sim_params").struct.field("dropout_n") < 20
+    elif dropout_n == "many":
+        dropout_expr = pl.col("sim_params").struct.field("dropout_n") >= 20
+    else:
+        raise ValueError("dropout_n has to be 'many' or 'few'")
+    return (pl.col("sim_params").struct.field("clean_dmol").eq(clean_dmol) &
+            pl.col("sim_params").struct.field("clean_nmol").eq(clean_nmol) &
+            dropout_expr)
+
+df_dd.filter(dd_filter2(25, 3500, "many"))
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+shape: (23, 5)
+| uuid                               | feature                                     | label_restoration                           | label_segmentation  | sim_params                                                                                                                   |
+|------------------------------------+---------------------------------------------+---------------------------------------------+---------------------+------------------------------------------------------------------------------------------------------------------------------|
+| str                                | array[f32, 16384]                           | array[f32, 16384]                           | array[f32, 16384]   | struct[19]                                                                                                                   |
+| "34fb604b-e799-42e0-9e82-8e7070... | [2582.829346, 2937.64917, ... 3194.250488]  | [2582.829346, 2937.64917, ... 3194.250488]  | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,38,1379.898315,null,null,null} |
+| "036c4da7-3059-4404-931e-9b6002... | [2865.073242, 2802.429932, ... 2525.241943] | [2865.073242, 2802.429932, ... 2525.241943] | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,36,1379.877075,null,null,null} |
+| "7e3d563b-ee71-4ffb-b991-05986e... | [3158.827393, 3099.01709, ... 2937.622559]  | [3158.827393, 3099.01709, ... 2937.622559]  | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,39,1460.021484,null,null,null} |
+| "2b3da756-88d7-4e83-9b81-790e4b... | [2832.998779, 2282.303955, ... 2643.378174] | [2832.998779, 2282.303955, ... 2643.378174] | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,23,1328.505859,null,null,null} |
+| "7af663cf-d62b-4699-a3ad-a73913... | [2829.783936, 2776.904785, ... 2315.131348] | [2829.783936, 2776.904785, ... 2315.131348] | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,40,1450.831787,null,null,null} |
+| ...                                | ...                                         | ...                                         | ...                 | ...                                                                                                                          |
+| "6fba9811-4935-4b18-88d0-9d2de4... | [2629.106934, 2839.199463, ... 2676.842773] | [2629.106934, 2839.199463, ... 2676.842773] | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,35,1478.511841,null,null,null} |
+| "12fca900-1c23-4484-b3c7-2acd58... | [2762.321289, 2972.924805, ... 2511.83374]  | [2762.321289, 2972.924805, ... 2511.83374]  | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,30,1347.592041,null,null,null} |
+| "bb945bd7-04a6-4131-8328-c35b77... | [2726.799316, 3772.142578, ... 2556.201172] | [2726.799316, 3772.142578, ... 2556.201172] | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,22,1447.966553,null,null,null} |
+| "e38d078e-aa79-4fb3-9977-c6b2fb... | [2748.650146, 3033.24585, ... 2839.56543]   | [2748.650146, 3033.24585, ... 2839.56543]   | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,26,1482.89563,null,null,null}  |
+| "9abd34be-5bf6-49ba-aeeb-48ed6d... | [2656.391846, 3099.52417, ... 2752.408203]  | [2656.391846, 3099.52417, ... 2752.408203]  | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,38,1267.764404,null,null,null} |
+:END:
+
+#+begin_src jupyter-python
+# def corr_and_fit_simulations(data, )
+#+end_src
+
+
+#+begin_src jupyter-python
+d = 0.075
+print(get_tt(d))
+test = df_pa.filter(pl.col("sim_params").struct.field("clean_dmol").eq(d))["label_restoration"]
+cor, res, fit = autocorrelate_and_fit(
+    test[11], param_1sp, options_1sp
+)
+
+print(lmfit.fit_report(res.params))
+#+end_src
+
+#+RESULTS:
+#+begin_example
+150.28
+[[Variables]]
+    offset: -0.05588882 +/- 0.00904247 (16.18%) (init = 0.01)
+    GN0:     0.62972610 +/- 0.01287320 (2.04%) (init = 1)
+    A1:      1 (fixed)
+    txy1:    142.472589 +/- 12.8268828 (9.00%) (init = 1)
+    alpha1:  1 (fixed)
+[[Correlations]] (unreported correlations are < 0.100)
+    C(offset, txy1) = -0.6083
+    C(offset, GN0)  = -0.4864
+    C(GN0, txy1)    = -0.1892
+#+end_example
+
+
+#+begin_src jupyter-python
+df_dd.filter(dd_filter(0.075, 3500, 35))
+
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+shape: (2, 5)
+| uuid                               | feature                                     | label_restoration                           | label_segmentation  | sim_params                                                                                                                    |
+|------------------------------------+---------------------------------------------+---------------------------------------------+---------------------+-------------------------------------------------------------------------------------------------------------------------------|
+| str                                | array[f32, 16384]                           | array[f32, 16384]                           | array[f32, 16384]   | struct[19]                                                                                                                    |
+| "5874ddcd-1795-48fd-9f1e-cc9dc7... | [2972.186279, 2974.71167, ... 2906.15332]   | [2972.186279, 2974.71167, ... 2906.15332]   | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,0.075,3500,"detector_dropout","both",1500,1500,"None",null,35,1662.277954,null,null,null} |
+| "20f72f87-0c82-4193-b653-6dc258... | [3181.917236, 3275.409912, ... 2790.125488] | [3181.917236, 3275.409912, ... 2790.125488] | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,0.075,3500,"detector_dropout","both",1500,1500,"None",null,35,1954.134399,null,null,null} |
+:END:
+
+
+#+begin_src jupyter-python
+cor, res, fit = autocorrelate_and_fit(
+    pa_few_slow_broad[4, "feature"], param_2sp, options_2sp
+)
+plt.subplot(211).semilogx(cor[:, 0], cor[:, 1], "g", label="correlation")
+plt.subplot(211).semilogx(cor[:, 0], fit, 'r', label='fit')
+plt.subplot(212).semilogx(cor[:, 0], res.residual)
+print(lmfit.fit_report(res.params))
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+: [[Variables]]
+:     offset: -0.24013967 (init = 0.01)
+:     GN0:     1.51514205 (init = 1)
+:     A1:      0.00430554 (init = 1)
+:     A2:      0.99569446 (init = 1)
+:     txy1:    1.64996810 (init = 1)
+:     txy2:    382.502247 (init = 1)
+:     alpha1:  1 (fixed)
+:     alpha2:  1 (fixed)
+[[file:./.ob-jupyter/6b3fd94f9de7520f4deb3401f06e80fcc49688f1.png]]
+:END:
+
+#+begin_src jupyter-python
+nmolecule = 1 / res.params['GN0'].value
+transit_time = res.params['txy1'].value
+diffrate_calc = (float(250) / 1000)**2 / (8 * np.log(2.0) * transit_time /
+                                               1000)
+print(nmolecule)
+print(transit_time)
+print(diffrate_calc)
+
+#+end_src
+
+#+RESULTS:
+: 0.6613676929047021
+: 381.71576266091614
+: 0.02952735021570821
+
+
+#+begin_src jupyter-python
+def get_diffrate(transit_time: float, fwhm=250) -> float:
+    return round((fwhm / 1000)**2 / (8 * np.log(2.0) * transit_time / 1000), 2)
+
+def get_tt(diffrate: float, fwhm=250) -> float:
+    return round((((fwhm / 1000)**2 * 1000) / (8 * np.log(2) * diffrate)), 2)
+
+
+plot_sim_example_with_corr_fit(
+    df_pa.filter(pa_filter(0.075, 250, 0.01)), 6, param_1sp, options_1sp,
+    "Peak artifact",
+    "Fluorescence time-series, 250 molecules\n$\\tau_{{\\mathrm{{sim}}}}$ = "
+    f"{get_tt(0.075)} ms, broad peaks"
+)
+#+end_src
+
+#+RESULTS:
+[[file:./.ob-jupyter/b7375aa53dcdb70cbe931d5c151bf7762d7d0e45.png]]
+
+
+#+begin_src jupyter-python
+plot_sim_example_with_corr_fit(
+    df_pa.filter(pa_filter(25, 2000, 1)), 0, param_1sp, options_1sp,
+    "Peak artifact",
+    "Fluorescence time-series, 2000 molecules\nD = 25 $\\mu m^2$/s, steep peaks"
+)
+#+end_src
+
+#+RESULTS:
+[[file:./.ob-jupyter/7d728699fbf9c17ca70d139bbeafb5754dc2d9a8.png]]
+
+#+begin_src jupyter-python
+
+plot_sim_example_with_corr_fit(
+    df_pb.filter(pb_filter(0.075, 250, "both")), 15, param_1sp, options_1sp,
+    "Photobleaching",
+    "Fluorescence time-series, 2000 molecules\nD = 0.25 $\\mu m^2$/s, "
+    "mobile bleaching"
+)
+
+#+end_src
+
+#+RESULTS:
+[[file:./.ob-jupyter/fe45b33ae9e224d05f91a79fb5ec7405c6683376.png]]
+
+#+begin_src jupyter-python
+plot_sim_example_with_corr_fit(
+    df_pb.filter(pb_filter(25, 3500, "immobile")), 3, param_1sp, options_1sp,
+    "Photobleaching",
+    "Fluorescence time-series, 3500 molecules\nD = 25 $\\mu m^2$/s, "
+    "steep immobile bleaching"
+)
+
+#+end_src
+
+#+RESULTS:
+[[file:./.ob-jupyter/939adbe4eaa0df6e0ffaee4931be9ade05b87aa7.png]]
+
+
+#+begin_src jupyter-python
+plot_sim_example_with_corr_fit(
+    df_dd.filter(dd_filter(25, 3500, 40)), 0, param_1sp, options_1sp,
+    "Detector dropout",
+    "Fluorescence time-series, 3500 molecules\n$\\tau_{{\\mathrm{{sim}}}}$ = "
+    f"{get_tt(0.075)} ms, 36 dropouts"
+)
+
+#+end_src
+
+#+RESULTS:
+[[file:./.ob-jupyter/6ef76579767fef7c5a9c09f321b61181ed8511ef.png]]
+
+#+begin_src jupyter-python
+plot_sim_example_with_corr_fit(
+    df_dd.filter(dd_filter(0.075, 3500, 36)), 0, param_1sp, options_1sp,
+    "Detector dropout",
+    "Fluorescence time-series, 3500 molecules\n$\\tau_{{\\mathrm{{sim}}}}$ = "
+    f"{get_tt(0.075)} ms, 36 dropouts"
+)
+
+#+end_src
+
+#+RESULTS:
+[[file:./.ob-jupyter/53c94ab69ef0bae34763a71cd92663e4a781da6b.png]]
+
+
+
+#+begin_src jupyter-python
+
+plt.figure(figsize=(16,16), layout="tight")
+plt.subplot(821).plot(pa_few_slow_broad[4, "label_restoration"])
+plt.subplot(821).plot(pa_few_slow_broad[4, "feature"], alpha=0.7)
+plt.subplot(823).plot(pa_few_slow_steep[0, "label_restoration"])
+plt.subplot(823).plot(pa_few_slow_steep[0, "feature"], alpha=0.7)
+plt.subplot(825).plot(pa_few_fast_broad[0, "label_restoration"])
+plt.subplot(825).plot(pa_few_fast_broad[0, "feature"], alpha=0.7)
+plt.subplot(827).plot(pa_few_fast_steep[0, "label_restoration"])
+plt.subplot(827).plot(pa_few_fast_steep[0, "feature"], alpha=0.7)
+plt.subplot(829).plot(pa_many_slow_broad[4, "label_restoration"])
+plt.subplot(829).plot(pa_many_slow_broad[4, "feature"], alpha=0.7)
+plt.subplot(8, 2, 11).plot(pa_many_slow_steep[0, "label_restoration"])
+plt.subplot(8, 2, 11).plot(pa_many_slow_steep[0, "feature"], alpha=0.7)
+plt.subplot(8, 2, 13).plot(pa_many_fast_broad[0, "label_restoration"])
+plt.subplot(8, 2, 13).plot(pa_many_fast_broad[0, "feature"], alpha=0.7)
+plt.subplot(8, 2, 15).plot(pa_many_fast_steep[0, "label_restoration"])
+plt.subplot(8, 2, 15).plot(pa_many_fast_steep[0, "feature"], alpha=0.7)
+plt.show()
+
+# pprint(dt.row(mytrace)[4])
+
+
+#+end_src
+
+#+RESULTS:
+[[file:./.ob-jupyter/3f5e76d6890f3d0b425da6170e4e101024a96dd5.png]]
+
 
 *** test croissant
 
