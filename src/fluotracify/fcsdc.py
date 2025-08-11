@@ -492,12 +492,168 @@ class FCSFit:
         tc: lag time tau
         """
         p = param
+
         if self.equation_dim == "2D":
             if self.equation_dspecies == 1:
                 gdiff = p["a1"].value * (
                     (1 + ((tc / p["txy1"].value)**p["alpha1"].value))**-1)
+            elif self.equation_dspecies == 2:
+                gdiff = (
+                    (p["a1"].value *
+                     ((1 + (tc / p["txy1"].value)**p["alpha1"].value)**-1)) +
+                    (p["a2"].value *
+                     ((1 + (tc / p["txy2"].value)**p["alpha2"].value)**-1))
+                )
+            elif self.equation_dspecies == 3:
+                gdiff = (
+                    (p["a1"].value *
+                     ((1 + (tc / p["txy1"].value)**p["alpha1"].value)**-1)) +
+                    (p["a2"].value *
+                     ((1 + (tc / p["txy2"].value)**p["alpha2"].value)**-1)) +
+                    (p["a3"].value *
+                     ((1 + (tc / p["txy3"].value)**p["alpha3"].value)**-1))
+                )
+            else:
+                raise ValueError("equation_dspecies has to be 1, 2 or 3")
+        elif self.equation_dim == "3D":
+            if self.equation_diff3d == "tau_z":
+                if self.equation_dspecies == 1:
+                    gdiff = (
+                        p["a1"].value * (
+                            ((1 + ((tc / p["txy1"].value
+                                    )**p["alpha1"].value))**-1) *
+                            ((1 + (tc / p["tz1"].value))**-0.5)
+                        )
+                    )
+                elif self.equation_dspecies == 2:
+                    gdiff = (
+                        (p["a1"].value * (
+                            ((1 + ((tc / p["txy1"].value
+                                    )**p["alpha1"].value))**-1) *
+                            ((1 + (tc / p["tz1"].value))**-0.5)
+                        )) +
+                        (p["a2"].value * (
+                            ((1 + ((tc / p["txy2"].value
+                                    )**p["alpha2"].value))**-1) *
+                            ((1 + (tc / p["tz2"].value))**-0.5)
+                        ))
+                    )
+                elif self.equation_dspecies == 3:
+                    gdiff = (
+                        (p["a1"].value * (
+                            ((1 + ((tc / p["txy1"].value
+                                    )**p["alpha1"].value))**-1) *
+                            ((1 + (tc / p["tz1"].value))**-0.5)
+                        )) +
+                        (p["a2"].value * (
+                            ((1 + ((tc / p["txy2"].value
+                                    )**p["alpha2"].value))**-1) *
+                            ((1 + (tc / p["tz2"].value))**-0.5)
+                        )) +
+                        (p["a3"].value * (
+                            ((1 + ((tc / p["txy3"].value
+                                    )**p["alpha3"].value))**-1) *
+                            ((1 + (tc / p["tz3"].value))**-0.5)
+                        ))
+                    )
+                else:
+                    raise ValueError("equation_dspecies has to be 1, 2 or 3")
+            elif self.equation_diff3d == "aspect_ratio":
+                if self.equation_dspecies == 1:
+                    gdiff = (
+                        p["a1"].value * (
+                            ((1 + ((tc / p["txy1"].value
+                                    )**p["alpha1"].value))**-1) *
+                            ((1 + (tc / (p["txy1"].value *
+                                         (p["ar1"].value**2))))**-0.5)
+                        )
+                    )
+                elif self.equation_dspecies == 2:
+                    gdiff = (
+                        (p["a1"].value * (
+                            ((1 + ((tc / p["txy1"].value
+                                    )**p["alpha1"].value))**-1) *
+                            ((1 + (tc / (p["txy1"].value *
+                                         (p["ar1"].value**2))))**-0.5)
+                        )) +
+                        (p["a2"].value * (
+                            ((1 + ((tc / p["txy2"].value
+                                    )**p["alpha2"].value))**-1) *
+                            ((1 + (tc / (p["txy2"].value *
+                                         (p["ar2"].value**2))))**-0.5)
+                        ))
+                    )
+                elif self.equation_dspecies == 3:
+                    gdiff = (
+                        (p["a1"].value * (
+                            ((1 + ((tc / p["txy1"].value
+                                    )**p["alpha1"].value))**-1) *
+                            ((1 + (tc / (p["txy1"].value *
+                                         (p["ar1"].value**2))))**-0.5)
+                        )) +
+                        (p["a2"].value * (
+                            ((1 + ((tc / p["txy2"].value
+                                    )**p["alpha2"].value))**-1) *
+                            ((1 + (tc / (p["txy2"].value *
+                                         (p["ar2"].value**2))))**-0.5)
+                        )) +
+                        (p["a3"].value * (
+                            ((1 + ((tc / p["txy3"].value
+                                    )**p["alpha3"].value))**-1) *
+                            ((1 + (tc / (p["txy3"].value *
+                                         (p["ar3"].value**2))))**-0.5)
+                        ))
+                    )
+                else:
+                    raise ValueError("equation_dspecies has to be 1, 2 or 3")
+            else:
+                raise ValueError(
+                    "for a 3D fit, equation_diff3d has to be 'tau_z' or"
+                    "'aspect_ratio'"
+                )
+        else:
+            raise ValueError("equation_dim has to be '2D' or '3D'")
         if self.equation_triplet == "none":
             gt = 1
+        elif self.equation_triplet == "triplet_ratio":
+            if self.equation_tspecies == 1:
+                gt = 1 + (p["b1"].value * np.exp(-tc / p["taut1"].value))
+            elif self.equation_tspecies == 2:
+                gt = (1 +
+                      (p["b1"].value * np.exp(-tc / p["taut1"].value)) +
+                      (p["b2"].value * np.exp(-tc / p["taut2"].value))
+                      )
+            elif self.equation_tspecies == 3:
+                gt = (1 +
+                      (p["b1"].value * np.exp(-tc / p["taut1"].value)) +
+                      (p["b2"].value * np.exp(-tc / p["taut2"].value)) +
+                      (p["b3"].value * np.exp(-tc / p["taut3"].value))
+                      )
+            else:
+                raise ValueError("equation_tspecies has to be 1, 2 or 3")
+        elif self.equation_triplet == "triplet_fraction":
+            if self.equation_tspecies == 1:
+                gt = (1 - p["t1"].value +
+                      (p["t1"].value * np.exp(-tc / p["taut1"].value))
+                      )
+            elif self.equation_tspecies == 2:
+                gt = (1 - (p["t1"].value + p["t2"].value) +
+                      ((p["t1"].value * np.exp(-tc / p["taut1"].value)) +
+                       (p["t2"].value * np.exp(-tc / p["taut2"].value)))
+                      )
+            elif self.equation_tspecies == 3:
+                gt = (1 - (p["t1"].value + p["t2"].value + p["t3"].value) +
+                      ((p["t1"].value * np.exp(-tc / p["taut1"].value)) +
+                       (p["t2"].value * np.exp(-tc / p["taut2"].value)) +
+                       (p["t3"].value * np.exp(-tc / p["taut3"].value)))
+                      )
+            else:
+                raise ValueError("equation_tspecies has to be 1, 2 or 3")
+        else:
+            raise ValueError(
+                "equation_triplet has to be 'none', 'triplet_ratio' or "
+                "'triplet_equation'"
+            )
         return np.float32(p["offset"].value + (p["gn0"].value * gdiff * gt))
 
     def get_residual(self, param, tc, cor):
@@ -555,7 +711,7 @@ class SimulatedFCSCorrelationAndFit():
     uuid: uuid.UUID
     sim_params: FCSSimParams
     corr_params: FCSCorParams
-    fit_params: FCSFitParams
+    fit_params: FCSFit
 
 
 
