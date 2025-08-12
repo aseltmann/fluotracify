@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
+import datetime
 import lmfit
 import logging
+import multipletau
 import numpy as np
 import polars as pl
-import uuid
+import uuid as uuid_module
 
 from dataclasses import dataclass, field, astuple, asdict
 from typing import Literal, Any
@@ -133,6 +135,7 @@ class FCSTimeSeries:
     """Holds exactly one FCS time-series including"""
 
     name: str
+    date: datetime.date | datetime.datetime
     channel: int
     bin: float
     size: int
@@ -141,30 +144,54 @@ class FCSTimeSeries:
     kcount: int | float | None = field(init=False)
     brightness_nandb: int | float | None = field(init=False)
     number_nandb: int | float | None = field(init=False)
-    correlation: FCSCorrelation | ProcessedFCSCorrelation | None = None
 
     def __eq__(self, other):
         return dc_eq(self, other)
 
     def __post_init__(self):
-        # counting statistics
+        if isinstance(self.date, datetime.datetime):
+            self.date = self.date.date()
         self.kcount, self.brightness_nandb, self.number_nandb = photon_counting_stats(
             self.trace, self.scale
         )
 
-        log.debug(
-            "FCSTimeSeries: kcount: %s, brightness: %s, number: %s",
-            self.kcount,
-            self.brightness_nandb,
-            self.number_nandb,
+        # log.debug(
+        #     "FCSTimeSeries: kcount: %s, brightness: %s, number: %s",
+        #     self.kcount,
+        #     self.brightness_nandb,
+        #     self.number_nandb,
+        # )
+
+    def to_dict(self) -> dict:
+        return asdict(self)
+
+    def to_polars(self) -> pl.DataFrame:
+        ts_params = {k: v for k, v in self.to_dict().items()
+                     if k not in ["scale", "trace"]}
+        ts_params_schema = {
+            "bin": pl.Float32, "channel": pl.UInt32, "date": pl.Date,
+            "name": pl.String, "size": pl.UInt32, "kcount": pl.Float32,
+            "brightness_nandb": pl.Float32, "number_nandb": pl.Float32,
+        }
+        out = pl.DataFrame(
+            {"scale": [self.scale], "trace": [self.trace],
+             "ts_params": ts_params},
+            schema={
+                "scale": pl.Array(pl.Float32, shape=(self.size)),
+                "trace": pl.Array(pl.Float32, shape=(self.size)),
+                "ts_params": pl.Struct(ts_params_schema)
+            }
         )
+        return out
+
 
 class FCSTimeSeriesLabel(FCSTimeSeries):
     kcount: int | float | None = None
     brightness_nandb: int | float | None = None
     number_nandb: int | float | None = None
     def __post_init__(self):
-        pass
+        if isinstance(self.date, datetime.datetime):
+            self.date = self.date.date()
 
 @dataclass
 class ProcessedFCSTimeSeries(FCSTimeSeries):
@@ -211,53 +238,56 @@ class FCSSimParams:
         self.pos_x = int(self.box_width // 2)
         self.pos_y = int(self.box_height // 2)
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         return {k: v for k, v in asdict(self).items()}
 
+    def to_polars(self) -> pl.DataFrame:
+        schema = {
+             "total_sim_time": pl.Float32, "time_step": pl.Float32,
+             "psf_fwhm": pl.Float32, "psf_distance": pl.Float32,
+             "box_width": pl.UInt32, "box_height": pl.UInt32,
+             "clean_dmol": pl.Float32, "clean_nmol": pl.UInt32,
+             "sim_artifact": pl.String, "sim_label_for": pl.String,
+             "pos_x": pl.UInt32, "pos_y": pl.UInt32, "bleach_type": pl.String,
+             "bleach_exp_scale": pl.Float32, "dropout_n": pl.UInt32,
+             "dropout_maxdrop": pl.Float32, "peak_dmol": pl.Float32,
+             "peak_nmol": pl.UInt32, "peak_brightness": pl.UInt32,
+        }
+        out = pl.DataFrame(
+            {"sim_params": self.to_dict()},
+            schema={"sim_params": pl.Struct(schema)}
+        )
+        return out
 
 @dataclass
 class SimulatedFCSTimeSeries():
     """Simulated FCS time-series based on brownian motion / random walk of a
     given number of molecules. Also supports artifacts
     """
-    uuid: uuid.UUID
+    uuid: uuid_module.UUID
     sim_params: FCSSimParams
     record: dict[Literal["feature", "label_restoration", "label_segmentation"],
                  FCSTimeSeries | FCSTimeSeriesLabel] = (
         field(default_factory=dict, compare=False)
     )
-    def to_polars(self):
-        ts_schema = {}
-        for key, rec in self.record.items():
-            ts_schema = ts_schema | {
-                key: pl.Array(pl.Float32, shape=(rec.size))
-            }
-
-        out = pl.DataFrame(
-            {"uuid": str(self.uuid)} |
-            {k: [v.trace] for k, v in self.record.items()} |
-            {"sim_params": self.sim_params.to_dict()},
-            schema={
-                "uuid": pl.String
-            } | ts_schema | {
-                "sim_params": pl.Struct({
-                    "total_sim_time": pl.Float32, "time_step": pl.Float32,
-                    "psf_fwhm": pl.Float32, "box_width": pl.UInt32,
-                    "box_height": pl.UInt32, "clean_dmol": pl.Float32,
-                    "clean_nmol": pl.UInt32, "sim_artifact": pl.String,
-                    "sim_label_for": pl.String, "pos_x": pl.UInt32,
-                    "pos_y": pl.UInt32, "bleach_type": pl.String,
-                    "bleach_exp_scale": pl.Float32, "dropout_n": pl.UInt32,
-                    "dropout_maxdrop": pl.Float32, "peak_dmol": pl.Float32,
-                    "peak_nmol": pl.UInt32, "peak_brightness": pl.UInt32,
-                })
-            }
+    def to_polars(self) -> pl.DataFrame:
+        r = self.record.items()
+        rec = [v.to_polars().select("trace").rename({"trace": k}) for k, v in r]
+        if "feature" in self.record.keys():
+            ts_params = self.record["feature"].to_polars().select("ts_params")
+        else:
+            ts_params = [v.to_polars().select("ts_params") for _, v in r][0]
+        out = pl.DataFrame({"uuid": str(self.uuid)}, schema={"uuid": pl.String})
+        out = pl.concat(
+            [out, *rec, ts_params, self.sim_params.to_polars()],
+            how="horizontal"
         )
         return out
 
 
 @dataclass
-class FCSCorParams:
+class FCSCor:
+    uuid: uuid_module.UUID
     method: Literal["multipletau", "tttr2xfcs"]
     multipletau_m: int | None = None
     multipletau_deltat: float | None = None
@@ -266,6 +296,11 @@ class FCSCorParams:
     tttr2xfcs_ncascstart: int | None = None
     tttr2xfcs_ncascend: int | None = None
     tttr2xfcs_nsub: int | None = None
+    tc: np.ndarray | None = None
+    g: np.ndarray | None = None
+    sim_uuid: uuid_module.UUID | None = None
+    sim_params: FCSSimParams | None = None
+    ts_params: dict | None = None
 
     def __post_init__(self):
         if (self.method == "multipletau") & (None in [
@@ -281,12 +316,31 @@ class FCSCorParams:
                 f"if {self.method=}, the tttr2xfcs options can not be None."
             )
 
-    def to_dict(self):
+    def autocorrelate(self, input: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+        if self.method == "multipletau":
+            cor = multipletau.autocorrelate(
+                input, m=self.multipletau_m,
+                deltat=self.multipletau_deltat, normalize=self.multipletau_norm,
+                compress=self.multipletau_compress
+            )
+            self.tc = np.float32(cor[1:, 0])
+            self.g = np.float32(cor[1:, 1])
+        elif self.method == "tttr2xfcs":
+            raise NotImplementedError("tttr2xfcs is not implemented yet")
+        else:
+            raise ValueError("method has to be 'multipletau' or 'tttr2xfcs'")
+        return self.tc, self.g
+
+    def to_dict(self) -> dict:
         return {k: v for k, v in asdict(self).items()}
+
+    def to_polars(self):
+        pass
 
 
 @dataclass
 class FCSFit:
+    uuid: uuid_module.UUID
     method: Literal["lmfit"]
     params: lmfit.Parameters
     equation_dim: Literal["2D", "3D"]
@@ -297,12 +351,14 @@ class FCSFit:
     ] = "none"
     equation_tspecies: Literal[1, 2, 3] | None = None
     result_minimizer: lmfit.minimizer.MinimizerResult | None = None
-    result_tc: np.ndarray | None = None
-    result_cor: np.ndarray | None = None
     result_g: np.ndarray | None = None
     result_residual: np.ndarray | None = None
+    correlation: FCSCor | None = None
+    sim_uuid: uuid_module.UUID | None = None
+    sim_params: FCSSimParams | None = None
 
     def __post_init__(self):
+
         k = self.params.keys()
         if not set(k).issubset({
                 "offset", "gn0", "a1", "a2", "a3", "txy1", "txy2", "txy3",
@@ -482,7 +538,9 @@ class FCSFit:
                         "t1, t2, and t3, but don't set b1, b2 and b3"
                     )
 
-    def get_equation(self, param, tc):
+    def get_equation(
+            self, param: lmfit.Parameters, tc: np.ndarray
+    ) -> np.ndarray:
         """Returns output of theoretical FCS equations for fitting
         autocorrelation functions given the parameters of the dataclass
 
@@ -656,13 +714,20 @@ class FCSFit:
             )
         return np.float32(p["offset"].value + (p["gn0"].value * gdiff * gt))
 
-    def get_residual(self, param, tc, cor):
+    def get_residual(
+            self, param: lmfit.Parameters, tc: np.ndarray, cor: np.ndarray
+    ) -> np.ndarray:
         equ = self.get_equation(param, tc)
         return np.float32(cor - equ)
 
-    def minimize(self, tc, cor) -> lmfit.minimizer.MinimizerResult:
+    def minimize(
+            self, tc: np.ndarray, cor: np.ndarray
+    ) -> lmfit.minimizer.MinimizerResult:
         if self.method != "lmfit":
             raise ValueError("Currently only fitting via lmfit is supported.")
+        if (self.correlation is None
+            ) | (not isinstance(self.correlation, FCSCor)):
+            raise ValueError("for fitting, provide a correlation")
         self.result_minimizer = lmfit.minimize(
             self.get_residual, self.params, args=(tc, cor)
         )
@@ -677,8 +742,7 @@ class FCSFit:
             )
         return self.result_minimizer
 
-    def to_dict(self):
-        params_dict = {k: v for k, v in self.params.items()}
+    def get_minimizer_params(self) -> dict | None:
         if (rm_params_dict := getattr(self.result_minimizer, "params", None)
             ) is not None:
             rm_params_dict = {k: v for k, v in rm_params_dict.items()}
@@ -693,12 +757,104 @@ class FCSFit:
                    "fit_stats": rm_fitstats,
                    "call_kws": rm_callkws}
         rm_dict = None if self.result_minimizer is None else rm_dict
+        return rm_dict
+
+    def to_dict(self) -> dict:
+        rm_dict = self.get_minimizer_params()
         return {k: (v if k not in ["params", "result_minimizer"] else
-                    (params_dict if k == "params" else rm_dict))
+                    (dict(self.params) if k == "params" else rm_dict))
                 for k, v in asdict(self).items()}
 
     def to_polars(self):
-        ts_schema = {}
+        cor_params_schema = {
+            "method": pl.String, "multipletau_m": pl.UInt32,
+            "multipletau_deltat": pl.Float32, "multipletau_norm": pl.Boolean,
+            "multipletau_compress": pl.String, "tttr2xfcs_nsub": pl.UInt32,
+            "tttr2xfcs_ncascstart": pl.UInt32, "tttr2xfcs_ncascend": pl.UInt32,
+        }
+        fit_initial_params = {
+            "method": self.method, "equation_dim": self.equation_dim,
+            "equation_dspecies": self.equation_dspecies,
+            "equation_diff3d": self.equation_diff3d,
+            "equation_triplet": self.equation_triplet,
+            "equation_tspecies": self.equation_tspecies,
+            "params": dict(self.params),
+        }
+        params_schema = {v: pl.Float32 for v in [
+            "offset", "gn0", "a1", "a2", "a3", "txy1", "txy2", "txy3",
+            "alpha1", "alpha2", "alpha3", "ar1", "ar2", "ar3", "tz1", "tz2",
+            "tz3", "b1", "b2", "b3", "t1", "t2", "t3", "taut1", "taut2", "taut3"
+        ]}
+        fit_initial_schema = {
+            "method": pl.String, "equation_diff3d": pl.String,
+            "equation_dim": pl.String, "equation_dspecies": pl.UInt32,
+            "equation_triplet": pl.String, "equation_tspecies": pl.Uint32,
+            "params": pl.Struct(params_schema)
+        }
+        fit_minimizer_params = self.get_minimizer_params()
+        if fit_minimizer_params is not None:
+            fit_minimizer_params = fit_minimizer_params["result_minimizer"]
+            del fit_minimizer_params["call_kws"]
+        fit_minimizer_schema = {
+            "aborted": pl.Boolean, "success": pl.Boolean, "message": pl.String,
+            "fit_stats": pl.Struct({
+                "aic": pl.Float32, "bic": pl.Float32, "chisqr": pl.Float32,
+                "ndata": pl.UInt32, "nfev": pl.UInt32, "nfree": pl.UInt32,
+                "nvarys": pl.UInt32, "redchi": pl.Float32,
+            }),
+            "params": pl.Struct(params_schema),
+        }
+        sim_params_schema = {
+            "total_sim_time": pl.Float32, "time_step": pl.Float32,
+            "psf_fwhm": pl.Float32, "box_width": pl.UInt32,
+            "box_height": pl.UInt32, "clean_dmol": pl.Float32,
+            "clean_nmol": pl.UInt32, "sim_artifact": pl.String,
+            "sim_label_for": pl.String, "pos_x": pl.UInt32, "pos_y": pl.UInt32,
+            "bleach_type": pl.String, "bleach_exp_scale": pl.Float32,
+            "dropout_n": pl.UInt32, "dropout_maxdrop": pl.Float32,
+            "peak_dmol": pl.Float32, "peak_nmol": pl.UInt32,
+            "peak_brightness": pl.UInt32,
+        }
+        out = pl.DataFrame(
+            {"uuid": str(self.uuid)} |
+            {"cor_tc": self.cor_tc} |
+            {"cor_g": self.cor_g} |
+            {"fit_g": self.result_g} |
+            {"fit_residual": self.result_residual} |
+            {"cor_params": (None if self.cor_params is None
+                            else self.cor_params.to_dict())} |
+            {"fit_initial_params": fit_initial_params} |
+            {"fit_minimizer_params": fit_minimizer_params} |
+            {"sim_uuid": self.sim_uuid} |
+            {"sim_params": (None if self.sim_params is None
+                            else self.sim_params.to_dict())},
+            schema={
+                "uuid": pl.String,
+                "cor_tc": (
+                    pl.Array(pl.Float32, self.cor_tc.size)
+                    if self.cor_tc is not None else pl.Null
+                ),
+                "cor_g": (
+                    pl.Array(pl.Float32, self.cor_g.size)
+                    if self.cor_g is not None else pl.Null
+                ),
+                "fit_g": (
+                    pl.Array(pl.Float32, self.result_g.size)
+                    if self.result_g is not None else pl.Null
+                ),
+                "fit_residual": (
+                    pl.Array(pl.Float32, self.result_residual.size)
+                    if self.result_residual is not None else pl.Null
+                ),
+                "cor_params": pl.Struct(cor_params_schema),
+                "fit_initial_params": fit_initial_schema,
+                "fit_minimizer_params": fit_minimizer_schema,
+                "sim_uuid": pl.String,
+                "sim_params": (pl.Null if self.sim_params is None
+                               else pl.Struct(sim_params_schema))
+            }
+        )
+        return out
 
 
 
@@ -708,9 +864,9 @@ class SimulatedFCSCorrelationAndFit():
     on brownian motion / random walk of a given number of molecules with a
     given diffusion coefficient.
     """
-    uuid: uuid.UUID
+    uuid: uuid_module.UUID
     sim_params: FCSSimParams
-    corr_params: FCSCorParams
+    corr_params: FCSCor
     fit_params: FCSFit
 
 
