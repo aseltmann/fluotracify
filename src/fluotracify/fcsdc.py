@@ -298,9 +298,6 @@ class FCSCor:
     tttr2xfcs_nsub: int | None = None
     tc: np.ndarray | None = None
     g: np.ndarray | None = None
-    sim_uuid: uuid_module.UUID | None = None
-    sim_params: FCSSimParams | None = None
-    ts_params: dict | None = None
 
     def __post_init__(self):
         if (self.method == "multipletau") & (None in [
@@ -334,8 +331,46 @@ class FCSCor:
     def to_dict(self) -> dict:
         return {k: v for k, v in asdict(self).items()}
 
-    def to_polars(self):
-        pass
+    def to_polars(self) -> pl.DataFrame:
+        cor_params = {k: v for k, v in self.to_dict().items()
+                      if k not in ["tc", "g"]}
+        cor_params_schema = {
+            "uuid": pl.String, "method": pl.String, "multipletau_m": pl.UInt32,
+            "multipletau_deltat": pl.Float32, "multipletau_norm": pl.Boolean,
+            "multipletau_compress": pl.String, "tttr2xfcs_nsub": pl.UInt32,
+            "tttr2xfcs_ncascstart": pl.UInt32, "tttr2xfcs_ncascend": pl.UInt32,
+        }
+        cor_schema = (pl.Null if self.g is None
+                      else pl.Array(pl.Float32, shape=(self.g.size)))
+        out = pl.DataFrame(
+            {"tc": [self.tc], "g": [self.g], "cor_params": cor_params},
+            schema={"tc": cor_schema, "g": cor_schema,
+                    "cor_params": pl.Struct(cor_params_schema)}
+        )
+        return out
+
+@dataclass
+class SimulatedFCSTimeSeriesCor:
+    uuid: uuid_module.UUID
+    sim_params: FCSSimParams
+    record: dict[Literal["feature", "label_restoration", "label_segmentation"],
+                 FCSCor] = (
+        field(default_factory=dict, compare=False)
+    )
+    def to_polars(self) -> pl.DataFrame:
+        r = self.record.items()
+        rec = [v.to_polars().select("trace").rename({"trace": k}) for k, v in r]
+        if "feature" in self.record.keys():
+            ts_params = self.record["feature"].to_polars().select("ts_params")
+        else:
+            ts_params = [v.to_polars().select("ts_params") for _, v in r][0]
+        out = pl.DataFrame({"uuid": str(self.uuid)}, schema={"uuid": pl.String})
+        out = pl.concat(
+            [out, *rec, ts_params, self.sim_params.to_polars()],
+            how="horizontal"
+        )
+        return out
+
 
 
 @dataclass
