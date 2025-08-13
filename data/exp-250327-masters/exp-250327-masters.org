@@ -965,8 +965,6 @@ detector dropout total N=2880
 #+transclude: [[src-python/simulate_datasets.py]] :lines 1-295 :src jupyter-python
 
 
-
-
 #+begin_example
 2025-05-28 17:41:10,105 - sim - Start simulating training traces with peak artifacts
 2025-05-28 17:41:10,106 - sim - Simulating clean_dmol=0.05
@@ -1357,30 +1355,54 @@ for myfile in [
         ts = ts.to_polars().select("ts_params")
         ts_params = pl.concat([ts_params, ts], how="vertical")
     df_new = pl.concat([df, ts_params], how="horizontal")
-
-    break
+    print(f"new size: {df_new.estimated_size() / 1_000_000} MB")
+    df_new.write_parquet(f"data/exp-250327-masters/parquet/{myfile}")
 
  #+end_src
 
  #+RESULTS:
- :RESULTS:
- : Adding 'ts_params' to 2025-05-28-detector-dropout-testing.parquet ...
- shape: (576, 6)
-| uuid                               | feature                                     | label_restoration                           | label_segmentation  | sim_params                                                                                                                   | ts_params                                                                   |
-|------------------------------------+---------------------------------------------+---------------------------------------------+---------------------+------------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------|
-| str                                | array[f32, 16384]                           | array[f32, 16384]                           | array[f32, 16384]   | struct[19]                                                                                                                   | struct[8]                                                                   |
-| "eb293579-255d-4284-93fa-47c0ba... | [1135.626099, 1147.085327, ... 1538.937256] | [1135.626099, 1147.085327, ... 1538.937256] | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,0.075,2000,"detector_dropout","both",1500,1500,"None",null,0,-0.0,null,null,null}        | {1.0,1,2025-05-29,"detector_dropout",16384,1571.959229,57.667694,27.260588} |
-| "60f5849a-9628-49b6-874d-054e6a... | [1562.163452, 1580.126587, ... 1164.99292]  | [1562.163452, 1580.126587, ... 1164.99292]  | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,0.075,2000,"detector_dropout","both",1500,1500,"None",null,32,940.676514,null,null,null} | {1.0,1,2025-05-29,"detector_dropout",16384,1630.178833,36.429173,44.752003} |
-| "0a4ec249-6c0a-4756-bddb-a8621b... | [1054.559692, 1102.035156, ... 1461.77002]  | [1054.559692, 1102.035156, ... 1461.77002]  | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,0.075,2000,"detector_dropout","both",1500,1500,"None",null,6,820.669189,null,null,null}  | {1.0,1,2025-05-29,"detector_dropout",16384,1578.872437,46.706078,33.806496} |
-| "6c9becb8-efe6-485f-bead-3e7b22... | [2040.393188, 2059.102295, ... 1726.907837] | [2040.393188, 2059.102295, ... 1726.907837] | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,0.075,2000,"detector_dropout","both",1500,1500,"None",null,27,911.890442,null,null,null} | {1.0,1,2025-05-29,"detector_dropout",16384,1606.046997,51.055786,31.45863}  |
-| "1f75d3bf-abb9-43bf-8e15-3f8ec3... | [1815.183105, 1802.478271, ... 1536.903809] | [1815.183105, 1802.478271, ... 1536.903809] | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,0.075,2000,"detector_dropout","both",1500,1500,"None",null,27,851.476624,null,null,null} | {1.0,1,2025-05-29,"detector_dropout",16384,1665.149292,44.947208,37.049042} |
-| ...                                | ...                                         | ...                                         | ...                 | ...                                                                                                                          | ...                                                                         |
-| "9c78975f-f414-4bb9-b3d4-e514d7... | [2997.022461, 2771.729492, ... 2641.381592] | [2997.022461, 2771.729492, ... 2641.381592] | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,13,1558.496094,null,null,null} | {1.0,1,2025-05-29,"detector_dropout",16384,2745.165039,52.246071,52.546204} |
-| "bb945bd7-04a6-4131-8328-c35b77... | [2726.799316, 3772.142578, ... 2556.201172] | [2726.799316, 3772.142578, ... 2556.201172] | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,22,1447.966553,null,null,null} | {1.0,1,2025-05-29,"detector_dropout",16384,2743.108154,52.304886,52.447788} |
-| "e38d078e-aa79-4fb3-9977-c6b2fb... | [2748.650146, 3033.24585, ... 2839.56543]   | [2748.650146, 3033.24585, ... 2839.56543]   | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,26,1482.89563,null,null,null}  | {1.0,1,2025-05-29,"detector_dropout",16384,2739.699707,54.137253,50.609642} |
-| "9abd34be-5bf6-49ba-aeeb-48ed6d... | [2656.391846, 3099.52417, ... 2752.408203]  | [2656.391846, 3099.52417, ... 2752.408203]  | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,38,1267.764404,null,null,null} | {1.0,1,2025-05-29,"detector_dropout",16384,2740.506348,53.352455,51.369213} |
-| "1217ed2e-6126-465c-bc11-2f40ff... | [2435.778809, 2484.050781, ... 2491.924561] | [2435.778809, 2484.050781, ... 2491.924561] | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,0,-0.0,null,null,null}         | {1.0,1,2025-05-29,"detector_dropout",16384,2752.250488,47.748619,57.64394}  |
- :END:
+ #+begin_example
+ Adding 'ts_params' to 2025-05-28-detector-dropout-training.parquet ...
+ old size: 339.95376 MB
+ new size: 340.029792 MB
+ Adding 'ts_params' to 2025-05-28-detector-dropout-validation.parquet ...
+ old size: 113.31792 MB
+ new size: 113.343264 MB
+ Adding 'ts_params' to 2025-05-28-peak-artifacts-testing.parquet ...
+ old size: 226.633392 MB
+ new size: 226.681776 MB
+ Adding 'ts_params' to 2025-05-28-peak-artifacts-training.parquet ...old size: 679.900176 MB
+ new size: 680.045328 MB
+ Adding 'ts_params' to 2025-05-28-peak-artifacts-validation.parquet ...
+ old size: 226.633392 MB
+ new size: 226.681776 MB
+ Adding 'ts_params' to 2025-05-28-photobleaching-testing.parquet ...
+ old size: 226.635984 MB
+ new size: 226.684368 MB
+ Adding 'ts_params' to 2025-05-28-photobleaching-training.parquet ...
+ old size: 679.907952 MB
+ new size: 680.053104 MB
+ Adding 'ts_params' to 2025-05-28-photobleaching-validation.parquet ...
+ old size: 226.635984 MB
+ new size: 226.684368 MB
+ #+end_example
+
+*** Correlate simulated datasets
+
+#+transclude: [[./src-python/correlate_datasets.py]]  :src jupyter-python
+
+#+RESULTS:
+: Correlating traces in 2025-05-28-detector-dropout-testing.parquet ...
+: Correlating traces in 2025-05-28-detector-dropout-training.parquet ...
+: Correlating traces in 2025-05-28-detector-dropout-validation.parquet ...
+: Correlating traces in 2025-05-28-peak-artifacts-testing.parquet ...
+: Correlating traces in 2025-05-28-peak-artifacts-training.parquet ...
+: Correlating traces in 2025-05-28-peak-artifacts-validation.parquet ...
+: Correlating traces in 2025-05-28-photobleaching-testing.parquet ...
+: Correlating traces in 2025-05-28-photobleaching-training.parquet ...
+: Correlating traces in 2025-05-28-photobleaching-validation.parquet ...
+
+
 *** Load and plot simulated datasets for research internship report
 
 #+begin_src jupyter-python

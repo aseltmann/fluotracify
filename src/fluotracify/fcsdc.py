@@ -161,6 +161,13 @@ class FCSTimeSeries:
         #     self.brightness_nandb,
         #     self.number_nandb,
         # )
+    @classmethod
+    def from_polars(cls, df: pl.DataFrame):
+        par = {k: v.to_numpy()[0]
+               for k, v in df.to_dict().items() if k in ["scale", "trace"]}
+        par = par | {k: v for k, v in df["ts_params"].item().items()
+                     if not k in ["kcount", "brightness_nandb", "number_nandb"]}
+        return cls(**par)
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -237,6 +244,20 @@ class FCSSimParams:
     def __post_init__(self):
         self.pos_x = int(self.box_width // 2)
         self.pos_y = int(self.box_height // 2)
+
+    @classmethod
+    def from_polars(cls, ser: pl.Series):
+        # read in from polars Series which was exported with the to_polars()
+        # method
+        par = {k: v for k, v in ser.item().items()
+               if k not in ["pos_x", "pos_y"]}
+        # cleanup floating point errors
+        par["clean_dmol"] = round(par["clean_dmol"], 3)
+        par["peak_dmol"] = (None if par["peak_dmol"] is None
+                            else round(par["peak_dmol"], 3))
+        par["bleach_exp_scale"] = (None if par["bleach_exp_scale"] is None
+                                   else round(par["bleach_exp_scale"], 2))
+        return cls(**par)
 
     def to_dict(self) -> dict:
         return {k: v for k, v in asdict(self).items()}
@@ -359,14 +380,12 @@ class SimulatedFCSTimeSeriesCor:
     )
     def to_polars(self) -> pl.DataFrame:
         r = self.record.items()
-        rec = [v.to_polars().select("trace").rename({"trace": k}) for k, v in r]
-        if "feature" in self.record.keys():
-            ts_params = self.record["feature"].to_polars().select("ts_params")
-        else:
-            ts_params = [v.to_polars().select("ts_params") for _, v in r][0]
+        g = [v.to_polars().select("g").rename({"g": f"{k}_g"}) for k, v in r]
+        tc = [v.to_polars().select("tc") for k, v in r][0]
+        cor_params = [v.to_polars().select("cor_params") for _, v in r][0]
         out = pl.DataFrame({"uuid": str(self.uuid)}, schema={"uuid": pl.String})
         out = pl.concat(
-            [out, *rec, ts_params, self.sim_params.to_polars()],
+            [out, tc, *g, cor_params, self.sim_params.to_polars()],
             how="horizontal"
         )
         return out
