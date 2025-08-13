@@ -4,10 +4,12 @@ import lmfit
 import logging
 import multipletau
 import numpy as np
+import numpy.typing as npt
 import polars as pl
 import uuid as uuid_module
 
 from dataclasses import dataclass, field, astuple, asdict
+from pprint import pprint
 from typing import Literal, Any
 
 logging.basicConfig(format="%(asctime)s - fcsdc - %(message)s")
@@ -341,8 +343,8 @@ class FCSCor:
                 deltat=self.multipletau_deltat, normalize=self.multipletau_norm,
                 compress=self.multipletau_compress
             )
-            self.tc = np.float32(cor[1:, 0])
-            self.g = np.float32(cor[1:, 1])
+            self.tc = np.array(cor[1:, 0], dtype=np.float32)
+            self.g = np.array(cor[1:, 1], dtype=np.float32)
         elif self.method == "tttr2xfcs":
             raise NotImplementedError("tttr2xfcs is not implemented yet")
         else:
@@ -405,11 +407,9 @@ class FCSFit:
     ] = "none"
     equation_tspecies: Literal[1, 2, 3] | None = None
     result_minimizer: lmfit.minimizer.MinimizerResult | None = None
-    result_g: np.ndarray | None = None
-    result_residual: np.ndarray | None = None
-    correlation: FCSCor | None = None
-    sim_uuid: uuid_module.UUID | None = None
-    sim_params: FCSSimParams | None = None
+    tc: np.ndarray | None = None
+    g: np.ndarray | None = None
+    residual: np.ndarray | None = None
 
     def __post_init__(self):
 
@@ -594,7 +594,7 @@ class FCSFit:
 
     def get_equation(
             self, param: lmfit.Parameters, tc: np.ndarray
-    ) -> np.ndarray:
+    ) -> npt.NDArray[np.float32]:
         """Returns output of theoretical FCS equations for fitting
         autocorrelation functions given the parameters of the dataclass
 
@@ -766,33 +766,30 @@ class FCSFit:
                 "equation_triplet has to be 'none', 'triplet_ratio' or "
                 "'triplet_equation'"
             )
-        return np.float32(p["offset"].value + (p["gn0"].value * gdiff * gt))
+        return np.array(p["offset"].value + (p["gn0"].value * gdiff * gt),
+                        dtype=np.float32)
 
     def get_residual(
-            self, param: lmfit.Parameters, tc: np.ndarray, cor: np.ndarray
-    ) -> np.ndarray:
+            self, param: lmfit.Parameters, tc: np.ndarray, cor_g: np.ndarray
+    ) -> npt.NDArray[np.float32]:
         equ = self.get_equation(param, tc)
-        return np.float32(cor - equ)
+        return np.array(cor_g - equ, dtype=np.float32)
 
     def minimize(
-            self, tc: np.ndarray, cor: np.ndarray
+            self, tc: np.ndarray, cor_g: np.ndarray
     ) -> lmfit.minimizer.MinimizerResult:
         if self.method != "lmfit":
             raise ValueError("Currently only fitting via lmfit is supported.")
-        if (self.correlation is None
-            ) | (not isinstance(self.correlation, FCSCor)):
-            raise ValueError("for fitting, provide a correlation")
         self.result_minimizer = lmfit.minimize(
-            self.get_residual, self.params, args=(tc, cor)
+            self.get_residual, self.params, args=(tc, cor_g)
         )
         if self.result_minimizer is not None:
-            self.result_tc = np.float32(tc)
-            self.result_cor = np.float32(cor)
-            self.result_g = np.float32(self.get_equation(
-                self.result_minimizer.params, self.result_tc
-            ))
-            self.result_residual = self.get_residual(
-                self.result_minimizer.params, self.result_tc, cor
+            self.tc = np.array(tc, dtype=np.float32)
+            self.g = np.array(self.get_equation(
+                self.result_minimizer.params, self.tc
+            ), dtype=np.float32)
+            self.residual = self.get_residual(
+                self.result_minimizer.params, self.tc, cor_g
             )
         return self.result_minimizer
 
@@ -820,92 +817,72 @@ class FCSFit:
                 for k, v in asdict(self).items()}
 
     def to_polars(self):
-        cor_params_schema = {
-            "method": pl.String, "multipletau_m": pl.UInt32,
-            "multipletau_deltat": pl.Float32, "multipletau_norm": pl.Boolean,
-            "multipletau_compress": pl.String, "tttr2xfcs_nsub": pl.UInt32,
-            "tttr2xfcs_ncascstart": pl.UInt32, "tttr2xfcs_ncascend": pl.UInt32,
-        }
+        params_list = [
+            "offset", "gn0", "a1", "a2", "a3", "txy1", "txy2", "txy3",
+            "alpha1", "alpha2", "alpha3", "ar1", "ar2", "ar3", "tz1", "tz2",
+            "tz3", "b1", "b2", "b3", "t1", "t2", "t3", "taut1", "taut2", "taut3"
+        ]
+        p = dict(self.params)
+        params = {v: p[v] for v in params_list if v in p}  # {v: (p[v] if v in p else None) for v in params_list}
+        param = params["offset"]
         fit_initial_params = {
             "method": self.method, "equation_dim": self.equation_dim,
             "equation_dspecies": self.equation_dspecies,
             "equation_diff3d": self.equation_diff3d,
             "equation_triplet": self.equation_triplet,
             "equation_tspecies": self.equation_tspecies,
-            "params": dict(self.params),
-        }
-        params_schema = {v: pl.Float32 for v in [
-            "offset", "gn0", "a1", "a2", "a3", "txy1", "txy2", "txy3",
-            "alpha1", "alpha2", "alpha3", "ar1", "ar2", "ar3", "tz1", "tz2",
-            "tz3", "b1", "b2", "b3", "t1", "t2", "t3", "taut1", "taut2", "taut3"
-        ]}
-        fit_initial_schema = {
-            "method": pl.String, "equation_diff3d": pl.String,
-            "equation_dim": pl.String, "equation_dspecies": pl.UInt32,
-            "equation_triplet": pl.String, "equation_tspecies": pl.Uint32,
-            "params": pl.Struct(params_schema)
-        }
-        fit_minimizer_params = self.get_minimizer_params()
-        if fit_minimizer_params is not None:
-            fit_minimizer_params = fit_minimizer_params["result_minimizer"]
-            del fit_minimizer_params["call_kws"]
-        fit_minimizer_schema = {
-            "aborted": pl.Boolean, "success": pl.Boolean, "message": pl.String,
-            "fit_stats": pl.Struct({
-                "aic": pl.Float32, "bic": pl.Float32, "chisqr": pl.Float32,
-                "ndata": pl.UInt32, "nfev": pl.UInt32, "nfree": pl.UInt32,
-                "nvarys": pl.UInt32, "redchi": pl.Float32,
-            }),
-            "params": pl.Struct(params_schema),
-        }
-        sim_params_schema = {
-            "total_sim_time": pl.Float32, "time_step": pl.Float32,
-            "psf_fwhm": pl.Float32, "box_width": pl.UInt32,
-            "box_height": pl.UInt32, "clean_dmol": pl.Float32,
-            "clean_nmol": pl.UInt32, "sim_artifact": pl.String,
-            "sim_label_for": pl.String, "pos_x": pl.UInt32, "pos_y": pl.UInt32,
-            "bleach_type": pl.String, "bleach_exp_scale": pl.Float32,
-            "dropout_n": pl.UInt32, "dropout_maxdrop": pl.Float32,
-            "peak_dmol": pl.Float32, "peak_nmol": pl.UInt32,
-            "peak_brightness": pl.UInt32,
-        }
+        } | params
+        params_schema = {k: pl.Object for k, _ in params.items()}  # {v: pl.Object for v in params_list}
+        pprint(params)
+        pprint(params_schema)
+        # fit_initial_schema = {
+        #     "method": pl.String, "equation_diff3d": pl.String,
+        #     "equation_dim": pl.String, "equation_dspecies": pl.UInt32,
+        #     "equation_triplet": pl.String, "equation_tspecies": pl.UInt32,
+        # } | {params_schema}
+        # pprint(fit_initial_params)
+        # pprint(fit_initial_schema)
+        # fit_minimizer_params = self.get_minimizer_params()
+        # if fit_minimizer_params is not None:
+        #     # fit_minimizer_params["para"]
+        #     del fit_minimizer_params["call_kws"]
+        # fit_minimizer_schema = {
+        #     "aborted": pl.Boolean, "success": pl.Boolean, "message": pl.String,
+        #     "fit_stats": pl.Struct({
+        #         "aic": pl.Float32, "bic": pl.Float32, "chisqr": pl.Float32,
+        #         "ndata": pl.UInt32, "nfev": pl.UInt32, "nfree": pl.UInt32,
+        #         "nvarys": pl.UInt32, "redchi": pl.Float32,
+        #     }),
+        #     "params": pl.Struct(params_schema),
+        # }
         out = pl.DataFrame(
             {"uuid": str(self.uuid)} |
-            {"cor_tc": self.cor_tc} |
-            {"cor_g": self.cor_g} |
-            {"fit_g": self.result_g} |
-            {"fit_residual": self.result_residual} |
-            {"cor_params": (None if self.cor_params is None
-                            else self.cor_params.to_dict())} |
-            {"fit_initial_params": fit_initial_params} |
-            {"fit_minimizer_params": fit_minimizer_params} |
-            {"sim_uuid": self.sim_uuid} |
-            {"sim_params": (None if self.sim_params is None
-                            else self.sim_params.to_dict())},
+            {"tc": [self.tc]} |
+            {"g": [self.g]} |
+            {"residual": [self.residual]} |
+            {"params": dict(self.params)["offset"]},
+            # {"fit_initial_params": fit_initial_params},
+            # {"fit_minimizer_params": fit_minimizer_params},
             schema={
                 "uuid": pl.String,
-                "cor_tc": (
-                    pl.Array(pl.Float32, self.cor_tc.size)
-                    if self.cor_tc is not None else pl.Null
+                "tc": (
+                    pl.Array(pl.Float32, self.tc.size)
+                    if self.tc is not None else pl.Null
                 ),
-                "cor_g": (
-                    pl.Array(pl.Float32, self.cor_g.size)
-                    if self.cor_g is not None else pl.Null
+                "g": (
+                    pl.Array(pl.Float32, self.g.size)
+                    if self.g is not None else pl.Null
                 ),
-                "fit_g": (
-                    pl.Array(pl.Float32, self.result_g.size)
-                    if self.result_g is not None else pl.Null
+                "residual": (
+                    pl.Array(pl.Float32, self.residual.size)
+                    if self.residual is not None else pl.Null
                 ),
-                "fit_residual": (
-                    pl.Array(pl.Float32, self.result_residual.size)
-                    if self.result_residual is not None else pl.Null
-                ),
-                "cor_params": pl.Struct(cor_params_schema),
-                "fit_initial_params": fit_initial_schema,
-                "fit_minimizer_params": fit_minimizer_schema,
-                "sim_uuid": pl.String,
-                "sim_params": (pl.Null if self.sim_params is None
-                               else pl.Struct(sim_params_schema))
+                "params": pl.Object,
+                # "fit_initial_params": pl.Struct(fit_initial_schema),
+                # "fit_minimizer_params": (
+                #     pl.Struct(fit_minimizer_schema)
+                #     if fit_minimizer_params is not None else pl.Null
+                # ),
             }
         )
         return out

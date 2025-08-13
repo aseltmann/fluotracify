@@ -1417,6 +1417,7 @@ import numpy as np
 import polars as pl
 import seaborn as sns
 
+from datetime import datetime
 from multipletau import autocorrelate
 from pathlib import Path
 from pprint import pprint
@@ -1433,12 +1434,6 @@ from fluotracify.applications import equations_to_fit as eq, correlate
 logging.basicConfig(format="%(asctime)s - %(message)s")
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
-
-# correlation parameters
-cor_options = fcsdc.FCSCorParams(
-    method="multipletau", multipletau_m=16, multipletau_deltat=1.,
-    multipletau_norm=True, multipetau_compress="average"
-)
 
 # fit 2D, no triplet, 1 species
 options_1sp = {"Dimen": 1, "Diff_species": 1, "Triplet_eq": 1}
@@ -1461,19 +1456,11 @@ param_2sp.add("txy2", value=1., min=0.001, max=2000.0, vary=True)
 param_2sp.add("alpha1", value=1., min=0.6, max=2., vary=False)
 param_2sp.add("alpha2", value=1., min=0.6, max=2., vary=False)
 
+def get_diffrate(transit_time: float, fwhm=250) -> float:
+    return round((fwhm / 1000)**2 / (8 * np.log(2.0) * transit_time / 1000), 2)
 
-def autocorrelate_and_fit(
-        data, cor_options: fcsdc.FCSCorParams, fit_options: dict,
-        param: lmfit.Parameters
-):
-    cor = autocorrelate(
-        data, m=cor_options["m"], deltat=cor_options["deltat"],
-        normalize=cor_options["normalize"], compress=cor_options["compress"])
-    res = lmfit.minimize(
-        eq.residual, param, args=(cor[:, 0], cor[:, 1], options)
-    )
-    fit = eq.equation_(res.params, cor[:, 0], options)
-    return cor, res, fit
+def get_tt(diffrate: float, fwhm=250) -> float:
+    return round((((fwhm / 1000)**2 * 1000) / (8 * np.log(2) * diffrate)), 2)
 
 
 def plot_sim_example_with_corr_fit(
@@ -1525,112 +1512,29 @@ def plot_sim_example_with_corr_fit(
 #+end_src
 
 #+RESULTS:
-
-#+begin_src jupyter-python
-test = fcsdc.FCSFitParams(
-    method="lmfit", equation_dim="2D", equation_dspecies=1,
-    equation_triplet="none", lmfit_params=param_1sp,
-    offset=0.01, offset_min=-0.5, offset_max=1.5, offset_vary=True,
-    gn0=1., gn0_min=-0.0001, gn0_max=3000., gn0_vary=True,
-    a1=1., a1_min=0.0001, a1_max=1., a1_vary=False,
-    txy1=1., txy1_min=0.001, txy1_max=2000., txy1_vary=True,
-    alpha1=1., alpha1_min=0.6, alpha1_max=2., alpha1_vary=False,
-)
-
-res = lmfit.minimize(
-    test.get_residual, test.lmfit_params, args=(cor[:, 0], cor[:, 1])
-)
-# fit = eq.equation_(res.params, cor[:, 0], options)
-# equ = test.get_equation(cor[1:, 0])
-# res = cor[1:, 0] - equ
-# test
-# res
-# print(lmfit.fit_report(res.params))
-# param_1sp["A1"].value
-pprint(dict(param_1sp)["A1"])
-#+end_src
-
-#+RESULTS:
-: <Parameter 'A1', value=1.0 (fixed), bounds=[0.0001:1.0]>
-:RESULTS:
-** Fit Result
-:PROPERTIES:
-:CUSTOM_ID: fit-result
-:END:
-| fitting method      | leastsq     |
-| ​# function evals    | 4           |
-| ​# data points       | 95          |
-| ​# variables         | 3           |
-| chi-square          | 6.62174551  |
-| reduced chi-square  | 0.07197549  |
-| Akaike info crit.   | -247.034199 |
-| Bayesian info crit. | -239.372568 |
-#+caption: Fit Statistics
-
-| name   | value      | initial value | min         | max        | vary  |
-|--------+------------+---------------+-------------+------------+-------|
-| offset | 0.01000000 | 0.01          | -0.50000000 | 1.50000000 | True  |
-| GN0    | 1.00000000 | 1.0           | -1.0000e-04 | 3000.00000 | True  |
-| A1     | 1.00000000 | 1.0           | 1.0000e-04  | 1.00000000 | False |
-| txy1   | 1.00000000 | 1.0           | 1.0000e-03  | 2000.00000 | True  |
-| alpha1 | 1.00000000 | 1.0           | 0.60000000  | 2.00000000 | False |
-#+caption: Parameters
-:END:
-
-
-#+begin_src jupyter-python
-plt.semilogx(cor[1:, 0], eq.equation_(param_1sp, cor[1:, 0], options_1sp))
-#+end_src
-
+#+begin_example
+2025-08-13 17:59:06.361902: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2025-08-13 17:59:06.362314: I external/local_xla/xla/tsl/cuda/cudart_stub.cc:32] Could not find cuda drivers on your machine, GPU will not be used.
+2025-08-13 17:59:06.364197: I external/local_xla/xla/tsl/cuda/cudart_stub.cc:32] Could not find cuda drivers on your machine, GPU will not be used.
+2025-08-13 17:59:06.369396: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:467] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+E0000 00:00:1755100746.378243   42151 cuda_dnn.cc:8579] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+E0000 00:00:1755100746.380799   42151 cuda_blas.cc:1407] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+W0000 00:00:1755100746.387778   42151 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+W0000 00:00:1755100746.387789   42151 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+W0000 00:00:1755100746.387789   42151 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+W0000 00:00:1755100746.387790   42151 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+2025-08-13 17:59:06.390576: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+#+end_example
 
 #+begin_src jupyter-python
 from importlib import reload
-
 reload(fcsdc)
 #+end_src
 
 #+RESULTS:
 : <module 'fluotracify.fcsdc' from '/home/lea/Programs/drmed-git/src/fluotracify/fcsdc.py'>
-
-#+begin_src jupyter-python
-cor, res, fit = autocorrelate_and_fit(
-    test[11], param_1sp, options_1sp
-)
-test = fcsdc.FCSCorParams(method="multipletau", multipletau_m=16)
-#+end_src
-
-#+RESULTS:
-:RESULTS:
-# [goto error]
-#+begin_example
----------------------------------------------------------------------------
-ValueError                                Traceback (most recent call last)
-Cell In[459], line 4
-      1 cor, res, fit = autocorrelate_and_fit(
-      2     test[11], param_1sp, options_1sp
-      3 )
-----> 4 test = fcsdc.FCSCorParams(method="multipletau", multipletau_m=16)
-
-File <string>:11, in __init__(self, method, multipletau_m, multipletau_deltat, multipletau_norm, multipletau_compress, tttr2xfcs_ncascstart, tttr2xfcs_ncascend, tttr2xfcs_nsub)
-
-File ~/Programs/drmed-git/src/fluotracify/fcsdc.py:273, in FCSCorParams.__post_init__(self)
-    269 def __post_init__(self):
-    270     if ((self.method == "multipletau") &
-    271         ((self.multipletau_m is None) or
-    272          (self.multipletau_deltat is None) or
---> 273          (self.multipletau_norm is None) or
-    274          (self.multipletau_compress is None))):
-    275         raise ValueError(
-    276             f"if {self.method=}, the multipletau options can not be None."
-    277         )
-    278     elif ((self.method == "tttr2xfcs") &
-    279         ((self.tttr2xfcs_ncascstart is None) or
-    280          (self.tttr2xfcs_ncascend is None) or
-    281          (self.tttr2xfcs_nsub is None))):
-
-ValueError: if self.method='multipletau', the multipletau options can not be None.
-#+end_example
-:END:
 
 
 #+begin_src jupyter-python
@@ -1640,9 +1544,9 @@ df_pb = pl.read_parquet(f"data/exp-250327-masters/parquet/"
                         "2025-05-28-photobleaching-testing.parquet")
 df_dd = pl.read_parquet(f"data/exp-250327-masters/parquet/"
                         "2025-05-28-detector-dropout-testing.parquet")
-pa_meta = df_pa.select(["uuid", "sim_params"])
-pb_meta = df_pb.select(["uuid", "sim_params"])
-dd_meta = df_dd.select(["uuid", "sim_params"])
+pa_meta = df_pa.select(["uuid", "sim_params", "ts_params"])
+pb_meta = df_pb.select(["uuid", "sim_params", "ts_params"])
+dd_meta = df_dd.select(["uuid", "sim_params", "ts_params"])
 #+end_src
 
 #+RESULTS:
@@ -1685,68 +1589,287 @@ df_dd.filter(dd_filter2(25, 3500, "many"))
 
 #+RESULTS:
 :RESULTS:
-shape: (23, 5)
-| uuid                               | feature                                     | label_restoration                           | label_segmentation  | sim_params                                                                                                                   |
-|------------------------------------+---------------------------------------------+---------------------------------------------+---------------------+------------------------------------------------------------------------------------------------------------------------------|
-| str                                | array[f32, 16384]                           | array[f32, 16384]                           | array[f32, 16384]   | struct[19]                                                                                                                   |
-| "34fb604b-e799-42e0-9e82-8e7070... | [2582.829346, 2937.64917, ... 3194.250488]  | [2582.829346, 2937.64917, ... 3194.250488]  | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,38,1379.898315,null,null,null} |
-| "036c4da7-3059-4404-931e-9b6002... | [2865.073242, 2802.429932, ... 2525.241943] | [2865.073242, 2802.429932, ... 2525.241943] | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,36,1379.877075,null,null,null} |
-| "7e3d563b-ee71-4ffb-b991-05986e... | [3158.827393, 3099.01709, ... 2937.622559]  | [3158.827393, 3099.01709, ... 2937.622559]  | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,39,1460.021484,null,null,null} |
-| "2b3da756-88d7-4e83-9b81-790e4b... | [2832.998779, 2282.303955, ... 2643.378174] | [2832.998779, 2282.303955, ... 2643.378174] | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,23,1328.505859,null,null,null} |
-| "7af663cf-d62b-4699-a3ad-a73913... | [2829.783936, 2776.904785, ... 2315.131348] | [2829.783936, 2776.904785, ... 2315.131348] | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,40,1450.831787,null,null,null} |
-| ...                                | ...                                         | ...                                         | ...                 | ...                                                                                                                          |
-| "6fba9811-4935-4b18-88d0-9d2de4... | [2629.106934, 2839.199463, ... 2676.842773] | [2629.106934, 2839.199463, ... 2676.842773] | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,35,1478.511841,null,null,null} |
-| "12fca900-1c23-4484-b3c7-2acd58... | [2762.321289, 2972.924805, ... 2511.83374]  | [2762.321289, 2972.924805, ... 2511.83374]  | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,30,1347.592041,null,null,null} |
-| "bb945bd7-04a6-4131-8328-c35b77... | [2726.799316, 3772.142578, ... 2556.201172] | [2726.799316, 3772.142578, ... 2556.201172] | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,22,1447.966553,null,null,null} |
-| "e38d078e-aa79-4fb3-9977-c6b2fb... | [2748.650146, 3033.24585, ... 2839.56543]   | [2748.650146, 3033.24585, ... 2839.56543]   | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,26,1482.89563,null,null,null}  |
-| "9abd34be-5bf6-49ba-aeeb-48ed6d... | [2656.391846, 3099.52417, ... 2752.408203]  | [2656.391846, 3099.52417, ... 2752.408203]  | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,38,1267.764404,null,null,null} |
+shape: (23, 6)
+| uuid                               | feature                                     | label_restoration                           | label_segmentation  | sim_params                                                                                                                   | ts_params                                                                   |
+|------------------------------------+---------------------------------------------+---------------------------------------------+---------------------+------------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------|
+| str                                | array[f32, 16384]                           | array[f32, 16384]                           | array[f32, 16384]   | struct[19]                                                                                                                   | struct[8]                                                                   |
+| "34fb604b-e799-42e0-9e82-8e7070... | [2582.829346, 2937.64917, ... 3194.250488]  | [2582.829346, 2937.64917, ... 3194.250488]  | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,38,1379.898315,null,null,null} | {1.0,1,2025-05-29,"detector_dropout",16384,2737.382812,54.73138,50.017921}  |
+| "036c4da7-3059-4404-931e-9b6002... | [2865.073242, 2802.429932, ... 2525.241943] | [2865.073242, 2802.429932, ... 2525.241943] | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,36,1379.877075,null,null,null} | {1.0,1,2025-05-29,"detector_dropout",16384,2731.898926,53.736076,50.8423}   |
+| "7e3d563b-ee71-4ffb-b991-05986e... | [3158.827393, 3099.01709, ... 2937.622559]  | [3158.827393, 3099.01709, ... 2937.622559]  | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,39,1460.021484,null,null,null} | {1.0,1,2025-05-29,"detector_dropout",16384,2744.625977,55.90184,49.100235}  |
+| "2b3da756-88d7-4e83-9b81-790e4b... | [2832.998779, 2282.303955, ... 2643.378174] | [2832.998779, 2282.303955, ... 2643.378174] | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,23,1328.505859,null,null,null} | {1.0,1,2025-05-29,"detector_dropout",16384,2748.875488,52.918583,51.948544} |
+| "7af663cf-d62b-4699-a3ad-a73913... | [2829.783936, 2776.904785, ... 2315.131348] | [2829.783936, 2776.904785, ... 2315.131348] | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,40,1450.831787,null,null,null} | {1.0,1,2025-05-29,"detector_dropout",16384,2741.704834,55.300304,49.581501} |
+| ...                                | ...                                         | ...                                         | ...                 | ...                                                                                                                          | ...                                                                         |
+| "6fba9811-4935-4b18-88d0-9d2de4... | [2629.106934, 2839.199463, ... 2676.842773] | [2629.106934, 2839.199463, ... 2676.842773] | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,35,1478.511841,null,null,null} | {1.0,1,2025-05-29,"detector_dropout",16384,2741.281494,55.545742,49.354797} |
+| "12fca900-1c23-4484-b3c7-2acd58... | [2762.321289, 2972.924805, ... 2511.83374]  | [2762.321289, 2972.924805, ... 2511.83374]  | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,30,1347.592041,null,null,null} | {1.0,1,2025-05-29,"detector_dropout",16384,2742.931641,53.027969,51.729286} |
+| "bb945bd7-04a6-4131-8328-c35b77... | [2726.799316, 3772.142578, ... 2556.201172] | [2726.799316, 3772.142578, ... 2556.201172] | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,22,1447.966553,null,null,null} | {1.0,1,2025-05-29,"detector_dropout",16384,2743.108154,52.304886,52.447788} |
+| "e38d078e-aa79-4fb3-9977-c6b2fb... | [2748.650146, 3033.24585, ... 2839.56543]   | [2748.650146, 3033.24585, ... 2839.56543]   | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,26,1482.89563,null,null,null}  | {1.0,1,2025-05-29,"detector_dropout",16384,2739.699707,54.137253,50.609642} |
+| "9abd34be-5bf6-49ba-aeeb-48ed6d... | [2656.391846, 3099.52417, ... 2752.408203]  | [2656.391846, 3099.52417, ... 2752.408203]  | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,38,1267.764404,null,null,null} | {1.0,1,2025-05-29,"detector_dropout",16384,2740.506348,53.352455,51.369213} |
 :END:
 
 #+begin_src jupyter-python
-# def corr_and_fit_simulations(data, )
-#+end_src
+from dataclasses import dataclass, field, astuple, asdict
+from typing import Literal, Any
 
+param_1sp = lmfit.Parameters()
+param_1sp.add("offset", value=0.01, min=-0.5, max=1.5, vary=True)
+param_1sp.add("gn0", value=1., min=-0.0001, max=3000., vary=True)
+param_1sp.add("a1", value=1., min=0.0001, max=1., vary=False)
+# param_1sp.add("a2", value=1., min=0.0001, max=1., vary=False)
+# param_1sp.add("ar1", value=1., min=0.0001, max=1., vary=False)
+# param_1sp.add("ar2", value=1., min=0.0001, max=1., vary=False)
+param_1sp.add("txy1", value=1., min=0.001, max=2000., vary=True)
+# param_1sp.add("txy2", value=1., min=0.001, max=2000., vary=True)
+# param_1sp.add("taut1", value=1., min=0.001, max=2000., vary=True)
+# param_1sp.add("b1", value=1., min=0.0001, max=1., vary=False)
 
-#+begin_src jupyter-python
+# param_1sp.add("tz1", value=1., min=0.001, max=2000., vary=True)
+# param_1sp.add("tz2", value=1., min=0.001, max=2000., vary=True)
+param_1sp.add("alpha1", value=1., min=0.6, max=2., vary=False)
+# param_1sp.add("alpha2", value=1., min=0.6, max=2., vary=False)
+# param_1sp.add("alpha3", value=1., min=0.6, max=2., vary=False)
+
+# correlation parameters
 d = 0.075
 print(get_tt(d))
-test = df_pa.filter(pl.col("sim_params").struct.field("clean_dmol").eq(d))["label_restoration"]
-cor, res, fit = autocorrelate_and_fit(
-    test[11], param_1sp, options_1sp
+data = df_pa.filter(pl.col("sim_params").struct.field("clean_dmol").eq(d))
+cor = fcsdc.FCSCor(
+    uuid=data[0, "uuid"], method="multipletau", multipletau_m=16,
+    multipletau_deltat=1., multipletau_norm=True,
+    multipletau_compress="average"
 )
+cor.autocorrelate(data[0, "label_restoration"])
 
-print(lmfit.fit_report(res.params))
-#+end_src
+# plt.plot(data[0])
+# plt.show()
+# plt.semilogx(cor.tc, cor.g)
 
-#+RESULTS:
-#+begin_example
-150.28
-[[Variables]]
-    offset: -0.05588882 +/- 0.00904247 (16.18%) (init = 0.01)
-    GN0:     0.62972610 +/- 0.01287320 (2.04%) (init = 1)
-    A1:      1 (fixed)
-    txy1:    142.472589 +/- 12.8268828 (9.00%) (init = 1)
-    alpha1:  1 (fixed)
-[[Correlations]] (unreported correlations are < 0.100)
-    C(offset, txy1) = -0.6083
-    C(offset, GN0)  = -0.4864
-    C(GN0, txy1)    = -0.1892
-#+end_example
+fit = fcsdc.FCSFit(
+    uuid=data[0, "uuid"], method="lmfit", params=param_1sp, equation_dim="2D",
+    equation_dspecies=1
+)
+fit.minimize(cor.tc, cor.g)
+# fit.to_polars()
+par = dict(fit.params)
+par["offset"]
+lmfit.Parameter
 
-
-#+begin_src jupyter-python
-df_dd.filter(dd_filter(0.075, 3500, 35))
+# test = fit.to_polars()
+# test["fit_initial_params"].struct.unnest()["params"].struct.unnest()
+# plt.semilogx(cor.tc, fit.result_fit)
+# plt.show()
+# plt.show()
+# plt.semilogx(cor[:, 0], res.residual)
+# equ = test.get_equation(cor[1:, 0])
+# res = cor[1:, 0] - equ
+# test
+# res
+# print(lmfit.fit_report(fit.result_minimizer))
+# param_1sp["A1"].value
+# pprint(dict(param_1sp)["A1"])
 
 #+end_src
 
 #+RESULTS:
 :RESULTS:
-shape: (2, 5)
-| uuid                               | feature                                     | label_restoration                           | label_segmentation  | sim_params                                                                                                                    |
-|------------------------------------+---------------------------------------------+---------------------------------------------+---------------------+-------------------------------------------------------------------------------------------------------------------------------|
-| str                                | array[f32, 16384]                           | array[f32, 16384]                           | array[f32, 16384]   | struct[19]                                                                                                                    |
-| "5874ddcd-1795-48fd-9f1e-cc9dc7... | [2972.186279, 2974.71167, ... 2906.15332]   | [2972.186279, 2974.71167, ... 2906.15332]   | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,0.075,3500,"detector_dropout","both",1500,1500,"None",null,35,1662.277954,null,null,null} |
-| "20f72f87-0c82-4193-b653-6dc258... | [3181.917236, 3275.409912, ... 2790.125488] | [3181.917236, 3275.409912, ... 2790.125488] | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,0.075,3500,"detector_dropout","both",1500,1500,"None",null,35,1954.134399,null,null,null} |
+: 150.28
+: <Parameter 'offset', value=0.01, bounds=[-0.5:1.5]>
+:END:
+
+
+#+begin_src jupyter-python
+fit_method = "lmfit"
+
+param_1sp = lmfit.Parameters()
+param_1sp.add("offset", value=0.01, min=-0.5, max=1.5, vary=True)
+param_1sp.add("gn0", value=1., min=-0.0001, max=3000., vary=True)
+param_1sp.add("a1", value=1., min=0.0001, max=1., vary=False)
+param_1sp.add("txy1", value=1., min=0.001, max=2000., vary=True)
+param_1sp.add("alpha1", value=1., min=0.6, max=2., vary=False)
+equation_dim = "2D"
+equation_dspecies = 1.
+
+for myfile in [
+        "2025-08-13-detector-dropout-testing-correlation.parquet",
+        "2025-08-13-detector-dropout-training-correlation.parquet",
+        "2025-08-13-detector-dropout-validation-correlation.parquet",
+        "2025-08-13-peak-artifacts-testing-correlation.parquet",
+        "2025-08-13-peak-artifacts-training-correlation.parquet",
+        "2025-08-13-peak-artifacts-validation-correlation.parquet",
+        "2025-08-13-photobleaching-testing-correlation.parquet",
+        "2025-08-13-photobleaching-training-correlation.parquet",
+        "2025-08-13-photobleaching-validation-correlation.parquet",
+]:
+    print(f"Fitting correlations in {myfile} ...")
+    df = pl.read_parquet(f"data/exp-250327-masters/parquet/{myfile}")
+    display(df)
+    break
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+: Fitting correlations in 2025-08-13-detector-dropout-testing-correlation.parquet ...
+shape: (576, 6)
+| uuid                               | tc                      | feature_g                           | label_restoration_g                 | cor_params                                                                                  | sim_params                                                                                                                   |
+|------------------------------------+-------------------------+-------------------------------------+-------------------------------------+---------------------------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------|
+| str                                | array[f32, 94]          | array[f32, 94]                      | array[f32, 94]                      | struct[9]                                                                                   | struct[19]                                                                                                                   |
+| "eb293579-255d-4284-93fa-47c0ba... | [1.0, 2.0, ... 14336.0] | [0.037113, 0.036914, ... 0.005014]  | [0.037113, 0.036914, ... 0.005014]  | {"eb293579-255d-4284-93fa-47c0bab09252","multipletau",16,1.0,true,"average",null,null,null} | {16384.0,1.0,250.0,4000.0,3000,3000,0.075,2000,"detector_dropout","both",1500,1500,"None",null,0,-0.0,null,null,null}        |
+| "60f5849a-9628-49b6-874d-054e6a... | [1.0, 2.0, ... 14336.0] | [0.021983, 0.021672, ... 0.001321]  | [0.020194, 0.02, ... 0.001172]      | {"60f5849a-9628-49b6-874d-054e6af291e0","multipletau",16,1.0,true,"average",null,null,null} | {16384.0,1.0,250.0,4000.0,3000,3000,0.075,2000,"detector_dropout","both",1500,1500,"None",null,32,940.676514,null,null,null} |
+| "0a4ec249-6c0a-4756-bddb-a8621b... | [1.0, 2.0, ... 14336.0] | [0.029899, 0.029663, ... -0.011451] | [0.0297, 0.029492, ... -0.011086]   | {"0a4ec249-6c0a-4756-bddb-a8621b994bcb","multipletau",16,1.0,true,"average",null,null,null} | {16384.0,1.0,250.0,4000.0,3000,3000,0.075,2000,"detector_dropout","both",1500,1500,"None",null,6,820.669189,null,null,null}  |
+| "6c9becb8-efe6-485f-bead-3e7b22... | [1.0, 2.0, ... 14336.0] | [0.031529, 0.031229, ... 0.003309]  | [0.029492, 0.029286, ... 0.003756]  | {"6c9becb8-efe6-485f-bead-3e7b225c0c2d","multipletau",16,1.0,true,"average",null,null,null} | {16384.0,1.0,250.0,4000.0,3000,3000,0.075,2000,"detector_dropout","both",1500,1500,"None",null,27,911.890442,null,null,null} |
+| "1f75d3bf-abb9-43bf-8e15-3f8ec3... | [1.0, 2.0, ... 14336.0] | [0.026905, 0.026537, ... -0.000454] | [0.025743, 0.025546, ... -0.001193] | {"1f75d3bf-abb9-43bf-8e15-3f8ec3def156","multipletau",16,1.0,true,"average",null,null,null} | {16384.0,1.0,250.0,4000.0,3000,3000,0.075,2000,"detector_dropout","both",1500,1500,"None",null,27,851.476624,null,null,null} |
+| ...                                | ...                     | ...                                 | ...                                 | ...                                                                                         | ...                                                                                                                          |
+| "9c78975f-f414-4bb9-b3d4-e514d7... | [1.0, 2.0, ... 14336.0] | [0.006496, 0.004069, ... 0.000035]  | [0.005571, 0.003122, ... 0.000017]  | {"9c78975f-f414-4bb9-b3d4-e514d7d235fe","multipletau",16,1.0,true,"average",null,null,null} | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,13,1558.496094,null,null,null} |
+| "bb945bd7-04a6-4131-8328-c35b77... | [1.0, 2.0, ... 14336.0] | [0.006382, 0.004215, ... -0.000041] | [0.005197, 0.003125, ... -0.000011] | {"bb945bd7-04a6-4131-8328-c35b77a14afd","multipletau",16,1.0,true,"average",null,null,null} | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,22,1447.966553,null,null,null} |
+| "e38d078e-aa79-4fb3-9977-c6b2fb... | [1.0, 2.0, ... 14336.0] | [0.006826, 0.004559, ... 0.00001]   | [0.005501, 0.003264, ... 0.000013]  | {"e38d078e-aa79-4fb3-9977-c6b2fb901311","multipletau",16,1.0,true,"average",null,null,null} | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,26,1482.89563,null,null,null}  |
+| "9abd34be-5bf6-49ba-aeeb-48ed6d... | [1.0, 2.0, ... 14336.0] | [0.006844, 0.00403, ... 0.000027]   | [0.005259, 0.002683, ... 0.000013]  | {"9abd34be-5bf6-49ba-aeeb-48ed6df62683","multipletau",16,1.0,true,"average",null,null,null} | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,38,1267.764404,null,null,null} |
+| "1217ed2e-6126-465c-bc11-2f40ff... | [1.0, 2.0, ... 14336.0] | [0.00538, 0.003081, ... 0.000049]   | [0.00538, 0.003081, ... 0.000049]   | {"1217ed2e-6126-465c-bc11-2f40ff12e71e","multipletau",16,1.0,true,"average",null,null,null} | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,0,-0.0,null,null,null}         |
+:END:
+
+
+#+begin_src jupyter-python
+cor_df.schema
+#+end_src
+
+#+RESULTS:
+: Schema([('uuid', String),
+:         ('tc', Array(Float32, shape=(94,))),
+:         ('feature_g', Array(Float32, shape=(94,))),
+:         ('label_restoration_g', Array(Float32, shape=(94,))),
+:         ('cor_params',
+:          Struct({'uuid': String, 'method': String, 'multipletau_m': UInt32, 'multipletau_deltat': Float32, 'multipletau_norm': Boolean, 'multipletau_compress': String, 'tttr2xfcs_nsub': UInt32, 'tttr2xfcs_ncascstart': UInt32, 'tttr2xfcs_ncascend': UInt32})),
+:         ('sim_params',
+:          Struct({'total_sim_time': Float32, 'time_step': Float32, 'psf_fwhm': Float32, 'psf_distance': Float32, 'box_width': UInt32, 'box_height': UInt32, 'clean_dmol': Float32, 'clean_nmol': UInt32, 'sim_artifact': String, 'sim_label_for': String, 'pos_x': UInt32, 'pos_y': UInt32, 'bleach_type': String, 'bleach_exp_scale': Float32, 'dropout_n': UInt32, 'dropout_maxdrop': Float32, 'peak_dmol': Float32, 'peak_nmol': UInt32, 'peak_brightness': UInt32}))])
+
+
+#+begin_src jupyter-python
+from datetime import datetime
+dt_test = pl.read_parquet(
+    f"data/exp-250327-masters/parquet/2025-05-28-detector-dropout-testing.parquet"
+)
+data = dt_test[0]
+trace = data["feature"].to_numpy()[0]
+time_step = data["sim_params"].struct.field("time_step")[0]
+size = data["feature"].to_numpy().size
+record = {
+    "feature": fcsdc.FCSTimeSeries(
+        name="detector-dropout-feature", trace=data["feature"].to_numpy()[0],
+        date=datetime.fromisoformat("2025-05-29"),
+        scale=np.arange(0, size, time_step), channel=1, bin=time_step, size=size,
+    ),
+    "label_restoration": fcsdc.FCSTimeSeriesLabel(
+        name="detector-dropout-label-restoration",
+        trace=data["label_restoration"].to_numpy()[0],
+        date=datetime.fromisoformat("2025-05-29"),
+        scale=np.arange(0, size, time_step), channel=1, bin=time_step, size=size,
+    )
+}
+
+test = fcsdc.SimulatedFCSTimeSeries(
+    uuid=data["uuid"][0], sim_params=sim_params, record=record
+)
+df = test.record["feature"].to_polars().select("ts_params")
+# df = pl.DataFrame()
+# pl.concat([df, *pols], how="horizontal")
+test.record["feature"].to_polars()
+# print(pols[0])
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+shape: (1, 3)
+| scale                   | trace                                       | ts_params                                                                           |
+|-------------------------+---------------------------------------------+-------------------------------------------------------------------------------------|
+| array[f32, 16384]       | array[f32, 16384]                           | struct[8]                                                                           |
+| [0.0, 1.0, ... 16383.0] | [1135.626099, 1147.085327, ... 1538.937256] | {1.0,1,2025-05-29,"detector-dropout-feature",16384,1571.959229,57.667694,27.260588} |
+:END:
+
+
+#+begin_src jupyter-python
+plt.semilogx(fit.result_tc, cor[:, 1])
+plt.semilogx(fit.result_tc, fit.result_g)
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+| <matplotlib.lines.Line2D | at | 0x7f4232b4eb10> |
+[[file:./.ob-jupyter/dc74eeeddfc39e599c86259c3663014f2800b98b.png]]
+:END:
+
+#+begin_src jupyter-python
+test = fit.to_dict()["result_minimizer"]
+test.keys()
+#+end_src
+
+#+RESULTS:
+: dict_keys(['aborted', 'success', 'message', 'params', 'fit_stats', 'call_kws'])
+
+
+#+begin_src jupyter-python
+fit.result_residual[0]
+#+end_src
+
+#+RESULTS:
+: np.float32(-0.016290966)
+
+
+#+begin_src jupyter-python
+res = fit.result_minimizer
+pprint(res.status)
+pprint(res.covar)
+pprint(res.flatchain)
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+: False
+: 'Fit succeeded.'
+# [goto error]
+: ---------------------------------------------------------------------------
+: AttributeError                            Traceback (most recent call last)
+: Cell In[319], line 4
+:       2 pprint(res.aborted)
+:       3 pprint(res.message)
+: ----> 4 pprint(res.status)
+:       5 pprint(res.success)
+:       6 pprint(res.covar)
+: 
+: AttributeError: 'MinimizerResult' object has no attribute 'status'
+:END:
+
+#+begin_src jupyter-python
+res
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+:PROPERTIES:
+:CUSTOM_ID: fit-result
+:END:
+| fitting method      | leastsq     |
+| ​# function evals    | 37          |
+| ​# data points       | 95          |
+| ​# variables         | 3           |
+| chi-square          | 0.08295621  |
+| reduced chi-square  | 9.0170e-04  |
+| Akaike info crit.   | -663.115327 |
+| Bayesian info crit. | -655.453697 |
+#+caption: Fit Statistics
+
+| name   | value       | standard error | relative error | initial value | min         | max        | vary  |
+|--------+-------------+----------------+----------------+---------------+-------------+------------+-------|
+| offset | -0.02715254 | 0.00546698     | (20.13%)       | 0.01          | -0.50000000 | 1.50000000 | True  |
+| gn0    | 0.47930675  | 0.00961368     | (2.01%)        | 1.0           | -1.0000e-04 | 3000.00000 | True  |
+| a1     | 1.00000000  | 0.00000000     | (0.00%)        | 1.0           | 1.0000e-04  | 1.00000000 | False |
+| txy1   | 79.7048917  | 6.55525339     | (8.22%)        | 1.0           | 1.0000e-03  | 2000.00000 | True  |
+| alpha1 | 1.00000000  | 0.00000000     | (0.00%)        | 1.0           | 0.60000000  | 2.00000000 | False |
+#+caption: Parameters
+
+| Parameter1 | Parameter 2 | Correlation |
+|------------+-------------+-------------|
+| offset     | txy1        | -0.5643     |
+| gn0        | txy1        | -0.3842     |
+| offset     | gn0         | -0.3402     |
+#+caption: Correlations (unreported values are < 0.100)
 :END:
 
 
@@ -1792,11 +1915,6 @@ print(diffrate_calc)
 
 
 #+begin_src jupyter-python
-def get_diffrate(transit_time: float, fwhm=250) -> float:
-    return round((fwhm / 1000)**2 / (8 * np.log(2.0) * transit_time / 1000), 2)
-
-def get_tt(diffrate: float, fwhm=250) -> float:
-    return round((((fwhm / 1000)**2 * 1000) / (8 * np.log(2) * diffrate)), 2)
 
 
 plot_sim_example_with_corr_fit(
