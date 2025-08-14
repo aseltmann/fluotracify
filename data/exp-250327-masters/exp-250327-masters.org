@@ -1402,6 +1402,86 @@ for myfile in [
 : Correlating traces in 2025-05-28-photobleaching-training.parquet ...
 : Correlating traces in 2025-05-28-photobleaching-validation.parquet ...
 
+*** Fit simulated datasets
+
+#+transclude: [[./src-python/fit_datasets.py]]  :src jupyter-python
+
+#+RESULTS:
+: Fitting correlations in 2025-08-13-detector-dropout-testing-correlation.parquet ...
+: Fitting correlations in 2025-08-13-detector-dropout-training-correlation.parquet ...
+: Fitting correlations in 2025-08-13-detector-dropout-validation-correlation.parquet ...
+: Fitting correlations in 2025-08-13-peak-artifacts-testing-correlation.parquet ...
+: Fitting correlations in 2025-08-13-peak-artifacts-training-correlation.parquet ...
+: Fitting correlations in 2025-08-13-peak-artifacts-validation-correlation.parquet ...
+: Fitting correlations in 2025-08-13-photobleaching-testing-correlation.parquet ...
+: Fitting correlations in 2025-08-13-photobleaching-training-correlation.parquet ...
+: Fitting correlations in 2025-08-13-photobleaching-validation-correlation.parquet ...
+
+Now, plot some examples with very high residuals to check if the fitting
+parameters are sensible. I compute the normalized root mean square error
+(NRMSE) - the MSE is a goodness of fit measure, the root makes sure that it is
+in the same units as the data, and the normalization makes FCS fits with
+different G ranges comparable (more molecules = smaller G)
+
+#+begin_src jupyter-python
+def nrmse(predictions: pl.Series, targets: pl.Series) -> pl.Expr:
+    """Normalized Root Mean Square Error, normalization by mean of targets"""
+    rmse = (predictions - targets).pow(2).mean().sqrt()
+    return rmse / targets.mean()
+pl.struct
+
+
+for myfile in [
+        # "2025-08-14-detector-dropout-training-fit.parquet",
+        "2025-08-14-peak-artifacts-training-fit.parquet",
+        "2025-08-14-photobleaching-training-fit.parquet",
+]:
+    df = pl.read_parquet(f"data/exp-250327-masters/parquet/{myfile}")
+    df_cor = pl.read_parquet(f"data/exp-250327-masters/parquet/2025-08-13-peak-artifacts-training-correlation.parquet")
+    record = "feature_g"
+    df_nrmse = pl.concat([df.select(record).rename({record: "fit"}),
+                          df_cor.select(record).rename({record: "cor"})], how="horizontal")
+    df_nrmse = df_nrmse.with_columns(
+        (pl.col("fit") - pl.col("cor")).alias("nrmse")) # df_nrmse = df_nrmse["nrmse"].map_elements(lambda x: np.pow(x, 2))
+    display(df_nrmse.select("nrmse").to_series()
+            .map_elements(lambda x: np.sqrt(np.mean(np.pow(x, 2))) / pl.))
+    # df_nrmse = df.select(record).to_series() - cors
+    # display(cors)
+    # display(df_nrmse.map_elements(lambda x: np.sqrt(np.mean(np.pow(x, 2))), return_dtype=df_nrmse.dtype))
+    # display(df_nrmse)
+
+    # display(df["feature_residual"])
+    # df_hichi = df.filter(pl.col("feature_minimizer_params").struct.field("fit_stats").struct.field("chisqr") > 10)
+    # myex = 4
+    # mycor = df_cor.filter(pl.col("uuid") == df_hichi[myex, "uuid"])
+    # plt.semilogx(mycor[0, "tc"], mycor[0, "feature_g"])
+    # plt.semilogx(df_hichi[myex, "tc"], df_hichi[myex, "feature_g"])
+
+    break
+
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+: /tmp/ipykernel_5642/3556985986.py:20: MapWithoutReturnDtypeWarning: Calling `map_elements` without specifying `return_dtype` can lead to unpredictable results. Specify `return_dtype` to silence this warning.
+:   display(df_nrmse.select("nrmse").to_series().map_elements(lambda x: np.sqrt(np.mean(np.pow(x, 2)))))
+shape: (3_456,)
+| nrmse    |
+|----------|
+| f64      |
+| 0.141888 |
+| 0.044284 |
+| 0.087316 |
+| 0.05401  |
+| 0.106771 |
+| ...      |
+| 0.001391 |
+| 0.00203  |
+| 0.001881 |
+| 0.000981 |
+| 0.000885 |
+:END:
+
 
 *** Load and plot simulated datasets for research internship report
 
