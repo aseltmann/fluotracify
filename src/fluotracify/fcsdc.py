@@ -815,6 +815,28 @@ class FCSFit:
         return {k: (v if k not in ["params", "result_minimizer"] else
                     (dict(self.params) if k == "params" else rm_dict))
                 for k, v in asdict(self).items()}
+    def lmfit_parameters_to_dict(self, params: lmfit.Parameters) -> dict:
+        params_list = [
+            "offset", "gn0", "a1", "a2", "a3", "txy1", "txy2", "txy3",
+            "alpha1", "alpha2", "alpha3", "ar1", "ar2", "ar3", "tz1", "tz2",
+            "tz3", "b1", "b2", "b3", "t1", "t2", "t3", "taut1", "taut2", "taut3"
+        ]
+        param_empty = {
+            "value": None, "min": None, "max": None, "vary": None,
+            "stderr": None
+        }
+        params_dict = {}
+        for p in params_list:
+            v = params[p] if p in params.keys() else None
+            if v is None:
+                param_dict = param_empty
+            else:
+                param_dict = {
+                    "value": v.value, "min": v.min, "max": v.max,
+                    "vary": v.vary, "stderr": v.stderr
+                }
+            params_dict[p] = param_dict
+        return params_dict
 
     def to_polars(self):
         params_list = [
@@ -822,47 +844,47 @@ class FCSFit:
             "alpha1", "alpha2", "alpha3", "ar1", "ar2", "ar3", "tz1", "tz2",
             "tz3", "b1", "b2", "b3", "t1", "t2", "t3", "taut1", "taut2", "taut3"
         ]
-        p = dict(self.params)
-        params = {v: p[v] for v in params_list if v in p}  # {v: (p[v] if v in p else None) for v in params_list}
-        param = params["offset"]
-        fit_initial_params = {
+
+        param_schema = {"value": pl.Float32, "min": pl.Float32, "max": pl.Float32,
+                        "vary": pl.Boolean, "stderr": pl.Float32}
+        params_schema = {p: pl.Struct(param_schema) for p in params_list}
+
+        params = self.lmfit_parameters_to_dict(self.params)
+        initial_params = {
             "method": self.method, "equation_dim": self.equation_dim,
             "equation_dspecies": self.equation_dspecies,
             "equation_diff3d": self.equation_diff3d,
             "equation_triplet": self.equation_triplet,
-            "equation_tspecies": self.equation_tspecies,
-        } | params
-        params_schema = {k: pl.Object for k, _ in params.items()}  # {v: pl.Object for v in params_list}
-        pprint(params)
-        pprint(params_schema)
-        # fit_initial_schema = {
-        #     "method": pl.String, "equation_diff3d": pl.String,
-        #     "equation_dim": pl.String, "equation_dspecies": pl.UInt32,
-        #     "equation_triplet": pl.String, "equation_tspecies": pl.UInt32,
-        # } | {params_schema}
-        # pprint(fit_initial_params)
-        # pprint(fit_initial_schema)
-        # fit_minimizer_params = self.get_minimizer_params()
-        # if fit_minimizer_params is not None:
-        #     # fit_minimizer_params["para"]
-        #     del fit_minimizer_params["call_kws"]
-        # fit_minimizer_schema = {
-        #     "aborted": pl.Boolean, "success": pl.Boolean, "message": pl.String,
-        #     "fit_stats": pl.Struct({
-        #         "aic": pl.Float32, "bic": pl.Float32, "chisqr": pl.Float32,
-        #         "ndata": pl.UInt32, "nfev": pl.UInt32, "nfree": pl.UInt32,
-        #         "nvarys": pl.UInt32, "redchi": pl.Float32,
-        #     }),
-        #     "params": pl.Struct(params_schema),
-        # }
+            "equation_tspecies": self.equation_tspecies, "params": params
+        }
+        initial_schema = {
+            "method": pl.String, "equation_diff3d": pl.String,
+            "equation_dim": pl.String, "equation_dspecies": pl.UInt32,
+            "equation_triplet": pl.String, "equation_tspecies": pl.UInt32,
+            "params": pl.Struct(params_schema)
+        }
+        minimizer_params = self.get_minimizer_params()
+        if minimizer_params is not None:
+            minimizer_params["params"] = self.lmfit_parameters_to_dict(
+                minimizer_params["params"]
+            )
+            del minimizer_params["call_kws"]
+        minimizer_schema = {
+            "aborted": pl.Boolean, "success": pl.Boolean, "message": pl.String,
+            "fit_stats": pl.Struct({
+                "aic": pl.Float32, "bic": pl.Float32, "chisqr": pl.Float32,
+                "ndata": pl.UInt32, "nfev": pl.UInt32, "nfree": pl.UInt32,
+                "nvarys": pl.UInt32, "redchi": pl.Float32,
+            }),
+            "params": pl.Struct(params_schema),
+        }
         out = pl.DataFrame(
             {"uuid": str(self.uuid)} |
             {"tc": [self.tc]} |
             {"g": [self.g]} |
             {"residual": [self.residual]} |
-            {"params": dict(self.params)["offset"]},
-            # {"fit_initial_params": fit_initial_params},
-            # {"fit_minimizer_params": fit_minimizer_params},
+            {"initial_params": initial_params} |
+            {"minimizer_params": minimizer_params},
             schema={
                 "uuid": pl.String,
                 "tc": (
@@ -877,12 +899,11 @@ class FCSFit:
                     pl.Array(pl.Float32, self.residual.size)
                     if self.residual is not None else pl.Null
                 ),
-                "params": pl.Object,
-                # "fit_initial_params": pl.Struct(fit_initial_schema),
-                # "fit_minimizer_params": (
-                #     pl.Struct(fit_minimizer_schema)
-                #     if fit_minimizer_params is not None else pl.Null
-                # ),
+                "initial_params": pl.Struct(initial_schema),
+                "minimizer_params": (
+                    pl.Struct(minimizer_schema)
+                    if minimizer_params is not None else pl.Null
+                ),
             }
         )
         return out
