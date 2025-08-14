@@ -283,7 +283,7 @@ class FCSSimParams:
         return out
 
 @dataclass
-class SimulatedFCSTimeSeries():
+class SimulatedFCSTimeSeries:
     """Simulated FCS time-series based on brownian motion / random walk of a
     given number of molecules. Also supports artifacts
     """
@@ -336,13 +336,27 @@ class FCSCor:
                 f"if {self.method=}, the tttr2xfcs options can not be None."
             )
 
-    def autocorrelate(self, input: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    @classmethod
+    def from_polars(cls, df: pl.DataFrame):
+        par = {k: v.to_numpy()[0]
+               for k, v in df.to_dict().items() if k in ["tc", "g"]}
+        par = par | {k: v for k, v in df["cor_params"].item().items()}
+        return cls(**par)
+
+    def autocorrelate(
+            self, input: np.ndarray
+    ) -> tuple[npt.NDArray[np.float32], npt.NDArray[np.float32]]:
         if self.method == "multipletau":
+            assert self.multipletau_m is not None
+            assert self.multipletau_deltat is not None
+            assert self.multipletau_norm is not None
+            assert self.multipletau_compress is not None
             cor = multipletau.autocorrelate(
                 input, m=self.multipletau_m,
                 deltat=self.multipletau_deltat, normalize=self.multipletau_norm,
                 compress=self.multipletau_compress
             )
+            assert isinstance(cor, np.ndarray)
             self.tc = np.array(cor[1:, 0], dtype=np.float32)
             self.g = np.array(cor[1:, 1], dtype=np.float32)
         elif self.method == "tttr2xfcs":
@@ -383,7 +397,7 @@ class SimulatedFCSTimeSeriesCor:
     def to_polars(self) -> pl.DataFrame:
         r = self.record.items()
         g = [v.to_polars().select("g").rename({"g": f"{k}_g"}) for k, v in r]
-        tc = [v.to_polars().select("tc") for k, v in r][0]
+        tc = [v.to_polars().select("tc") for _, v in r][0]
         cor_params = [v.to_polars().select("cor_params") for _, v in r][0]
         out = pl.DataFrame({"uuid": str(self.uuid)}, schema={"uuid": pl.String})
         out = pl.concat(
@@ -604,6 +618,11 @@ class FCSFit:
         tc: lag time tau
         """
         p = param
+        if self.equation_dspecies == 2:
+            p["a2"].value = 1.0 - p["a1"].value
+        elif self.equation_dspecies == 3:
+            p["a2"].value = 1.0 - p["a1"].value - p["a3"].value
+            p["a3"].value = 1.0 - p["a2"].value - p["a1"].value
 
         if self.equation_dim == "2D":
             if self.equation_dspecies == 1:
@@ -786,10 +805,10 @@ class FCSFit:
         if self.result_minimizer is not None:
             self.tc = np.array(tc, dtype=np.float32)
             self.g = np.array(self.get_equation(
-                self.result_minimizer.params, self.tc
+                getattr(self.result_minimizer, "params"), self.tc
             ), dtype=np.float32)
             self.residual = self.get_residual(
-                self.result_minimizer.params, self.tc, cor_g
+                getattr(self.result_minimizer, "params"), self.tc, cor_g
             )
         return self.result_minimizer
 
@@ -805,6 +824,7 @@ class FCSFit:
                    "success": getattr(self.result_minimizer, "success", None),
                    "message": getattr(self.result_minimizer, "message", None),
                    "params": rm_params_dict,
+                   "fit_report": lmfit.fit_report(self.result_minimizer),
                    "fit_stats": rm_fitstats,
                    "call_kws": rm_callkws}
         rm_dict = None if self.result_minimizer is None else rm_dict
@@ -812,9 +832,13 @@ class FCSFit:
 
     def to_dict(self) -> dict:
         rm_dict = self.get_minimizer_params()
-        return {k: (v if k not in ["params", "result_minimizer"] else
-                    (dict(self.params) if k == "params" else rm_dict))
-                for k, v in asdict(self).items()}
+        out = {
+            k: (v if k not in ["params", "result_minimizer"]
+                else (dict(self.params) if k == "params" else rm_dict))
+            for k, v in asdict(self).items()
+        }
+        return out
+
     def lmfit_parameters_to_dict(self, params: lmfit.Parameters) -> dict:
         params_list = [
             "offset", "gn0", "a1", "a2", "a3", "txy1", "txy2", "txy3",
@@ -876,7 +900,7 @@ class FCSFit:
                 "ndata": pl.UInt32, "nfev": pl.UInt32, "nfree": pl.UInt32,
                 "nvarys": pl.UInt32, "redchi": pl.Float32,
             }),
-            "params": pl.Struct(params_schema),
+            "fit_report": pl.String, "params": pl.Struct(params_schema),
         }
         out = pl.DataFrame(
             {"uuid": str(self.uuid)} |
@@ -911,16 +935,32 @@ class FCSFit:
 
 
 @dataclass
-class SimulatedFCSCorrelationAndFit():
-    """Multipletau correlation and lmfit fit of simulated FCS time-series based
-    on brownian motion / random walk of a given number of molecules with a
-    given diffusion coefficient.
-    """
+class SimulatedFCSTimeSeriesFit:
     uuid: uuid_module.UUID
     sim_params: FCSSimParams
-    corr_params: FCSCor
-    fit_params: FCSFit
+    record: dict[Literal["feature", "label_restoration", "label_segmentation"],
+                 FCSFit] = (
+        field(default_factory=dict, compare=False)
+    )
 
+    def to_polars(self) -> pl.DataFrame:
+        r = self.record.items()
+        tc = [v.to_polars().select("tc") for _, v in r][0]
+        g = [v.to_polars().select("g").rename({"g": f"{k}_g"}) for k, v in r]
+        res = [v.to_polars().select("residual")
+               .rename({"residual": f"{k}_residual"}) for k, v in r]
+        ini_p = [v.to_polars().select("initial_params")
+                 .rename({"initial_params": f"{k}_initial_params"})
+                 for k, v in r]
+        min_p = [v.to_polars().select("minimizer_params")
+                 .rename({"minimizer_params": f"{k}_minimizer_params"})
+                 for k, v in r]
+        out = pl.DataFrame({"uuid": str(self.uuid)}, schema={"uuid": pl.String})
+        out = pl.concat(
+            [out, tc, *g, *res, *ini_p, *min_p, self.sim_params.to_polars()],
+            how="horizontal"
+        )
+        return out
 
 
 @dataclass
