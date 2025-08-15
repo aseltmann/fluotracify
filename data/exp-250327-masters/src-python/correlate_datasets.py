@@ -56,9 +56,7 @@ for myfile in [
                 record[s.name] = fcsdc.FCSTimeSeriesLabel.from_polars(ts)
         sim_params = fcsdc.FCSSimParams.from_polars(row["sim_params"])
         sim_ts = fcsdc.SimulatedFCSTimeSeries(
-            uuid=row["uuid"].item(),
-            sim_params=sim_params,
-            record=record
+            uuid=row["uuid"].item(), sim_params=sim_params, record=record
         )
         cor_record = {}
         for k, rec in sim_ts.record.items():
