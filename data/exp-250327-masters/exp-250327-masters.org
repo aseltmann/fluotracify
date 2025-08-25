@@ -1349,7 +1349,7 @@ for myfile in [
 
 *** Correlate simulated datasets
 
-#+transclude: [[./src-python/correlate_datasets.py]]  :src jupyter-python
+#+transclude: [[./2025-05-28-simulations/src-python/correlate_datasets.py]]  :src jupyter-python
 
 #+RESULTS:
 : Correlating traces in 2025-05-28-detector-dropout-testing.parquet ...

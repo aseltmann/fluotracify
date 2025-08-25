@@ -34,7 +34,9 @@ for myfile in [
         "2025-05-28-photobleaching-validation.parquet",
 ]:
     print(f"Correlating traces in {myfile} ...")
-    df = pl.read_parquet(f"data/exp-250327-masters/parquet/{myfile}")
+    df = pl.read_parquet(
+        f"data/exp-250327-masters/2025-05-28-simulations/parquet/{myfile}"
+    )
     stop = df["sim_params"].struct.field("total_sim_time")
     step = df["sim_params"].struct.field("time_step")
     cor_df = pl.DataFrame()
@@ -78,4 +80,6 @@ for myfile in [
     out_first = out_file[0].split("-")[3:]
     out_date = datetime.today().date()
     out_file = f"{out_date}-{'-'.join(out_first)}-correlation.{out_file[1]}"
-    cor_df.write_parquet(f"data/exp-250327-masters/parquet/{out_file}")
+    cor_df.write_parquet(
+        f"data/exp-250327-masters/2025-05-28-simulations/parquet/{out_file}"
+    )
