@@ -1344,9 +1344,9 @@ for myfile in [
 : Correlating traces in 2025-05-28-photobleaching-training.parquet ...
 : Correlating traces in 2025-05-28-photobleaching-validation.parquet ...
 
-*** Fit simulated datasets
+*** Fit simulated datasets and compute fit and quality parameters
 
-#+transclude: [[./src-python/fit_datasets.py]] :lines 1-76 :src jupyter-python
+#+transclude: [[./2025-05-28-simulations/src-python/fit_datasets.py]] :lines 1-77 :src jupyter-python
 
 #+RESULTS:
 : Fitting correlations in 2025-08-13-detector-dropout-testing-correlation.parquet ...
@@ -1359,15 +1359,13 @@ for myfile in [
 : Fitting correlations in 2025-08-13-photobleaching-training-correlation.parquet ...
 : Fitting correlations in 2025-08-13-photobleaching-validation-correlation.parquet ...
 
-**** Extract fit and quality parameters
-
 Now, plot some examples with very high residuals to check if the fitting
 parameters are sensible. I compute the normalized root mean square error
 (NRMSE) - the MSE is a goodness of fit measure, the root makes sure that it is
 in the same units as the data, and the normalization makes FCS fits with
 different G ranges comparable (more molecules = smaller G)
 
-#+transclude: [[./src-python/fit_datasets.py]] :lines 79-190 :src jupyter-python
+#+transclude: [[./2025-05-28-simulations/src-python/fit_datasets.py]] :lines 80-191 :src jupyter-python
 
 #+RESULTS:
 :RESULTS:
@@ -1388,7 +1386,7 @@ shape: (17_280, 28)
 | "fff969bd-45e0-4aaa-8f45-41c69b... | [1.0, 2.0, ... 14336.0] | {16384.0,1.0,250.0,4000.0,3000,3000,0.5,50,"photobleaching","both",1500,1500,"both",0.1,null,null,null,null,null}            | {false,true,"Fit succeeded.",{-607.513062,-599.883179,0.137595,94,30,91,3,0.001512},"[[Fit Statistics]]     # fitting method   = leastsq     # function evals   = 30     # data points      = 94     # variables        = 3     chi-square         = 0.13759511     reduced chi-square = 0.00151203     Akaike info crit   = -607.513056     Bayesian info crit = -599.883172 [[Variables]]     offset: -0.02695305 +/- 0.00588899 (21.85%) (init = 0.01)     gn0:     1.22609115 +/- 0.02148070 (1.75%) (init = 1)     a1:      1 (fixed)     txy1:    21.2255557 +/- 1.10820682 (5.22%) (init = 1)     alpha1:  1 (fixed) [[Correlations]] (unreported correlations are < 0.100)     C(gn0, txy1)    = -0.7291     C(offset, txy1) = -0.4771",{{-0.026953,-0.5,1.5,true,0.005889},{1.226091,-0.0001,3000.0,true,0.021481},{1.0,0.0001,1.0,false,0.0},{null,null,null,null,null},{null,null,null,null,null},{21.225555,0.001,2000.0,true,1.108207},{null,null,null,null,null},{null,null,null,null,null},{1.0,0.6,2.0,false,0.0},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null}}}                                       | [1.143972, 1.093557, ... -0.02514]  | [-0.007737, -0.004393, ... -0.048446] | [1.136236, 1.089164, ... -0.073586] | [85.462898, 91.559509, ... 32.769947]       | {1.0,1,2025-05-29,"photobleaching",16384,46.978233,68.888069,0.681992}      | 0.029346 | 94    | 3      | 0.137595 | 0.001512  | "photobleaching"   | "label_restoration" | 21.225555  | 0.8156    | 0.5        | 50         | null      | null      | 0.1              | "both"      | null      | null            | 0.98667  | 0.53      |
 :END:
 
-#+transclude: [[./src-python/fit_datasets.py]] :lines 191-192 :src jupyter-python
+#+transclude: [[./2025-05-28-simulations/src-python/fit_datasets.py]] :lines 192-193 :src jupyter-python
 
 #+RESULTS:
 

@@ -18,6 +18,7 @@ sys.path.append(FLUOTRACIFY_PATH.as_posix())
 
 from fluotracify import fcsdc
 
+workdir = "data/exp-250327-masters/2025-05-28-simulations/parquet"
 fit_method = "lmfit"
 
 param_1sp = lmfit.Parameters()
@@ -41,7 +42,7 @@ for myfile in [
         "2025-08-13-photobleaching-validation-correlation.parquet",
 ]:
     print(f"Fitting correlations in {myfile} ...")
-    df = pl.read_parquet(f"data/exp-250327-masters/parquet/{myfile}")
+    df = pl.read_parquet(f"{workdir}/{myfile}")
     fit_df = pl.DataFrame()
     for idx, row in enumerate(df.iter_slices(n_rows=1)):
         cor_record = {}
@@ -73,7 +74,7 @@ for myfile in [
     out_first = "-".join(out_first).rstrip("-correlation")
     out_date = datetime.today().date()
     out_file = f"{out_date}-{out_first}-fit.{out_file[1]}"
-    fit_df.write_parquet(f"data/exp-250327-masters/parquet/{out_file}")
+    fit_df.write_parquet(f"{workdir}/{out_file}")
 
 
 def nrmse(cor: pl.Series, fit: pl.Series) -> np.ndarray:
@@ -105,12 +106,12 @@ for myfile in [
         "2025-08-14-peak-artifacts-training-fit.parquet",
         "2025-08-14-photobleaching-training-fit.parquet",
 ]:
-    df = pl.read_parquet(f"data/exp-250327-masters/parquet/{myfile}")
+    df = pl.read_parquet(f"{workdir}/{myfile}")
     stem = myfile.lstrip("2025-08-14").rstrip("-fit.parquet")
     corfile = f"2025-08-13-{stem}-correlation.parquet"
     tsfile = f"2025-05-28-{stem}.parquet"
-    df_cor = pl.read_parquet(f"data/exp-250327-masters/parquet/{corfile}")
-    df_ts = pl.read_parquet(f"data/exp-250327-masters/parquet/{tsfile}")
+    df_cor = pl.read_parquet(f"{workdir}/{corfile}")
+    df_ts = pl.read_parquet(f"{workdir}/{tsfile}")
     df_record = pl.DataFrame()
     for record in ["feature_g", "label_restoration_g"]:
         minimizer = f"{record.rstrip('_g')}_minimizer_params"
@@ -189,4 +190,4 @@ for myfile in [
 
 display(df_eval)
 out_file = "2025-08-14-fit-quality.parquet"
-df_eval.write_parquet(f"data/exp-250327-masters/parquet/{out_file}")
+df_eval.write_parquet(f"{workdir}/{out_file}")
