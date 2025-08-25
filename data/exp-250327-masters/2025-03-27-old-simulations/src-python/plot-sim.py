@@ -13,24 +13,16 @@ os.chdir("/home/lea/Programs/drmed-git")
 FLUOTRACIFY_PATH = "./src/"
 sys.path.append(FLUOTRACIFY_PATH)
 
-from fluotracify.simulations import import_simulation_from_csv as isfc
+from fluotracify.simulations import (import_simulation_from_csv as isfc,
+                                     analyze_simulations as ans)
 
 sns.set_theme(style="whitegrid", font_scale=2, palette='colorblind',
               context='paper')
 
-def convert_diffcoeff_to_transittimes(diff, fwhm=250):
-    tt = ((fwhm / 1000)**2 * 1000) / (8 * np.log(2) * diff)
-    tt_log = np.log(tt)
-    # tt_0dot05 = 0.05 * tt_log
-    tt_0dot1 = 0.1 * tt_log
-    tt_low_high = sorted([np.exp(tt_log - tt_0dot1),
-                          np.exp(tt_log + tt_0dot1)])
-    return tt, tt_low_high
-
 def get_tt(dr):
     dr = dr.removesuffix('-3000.0').removesuffix('-7000.0').removesuffix('-1000.0')
     dr = float(dr)
-    tt, _ = convert_diffcoeff_to_transittimes(dr, 250)
+    tt, _ = ans.convert_diffcoeff_to_transittimes(dr, 250)
     return f'\nsimulated trace\n$\\tau_{{sim}}={tt:.2f}ms$'
 
 def save_plot(filename, txt):
@@ -40,6 +32,8 @@ def save_plot(filename, txt):
     plt.savefig(f'{plot_file}.pdf', bbox_inches='tight', dpi=300)
     os.system(f'pdf2svg {plot_file}.pdf {plot_file}.svg')
     os.system(f'rm {plot_file}.pdf')
+
+today = datetime.date.today()
 
 # ----------------------- Detector Dropout ---------------------------------
 folder = (
@@ -105,7 +99,8 @@ sim_labels.columns = sim_columns
 sim_labbool = sim_labels < lab_thresh
 sim_labbool.columns = sim_columns
 
-filename = f"./data/exp-250327-masters/jupyter/{datetime.date.today()}-detdrop"
+filename = (f"./data/exp-250327-masters/{today}-old-simulations/"
+            "jupyter/{today}-detdrop")
 plot_index = ["0.5", "5.0"]
 plot_traceno = [0, 0]
 for i, (idx, t) in enumerate(zip(plot_index, plot_traceno)):
@@ -201,7 +196,8 @@ sim_labels.columns = sim_columns
 sim_labbool = sim_labels > lab_thresh
 sim_labbool.columns = sim_columns
 
-filename = f"./data/exp-250327-masters/jupyter/{datetime.date.today()}-bleach"
+filename = (f"./data/exp-250327-masters/{today}-old-simulations/"
+            "jupyter/{datetime.date.today()}-bleach")
 plot_index = ["0.5-3000.0", "0.5-7000.0", "5.0-1000.0", "5.0-7000.0"]
 plot_traceno = [3, 1, 0, 2]
 for i, (idx, t) in enumerate(zip(plot_index, plot_traceno)):
@@ -214,7 +210,7 @@ for i, (idx, t) in enumerate(zip(plot_index, plot_traceno)):
     sns.lineplot(data=sim_labbool_scaled, alpha=0.5)
     plt.fill_between(x=sim_labbool.loc[:, idx].iloc[:, t].index,
                      y1=sim_labbool_scaled,
-                     y2=0, alpha=0.5, label='label:\ndetector dropout')
+                     y2=0, alpha=0.5, label='label:\nphotobleaching')
 
     ax.set_prop_cycle(color=[sns.color_palette()[2]])
     sim_invbool_scaled = sim_dirty.loc[:, idx].iloc[
@@ -226,4 +222,4 @@ for i, (idx, t) in enumerate(zip(plot_index, plot_traceno)):
     sns.lineplot(data=sim_dirty.loc[:, idx].iloc[:, t], label=txt)
     plt.legend(bbox_to_anchor=(1.02, 1), loc='upper left', borderaxespad=0)
     plt.setp(ax, xlabel=r'Time [$ms$]', ylabel=r'Intensity [a.u.]', title='')
-    save_plot(filename, f'{txt}-{i}')
+    save_plot(filename, f'{txt}-{idx.lstrip("0.5-").lstrip("5.0-")}-{i}')
