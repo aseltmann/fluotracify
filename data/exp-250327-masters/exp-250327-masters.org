@@ -720,46 +720,15 @@ Name: diffusion rate of molecules, dtype: int64
 *** Simulate peak artifacts, photobleaching and detector dropout
 
 #+begin_src jupyter-python
-import importlib
-importlib.reload(fcsdc)
-importlib.reload(stwa)
-importlib.reload(sm)
-#+end_src
-
-#+RESULTS:
-: <module 'fluotracify.simulations.simulation_methods' from '/home/lea/Programs/drmed-git/src/fluotracify/simulations/simulation_methods.py'>
-
-
-#+begin_src jupyter-python
-import copy
-import datetime
 import logging
 import os
 import sys
-import uuid
-
-import matplotlib.pyplot as plt
-import numpy as np
-import numpy.typing as npt
-import pandas as pd
-import polars as pl
-import seaborn as sns
-import scipy.stats as sst
-
-from dataclasses import dataclass, replace, field, astuple
-from pathlib import Path
-from pprint import pprint
-from typing import Literal, Any
-from tqdm.auto import tqdm, trange
 
 os.chdir("/home/lea/Programs/drmed-git")
 FLUOTRACIFY_PATH = Path("/home/lea/Programs/drmed-git/src/")
 sys.path.append(FLUOTRACIFY_PATH.as_posix())
 
-from fluotracify import fcsdc
 from fluotracify.simulations import (
-    simulate_trace_with_artifact as stwa,
-    simulation_methods as sm,
     analyze_simulations as ans,
 )
 
@@ -770,15 +739,7 @@ logging.basicConfig(format="%(asctime)s - %(message)s")
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 
-def save_simulated_fcsts_record(
-        fcsts: fcsdc.SimulatedFCSTimeSeries
-) -> None:
-    pass
-
-
 #+end_src
-
-
 
 #+RESULTS:
 
@@ -824,7 +785,6 @@ print(50, "\n", ans.convert_diffcoeff_to_transittimes(50))
 50
  (np.float64(0.22542110013890052), [np.float64(0.1942200320567072), np.float64(0.26163455875136327)])
 #+end_example
-
 
 
 #+begin_src jupyter-python
@@ -891,7 +851,7 @@ bleach_type: mobile, immobile, both
 bleach_exp_scale: 16 values: 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, ... , 0.16
 detector_dropout: all random
 
-#+transclude: [[src-python/simulate_datasets.py]] :lines 1-113 :src jupyter-python
+#+transclude: [[2025-05-28-simulations/src-python/simulate_datasets.py]] :lines 1-119 :src jupyter-python
 
 #+RESULTS:
 
@@ -962,7 +922,7 @@ detector dropout total N=2880
 #+end_example
 
 
-#+transclude: [[src-python/simulate_datasets.py]] :lines 1-295 :src jupyter-python
+#+transclude: [[2025-05-28-simulations/src-python/simulate_datasets.py]] :lines 1-288 :src jupyter-python
 
 
 #+begin_example
@@ -1058,7 +1018,7 @@ detector dropout total N=2880
 
 There was a typo in the photobleaching testing code, so I ran that part again:
 
-#+transclude: [[src-python/simulate_datasets.py]] :lines 296-317 :src jupyter-python
+#+transclude: [[2025-05-28-simulations/src-python/simulate_datasets.py]] :lines 289-309 :src jupyter-python
 
 #+RESULTS:
 : 2025-05-28 23:10:32,445 - sim - Start simulating testing traces with photobleaching artifacts

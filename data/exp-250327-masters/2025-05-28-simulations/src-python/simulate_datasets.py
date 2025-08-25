@@ -117,6 +117,7 @@ CLEAN_TEST_DETDROP = {
 DETDROP_NREPEATS = 48
 
 rng = np.random.default_rng(seed=42)
+outdir = "data/exp-250327-masters/2025-05-28-simulations/parquet"
 # -------------------------- PEAK ARTIFACTS --------------------------
 sim_artifact = "peak_artifacts"
 # training data
@@ -137,8 +138,7 @@ for clean_dmol, clean_nmol_list in CLEAN_TRAIN.items():
                    )
                 dc = stwa.perform_simulation(sim_params, rng)
                 df = pl.concat([df, dc.to_polars()], how="vertical")
-out = (f"data/exp-250327-masters/parquet/{datetime.date.today()}-peak-"
-       "artifacts-training.parquet")
+out = (f"{outdir}/{datetime.date.today()}-peak-artifacts-training.parquet")
 df.write_parquet(out)
 log.debug(f"Saved training traces with peak artifacts as {out}")
 # validation data
@@ -159,8 +159,7 @@ for clean_dmol, clean_nmol_list in CLEAN_VAL.items():
                    )
                 dc = stwa.perform_simulation(sim_params, rng)
                 df = pl.concat([df, dc.to_polars()], how="vertical")
-out = (f"data/exp-250327-masters/parquet/{datetime.date.today()}-peak-"
-       "artifacts-validation.parquet")
+out = (f"{outdir}/{datetime.date.today()}-peak-artifacts-validation.parquet")
 df.write_parquet(out)
 log.debug(f"Saved validation traces with peak artifacts as {out}")
 # testing data
@@ -181,8 +180,7 @@ for clean_dmol, clean_nmol_list in CLEAN_TEST.items():
                    )
                 dc = stwa.perform_simulation(sim_params, rng)
                 df = pl.concat([df, dc.to_polars()], how="vertical")
-out = (f"data/exp-250327-masters/parquet/{datetime.date.today()}-peak-"
-       "artifacts-testing.parquet")
+out = (f"{outdir}/{datetime.date.today()}-peak-artifacts-testing.parquet")
 df.write_parquet(out)
 log.debug(f"Saved testing traces with peak artifacts as {out}")
 # -------------------------- DETECTOR DROPOUT --------------------------
@@ -203,8 +201,7 @@ for clean_dmol, clean_nmol_list in CLEAN_TRAIN_DETDROP.items():
                )
             dc = stwa.perform_simulation(sim_params, rng)
             df = pl.concat([df, dc.to_polars()], how="vertical")
-out = (f"data/exp-250327-masters/parquet/{datetime.date.today()}-detector-"
-       "dropout-training.parquet")
+out = (f"{outdir}/{datetime.date.today()}-detector-dropout-training.parquet")
 df.write_parquet(out)
 log.debug(f"Saved training traces with detector dropout as {out}")
 # validation data
@@ -223,8 +220,7 @@ for clean_dmol, clean_nmol_list in CLEAN_VAL_DETDROP.items():
                )
             dc = stwa.perform_simulation(sim_params, rng)
             df = pl.concat([df, dc.to_polars()], how="vertical")
-out = (f"data/exp-250327-masters/parquet/{datetime.date.today()}-detector-"
-       "dropout-validation.parquet")
+out = (f"{outdir}/{datetime.date.today()}-detector-dropout-validation.parquet")
 df.write_parquet(out)
 log.debug(f"Saved validation traces with detector dropout as {out}")
 # testing data
@@ -243,8 +239,7 @@ for clean_dmol, clean_nmol_list in CLEAN_TEST_DETDROP.items():
                )
             dc = stwa.perform_simulation(sim_params, rng)
             df = pl.concat([df, dc.to_polars()], how="vertical")
-out = (f"data/exp-250327-masters/parquet/{datetime.date.today()}-detector-"
-       "dropout-testing.parquet")
+out = (f"{outdir}/{datetime.date.today()}-detector-dropout-testing.parquet")
 df.write_parquet(out)
 log.debug(f"Saved testing traces with detector dropout as {out}")
 # -------------------------- PHOTOBLEACHING --------------------------
@@ -267,8 +262,7 @@ for clean_dmol, clean_nmol_list in CLEAN_TRAIN.items():
                    )
                 dc = stwa.perform_simulation(sim_params, rng)
                 df = pl.concat([df, dc.to_polars()], how="vertical")
-out = (f"data/exp-250327-masters/parquet/{datetime.date.today()}-"
-       "photobleaching-training.parquet")
+out = (f"{outdir}/{datetime.date.today()}-photobleaching-training.parquet")
 df.write_parquet(out)
 log.debug(f"Saved training traces with photobleaching as {out}")
 # validation data
@@ -289,8 +283,7 @@ for clean_dmol, clean_nmol_list in CLEAN_VAL.items():
                    )
                 dc = stwa.perform_simulation(sim_params, rng)
                 df = pl.concat([df, dc.to_polars()], how="vertical")
-out = (f"data/exp-250327-masters/parquet/{datetime.date.today()}-"
-       "photobleaching-validation.parquet")
+out = (f"{outdir}/{datetime.date.today()}-photobleaching-validation.parquet")
 df.write_parquet(out)
 log.debug(f"Saved validation traces with photobleaching as {out}")
 # testing data
@@ -311,7 +304,6 @@ for clean_dmol, clean_nmol_list in CLEAN_TEST.items():
                    )
                 dc = stwa.perform_simulation(sim_params, rng)
                 df = pl.concat([df, dc.to_polars()], how="vertical")
-out = (f"data/exp-250327-masters/parquet/{datetime.date.today()}-"
-       "photobleaching-testing.parquet")
+out = (f"{outdir}/{datetime.date.today()}-photobleaching-testing.parquet")
 df.write_parquet(out)
 log.debug(f"Saved testing traces with photobleaching as {out}")
