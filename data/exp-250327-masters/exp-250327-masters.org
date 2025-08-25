@@ -341,8 +341,9 @@
     'MPLBACKEND': 'module://matplotlib_inline.backend_inline'}
    #+end_example
 
-*** Plot simulated detector dropout
-#+transclude: [[src-python/plot-sim.py]] :lines 1-72 :src jupyter-python
+*** 2025-03-27-old-simulations
+**** Plot simulated detector dropout
+#+transclude: [[2025-03-27-old-simulations/src-python/plot-sim.py]] :lines 1-68 :src jupyter-python
 
 #+RESULTS:
 :RESULTS:
@@ -363,7 +364,7 @@ Name: diffusion rate of molecules, dtype: int64
 #+end_example
 :END:
 
-#+transclude: [[src-python/plot-sim.py]] :lines 74-79 :src jupyter-python
+#+transclude: [[src-python/plot-sim.py]] :lines 70-79 :src jupyter-python
 
 #+RESULTS:
 :RESULTS:
@@ -499,14 +500,14 @@ Name: diffusion rate of molecules, dtype: int64
 | 75 | traces_rand_Aug2019_set029.csv | 16000                    |
 :END:
 
-#+transclude: [[src-python/plot-sim.py]] :lines 81-106 :src jupyter-python
+#+transclude: [[2025-03-27-old-simulations/src-python/plot-sim.py]] :lines 81-106 :src jupyter-python
 
 #+RESULTS:
 : 2025-03-27 17:02:30,352 - 1/2: ../drmed-collections/2019-08-sim-detector-dropout/d5p0-nmol5000/traces_rand_Aug2019_set027.csv
 : 2025-03-27 17:02:31,483 - 2/2: ../drmed-collections/2019-08-sim-detector-dropout/d0p5-nmol5000/traces_rand_Aug2019_set015.csv
 : 2025-03-27 17:02:31,495 - The given DataFrame was split into 2 parts with shapes: [(20000, 200), (20000, 200)]
 
-#+transclude: [[src-python/plot-sim.py]] :lines 108-133 :src jupyter-python
+#+transclude: [[2025-03-27-old-simulations/src-python/plot-sim.py]] :lines 108-134 :src jupyter-python
 
 #+RESULTS:
 :RESULTS:
@@ -514,33 +515,14 @@ Name: diffusion rate of molecules, dtype: int64
 [[file:./.ob-jupyter/7cd19184da0385e8d53f71dd9de4c757ced42ea0.png]]
 :END:
 
-*** Plot simulated photobleaching
+**** Plot simulated photobleaching
 import libraries if not done before
-#+transclude: [[src-python/plot-sim.py]] :lines 1-34 :src jupyter-python
+#+transclude: [[2025-03-27-old-simulations/src-python/plot-sim.py]] :lines 1-37 :src jupyter-python
 
 #+RESULTS:
 
-:RESULTS:
-: 0.5
-|    | path and file name             | number of fast molecules | number of bleached molecules |
-|----+--------------------------------+--------------------------+------------------------------|
-| 13 | traces_rand_Sep2019_set036.csv | 7000                     | 14000                        |
-| 64 | traces_rand_Sep2019_set042.csv | 5000                     | 10000                        |
-| 84 | traces_rand_Sep2019_set062.csv | 10000                    | 20000                        |
-| 92 | traces_rand_Sep2019_set023.csv | 3000                     | 6000                         |
-: 1.0
-|    | path and file name             | number of fast molecules | number of bleached molecules |
-|----+--------------------------------+--------------------------+------------------------------|
-| 2  | traces_rand_Sep2019_set073.csv | 5000                     | 10000                        |
-| 8  | traces_rand_Sep2019_set053.csv | 7000                     | 14000                        |
-| 19 | traces_rand_Sep2019_set030.csv | 4000                     | 8000                         |
-| 23 | traces_rand_Sep2019_set015.csv | 6000                     | 12000                        |
-|
-#+end_example
-# [goto error]
-:END:
 
-#+transclude: [[src-python/plot-sim.py]] :lines 127-157 :src jupyter-python
+#+transclude: [[2025-03-27-old-simulations/src-python/plot-sim.py]] :lines 136-167 :src jupyter-python
 
 #+RESULTS:
 :RESULTS:
@@ -562,7 +544,7 @@ Name: diffusion rate of molecules, dtype: int64
 #+end_example
 :END:
 
-#+transclude: [[src-python/plot-sim.py]] :lines 159-165 :src jupyter-python
+#+transclude: [[2025-03-27-old-simulations/src-python/plot-sim.py]] :lines 169-165 :src jupyter-python
 
 #+RESULTS:
 :RESULTS:
@@ -698,7 +680,7 @@ Name: diffusion rate of molecules, dtype: int64
 | 95 | traces_rand_Sep2019_set084.csv | 7000                     | 14000                        |
 :END:
 
-#+transclude: [[src-python/plot-sim.py]] :lines 167-194 :src jupyter-python
+#+transclude: [[2025-03-27-old-simulations/src-python/plot-sim.py]] :lines 167-206 :src jupyter-python
 
 #+RESULTS:
 : 2025-03-27 16:56:43,119 - 1/4: ../drmed-collections/2019-09-sim-photobleaching/d5p0-nmol1000-nbleach2000/traces_rand_Sep2019_set020.csv
@@ -707,7 +689,7 @@ Name: diffusion rate of molecules, dtype: int64
 : 2025-03-27 16:56:46,475 - 4/4: ../drmed-collections/2019-09-sim-photobleaching/d0p5-nmol3000-nbleach6000/traces_rand_Sep2019_set023.csv
 : 2025-03-27 16:56:46,503 - The given DataFrame was split into 2 parts with shapes: [(20000, 400), (20000, 400)]
 
-#+transclude: [[src-python/plot-sim.py]] :lines 196-221 :src jupyter-python
+#+transclude: [[2025-03-27-old-simulations/src-python/plot-sim.py]] :lines 208-234 :src jupyter-python
 
 #+RESULTS:
 :RESULTS:

@@ -8,6 +8,7 @@ import pandas as pd
 import seaborn as sns
 
 from pathlib import Path
+from IPython.display import display
 
 os.chdir("/home/lea/Programs/drmed-git")
 FLUOTRACIFY_PATH = "./src/"
@@ -41,9 +42,7 @@ folder = (
     "/drmed-collections/drmed-simexps/secondartefact_Aug2019_rand"
 )
 files = list(Path(folder).rglob("*.csv"))
-
 nfiles = len(files)
-
 exp_pars = pd.DataFrame()
 
 for idx, myfile in enumerate(files):
@@ -51,13 +50,17 @@ for idx, myfile in enumerate(files):
     exp_par = pd.read_csv(
         myfile, sep=",", nrows=9, index_col=0, usecols=[0, 1], engine="python"
     ).squeeze("columns")
-    exp_pars = pd.concat([exp_pars, exp_par], axis=1, ignore_index=True, sort=False)
+    exp_pars = pd.concat(
+        [exp_pars, exp_par], axis=1, ignore_index=True, sort=False
+    )
 
 exp_pars.loc["path and file name"] = exp_pars.loc["path and file name"].apply(
     lambda x: Path(x).name
 )
-exp_pars_num = exp_pars.loc["extent of the PSF":"height of the simulation"].apply(
-    pd.to_numeric
+exp_pars_num = (
+    exp_pars
+    .loc["extent of the PSF":"height of the simulation"]
+    .apply(pd.to_numeric)
 )
 for i in ["number of fast molecules", "diffusion rate of molecules"]:
     exp_pars_num.loc[i].plot(kind="hist", title=f"{i}")
@@ -68,9 +71,12 @@ print(exp_pars.loc["diffusion rate of molecules"].value_counts())
 for mol in sorted(exp_pars_num.loc["diffusion rate of molecules"].unique()):
     myidx = exp_pars_num.loc["diffusion rate of molecules"].eq(mol)
     myfiles = exp_pars.loc["path and file name", myidx]
-    display(f"{mol}",
-            exp_pars.loc[["path and file name", "number of fast molecules"],
-                         exp_pars.loc["path and file name"].isin(myfiles)].T)
+    display(f"{mol}", (
+        exp_pars
+        .loc[["path and file name", "number of fast molecules"],
+             exp_pars.loc["path and file name"].isin(myfiles)]
+        .T
+    ))
 
 sim_path = Path("../drmed-collections/2019-08-sim-detector-dropout")
 col_per_example = 2
@@ -134,9 +140,7 @@ folder = (
     "/drmed-collections/drmed-simexps/thirdartefact_Sep2019"
 )
 files = list(Path(folder).rglob("*.csv"))
-
 nfiles = len(files)
-
 exp_pars = pd.DataFrame()
 
 for idx, myfile in enumerate(files):
@@ -144,13 +148,16 @@ for idx, myfile in enumerate(files):
     exp_par = pd.read_csv(
         myfile, sep=",", nrows=10, index_col=0, usecols=[0, 1], engine="python"
     ).squeeze("columns")
-    exp_pars = pd.concat([exp_pars, exp_par], axis=1, ignore_index=True, sort=False)
-
+    exp_pars = pd.concat(
+        [exp_pars, exp_par], axis=1, ignore_index=True, sort=False
+    )
 exp_pars.loc["path and file name"] = exp_pars.loc["path and file name"].apply(
     lambda x: Path(x).name
 )
-exp_pars_num = exp_pars.loc["extent of the PSF":"height of the simulation"].apply(
-    pd.to_numeric
+exp_pars_num = (
+    exp_pars
+    .loc["extent of the PSF":"height of the simulation"]
+    .apply(pd.to_numeric)
 )
 for i in ["number of fast molecules", "number of bleached molecules",
           "diffusion rate of molecules"]:
@@ -162,10 +169,12 @@ print(exp_pars.loc["diffusion rate of molecules"].value_counts())
 for mol in sorted(exp_pars_num.loc["diffusion rate of molecules"].unique()):
     myidx = exp_pars_num.loc["diffusion rate of molecules"].eq(mol)
     myfiles = exp_pars.loc["path and file name", myidx]
-    display(f"{mol}",
-            exp_pars.loc[["path and file name", "number of fast molecules",
-                          "number of bleached molecules"],
-                         exp_pars.loc["path and file name"].isin(myfiles)].T)
+    display(f"{mol}", (
+        exp_pars.loc[["path and file name", "number of fast molecules",
+                      "number of bleached molecules"],
+                     exp_pars.loc["path and file name"].isin(myfiles)]
+        .T
+    ))
 
 sim_path = Path("../drmed-collections/2019-09-sim-photobleaching")
 col_per_example = 2
