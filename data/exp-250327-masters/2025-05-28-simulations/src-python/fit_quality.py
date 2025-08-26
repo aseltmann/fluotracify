@@ -186,7 +186,7 @@ def fitres(
     elif x == "n":
         xlab = "measured molecule number n"
     elif x == "redchi":
-        xlab = "reduced chi-square"
+        xlab = "$\\chi^2_{\\nu}$"
     elif x == "nrmse":
         xlab = "NRMSE"
     elif x == "adjr2":
