@@ -136,3 +136,4 @@ dmypy.json
 
 # tramp files
 tramp.??????
+/data/exp-250327-masters/2025-05-28-simulations/parquet/2025-05-28*.parquet

@@ -22,5 +22,6 @@ dependencies:
   - conda-forge::pip=25.0.1:
     - multipletau=0.4.1
     - tensorflow=2.19.0
+  # system: pdf2svg for svg conversion
 
 prefix: "/home/lea/Programs/miniconda3/envs/tf"
