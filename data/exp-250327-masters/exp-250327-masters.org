@@ -699,7 +699,8 @@ Name: diffusion rate of molecules, dtype: int64
 [[file:./.ob-jupyter/1c7fd5e5a4817449fd2d1e9d22e750d62907c4df.png]]
 :END:
 
-*** Simulate peak artifacts, photobleaching and detector dropout
+*** 2025-05-28-simulations
+**** Simulate peak artifacts, photobleaching and detector dropout
 
 #+begin_src jupyter-python
 import logging
@@ -1329,7 +1330,7 @@ for myfile in [
  new size: 226.684368 MB
  #+end_example
 
-*** Correlate simulated datasets
+**** Correlate simulated datasets
 
 #+transclude: [[./2025-05-28-simulations/src-python/correlate_datasets.py]]  :src jupyter-python
 
@@ -1344,7 +1345,7 @@ for myfile in [
 : Correlating traces in 2025-05-28-photobleaching-training.parquet ...
 : Correlating traces in 2025-05-28-photobleaching-validation.parquet ...
 
-*** Fit simulated datasets and compute fit and quality parameters
+**** Fit simulated datasets and compute fit and quality parameters
 
 #+transclude: [[./2025-05-28-simulations/src-python/fit_datasets.py]] :lines 1-77 :src jupyter-python
 
@@ -1389,6 +1390,8 @@ shape: (17_280, 28)
 #+transclude: [[./2025-05-28-simulations/src-python/fit_datasets.py]] :lines 192-193 :src jupyter-python
 
 #+RESULTS:
+
+**** Explore fit quality metrics
 
 #+begin_src jupyter-python
 df_eval = pl.read_parquet(
@@ -1513,7 +1516,7 @@ print(len(df_bad))
 : 1711
 : 638
 
-**** Show fit and quality examples of time-series without artifacts
+***** Show fit and quality examples of time-series without artifacts
 
 First, let's take a look at fits of *clean traces* (=label_restoration=) where the
 min and max initial tau value was reached, or which have quite high nrmse or
@@ -1820,7 +1823,7 @@ shape: (9, 4)
 [[file:./.ob-jupyter/f85ab0074d8bb5412df69e6ef8234fa828680b4e.png]]
 :END:
 
-**** Show fit and quality examples of time-series with peak artifacts
+***** Show fit and quality examples of time-series with peak artifacts
 
 
 Second, let's take a look at fits of time-series with peak artifacts
@@ -2153,7 +2156,7 @@ shape: (9, 5)
 [[file:./.ob-jupyter/281ec0ab341af60b365d42cdc230bb8de51b2846.png]]
 :END:
 
-**** Show fit and quality examples of time-series with photobleaching
+***** Show fit and quality examples of time-series with photobleaching
 
 
 Second, let's take a look at fits of time-series with peak artifacts
@@ -2623,7 +2626,7 @@ shape: (9, 6)
 [[file:./.ob-jupyter/6906fa716afaec1d378a5756b71f3ee5fc53ccef.png]]
 :END:
 
-**** Show fit and quality examples of time-series with detector dropout
+***** Show fit and quality examples of time-series with detector dropout
 
 
 Second, let's take a look at fits of time-series with detector dropout
@@ -2964,1328 +2967,215 @@ shape: (9, 6)
 [[file:./.ob-jupyter/6906fa716afaec1d378a5756b71f3ee5fc53ccef.png]]
 :END:
 
-**** Plot time-series with peak artifacts example, tau and n distributions, and quality metrics
+**** Plot time-series examples
 
+First, define modules and plotting functions
 
-#+begin_src jupyter-python
-def tscorres(axd: dict, idx: int, rec_l: dict, rec_f: dict) -> None:
-    colf = "tab:pink"
-    axts = axd[f"ts{idx}"]
-    axcn = axd[f"cor{idx}no"]
-    axcy = axd[f"cor{idx}yes"]
-    axrn = axd[f"res{idx}no"]
-    axry = axd[f"res{idx}yes"]
-    sns.lineplot(data=rec_f["trace"], label="artifact", color=colf, ax=axts)
-    sns.lineplot(data=rec_l["trace"], label="no artifact", alpha=0.7, ax=axts)
-    sns.lineplot(x=rec_l["tc"], y=rec_l["cor"], ax=axcn)
-    sns.lineplot(x=rec_l["tc"], y=rec_l["fit"], ax=axcn, color="C2")
-    sns.lineplot(x=rec_f["tc"], y=rec_f["cor"], ax=axcy, color=colf)
-    sns.lineplot(x=rec_f["tc"], y=rec_f["fit"], ax=axcy, color="C2")
-    sns.lineplot(x=rec_l["tc"], y=rec_l["residual"], ax=axrn)
-    sns.lineplot(x=rec_f["tc"], y=rec_f["residual"], ax=axry, color=colf)
-
-def prepare_grid(n: int) -> tuple[mpl.figure.Figure, dict[str, mpl.axes.Axes]]:
-    gs_kw = dict(height_ratios=[1, 1, 0.5])
-    g1 = ["ts1", "ts1"]
-    g2 = ["cor1no", "cor1yes"]
-    g3 = ["res1no", "res1yes"]
-    for i in range(2, n + 1):
-       g1 = g1 + [f"ts{i}"] * 2
-       g2 = g2 + [f"cor{i}no", f"cor{i}yes"]
-       g3 = g3 + [f"res{i}no", f"res{i}yes"]
-    fig, axd = plt.subplot_mosaic(
-        mosaic=[g1, g2, g3], figsize=(4*n, 6), gridspec_kw=gs_kw,
-        layout="constrained"
-    )
-    for i in range(1, n + 1):
-        axd[f"cor{i}no"].sharey(axd[f"cor{i}yes"])
-        axd[f"res{i}no"].sharey(axd[f"res{i}yes"])
-    plt.setp([axd[g] for g in g1], xlabel=r"macrotime [$ms$]",
-             ylabel="intensity [a.u.]")
-    plt.setp([axd[g].get_xticklabels() for g in g2], visible=False)
-    plt.setp([axd[g].get_yticklabels() for g in g2 + g3 if "yes" in g],
-             visible=False)
-    plt.setp([axd[g] for g in g2 if "yes" in g], title="artifact", xscale="log")
-    plt.setp([axd[g] for g in g2 if "no" in g], ylabel=r"$G(\tau)$", xscale="log",
-             title="no artifact")
-    plt.setp([axd[g] for g in g3], xlabel=r"lag time $\tau$ [$ms$]", xscale="log")
-    plt.setp([axd[g] for g in g3 if "no" in g], ylabel="residual")
-
-
-    return fig, axd
-#+end_src
+#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 1-73 :src jupyter-python
 
 #+RESULTS:
 
-#+begin_src jupyter-python
-def pa_filter() -> pl.Expr:
-    return ((pl.col("artifact") == "peak_artifacts") &
-            (pl.col("clean_dmol").is_in([0.1, 1., 10.])) &
-            (pl.col("clean_nmol").is_in([125, 1000, 3000])))
+Plot examples of time-series with peak artifacts
 
-def pa_tsfilter(peak_dmol: float, record_type: str) -> pl.Expr:
-    return (pa_filter() &
-            pl.col("peak_dmol").eq(peak_dmol) &
-            pl.col("record_type").eq(record_type))
-
-def pa_ts(idx: int, peak_dmol: float, record_type: str) -> dict:
-    return (df_eval
-            .filter(pa_tsfilter(peak_dmol, record_type))
-            .row(idx, named=True))
-
-
-fig, axd = prepare_grid(3)
-tscorres(axd, 1, pa_ts(0, 0.01, "label_restoration"), pa_ts(0, 0.01, "feature"))
-tscorres(axd, 2, pa_ts(0, 0.1, "label_restoration"), pa_ts(0, 0.1, "feature"))
-tscorres(axd, 3, pa_ts(0, 1., "label_restoration"), pa_ts(0, 1., "feature"))
-plt.setp(axd["ts1"], title="broad peak artifacts")
-plt.setp(axd["ts2"], title="middle-sized peak artifacts")
-plt.setp(axd["ts3"], title="steep peak artifacts")
-
-plt.show()
-#+end_src
+#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 75-96 :src jupyter-python
 
 #+RESULTS:
-[[file:./.ob-jupyter/05b3a1e1f244cc29d7789ff2623b17f08f00cb90.png]]
+[[file:./.ob-jupyter/d5169cbace9dbf04dbaed140aa85bff6d6b9593f.png]]
 
+Plot examples of time-series with photobleaching
 
-#+begin_src jupyter-python
-def pb_filter() -> pl.Expr:
-    return ((pl.col("artifact") == "photobleaching") &
-            (pl.col("clean_dmol").is_in([0.1, 1., 10.])) &
-            (pl.col("clean_nmol").is_in([125, 1000, 3000])))
-
-def pb_tsfilter(
-        bleach_type: str, bleach_exp_scale: float, record_type: str
-) -> pl.Expr:
-    return (pb_filter() &
-            pl.col("bleach_type").eq(bleach_type) &
-            pl.col("bleach_exp_scale").eq(bleach_exp_scale) &
-            pl.col("record_type").eq(record_type))
-
-def pb_ts(
-        idx: int, bleach_type: str, bleach_exp_scale: float, record_type: str
-) -> dict:
-    return (df_eval
-            .filter(pb_tsfilter(bleach_type, bleach_exp_scale, record_type))
-            .row(idx, named=True))
-
-
-fig, axd = prepare_grid(4)
-tscorres(axd, 1,
-         pb_ts(3, "both", 0.01, "label_restoration"),
-         pb_ts(3, "both", 0.01, "feature"))
-tscorres(axd, 2,
-         pb_ts(0, "both", 0.16, "label_restoration"),
-         pb_ts(0, "both", 0.16, "feature"))
-tscorres(axd, 3,
-         pb_ts(1, "immobile", 0.08, "label_restoration"),
-         pb_ts(1, "immobile", 0.08, "feature"))
-tscorres(axd, 4,
-         pb_ts(1, "mobile", 0.08, "label_restoration"),
-         pb_ts(1, "mobile", 0.08, "feature"))
-plt.setp(axd["ts1"], title=("steep photobleaching (scale = 0.01)\n"
-                            "both immobile and mobile molecules"))
-plt.setp(axd["ts2"], title=("shallow photobleaching (scale = 0.16)\n"
-                            "both immobile and mobile molecules"))
-plt.setp(axd["ts3"], title=("middle photobleaching (scale = 0.08)\n"
-                            "only immobile molecules bleached"))
-plt.setp(axd["ts4"], title=("middle photobleaching (scale = 0.08)\n"
-                            "only mobile molecules bleached"))
-plt.show()
-#+end_src
+#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 98-138 :src jupyter-python
 
 #+RESULTS:
-[[file:./.ob-jupyter/abc2b6d5f5f826511386065a8d48be43df9b8ed1.png]]
+[[file:./.ob-jupyter/fc0d12843c3e3665ff8f04b00980b3139250dbda.png]]
 
 
+Plot examples of time-series with detector dropout
 
-#+begin_src jupyter-python
-def dd_filter() -> pl.Expr:
-    return ((pl.col("artifact") == "detector_dropout") &
-            (pl.col("clean_dmol").is_in([0.1, 1., 10.])) &
-            (pl.col("clean_nmol").is_in([125, 1000, 3000])))
-
-def dd_tsfilter(
-        dropout_n: int, dropout_maxdrop: Literal["small", "middle", "large"], record_type: str
-) -> pl.Expr:
-    if dropout_maxdrop == "small":
-        maxdrop_expr = pl.col("dropout_maxdrop") <= 301
-    elif dropout_maxdrop == "middle":
-        maxdrop_expr = ((pl.col("dropout_maxdrop") < 1546) &
-                        (pl.col("dropout_maxdrop") > 301))
-    elif dropout_maxdrop == "large":
-        maxdrop_expr = pl.col("dropout_maxdrop") >= 1546
-    return (dd_filter() &
-            pl.col("dropout_n").eq(dropout_n) & maxdrop_expr &
-            pl.col("record_type").eq(record_type))
-
-def dd_ts(
-        idx: int, dropout_n: int, dropout_maxdrop: str, record_type: str
-) -> dict:
-    return (df_eval
-            .filter(dd_tsfilter(dropout_n, dropout_maxdrop, record_type))
-            .row(idx, named=True))
-
-
-fig, axd = prepare_grid(4)
-tscorres(axd, 1, dd_ts(0, 9, "middle", "label_restoration"), dd_ts(0, 9, "middle", "feature"))
-tscorres(axd, 2, dd_ts(2, 32, "middle", "label_restoration"), dd_ts(2, 32, "middle", "feature"))
-tscorres(axd, 3, dd_ts(0, 18, "small", "label_restoration"), dd_ts(0, 18, "small", "feature"))
-tscorres(axd, 4, dd_ts(0, 18, "large", "label_restoration"), dd_ts(0, 18, "large", "feature"))
-plt.setp(axd["ts1"], title=("few dropouts ($n=9$)\n"
-                            "middle intensity drop ($301 < drop < 1546$)"))
-plt.setp(axd["ts2"], title=("many dropouts ($n=32$)\n"
-                            "middle intensity drop ($301 < drop < 1546$)"))
-plt.setp(axd["ts3"], title=("middle amount of dropouts ($n=18$)\n"
-                            "small intensity drop ($drop \\leq 301$)"))
-plt.setp(axd["ts4"], title=("middle amount of dropouts ($n=18$)\n"
-                            "large intensity drop ($drop \\geq 1546$)"))
-plt.show()
-#+end_src
+#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 140-174 :src jupyter-python
 
 #+RESULTS:
-[[file:./.ob-jupyter/21d870c8bcda579ef9534026f27aee3957314321.png]]
+[[file:./.ob-jupyter/6489e274fc02905dc19417774dad59e6dcf51190.png]]
 
+**** Plot fit results and fit quality distributions
+Import needed modules first
 
+#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 1-27 :src jupyter-python
 
-#+begin_src jupyter-python
-df_fitres = pl.concat([
-    df_eval.rename({"diffcoeff": "fitres"}).select(pl.exclude("n"))
-    .with_columns(fittype=pl.lit("diffcoeff")),
-    df_eval.rename({"n": "fitres"}).select(pl.exclude("diffcoeff"))
-    .with_columns(fittype=pl.lit("n"))
-], how="align")
-df_fitres
-#+end_src
+#+RESULTS:
+
+Then, define plotting functions
+
+#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 176-264 :src jupyter-python
+
+#+RESULTS:
+
+***** Time-series with peak artifacts
+
+First, load the data
+
+#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 266-288 :src jupyter-python
+
+#+RESULTS:
+
+Plot fit distributions
+
+#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 290-294 :src jupyter-python
 
 #+RESULTS:
 :RESULTS:
-shape: (34_560, 28)
-| uuid                               | tc                      | sim_params                                                                                                              | minimizer                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | fit                                 | residual                              | cor                                  | trace                                       | ts_params                                                                  |    nrmse | ndata | nvarys |   chisqr |    redchi | artifact         | record_type         |         tau | clean_dmol | clean_nmol | peak_dmol | peak_nmol | bleach_exp_scale | bleach_type | dropout_n | dropout_maxdrop |    adjr2 |    fitres | fittype     |
-|------------------------------------+-------------------------+-------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------+---------------------------------------+--------------------------------------+---------------------------------------------+----------------------------------------------------------------------------+----------+-------+--------+----------+-----------+------------------+---------------------+-------------+------------+------------+-----------+-----------+------------------+-------------+-----------+-----------------+----------+-----------+-------------|
-| str                                | array[f32, 94]          | struct[19]                                                                                                              | struct[6]                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | array[f32, 94]                      | array[f32, 94]                        | array[f32, 94]                       | array[f32, 16384]                           | struct[8]                                                                  |      f32 |   u32 |    u32 |      f32 |       f32 | str              | str                 |         f32 |        f64 |        u32 | f64       | u32       | f64              | str         | u32       | f32             |      f64 |       f64 | str         |
-| "000ad43f-9a88-4702-883a-4c3685... | [1.0, 2.0, ... 14336.0] | {16384.0,1.0,250.0,4000.0,3000,3000,50.0,3500,"photobleaching","both",1500,1500,"mobile",0.04,null,null,null,null,null} | {false,true,"Fit succeeded.",{-1715.208008,-1707.578125,0.000001,94,214,91,3,1.1530e-8},"[[Fit Statistics]]     # fitting method   = leastsq     # function evals   = 214     # data points      = 94     # variables        = 3     chi-square         = 1.0493e-06     reduced chi-square = 1.1530e-08     Akaike info crit   = -1715.20806     Bayesian info crit = -1707.57818 [[Variables]]     offset: -5.3440e-05 +/- 1.2633e-05 (23.64%) (init = 0.01)     gn0:     3.06456817 +/- 201.653739 (6580.17%) (init = 1)     a1:      1 (fixed)     txy1:    0.00100001 +/- 0.02526493 (2526.46%) (init = 1)     alpha1:  1 (fixed) [[Correlations]] (unreported correlations are < 0.100)     C(gn0, txy1)    = -1.0000     C(offset, txy1) = -0.3713     C(offset, gn0)  = +0.3712",{{-0.000053,-0.5,1.5,true,0.000013},{3.064568,-0.0001,3000.0,true,201.653732},{1.0,0.0001,1.0,false,0.0},{null,null,null,null,null},{null,null,null,null,null},{0.001,0.001,2000.0,true,0.025265},{null,null,null,null,null},{null,null,null,null,null},{1.0,0.6,2.0,false,0.0},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null}}} | [0.003008, 0.001478, ... -0.000053] | [0.000184, -0.0001, ... 0.000053]     | [0.003193, 0.001378, ... -5.2874e-7] | [2375.460938, 2655.844727, ... 2533.546631] | {1.0,1,2025-05-29,"photobleaching",16384,2867.158203,100.214249,28.612032} | 0.030969 |    94 |      3 | 0.000001 | 1.1530e-8 | "photobleaching" | "label_restoration" |       0.001 |       50.0 |       3500 | null      | null      | 0.04             | "mobile"    | null      | null            | 0.924979 |   0.32631 | "n"         |
-| "000ad43f-9a88-4702-883a-4c3685... | [1.0, 2.0, ... 14336.0] | {16384.0,1.0,250.0,4000.0,3000,3000,50.0,3500,"photobleaching","both",1500,1500,"mobile",0.04,null,null,null,null,null} | {false,true,"Fit succeeded.",{-1715.208008,-1707.578125,0.000001,94,214,91,3,1.1530e-8},"[[Fit Statistics]]     # fitting method   = leastsq     # function evals   = 214     # data points      = 94     # variables        = 3     chi-square         = 1.0493e-06     reduced chi-square = 1.1530e-08     Akaike info crit   = -1715.20806     Bayesian info crit = -1707.57818 [[Variables]]     offset: -5.3440e-05 +/- 1.2633e-05 (23.64%) (init = 0.01)     gn0:     3.06456817 +/- 201.653739 (6580.17%) (init = 1)     a1:      1 (fixed)     txy1:    0.00100001 +/- 0.02526493 (2526.46%) (init = 1)     alpha1:  1 (fixed) [[Correlations]] (unreported correlations are < 0.100)     C(gn0, txy1)    = -1.0000     C(offset, txy1) = -0.3713     C(offset, gn0)  = +0.3712",{{-0.000053,-0.5,1.5,true,0.000013},{3.064568,-0.0001,3000.0,true,201.653732},{1.0,0.0001,1.0,false,0.0},{null,null,null,null,null},{null,null,null,null,null},{0.001,0.001,2000.0,true,0.025265},{null,null,null,null,null},{null,null,null,null,null},{1.0,0.6,2.0,false,0.0},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null}}} | [0.003008, 0.001478, ... -0.000053] | [0.000184, -0.0001, ... 0.000053]     | [0.003193, 0.001378, ... -5.2874e-7] | [2375.460938, 2655.844727, ... 2533.546631] | {1.0,1,2025-05-29,"photobleaching",16384,2867.158203,100.214249,28.612032} | 0.030969 |    94 |      3 | 0.000001 | 1.1530e-8 | "photobleaching" | "label_restoration" |       0.001 |       50.0 |       3500 | null      | null      | 0.04             | "mobile"    | null      | null            | 0.924979 |  11270.92 | "diffcoeff" |
-| "000ad43f-9a88-4702-883a-4c3685... | [1.0, 2.0, ... 14336.0] | {16384.0,1.0,250.0,4000.0,3000,3000,50.0,3500,"photobleaching","both",1500,1500,"mobile",0.04,null,null,null,null,null} | {false,true,"Fit succeeded.",{-1300.80957,-1293.179688,0.000086,94,46,91,3,9.4716e-7},"[[Fit Statistics]]     # fitting method   = leastsq     # function evals   = 46     # data points      = 94     # variables        = 3     chi-square         = 8.6192e-05     reduced chi-square = 9.4716e-07     Akaike info crit   = -1300.80952     Bayesian info crit = -1293.17964 [[Variables]]     offset: -0.00455686 +/- 3.1485e-04 (6.91%) (init = 0.01)     gn0:     0.02170118 +/- 3.1952e-04 (1.47%) (init = 1)     a1:      1 (fixed)     txy1:    709.216186 +/- 43.6124144 (6.15%) (init = 1)     alpha1:  1 (fixed) [[Correlations]] (unreported correlations are < 0.100)     C(offset, gn0)  = -0.8360     C(offset, txy1) = -0.7546     C(gn0, txy1)    = +0.4170",{{-0.004557,-0.5,1.5,true,0.000315},{0.021701,-0.0001,3000.0,true,0.00032},{1.0,0.0001,1.0,false,0.0},{null,null,null,null,null},{null,null,null,null,null},{709.216187,0.001,2000.0,true,43.612415},{null,null,null,null,null},{null,null,null,null,null},{1.0,0.6,2.0,false,0.0},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null}}}        | [0.017114, 0.017083, ... -0.003534] | [0.002874, 0.001025, ... -0.00624]    | [0.019988, 0.018108, ... -0.009774]  | [4750.921875, 5310.6875, ... 2533.546631]   | {1.0,1,2025-05-29,"photobleaching",16384,2867.158203,100.214249,28.612032} | 0.032174 |    94 |      3 | 0.000086 | 9.4716e-7 | "photobleaching" | "feature"           |  709.216187 |       50.0 |       3500 | null      | null      | 0.04             | "mobile"    | null      | null            | 0.983382 |      0.02 | "diffcoeff" |
-| "000ad43f-9a88-4702-883a-4c3685... | [1.0, 2.0, ... 14336.0] | {16384.0,1.0,250.0,4000.0,3000,3000,50.0,3500,"photobleaching","both",1500,1500,"mobile",0.04,null,null,null,null,null} | {false,true,"Fit succeeded.",{-1300.80957,-1293.179688,0.000086,94,46,91,3,9.4716e-7},"[[Fit Statistics]]     # fitting method   = leastsq     # function evals   = 46     # data points      = 94     # variables        = 3     chi-square         = 8.6192e-05     reduced chi-square = 9.4716e-07     Akaike info crit   = -1300.80952     Bayesian info crit = -1293.17964 [[Variables]]     offset: -0.00455686 +/- 3.1485e-04 (6.91%) (init = 0.01)     gn0:     0.02170118 +/- 3.1952e-04 (1.47%) (init = 1)     a1:      1 (fixed)     txy1:    709.216186 +/- 43.6124144 (6.15%) (init = 1)     alpha1:  1 (fixed) [[Correlations]] (unreported correlations are < 0.100)     C(offset, gn0)  = -0.8360     C(offset, txy1) = -0.7546     C(gn0, txy1)    = +0.4170",{{-0.004557,-0.5,1.5,true,0.000315},{0.021701,-0.0001,3000.0,true,0.00032},{1.0,0.0001,1.0,false,0.0},{null,null,null,null,null},{null,null,null,null,null},{709.216187,0.001,2000.0,true,43.612415},{null,null,null,null,null},{null,null,null,null,null},{1.0,0.6,2.0,false,0.0},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null}}}        | [0.017114, 0.017083, ... -0.003534] | [0.002874, 0.001025, ... -0.00624]    | [0.019988, 0.018108, ... -0.009774]  | [4750.921875, 5310.6875, ... 2533.546631]   | {1.0,1,2025-05-29,"photobleaching",16384,2867.158203,100.214249,28.612032} | 0.032174 |    94 |      3 | 0.000086 | 9.4716e-7 | "photobleaching" | "feature"           |  709.216187 |       50.0 |       3500 | null      | null      | 0.04             | "mobile"    | null      | null            | 0.983382 | 46.080441 | "n"         |
-| "0018fb80-c6aa-400d-afaa-5ca618... | [1.0, 2.0, ... 14336.0] | {16384.0,1.0,250.0,4000.0,3000,3000,0.5,125,"photobleaching","both",1500,1500,"both",0.15,null,null,null,null,null}     | {false,true,"Fit succeeded.",{-776.534546,-768.904663,0.022788,94,31,91,3,0.00025},"[[Fit Statistics]]     # fitting method   = leastsq     # function evals   = 31     # data points      = 94     # variables        = 3     chi-square         = 0.02278755     reduced chi-square = 2.5041e-04     Akaike info crit   = -776.534547     Bayesian info crit = -768.904663 [[Variables]]     offset:  4.7817e-05 +/- 0.00239459 (5007.78%) (init = 0.01)     gn0:     0.43717637 +/- 0.00880057 (2.01%) (init = 1)     a1:      1 (fixed)     txy1:    20.9592287 +/- 1.25389185 (5.98%) (init = 1)     alpha1:  1 (fixed) [[Correlations]] (unreported correlations are < 0.100)     C(gn0, txy1)    = -0.7316     C(offset, txy1) = -0.4780",{{0.000048,-0.5,1.5,true,0.002395},{0.437176,-0.0001,3000.0,true,0.008801},{1.0,0.0001,1.0,false,0.0},{null,null,null,null,null},{null,null,null,null,null},{20.959229,0.001,2000.0,true,1.253892},{null,null,null,null,null},{null,null,null,null,null},{1.0,0.6,2.0,false,0.0},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null}}}                                        | [0.417316, 0.399141, ... 0.000686]  | [0.005409, 0.005063, ... 0.009301]    | [0.422725, 0.404204, ... 0.009987]   | [19.464981, 14.212337, ... 103.098755]      | {1.0,1,2025-05-29,"photobleaching",16384,116.281189,57.302021,2.029392}    | 0.030828 |    94 |      3 | 0.022788 |   0.00025 | "photobleaching" | "label_restoration" |   20.959229 |        0.5 |        125 | null      | null      | 0.15             | "both"      | null      | null            | 0.982597 |      0.54 | "diffcoeff" |
-| ...                                | ...                     | ...                                                                                                                     | ...                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | ...                                 | ...                                   | ...                                  | ...                                         | ...                                                                        |      ... |   ... |    ... |      ... |       ... | ...              | ...                 |         ... |        ... |        ... | ...       | ...       | ...              | ...         | ...       | ...             |      ... |       ... | ...         |
-| "fffa0b76-ddcf-4bdc-99f4-95934d... | [1.0, 2.0, ... 14336.0] | {16384.0,1.0,250.0,4000.0,3000,3000,5.0,3000,"peak_artifacts","both",1500,1500,"None",null,null,null,1.0,3,7500}        | {false,true,"Fit succeeded.",{-1155.521362,-1147.891479,0.000404,94,40,91,3,0.000004},"[[Fit Statistics]]     # fitting method   = leastsq     # function evals   = 40     # data points      = 94     # variables        = 3     chi-square         = 4.0432e-04     reduced chi-square = 4.4430e-06     Akaike info crit   = -1155.52132     Bayesian info crit = -1147.89144 [[Variables]]     offset: -0.00167535 +/- 2.8211e-04 (16.84%) (init = 0.01)     gn0:     0.11000078 +/- 0.00240479 (2.19%) (init = 1)     a1:      1 (fixed)     txy1:    5.65922472 +/- 0.26688502 (4.72%) (init = 1)     alpha1:  1 (fixed) [[Correlations]] (unreported correlations are < 0.100)     C(gn0, txy1)    = -0.8622     C(offset, txy1) = -0.4170     C(offset, gn0)  = +0.1154",{{-0.001675,-0.5,1.5,true,0.000282},{0.110001,-0.0001,3000.0,true,0.002405},{1.0,0.0001,1.0,false,0.0},{null,null,null,null,null},{null,null,null,null,null},{5.659225,0.001,2000.0,true,0.266885},{null,null,null,null,null},{null,null,null,null,null},{1.0,0.6,2.0,false,0.0},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null}}}         | [0.091807, 0.079602, ... -0.001632] | [-0.003334, -0.00105, ... 0.003926]   | [0.088473, 0.078552, ... 0.002294]   | [2722.395264, 2258.132812, ... 1848.647705] | {1.0,1,2025-05-29,"peak_artifacts",16384,2521.097168,255.308151,9.875325}  | 0.022541 |    94 |      3 | 0.000404 |  0.000004 | "peak_artifacts" | "feature"           |    5.659225 |        5.0 |       3000 | 1.0       | 3         | null             | "None"      | null      | null            | 0.988581 |  9.090844 | "n"         |
-| "fffe0252-4b2c-47a9-9ca1-8d9dc8... | [1.0, 2.0, ... 14336.0] | {16384.0,1.0,250.0,4000.0,3000,3000,50.0,2000,"peak_artifacts","both",1500,1500,"None",null,null,null,0.01,10,8000}     | {false,true,"Fit succeeded.",{-1649.575439,-1641.945557,0.000002,94,324,91,3,2.3178e-8},"[[Fit Statistics]]     # fitting method   = leastsq     # function evals   = 324     # data points      = 94     # variables        = 3     chi-square         = 2.1092e-06     reduced chi-square = 2.3178e-08     Akaike info crit   = -1649.57542     Bayesian info crit = -1641.94553 [[Variables]]     offset: -5.1305e-05 +/- 1.7241e-05 (33.60%) (init = 0.01)     gn0:     5.02580455 +/- 379.949007 (7559.96%) (init = 1)     a1:      1 (fixed)     txy1:    0.00100000 +/- 0.02038422 (2038.42%) (init = 1)     alpha1:  1 (fixed) [[Correlations]] (unreported correlations are < 0.100)     C(gn0, txy1)    = +1.0000     C(offset, txy1) = +0.2636     C(offset, gn0)  = +0.2635",{{-0.000051,-0.5,1.5,true,0.000017},{5.025805,-0.0001,3000.0,true,379.949005},{1.0,0.0001,1.0,false,0.0},{null,null,null,null,null},{null,null,null,null,null},{0.001,0.001,2000.0,true,0.020384},{null,null,null,null,null},{null,null,null,null,null},{1.0,0.6,2.0,false,0.0},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null}}} | [0.004969, 0.00246, ... -0.000051]  | [0.000167, 0.000091, ... 0.000084]    | [0.005136, 0.002552, ... 0.000033]   | [1404.871338, 1487.868164, ... 1144.36499]  | {1.0,1,2025-05-29,"peak_artifacts",16384,2322.567627,1664.921997,1.395086} | 0.027065 |    94 |      3 | 0.000002 | 2.3178e-8 | "peak_artifacts" | "label_restoration" |       0.001 |       50.0 |       2000 | 0.01      | 10        | null             | "None"      | null      | null            | 0.942879 |  0.198973 | "n"         |
-| "fffe0252-4b2c-47a9-9ca1-8d9dc8... | [1.0, 2.0, ... 14336.0] | {16384.0,1.0,250.0,4000.0,3000,3000,50.0,2000,"peak_artifacts","both",1500,1500,"None",null,null,null,0.01,10,8000}     | {false,true,"Fit succeeded.",{-1649.575439,-1641.945557,0.000002,94,324,91,3,2.3178e-8},"[[Fit Statistics]]     # fitting method   = leastsq     # function evals   = 324     # data points      = 94     # variables        = 3     chi-square         = 2.1092e-06     reduced chi-square = 2.3178e-08     Akaike info crit   = -1649.57542     Bayesian info crit = -1641.94553 [[Variables]]     offset: -5.1305e-05 +/- 1.7241e-05 (33.60%) (init = 0.01)     gn0:     5.02580455 +/- 379.949007 (7559.96%) (init = 1)     a1:      1 (fixed)     txy1:    0.00100000 +/- 0.02038422 (2038.42%) (init = 1)     alpha1:  1 (fixed) [[Correlations]] (unreported correlations are < 0.100)     C(gn0, txy1)    = +1.0000     C(offset, txy1) = +0.2636     C(offset, gn0)  = +0.2635",{{-0.000051,-0.5,1.5,true,0.000017},{5.025805,-0.0001,3000.0,true,379.949005},{1.0,0.0001,1.0,false,0.0},{null,null,null,null,null},{null,null,null,null,null},{0.001,0.001,2000.0,true,0.020384},{null,null,null,null,null},{null,null,null,null,null},{1.0,0.6,2.0,false,0.0},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null}}} | [0.004969, 0.00246, ... -0.000051]  | [0.000167, 0.000091, ... 0.000084]    | [0.005136, 0.002552, ... 0.000033]   | [1404.871338, 1487.868164, ... 1144.36499]  | {1.0,1,2025-05-29,"peak_artifacts",16384,2322.567627,1664.921997,1.395086} | 0.027065 |    94 |      3 | 0.000002 | 2.3178e-8 | "peak_artifacts" | "label_restoration" |       0.001 |       50.0 |       2000 | 0.01      | 10        | null             | "None"      | null      | null            | 0.942879 |  11271.04 | "diffcoeff" |
-| "fffe0252-4b2c-47a9-9ca1-8d9dc8... | [1.0, 2.0, ... 14336.0] | {16384.0,1.0,250.0,4000.0,3000,3000,50.0,2000,"peak_artifacts","both",1500,1500,"None",null,null,null,0.01,10,8000}     | {false,true,"Fit succeeded.",{-521.032166,-513.402283,0.345269,94,62,91,3,0.003794},"[[Fit Statistics]]     # fitting method   = leastsq     # function evals   = 62     # data points      = 94     # variables        = 3     chi-square         = 0.34526941     reduced chi-square = 0.00379417     Akaike info crit   = -521.032155     Bayesian info crit = -513.402270 [[Variables]]     offset: -0.37271373 +/- 0.02987780 (8.02%) (init = 0.01)     gn0:     1.10188097 +/- 0.02879862 (2.61%) (init = 1)     a1:      1 (fixed)     txy1:    1642.10986 +/- 147.482764 (8.98%) (init = 1)     alpha1:  1 (fixed) [[Correlations]] (unreported correlations are < 0.100)     C(offset, gn0)  = -0.9412     C(offset, txy1) = -0.8396     C(gn0, txy1)    = +0.6902",{{-0.372714,-0.5,1.5,true,0.029878},{1.101881,-0.0001,3000.0,true,0.028799},{1.0,0.0001,1.0,false,0.0},{null,null,null,null,null},{null,null,null,null,null},{1642.109863,0.001,2000.0,true,147.482758},{null,null,null,null,null},{null,null,null,null,null},{1.0,0.6,2.0,false,0.0},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null}}}       | [0.728497, 0.727827, ... -0.259471] | [-0.023314, -0.024153, ... -0.011328] | [0.705183, 0.703674, ... -0.270798]  | [1419.487915, 1498.282959, ... 1144.368774] | {1.0,1,2025-05-29,"peak_artifacts",16384,2322.567627,1664.921997,1.395086} | 0.053077 |    94 |      3 | 0.345269 |  0.003794 | "peak_artifacts" | "feature"           | 1642.109863 |       50.0 |       2000 | 0.01      | 10        | null             | "None"      | null      | null            | 0.967445 |      0.01 | "diffcoeff" |
-| "fffe0252-4b2c-47a9-9ca1-8d9dc8... | [1.0, 2.0, ... 14336.0] | {16384.0,1.0,250.0,4000.0,3000,3000,50.0,2000,"peak_artifacts","both",1500,1500,"None",null,null,null,0.01,10,8000}     | {false,true,"Fit succeeded.",{-521.032166,-513.402283,0.345269,94,62,91,3,0.003794},"[[Fit Statistics]]     # fitting method   = leastsq     # function evals   = 62     # data points      = 94     # variables        = 3     chi-square         = 0.34526941     reduced chi-square = 0.00379417     Akaike info crit   = -521.032155     Bayesian info crit = -513.402270 [[Variables]]     offset: -0.37271373 +/- 0.02987780 (8.02%) (init = 0.01)     gn0:     1.10188097 +/- 0.02879862 (2.61%) (init = 1)     a1:      1 (fixed)     txy1:    1642.10986 +/- 147.482764 (8.98%) (init = 1)     alpha1:  1 (fixed) [[Correlations]] (unreported correlations are < 0.100)     C(offset, gn0)  = -0.9412     C(offset, txy1) = -0.8396     C(gn0, txy1)    = +0.6902",{{-0.372714,-0.5,1.5,true,0.029878},{1.101881,-0.0001,3000.0,true,0.028799},{1.0,0.0001,1.0,false,0.0},{null,null,null,null,null},{null,null,null,null,null},{1642.109863,0.001,2000.0,true,147.482758},{null,null,null,null,null},{null,null,null,null,null},{1.0,0.6,2.0,false,0.0},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null}}}       | [0.728497, 0.727827, ... -0.259471] | [-0.023314, -0.024153, ... -0.011328] | [0.705183, 0.703674, ... -0.270798]  | [1419.487915, 1498.282959, ... 1144.368774] | {1.0,1,2025-05-29,"peak_artifacts",16384,2322.567627,1664.921997,1.395086} | 0.053077 |    94 |      3 | 0.345269 |  0.003794 | "peak_artifacts" | "feature"           | 1642.109863 |       50.0 |       2000 | 0.01      | 10        | null             | "None"      | null      | null            | 0.967445 |  0.907539 | "n"         |
+: /tmp/ipykernel_5672/627744654.py:84: UserWarning: set_ticklabels() should only be used with a fixed number of ticks, i.e. after set_ticks() or using a FixedLocator.
+:   ax[0, 0].set_yticklabels(yticklabels)
+[[file:./.ob-jupyter/9405096206490b5b0e89a507952e84711fe1c0dd.png]]
 :END:
 
-#+begin_src jupyter-python
-def fitres(
-        data, x: Literal["diffcoeff", "n"], y: Literal["peak_dmol"],
-        rowlab: str, order: list, log_scale: bool, ax: mpl.axes.Axes,
-        legend: bool, cut: int,
-) -> mpl.axes.Axes:
-    if x == "diffcoeff":
-        xlab = "measured diffusion coeff. D [$\\frac{{\\mu m^2}}{{s}}$]"
-        title = f"simulated D = {rowlab} $\\frac{{\\mu m^2}}{{s}}$"
-    elif x == "n":
-        xlab = "measured molecule number n"
-        title = f"simulated n = {rowlab} (not physical)"
-    ax = sns.violinplot(
-        data, x=x, y=y, order=order, log_scale=log_scale, ax=ax, legend=legend,
-        cut=cut, inner="quart", hue="record_type", density_norm="width",
-        fill=False, split=True, palette=["tab:pink", "tab:blue"]
-    )
-    plt.setp(ax, title=title, xlabel=xlab, ylabel=None)
-    return ax
+Plot reduced chi squared
 
-#+end_src
-
-#+RESULTS:
-
-
-#+begin_src jupyter-python
-pa_pd = (
-    df_eval.filter(pa_filter())
-    .cast({"peak_dmol": pl.String, "peak_nmol": pl.String})
-    #        "clean_nmol": pl.String, "clean_dmol": pl.String})
-    .select("record_type", "diffcoeff", "n", "clean_dmol", "clean_nmol",
-            "peak_dmol", "peak_nmol", "nrmse", "redchi", "adjr2")
-    .to_pandas()
-)
-
-f, ax = plt.subplots(2, 3, figsize=(11, 6), layout="constrained", sharey=True)
-for i, dmol in enumerate([0.1, 1, 10]):
-    fitres(pa_pd.loc[pa_pd["clean_dmol"] == dmol], x="diffcoeff", y="peak_dmol",
-           rowlab=dmol, order=["0.01", "0.1", "1.0"], log_scale=True,
-           ax=ax[0, i], legend=False, cut=2)
-for i, nmol in enumerate([125, 1000, 3000]):
-    if nmol == 125:
-        legend = True
-    else:
-        legend = False
-    fitres(pa_pd.loc[pa_pd["clean_nmol"] == nmol], x="n", y="peak_dmol",
-           rowlab=nmol, order=["0.01", "0.1", "1.0"], log_scale=False,
-           ax=ax[1, i], legend=legend, cut=0)
-ax[0, 0].sharex(ax[0, 2])
-ax[0, 1].sharex(ax[0, 2])
-ax[0, 0].set_yticklabels([
-    "broad peak artifacts\n$D_{sim}$ = 0.01 $\\frac{{\\mu m^2}}{{s}}$"
-     "\n$n_{\\mathrm{clusters}} = 10$",
-    "middle-sized peak artifacts\n$D_{sim}$ = 0.1 $\\frac{{\\mu m^2}}{{s}}$"
-     "\n$n_{\\mathrm{clusters}} = 7$",
-    "steep peak artifacts\n$D_{sim}$ = 1 $\\frac{{\\mu m^2}}{{s}}$"
-     "\n$n_{\\mathrm{clusters}} = 3$",
-])
-sns.move_legend(ax[1, 0], "lower center", bbox_to_anchor=(.5, -0.4), ncol=2,
-                title=None, frameon=True)
-for t, l in zip(ax[1, 0].axes.get_legend().texts,
-                ["with artifact", "without artifact"]):
-    t.set_text(l)
-plt.show()
-
-
-#+end_src
+#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 295-299 :src jupyter-python
 
 #+RESULTS:
 :RESULTS:
-: /tmp/ipykernel_6868/3922314632.py:25: UserWarning: set_ticklabels() should only be used with a fixed number of ticks, i.e. after set_ticks() or using a FixedLocator.
-:   ax[0, 0].set_yticklabels([
-[[file:./.ob-jupyter/561f16d6c8394302cc49dce65cc053c2c6723de1.png]]
+: /tmp/ipykernel_5672/627744654.py:84: UserWarning: set_ticklabels() should only be used with a fixed number of ticks, i.e. after set_ticks() or using a FixedLocator.
+:   ax[0, 0].set_yticklabels(yticklabels)
+[[file:./.ob-jupyter/b4f2ade87e4b3ef8266d4f0f3046d262539e067f.png]]
 :END:
 
-#+begin_src jupyter-python
-pb_pd = (
-    pl.concat([
-        (df_eval
-         .filter(pb_filter() & (pl.col("bleach_exp_scale") < 0.09) &
-                 (pl.col("bleach_type") == "both"))
-         .with_columns(bleach_group=pl.lit("steep_both"))),
-        (df_eval
-         .filter(pb_filter() & (pl.col("bleach_exp_scale") >= 0.09) &
-                 (pl.col("bleach_type") == "both"))
-         .with_columns(bleach_group=pl.lit("shallow_both"))),
-        (df_eval
-         .filter(pb_filter() & ((pl.col("bleach_exp_scale") >= 0.05) &
-                                (pl.col("bleach_exp_scale") <= 0.12)) &
-                 (pl.col("bleach_type") == "immobile"))
-         .with_columns(bleach_group=pl.lit("middle_immob"))),
-        (df_eval
-         .filter(pb_filter() & ((pl.col("bleach_exp_scale") >= 0.05) &
-                                (pl.col("bleach_exp_scale") <= 0.12)) &
-                 (pl.col("bleach_type") == "mobile"))
-         .with_columns(bleach_group=pl.lit("middle_mobile"))),
-    ], how="vertical")
-    .select("record_type", "diffcoeff", "n", "clean_dmol", "clean_nmol",
-            "bleach_group", "nrmse", "redchi", "adjr2")
-    .to_pandas()
-)
+Plot NRMSE
 
-f, ax = plt.subplots(2, 3, figsize=(11, 7), layout="constrained", sharey=True)
-for i, dmol in enumerate([0.1, 1, 10]):
-    fitres(
-        pb_pd.loc[pb_pd["clean_dmol"] == dmol], x="diffcoeff", ax=ax[0, i],
-        y="bleach_group", rowlab=dmol, log_scale=True, legend=False, cut=2,
-        order=["steep_both", "shallow_both", "middle_immob", "middle_mobile"],
-    )
-for i, nmol in enumerate([125, 1000, 3000]):
-    if nmol == 125:
-        legend = True
-    else:
-        legend = False
-    fitres(
-        pb_pd.loc[pb_pd["clean_nmol"] == nmol], x="n", y="bleach_group",
-        rowlab=nmol, log_scale=False, ax=ax[1, i], legend=legend, cut=0,
-        order=["steep_both", "shallow_both", "middle_immob", "middle_mobile"],
-    )
-ax[0, 0].sharex(ax[0, 2])
-ax[0, 1].sharex(ax[0, 2])
-# ax[0, 0].set_yticklabels([
-#     "broad peak artifacts\n$D_{sim}$ = 0.01 $\\frac{{\\mu m^2}}{{s}}$"
-#      "\n$n_{\\mathrm{clusters}} = 10$",
-#     "middle-sized peak artifacts\n$D_{sim}$ = 0.1 $\\frac{{\\mu m^2}}{{s}}$"
-#      "\n$n_{\\mathrm{clusters}} = 7$",
-#     "steep peak artifacts\n$D_{sim}$ = 1 $\\frac{{\\mu m^2}}{{s}}$"
-#      "\n$n_{\\mathrm{clusters}} = 3$",
-# ])
-sns.move_legend(ax[1, 0], "lower center", bbox_to_anchor=(.5, -0.4), ncol=2,
-                title=None, frameon=True)
-for t, l in zip(ax[1, 0].axes.get_legend().texts,
-                ["with artifact", "without artifact"]):
-    t.set_text(l)
-plt.show()
-
-#+end_src
-
-#+RESULTS:
-[[file:./.ob-jupyter/916841235fb29d03cf97591b1d2dde0fc68f3d15.png]]
-
-
-#+begin_src jupyter-python
-pb_pd = (
-    df_eval.filter(pb_filter())
-    .cast({"peak_dmol": pl.String, "peak_nmol": pl.String})
-    #        "clean_nmol": pl.String, "clean_dmol": pl.String})
-)
-#+end_src
+#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 300-304 :src jupyter-python
 
 #+RESULTS:
 :RESULTS:
-: <seaborn.axisgrid.FacetGrid at 0x7f11d4f2e1e0>
-[[file:./.ob-jupyter/19e3788de6b2cba22cd8fb2b9d61b0da107e955b.png]]
+: /tmp/ipykernel_5672/627744654.py:84: UserWarning: set_ticklabels() should only be used with a fixed number of ticks, i.e. after set_ticks() or using a FixedLocator.
+:   ax[0, 0].set_yticklabels(yticklabels)
+[[file:./.ob-jupyter/07bf8eb447ff948a10af6c94639bec788f116861.png]]
 :END:
 
-#+begin_src jupyter-python
+Plot Adjusted R²
 
-g2 = fitres(pa_pd, x="n", y="peak_dmol", col="clean_nmol", log_scale=False,
-           sharex=False)
-g2.set_yticklabels([
-    "steep\npeak artifacts\n$D_{sim}$ = 1 $\\frac{{\\mu m^2}}{{s}}$"
-     "\n$n_{\\mathrm{clusters}} = 3$",
-    "middle-sized\npeak artifacts\n$D_{sim}$ = 0.1 $\\frac{{\\mu m^2}}{{s}}$"
-     "\n$n_{\\mathrm{clusters}} = 7$",
-    "broad\npeak artifacts\n$D_{sim}$ = 0.01 $\\frac{{\\mu m^2}}{{s}}$"
-     "\n$n_{\\mathrm{clusters}} = 10$",
-])
-
-#+end_src
+#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 305-309 :src jupyter-python
 
 #+RESULTS:
 :RESULTS:
-: <seaborn.axisgrid.FacetGrid at 0x7f11f55d5dc0>
-[[file:./.ob-jupyter/f962419f94493cc87fb945433e1ed68d87557d96.png]]
+: /tmp/ipykernel_5672/627744654.py:84: UserWarning: set_ticklabels() should only be used with a fixed number of ticks, i.e. after set_ticks() or using a FixedLocator.
+:   ax[0, 0].set_yticklabels(yticklabels)
+[[file:./.ob-jupyter/037fe0117f7e2a1661b75360e577a5af32e50f63.png]]
 :END:
 
-#+begin_src jupyter-python
-fig, ax = plt.subplots(2, 1)
-ax[0] = g1
-ax[1] = g2
-#+end_src
+***** Time-series with photobleaching
+
+First, load the data
+
+#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 311-350 :src jupyter-python
 
 #+RESULTS:
-[[file:./.ob-jupyter/456511b546c42788308fea78b28519529a7c54f3.png]]
 
+Plot fit distributions
 
-#+begin_src jupyter-python
-sns.catplot(
-    data=pd_df, x="nrmse", hue="record_type", col="clean_dmol",
-    y="peak_dmol", kind="violin", split=True, log_scale=False, fill=False
-)
-#+end_src
+#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 352-356 :src jupyter-python
 
 #+RESULTS:
 :RESULTS:
-: <seaborn.axisgrid.FacetGrid at 0x7f0c32f41b80>
-[[file:./.ob-jupyter/c45f776cc97de22a5650cd1c5df7d6cc27a301eb.png]]
+: /tmp/ipykernel_5672/627744654.py:84: UserWarning: set_ticklabels() should only be used with a fixed number of ticks, i.e. after set_ticks() or using a FixedLocator.
+:   ax[0, 0].set_yticklabels(yticklabels)
+[[file:./.ob-jupyter/610f457381aac16eb1dbd5eabeb2aa40b0427cc8.png]]
 :END:
 
-#+begin_src jupyter-python
-sns.catplot(
-    data=pd_df, x="adjr2", hue="record_type", col="clean_dmol",
-    y="peak_dmol", kind="violin", split=True, log_scale=False, fill=False
-)
-#+end_src
+Plot reduced chi squared
+
+#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 357-361 :src jupyter-python
 
 #+RESULTS:
 :RESULTS:
-: <seaborn.axisgrid.FacetGrid at 0x7f0c1fb97650>
-[[file:./.ob-jupyter/cc4e422095b7f95ad0d9087e11c4e08522cdb37b.png]]
+: /tmp/ipykernel_5672/627744654.py:84: UserWarning: set_ticklabels() should only be used with a fixed number of ticks, i.e. after set_ticks() or using a FixedLocator.
+:   ax[0, 0].set_yticklabels(yticklabels)
+[[file:./.ob-jupyter/224eeaac88806d5ff9e1f3823f11a9ac3b5ec63e.png]]
 :END:
 
-#+begin_src jupyter-python
-sns.catplot(
-    data=pd_df, x="redchi", hue="record_type", col="clean_dmol",
-    y="peak_dmol", kind="violin", split=True, log_scale=True, fill=False
-)
-#+end_src
+Plot NRMSE
+
+#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 362-366 :src jupyter-python
 
 #+RESULTS:
 :RESULTS:
-: <seaborn.axisgrid.FacetGrid at 0x7f0b7a897080>
-[[file:./.ob-jupyter/e75b3b6e87a70b4c7bbef4d8cee85c38ddd74153.png]]
+: /tmp/ipykernel_5672/627744654.py:84: UserWarning: set_ticklabels() should only be used with a fixed number of ticks, i.e. after set_ticks() or using a FixedLocator.
+:   ax[0, 0].set_yticklabels(yticklabels)
+[[file:./.ob-jupyter/f1a3829bb3d4f9ecf18fa9396a590e25e8d53faf.png]]
 :END:
 
+Plot Adjusted R²
 
-
-#+begin_src jupyter-python
-sns.catplot(
-    data=pd_df, x="n", hue="record_type", col="clean_nmol", y="peak_nmol",
-    kind="violin", split=True, log_scale=False, fill=False, cut=0, sharex=False
-)
-#+end_src
+#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 367-371 :src jupyter-python
 
 #+RESULTS:
 :RESULTS:
-: <seaborn.axisgrid.FacetGrid at 0x7f0c495df230>
-[[file:./.ob-jupyter/9f5a184d048807d1d036581e776db0abbf60a49e.png]]
+: /tmp/ipykernel_5672/627744654.py:84: UserWarning: set_ticklabels() should only be used with a fixed number of ticks, i.e. after set_ticks() or using a FixedLocator.
+:   ax[0, 0].set_yticklabels(yticklabels)
+[[file:./.ob-jupyter/e3021785bb92a620147f6b6328cc2a25ae9b6d1b.png]]
 :END:
 
-#+begin_src jupyter-python
-sns.catplot(
-    data=pd_df, x="redchi", hue="record_type", col="peak_nmol",
-    y="clean_nmol", kind="violin", split=True, log_scale=True, fill=False,
-)
-#+end_src
+***** Time-series with detector dropout
+
+First, load the data
+
+#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 373-402 :src jupyter-python
+
+#+RESULTS:
+
+Plot fit distributions
+
+#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 404-408 :src jupyter-python
 
 #+RESULTS:
 :RESULTS:
-: <seaborn.axisgrid.FacetGrid at 0x7f0c3c3d90a0>
-[[file:./.ob-jupyter/c3be176494b33156a8d77a18379f12af2176f31c.png]]
+: /tmp/ipykernel_5672/627744654.py:84: UserWarning: set_ticklabels() should only be used with a fixed number of ticks, i.e. after set_ticks() or using a FixedLocator.
+:   ax[0, 0].set_yticklabels(yticklabels)
+[[file:./.ob-jupyter/df44b490e11d514d9d6b6a9ff885d51e39c4a12a.png]]
 :END:
 
+Plot reduced chi squared
 
-#+begin_src jupyter-python
-display(df["clean_nmol"].value_counts(sort=True))
-display(df["clean_dmol"].value_counts(sort=True))
-df.filter((pl.col("clean_dmol") == 0.1) & (pl.col("clean_nmol") == 125))
-
-#+end_src
+#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 409-413 :src jupyter-python
 
 #+RESULTS:
 :RESULTS:
-shape: (10, 2)
-| clean_nmol | count |
-|------------+-------|
-| u32        | u32   |
-| 50         | 1152  |
-| 4000       | 1152  |
-| 125        | 960   |
-| 500        | 960   |
-| 3000       | 960   |
-| 1000       | 960   |
-| 100        | 192   |
-| 3500       | 192   |
-| 250        | 192   |
-| 2000       | 192   |
-shape: (12, 2)
-| clean_dmol | count |
-|------------+-------|
-| f32        | u32   |
-| 50.0       | 960   |
-| 0.05       | 960   |
-| 0.1        | 576   |
-| 3.0        | 576   |
-| 1.75       | 576   |
-| ...        | ...   |
-| 1.0        | 576   |
-| 25.0       | 384   |
-| 0.25       | 384   |
-| 0.075      | 384   |
-| 5.0        | 384   |
-shape: (96, 25)
-| uuid                               | tc                      | sim_params                                                                                                        | minimizer                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | fit                                 | cor                                 | trace                                   | ts_params                                                                | nrmse    | ndata | nvarys | chisqr   | redchi   | artifact         | record_type         | tau        | n        | clean_dmol | clean_nmol | peak_dmol | bleach_exp_scale | bleach_type | dropout_n | dropout_maxdrop | adjr2    |
-|------------------------------------+-------------------------+-------------------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------+-------------------------------------+-----------------------------------------+--------------------------------------------------------------------------+----------+-------+--------+----------+----------+------------------+---------------------+------------+----------+------------+------------+-----------+------------------+-------------+-----------+-----------------+----------|
-| str                                | array[f32, 94]          | struct[19]                                                                                                        | struct[6]                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | array[f32, 94]                      | array[f32, 94]                      | array[f32, 16384]                       | struct[8]                                                                | f32      | u32   | u32    | f32      | f32      | str              | str                 | f32        | f32      | f32        | u32        | f32       | f32              | str         | u32       | f32             | f64      |
-| "0a7cb9b9-0df0-4707-bcd7-50c3c4... | [1.0, 2.0, ... 14336.0] | {16384.0,1.0,250.0,4000.0,3000,3000,0.1,125,"peak_artifacts","both",1500,1500,"None",null,null,null,1.0,3,1496}   | {false,true,"Fit succeeded.",{-537.712158,-530.082275,0.289131,94,36,91,3,0.003177},"[[Fit Statistics]]     # fitting method   = leastsq     # function evals   = 36     # data points      = 94     # variables        = 3     chi-square         = 0.28913052     reduced chi-square = 0.00317726     Akaike info crit   = -537.712155     Bayesian info crit = -530.082271 [[Variables]]     offset: -0.01185921 +/- 0.00842175 (71.01%) (init = 0.01)     gn0:     1.52229972 +/- 0.03315088 (2.18%) (init = 1)     a1:      1 (fixed)     txy1:    18.6328349 +/- 1.17029561 (6.28%) (init = 1)     alpha1:  1 (fixed) [[Correlations]] (unreported correlations are < 0.100)     C(gn0, txy1)    = -0.7480     C(offset, txy1) = -0.4726",{{-0.011859,-0.5,1.5,true,0.008422},{1.5223,-0.0001,3000.0,true,0.033151},{1.0,0.0001,1.0,false,0.0},{null,null,null,null,null},{null,null,null,null,null},{18.632835,0.001,2000.0,true,1.170296},{null,null,null,null,null},{null,null,null,null,null},{1.0,0.6,2.0,false,0.0},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null}}}                                    | [1.432902, 1.36288, ... -0.009883]  | [1.457572, 1.374343, ... 0.072493]  | [46.455013, 53.793434, ... 104.711929]  | {1.0,1,2025-05-29,"peak_artifacts",16384,126.261566,195.123138,0.647126} | 0.034336 | 94    | 3      | 0.289131 | 0.003177 | "peak_artifacts" | "feature"           | 18.632835  | 0.656901 | 0.1        | 125        | 1.0       | null             | "None"      | null      | null            | 0.980708 |
-| "0d79fdc1-9209-4db0-82fa-9b2827... | [1.0, 2.0, ... 14336.0] | {16384.0,1.0,250.0,4000.0,3000,3000,0.1,125,"peak_artifacts","both",1500,1500,"None",null,null,null,0.1,7,1840}   | {false,true,"Fit succeeded.",{-344.512177,-336.882294,2.257915,94,42,91,3,0.024812},"[[Fit Statistics]]     # fitting method   = leastsq     # function evals   = 42     # data points      = 94     # variables        = 3     chi-square         = 2.25791487     reduced chi-square = 0.02481225     Akaike info crit   = -344.512184     Bayesian info crit = -336.882300 [[Variables]]     offset: -0.13968184 +/- 0.03208663 (22.97%) (init = 0.01)     gn0:     2.01431616 +/- 0.04649433 (2.31%) (init = 1)     a1:      1 (fixed)     txy1:    142.075943 +/- 14.4080920 (10.14%) (init = 1)     alpha1:  1 (fixed) [[Correlations]] (unreported correlations are < 0.100)     C(offset, txy1) = -0.6096     C(offset, gn0)  = -0.4628     C(gn0, txy1)    = -0.2180",{{-0.139682,-0.5,1.5,true,0.032087},{2.014316,-0.0001,3000.0,true,0.046494},{1.0,0.0001,1.0,false,0.0},{null,null,null,null,null},{null,null,null,null,null},{142.075943,0.001,2000.0,true,14.408092},{null,null,null,null,null},{null,null,null,null,null},{1.0,0.6,2.0,false,0.0},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null}}} | [1.860556, 1.846672, ... -0.119915] | [1.969036, 1.949578, ... -0.025041] | [27.627409, 19.108013, ... 132.570862]  | {1.0,1,2025-05-29,"peak_artifacts",16384,276.828156,549.45343,0.503855}  | 0.066012 | 94    | 3      | 2.257915 | 0.024812 | "peak_artifacts" | "feature"           | 142.075943 | 0.496446 | 0.1        | 125        | 0.1       | null             | "None"      | null      | null            | 0.954409 |
-| "112be169-774c-47c3-ae22-bd7d18... | [1.0, 2.0, ... 14336.0] | {16384.0,1.0,250.0,4000.0,3000,3000,0.1,125,"peak_artifacts","both",1500,1500,"None",null,null,null,0.01,10,1341} | {false,true,"Fit succeeded.",{-573.176636,-565.546753,0.198263,94,51,91,3,0.002179},"[[Fit Statistics]]     # fitting method   = leastsq     # function evals   = 51     # data points      = 94     # variables        = 3     chi-square         = 0.19826336     reduced chi-square = 0.00217872     Akaike info crit   = -573.176657     Bayesian info crit = -565.546773 [[Variables]]     offset: -0.05467338 +/- 0.00964037 (17.63%) (init = 0.01)     gn0:     0.61407998 +/- 0.01365567 (2.22%) (init = 1)     a1:      1 (fixed)     txy1:    152.475586 +/- 14.9812277 (9.83%) (init = 1)     alpha1:  1 (fixed) [[Correlations]] (unreported correlations are < 0.100)     C(offset, txy1) = -0.6137     C(offset, gn0)  = -0.4813     C(gn0, txy1)    = -0.1935",{{-0.054673,-0.5,1.5,true,0.00964},{0.61408,-0.0001,3000.0,true,0.013656},{1.0,0.0001,1.0,false,0.0},{null,null,null,null,null},{null,null,null,null,null},{152.475586,0.001,2000.0,true,14.981228},{null,null,null,null,null},{null,null,null,null,null},{1.0,0.6,2.0,false,0.0},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null}}}    | [0.555405, 0.551456, ... -0.048211] | [0.555387, 0.551392, ... -0.313176] | [4.047597, 3.246384, ... 86.329742]     | {1.0,1,2025-05-29,"peak_artifacts",16384,106.487549,58.579205,1.81795}   | 0.052876 | 94    | 3      | 0.198263 | 0.002179 | "peak_artifacts" | "feature"           | 152.475586 | 1.628452 | 0.1        | 125        | 0.01      | null             | "None"      | null      | null            | 0.957096 |
-| "1406f8ef-3a0a-408f-b351-55f660... | [1.0, 2.0, ... 14336.0] | {16384.0,1.0,250.0,4000.0,3000,3000,0.1,125,"peak_artifacts","both",1500,1500,"None",null,null,null,0.01,10,847}  | {false,true,"Fit succeeded.",{-484.146484,-476.516602,0.511182,94,70,91,3,0.005617},"[[Fit Statistics]]     # fitting method   = leastsq     # function evals   = 70     # data points      = 94     # variables        = 3     chi-square         = 0.51118208     reduced chi-square = 0.00561739     Akaike info crit   = -484.146476     Bayesian info crit = -476.516592 [[Variables]]     offset: -0.08072774 +/- 0.02030165 (25.15%) (init = 0.01)     gn0:     0.67303400 +/- 0.02214402 (3.29%) (init = 1)     a1:      1 (fixed)     txy1:    431.034341 +/- 62.7329450 (14.55%) (init = 1)     alpha1:  1 (fixed) [[Correlations]] (unreported correlations are < 0.100)     C(offset, gn0)  = -0.7406     C(offset, txy1) = -0.7049     C(gn0, txy1)    = +0.2232",{{-0.080728,-0.5,1.5,true,0.020302},{0.673034,-0.0001,3000.0,true,0.022144},{1.0,0.0001,1.0,false,0.0},{null,null,null,null,null},{null,null,null,null,null},{431.034332,0.001,2000.0,true,62.732944},{null,null,null,null,null},{null,null,null,null,null},{1.0,0.6,2.0,false,0.0},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null}}} | [0.590748, 0.589198, ... -0.061083] | [0.62098, 0.617778, ... 0.204917]   | [383.969635, 429.231842, ... 28.426842] | {1.0,1,2025-05-29,"peak_artifacts",16384,134.599396,83.025047,1.621289}  | 0.073715 | 94    | 3      | 0.511182 | 0.005617 | "peak_artifacts" | "feature"           | 431.034332 | 1.485809 | 0.1        | 125        | 0.01      | null             | "None"      | null      | null            | 0.911589 |
-| "1ffb0d23-d2bb-4b33-b451-b076f8... | [1.0, 2.0, ... 14336.0] | {16384.0,1.0,250.0,4000.0,3000,3000,0.1,125,"peak_artifacts","both",1500,1500,"None",null,null,null,0.1,7,1141}   | {false,true,"Fit succeeded.",{-380.983521,-373.353638,1.531808,94,47,91,3,0.016833},"[[Fit Statistics]]     # fitting method   = leastsq     # function evals   = 47     # data points      = 94     # variables        = 3     chi-square         = 1.53180797     reduced chi-square = 0.01683305     Akaike info crit   = -380.983530     Bayesian info crit = -373.353646 [[Variables]]     offset: -0.16058169 +/- 0.02807887 (17.49%) (init = 0.01)     gn0:     1.60254532 +/- 0.03724843 (2.32%) (init = 1)     a1:      1 (fixed)     txy1:    188.763287 +/- 19.6213100 (10.39%) (init = 1)     alpha1:  1 (fixed) [[Correlations]] (unreported correlations are < 0.100)     C(offset, txy1) = -0.6302     C(offset, gn0)  = -0.5408     C(gn0, txy1)    = -0.1093",{{-0.160582,-0.5,1.5,true,0.028079},{1.602545,-0.0001,3000.0,true,0.037248},{1.0,0.0001,1.0,false,0.0},{null,null,null,null,null},{null,null,null,null,null},{188.76329,0.001,2000.0,true,19.621309},{null,null,null,null,null},{null,null,null,null,null},{1.0,0.6,2.0,false,0.0},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null}}}  | [1.433519, 1.425162, ... -0.139755] | [1.476387, 1.464066, ... -0.376783] | [49.457535, 48.595768, ... 259.557098]  | {1.0,1,2025-05-29,"peak_artifacts",16384,214.854553,318.940521,0.673692} | 0.065465 | 94    | 3      | 1.531808 | 0.016833 | "peak_artifacts" | "feature"           | 188.76329  | 0.624007 | 0.1        | 125        | 0.1       | null             | "None"      | null      | null            | 0.952266 |
-| ...                                | ...                     | ...                                                                                                               | ...                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | ...                                 | ...                                 | ...                                     | ...                                                                      | ...      | ...   | ...    | ...      | ...      | ...              | ...                 | ...        | ...      | ...        | ...        | ...       | ...              | ...         | ...       | ...             | ...      |
-| "ed97a1d5-d130-4320-a5c3-65169a... | [1.0, 2.0, ... 14336.0] | {16384.0,1.0,250.0,4000.0,3000,3000,0.1,125,"peak_artifacts","both",1500,1500,"None",null,null,null,0.01,10,1195} | {false,true,"Fit succeeded.",{-612.30426,-604.674377,0.130758,94,46,91,3,0.001437},"[[Fit Statistics]]     # fitting method   = leastsq     # function evals   = 46     # data points      = 94     # variables        = 3     chi-square         = 0.13075758     reduced chi-square = 0.00143690     Akaike info crit   = -612.304270     Bayesian info crit = -604.674386 [[Variables]]     offset: -0.02485498 +/- 0.00732902 (29.49%) (init = 0.01)     gn0:     0.66948193 +/- 0.01168354 (1.75%) (init = 1)     a1:      1 (fixed)     txy1:    109.595900 +/- 8.16277086 (7.45%) (init = 1)     alpha1:  1 (fixed) [[Correlations]] (unreported correlations are < 0.100)     C(offset, txy1) = -0.5885     C(offset, gn0)  = -0.3915     C(gn0, txy1)    = -0.3148",{{-0.024855,-0.5,1.5,true,0.007329},{0.669482,-0.0001,3000.0,true,0.011684},{1.0,0.0001,1.0,false,0.0},{null,null,null,null,null},{null,null,null,null,null},{109.595901,0.001,2000.0,true,8.162771},{null,null,null,null,null},{null,null,null,null,null},{1.0,0.6,2.0,false,0.0},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null}}}    | [0.638574, 0.632629, ... -0.019776] | [0.64055, 0.634586, ... 0.089856]   | [153.61084, 153.023315, ... 258.339722] | {1.0,1,2025-05-29,"peak_artifacts",16384,262.424988,290.759766,0.902604} | 0.048615 | 94    | 3      | 0.130758 | 0.001437 | "peak_artifacts" | "label_restoration" | 109.595901 | 1.493692 | 0.1        | 125        | 0.01      | null             | "None"      | null      | null            | 0.974816 |
-| "f3e8aa65-b2c0-4530-a78b-110b3a... | [1.0, 2.0, ... 14336.0] | {16384.0,1.0,250.0,4000.0,3000,3000,0.1,125,"peak_artifacts","both",1500,1500,"None",null,null,null,1.0,3,1723}   | {false,true,"Fit succeeded.",{-574.962463,-567.332581,0.194532,94,60,91,3,0.002138},"[[Fit Statistics]]     # fitting method   = leastsq     # function evals   = 60     # data points      = 94     # variables        = 3     chi-square         = 0.19453235     reduced chi-square = 0.00213772     Akaike info crit   = -574.962451     Bayesian info crit = -567.332567 [[Variables]]     offset: -0.02514292 +/- 0.00971107 (38.62%) (init = 0.01)     gn0:     0.45246579 +/- 0.01340016 (2.96%) (init = 1)     a1:      1 (fixed)     txy1:    164.761670 +/- 21.6824541 (13.16%) (init = 1)     alpha1:  1 (fixed) [[Correlations]] (unreported correlations are < 0.100)     C(offset, txy1) = -0.6201     C(offset, gn0)  = -0.5036     C(gn0, txy1)    = -0.1615",{{-0.025143,-0.5,1.5,true,0.009711},{0.452466,-0.0001,3000.0,true,0.0134},{1.0,0.0001,1.0,false,0.0},{null,null,null,null,null},{null,null,null,null,null},{164.761673,0.001,2000.0,true,21.682453},{null,null,null,null,null},{null,null,null,null,null},{1.0,0.6,2.0,false,0.0},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null}}}   | [0.424593, 0.421896, ... -0.020002] | [0.452952, 0.448662, ... -0.115117] | [42.850483, 50.372593, ... 15.026757]   | {1.0,1,2025-05-29,"peak_artifacts",16384,166.812836,324.765106,0.513673} | 0.076107 | 94    | 3      | 0.194532 | 0.002138 | "peak_artifacts" | "label_restoration" | 164.761673 | 2.210112 | 0.1        | 125        | 1.0       | null             | "None"      | null      | null            | 0.92541  |
-| "f4d56f36-b944-4181-a31c-b406b2... | [1.0, 2.0, ... 14336.0] | {16384.0,1.0,250.0,4000.0,3000,3000,0.1,125,"peak_artifacts","both",1500,1500,"None",null,null,null,0.1,7,1733}   | {false,true,"Fit succeeded.",{-635.317261,-627.687378,0.102363,94,30,91,3,0.001125},"[[Fit Statistics]]     # fitting method   = leastsq     # function evals   = 30     # data points      = 94     # variables        = 3     chi-square         = 0.10236307     reduced chi-square = 0.00112487     Akaike info crit   = -635.317265     Bayesian info crit = -627.687381 [[Variables]]     offset: -0.01321971 +/- 0.00637576 (48.23%) (init = 0.01)     gn0:     0.46398099 +/- 0.01053330 (2.27%) (init = 1)     a1:      1 (fixed)     txy1:    100.080916 +/- 9.57765652 (9.57%) (init = 1)     alpha1:  1 (fixed) [[Correlations]] (unreported correlations are < 0.100)     C(offset, txy1) = -0.5816     C(offset, gn0)  = -0.3671     C(gn0, txy1)    = -0.3464",{{-0.01322,-0.5,1.5,true,0.006376},{0.463981,-0.0001,3000.0,true,0.010533},{1.0,0.0001,1.0,false,0.0},{null,null,null,null,null},{null,null,null,null,null},{100.080917,0.001,2000.0,true,9.577657},{null,null,null,null,null},{null,null,null,null,null},{1.0,0.6,2.0,false,0.0},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null}}}    | [0.446171, 0.441671, ... -0.010003] | [0.445044, 0.441061, ... 0.105895]  | [154.39238, 151.123688, ... 141.67514]  | {1.0,1,2025-05-29,"peak_artifacts",16384,155.314743,210.320465,0.738512} | 0.054763 | 94    | 3      | 0.102363 | 0.001125 | "peak_artifacts" | "label_restoration" | 100.080917 | 2.155261 | 0.1        | 125        | 0.1       | null             | "None"      | null      | null            | 0.959024 |
-| "fca988a3-3b0d-4c5d-b43d-f9b5a3... | [1.0, 2.0, ... 14336.0] | {16384.0,1.0,250.0,4000.0,3000,3000,0.1,125,"peak_artifacts","both",1500,1500,"None",null,null,null,0.1,7,2103}   | {false,true,"Fit succeeded.",{-733.748352,-726.118469,0.035923,94,36,91,3,0.000395},"[[Fit Statistics]]     # fitting method   = leastsq     # function evals   = 36     # data points      = 94     # variables        = 3     chi-square         = 0.03592331     reduced chi-square = 3.9476e-04     Akaike info crit   = -733.748375     Bayesian info crit = -726.118491 [[Variables]]     offset: -0.01380856 +/- 0.00374833 (27.14%) (init = 0.01)     gn0:     0.36421138 +/- 0.00629940 (1.73%) (init = 1)     a1:      1 (fixed)     txy1:    96.0321275 +/- 6.95551539 (7.24%) (init = 1)     alpha1:  1 (fixed) [[Correlations]] (unreported correlations are < 0.100)     C(offset, txy1) = -0.5786     C(gn0, txy1)    = -0.3602     C(offset, gn0)  = -0.3562",{{-0.013809,-0.5,1.5,true,0.003748},{0.364211,-0.0001,3000.0,true,0.006299},{1.0,0.0001,1.0,false,0.0},{null,null,null,null,null},{null,null,null,null,null},{96.032127,0.001,2000.0,true,6.955515},{null,null,null,null,null},{null,null,null,null,null},{1.0,0.6,2.0,false,0.0},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null}}}    | [0.346649, 0.342972, ... -0.011385] | [0.353428, 0.349529, ... -0.001402] | [34.067108, 43.030457, ... 125.210922]  | {1.0,1,2025-05-29,"peak_artifacts",16384,180.238754,438.134735,0.411403} | 0.046177 | 94    | 3      | 0.035923 | 0.000395 | "peak_artifacts" | "label_restoration" | 96.032127  | 2.745658 | 0.1        | 125        | 0.1       | null             | "None"      | null      | null            | 0.976095 |
-| "feecd64b-6df0-4ab9-b45e-912799... | [1.0, 2.0, ... 14336.0] | {16384.0,1.0,250.0,4000.0,3000,3000,0.1,125,"peak_artifacts","both",1500,1500,"None",null,null,null,0.01,10,1462} | {false,true,"Fit succeeded.",{-586.929321,-579.299438,0.171279,94,62,91,3,0.001882},"[[Fit Statistics]]     # fitting method   = leastsq     # function evals   = 62     # data points      = 94     # variables        = 3     chi-square         = 0.17127862     reduced chi-square = 0.00188218     Akaike info crit   = -586.929299     Bayesian info crit = -579.299415 [[Variables]]     offset: -0.03632903 +/- 0.00925699 (25.48%) (init = 0.01)     gn0:     0.58741002 +/- 0.01249420 (2.13%) (init = 1)     a1:      1 (fixed)     txy1:    176.873419 +/- 16.7978499 (9.50%) (init = 1)     alpha1:  1 (fixed) [[Correlations]] (unreported correlations are < 0.100)     C(offset, txy1) = -0.6261     C(offset, gn0)  = -0.5223     C(gn0, txy1)    = -0.1342",{{-0.036329,-0.5,1.5,true,0.009257},{0.58741,-0.0001,3000.0,true,0.012494},{1.0,0.0001,1.0,false,0.0},{null,null,null,null,null},{null,null,null,null,null},{176.873413,0.001,2000.0,true,16.79785},{null,null,null,null,null},{null,null,null,null,null},{1.0,0.6,2.0,false,0.0},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null},{null,null,null,null,null}}}    | [0.547779, 0.544513, ... -0.02917]  | [0.574183, 0.569009, ... -0.15174]  | [53.846069, 44.656242, ... 39.317459]   | {1.0,1,2025-05-29,"peak_artifacts",16384,81.268234,46.101364,1.762924}   | 0.058803 | 94    | 3      | 0.171279 | 0.001882 | "peak_artifacts" | "label_restoration" | 176.873413 | 1.702388 | 0.1        | 125        | 0.01      | null             | "None"      | null      | null            | 0.959826 |
+: /tmp/ipykernel_5672/627744654.py:84: UserWarning: set_ticklabels() should only be used with a fixed number of ticks, i.e. after set_ticks() or using a FixedLocator.
+:   ax[0, 0].set_yticklabels(yticklabels)
+[[file:./.ob-jupyter/7cf8e40cefe652d021a66df45caf2771252015fd.png]]
 :END:
 
+Plot NRMSE
 
-#+begin_src jupyter-python
-# sns.lineplot(data=df_)
-#+end_src
+#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 414-418 :src jupyter-python
 
 #+RESULTS:
 :RESULTS:
-: <Axes: >
-[[file:./.ob-jupyter/15f9d033e86ca0b0513895e61548e084de2d7ffd.png]]
+: /tmp/ipykernel_5672/627744654.py:84: UserWarning: set_ticklabels() should only be used with a fixed number of ticks, i.e. after set_ticks() or using a FixedLocator.
+:   ax[0, 0].set_yticklabels(yticklabels)
+[[file:./.ob-jupyter/c2f8b3c1abfaa6fddf7e7b14ef1c9b1084ac6c4a.png]]
 :END:
 
-#+begin_src jupyter-python
+Plot Adjusted R²
 
-pa_pd = (
-    df_fitres.filter(pa_filter())
-    .cast({"peak_dmol": pl.String, "peak_nmol": pl.String,
-           "clean_nmol": pl.String, "clean_dmol": pl.String})
-    .select("record_type", "diffcoeff", "n", "clean_dmol", "clean_nmol",
-            "peak_dmol", "peak_nmol", "nrmse", "redchi", "adjr2",
-            "trace", "cor", "fit", "tc"
-            )
-    .to_pandas()
-)
-
-#+end_src
-
-#+begin_src jupyter-python
-
-def plot_sim_example_with_corr_fit(
-        data, idx: int, param: lmfit.Parameters, options, artifact: str,
-        title: str
-) -> None:
-    gs_kw = dict(width_ratios=[1.5, 1, 1], height_ratios=[3, 1])
-    fig, axd = plt.subplot_mosaic(
-        [['left', 'cor1', 'cor2'],
-        ['left', 'res1', 'res2']],
-        gridspec_kw=gs_kw, figsize=(9, 4), layout="tight"
-    )
-    axd["cor1"].sharey(axd["cor2"])
-    axd["res1"].sharey(axd["res2"])
-    cor1, res1, fit1 = autocorrelate_and_fit(
-        data[idx, "label_restoration"], param, options
-    )
-    cor2, res2, fit2 = autocorrelate_and_fit(
-        data[idx, "feature"], param, options
-    )
-    tau1 = round(res1.params['txy1'].value, 2)
-    tau1 = f"No artifact\n$\\tau_{{\\mathrm{{diff}}}}$ = {tau1} ms"
-    tau2 = round(res2.params['txy1'].value, 2)
-    tau2 = f"{artifact}\n$\\tau_{{\\mathrm{{diff}}}}$ = {tau2} ms"
-    cory = r"$G(\tau)$"
-    corx = r"lag time [$\tau$]"
-    sns.lineplot(data=data[idx, "label_restoration"], ax=axd["left"],
-                 label="No artifact")
-    sns.lineplot(data=data[idx, "feature"], alpha=0.7, ax=axd["left"],
-                 label=artifact)
-    plt.setp(axd["left"], xlabel=r"macrotime [$ms$]", ylabel="intensity [a.u.]",
-             title=title)
-
-    sns.lineplot(x=cor1[1:, 0], y=cor1[1:, 1], ax=axd["cor1"])
-    sns.lineplot(x=cor1[1:, 0], y=fit1[1:], ax=axd["cor1"])
-    plt.setp(axd["cor1"], xlabel=corx, ylabel=cory, title=tau1, xscale="log")
-
-    sns.lineplot(x=cor1[1:, 0], y=res1.residual[1:], ax=axd["res1"])
-    plt.setp(axd["res1"], xlabel=r'residual', xscale="log")
-
-    sns.lineplot(x=cor2[1:, 0], y=cor2[1:, 1], ax=axd["cor2"])
-    sns.lineplot(x=cor2[1:, 0], y=fit2[1:], ax=axd["cor2"])
-    plt.setp(axd["cor2"], xlabel=corx, ylabel=cory, title=tau2, xscale="log")
-
-    sns.lineplot(x=cor2[1:, 0], y=res2.residual[1:], ax=axd["res2"])
-    plt.setp(axd["res2"], xlabel=r'residual', xscale="log")
-
-    plt.show()
-
-
-#+end_src
-
-
-**** plot quality metrics
-
-#+begin_src jupyter-python
-
-pd_eval = df_eval.select("redchi", "nrmse", "adjr2", "artifact", "record_type").to_pandas()
-
-f, ax = plt.subplots(1, 3, figsize=(9, 4), layout="tight", sharey=True)
-sns.violinplot(
-    pd_eval, x="redchi", y="artifact", hue="record_type", density_norm="width",
-    log_scale=True, fill=False, inner="quart", split=True, ax=ax[0], legend=False
-).set_yticklabels(["with and without\ndetector dropout",
-                   "with and without\npeak artifacts",
-                   "with and without\nphotobleaching"])
-sns.violinplot(
-    pd_eval, x="nrmse", y="artifact", hue="record_type", density_norm="width",
-    log_scale=False, fill=False, inner="quart", split=True, ax=ax[1], legend=False
-)
-sns.violinplot(
-    pd_eval, x="adjr2", y="artifact", hue="record_type", density_norm="width",
-    log_scale=False, fill=False, inner="quart", split=True, ax=ax[2], legend=True
-)
-sns.move_legend(ax[2], "lower center", bbox_to_anchor=(.5, 1), ncol=2, title=None, frameon=False)
-for t, l in zip(ax[2].axes.get_legend().texts, ["with artifact", "without artifact"]):
-    t.set_text(l)
-plt.setp(ax[0], xlabel="reduced chi-square", ylabel=None)
-plt.setp(ax[1], xlabel="NRMSE")
-plt.setp(ax[2], xlabel="Adjusted R²", xlim=(0.75, 1))
-plt.show()
-#+end_src
+#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 419-423 :src jupyter-python
 
 #+RESULTS:
 :RESULTS:
-: /tmp/ipykernel_21966/107542450.py:7: UserWarning: set_ticklabels() should only be used with a fixed number of ticks, i.e. after set_ticks() or using a FixedLocator.
+: /tmp/ipykernel_5672/627744654.py:84: UserWarning: set_ticklabels() should only be used with a fixed number of ticks, i.e. after set_ticks() or using a FixedLocator.
+:   ax[0, 0].set_yticklabels(yticklabels)
+[[file:./.ob-jupyter/891560b2225af61ca0e8ed231c1de4ece514d97b.png]]
+:END:
+
+**** Plot quality metrics overview
+
+#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 425-457 :src jupyter-python
+
+#+RESULTS:
+:RESULTS:
+: /tmp/ipykernel_5672/4024010344.py:12: UserWarning: set_ticklabels() should only be used with a fixed number of ticks, i.e. after set_ticks() or using a FixedLocator.
 :   ).set_yticklabels(["with and without\ndetector dropout",
-[[file:./.ob-jupyter/187f531d9e762e230fe0bd419ed5678562df3d35.png]]
+[[file:./.ob-jupyter/0ab931f2a5c1727941fb1385850218f02c020141.png]]
 :END:
-
-
-
-
-
-#+begin_src jupyter-python
-#+end_src
-
-#+RESULTS:
-| Text | (0 0 feature) | Text | (0 0 label_restoration) |
-
-
-#+begin_src jupyter-python
-sns.violinplot(
-    pd_eval, x="redchi", y="artifact", hue="record_type", density_norm="width",
-    log_scale=True, fill=False, inner="quart", split=True, legend=True
-)
-
-#+end_src
-
-#+RESULTS:
-:RESULTS:
-: <Axes: xlabel='redchi', ylabel='artifact'>
-[[file:./.ob-jupyter/44839efa576069587312e372447f7020f1743b28.png]]
-:END:
-
-
-
-
-
-
-#+begin_src jupyter-python
-    # display(df_nrmse)
-    df_badfit = df_nrmse.filter(pl.col("nrmse") > 0.1)
-    df_badfit = df_nrmse.filter(pl.col(minimizer).struct.field("fit_stats").struct.field("chisqr") > 1)
-    # display(df_badfit)
-    myex = 9
-    # pprint("chisqr", df_badfit[myex, "feature_minimizer_params"]["fit_stats"]["chisqr"])
-
-    # mycor = df_cor.filter(pl.col("uuid") == df_hichi[myex, "uuid"])
-    plt.semilogx(df_badfit[myex, "tc"], df_badfit[myex, "cor"])
-    plt.semilogx(df_badfit[myex, "tc"], df_badfit[myex, "fit"])
-
-    pprint({k: v for k, v in df_badfit[myex, "sim_params"].items() if k in [
-        "sim_artifact", "clean_dmol", "clean_nmol", "bleach_type",
-        "bleach_exp_scale", "dropout_n", "dropout_maxdrop", "peak_dmol",
-        "peak_nmol", "peak_brightness"
-    ]})
-    display(f"number of bad fits: {len(df_badfit)}")
-    display(f"nrmse: {df_badfit[myex, 'nrmse']}")
-    display(f"chisqr: {df_badfit[myex, minimizer]['fit_stats']['chisqr']}")
-    break
-
-#+end_src
-
-#+begin_src jupyter-python
-
-#+end_src
-
-
-
-#+begin_src jupyter-python
-
-pd_eval = df_eval.select("redchi", "nrmse", "chisqr", "artifact", "record_type").to_pandas()
-
-f, ax = plt.subplots(1, 2, figsize=(9, 4), layout="tight", sharey=True)
-sns.violinplot(
-    pd_eval, x="chisqr", y="artifact", hue="record_type", density_norm="width",
-    log_scale=True, fill=False, inner="quart", split=True, ax=ax[0],
-    legend=True
-)
-sns.violinplot(
-    pd_eval, x="nrmse", y="artifact", hue="record_type", density_norm="width",
-    log_scale=False, fill=False, inner="quart", split=True, ax=ax[1], legend=False
-)
-plt.plot()
-# sns.move_legend(ax[1], "lower center", bbox_to_anchor=(.5, 1), ncol=2, title=None, frameon=False)
-#+end_src
-
-#+RESULTS:
-[[file:./.ob-jupyter/a8b07fcc33b2f1c876a65bc8da0634a9fc902d23.png]]
-
-
-#+begin_src jupyter-python
-pd_eval
-#+end_src
-
-
-#+begin_src jupyter-python
-sns.violinplot(
-    pd_eval, x="redchi", y="artifact", hue="record_type", density_norm="width",
-    log_scale=True, fill=False, inner="quart", split=True, legend=True
-)
-
-#+end_src
-
-#+RESULTS:
-:RESULTS:
-: <Axes: xlabel='redchi', ylabel='artifact'>
-[[file:./.ob-jupyter/44839efa576069587312e372447f7020f1743b28.png]]
-:END:
-
-
-
-
-
-
-#+begin_src jupyter-python
-    # display(df_nrmse)
-    df_badfit = df_nrmse.filter(pl.col("nrmse") > 0.1)
-    df_badfit = df_nrmse.filter(pl.col(minimizer).struct.field("fit_stats").struct.field("chisqr") > 1)
-    # display(df_badfit)
-    myex = 9
-    # pprint("chisqr", df_badfit[myex, "feature_minimizer_params"]["fit_stats"]["chisqr"])
-
-    # mycor = df_cor.filter(pl.col("uuid") == df_hichi[myex, "uuid"])
-    plt.semilogx(df_badfit[myex, "tc"], df_badfit[myex, "cor"])
-    plt.semilogx(df_badfit[myex, "tc"], df_badfit[myex, "fit"])
-
-    pprint({k: v for k, v in df_badfit[myex, "sim_params"].items() if k in [
-        "sim_artifact", "clean_dmol", "clean_nmol", "bleach_type",
-        "bleach_exp_scale", "dropout_n", "dropout_maxdrop", "peak_dmol",
-        "peak_nmol", "peak_brightness"
-    ]})
-    display(f"number of bad fits: {len(df_badfit)}")
-    display(f"nrmse: {df_badfit[myex, 'nrmse']}")
-    display(f"chisqr: {df_badfit[myex, minimizer]['fit_stats']['chisqr']}")
-    break
-
-#+end_src
-
-
-*** Load and plot simulated datasets for research internship report
-
-#+begin_src jupyter-python
-import logging
-import os
-import sys
-
-import lmfit
-
-import matplotlib.pyplot as plt
-import matplotlib as mpl
-import numpy as np
-import polars as pl
-import seaborn as sns
-import seaborn.objects as so
-
-from datetime import datetime
-from multipletau import autocorrelate
-from pathlib import Path
-from pprint import pprint
-from typing import Literal
-
-
-os.chdir("/home/lea/Programs/drmed-git")
-FLUOTRACIFY_PATH = Path("/home/lea/Programs/drmed-git/src/")
-sys.path.append(FLUOTRACIFY_PATH.as_posix())
-
-from fluotracify import fcsdc
-from fluotracify.simulations import simulate_trace_with_artifact as stwa
-from fluotracify.applications import equations_to_fit as eq, correlate
-
-logging.basicConfig(format="%(asctime)s - %(message)s")
-log = logging.getLogger(__name__)
-log.setLevel(logging.DEBUG)
-
-# fit 2D, no triplet, 1 species
-options_1sp = {"Dimen": 1, "Diff_species": 1, "Triplet_eq": 1}
-param_1sp = lmfit.Parameters()
-param_1sp.add("offset", value=0.01, min=-0.5, max=1.5, vary=True)
-param_1sp.add("GN0", value=1., min=-0.0001, max=3000., vary=True)
-param_1sp.add("A1", value=1., min=0.0001, max=1., vary=False)
-param_1sp.add("txy1", value=1., min=0.001, max=2000., vary=True)
-param_1sp.add("alpha1", value=1., min=0.6, max=2., vary=False)
-
-# fit 2D, no triplet, 2 species
-options_2sp = {"Dimen": 1, "Diff_species": 2, "Triplet_eq": 1}
-param_2sp = lmfit.Parameters()
-param_2sp.add("offset", value=0.01, min=-0.5, max=1.5, vary=True)
-param_2sp.add("GN0", value=1., min=-0.0001, max=3000.0, vary=True)
-param_2sp.add("A1", value=1., min=0.0001, max=1.0000, vary=True)
-param_2sp.add("A2", value=1., min=0.0001, max=1.0000, vary=True)
-param_2sp.add("txy1", value=1., min=0.001, max=2000.0, vary=True)
-param_2sp.add("txy2", value=1., min=0.001, max=2000.0, vary=True)
-param_2sp.add("alpha1", value=1., min=0.6, max=2., vary=False)
-param_2sp.add("alpha2", value=1., min=0.6, max=2., vary=False)
-
-def get_diffrate(transit_time: float, fwhm=250) -> float:
-    return round((fwhm / 1000)**2 / (8 * np.log(2.0) * transit_time / 1000), 2)
-
-def get_tt(diffrate: float, fwhm=250) -> float:
-    return round((((fwhm / 1000)**2 * 1000) / (8 * np.log(2) * diffrate)), 2)
-
-
-#+end_src
-
-#+RESULTS:
-
-#+begin_src jupyter-python
-from importlib import reload
-reload(fcsdc)
-#+end_src
-
-#+RESULTS:
-: <module 'fluotracify.fcsdc' from '/home/lea/Programs/drmed-git/src/fluotracify/fcsdc.py'>
-
-
-#+begin_src jupyter-python
-df_pa = pl.read_parquet(f"data/exp-250327-masters/parquet/"
-                        "2025-05-28-peak-artifacts-testing.parquet")
-df_pb = pl.read_parquet(f"data/exp-250327-masters/parquet/"
-                        "2025-05-28-photobleaching-testing.parquet")
-df_dd = pl.read_parquet(f"data/exp-250327-masters/parquet/"
-                        "2025-05-28-detector-dropout-testing.parquet")
-pa_meta = df_pa.select(["uuid", "sim_params", "ts_params"])
-pb_meta = df_pb.select(["uuid", "sim_params", "ts_params"])
-dd_meta = df_dd.select(["uuid", "sim_params", "ts_params"])
-#+end_src
-
-#+RESULTS:
-
-plot clean example with autocorrelation and fit of
-- few (250) slow (0.075) molecules vs many (2000) fast (25) molecules
-- for peak artifacts: broad (0.01) vs sharp (3)
-
-#+begin_src jupyter-python
-def pa_filter(clean_dmol: float, clean_nmol: int, peak_dmol: float) -> pl.Expr:
-    return (pl.col("sim_params").struct.field("clean_dmol").eq(clean_dmol) &
-            pl.col("sim_params").struct.field("clean_nmol").eq(clean_nmol) &
-            pl.col("sim_params").struct.field("peak_dmol").eq(peak_dmol))
-
-def pb_filter(clean_dmol: float, clean_nmol: int, bleach_type: str) -> pl.Expr:
-    return (pl.col("sim_params").struct.field("clean_dmol").eq(clean_dmol) &
-            pl.col("sim_params").struct.field("clean_nmol").eq(clean_nmol) &
-            pl.col("sim_params").struct.field("bleach_type").eq(bleach_type))
-
-def dd_filter1(clean_dmol: float, clean_nmol: int, dropout_n: int) -> pl.Expr:
-    return (pl.col("sim_params").struct.field("clean_dmol").eq(clean_dmol) &
-            pl.col("sim_params").struct.field("clean_nmol").eq(clean_nmol) &
-            pl.col("sim_params").struct.field("dropout_n").eq(dropout_n))
-
-def dd_filter2(
-        clean_dmol: float, clean_nmol: int, dropout_n: str = "few"
-) -> pl.Expr:
-    if dropout_n == "few":
-        dropout_expr = pl.col("sim_params").struct.field("dropout_n") < 20
-    elif dropout_n == "many":
-        dropout_expr = pl.col("sim_params").struct.field("dropout_n") >= 20
-    else:
-        raise ValueError("dropout_n has to be 'many' or 'few'")
-    return (pl.col("sim_params").struct.field("clean_dmol").eq(clean_dmol) &
-            pl.col("sim_params").struct.field("clean_nmol").eq(clean_nmol) &
-            dropout_expr)
-
-df_dd.filter(dd_filter2(25, 3500, "many"))
-#+end_src
-
-#+RESULTS:
-:RESULTS:
-shape: (23, 6)
-| uuid                               | feature                                     | label_restoration                           | label_segmentation  | sim_params                                                                                                                   | ts_params                                                                   |
-|------------------------------------+---------------------------------------------+---------------------------------------------+---------------------+------------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------|
-| str                                | array[f32, 16384]                           | array[f32, 16384]                           | array[f32, 16384]   | struct[19]                                                                                                                   | struct[8]                                                                   |
-| "34fb604b-e799-42e0-9e82-8e7070... | [2582.829346, 2937.64917, ... 3194.250488]  | [2582.829346, 2937.64917, ... 3194.250488]  | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,38,1379.898315,null,null,null} | {1.0,1,2025-05-29,"detector_dropout",16384,2737.382812,54.73138,50.017921}  |
-| "036c4da7-3059-4404-931e-9b6002... | [2865.073242, 2802.429932, ... 2525.241943] | [2865.073242, 2802.429932, ... 2525.241943] | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,36,1379.877075,null,null,null} | {1.0,1,2025-05-29,"detector_dropout",16384,2731.898926,53.736076,50.8423}   |
-| "7e3d563b-ee71-4ffb-b991-05986e... | [3158.827393, 3099.01709, ... 2937.622559]  | [3158.827393, 3099.01709, ... 2937.622559]  | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,39,1460.021484,null,null,null} | {1.0,1,2025-05-29,"detector_dropout",16384,2744.625977,55.90184,49.100235}  |
-| "2b3da756-88d7-4e83-9b81-790e4b... | [2832.998779, 2282.303955, ... 2643.378174] | [2832.998779, 2282.303955, ... 2643.378174] | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,23,1328.505859,null,null,null} | {1.0,1,2025-05-29,"detector_dropout",16384,2748.875488,52.918583,51.948544} |
-| "7af663cf-d62b-4699-a3ad-a73913... | [2829.783936, 2776.904785, ... 2315.131348] | [2829.783936, 2776.904785, ... 2315.131348] | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,40,1450.831787,null,null,null} | {1.0,1,2025-05-29,"detector_dropout",16384,2741.704834,55.300304,49.581501} |
-| ...                                | ...                                         | ...                                         | ...                 | ...                                                                                                                          | ...                                                                         |
-| "6fba9811-4935-4b18-88d0-9d2de4... | [2629.106934, 2839.199463, ... 2676.842773] | [2629.106934, 2839.199463, ... 2676.842773] | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,35,1478.511841,null,null,null} | {1.0,1,2025-05-29,"detector_dropout",16384,2741.281494,55.545742,49.354797} |
-| "12fca900-1c23-4484-b3c7-2acd58... | [2762.321289, 2972.924805, ... 2511.83374]  | [2762.321289, 2972.924805, ... 2511.83374]  | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,30,1347.592041,null,null,null} | {1.0,1,2025-05-29,"detector_dropout",16384,2742.931641,53.027969,51.729286} |
-| "bb945bd7-04a6-4131-8328-c35b77... | [2726.799316, 3772.142578, ... 2556.201172] | [2726.799316, 3772.142578, ... 2556.201172] | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,22,1447.966553,null,null,null} | {1.0,1,2025-05-29,"detector_dropout",16384,2743.108154,52.304886,52.447788} |
-| "e38d078e-aa79-4fb3-9977-c6b2fb... | [2748.650146, 3033.24585, ... 2839.56543]   | [2748.650146, 3033.24585, ... 2839.56543]   | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,26,1482.89563,null,null,null}  | {1.0,1,2025-05-29,"detector_dropout",16384,2739.699707,54.137253,50.609642} |
-| "9abd34be-5bf6-49ba-aeeb-48ed6d... | [2656.391846, 3099.52417, ... 2752.408203]  | [2656.391846, 3099.52417, ... 2752.408203]  | [0.0, 0.0, ... 0.0] | {16384.0,1.0,250.0,4000.0,3000,3000,25.0,3500,"detector_dropout","both",1500,1500,"None",null,38,1267.764404,null,null,null} | {1.0,1,2025-05-29,"detector_dropout",16384,2740.506348,53.352455,51.369213} |
-:END:
-
-#+begin_src jupyter-python
-from dataclasses import dataclass, field, astuple, asdict
-from typing import Literal, Any
-
-param_1sp = lmfit.Parameters()
-param_1sp.add("offset", value=0.01, min=-0.5, max=1.5, vary=True)
-param_1sp.add("gn0", value=1., min=-0.0001, max=3000., vary=True)
-param_1sp.add("a1", value=1., min=0.0001, max=1., vary=False)
-# param_1sp.add("a2", value=1., min=0.0001, max=1., vary=False)
-# param_1sp.add("ar1", value=1., min=0.0001, max=1., vary=False)
-# param_1sp.add("ar2", value=1., min=0.0001, max=1., vary=False)
-param_1sp.add("txy1", value=1., min=0.001, max=2000., vary=True)
-# param_1sp.add("txy2", value=1., min=0.001, max=2000., vary=True)
-# param_1sp.add("taut1", value=1., min=0.001, max=2000., vary=True)
-# param_1sp.add("b1", value=1., min=0.0001, max=1., vary=False)
-
-# param_1sp.add("tz1", value=1., min=0.001, max=2000., vary=True)
-# param_1sp.add("tz2", value=1., min=0.001, max=2000., vary=True)
-param_1sp.add("alpha1", value=1., min=0.6, max=2., vary=False)
-# param_1sp.add("alpha2", value=1., min=0.6, max=2., vary=False)
-# param_1sp.add("alpha3", value=1., min=0.6, max=2., vary=False)
-
-# correlation parameters
-d = 0.075
-print(get_tt(d))
-data = df_pa.filter(pl.col("sim_params").struct.field("clean_dmol").eq(d))
-cor = fcsdc.FCSCor(
-    uuid=data[0, "uuid"], method="multipletau", multipletau_m=16,
-    multipletau_deltat=1., multipletau_norm=True,
-    multipletau_compress="average"
-)
-cor.autocorrelate(data[0, "label_restoration"])
-
-# plt.plot(data[0])
-# plt.show()
-# plt.semilogx(cor.tc, cor.g)
-
-fit = fcsdc.FCSFit(
-    uuid=data[0, "uuid"], method="lmfit", params=param_1sp, equation_dim="2D",
-    equation_dspecies=1
-)
-fit.minimize(cor.tc, cor.g)
-pprint(fit.get_minimizer_params())
-
-# pprint(params_schema)
-
-# test = fit.to_polars()
-# test["fit_initial_params"].struct.unnest()["params"].struct.unnest()
-# plt.semilogx(cor.tc, cor.g)
-# plt.semilogx(fit.tc, fit.g)
-# plt.show()
-# # plt.show()
-# plt.semilogx(fit.tc, fit.residual)
-# param_1sp["A1"].value
-# pprint(dict(param_1sp)["A1"])
-
-#+end_src
-
-#+RESULTS:
-#+begin_example
-150.28
-{'aborted': False,
- 'call_kws': {'Dfun': None,
-              'col_deriv': 0,
-              'diag': None,
-              'epsfcn': 1e-10,
-              'factor': 100,
-              'ftol': 1.5e-08,
-              'full_output': 1,
-              'gtol': 0.0,
-              'maxfev': 16000,
-              'xtol': 1.5e-08},
- 'fit_report': '[[Fit Statistics]]\n'
-               '    # fitting method   = leastsq\n'
-               '    # function evals   = 61\n'
-               '    # data points      = 94\n'
-               '    # variables        = 3\n'
-               '    chi-square         = 0.08266441\n'
-               '    reduced chi-square = 9.0840e-04\n'
-               '    Akaike info crit   = -655.408523\n'
-               '    Bayesian info crit = -647.778639\n'
-               '[[Variables]]\n'
-               '    offset: -0.02695699 +/- 0.00549324 (20.38%) (init = 0.01)\n'
-               '    gn0:     0.48073625 +/- 0.01003041 (2.09%) (init = 1)\n'
-               '    a1:      1 (fixed)\n'
-               '    txy1:    78.9212165 +/- 6.68462003 (8.47%) (init = 1)\n'
-               '    alpha1:  1 (fixed)\n'
-               '[[Correlations]] (unreported correlations are < 0.100)\n'
-               '    C(offset, txy1) = -0.5641\n'
-               '    C(gn0, txy1)    = -0.4250\n'
-               '    C(offset, gn0)  = -0.3046',
- 'fit_stats': {'aic': np.float64(-655.4085233745535),
-               'bic': np.float64(-647.7786390277435),
-               'chisqr': np.float64(0.08266441128556695),
-               'ndata': 94,
-               'nfev': 61,
-               'nfree': 91,
-               'nvarys': 3,
-               'redchi': np.float64(0.0009084001240172193)},
- 'message': 'Fit succeeded.',
- 'params': {'a1': <Parameter 'a1', value=1.0 (fixed), bounds=[0.0001:1.0]>,
-            'alpha1': <Parameter 'alpha1', value=1.0 (fixed), bounds=[0.6:2.0]>,
-            'gn0': <Parameter 'gn0', value=np.float64(0.48073625153203076) +/- 0.01, bounds=[-0.0001:3000.0]>,
-            'offset': <Parameter 'offset', value=np.float64(-0.026956991097324745) +/- 0.00549, bounds=[-0.5:1.5]>,
-            'txy1': <Parameter 'txy1', value=np.float64(78.92121646466406) +/- 6.68, bounds=[0.001:2000.0]>},
- 'success': True}
-#+end_example
-
-#+begin_src jupyter-python
-cor_df.schema
-#+end_src
-
-#+RESULTS:
-: Schema([('uuid', String),
-:         ('tc', Array(Float32, shape=(94,))),
-:         ('feature_g', Array(Float32, shape=(94,))),
-:         ('label_restoration_g', Array(Float32, shape=(94,))),
-:         ('cor_params',
-:          Struct({'uuid': String, 'method': String, 'multipletau_m': UInt32, 'multipletau_deltat': Float32, 'multipletau_norm': Boolean, 'multipletau_compress': String, 'tttr2xfcs_nsub': UInt32, 'tttr2xfcs_ncascstart': UInt32, 'tttr2xfcs_ncascend': UInt32})),
-:         ('sim_params',
-:          Struct({'total_sim_time': Float32, 'time_step': Float32, 'psf_fwhm': Float32, 'psf_distance': Float32, 'box_width': UInt32, 'box_height': UInt32, 'clean_dmol': Float32, 'clean_nmol': UInt32, 'sim_artifact': String, 'sim_label_for': String, 'pos_x': UInt32, 'pos_y': UInt32, 'bleach_type': String, 'bleach_exp_scale': Float32, 'dropout_n': UInt32, 'dropout_maxdrop': Float32, 'peak_dmol': Float32, 'peak_nmol': UInt32, 'peak_brightness': UInt32}))])
-
-
-#+begin_src jupyter-python
-from datetime import datetime
-dt_test = pl.read_parquet(
-    f"data/exp-250327-masters/parquet/2025-05-28-detector-dropout-testing.parquet"
-)
-data = dt_test[0]
-trace = data["feature"].to_numpy()[0]
-time_step = data["sim_params"].struct.field("time_step")[0]
-size = data["feature"].to_numpy().size
-record = {
-    "feature": fcsdc.FCSTimeSeries(
-        name="detector-dropout-feature", trace=data["feature"].to_numpy()[0],
-        date=datetime.fromisoformat("2025-05-29"),
-        scale=np.arange(0, size, time_step), channel=1, bin=time_step, size=size,
-    ),
-    "label_restoration": fcsdc.FCSTimeSeriesLabel(
-        name="detector-dropout-label-restoration",
-        trace=data["label_restoration"].to_numpy()[0],
-        date=datetime.fromisoformat("2025-05-29"),
-        scale=np.arange(0, size, time_step), channel=1, bin=time_step, size=size,
-    )
-}
-
-test = fcsdc.SimulatedFCSTimeSeries(
-    uuid=data["uuid"][0], sim_params=sim_params, record=record
-)
-df = test.record["feature"].to_polars().select("ts_params")
-# df = pl.DataFrame()
-# pl.concat([df, *pols], how="horizontal")
-test.record["feature"].to_polars()
-# print(pols[0])
-#+end_src
-
-#+RESULTS:
-:RESULTS:
-shape: (1, 3)
-| scale                   | trace                                       | ts_params                                                                           |
-|-------------------------+---------------------------------------------+-------------------------------------------------------------------------------------|
-| array[f32, 16384]       | array[f32, 16384]                           | struct[8]                                                                           |
-| [0.0, 1.0, ... 16383.0] | [1135.626099, 1147.085327, ... 1538.937256] | {1.0,1,2025-05-29,"detector-dropout-feature",16384,1571.959229,57.667694,27.260588} |
-:END:
-
-
-#+begin_src jupyter-python
-plt.semilogx(fit.result_tc, cor[:, 1])
-plt.semilogx(fit.result_tc, fit.result_g)
-#+end_src
-
-#+RESULTS:
-:RESULTS:
-| <matplotlib.lines.Line2D | at | 0x7f4232b4eb10> |
-[[file:./.ob-jupyter/dc74eeeddfc39e599c86259c3663014f2800b98b.png]]
-:END:
-
-#+begin_src jupyter-python
-test = fit.to_dict()["result_minimizer"]
-test.keys()
-#+end_src
-
-#+RESULTS:
-: dict_keys(['aborted', 'success', 'message', 'params', 'fit_stats', 'call_kws'])
-
-
-#+begin_src jupyter-python
-fit.result_residual[0]
-#+end_src
-
-#+RESULTS:
-: np.float32(-0.016290966)
-
-
-#+begin_src jupyter-python
-res = fit.result_minimizer
-pprint(res.status)
-pprint(res.covar)
-pprint(res.flatchain)
-#+end_src
-
-#+RESULTS:
-:RESULTS:
-: False
-: 'Fit succeeded.'
-# [goto error]
-: ---------------------------------------------------------------------------
-: AttributeError                            Traceback (most recent call last)
-: Cell In[319], line 4
-:       2 pprint(res.aborted)
-:       3 pprint(res.message)
-: ----> 4 pprint(res.status)
-:       5 pprint(res.success)
-:       6 pprint(res.covar)
-: 
-: AttributeError: 'MinimizerResult' object has no attribute 'status'
-:END:
-
-#+begin_src jupyter-python
-res
-#+end_src
-
-#+RESULTS:
-:RESULTS:
-:PROPERTIES:
-:CUSTOM_ID: fit-result
-:END:
-| fitting method      | leastsq     |
-| ​# function evals    | 37          |
-| ​# data points       | 95          |
-| ​# variables         | 3           |
-| chi-square          | 0.08295621  |
-| reduced chi-square  | 9.0170e-04  |
-| Akaike info crit.   | -663.115327 |
-| Bayesian info crit. | -655.453697 |
-#+caption: Fit Statistics
-
-| name   | value       | standard error | relative error | initial value | min         | max        | vary  |
-|--------+-------------+----------------+----------------+---------------+-------------+------------+-------|
-| offset | -0.02715254 | 0.00546698     | (20.13%)       | 0.01          | -0.50000000 | 1.50000000 | True  |
-| gn0    | 0.47930675  | 0.00961368     | (2.01%)        | 1.0           | -1.0000e-04 | 3000.00000 | True  |
-| a1     | 1.00000000  | 0.00000000     | (0.00%)        | 1.0           | 1.0000e-04  | 1.00000000 | False |
-| txy1   | 79.7048917  | 6.55525339     | (8.22%)        | 1.0           | 1.0000e-03  | 2000.00000 | True  |
-| alpha1 | 1.00000000  | 0.00000000     | (0.00%)        | 1.0           | 0.60000000  | 2.00000000 | False |
-#+caption: Parameters
-
-| Parameter1 | Parameter 2 | Correlation |
-|------------+-------------+-------------|
-| offset     | txy1        | -0.5643     |
-| gn0        | txy1        | -0.3842     |
-| offset     | gn0         | -0.3402     |
-#+caption: Correlations (unreported values are < 0.100)
-:END:
-
-
-#+begin_src jupyter-python
-cor, res, fit = autocorrelate_and_fit(
-    pa_few_slow_broad[4, "feature"], param_2sp, options_2sp
-)
-plt.subplot(211).semilogx(cor[:, 0], cor[:, 1], "g", label="correlation")
-plt.subplot(211).semilogx(cor[:, 0], fit, 'r', label='fit')
-plt.subplot(212).semilogx(cor[:, 0], res.residual)
-print(lmfit.fit_report(res.params))
-#+end_src
-
-#+RESULTS:
-:RESULTS:
-: [[Variables]]
-:     offset: -0.24013967 (init = 0.01)
-:     GN0:     1.51514205 (init = 1)
-:     A1:      0.00430554 (init = 1)
-:     A2:      0.99569446 (init = 1)
-:     txy1:    1.64996810 (init = 1)
-:     txy2:    382.502247 (init = 1)
-:     alpha1:  1 (fixed)
-:     alpha2:  1 (fixed)
-[[file:./.ob-jupyter/6b3fd94f9de7520f4deb3401f06e80fcc49688f1.png]]
-:END:
-
-#+begin_src jupyter-python
-nmolecule = 1 / res.params['GN0'].value
-transit_time = res.params['txy1'].value
-diffrate_calc = (float(250) / 1000)**2 / (8 * np.log(2.0) * transit_time /
-                                               1000)
-print(nmolecule)
-print(transit_time)
-print(diffrate_calc)
-
-#+end_src
-
-#+RESULTS:
-: 0.6613676929047021
-: 381.71576266091614
-: 0.02952735021570821
-
-
-#+begin_src jupyter-python
-
-
-plot_sim_example_with_corr_fit(
-    df_pa.filter(pa_filter(0.075, 250, 0.01)), 6, param_1sp, options_1sp,
-    "Peak artifact",
-    "Fluorescence time-series, 250 molecules\n$\\tau_{{\\mathrm{{sim}}}}$ = "
-    f"{get_tt(0.075)} ms, broad peaks"
-)
-#+end_src
-
-#+RESULTS:
-[[file:./.ob-jupyter/b7375aa53dcdb70cbe931d5c151bf7762d7d0e45.png]]
-
-
-#+begin_src jupyter-python
-plot_sim_example_with_corr_fit(
-    df_pa.filter(pa_filter(25, 2000, 1)), 0, param_1sp, options_1sp,
-    "Peak artifact",
-    "Fluorescence time-series, 2000 molecules\nD = 25 $\\mu m^2$/s, steep peaks"
-)
-#+end_src
-
-#+RESULTS:
-[[file:./.ob-jupyter/7d728699fbf9c17ca70d139bbeafb5754dc2d9a8.png]]
-
-#+begin_src jupyter-python
-
-plot_sim_example_with_corr_fit(
-    df_pb.filter(pb_filter(0.075, 250, "both")), 15, param_1sp, options_1sp,
-    "Photobleaching",
-    "Fluorescence time-series, 2000 molecules\nD = 0.25 $\\mu m^2$/s, "
-    "mobile bleaching"
-)
-
-#+end_src
-
-#+RESULTS:
-[[file:./.ob-jupyter/fe45b33ae9e224d05f91a79fb5ec7405c6683376.png]]
-
-#+begin_src jupyter-python
-plot_sim_example_with_corr_fit(
-    df_pb.filter(pb_filter(25, 3500, "immobile")), 3, param_1sp, options_1sp,
-    "Photobleaching",
-    "Fluorescence time-series, 3500 molecules\nD = 25 $\\mu m^2$/s, "
-    "steep immobile bleaching"
-)
-
-#+end_src
-
-#+RESULTS:
-[[file:./.ob-jupyter/939adbe4eaa0df6e0ffaee4931be9ade05b87aa7.png]]
-
-
-#+begin_src jupyter-python
-plot_sim_example_with_corr_fit(
-    df_dd.filter(dd_filter(25, 3500, 40)), 0, param_1sp, options_1sp,
-    "Detector dropout",
-    "Fluorescence time-series, 3500 molecules\n$\\tau_{{\\mathrm{{sim}}}}$ = "
-    f"{get_tt(0.075)} ms, 36 dropouts"
-)
-
-#+end_src
-
-#+RESULTS:
-[[file:./.ob-jupyter/6ef76579767fef7c5a9c09f321b61181ed8511ef.png]]
-
-#+begin_src jupyter-python
-plot_sim_example_with_corr_fit(
-    df_dd.filter(dd_filter(0.075, 3500, 36)), 0, param_1sp, options_1sp,
-    "Detector dropout",
-    "Fluorescence time-series, 3500 molecules\n$\\tau_{{\\mathrm{{sim}}}}$ = "
-    f"{get_tt(0.075)} ms, 36 dropouts"
-)
-
-#+end_src
-
-#+RESULTS:
-[[file:./.ob-jupyter/53c94ab69ef0bae34763a71cd92663e4a781da6b.png]]
-
-
-
-#+begin_src jupyter-python
-
-plt.figure(figsize=(16,16), layout="tight")
-plt.subplot(821).plot(pa_few_slow_broad[4, "label_restoration"])
-plt.subplot(821).plot(pa_few_slow_broad[4, "feature"], alpha=0.7)
-plt.subplot(823).plot(pa_few_slow_steep[0, "label_restoration"])
-plt.subplot(823).plot(pa_few_slow_steep[0, "feature"], alpha=0.7)
-plt.subplot(825).plot(pa_few_fast_broad[0, "label_restoration"])
-plt.subplot(825).plot(pa_few_fast_broad[0, "feature"], alpha=0.7)
-plt.subplot(827).plot(pa_few_fast_steep[0, "label_restoration"])
-plt.subplot(827).plot(pa_few_fast_steep[0, "feature"], alpha=0.7)
-plt.subplot(829).plot(pa_many_slow_broad[4, "label_restoration"])
-plt.subplot(829).plot(pa_many_slow_broad[4, "feature"], alpha=0.7)
-plt.subplot(8, 2, 11).plot(pa_many_slow_steep[0, "label_restoration"])
-plt.subplot(8, 2, 11).plot(pa_many_slow_steep[0, "feature"], alpha=0.7)
-plt.subplot(8, 2, 13).plot(pa_many_fast_broad[0, "label_restoration"])
-plt.subplot(8, 2, 13).plot(pa_many_fast_broad[0, "feature"], alpha=0.7)
-plt.subplot(8, 2, 15).plot(pa_many_fast_steep[0, "label_restoration"])
-plt.subplot(8, 2, 15).plot(pa_many_fast_steep[0, "feature"], alpha=0.7)
-plt.show()
-
-# pprint(dt.row(mytrace)[4])
-
-
-#+end_src
-
-#+RESULTS:
-[[file:./.ob-jupyter/3f5e76d6890f3d0b425da6170e4e101024a96dd5.png]]
 
 
 *** test croissant
