@@ -262,6 +262,7 @@ def resfit_subplot(
     for t, l in zip(ax[1, 0].axes.get_legend().texts,
                     ["with artifact", "without artifact"]):
         t.set_text(l)
+    return ax
 
 # Plot time-series with peak artifacts fit results and fit quality metrics
 
@@ -375,7 +376,7 @@ save_plot("photobleaching-fit-quality-adjr2", "svg")
 def dd_filter() -> pl.Expr:
     return ((pl.col("artifact") == "detector_dropout") &
             (pl.col("clean_dmol").is_in([0.1, 1., 10.])) &
-            (pl.col("clean_nmol").is_in([1000, 3000, 4000])))
+            (pl.col("clean_nmol").is_in([1000, 4000])))
 dd_pd = (
     pl.concat([
         (df_eval
@@ -399,27 +400,66 @@ dd_yticklabels = [
     "detector dropout\n$n_{\\mathrm{dropouts}} > 25$",
 ]
 dd_order = ["few", "middle", "many"]
-dd_nmol_list = [1000, 3000, 4000]
+dd_nmol_list = [1000, 4000]
+dd_groupsize = [dd_pd.loc[(dd_pd["clean_dmol"] == d) &
+                          (dd_pd["clean_nmol"] == n) &
+                          (dd_pd["dd_group"] == p)
+                 ].shape[0]
+       for d in [0.1, 1.0, 10.0]
+       for n in [1000, 4000]
+       for p in dd_order]
+dd_min = min(dd_groupsize)
+def dd_filter2(
+        df: pl.DataFrame, limit: int, group: str, clean1_ex: pl.Expr,
+        clean2_ex: pl.Expr, dropout_ex: pl.Expr,
+) -> pl.DataFrame:
+    return (df
+            .filter((pl.col("artifact") == "detector_dropout") & clean1_ex &
+                    clean2_ex & dropout_ex)
+            .limit(limit)
+            .with_columns(dd_group=pl.lit(group))
+            )
+dd_pd = (
+    pl.concat(
+        [dd_filter2(df_eval, dd_min, "few", pl.col("clean_dmol") == d,
+                    pl.col("clean_nmol") == n, pl.col("dropout_n") < 13)
+         for d in [0.1, 1.0, 10.0] for n in [1000, 4000]] +
+        [dd_filter2(df_eval, dd_min, "middle", pl.col("clean_dmol") == d,
+                    pl.col("clean_nmol") == n,
+                    (pl.col("dropout_n") >= 13) & (pl.col("dropout_n") <= 25))
+         for d in [0.1, 1.0, 10.0] for n in [1000, 4000]] +
+        [dd_filter2(df_eval, dd_min, "many", pl.col("clean_dmol") == d,
+                    pl.col("clean_nmol") == n, pl.col("dropout_n") > 25)
+         for d in [0.1, 1.0, 10.0] for n in [1000, 4000]]
+        , how="vertical")
+    .select("record_type", "diffcoeff", "n", "clean_dmol", "clean_nmol",
+            "dd_group", "nrmse", "redchi", "adjr2")
+    .to_pandas()
+)
 
-resfit_subplot(
+ax = resfit_subplot(
     dd_pd, figsize=(11, 6), x="diffcoeff_and_n", y="dd_group", order=dd_order,
     nmol_list=dd_nmol_list, xlim=(10e-5, 10e2), yticklabels=dd_yticklabels,
 )
+plt.delaxes(ax[1, 2])
 save_plot("detector-dropout-fit-distributions", "svg")
-resfit_subplot(
+ax = resfit_subplot(
     dd_pd, figsize=(11, 6), x="redchi", y="dd_group", order=dd_order,
     nmol_list=dd_nmol_list, xlim=(1e-9, 1e-3), yticklabels=dd_yticklabels,
 )
+plt.delaxes(ax[1, 2])
 save_plot("detector-dropout-fit-quality-redchi", "svg")
-resfit_subplot(
+ax = resfit_subplot(
     dd_pd, figsize=(11, 6), x="nrmse", y="dd_group", order=dd_order,
     nmol_list=dd_nmol_list, xlim=(0, 0.10), yticklabels=dd_yticklabels,
 )
+plt.delaxes(ax[1, 2])
 save_plot("detector-dropout-fit-quality-nrmse", "svg")
-resfit_subplot(
+ax = resfit_subplot(
     dd_pd, figsize=(11, 6), x="adjr2", y="dd_group", order=dd_order,
     nmol_list=dd_nmol_list, xlim=(0.85, 1), yticklabels=dd_yticklabels,
 )
+plt.delaxes(ax[1, 2])
 save_plot("detector-dropout-fit-quality-adjr2", "svg")
 
 # plot overview of fit quality parameters

@@ -3006,7 +3006,7 @@ Import needed modules first
 
 Then, define plotting functions
 
-#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 176-264 :src jupyter-python
+#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 176-265 :src jupyter-python
 
 #+RESULTS:
 
@@ -3014,35 +3014,46 @@ Then, define plotting functions
 
 First, load the data
 
-#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 266-288 :src jupyter-python
+#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 267-289 :src jupyter-python
 
 #+RESULTS:
+
+#+begin_src jupyter-python
+print([pa_pd.loc[(pa_pd["clean_dmol"] == d) & (pa_pd["peak_dmol"] == p)
+                 ].shape[0] for d in [0.1, 1.0, 10.0] for p in pa_order])
+print([pa_pd.loc[(pa_pd["clean_nmol"] == n) & (pa_pd["peak_dmol"] == p)
+                 ].shape[0] for n in pa_nmol_list for p in pa_order])
+#+end_src
+
+#+RESULTS:
+: [96, 96, 96, 96, 96, 96, 96, 96, 96]
+: [96, 96, 96, 96, 96, 96, 96, 96, 96]
 
 Plot fit distributions
 
-#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 290-294 :src jupyter-python
+#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 291-295 :src jupyter-python
 
 #+RESULTS:
 :RESULTS:
-: /tmp/ipykernel_5672/627744654.py:84: UserWarning: set_ticklabels() should only be used with a fixed number of ticks, i.e. after set_ticks() or using a FixedLocator.
+: /tmp/ipykernel_5672/2240426898.py:84: UserWarning: set_ticklabels() should only be used with a fixed number of ticks, i.e. after set_ticks() or using a FixedLocator.
 :   ax[0, 0].set_yticklabels(yticklabels)
 [[file:./.ob-jupyter/9405096206490b5b0e89a507952e84711fe1c0dd.png]]
 :END:
 
 Plot reduced chi squared
 
-#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 295-299 :src jupyter-python
+#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 296-300 :src jupyter-python
 
 #+RESULTS:
 :RESULTS:
-: /tmp/ipykernel_5672/627744654.py:84: UserWarning: set_ticklabels() should only be used with a fixed number of ticks, i.e. after set_ticks() or using a FixedLocator.
+: /tmp/ipykernel_5672/1247641496.py:84: UserWarning: set_ticklabels() should only be used with a fixed number of ticks, i.e. after set_ticks() or using a FixedLocator.
 :   ax[0, 0].set_yticklabels(yticklabels)
-[[file:./.ob-jupyter/b4f2ade87e4b3ef8266d4f0f3046d262539e067f.png]]
+[[file:./.ob-jupyter/b76d3e1649b44e2874c1877cf7867e009f83b4d7.png]]
 :END:
 
 Plot NRMSE
 
-#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 300-304 :src jupyter-python
+#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 301-305 :src jupyter-python
 
 #+RESULTS:
 :RESULTS:
@@ -3053,7 +3064,7 @@ Plot NRMSE
 
 Plot Adjusted R²
 
-#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 305-309 :src jupyter-python
+#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 306-310 :src jupyter-python
 
 #+RESULTS:
 :RESULTS:
@@ -3066,13 +3077,24 @@ Plot Adjusted R²
 
 First, load the data
 
-#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 311-350 :src jupyter-python
+#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 312-351 :src jupyter-python
 
 #+RESULTS:
 
+#+begin_src jupyter-python
+print([pb_pd.loc[(pb_pd["clean_dmol"] == d) & (pb_pd["bleach_group"] == p)
+                 ].shape[0] for d in [0.1, 1.0, 10.0] for p in pb_order])
+print([pb_pd.loc[(pb_pd["clean_nmol"] == n) & (pb_pd["bleach_group"] == p)
+                 ].shape[0] for n in pb_nmol_list for p in pb_order])
+#+end_src
+
+#+RESULTS:
+: [48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48]
+: [48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48]
+
 Plot fit distributions
 
-#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 352-356 :src jupyter-python
+#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 353-357 :src jupyter-python
 
 #+RESULTS:
 :RESULTS:
@@ -3083,18 +3105,18 @@ Plot fit distributions
 
 Plot reduced chi squared
 
-#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 357-361 :src jupyter-python
+#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 358-362 :src jupyter-python
 
 #+RESULTS:
 :RESULTS:
-: /tmp/ipykernel_5672/627744654.py:84: UserWarning: set_ticklabels() should only be used with a fixed number of ticks, i.e. after set_ticks() or using a FixedLocator.
+: /tmp/ipykernel_5672/1247641496.py:84: UserWarning: set_ticklabels() should only be used with a fixed number of ticks, i.e. after set_ticks() or using a FixedLocator.
 :   ax[0, 0].set_yticklabels(yticklabels)
-[[file:./.ob-jupyter/224eeaac88806d5ff9e1f3823f11a9ac3b5ec63e.png]]
+[[file:./.ob-jupyter/e418dd60e4837ddd757d1fa9f5fbfcd1c93f6c17.png]]
 :END:
 
 Plot NRMSE
 
-#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 362-366 :src jupyter-python
+#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 363-367 :src jupyter-python
 
 #+RESULTS:
 :RESULTS:
@@ -3105,7 +3127,7 @@ Plot NRMSE
 
 Plot Adjusted R²
 
-#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 367-371 :src jupyter-python
+#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 368-372 :src jupyter-python
 
 #+RESULTS:
 :RESULTS:
@@ -3118,57 +3140,68 @@ Plot Adjusted R²
 
 First, load the data
 
-#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 373-402 :src jupyter-python
+#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 374-438 :src jupyter-python
 
 #+RESULTS:
+
+#+begin_src jupyter-python
+print([dd_pd.loc[(dd_pd["clean_dmol"] == d) & (dd_pd["dd_group"] == p)
+                 ].shape[0] for d in [0.1, 1.0, 10.0] for p in dd_order])
+print([dd_pd.loc[(dd_pd["clean_nmol"] == n) & (dd_pd["dd_group"] == p)
+                 ].shape[0] for n in dd_nmol_list for p in dd_order])
+#+end_src
+
+#+RESULTS:
+: [44, 44, 44, 44, 44, 44, 44, 44, 44]
+: [66, 66, 66, 66, 66, 66]
 
 Plot fit distributions
 
-#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 404-408 :src jupyter-python
+#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 440-445 :src jupyter-python
 
 #+RESULTS:
 :RESULTS:
-: /tmp/ipykernel_5672/627744654.py:84: UserWarning: set_ticklabels() should only be used with a fixed number of ticks, i.e. after set_ticks() or using a FixedLocator.
+: /tmp/ipykernel_5672/2240426898.py:84: UserWarning: set_ticklabels() should only be used with a fixed number of ticks, i.e. after set_ticks() or using a FixedLocator.
 :   ax[0, 0].set_yticklabels(yticklabels)
-[[file:./.ob-jupyter/df44b490e11d514d9d6b6a9ff885d51e39c4a12a.png]]
+[[file:./.ob-jupyter/2a6b1a091c49d71f678504bf270390a2c6fdb09f.png]]
 :END:
 
 Plot reduced chi squared
 
-#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 409-413 :src jupyter-python
+#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 446-451 :src jupyter-python
 
 #+RESULTS:
 :RESULTS:
-: /tmp/ipykernel_5672/627744654.py:84: UserWarning: set_ticklabels() should only be used with a fixed number of ticks, i.e. after set_ticks() or using a FixedLocator.
+: /tmp/ipykernel_5672/2240426898.py:84: UserWarning: set_ticklabels() should only be used with a fixed number of ticks, i.e. after set_ticks() or using a FixedLocator.
 :   ax[0, 0].set_yticklabels(yticklabels)
-[[file:./.ob-jupyter/7cf8e40cefe652d021a66df45caf2771252015fd.png]]
+[[file:./.ob-jupyter/390dd291ec8426929644f4da50d423deb7e33ea3.png]]
 :END:
 
 Plot NRMSE
 
-#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 414-418 :src jupyter-python
+#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 452-457 :src jupyter-python
 
 #+RESULTS:
 :RESULTS:
-: /tmp/ipykernel_5672/627744654.py:84: UserWarning: set_ticklabels() should only be used with a fixed number of ticks, i.e. after set_ticks() or using a FixedLocator.
+: /tmp/ipykernel_5672/2240426898.py:84: UserWarning: set_ticklabels() should only be used with a fixed number of ticks, i.e. after set_ticks() or using a FixedLocator.
 :   ax[0, 0].set_yticklabels(yticklabels)
-[[file:./.ob-jupyter/c2f8b3c1abfaa6fddf7e7b14ef1c9b1084ac6c4a.png]]
+[[file:./.ob-jupyter/bcb534b57d9dbaa9f4015aca6ba8e508ecd66639.png]]
 :END:
 
 Plot Adjusted R²
 
-#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 419-423 :src jupyter-python
+#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 458-463 :src jupyter-python
 
 #+RESULTS:
 :RESULTS:
-: /tmp/ipykernel_5672/627744654.py:84: UserWarning: set_ticklabels() should only be used with a fixed number of ticks, i.e. after set_ticks() or using a FixedLocator.
+: /tmp/ipykernel_5672/2240426898.py:84: UserWarning: set_ticklabels() should only be used with a fixed number of ticks, i.e. after set_ticks() or using a FixedLocator.
 :   ax[0, 0].set_yticklabels(yticklabels)
-[[file:./.ob-jupyter/891560b2225af61ca0e8ed231c1de4ece514d97b.png]]
+[[file:./.ob-jupyter/60b93835d64cd0b17a8b1e1fc390a70310b131b2.png]]
 :END:
 
 **** Plot quality metrics overview
 
-#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 425-457 :src jupyter-python
+#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 465-497 :src jupyter-python
 
 #+RESULTS:
 :RESULTS:
