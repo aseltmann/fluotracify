@@ -295,7 +295,7 @@ resfit_subplot(
 save_plot("peak-artifacts-fit-distributions", "svg")
 resfit_subplot(
     pa_pd, figsize=(11, 6), x="redchi", y="peak_dmol", order=pa_order,
-    nmol_list=pa_nmol_list, xlim=(1e-10, 1e1), yticklabels=pa_yticklabels
+    nmol_list=pa_nmol_list, xlim=(1e-8, 1e3), yticklabels=pa_yticklabels
 )
 save_plot("peak-artifacts-fit-quality-redchi", "svg")
 resfit_subplot(
@@ -357,7 +357,7 @@ resfit_subplot(
 save_plot("photobleaching-fit-distributions", "svg")
 resfit_subplot(
     pb_pd, figsize=(11, 7), x="redchi", y=pb_group, order=pb_order,
-    nmol_list=pb_nmol_list, xlim=(1e-10, 1.), yticklabels=pb_yticklabels,
+    nmol_list=pb_nmol_list, xlim=(1e-8, 1e2), yticklabels=pb_yticklabels,
 )
 save_plot("photobleaching-fit-quality-redchi", "svg")
 resfit_subplot(
@@ -445,7 +445,7 @@ plt.delaxes(ax[1, 2])
 save_plot("detector-dropout-fit-distributions", "svg")
 ax = resfit_subplot(
     dd_pd, figsize=(11, 6), x="redchi", y="dd_group", order=dd_order,
-    nmol_list=dd_nmol_list, xlim=(1e-9, 1e-3), yticklabels=dd_yticklabels,
+    nmol_list=dd_nmol_list, xlim=(1e-6, 1e3), yticklabels=dd_yticklabels,
 )
 plt.delaxes(ax[1, 2])
 save_plot("detector-dropout-fit-quality-redchi", "svg")

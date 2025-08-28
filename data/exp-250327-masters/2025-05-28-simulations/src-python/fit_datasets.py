@@ -76,6 +76,15 @@ for myfile in [
     out_file = f"{out_date}-{out_first}-fit.{out_file[1]}"
     fit_df.write_parquet(f"{workdir}/{out_file}")
 
+def redchi(
+        cor: pl.Series, fit: pl.Series, ndata: pl.Series, nvarys: pl.Series
+) -> np.ndarray:
+    chisq = np.sum(
+        np.pow((cor - fit).to_numpy(), 2) / np.var(cor.to_numpy(), axis=0),
+        axis=1
+    )
+    redchi = chisq / (ndata.to_numpy() - nvarys.to_numpy())
+    return redchi
 
 def nrmse(cor: pl.Series, fit: pl.Series) -> np.ndarray:
     rmse = np.sqrt(np.mean(np.pow((cor - fit).to_numpy(), 2), axis=1))
@@ -136,14 +145,6 @@ for myfile in [
                 pl.col("minimizer").struct.field("fit_stats")
                 .struct.field("nvarys")
             ),
-            chisqr=(
-                pl.col("minimizer").struct.field("fit_stats")
-                .struct.field("chisqr")
-            ),
-            redchi=(
-                pl.col("minimizer").struct.field("fit_stats")
-                .struct.field("redchi")
-            ),
             artifact=pl.col("sim_params").struct.field("sim_artifact"),
             record_type=pl.lit(f"{record.rstrip('_g')}"),
             tau=(
@@ -175,6 +176,12 @@ for myfile in [
             ),
         )
         df_nrmse = df_nrmse.with_columns(
+            redchi=pl.struct("fit", "cor", "ndata", "nvarys").map_batches(
+                lambda x: redchi(
+                    x.struct.field("cor"), x.struct.field("fit"),
+                    x.struct.field("ndata"), x.struct.field("nvarys")
+                )
+            ),
             adjr2=pl.struct("fit", "cor", "ndata", "nvarys").map_batches(
                 lambda x: adjr2(
                     x.struct.field("cor"), x.struct.field("fit"),

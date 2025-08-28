@@ -50,7 +50,7 @@ def apply_photobleaching(
         psf=clean_psf, track_arr=track_arr, nmol=params.clean_nmol,
         pos_y=params.pos_y, pos_x=params.pos_x
     )
-    bleach_trace: npt.NDArray[np.float64] = bleach_trace_dict['trace'][0]
+    bleach_trace: npt.NDArray[np.float64] = bleach_trace_dict["trace"][0]
     return bleach_trace
 
 
