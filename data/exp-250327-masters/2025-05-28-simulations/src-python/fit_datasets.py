@@ -80,7 +80,7 @@ def redchi(
         cor: pl.Series, fit: pl.Series, ndata: pl.Series, nvarys: pl.Series
 ) -> np.ndarray:
     chisq = np.sum(
-        np.pow((cor - fit).to_numpy(), 2) / np.var(cor.to_numpy(), axis=0),
+        np.pow((cor - fit).to_numpy(), 2) / np.abs(fit.to_numpy()),
         axis=1
     )
     redchi = chisq / (ndata.to_numpy() - nvarys.to_numpy())
