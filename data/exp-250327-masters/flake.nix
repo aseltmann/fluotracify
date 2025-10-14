@@ -36,7 +36,7 @@ let
       owner = "pola-rs";
       repo = pname;
       rev = "py-${version}";
-      hash = "";
+      hash = "sha256-m9NVvs1siXY0wIJ3Fbk21LsoMqBh0euX/38yY+DtY2c=";
     };
     cargoDeps = pkgs.rustPlatform.fetchCargoVendor {
       inherit pname version src;
