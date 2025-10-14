@@ -38,7 +38,7 @@ let
     };
     cargoDeps = pkgs.rustPlatform.fetchCargoVendor {
       inherit pname version src;
-      hash = "";
+      hash = "sha256-HoB+ANogonDKdgK8r/6MQaOqIbAX7V3xZmOe2DMiBiM=";
     };
     nativeBuildInputs = with pkgs.rustPlatform; [
       cargoSetupHook
