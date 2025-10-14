@@ -23,7 +23,7 @@ in
             click
             cython
             ipykernel
-            ipywidgetws
+            ipywidgets
             jupyterlab
             lmfit
             matplotlib
