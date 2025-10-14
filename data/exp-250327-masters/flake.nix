@@ -36,10 +36,9 @@ let
       inherit pname version;
       hash = "sha256-0qy3H84f8Op2219kir2Rp6bEYPr6vOmi6BdRhO+gDQI=";
     };
-    # build-system = with pkgs.python312Packages; [
-    #   setuptools
-    #   setuptools-scm
-    # ];
+    build-system = with pkgs.python312Packages; [
+      maturin
+    ];
     # dependencies = with pkgs.python312Packages; [
     #   numpy
     # ];
