@@ -36,7 +36,7 @@ let
   }) { inherit system; };
 in
   {
-    devShells.default = pkgs.mkShell {
+    devShells.default = pkgs.mkShellNoCC {
       packages =
         with pkgs; [
           pdf2svg
