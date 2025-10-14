@@ -15,6 +15,7 @@ let
   multipletau = pkgs.python3Packages.buildPythonPackage rec {
     pname = "multipletau";
     version = "0.4.1";
+    pyproject = true;
     src = pkgs.fetchFromGitHub {
       owner = "FCS-analysis";
       repo = pname;
