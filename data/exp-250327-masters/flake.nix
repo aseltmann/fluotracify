@@ -40,6 +40,7 @@ in
             matplotlib
             mlcroissant
             mlflow
+            multipletau
             numpy
             pandas
             polars
