@@ -12,7 +12,7 @@ flake-utils.lib.eachDefaultSystem (
   system:
 let
   pkgs = nixpkgs.legacyPackages.${system};
-  multipletau = pkgs.pythonPackages.buildPythonPackage rec {
+  multipletau = pkgs.pythonPackages312.buildPythonPackage rec {
     pname = "multipletau";
     version = "0.4.1";
     src = pkgs.fetchFromGitHub {
