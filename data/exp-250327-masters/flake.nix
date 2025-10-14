@@ -12,7 +12,7 @@ flake-utils.lib.eachDefaultSystem (
   system:
 let
   pkgs = nixpkgs.legacyPackages.${system};
-  multipletau = pkgs.python3Packages.buildPythonPackage rec {
+  multipletau = pkgs.python312Packages.buildPythonPackage rec {
     pname = "multipletau";
     version = "0.4.1";
     pyproject = true;
@@ -22,10 +22,13 @@ let
       rev = version;
       sha256 = "sha256-uFcHqKrLELsOxkr1WKQkzLtLjl/LFjg+vzfSW6UFezU=";
     };
-    # build-system = with pkgs.python3Packages; [ setuptools ];
-    dependencies = with pkgs.python3Packages; [
+    build-system = with pkgs.python312Packages; [
       setuptools
+      setuptools-scm
     ];
+    # dependencies = with pkgs.python3Packages; [
+    #   setuptools
+    # ];
   };
 in
   {
