@@ -19,7 +19,7 @@ in
           pdf2svg
           python312
         ] ++ (
-          with pkgs.python313Packages; [
+          with pkgs.python312Packages; [
             click
             cython
             ipykernel
