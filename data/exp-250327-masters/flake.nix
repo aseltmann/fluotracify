@@ -36,7 +36,7 @@ let
       inherit pname version;
       hash = "sha256-0qy3H84f8Op2219kir2Rp6bEYPr6vOmi6BdRhO+gDQI=";
     };
-    build-system = with pkgs.python312Packages; [
+    build-system = with pkgs; [
       maturin
     ];
     # dependencies = with pkgs.python312Packages; [
