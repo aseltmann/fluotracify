@@ -22,7 +22,10 @@ let
       rev = version;
       sha256 = "sha256-uFcHqKrLELsOxkr1WKQkzLtLjl/LFjg+vzfSW6UFezU=";
     };
-    build-system = with pkgs.python3Packages; [ setuptools ];
+    # build-system = with pkgs.python3Packages; [ setuptools ];
+    dependencies = with python312Packages; [
+      setuptools
+    ];
   };
 in
   {
