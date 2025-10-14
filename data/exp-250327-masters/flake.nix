@@ -19,7 +19,7 @@ let
       owner = "FCS-analysis";
       repo = pname;
       rev = version;
-      sha256 = "";
+      sha256 = "sha256-uFcHqKrLELsOxkr1WKQkzLtLjl/LFjg+vzfSW6UFezU=";
     };
   };
 in
