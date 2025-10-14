@@ -36,12 +36,14 @@ let
       inherit pname version;
       hash = "sha256-0qy3H84f8Op2219kir2Rp6bEYPr6vOmi6BdRhO+gDQI=";
     };
-    build-system = with pkgs; [
-      maturin
+    cargoDeps = pkgs.rustPlatform.fetchCargoVendor {
+      inherit pname version src;
+      hash = "";
+    };
+    nativeBuildInputs = with pkgs.rustPlatform; [
+      cargoSetupHook
+      maturinBuildHook
     ];
-    # dependencies = with pkgs.python312Packages; [
-    #   numpy
-    # ];
   };
 in
   {
