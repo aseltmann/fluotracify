@@ -12,7 +12,7 @@ flake-utils.lib.eachDefaultSystem (
   system:
 let
   pkgs = nixpkgs.legacyPackages.${system};
-  multipletau = pkgs.python312Packages.buildPythonPackage rec {
+  multipletau-pypi = pkgs.python312Packages.buildPythonPackage rec {
     pname = "multipletau";
     version = "0.4.1";
     pyproject = true;
@@ -27,6 +27,22 @@ let
     dependencies = with pkgs.python312Packages; [
       numpy
     ];
+  };
+  polars-pypi = pkgs.python312Packages.buildPythonPackage rec {
+    pname = "polars";
+    version = "1.29.0";
+    pyproject = true;
+    src = pkgs.fetchPypi {
+      inherit pname version;
+      hash = "";
+    };
+    # build-system = with pkgs.python312Packages; [
+    #   setuptools
+    #   setuptools-scm
+    # ];
+    # dependencies = with pkgs.python312Packages; [
+    #   numpy
+    # ];
   };
 in
   {
@@ -46,10 +62,10 @@ in
             matplotlib
             mlcroissant
             mlflow
-            multipletau
+            multipletau-pypi
             numpy
             pandas
-            polars
+            polars-pypi
             scikit-image
             scikit-learn
             scipy
