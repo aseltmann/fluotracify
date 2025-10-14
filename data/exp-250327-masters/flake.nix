@@ -28,25 +28,13 @@ let
       numpy
     ];
   };
-  polars-pypi = pkgs.python312Packages.buildPythonPackage rec {
-    pname = "polars";
-    version = "1.29.0";
-    pyproject = true;
-    src = pkgs.fetchFromGitHub {
-      owner = "pola-rs";
-      repo = pname;
-      rev = "py-${version}";
-      hash = "sha256-m9NVvs1siXY0wIJ3Fbk21LsoMqBh0euX/38yY+DtY2c=";
-    };
-    cargoDeps = pkgs.rustPlatform.fetchCargoVendor {
-      inherit pname version src;
-      hash = "sha256-HoB+ANogonDKdgK8r/6MQaOqIbAX7V3xZmOe2DMiBiM=";
-    };
-    nativeBuildInputs = with pkgs.rustPlatform; [
-      cargoSetupHook
-      maturinBuildHook
-    ];
-  };
+  pkgs-polars = import (builtins.fetchGit {
+    name = "nixpkgs-unstable-for-polars";
+    url = "https://github.com/NixOS/nixpkgs/";
+    ref = "refs/heads/nixos-unstable";
+    rev = "55b0d38442aac04f892f03b6a53cd9bb4c6cfc1c";
+  }) {};
+  polars-unstable = pkgs-polars.python312Packages.polars;
 in
   {
     devShells.default = pkgs.mkShell {
@@ -68,7 +56,7 @@ in
             multipletau-pypi
             numpy
             pandas
-            polars-pypi
+            polars-unstable
             scikit-image
             scikit-learn
             scipy
