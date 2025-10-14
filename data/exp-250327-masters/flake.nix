@@ -8,9 +8,20 @@
 
   outputs = {nixpkgs, flake-utils, ...}:
 
-flake-utils.lib.eachDefaultSystem (system:
+flake-utils.lib.eachDefaultSystem (
+  system:
 let
-  pkgs = import nixpkgs { inherit system; };
+  pkgs = nixpkgs.legacyPackages.${system};
+  multipletau = pkgs.pythonPackages.buildPythonPackage rec {
+    pname = "multipletau";
+    version = "v0.4.1";
+    src = pkgs.fetchFromGithub {
+      owner = "FCS-analysis";
+      repo = pname;
+      rev = version;
+      sha256 = "";
+    };
+  };
 in
   {
     devShells.default = pkgs.mkShell {
