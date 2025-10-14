@@ -14,7 +14,7 @@ let
   pkgs = nixpkgs.legacyPackages.${system};
   multipletau = pkgs.pythonPackages.buildPythonPackage rec {
     pname = "multipletau";
-    version = "v0.4.1";
+    version = "0.4.1";
     src = pkgs.fetchFromGitHub {
       owner = "FCS-analysis";
       repo = pname;
