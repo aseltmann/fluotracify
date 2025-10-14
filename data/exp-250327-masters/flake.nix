@@ -3,15 +3,17 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-25.05";
+    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = {nixpkgs, flake-utils, ...}:
+  outputs = {nixpkgs, nixpkgs-unstable, flake-utils, ...}:
 
 flake-utils.lib.eachDefaultSystem (
   system:
 let
   pkgs = nixpkgs.legacyPackages.${system};
+  pkgs-unstable = nixpkgs-unstable.legacyPackages.${system};
   multipletau-pypi = pkgs.python312Packages.buildPythonPackage rec {
     pname = "multipletau";
     version = "0.4.1";
@@ -28,12 +30,6 @@ let
       numpy
     ];
   };
-  pkgs-polars = import (builtins.fetchGit {
-    name = "nixpkgs-unstable-for-polars";
-    url = "https://github.com/NixOS/nixpkgs/";
-    ref = "refs/heads/nixos-unstable";
-    rev = "5fa4e5ce4cdfb1fb002889f3f65aa23e8b0b7425";
-  }) {};
 in
   {
     devShells.default = pkgs.mkShell {
@@ -62,7 +58,7 @@ in
             tensorflow
             tqdm
           ]) ++ (
-            with pkgs-polars.python312Packages; [
+            with pkgs-unstable.python312Packages; [
               polars
             ]);
       shellHook = ''
