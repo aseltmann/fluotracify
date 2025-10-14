@@ -3,17 +3,15 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-25.05";
-    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = {nixpkgs, nixpkgs-unstable, flake-utils, ...}:
+  outputs = {nixpkgs, flake-utils, ...}:
 
 flake-utils.lib.eachDefaultSystem (
   system:
 let
   pkgs = nixpkgs.legacyPackages.${system};
-  pkgs-unstable = nixpkgs-unstable.legacyPackages.${system};
   multipletau-pypi = pkgs.python312Packages.buildPythonPackage rec {
     pname = "multipletau";
     version = "0.4.1";
@@ -30,6 +28,12 @@ let
       numpy
     ];
   };
+  pkgs-unstable = import (builtins.fetchGit {
+    name = "nixpkgs-unstable-2025-07-06";
+    url = "https://github.com/nixos/nixpkgs/";
+    ref = "refs/heads/nixos-unstable";
+    rev = "55b0d38442aac04f892f03b6a53cd9bb4c6cfc1c";
+  }) {};
 in
   {
     devShells.default = pkgs.mkShell {
