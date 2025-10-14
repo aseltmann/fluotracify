@@ -18,7 +18,7 @@ let
     pyproject = true;
     src = pkgs.fetchPypi {
       inherit pname version;
-      hash = "sha256-uFcHqKrLELsOxkr1WKQkzLtLjl/LFjg+vzfSW6UFezU=";
+      hash = "sha256-roP342FbjWKEtx32KSe6Ibgy0eiwLHgqoFwXUlnuVO8=";
     };
     build-system = with pkgs.python312Packages; [
       setuptools
