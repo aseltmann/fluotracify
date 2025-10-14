@@ -34,7 +34,6 @@ let
     ref = "refs/heads/nixos-unstable";
     rev = "5fa4e5ce4cdfb1fb002889f3f65aa23e8b0b7425";
   }) {};
-  polars-unstable = pkgs-polars.python312Packages.polars;
 in
   {
     devShells.default = pkgs.mkShell {
@@ -56,14 +55,17 @@ in
             multipletau-pypi
             numpy
             pandas
-            # polars-unstable
+            polars-unstable
             scikit-image
             scikit-learn
             scipy
             seaborn
             tensorflow
             tqdm
-          ]);
+          ]) ++ (
+            with pkgs-polars.python312Packages; [
+              polars
+            ]);
       shellHook = ''
         jupyter lab
       '';
