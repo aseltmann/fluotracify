@@ -16,11 +16,9 @@ let
     pname = "multipletau";
     version = "0.4.1";
     pyproject = true;
-    src = pkgs.fetchFromGitHub {
-      owner = "FCS-analysis";
-      repo = pname;
-      rev = version;
-      sha256 = "sha256-uFcHqKrLELsOxkr1WKQkzLtLjl/LFjg+vzfSW6UFezU=";
+    src = pkgs.fetchPypi {
+      inherit pname version;
+      hash = "sha256-uFcHqKrLELsOxkr1WKQkzLtLjl/LFjg+vzfSW6UFezU=";
     };
     build-system = with pkgs.python312Packages; [
       setuptools
