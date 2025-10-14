@@ -55,7 +55,6 @@ in
             multipletau-pypi
             numpy
             pandas
-            polars-unstable
             scikit-image
             scikit-learn
             scipy
