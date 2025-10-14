@@ -32,9 +32,11 @@ let
     pname = "polars";
     version = "1.29.0";
     pyproject = true;
-    src = pkgs.fetchPypi {
-      inherit pname version;
-      hash = "sha256-0qy3H84f8Op2219kir2Rp6bEYPr6vOmi6BdRhO+gDQI=";
+    src = pkgs.fetchFromGitHub {
+      owner = "pola-rs";
+      repo = pname;
+      rev = "py-${version}";
+      hash = "";
     };
     cargoDeps = pkgs.rustPlatform.fetchCargoVendor {
       inherit pname version src;
