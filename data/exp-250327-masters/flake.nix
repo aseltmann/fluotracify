@@ -26,9 +26,9 @@ let
       setuptools
       setuptools-scm
     ];
-    # dependencies = with pkgs.python3Packages; [
-    #   setuptools
-    # ];
+    dependencies = with pkgs.python312Packages; [
+      numpy
+    ];
   };
 in
   {
