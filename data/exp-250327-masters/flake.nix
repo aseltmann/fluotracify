@@ -28,11 +28,11 @@ let
       numpy
     ];
   };
-  pkgs-unstable = import (builtins.fetchGit {
+  pkgs-unstable = import (builtins.fetchTarball {
     name = "nixpkgs-unstable-2025-07-06";
-    url = "https://github.com/nixos/nixpkgs/";
-    ref = "refs/heads/nixos-unstable";
-    rev = "55b0d38442aac04f892f03b6a53cd9bb4c6cfc1c";
+    url = "https://github.com/nixos/nixpkgs/archive/55b0d38442aac04f892f03b6a53cd9bb4c6cfc1c.tar.gz";
+    # Hash obtained using `nix-prefetch-url --unpack <url>`
+    sha256 = "1fh4iw2mq6afyf3myfh6md0q002s9sg943mh94sdw3gw27916373";
   }) {};
 in
   {
