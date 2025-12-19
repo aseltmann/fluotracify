@@ -38,30 +38,30 @@
           packages =
             with pkgs; [
               pdf2svg
-              python312
+              python312  # 3.12.12
             ] ++ (
               with pkgs.python312Packages; [
-                click
-                cython
-                ipykernel
-                ipywidgets
-                jupyterlab
-                lmfit
-                matplotlib
-                mlcroissant
-                mlflow
-                multipletau-pypi
-                numpy
-                pandas
-                scikit-image
-                scikit-learn
-                scipy
-                seaborn
-                tensorflow
-                tqdm
+                click  # 8.1.8
+                cython  # 3.0.12
+                ipykernel  # 6.29.5
+                ipywidgets  # 8.1.5 (conda env: 8.1.7)
+                jupyterlab  # 4.4.1
+                lmfit  # 1.3.3
+                matplotlib  # 3.10.1
+                mlcroissant  # 1.0.17
+                mlflow  # 2.20.3 (conda 2.21.3)
+                multipletau-pypi  # 0.4.1
+                numpy  # 2.2.5
+                pandas  # 2.2.3
+                scikit-image  # 0.25.2
+                scikit-learn  # 1.6.1
+                scipy  # 1.15.3 (conda 1.15.2)
+                seaborn  # 0.13.2 
+                tensorflow  # 2.19.0
+                tqdm  # 4.67.1
               ]) ++ (
                 with pkgs-unstable.python312Packages; [
-                  polars
+                  polars  # 1.31.0  # polars jumped from 1.27.1 to 1.31.0 in nixpkgs, choose higher version
                 ]);
           shellHook = ''
             jupyter lab
