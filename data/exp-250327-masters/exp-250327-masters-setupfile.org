@@ -1,10 +1,10 @@
 #+TITLE: Lab book Fluotracify
 #+AUTHOR: Alva Seltmann
 #+LANGUAGE: en
-#+PROPERTY: header-args:jupyter-python :session /jpy:localhost#8888:tf
+#+PROPERTY: header-args:jupyter-python :session /jpy:localhost#8888:masters-python
 #+PROPERTY: header-args:jupyter-python+ :pandoc t
 #+PROPERTY: header-args:jupyter-python+ :async yes
-#+PROPERTY: header-args:jupyter-python+ :kernel conda-env-tf-py
+#+PROPERTY: header-args:jupyter-python+ :kernel python3
 #+PROPERTY: header-args :eval never-export :exports both
 #+OPTIONS: toc:4
 #+OPTIONS: H:4
