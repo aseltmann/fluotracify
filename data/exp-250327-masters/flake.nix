@@ -64,6 +64,7 @@
                   polars  # 1.31.0  # polars jumped from 1.27.1 to 1.31.0 in nixpkgs, choose higher version
                 ]);
           shellHook = ''
+            emacs &
             jupyter lab
           '';
         };
