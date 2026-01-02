@@ -23,6 +23,15 @@ log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 
 
+def autocorrelate_and_fit(data, param: Parameters, options: dict):
+    cor = autocorrelate(data, m=16, normalize=True, deltat=1.)
+    res = minimize(
+        eq.residual, param, args=(cor[:, 0], cor[:, 1], options)
+    )
+    fit = eq.equation_(res.params, cor[:, 0], options)
+    return cor, res, fit
+
+
 def correlate_timetrace_and_save(df, out_path, out_txt):
     """Correlate FCS timetraces ordered columnwise and save each correlation as a
     single .csv file which can then be fitted by fitting software such as

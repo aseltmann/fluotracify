@@ -1,4 +1,4 @@
-#+setupfile: ../../lab-book-setupfile.org
+#+setupfile: exp-250327-masters-setupfile.org
 # #+include: ../../lab-book-technical.org
 # * Data
 ** exp-250327-masters
@@ -1347,7 +1347,7 @@ for myfile in [
 
 **** Fit simulated datasets and compute fit and quality parameters
 
-#+transclude: [[./2025-05-28-simulations/src-python/fit_datasets.py]] :lines 1-77 :src jupyter-python
+#+transclude: [[./2025-05-28-simulations/src-python/fit_datasets.py]]  :lines 1-77 :src jupyter-python
 
 #+RESULTS:
 : Fitting correlations in 2025-08-13-detector-dropout-testing-correlation.parquet ...
@@ -1368,13 +1368,13 @@ different G ranges comparable (more molecules = smaller G)
 
 First, load the respective modules
 
-#+transclude: [[./2025-05-28-simulations/src-python/fit_datasets.py]] :lines 1-22 :src jupyter-python
+#+transclude: [[./2025-05-28-simulations/src-python/fit_datasets.py]]  :lines 1-22 :src jupyter-python
 
 #+RESULTS:
 
 Then, do the computations
 
-#+transclude: [[./2025-05-28-simulations/src-python/fit_datasets.py]] :lines 79-198 :src jupyter-python
+#+transclude: [[./2025-05-28-simulations/src-python/fit_datasets.py]]  :lines 79-198 :src jupyter-python
 
 #+RESULTS:
 :RESULTS:
@@ -1397,7 +1397,7 @@ shape: (17_280, 27)
 
 And save the output
 
-#+transclude: [[./2025-05-28-simulations/src-python/fit_datasets.py]] :lines 199-200 :src jupyter-python
+#+transclude: [[./2025-05-28-simulations/src-python/fit_datasets.py]]  :lines 199-200 :src jupyter-python
 
 #+RESULTS:
 
@@ -2988,7 +2988,7 @@ transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 1-73 :sr
 
 Plot examples of time-series with peak artifacts
 
-#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]] :lines 75-96 :src jupyter-python
+#+transclude: [[2025-05-28-simulations/src-python/fit_quality.py]]  :lines 75-96 :src jupyter-python
 
 #+RESULTS:
 [[file:./.ob-jupyter/d5169cbace9dbf04dbaed140aa85bff6d6b9593f.png]]
@@ -3247,10 +3247,146 @@ Plot Adjusted R²
 
 #+RESULTS:
 :RESULTS:
-: /tmp/ipykernel_16517/4024010344.py:12: UserWarning: set_ticklabels() should only be used with a fixed number of ticks, i.e. after set_ticks() or using a FixedLocator.
+: /tmp/ipykernel_10650/4024010344.py:12: UserWarning: set_ticklabels() should only be used with a fixed number of ticks, i.e. after set_ticks() or using a FixedLocator.
 :   ).set_yticklabels(["with and without\ndetector dropout",
 [[file:./.ob-jupyter/c64ca6c98ef52c83a3b050864fefa17319c27c55.png]]
 :END:
+
+Display statistics for overview plot for NRMSE
+
+#+begin_src jupyter-python
+pl.concat([
+    ((pa_f_nrmse := df_eval
+     .filter(pl.col("artifact").eq("peak_artifacts") &
+             pl.col("record_type").eq("feature")))
+     ["nrmse"].describe().rename({"value": "pa_f_nrmse"})),
+    ((pa_l_nrmse := df_eval
+     .filter(pl.col("artifact").eq("peak_artifacts") &
+             pl.col("record_type").eq("label_restoration")))
+     ["nrmse"].describe().rename({"value": "pa_l_nrmse"})),
+    ((pb_f_nrmse := df_eval
+     .filter(pl.col("artifact").eq("photobleaching") &
+             pl.col("record_type").eq("feature")))
+     ["nrmse"].describe().rename({"value": "pb_f_nrmse"})),
+    ((pb_l_nrmse := df_eval
+     .filter(pl.col("artifact").eq("photobleaching") &
+             pl.col("record_type").eq("label_restoration")))
+     ["nrmse"].describe().rename({"value": "pb_l_nrmse"})),
+    ((dd_f_nrmse := df_eval
+     .filter(pl.col("artifact").eq("detector_dropout") &
+             pl.col("record_type").eq("feature")))
+     ["nrmse"].describe().rename({"value": "dd_f_nrmse"})),
+    ((dd_l_nrmse := df_eval
+     .filter(pl.col("artifact").eq("detector_dropout") &
+             pl.col("record_type").eq("label_restoration")))["nrmse"]
+     .describe().rename({"value": "dd_l_nrmse"})),
+    ], how="align")
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+shape: (9, 7)
+| statistic    | pa_f_nrmse | pa_l_nrmse | pb_f_nrmse | pb_l_nrmse | dd_f_nrmse | dd_l_nrmse |
+|--------------+------------+------------+------------+------------+------------+------------|
+| str          | f64        | f64        | f64        | f64        | f64        | f64        |
+| "25%"        | 0.030926   | 0.019454   | 0.039852   | 0.019733   | 0.020348   | 0.019602   |
+| "50%"        | 0.047161   | 0.028493   | 0.052977   | 0.028588   | 0.028439   | 0.02987    |
+| "75%"        | 0.061744   | 0.04913    | 0.064056   | 0.049529   | 0.047649   | 0.049824   |
+| "count"      | 3456.0     | 3456.0     | 3456.0     | 3456.0     | 1728.0     | 1728.0     |
+| "max"        | 0.145296   | 0.11614    | 0.136479   | 0.130504   | 0.113261   | 0.113822   |
+| "mean"       | 0.048576   | 0.035333   | 0.052044   | 0.035324   | 0.035088   | 0.035727   |
+| "min"        | 0.012103   | 0.010443   | 0.009612   | 0.009741   | 0.011472   | 0.010829   |
+| "null_count" | 0.0        | 0.0        | 0.0        | 0.0        | 0.0        | 0.0        |
+| "std"        | 0.020863   | 0.01978    | 0.017607   | 0.01959    | 0.018686   | 0.01962    |
+:END:
+
+
+Display statistics for overview plot for Adjusted R²
+
+#+begin_src jupyter-python
+pl.concat([
+    ((pa_f_adjr2 := df_eval
+     .filter(pl.col("artifact").eq("peak_artifacts") &
+             pl.col("record_type").eq("feature")))
+     ["adjr2"].describe().rename({"value": "pa_f_adjr2"})),
+    ((pa_l_adjr2 := df_eval
+     .filter(pl.col("artifact").eq("peak_artifacts") &
+             pl.col("record_type").eq("label_restoration")))
+    ["adjr2"].describe().rename({"value": "pa_l_adjr2"})),
+    ((pb_f_adjr2 := df_eval
+     .filter(pl.col("artifact").eq("photobleaching") &
+             pl.col("record_type").eq("feature")))
+    ["adjr2"].describe().rename({"value": "pb_f_adjr2"})),
+    ((pb_l_adjr2 := df_eval
+     .filter(pl.col("artifact").eq("photobleaching") &
+             pl.col("record_type").eq("label_restoration")))
+    ["adjr2"].describe().rename({"value": "pb_l_adjr2"})),
+    ((dd_f_adjr2 := df_eval
+     .filter(pl.col("artifact").eq("detector_dropout") &
+             pl.col("record_type").eq("feature")))
+    ["adjr2"].describe().rename({"value": "dd_f_adjr2"})),
+    ((dd_l_adjr2 := df_eval
+     .filter(pl.col("artifact").eq("detector_dropout") &
+             pl.col("record_type").eq("label_restoration")))
+    ["adjr2"].describe().rename({"value": "dd_l_adjr2"})),
+    ], how="align")
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+shape: (9, 7)
+| statistic    | pa_f_adjr2 | pa_l_adjr2 | pb_f_adjr2 | pb_l_adjr2 | dd_f_adjr2 | dd_l_adjr2 |
+|--------------+------------+------------+------------+------------+------------+------------|
+| str          | f64        | f64        | f64        | f64        | f64        | f64        |
+| "25%"        | 0.956434   | 0.955726   | 0.907955   | 0.956828   | 0.960444   | 0.95576    |
+| "50%"        | 0.97338    | 0.979782   | 0.946515   | 0.979503   | 0.978323   | 0.978172   |
+| "75%"        | 0.983335   | 0.988511   | 0.971878   | 0.988237   | 0.98749    | 0.988155   |
+| "count"      | 3456.0     | 3456.0     | 3456.0     | 3456.0     | 1728.0     | 1728.0     |
+| "max"        | 0.99422    | 0.995415   | 0.9955     | 0.996363   | 0.995279   | 0.995044   |
+| "mean"       | 0.964643   | 0.969136   | 0.931667   | 0.969228   | 0.970935   | 0.968799   |
+| "min"        | 0.678539   | 0.813455   | 0.421505   | 0.806314   | 0.842544   | 0.842476   |
+| "null_count" | 0.0        | 0.0        | 0.0        | 0.0        | 0.0        | 0.0        |
+| "std"        | 0.028429   | 0.025463   | 0.058011   | 0.025344   | 0.021922   | 0.025078   |
+:END:
+
+#+begin_src jupyter-python
+pval_dict = dict(
+    dd_nrmse=mannwhitneyu(dd_f_nrmse["nrmse"], dd_l_nrmse["nrmse"]).pvalue,
+    pa_nrmse=mannwhitneyu(pa_f_nrmse["nrmse"], pa_l_nrmse["nrmse"]).pvalue,
+    pb_nrmse=mannwhitneyu(pb_f_nrmse["nrmse"], pb_l_nrmse["nrmse"]).pvalue,
+    dd_adjr2=mannwhitneyu(dd_f_adjr2["adjr2"], dd_l_adjr2["adjr2"]).pvalue,
+    pa_adjr2=mannwhitneyu(pa_f_adjr2["adjr2"], pa_l_adjr2["adjr2"]).pvalue,
+    pb_adjr2=mannwhitneyu(pb_f_adjr2["adjr2"], pb_l_adjr2["adjr2"]).pvalue,
+)
+pprint(pval_dict)
+#+end_src
+
+#+RESULTS:
+: {'dd_adjr2': np.float64(0.5225339694451775),
+:  'dd_nrmse': np.float64(0.866914151701431),
+:  'pa_adjr2': np.float64(9.554447719291658e-33),
+:  'pa_nrmse': np.float64(2.682634593583649e-181),
+:  'pb_adjr2': np.float64(2.215323922640815e-286),
+:  'pb_nrmse': np.float64(1.8813110999733685e-277)}
+
+#+begin_src jupyter-python
+mannwhitneyu(pa_f_nrmse["nrmse"], pa_l_nrmse["nrmse"])
+#+end_src
+
+#+RESULTS:
+: MannwhitneyuResult(statistic=np.float64(8353650.0), pvalue=np.float64(2.682634593583649e-181))
+
+
+#+begin_src jupyter-python
+from scipy.stats import wilcoxon, mannwhitneyu
+from pprint import pprint
+
+# wilcoxon(pa_f_nrmse, pa_l_nrmse)
+# wilcoxon(dd_f_nrmse, dd_l_nrmse)
+#+end_src
+
+#+RESULTS:
+
 
 #+begin_src jupyter-python
 print([pd_eval.loc[pd_eval["artifact"] == a].shape[0]
@@ -3267,7 +3403,6 @@ print([pa_pd.loc[(pa_pd["clean_dmol"] == d) & (pa_pd["peak_dmol"] == p)
 print([pa_pd.loc[(pa_pd["clean_nmol"] == n) & (pa_pd["peak_dmol"] == p)
                  ].shape[0] for n in pa_nmol_list for p in pa_order])
 #+end_src
-
 
 
 *** test croissant
@@ -3638,3 +3773,52 @@ shape: (576, 1)
 | {1.0,1,2025-05-29,"detector_dropout",16384,2739.699707,54.137253,50.609642} |
 | {1.0,1,2025-05-29,"detector_dropout",16384,2740.506348,53.352455,51.369213} |
 | {1.0,1,2025-05-29,"detector_dropout",16384,2752.250488,47.748619,57.64394}  |
+
+
+*** 2025-12-19-simulations-segmentation
+**** Plot time-series examples with segmentation from simulation
+
+#+transclude: [[./2025-12-19-simulations-segmentation/src-python/segmentation-ground-truth.py]]  :src jupyter-python
+
+
+#+begin_src jupyter-python
+import numpy as np
+
+np.floor
+#+end_src
+
+#+RESULTS:
+: <ufunc 'floor'>
+
+
+*** package versions
+#+begin_src jupyter-python
+from importlib.metadata import version
+import platform
+print(
+    f"python {platform.python_version()}\n"
+    f"click {version('click')}\n"
+    f"cython {version('cython')}\n"
+    f"ipykernel {version('ipykernel')}\n"
+    f"ipywidgets {version('ipywidgets')}\n"
+    f"jupyterlab {version('jupyterlab')}\n"
+    f"lmfit {version('lmfit')}\n"
+    f"matplotlib {version('matplotlib')}\n"
+    f"mlcroissant {version('mlcroissant')}\n"
+    f"mlflow {version('mlflow')}\n"
+    f"multipletau {version('multipletau')}\n"
+    f"numpy {version('numpy')}\n"
+    f"pandas {version('pandas')}\n"
+    f"polars {version('polars')}\n"
+    f"scikit-image {version('scikit-image')}\n"
+    f"scikit-learn {version('scikit-learn')}\n"
+    f"scipy {version('scipy')}\n"
+    f"seaborn {version('seaborn')}\n"
+    f"tensorflow {version('tensorflow')}\n"
+    f"tqdm {version('tqdm')}\n"
+
+)
+#+end_src
+
+#+RESULTS:
+: 4cacdaac-be8d-42f4-97be-56c39926470e
