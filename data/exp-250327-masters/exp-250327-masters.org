@@ -3404,6 +3404,370 @@ print([pa_pd.loc[(pa_pd["clean_nmol"] == n) & (pa_pd["peak_dmol"] == p)
                  ].shape[0] for n in pa_nmol_list for p in pa_order])
 #+end_src
 
+*** 2025-12-19-simulations-segmentation
+**** Plot time-series examples with segmentation from simulation
+
+#+begin_src jupyter-python
+#!/usr/bin/env python3
+
+import os
+import sys
+import lmfit
+
+import multipletau
+import numpy as np
+import polars as pl
+
+from datetime import datetime
+from pathlib import Path
+
+from IPython.display import display
+
+os.chdir("/home/alva/Programs/drmed-git")
+FLUOTRACIFY_PATH = Path("/home/alva/Programs/drmed-git/src/")
+sys.path.append(FLUOTRACIFY_PATH.as_posix())
+
+from fluotracify import fcsdc
+
+inputdir = "data/exp-250327-masters/2025-05-28-simulations/parquet"
+workdir = "data/exp-250327-masters/2025-12-19-simulations-segmentation/parquet"
+fit_method = "lmfit"
+
+param_1sp = lmfit.Parameters()
+param_1sp.add("offset", value=0.01, min=-0.5, max=1.5, vary=True)
+param_1sp.add("gn0", value=1., min=-0.0001, max=3000., vary=True)
+param_1sp.add("a1", value=1., min=0.0001, max=1., vary=False)
+param_1sp.add("txy1", value=1., min=0.001, max=2000., vary=True)
+param_1sp.add("alpha1", value=1., min=0.6, max=2., vary=False)
+equation_dim = "2D"
+equation_dspecies = 1.
+#+end_src
+
+#+RESULTS:
+
+
+#+begin_src jupyter-python
+inputdir = "data/exp-250327-masters/2025-05-28-simulations/parquet"
+workdir = "data/exp-250327-masters/2025-12-19-simulations-segmentation/parquet"
+# df = pl.read_parquet(f"{inputdir}/2025-08-14-fit-quality.parquet")
+# df
+#+end_src
+
+#+RESULTS:
+
+#+begin_src jupyter-python
+df2 = pl.read_parquet(f"{inputdir}/2025-05-28-peak-artifacts-training.parquet")
+df2
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+shape: (3_456, 6)
+| uuid                               | feature                                     | label_restoration                           | label_segmentation                       | sim_params                                                                                                        | ts_params                                                                  |
+|------------------------------------+---------------------------------------------+---------------------------------------------+------------------------------------------+-------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------|
+| str                                | array[f32, 16384]                           | array[f32, 16384]                           | array[f32, 16384]                        | struct[19]                                                                                                        | struct[8]                                                                  |
+| "2fec7df0-7c14-4ab6-8d77-fa7868... | [239.979279, 249.755661, ... 1123.110596]   | [51.510159, 47.853531, ... 91.597885]       | [0.18192, 0.194886, ... 0.995669]        | {16384.0,1.0,250.0,4000.0,3000,3000,0.05,50,"peak_artifacts","both",1500,1500,"None",null,null,null,0.01,10,1036} | {1.0,1,2025-05-29,"peak_artifacts",16384,116.008667,262.504974,0.441956}   |
+| "b164008e-0b22-408e-afa3-9cafd8... | [49.690586, 45.992882, ... 2.082945]        | [49.690548, 45.99284, ... 2.082945]         | [7.1558e-8, 7.5528e-8, ... 4.3697e-10]   | {16384.0,1.0,250.0,4000.0,3000,3000,0.05,50,"peak_artifacts","both",1500,1500,"None",null,null,null,0.01,10,522}  | {1.0,1,2025-05-29,"peak_artifacts",16384,43.549427,35.404385,1.230133}     |
+| "e50a42a8-79b6-4905-b501-2aa9b9... | [23.223776, 22.169205, ... 21.744101]       | [15.354086, 13.855965, ... 21.743809]       | [0.014078, 0.014872, ... 5.2303e-7]      | {16384.0,1.0,250.0,4000.0,3000,3000,0.05,50,"peak_artifacts","both",1500,1500,"None",null,null,null,0.01,10,559}  | {1.0,1,2025-05-29,"peak_artifacts",16384,37.630753,38.586777,0.975284}     |
+| "540bf9f4-71a8-4fe5-9aa6-f7f8a1... | [18.362915, 15.592032, ... 126.506569]      | [18.362669, 15.591744, ... 126.506569]      | [4.9834e-7, 5.8128e-7, ... 1.5465e-12]   | {16384.0,1.0,250.0,4000.0,3000,3000,0.05,50,"peak_artifacts","both",1500,1500,"None",null,null,null,0.01,10,495}  | {1.0,1,2025-05-29,"peak_artifacts",16384,42.071472,39.886978,1.054832}     |
+| "4f58a240-21d5-498a-947c-4157c9... | [66.127007, 69.844078, ... 78.176125]       | [66.106781, 69.821037, ... 0.650439]        | [0.000022, 0.000025, ... 0.083182]       | {16384.0,1.0,250.0,4000.0,3000,3000,0.05,50,"peak_artifacts","both",1500,1500,"None",null,null,null,0.01,10,932}  | {1.0,1,2025-05-29,"peak_artifacts",16384,61.353661,65.832779,0.932019}     |
+| ...                                | ...                                         | ...                                         | ...                                      | ...                                                                                                               | ...                                                                        |
+| "7db740e8-407e-4958-9b3a-4b0a4a... | [3002.12207, 3304.633545, ... 4030.912109]  | [2999.718262, 3304.553711, ... 4030.912109] | [0.000481, 0.000016, ... 5.9872e-23]     | {16384.0,1.0,250.0,4000.0,3000,3000,50.0,4000,"peak_artifacts","both",1500,1500,"None",null,null,null,1.0,3,5000} | {1.0,1,2025-05-29,"peak_artifacts",16384,3300.677979,163.329163,20.209982} |
+| "3f8c8961-e655-44db-8479-1f79d2... | [3790.241943, 3360.623047, ... 2895.520752] | [3774.489014, 3314.133301, ... 2890.160156] | [0.002626, 0.007748, ... 0.000893]       | {16384.0,1.0,250.0,4000.0,3000,3000,50.0,4000,"peak_artifacts","both",1500,1500,"None",null,null,null,1.0,3,6000} | {1.0,1,2025-05-29,"peak_artifacts",16384,3324.20459,209.279129,15.88504}   |
+| "07e6793a-4692-43a3-a425-3f8023... | [2764.681885, 2313.73999, ... 3681.885498]  | [2764.681885, 2313.73999, ... 3681.885498]  | [5.7361e-18, 3.2779e-17, ... 1.1012e-29] | {16384.0,1.0,250.0,4000.0,3000,3000,50.0,4000,"peak_artifacts","both",1500,1500,"None",null,null,null,1.0,3,9000} | {1.0,1,2025-05-29,"peak_artifacts",16384,3300.577637,261.302277,12.632034} |
+| "a370b932-0525-4219-b2e7-79427a... | [3505.195312, 2398.957764, ... 3137.643311] | [3483.495117, 2302.143799, ... 3137.643311] | [0.003617, 0.016136, ... 3.7988e-20]     | {16384.0,1.0,250.0,4000.0,3000,3000,50.0,4000,"peak_artifacts","both",1500,1500,"None",null,null,null,1.0,3,6000} | {1.0,1,2025-05-29,"peak_artifacts",16384,3267.92334,157.209015,20.788393}  |
+| "0f8f19a1-c6c9-4901-b228-05ff8f... | [2674.079102, 2294.973145, ... 3381.0896]   | [2674.079102, 2294.973145, ... 3381.0896]   | [1.2036e-15, 1.7764e-15, ... 3.1275e-12] | {16384.0,1.0,250.0,4000.0,3000,3000,50.0,4000,"peak_artifacts","both",1500,1500,"None",null,null,null,1.0,3,5000} | {1.0,1,2025-05-29,"peak_artifacts",16384,3273.9375,140.292969,23.337856}   |
+:END:
+
+
+
+#+begin_src jupyter-python
+df2 = df2.with_columns(
+    artifact=pl.col("sim_params").struct.field("sim_artifact"),
+    clean_dmol=(
+        pl.col("sim_params").struct.field("clean_dmol")
+        .cast(pl.Float64).round(3)
+    ),
+    clean_nmol=pl.col("sim_params").struct.field("clean_nmol"),
+    peak_dmol=(
+        pl.col("sim_params").struct.field("peak_dmol").cast(pl.Float64)
+        .round(3)
+    ),
+    peak_nmol=pl.col("sim_params").struct.field("peak_nmol"),
+    bleach_exp_scale=(
+        pl.col("sim_params").struct.field("bleach_exp_scale")
+        .cast(pl.Float64).round(3)
+    ),
+    bleach_type=pl.col("sim_params").struct.field("bleach_type"),
+    dropout_n=pl.col("sim_params").struct.field("dropout_n"),
+    dropout_maxdrop=(
+        pl.col("sim_params").struct.field("dropout_maxdrop")
+    ),
+)
+# df2 = df2.head()
+df2
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+shape: (3_456, 15)
+| uuid                               | feature                                     | label_restoration                           | label_segmentation                       | sim_params                                                                                                        | ts_params                                                                  | artifact         | clean_dmol | clean_nmol | peak_dmol | peak_nmol | bleach_exp_scale | bleach_type | dropout_n | dropout_maxdrop |
+|------------------------------------+---------------------------------------------+---------------------------------------------+------------------------------------------+-------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------+------------------+------------+------------+-----------+-----------+------------------+-------------+-----------+-----------------|
+| str                                | array[f32, 16384]                           | array[f32, 16384]                           | array[f32, 16384]                        | struct[19]                                                                                                        | struct[8]                                                                  | str              | f64        | u32        | f64       | u32       | f64              | str         | u32       | f32             |
+| "2fec7df0-7c14-4ab6-8d77-fa7868... | [239.979279, 249.755661, ... 1123.110596]   | [51.510159, 47.853531, ... 91.597885]       | [0.18192, 0.194886, ... 0.995669]        | {16384.0,1.0,250.0,4000.0,3000,3000,0.05,50,"peak_artifacts","both",1500,1500,"None",null,null,null,0.01,10,1036} | {1.0,1,2025-05-29,"peak_artifacts",16384,116.008667,262.504974,0.441956}   | "peak_artifacts" | 0.05       | 50         | 0.01      | 10        | null             | "None"      | null      | null            |
+| "b164008e-0b22-408e-afa3-9cafd8... | [49.690586, 45.992882, ... 2.082945]        | [49.690548, 45.99284, ... 2.082945]         | [7.1558e-8, 7.5528e-8, ... 4.3697e-10]   | {16384.0,1.0,250.0,4000.0,3000,3000,0.05,50,"peak_artifacts","both",1500,1500,"None",null,null,null,0.01,10,522}  | {1.0,1,2025-05-29,"peak_artifacts",16384,43.549427,35.404385,1.230133}     | "peak_artifacts" | 0.05       | 50         | 0.01      | 10        | null             | "None"      | null      | null            |
+| "e50a42a8-79b6-4905-b501-2aa9b9... | [23.223776, 22.169205, ... 21.744101]       | [15.354086, 13.855965, ... 21.743809]       | [0.014078, 0.014872, ... 5.2303e-7]      | {16384.0,1.0,250.0,4000.0,3000,3000,0.05,50,"peak_artifacts","both",1500,1500,"None",null,null,null,0.01,10,559}  | {1.0,1,2025-05-29,"peak_artifacts",16384,37.630753,38.586777,0.975284}     | "peak_artifacts" | 0.05       | 50         | 0.01      | 10        | null             | "None"      | null      | null            |
+| "540bf9f4-71a8-4fe5-9aa6-f7f8a1... | [18.362915, 15.592032, ... 126.506569]      | [18.362669, 15.591744, ... 126.506569]      | [4.9834e-7, 5.8128e-7, ... 1.5465e-12]   | {16384.0,1.0,250.0,4000.0,3000,3000,0.05,50,"peak_artifacts","both",1500,1500,"None",null,null,null,0.01,10,495}  | {1.0,1,2025-05-29,"peak_artifacts",16384,42.071472,39.886978,1.054832}     | "peak_artifacts" | 0.05       | 50         | 0.01      | 10        | null             | "None"      | null      | null            |
+| "4f58a240-21d5-498a-947c-4157c9... | [66.127007, 69.844078, ... 78.176125]       | [66.106781, 69.821037, ... 0.650439]        | [0.000022, 0.000025, ... 0.083182]       | {16384.0,1.0,250.0,4000.0,3000,3000,0.05,50,"peak_artifacts","both",1500,1500,"None",null,null,null,0.01,10,932}  | {1.0,1,2025-05-29,"peak_artifacts",16384,61.353661,65.832779,0.932019}     | "peak_artifacts" | 0.05       | 50         | 0.01      | 10        | null             | "None"      | null      | null            |
+| ...                                | ...                                         | ...                                         | ...                                      | ...                                                                                                               | ...                                                                        | ...              | ...        | ...        | ...       | ...       | ...              | ...         | ...       | ...             |
+| "7db740e8-407e-4958-9b3a-4b0a4a... | [3002.12207, 3304.633545, ... 4030.912109]  | [2999.718262, 3304.553711, ... 4030.912109] | [0.000481, 0.000016, ... 5.9872e-23]     | {16384.0,1.0,250.0,4000.0,3000,3000,50.0,4000,"peak_artifacts","both",1500,1500,"None",null,null,null,1.0,3,5000} | {1.0,1,2025-05-29,"peak_artifacts",16384,3300.677979,163.329163,20.209982} | "peak_artifacts" | 50.0       | 4000       | 1.0       | 3         | null             | "None"      | null      | null            |
+| "3f8c8961-e655-44db-8479-1f79d2... | [3790.241943, 3360.623047, ... 2895.520752] | [3774.489014, 3314.133301, ... 2890.160156] | [0.002626, 0.007748, ... 0.000893]       | {16384.0,1.0,250.0,4000.0,3000,3000,50.0,4000,"peak_artifacts","both",1500,1500,"None",null,null,null,1.0,3,6000} | {1.0,1,2025-05-29,"peak_artifacts",16384,3324.20459,209.279129,15.88504}   | "peak_artifacts" | 50.0       | 4000       | 1.0       | 3         | null             | "None"      | null      | null            |
+| "07e6793a-4692-43a3-a425-3f8023... | [2764.681885, 2313.73999, ... 3681.885498]  | [2764.681885, 2313.73999, ... 3681.885498]  | [5.7361e-18, 3.2779e-17, ... 1.1012e-29] | {16384.0,1.0,250.0,4000.0,3000,3000,50.0,4000,"peak_artifacts","both",1500,1500,"None",null,null,null,1.0,3,9000} | {1.0,1,2025-05-29,"peak_artifacts",16384,3300.577637,261.302277,12.632034} | "peak_artifacts" | 50.0       | 4000       | 1.0       | 3         | null             | "None"      | null      | null            |
+| "a370b932-0525-4219-b2e7-79427a... | [3505.195312, 2398.957764, ... 3137.643311] | [3483.495117, 2302.143799, ... 3137.643311] | [0.003617, 0.016136, ... 3.7988e-20]     | {16384.0,1.0,250.0,4000.0,3000,3000,50.0,4000,"peak_artifacts","both",1500,1500,"None",null,null,null,1.0,3,6000} | {1.0,1,2025-05-29,"peak_artifacts",16384,3267.92334,157.209015,20.788393}  | "peak_artifacts" | 50.0       | 4000       | 1.0       | 3         | null             | "None"      | null      | null            |
+| "0f8f19a1-c6c9-4901-b228-05ff8f... | [2674.079102, 2294.973145, ... 3381.0896]   | [2674.079102, 2294.973145, ... 3381.0896]   | [1.2036e-15, 1.7764e-15, ... 3.1275e-12] | {16384.0,1.0,250.0,4000.0,3000,3000,50.0,4000,"peak_artifacts","both",1500,1500,"None",null,null,null,1.0,3,5000} | {1.0,1,2025-05-29,"peak_artifacts",16384,3273.9375,140.292969,23.337856}   | "peak_artifacts" | 50.0       | 4000       | 1.0       | 3         | null             | "None"      | null      | null            |
+:END:
+
+
+
+#+begin_src jupyter-python
+from typing import Literal
+
+def segment_threshold(
+        trace: pl.Series, artifact: Literal["peak_artifacts", "photobleaching",
+                                            "detector_dropout"],
+        threshold: pl.Float32
+) -> np.ndarray:
+    if artifact in ["peak_artifacts", "photobleaching"]:
+        seg = trace.to_numpy() > threshold
+    elif artifact == "detector_dropout":
+        seg = trace.to_numpy() < threshold
+    else:
+        raise ValueError(f"{artifact=} is not a valid artifact.")
+    return seg
+
+def cut_and_stitch(
+        trace: list, seg: list
+) -> np.ndarray:
+    new = np.delete(trace, seg)
+    # pad corrected trace to length of original trace, pad with NaN
+    new = np.pad(new, (0, np.sum(seg)), constant_values=None)
+    return new
+
+def correlate_multipletau(
+        df: dict, colname: str, pad_max_length: int,
+) -> np.ndarray:
+    trace = pl.Series(df[colname]).drop_nans().to_numpy()
+    stop = size = len(trace)
+    step = df["ts_params"]["bin"]
+    scale = np.arange(0, stop, step)
+    cor = fcsdc.FCSCor(
+        uuid=df["uuid"], method="multipletau",
+        multipletau_m=16,
+        multipletau_deltat=1.,
+        multipletau_norm=True,
+        multipletau_compress="average",
+    )
+    try:
+        cor.autocorrelate(trace)
+        cor.tc = np.pad(
+            cor.tc, (0, pad_max_length - len(cor.tc)), constant_values=None
+        )
+        cor.g = np.pad(
+            cor.g, (0, pad_max_length - len(cor.g)), constant_values=None
+        )
+    except ValueError:
+        cor.tc = np.tile(np.nan, pad_max_length)
+        cor.g = np.tile(np.nan, pad_max_length)
+    out = cor.to_polars().to_struct().struct.rename_fields([
+        f"{colname}_tc", f"{colname}_g", f"{colname}_params"
+    ])
+    return out
+
+multipletau_m = 16
+multipletau_deltat = 1.
+multipletau_norm = True
+multipletau_compress = "average"
+
+cor = multipletau.autocorrelate(
+    df2["feature"][0], m=multipletau_m, deltat=multipletau_deltat,
+    normalize=multipletau_norm, compress=multipletau_compress,
+)
+pad_max_length = cor[1:].shape[0]
+
+
+for t in np.arange(0.01, 0.11, 0.01):
+    t = round(t, 2)
+    seg = f"seg{t}".replace(".", "p")
+    new = f"new{t}".replace(".", "p")
+    cor = f"cor{t}".replace(".", "p")
+    df2 = df2.with_columns(
+        (pl.col("label_segmentation").map_batches(
+            lambda x: segment_threshold(
+                trace=x, artifact="peak_artifacts", threshold=t
+            )
+        )).alias(seg),
+    )
+    df2 = df2.with_columns(
+        (pl.struct("feature", seg).map_elements(
+            lambda x: cut_and_stitch(
+                x["feature"], x[seg]
+            ),
+            return_dtype=pl.List(pl.Float32)
+        )).alias(new),
+    )
+    df2 = df2.cast({new: pl.Array(pl.Float32, shape=(16384))})
+    df2 = df2.with_columns(
+        (pl.struct("uuid", new, "ts_params").map_elements(
+            lambda x: correlate_multipletau(x, new, pad_max_length),
+        )).alias(cor)
+    )
+    df2 = df2.with_columns(pl.col(cor).list.first().struct.unnest())
+    df2 = df2.drop(cor)
+
+
+
+# segment(pa_ts(0, 1.).select("label_segmentation"), "peak_artifacts", 0.04)
+# df2.pipe(pa_ts, peak_dmol=1.).pipe(segment, "peak_artifacts", 0.04)
+# sns.lineplot(data=df2.row(1)["label_segmentation"], label="artifact")
+# plt.show()
+# sns.lineplot(data=df2["seg"], label="segmentation label")
+
+# print(np.tile(np.asarray(0.04), 16))
+# print(pa_ts(0, 1.))
+
+#+end_src
+
+#+RESULTS:
+#+begin_example
+/tmp/ipykernel_93559/1818339703.py:87: MapWithoutReturnDtypeWarning: Calling `map_elements` without specifying `return_dtype` can lead to unpredictable results. Specify `return_dtype` to silence this warning.
+  df2 = df2.with_columns(
+/tmp/ipykernel_93559/1818339703.py:87: MapWithoutReturnDtypeWarning: Calling `map_elements` without specifying `return_dtype` can lead to unpredictable results. Specify `return_dtype` to silence this warning.
+  df2 = df2.with_columns(
+/tmp/ipykernel_93559/1818339703.py:87: MapWithoutReturnDtypeWarning: Calling `map_elements` without specifying `return_dtype` can lead to unpredictable results. Specify `return_dtype` to silence this warning.
+  df2 = df2.with_columns(
+/tmp/ipykernel_93559/1818339703.py:87: MapWithoutReturnDtypeWarning: Calling `map_elements` without specifying `return_dtype` can lead to unpredictable results. Specify `return_dtype` to silence this warning.
+  df2 = df2.with_columns(
+/tmp/ipykernel_93559/1818339703.py:87: MapWithoutReturnDtypeWarning: Calling `map_elements` without specifying `return_dtype` can lead to unpredictable results. Specify `return_dtype` to silence this warning.
+  df2 = df2.with_columns(
+/tmp/ipykernel_93559/1818339703.py:87: MapWithoutReturnDtypeWarning: Calling `map_elements` without specifying `return_dtype` can lead to unpredictable results. Specify `return_dtype` to silence this warning.
+  df2 = df2.with_columns(
+/tmp/ipykernel_93559/1818339703.py:87: MapWithoutReturnDtypeWarning: Calling `map_elements` without specifying `return_dtype` can lead to unpredictable results. Specify `return_dtype` to silence this warning.
+  df2 = df2.with_columns(
+/tmp/ipykernel_93559/1818339703.py:87: MapWithoutReturnDtypeWarning: Calling `map_elements` without specifying `return_dtype` can lead to unpredictable results. Specify `return_dtype` to silence this warning.
+  df2 = df2.with_columns(
+/tmp/ipykernel_93559/1818339703.py:87: MapWithoutReturnDtypeWarning: Calling `map_elements` without specifying `return_dtype` can lead to unpredictable results. Specify `return_dtype` to silence this warning.
+  df2 = df2.with_columns(
+/tmp/ipykernel_93559/1818339703.py:87: MapWithoutReturnDtypeWarning: Calling `map_elements` without specifying `return_dtype` can lead to unpredictable results. Specify `return_dtype` to silence this warning.
+  df2 = df2.with_columns(
+#+end_example
+
+#+begin_src jupyter-python
+#+end_src
+
+#+RESULTS:
+: array([nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan,
+:        nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan,
+:        nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan,
+:        nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan,
+:        nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan,
+:        nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan,
+:        nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan,
+:        nan, nan, nan])
+
+
+#+begin_src jupyter-python
+df2
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+shape: (3_456, 65)
+| uuid                               | feature                                     | label_restoration                           | label_segmentation                       | sim_params                                                                                                        | ts_params                                                                  | artifact         | clean_dmol | clean_nmol | peak_dmol | peak_nmol | bleach_exp_scale | bleach_type | dropout_n | dropout_maxdrop | seg0p01                   | new0p01                              | new0p01_tc              | new0p01_g                          | new0p01_params                                                                              | seg0p02                   | new0p02                              | new0p02_tc              | new0p02_g                          | new0p02_params                                                                              | seg0p03                   | new0p03                              | new0p03_tc              | new0p03_g                          | new0p03_params                                                                              | seg0p04                   | new0p04                              | new0p04_tc              | new0p04_g                          | new0p04_params                                                                              | seg0p05                   | new0p05                              | new0p05_tc              | new0p05_g                          | new0p05_params                                                                              | seg0p06                   | new0p06                              | new0p06_tc              | new0p06_g                          | new0p06_params                                                                              | seg0p07                   | new0p07                              | new0p07_tc              | new0p07_g                          | new0p07_params                                                                              | seg0p08                   | new0p08                              | new0p08_tc              | new0p08_g                          | new0p08_params                                                                              | seg0p09                   | new0p09                                | new0p09_tc              | new0p09_g                           | new0p09_params                                                                              | seg0p1                    | new0p1                                 | new0p1_tc               | new0p1_g                            | new0p1_params                                                                               |
+|------------------------------------+---------------------------------------------+---------------------------------------------+------------------------------------------+-------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------+------------------+------------+------------+-----------+-----------+------------------+-------------+-----------+-----------------+---------------------------+--------------------------------------+-------------------------+------------------------------------+---------------------------------------------------------------------------------------------+---------------------------+--------------------------------------+-------------------------+------------------------------------+---------------------------------------------------------------------------------------------+---------------------------+--------------------------------------+-------------------------+------------------------------------+---------------------------------------------------------------------------------------------+---------------------------+--------------------------------------+-------------------------+------------------------------------+---------------------------------------------------------------------------------------------+---------------------------+--------------------------------------+-------------------------+------------------------------------+---------------------------------------------------------------------------------------------+---------------------------+--------------------------------------+-------------------------+------------------------------------+---------------------------------------------------------------------------------------------+---------------------------+--------------------------------------+-------------------------+------------------------------------+---------------------------------------------------------------------------------------------+---------------------------+--------------------------------------+-------------------------+------------------------------------+---------------------------------------------------------------------------------------------+---------------------------+----------------------------------------+-------------------------+-------------------------------------+---------------------------------------------------------------------------------------------+---------------------------+----------------------------------------+-------------------------+-------------------------------------+---------------------------------------------------------------------------------------------|
+| str                                | array[f32, 16384]                           | array[f32, 16384]                           | array[f32, 16384]                        | struct[19]                                                                                                        | struct[8]                                                                  | str              | f64        | u32        | f64       | u32       | f64              | str         | u32       | f32             | array[bool, 16384]        | array[f32, 16384]                    | array[f32, 94]          | array[f32, 94]                     | struct[9]                                                                                   | array[bool, 16384]        | array[f32, 16384]                    | array[f32, 94]          | array[f32, 94]                     | struct[9]                                                                                   | array[bool, 16384]        | array[f32, 16384]                    | array[f32, 94]          | array[f32, 94]                     | struct[9]                                                                                   | array[bool, 16384]        | array[f32, 16384]                    | array[f32, 94]          | array[f32, 94]                     | struct[9]                                                                                   | array[bool, 16384]        | array[f32, 16384]                    | array[f32, 94]          | array[f32, 94]                     | struct[9]                                                                                   | array[bool, 16384]        | array[f32, 16384]                    | array[f32, 94]          | array[f32, 94]                     | struct[9]                                                                                   | array[bool, 16384]        | array[f32, 16384]                    | array[f32, 94]          | array[f32, 94]                     | struct[9]                                                                                   | array[bool, 16384]        | array[f32, 16384]                    | array[f32, 94]          | array[f32, 94]                     | struct[9]                                                                                   | array[bool, 16384]        | array[f32, 16384]                      | array[f32, 94]          | array[f32, 94]                      | struct[9]                                                                                   | array[bool, 16384]        | array[f32, 16384]                      | array[f32, 94]          | array[f32, 94]                      | struct[9]                                                                                   |
+| "2fec7df0-7c14-4ab6-8d77-fa7868... | [239.979279, 249.755661, ... 1123.110596]   | [51.510159, 47.853531, ... 91.597885]       | [0.18192, 0.194886, ... 0.995669]        | {16384.0,1.0,250.0,4000.0,3000,3000,0.05,50,"peak_artifacts","both",1500,1500,"None",null,null,null,0.01,10,1036} | {1.0,1,2025-05-29,"peak_artifacts",16384,116.008667,262.504974,0.441956}   | "peak_artifacts" | 0.05       | 50         | 0.01      | 10        | null             | "None"      | null      | null            | [true, true, ... true]    | [22.352154, 23.148581, ... NaN]      | [1.0, 2.0, ... NaN]     | [1.115903, 1.112193, ... NaN]      | {"2fec7df0-7c14-4ab6-8d77-fa78687cd5b1","multipletau",16,1.0,true,"average",null,null,null} | [true, true, ... true]    | [45.301743, 44.96574, ... NaN]       | [1.0, 2.0, ... NaN]     | [1.07153, 1.067861, ... NaN]       | {"2fec7df0-7c14-4ab6-8d77-fa78687cd5b1","multipletau",16,1.0,true,"average",null,null,null} | [true, true, ... true]    | [40.966949, 37.566311, ... NaN]      | [1.0, 2.0, ... NaN]     | [1.043171, 1.039635, ... NaN]      | {"2fec7df0-7c14-4ab6-8d77-fa78687cd5b1","multipletau",16,1.0,true,"average",null,null,null} | [true, true, ... true]    | [55.894711, 52.254028, ... NaN]      | [1.0, 2.0, ... NaN]     | [1.021614, 1.018029, ... NaN]      | {"2fec7df0-7c14-4ab6-8d77-fa78687cd5b1","multipletau",16,1.0,true,"average",null,null,null} | [true, true, ... true]    | [63.781872, 57.972542, ... NaN]      | [1.0, 2.0, ... NaN]     | [1.00319, 0.999634, ... NaN]       | {"2fec7df0-7c14-4ab6-8d77-fa78687cd5b1","multipletau",16,1.0,true,"average",null,null,null} | [true, true, ... true]    | [73.724594, 78.90892, ... NaN]       | [1.0, 2.0, ... NaN]     | [0.990297, 0.986805, ... NaN]      | {"2fec7df0-7c14-4ab6-8d77-fa78687cd5b1","multipletau",16,1.0,true,"average",null,null,null} | [true, true, ... true]    | [73.724594, 78.90892, ... NaN]       | [1.0, 2.0, ... NaN]     | [0.986636, 0.98312, ... NaN]       | {"2fec7df0-7c14-4ab6-8d77-fa78687cd5b1","multipletau",16,1.0,true,"average",null,null,null} | [true, true, ... true]    | [148.589478, 145.669952, ... NaN]    | [1.0, 2.0, ... NaN]     | [0.983096, 0.979495, ... NaN]      | {"2fec7df0-7c14-4ab6-8d77-fa78687cd5b1","multipletau",16,1.0,true,"average",null,null,null} | [true, true, ... true]    | [171.831589, 182.740433, ... NaN]      | [1.0, 2.0, ... NaN]     | [0.980313, 0.976623, ... NaN]       | {"2fec7df0-7c14-4ab6-8d77-fa78687cd5b1","multipletau",16,1.0,true,"average",null,null,null} | [true, true, ... true]    | [171.831589, 192.505417, ... NaN]      | [1.0, 2.0, ... NaN]     | [0.977932, 0.974212, ... NaN]       | {"2fec7df0-7c14-4ab6-8d77-fa78687cd5b1","multipletau",16,1.0,true,"average",null,null,null} |
+| "b164008e-0b22-408e-afa3-9cafd8... | [49.690586, 45.992882, ... 2.082945]        | [49.690548, 45.99284, ... 2.082945]         | [7.1558e-8, 7.5528e-8, ... 4.3697e-10]   | {16384.0,1.0,250.0,4000.0,3000,3000,0.05,50,"peak_artifacts","both",1500,1500,"None",null,null,null,0.01,10,522}  | {1.0,1,2025-05-29,"peak_artifacts",16384,43.549427,35.404385,1.230133}     | "peak_artifacts" | 0.05       | 50         | 0.01      | 10        | null             | "None"      | null      | null            | [false, false, ... false] | [49.690586, 45.992882, ... 2.082945] | [1.0, 2.0, ... 14336.0] | [0.830344, 0.825372, ... 0.022452] | {"b164008e-0b22-408e-afa3-9cafd82ec41d","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [49.690586, 45.992882, ... 2.082945] | [1.0, 2.0, ... 14336.0] | [0.830344, 0.825372, ... 0.022452] | {"b164008e-0b22-408e-afa3-9cafd82ec41d","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [49.690586, 45.992882, ... 2.082945] | [1.0, 2.0, ... 14336.0] | [0.830344, 0.825372, ... 0.022452] | {"b164008e-0b22-408e-afa3-9cafd82ec41d","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [49.690586, 45.992882, ... 2.082945] | [1.0, 2.0, ... 14336.0] | [0.830344, 0.825372, ... 0.022452] | {"b164008e-0b22-408e-afa3-9cafd82ec41d","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [49.690586, 45.992882, ... 2.082945] | [1.0, 2.0, ... 14336.0] | [0.830344, 0.825372, ... 0.022452] | {"b164008e-0b22-408e-afa3-9cafd82ec41d","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [49.690586, 45.992882, ... 2.082945] | [1.0, 2.0, ... 14336.0] | [0.830344, 0.825372, ... 0.022452] | {"b164008e-0b22-408e-afa3-9cafd82ec41d","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [49.690586, 45.992882, ... 2.082945] | [1.0, 2.0, ... 14336.0] | [0.830344, 0.825372, ... 0.022452] | {"b164008e-0b22-408e-afa3-9cafd82ec41d","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [49.690586, 45.992882, ... 2.082945] | [1.0, 2.0, ... 14336.0] | [0.830344, 0.825372, ... 0.022452] | {"b164008e-0b22-408e-afa3-9cafd82ec41d","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [49.690586, 45.992882, ... 2.082945]   | [1.0, 2.0, ... 14336.0] | [0.830344, 0.825372, ... 0.022452]  | {"b164008e-0b22-408e-afa3-9cafd82ec41d","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [49.690586, 45.992882, ... 2.082945]   | [1.0, 2.0, ... 14336.0] | [0.830344, 0.825372, ... 0.022452]  | {"b164008e-0b22-408e-afa3-9cafd82ec41d","multipletau",16,1.0,true,"average",null,null,null} |
+| "e50a42a8-79b6-4905-b501-2aa9b9... | [23.223776, 22.169205, ... 21.744101]       | [15.354086, 13.855965, ... 21.743809]       | [0.014078, 0.014872, ... 5.2303e-7]      | {16384.0,1.0,250.0,4000.0,3000,3000,0.05,50,"peak_artifacts","both",1500,1500,"None",null,null,null,0.01,10,559}  | {1.0,1,2025-05-29,"peak_artifacts",16384,37.630753,38.586777,0.975284}     | "peak_artifacts" | 0.05       | 50         | 0.01      | 10        | null             | "None"      | null      | null            | [true, true, ... false]   | [15.474997, 16.47633, ... NaN]       | [1.0, 2.0, ... NaN]     | [1.090783, 1.084954, ... NaN]      | {"e50a42a8-79b6-4905-b501-2aa9b99c0b4b","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [23.223776, 22.169205, ... NaN]      | [1.0, 2.0, ... NaN]     | [1.08759, 1.081997, ... NaN]       | {"e50a42a8-79b6-4905-b501-2aa9b99c0b4b","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [23.223776, 22.169205, ... NaN]      | [1.0, 2.0, ... NaN]     | [1.082057, 1.076463, ... NaN]      | {"e50a42a8-79b6-4905-b501-2aa9b99c0b4b","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [23.223776, 22.169205, ... NaN]      | [1.0, 2.0, ... NaN]     | [1.077639, 1.072074, ... NaN]      | {"e50a42a8-79b6-4905-b501-2aa9b99c0b4b","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [23.223776, 22.169205, ... NaN]      | [1.0, 2.0, ... NaN]     | [1.076499, 1.07094, ... NaN]       | {"e50a42a8-79b6-4905-b501-2aa9b99c0b4b","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [23.223776, 22.169205, ... NaN]      | [1.0, 2.0, ... NaN]     | [1.075468, 1.069851, ... NaN]      | {"e50a42a8-79b6-4905-b501-2aa9b99c0b4b","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [23.223776, 22.169205, ... NaN]      | [1.0, 2.0, ... NaN]     | [1.074112, 1.068503, ... NaN]      | {"e50a42a8-79b6-4905-b501-2aa9b99c0b4b","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [23.223776, 22.169205, ... NaN]      | [1.0, 2.0, ... NaN]     | [1.073276, 1.067688, ... NaN]      | {"e50a42a8-79b6-4905-b501-2aa9b99c0b4b","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [23.223776, 22.169205, ... NaN]        | [1.0, 2.0, ... NaN]     | [1.070331, 1.064754, ... NaN]       | {"e50a42a8-79b6-4905-b501-2aa9b99c0b4b","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [23.223776, 22.169205, ... NaN]        | [1.0, 2.0, ... NaN]     | [1.065777, 1.06026, ... NaN]        | {"e50a42a8-79b6-4905-b501-2aa9b99c0b4b","multipletau",16,1.0,true,"average",null,null,null} |
+| "540bf9f4-71a8-4fe5-9aa6-f7f8a1... | [18.362915, 15.592032, ... 126.506569]      | [18.362669, 15.591744, ... 126.506569]      | [4.9834e-7, 5.8128e-7, ... 1.5465e-12]   | {16384.0,1.0,250.0,4000.0,3000,3000,0.05,50,"peak_artifacts","both",1500,1500,"None",null,null,null,0.01,10,495}  | {1.0,1,2025-05-29,"peak_artifacts",16384,42.071472,39.886978,1.054832}     | "peak_artifacts" | 0.05       | 50         | 0.01      | 10        | null             | "None"      | null      | null            | [false, false, ... false] | [18.362915, 15.592032, ... NaN]      | [1.0, 2.0, ... NaN]     | [0.987306, 0.982091, ... NaN]      | {"540bf9f4-71a8-4fe5-9aa6-f7f8a129a621","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [18.362915, 15.592032, ... NaN]      | [1.0, 2.0, ... NaN]     | [0.982977, 0.977731, ... NaN]      | {"540bf9f4-71a8-4fe5-9aa6-f7f8a129a621","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [18.362915, 15.592032, ... NaN]      | [1.0, 2.0, ... NaN]     | [0.976336, 0.971258, ... NaN]      | {"540bf9f4-71a8-4fe5-9aa6-f7f8a129a621","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [18.362915, 15.592032, ... NaN]      | [1.0, 2.0, ... NaN]     | [0.969107, 0.96407, ... NaN]       | {"540bf9f4-71a8-4fe5-9aa6-f7f8a129a621","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [18.362915, 15.592032, ... NaN]      | [1.0, 2.0, ... NaN]     | [0.967894, 0.96286, ... NaN]       | {"540bf9f4-71a8-4fe5-9aa6-f7f8a129a621","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [18.362915, 15.592032, ... NaN]      | [1.0, 2.0, ... NaN]     | [0.967016, 0.96198, ... NaN]       | {"540bf9f4-71a8-4fe5-9aa6-f7f8a129a621","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [18.362915, 15.592032, ... NaN]      | [1.0, 2.0, ... NaN]     | [0.96667, 0.961634, ... NaN]       | {"540bf9f4-71a8-4fe5-9aa6-f7f8a129a621","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [18.362915, 15.592032, ... NaN]      | [1.0, 2.0, ... NaN]     | [0.966469, 0.961433, ... NaN]      | {"540bf9f4-71a8-4fe5-9aa6-f7f8a129a621","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [18.362915, 15.592032, ... 126.506569] | [1.0, 2.0, ... 14336.0] | [0.966211, 0.961175, ... -0.118509] | {"540bf9f4-71a8-4fe5-9aa6-f7f8a129a621","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [18.362915, 15.592032, ... 126.506569] | [1.0, 2.0, ... 14336.0] | [0.966211, 0.961175, ... -0.118509] | {"540bf9f4-71a8-4fe5-9aa6-f7f8a129a621","multipletau",16,1.0,true,"average",null,null,null} |
+| "4f58a240-21d5-498a-947c-4157c9... | [66.127007, 69.844078, ... 78.176125]       | [66.106781, 69.821037, ... 0.650439]        | [0.000022, 0.000025, ... 0.083182]       | {16384.0,1.0,250.0,4000.0,3000,3000,0.05,50,"peak_artifacts","both",1500,1500,"None",null,null,null,0.01,10,932}  | {1.0,1,2025-05-29,"peak_artifacts",16384,61.353661,65.832779,0.932019}     | "peak_artifacts" | 0.05       | 50         | 0.01      | 10        | null             | "None"      | null      | null            | [false, false, ... true]  | [66.127007, 69.844078, ... NaN]      | [1.0, 2.0, ... NaN]     | [0.642556, 0.638546, ... NaN]      | {"4f58a240-21d5-498a-947c-4157c97a00e3","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... true]  | [66.127007, 69.844078, ... NaN]      | [1.0, 2.0, ... NaN]     | [0.649373, 0.645361, ... NaN]      | {"4f58a240-21d5-498a-947c-4157c97a00e3","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... true]  | [66.127007, 69.844078, ... NaN]      | [1.0, 2.0, ... NaN]     | [0.648733, 0.644714, ... NaN]      | {"4f58a240-21d5-498a-947c-4157c97a00e3","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... true]  | [66.127007, 69.844078, ... NaN]      | [1.0, 2.0, ... NaN]     | [0.647834, 0.643819, ... NaN]      | {"4f58a240-21d5-498a-947c-4157c97a00e3","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... true]  | [66.127007, 69.844078, ... NaN]      | [1.0, 2.0, ... NaN]     | [0.6459, 0.641886, ... NaN]        | {"4f58a240-21d5-498a-947c-4157c97a00e3","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... true]  | [66.127007, 69.844078, ... NaN]      | [1.0, 2.0, ... NaN]     | [0.642176, 0.638165, ... NaN]      | {"4f58a240-21d5-498a-947c-4157c97a00e3","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... true]  | [66.127007, 69.844078, ... NaN]      | [1.0, 2.0, ... NaN]     | [0.637212, 0.633204, ... NaN]      | {"4f58a240-21d5-498a-947c-4157c97a00e3","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... true]  | [66.127007, 69.844078, ... NaN]      | [1.0, 2.0, ... NaN]     | [0.630385, 0.626376, ... NaN]      | {"4f58a240-21d5-498a-947c-4157c97a00e3","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [66.127007, 69.844078, ... NaN]        | [1.0, 2.0, ... NaN]     | [0.625291, 0.621249, ... NaN]       | {"4f58a240-21d5-498a-947c-4157c97a00e3","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [66.127007, 69.844078, ... NaN]        | [1.0, 2.0, ... NaN]     | [0.620359, 0.616325, ... NaN]       | {"4f58a240-21d5-498a-947c-4157c97a00e3","multipletau",16,1.0,true,"average",null,null,null} |
+| ...                                | ...                                         | ...                                         | ...                                      | ...                                                                                                               | ...                                                                        | ...              | ...        | ...        | ...       | ...       | ...              | ...         | ...       | ...             | ...                       | ...                                  | ...                     | ...                                | ...                                                                                         | ...                       | ...                                  | ...                     | ...                                | ...                                                                                         | ...                       | ...                                  | ...                     | ...                                | ...                                                                                         | ...                       | ...                                  | ...                     | ...                                | ...                                                                                         | ...                       | ...                                  | ...                     | ...                                | ...                                                                                         | ...                       | ...                                  | ...                     | ...                                | ...                                                                                         | ...                       | ...                                  | ...                     | ...                                | ...                                                                                         | ...                       | ...                                  | ...                     | ...                                | ...                                                                                         | ...                       | ...                                    | ...                     | ...                                 | ...                                                                                         | ...                       | ...                                    | ...                     | ...                                 | ...                                                                                         |
+| "7db740e8-407e-4958-9b3a-4b0a4a... | [3002.12207, 3304.633545, ... 4030.912109]  | [2999.718262, 3304.553711, ... 4030.912109] | [0.000481, 0.000016, ... 5.9872e-23]     | {16384.0,1.0,250.0,4000.0,3000,3000,50.0,4000,"peak_artifacts","both",1500,1500,"None",null,null,null,1.0,3,5000} | {1.0,1,2025-05-29,"peak_artifacts",16384,3300.677979,163.329163,20.209982} | "peak_artifacts" | 50.0       | 4000       | 1.0       | 3         | null             | "None"      | null      | null            | [false, false, ... false] | [3002.12207, 3304.633545, ... NaN]   | [1.0, 2.0, ... NaN]     | [0.002548, 0.001247, ... NaN]      | {"7db740e8-407e-4958-9b3a-4b0a4af1d565","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [3002.12207, 3304.633545, ... NaN]   | [1.0, 2.0, ... NaN]     | [0.002572, 0.00127, ... NaN]       | {"7db740e8-407e-4958-9b3a-4b0a4af1d565","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [3002.12207, 3304.633545, ... NaN]   | [1.0, 2.0, ... NaN]     | [0.002586, 0.001307, ... NaN]      | {"7db740e8-407e-4958-9b3a-4b0a4af1d565","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [3002.12207, 3304.633545, ... NaN]   | [1.0, 2.0, ... NaN]     | [0.002591, 0.0013, ... NaN]        | {"7db740e8-407e-4958-9b3a-4b0a4af1d565","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [3002.12207, 3304.633545, ... NaN]   | [1.0, 2.0, ... NaN]     | [0.002618, 0.001305, ... NaN]      | {"7db740e8-407e-4958-9b3a-4b0a4af1d565","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [3002.12207, 3304.633545, ... NaN]   | [1.0, 2.0, ... NaN]     | [0.002655, 0.001318, ... NaN]      | {"7db740e8-407e-4958-9b3a-4b0a4af1d565","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [3002.12207, 3304.633545, ... NaN]   | [1.0, 2.0, ... NaN]     | [0.002678, 0.001333, ... NaN]      | {"7db740e8-407e-4958-9b3a-4b0a4af1d565","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [3002.12207, 3304.633545, ... NaN]   | [1.0, 2.0, ... NaN]     | [0.002696, 0.001378, ... NaN]      | {"7db740e8-407e-4958-9b3a-4b0a4af1d565","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [3002.12207, 3304.633545, ... NaN]     | [1.0, 2.0, ... NaN]     | [0.002741, 0.001404, ... NaN]       | {"7db740e8-407e-4958-9b3a-4b0a4af1d565","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [3002.12207, 3304.633545, ... NaN]     | [1.0, 2.0, ... NaN]     | [0.002793, 0.00146, ... NaN]        | {"7db740e8-407e-4958-9b3a-4b0a4af1d565","multipletau",16,1.0,true,"average",null,null,null} |
+| "3f8c8961-e655-44db-8479-1f79d2... | [3790.241943, 3360.623047, ... 2895.520752] | [3774.489014, 3314.133301, ... 2890.160156] | [0.002626, 0.007748, ... 0.000893]       | {16384.0,1.0,250.0,4000.0,3000,3000,50.0,4000,"peak_artifacts","both",1500,1500,"None",null,null,null,1.0,3,6000} | {1.0,1,2025-05-29,"peak_artifacts",16384,3324.20459,209.279129,15.88504}   | "peak_artifacts" | 50.0       | 4000       | 1.0       | 3         | null             | "None"      | null      | null            | [false, false, ... false] | [3790.241943, 3360.623047, ... NaN]  | [1.0, 2.0, ... NaN]     | [0.002596, 0.001261, ... NaN]      | {"3f8c8961-e655-44db-8479-1f79d2dbdc6d","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [3790.241943, 3360.623047, ... NaN]  | [1.0, 2.0, ... NaN]     | [0.002619, 0.001266, ... NaN]      | {"3f8c8961-e655-44db-8479-1f79d2dbdc6d","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [3790.241943, 3360.623047, ... NaN]  | [1.0, 2.0, ... NaN]     | [0.002633, 0.001293, ... NaN]      | {"3f8c8961-e655-44db-8479-1f79d2dbdc6d","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [3790.241943, 3360.623047, ... NaN]  | [1.0, 2.0, ... NaN]     | [0.002666, 0.001371, ... NaN]      | {"3f8c8961-e655-44db-8479-1f79d2dbdc6d","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [3790.241943, 3360.623047, ... NaN]  | [1.0, 2.0, ... NaN]     | [0.002717, 0.001382, ... NaN]      | {"3f8c8961-e655-44db-8479-1f79d2dbdc6d","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [3790.241943, 3360.623047, ... NaN]  | [1.0, 2.0, ... NaN]     | [0.002749, 0.001408, ... NaN]      | {"3f8c8961-e655-44db-8479-1f79d2dbdc6d","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [3790.241943, 3360.623047, ... NaN]  | [1.0, 2.0, ... NaN]     | [0.002787, 0.001425, ... NaN]      | {"3f8c8961-e655-44db-8479-1f79d2dbdc6d","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [3790.241943, 3360.623047, ... NaN]  | [1.0, 2.0, ... NaN]     | [0.002881, 0.001498, ... NaN]      | {"3f8c8961-e655-44db-8479-1f79d2dbdc6d","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [3790.241943, 3360.623047, ... NaN]    | [1.0, 2.0, ... NaN]     | [0.002934, 0.001573, ... NaN]       | {"3f8c8961-e655-44db-8479-1f79d2dbdc6d","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [3790.241943, 3360.623047, ... NaN]    | [1.0, 2.0, ... NaN]     | [0.002998, 0.001631, ... NaN]       | {"3f8c8961-e655-44db-8479-1f79d2dbdc6d","multipletau",16,1.0,true,"average",null,null,null} |
+| "07e6793a-4692-43a3-a425-3f8023... | [2764.681885, 2313.73999, ... 3681.885498]  | [2764.681885, 2313.73999, ... 3681.885498]  | [5.7361e-18, 3.2779e-17, ... 1.1012e-29] | {16384.0,1.0,250.0,4000.0,3000,3000,50.0,4000,"peak_artifacts","both",1500,1500,"None",null,null,null,1.0,3,9000} | {1.0,1,2025-05-29,"peak_artifacts",16384,3300.577637,261.302277,12.632034} | "peak_artifacts" | 50.0       | 4000       | 1.0       | 3         | null             | "None"      | null      | null            | [false, false, ... false] | [2764.681885, 2313.73999, ... NaN]   | [1.0, 2.0, ... NaN]     | [0.002772, 0.001333, ... NaN]      | {"07e6793a-4692-43a3-a425-3f802376adf1","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [2764.681885, 2313.73999, ... NaN]   | [1.0, 2.0, ... NaN]     | [0.002802, 0.001371, ... NaN]      | {"07e6793a-4692-43a3-a425-3f802376adf1","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [2764.681885, 2313.73999, ... NaN]   | [1.0, 2.0, ... NaN]     | [0.002837, 0.001404, ... NaN]      | {"07e6793a-4692-43a3-a425-3f802376adf1","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [2764.681885, 2313.73999, ... NaN]   | [1.0, 2.0, ... NaN]     | [0.002841, 0.001437, ... NaN]      | {"07e6793a-4692-43a3-a425-3f802376adf1","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [2764.681885, 2313.73999, ... NaN]   | [1.0, 2.0, ... NaN]     | [0.002908, 0.001497, ... NaN]      | {"07e6793a-4692-43a3-a425-3f802376adf1","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [2764.681885, 2313.73999, ... NaN]   | [1.0, 2.0, ... NaN]     | [0.00295, 0.001518, ... NaN]       | {"07e6793a-4692-43a3-a425-3f802376adf1","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [2764.681885, 2313.73999, ... NaN]   | [1.0, 2.0, ... NaN]     | [0.003012, 0.001545, ... NaN]      | {"07e6793a-4692-43a3-a425-3f802376adf1","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [2764.681885, 2313.73999, ... NaN]   | [1.0, 2.0, ... NaN]     | [0.003068, 0.001609, ... NaN]      | {"07e6793a-4692-43a3-a425-3f802376adf1","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [2764.681885, 2313.73999, ... NaN]     | [1.0, 2.0, ... NaN]     | [0.003154, 0.00168, ... NaN]        | {"07e6793a-4692-43a3-a425-3f802376adf1","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [2764.681885, 2313.73999, ... NaN]     | [1.0, 2.0, ... NaN]     | [0.003185, 0.001699, ... NaN]       | {"07e6793a-4692-43a3-a425-3f802376adf1","multipletau",16,1.0,true,"average",null,null,null} |
+| "a370b932-0525-4219-b2e7-79427a... | [3505.195312, 2398.957764, ... 3137.643311] | [3483.495117, 2302.143799, ... 3137.643311] | [0.003617, 0.016136, ... 3.7988e-20]     | {16384.0,1.0,250.0,4000.0,3000,3000,50.0,4000,"peak_artifacts","both",1500,1500,"None",null,null,null,1.0,3,6000} | {1.0,1,2025-05-29,"peak_artifacts",16384,3267.92334,157.209015,20.788393}  | "peak_artifacts" | 50.0       | 4000       | 1.0       | 3         | null             | "None"      | null      | null            | [false, true, ... false]  | [3505.195312, 3302.857178, ... NaN]  | [1.0, 2.0, ... NaN]     | [0.002638, 0.001238, ... NaN]      | {"a370b932-0525-4219-b2e7-79427a1a0808","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [3505.195312, 2398.957764, ... NaN]  | [1.0, 2.0, ... NaN]     | [0.002685, 0.001276, ... NaN]      | {"a370b932-0525-4219-b2e7-79427a1a0808","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [3505.195312, 2398.957764, ... NaN]  | [1.0, 2.0, ... NaN]     | [0.00271, 0.001305, ... NaN]       | {"a370b932-0525-4219-b2e7-79427a1a0808","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [3505.195312, 2398.957764, ... NaN]  | [1.0, 2.0, ... NaN]     | [0.002708, 0.001312, ... NaN]      | {"a370b932-0525-4219-b2e7-79427a1a0808","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [3505.195312, 2398.957764, ... NaN]  | [1.0, 2.0, ... NaN]     | [0.002728, 0.001322, ... NaN]      | {"a370b932-0525-4219-b2e7-79427a1a0808","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [3505.195312, 2398.957764, ... NaN]  | [1.0, 2.0, ... NaN]     | [0.002741, 0.001333, ... NaN]      | {"a370b932-0525-4219-b2e7-79427a1a0808","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [3505.195312, 2398.957764, ... NaN]  | [1.0, 2.0, ... NaN]     | [0.002788, 0.001374, ... NaN]      | {"a370b932-0525-4219-b2e7-79427a1a0808","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [3505.195312, 2398.957764, ... NaN]  | [1.0, 2.0, ... NaN]     | [0.00282, 0.001404, ... NaN]       | {"a370b932-0525-4219-b2e7-79427a1a0808","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [3505.195312, 2398.957764, ... NaN]    | [1.0, 2.0, ... NaN]     | [0.002864, 0.001427, ... NaN]       | {"a370b932-0525-4219-b2e7-79427a1a0808","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [3505.195312, 2398.957764, ... NaN]    | [1.0, 2.0, ... NaN]     | [0.002885, 0.001469, ... NaN]       | {"a370b932-0525-4219-b2e7-79427a1a0808","multipletau",16,1.0,true,"average",null,null,null} |
+| "0f8f19a1-c6c9-4901-b228-05ff8f... | [2674.079102, 2294.973145, ... 3381.0896]   | [2674.079102, 2294.973145, ... 3381.0896]   | [1.2036e-15, 1.7764e-15, ... 3.1275e-12] | {16384.0,1.0,250.0,4000.0,3000,3000,50.0,4000,"peak_artifacts","both",1500,1500,"None",null,null,null,1.0,3,5000} | {1.0,1,2025-05-29,"peak_artifacts",16384,3273.9375,140.292969,23.337856}   | "peak_artifacts" | 50.0       | 4000       | 1.0       | 3         | null             | "None"      | null      | null            | [false, false, ... false] | [2674.079102, 2294.973145, ... NaN]  | [1.0, 2.0, ... NaN]     | [0.002711, 0.001354, ... NaN]      | {"0f8f19a1-c6c9-4901-b228-05ff8fa5fc6e","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [2674.079102, 2294.973145, ... NaN]  | [1.0, 2.0, ... NaN]     | [0.002678, 0.00135, ... NaN]       | {"0f8f19a1-c6c9-4901-b228-05ff8fa5fc6e","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [2674.079102, 2294.973145, ... NaN]  | [1.0, 2.0, ... NaN]     | [0.002684, 0.001354, ... NaN]      | {"0f8f19a1-c6c9-4901-b228-05ff8fa5fc6e","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [2674.079102, 2294.973145, ... NaN]  | [1.0, 2.0, ... NaN]     | [0.002721, 0.001351, ... NaN]      | {"0f8f19a1-c6c9-4901-b228-05ff8fa5fc6e","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [2674.079102, 2294.973145, ... NaN]  | [1.0, 2.0, ... NaN]     | [0.002748, 0.001407, ... NaN]      | {"0f8f19a1-c6c9-4901-b228-05ff8fa5fc6e","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [2674.079102, 2294.973145, ... NaN]  | [1.0, 2.0, ... NaN]     | [0.002773, 0.001424, ... NaN]      | {"0f8f19a1-c6c9-4901-b228-05ff8fa5fc6e","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [2674.079102, 2294.973145, ... NaN]  | [1.0, 2.0, ... NaN]     | [0.002811, 0.001445, ... NaN]      | {"0f8f19a1-c6c9-4901-b228-05ff8fa5fc6e","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [2674.079102, 2294.973145, ... NaN]  | [1.0, 2.0, ... NaN]     | [0.002835, 0.001455, ... NaN]      | {"0f8f19a1-c6c9-4901-b228-05ff8fa5fc6e","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [2674.079102, 2294.973145, ... NaN]    | [1.0, 2.0, ... NaN]     | [0.002888, 0.001489, ... NaN]       | {"0f8f19a1-c6c9-4901-b228-05ff8fa5fc6e","multipletau",16,1.0,true,"average",null,null,null} | [false, false, ... false] | [2674.079102, 2294.973145, ... NaN]    | [1.0, 2.0, ... NaN]     | [0.002933, 0.001539, ... NaN]       | {"0f8f19a1-c6c9-4901-b228-05ff8fa5fc6e","multipletau",16,1.0,true,"average",null,null,null} |
+:END:
+
+
+#+begin_src jupyter-python
+cor = fcsdc.FCSCor(
+    uuid=df2["uuid"][0], method="multipletau",
+    multipletau_m=16,
+    multipletau_deltat=1.,
+    multipletau_norm=True,
+    multipletau_compress="average",
+)
+cor.autocorrelate(df2["feature"][0])
+# print(len(cor.tc))
+cor.tc = np.pad(cor.tc, (0, pad_max_length - len(cor.tc)), constant_values=None)
+cor.g = np.pad(cor.g, (0, pad_max_length - len(cor.g)), constant_values=None)
+cor.to_polars().to_struct()
+# pl.Series.to_list
+# print(test3.to_list())
+# pl.Series(test3.to_list())
+# sns.lineplot(data=test1, label="artifact")
+# sns.lineplot(data=test3, label="artifact")
+# plt.show()
+# sns.lineplot(data=test2, label="segmentation label")
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+shape: (1,)
+| struct[3]                                                                                                                                               |
+| {[1.0, 2.0, ... 14336.0],[2.265887, 2.260584, ... 0.24747],{"2fec7df0-7c14-4ab6-8d77-fa78687cd5b1","multipletau",16,1.0,true,"average",null,null,null}} |
+:END:
+
+#+begin_src jupyter-python
+
+def pa_tsfilter(peak_dmol: float) -> pl.Expr:
+    return (pl.col("artifact").eq("peak_artifacts") &
+            pl.col("clean_dmol").eq(1.) &
+            pl.col("clean_nmol").eq(3000) &
+            pl.col("peak_dmol").eq(peak_dmol))
+
+def pa_ts(idx: int, peak_dmol: float, df: pl.DataFrame = df2) -> dict:
+    return (df
+            .filter(pa_tsfilter(peak_dmol))
+            .row(idx, named=True))
+pa_ts(0, 1.).keys()
+#+end_src
+
+#+RESULTS:
+: dict_keys(['uuid', 'feature', 'label_restoration', 'label_segmentation', 'sim_params', 'ts_params', 'artifact', 'clean_dmol', 'clean_nmol', 'peak_dmol', 'peak_nmol', 'bleach_exp_scale', 'bleach_type', 'dropout_n', 'dropout_maxdrop', 'seg'])
+
+
+#+begin_src jupyter-python
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+sns.lineplot(data=pa_ts(0, 1.)["feature"], label="artifact")
+plt.show()
+sns.lineplot(data=pa_ts(0, 1.)["label_segmentation"], label="segmentation label")
+plt.show()
+sns.lineplot(data=pa_ts(0, 1.)["seg"], label="segmentation label")
+# sns.lineplot(data=df["trace"], label="no artifact", alpha=0.7, ax=axts)
+
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+[[file:./.ob-jupyter/c0bd1e80d622f20a91e2eb318c03beceb9186510.png]]
+[[file:./.ob-jupyter/f2773d1ce359184793f938441a51107555dadd85.png]]
+: <Axes: >
+[[file:./.ob-jupyter/5ccce02585d3e1221893000a8969a931549a3baf.png]]
+:END:
+
 
 *** test croissant
 
@@ -3774,23 +4138,6 @@ shape: (576, 1)
 | {1.0,1,2025-05-29,"detector_dropout",16384,2740.506348,53.352455,51.369213} |
 | {1.0,1,2025-05-29,"detector_dropout",16384,2752.250488,47.748619,57.64394}  |
 
-
-*** 2025-12-19-simulations-segmentation
-**** Plot time-series examples with segmentation from simulation
-
-#+transclude: [[./2025-12-19-simulations-segmentation/src-python/segmentation-ground-truth.py]]  :src jupyter-python
-
-
-#+begin_src jupyter-python
-import numpy as np
-
-np.floor
-#+end_src
-
-#+RESULTS:
-: <ufunc 'floor'>
-
-
 *** package versions
 #+begin_src jupyter-python
 from importlib.metadata import version
@@ -3821,4 +4168,25 @@ print(
 #+end_src
 
 #+RESULTS:
-: 4cacdaac-be8d-42f4-97be-56c39926470e
+#+begin_example
+python 3.12.12
+click 8.1.8
+cython 3.0.12
+ipykernel 6.29.5
+ipywidgets 8.1.5
+jupyterlab 4.4.1
+lmfit 1.3.3
+matplotlib 3.10.1
+mlcroissant 1.0.17
+mlflow 2.20.3
+multipletau 0.4.1
+numpy 2.2.5
+pandas 2.2.3
+polars 1.31.0
+scikit-image 0.25.2
+scikit-learn 1.6.1
+scipy 1.15.3
+seaborn 0.13.2
+tensorflow 2.19.0
+tqdm 4.67.1
+#+end_example
