@@ -820,11 +820,15 @@ class FCSFit:
             "nfev", "nvarys", "ndata", "nfree", "chisqr", "redchi", "aic", "bic"
         ]}
         rm_callkws = getattr(self.result_minimizer, "call_kws", None)
+        try:
+            rm_fitreport = lmfit.fit_report(self.result_minimizer)
+        except UnboundLocalError:
+            rm_fitreport = None
         rm_dict = {"aborted": getattr(self.result_minimizer, "aborted", None),
                    "success": getattr(self.result_minimizer, "success", None),
                    "message": getattr(self.result_minimizer, "message", None),
                    "params": rm_params_dict,
-                   "fit_report": lmfit.fit_report(self.result_minimizer),
+                   "fit_report": rm_fitreport,
                    "fit_stats": rm_fitstats,
                    "call_kws": rm_callkws}
         rm_dict = None if self.result_minimizer is None else rm_dict
