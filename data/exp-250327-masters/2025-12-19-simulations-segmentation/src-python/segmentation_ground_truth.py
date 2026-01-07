@@ -1,180 +1,258 @@
+
 #!/usr/bin/env python3
 
 import os
 import sys
 import lmfit
 
+import multipletau
 import numpy as np
 import polars as pl
 
 from datetime import datetime
 from pathlib import Path
+from typing import Literal
 
 from IPython.display import display
 
 os.chdir("/home/alva/Programs/drmed-git")
-FLUOTRACIFY_PATH = Path("src/")
+FLUOTRACIFY_PATH = Path("/home/alva/Programs/drmed-git/src/")
 sys.path.append(FLUOTRACIFY_PATH.as_posix())
 
 from fluotracify import fcsdc
 
 inputdir = "data/exp-250327-masters/2025-05-28-simulations/parquet"
 workdir = "data/exp-250327-masters/2025-12-19-simulations-segmentation/parquet"
-fit_method = "lmfit"
 
+cor_method: Literal["multipletau"] = "multipletau"
+multipletau_m = 16
+multipletau_norm = True
+multipletau_compress: Literal["average"] = "average"
+
+fit_method: Literal["lmfit"] = "lmfit"
 param_1sp = lmfit.Parameters()
 param_1sp.add("offset", value=0.01, min=-0.5, max=1.5, vary=True)
 param_1sp.add("gn0", value=1., min=-0.0001, max=3000., vary=True)
 param_1sp.add("a1", value=1., min=0.0001, max=1., vary=False)
 param_1sp.add("txy1", value=1., min=0.001, max=2000., vary=True)
 param_1sp.add("alpha1", value=1., min=0.6, max=2., vary=False)
-equation_dim = "2D"
-equation_dspecies = 1.
+equation_dim: Literal["2D"] = "2D"
+equation_dspecies: Literal[1] = 1
+
+
+def segment_threshold(
+        trace: pl.Series, artifact: Literal["peak_artifacts", "photobleaching",
+                                            "detector_dropout"],
+        threshold: pl.Float32
+) -> np.ndarray:
+    if artifact in ["peak_artifacts", "photobleaching"]:
+        seg = trace.to_numpy() > threshold
+    elif artifact == "detector_dropout":
+        seg = trace.to_numpy() < threshold
+    else:
+        raise ValueError(f"{artifact=} is not a valid artifact.")
+    return seg
+
+
+def cut_and_stitch(
+        trace: list, seg: list
+) -> np.ndarray:
+    new = np.delete(trace, seg)
+    # pad corrected trace to length of original trace, pad with NaN
+    new = np.pad(new, (0, np.sum(seg)), constant_values=np.array(None))
+    return new
+
+
+def diffcoeff(tau: float, fwhm: float = 250) -> float:
+    return (fwhm / 1000)**2 / (8 * np.log(2.0) * tau / 1000)
+
+
+def nrmse(cor: np.ndarray, fit: np.ndarray) -> float:
+    rmse = np.sqrt(np.mean(np.pow((cor - fit), 2), axis=0))
+    nrmse = rmse / (np.max(cor, axis=0) - np.min(cor, axis=0))
+    return nrmse
+
+
+def adjr2(
+        cor: np.ndarray, fit: np.ndarray, ndata: int, nvarys: int
+) -> float:
+    """see
+    https://en.wikipedia.org/wiki/Coefficient_of_determination#Adjusted_R2
+    """
+    r2 = 1 - (np.sum(np.pow((cor - fit), 2), axis=0) /
+              np.sum(np.pow((cor - np.mean(cor, axis=0)), 2), axis=0))
+    adjr2 = 1 - (1 - r2) * ((ndata - 1) / (ndata - nvarys - 1))
+    return adjr2
+
+
+def correlate_multipletau(
+        df: dict, colname: str, outname: str, pad_max_length: int,
+) -> pl.Series:
+    trace = pl.Series(df[colname]).drop_nans().to_numpy()
+    cor = fcsdc.FCSCor(
+        uuid=df["uuid"], method=cor_method, multipletau_m=multipletau_m,
+        multipletau_deltat=df["bin"], multipletau_norm=multipletau_norm,
+        multipletau_compress=multipletau_compress,
+    )
+    try:
+        cor.autocorrelate(trace)
+        assert (cor.tc is not None) and (cor.g is not None)
+        cor.tc = np.pad(cor.tc, (0, pad_max_length - len(cor.tc)),
+                        constant_values=np.array(None))
+        cor.g = np.pad(cor.g, (0, pad_max_length - len(cor.g)),
+                       constant_values=np.array(None))
+    except (ValueError, AssertionError) as e:
+        cor.tc = np.tile(np.nan, pad_max_length)
+        cor.g = np.tile(np.nan, pad_max_length)
+    out = cor.to_polars().to_struct().struct.rename_fields([
+        f"{outname}_tc", f"{outname}_g", f"{outname}_params"
+    ])
+    return out
+
+
+def fcs_fit(
+        df: dict, colname: str, outname: str, pad_max_length: int,
+) -> pl.Series:
+    tc = pl.Series(df[f"{colname}_tc"]).drop_nans().to_numpy()
+    g = pl.Series(df[f"{colname}_g"]).drop_nans().to_numpy()
+
+    fit = fcsdc.FCSFit(
+        uuid=df["uuid"], method=fit_method, params=param_1sp,
+        equation_dim=equation_dim, equation_dspecies=equation_dspecies,
+    )
+    try:
+        fit.minimize(tc, g)
+    except ValueError:
+        fit.tc = np.tile(np.nan, pad_max_length)
+        fit.g = np.tile(np.nan, pad_max_length)
+        fit.residual = np.tile(np.nan, pad_max_length)
+    if fit.result_minimizer is not None:
+        assert (fit.tc is not None) and (fit.g is not None) and (
+            fit.residual is not None)
+        assert hasattr(fit.result_minimizer, "params")
+        fit_nrmse = pl.DataFrame(
+            [nrmse(g, fit.g)], schema={"nrmse": pl.Float32}
+        )
+        fit_adjr2 = pl.DataFrame(
+            [adjr2(g, fit.g, fit.result_minimizer.ndata,
+                   fit.result_minimizer.nvarys)],
+            schema={"adjr2": pl.Float32}
+        )
+        fit_txy1 = pl.DataFrame(
+            [fit.result_minimizer.params["txy1"].value],
+            schema={"txy1": pl.Float32}
+        )
+        fit_diffcoeff = pl.DataFrame(
+            [diffcoeff(fit.result_minimizer.params["txy1"].value)],
+            schema={"diffcoeff": pl.Float32}
+        )
+        fit_n = pl.DataFrame(
+            [1 / fit.result_minimizer.params["gn0"].value],
+            schema={"n": pl.Float32}
+        )
+        fit.tc = np.pad(fit.tc, (0, pad_max_length - len(fit.tc)),
+                        constant_values=np.array(None))
+        fit.g = np.pad(fit.g, (0, pad_max_length - len(fit.g)),
+                       constant_values=np.array(None))
+        fit.residual = np.pad(fit.residual,
+                              (0, pad_max_length - len(fit.residual)),
+                              constant_values=np.array(None))
+    else:
+        fit_nrmse = pl.DataFrame([np.nan], schema={"nrmse": pl.Float32})
+        fit_adjr2 = pl.DataFrame([np.nan], schema={"adjr2": pl.Float32})
+        fit_txy1 = pl.DataFrame([np.nan], schema={"txy1": pl.Float32})
+        fit_diffcoeff = pl.DataFrame([np.nan], schema={"diffcoeff": pl.Float32})
+        fit_n = pl.DataFrame([np.nan], schema={"n": pl.Float32})
+    out = fit.to_polars()
+    out = out.drop(["uuid", "tc", "initial_params", "minimizer_params"])
+    out = pl.concat([out, fit_nrmse, fit_adjr2, fit_txy1, fit_diffcoeff, fit_n],
+                    how="horizontal")
+    out = out.to_struct().struct.rename_fields([
+        f"{outname}_g", f"{outname}_residual", f"{outname}_nrmse",
+        f"{outname}_adjr2", f"{outname}_txy1", f"{outname}_diffcoeff",
+        f"{outname}_n"
+    ])
+    return out
+
 
 for myfile in [
-        # "2025-05-28-detector-dropout-testing.parquet",
-        # "2025-05-28-detector-dropout-training.parquet",
-        # "2025-05-28-detector-dropout-validation.parquet",
-        "2025-05-28-peak-artifacts-testing.parquet",
-        # "2025-05-28-peak-artifacts-training.parquet",
-        # "2025-05-28-peak-artifacts-validation.parquet",
-        # "2025-05-28-photobleaching-testing.parquet",
+        "2025-05-28-peak-artifacts-training.parquet",
         # "2025-05-28-photobleaching-training.parquet",
-        # "2025-05-28-photobleaching-validation.parquet",
-        # "2025-08-13-detector-dropout-testing-correlation.parquet",
-        # "2025-08-13-detector-dropout-training-correlation.parquet",
-        # "2025-08-13-detector-dropout-validation-correlation.parquet",
-        # "2025-08-13-peak-artifacts-testing-correlation.parquet",
-        # "2025-08-13-peak-artifacts-training-correlation.parquet",
-        # "2025-08-13-peak-artifacts-validation-correlation.parquet",
-        # "2025-08-13-photobleaching-testing-correlation.parquet",
-        # "2025-08-13-photobleaching-training-correlation.parquet",
-        # "2025-08-13-photobleaching-validation-correlation.parquet",
 ]:
-    df = pl.read_parquet(f"{workdir}/{myfile}")
-    stem = myfile.lstrip("2025-08-14").rstrip("-fit.parquet")
-    corfile = f"2025-08-13-{stem}-correlation.parquet"
-    tsfile = f"2025-05-28-{stem}.parquet"
-    df_cor = pl.read_parquet(f"{workdir}/{corfile}")
-    df_ts = pl.read_parquet(f"{workdir}/{tsfile}")
-    df_record = pl.DataFrame()
-    for record in ["feature_g", "label_restoration_g"]:
-        minimizer = f"{record.rstrip('_g')}_minimizer_params"
-        residual = f"{record.rstrip('_g')}_residual"
-        df_nrmse = pl.concat([
-            df.select("uuid", "tc", "sim_params", minimizer, record, residual)
-            .rename({minimizer: "minimizer", record: "fit",
-                     residual: "residual"}),
-            df_cor.select("uuid", record).rename({record: "cor"}),
-            df_ts.select("uuid", record.strip("_g"), "ts_params")
-            .rename({record.strip("_g"): "trace"})
-        ], how="align")
-        df_nrmse = df_nrmse.with_columns(
-            artifact=pl.col("sim_params").struct.field("sim_artifact"),
-            record_type=pl.lit(f"{record.rstrip('_g')}"),
-            clean_dmol=(
-                pl.col("sim_params").struct.field("clean_dmol")
-                .cast(pl.Float64).round(3)
-            ),
-            clean_nmol=pl.col("sim_params").struct.field("clean_nmol"),
-            peak_dmol=(
-                pl.col("sim_params").struct.field("peak_dmol").cast(pl.Float64)
-                .round(3)
-            ),
-            peak_nmol=pl.col("sim_params").struct.field("peak_nmol"),
-            bleach_exp_scale=(
-                pl.col("sim_params").struct.field("bleach_exp_scale")
-                .cast(pl.Float64).round(3)
-            ),
-            bleach_type=pl.col("sim_params").struct.field("bleach_type"),
-            dropout_n=pl.col("sim_params").struct.field("dropout_n"),
-            dropout_maxdrop=(
-                pl.col("sim_params").struct.field("dropout_maxdrop")
-            ),
-        )
-        df_record = pl.concat([df_record, df_nrmse], how="vertical")
-    df_eval = pl.concat([df_eval, df_record], how="vertical")
-    print(f"Correlating traces in {myfile} ...")
-    df = pl.read_parquet(
-        f"data/exp-250327-masters/2025-05-28-simulations/parquet/{myfile}"
-    )
-    stop = df["sim_params"].struct.field("total_sim_time")
-    step = df["sim_params"].struct.field("time_step")
-    cor_df = pl.DataFrame()
-    for idx, row in enumerate(df.iter_slices(n_rows=1)):
-        record = {}
-        for s in row.select(pl.selectors.matches(
-                "^feature$|^label_restoration$|^label_segmentation$")):
-            size = s.arr.len().item()
-            scale = pl.DataFrame(
-                {"scale": [np.arange(0, stop[idx], step[idx])]},
-                schema={"scale": pl.Array(pl.Float32, shape=(size))}
-            )
-            ts = row.select(
-                pl.col(s.name, "ts_params")).rename({s.name: "trace"})
-            ts = pl.concat([ts, scale], how="horizontal")
-            if s.name == "feature":
-                record[s.name] = fcsdc.FCSTimeSeries.from_polars(ts)
-            else:
-                record[s.name] = fcsdc.FCSTimeSeriesLabel.from_polars(ts)
-        sim_params = fcsdc.FCSSimParams.from_polars(row["sim_params"])
-        sim_ts = fcsdc.SimulatedFCSTimeSeries(
-            uuid=row["uuid"].item(), sim_params=sim_params, record=record
-        )
-        cor_record = {}
-        for k, rec in sim_ts.record.items():
-            if k in ["feature", "label_restoration"]:
-                cor = fcsdc.FCSCor(
-                    uuid=sim_ts.uuid, method=cor_method,
-                    multipletau_m=multipletau_m,
-                    multipletau_deltat=multipletau_deltat,
-                    multipletau_norm=multipletau_norm,
-                    multipletau_compress=multipletau_compress,
-                )
-                cor.autocorrelate(rec.trace)
-                cor_record[k] = cor
-        sim_cor = fcsdc.SimulatedFCSTimeSeriesCor(
-            uuid=sim_ts.uuid, sim_params=sim_params, record=cor_record
-        )
-        cor_df = pl.concat([cor_df, sim_cor.to_polars()], how="vertical")
-    out_file = myfile.split(".")
-    out_first = out_file[0].split("-")[3:]
-    out_date = datetime.today().date()
-    out_file = f"{out_date}-{'-'.join(out_first)}-correlation.{out_file[1]}"
-    cor_df.write_parquet(
-        f"data/exp-250327-masters/2025-05-28-simulations/parquet/{out_file}"
-    )
-    print(f"Fitting correlations in {myfile} ...")
+    print(f"Computing segmentation thresholds for {myfile} ...")
     df = pl.read_parquet(f"{inputdir}/{myfile}")
-    fit_df = pl.DataFrame()
-    for idx, row in enumerate(df.iter_slices(n_rows=1)):
-        cor_record = {}
-        for s in row.select(pl.selectors.matches(
-                "^feature_g$|^label_restoration_g$|^label_segmentation_g$")):
-            cor = row.select(
-                pl.col("tc", s.name, "cor_params")).rename({s.name: "g"})
-            cor_record[s.name.rstrip("_g")] = fcsdc.FCSCor.from_polars(cor)
-        sim_params = fcsdc.FCSSimParams.from_polars(row["sim_params"])
-        cor_ts = fcsdc.SimulatedFCSTimeSeriesCor(
-            uuid=row["uuid"].item(), sim_params=sim_params, record=cor_record
-        )
-        fit_record = {}
-        for k, rec in cor_ts.record.items():
-            assert isinstance(rec.tc,  np.ndarray)
-            assert isinstance(rec.g,  np.ndarray)
-            fit = fcsdc.FCSFit(
-                uuid=cor_ts.uuid, method=fit_method, params=param_1sp,
-                equation_dim="2D", equation_dspecies=1
-            )
-            fit.minimize(rec.tc, rec.g)
-            fit_record[k] = fit
-        sim_fit = fcsdc.SimulatedFCSTimeSeriesFit(
-            uuid=cor_ts.uuid, sim_params=sim_params, record=fit_record
-        )
-        fit_df = pl.concat([fit_df, sim_fit.to_polars()], how="vertical")
+    df = df.with_columns(
+        artifact=pl.col("sim_params").struct.field("sim_artifact"),
+        clean_dmol=(
+            pl.col("sim_params").struct.field("clean_dmol")
+            .cast(pl.Float64).round(3)
+           ),
+        clean_nmol=pl.col("sim_params").struct.field("clean_nmol"),
+        peak_dmol=(
+            pl.col("sim_params").struct.field("peak_dmol").cast(pl.Float64)
+            .round(3)
+           ),
+        peak_nmol=pl.col("sim_params").struct.field("peak_nmol"),
+        bleach_exp_scale=(
+            pl.col("sim_params").struct.field("bleach_exp_scale")
+            .cast(pl.Float64).round(3)
+           ),
+        bleach_type=pl.col("sim_params").struct.field("bleach_type"),
+        dropout_n=pl.col("sim_params").struct.field("dropout_n"),
+        dropout_maxdrop=(
+            pl.col("sim_params").struct.field("dropout_maxdrop")
+           ),
+        bin=pl.col("ts_params").struct.field("bin")
+    )
+    df = df.drop(["sim_params", "ts_params"])
+    df = df.head()
+    display(df)
+    testcor = multipletau.autocorrelate(
+        df["feature"][0], m=multipletau_m, deltat=df["bin"][0],
+        normalize=multipletau_norm, compress=multipletau_compress,
+       )
+    pad_max_length = testcor[1:].shape[0]
+
+    for t in np.arange(0.01, 0.11, 0.05):
+        t = round(t, 2)
+        seg = f"seg{t}".replace(".", "p")
+        new = f"new{t}".replace(".", "p")
+        cor = f"cor{t}".replace(".", "p")
+        fit = f"fit{t}".replace(".", "p")
+        df = df.with_columns(
+            (pl.col("label_segmentation").map_batches(
+                lambda x: segment_threshold(
+                    trace=x, artifact="peak_artifacts", threshold=t
+                   )
+               )).alias(seg),
+           )
+        df = df.with_columns(
+            (pl.struct("feature", seg).map_elements(
+                lambda x: cut_and_stitch(
+                    x["feature"], x[seg]
+                   ),
+                return_dtype=pl.List(pl.Float32)
+               )).alias(new),
+           )
+        df = df.cast({new: pl.Array(pl.Float32, shape=(16384))})
+        df = df.with_columns(
+            (pl.struct("uuid", new, "bin").map_elements(
+                lambda x: correlate_multipletau(x, new, cor, pad_max_length),
+               )).alias(cor)
+           )
+        df = df.with_columns(pl.col(cor).list.first().struct.unnest())
+        df = df.with_columns(
+            (pl.struct("uuid", f"{cor}_tc", f"{cor}_g").map_elements(
+                lambda x: fcs_fit(x, cor, fit, pad_max_length),
+               )).alias(fit)
+           )
+        df = df.with_columns(pl.col(fit).list.first().struct.unnest())
+        df = df.drop([cor, f"{cor}_params", fit])
+
+
     out_file = myfile.split(".")
     out_first = out_file[0].split("-")[3:]
-    out_first = "-".join(out_first).rstrip("-correlation")
+    out_first = "-".join(out_first)
     out_date = datetime.today().date()
-    out_file = f"{out_date}-{out_first}-fit.{out_file[1]}"
-    fit_df.write_parquet(f"{workdir}/{out_file}")
+    out_file = f"{out_date}-{out_first}-segmentation-ground-truth.{out_file[1]}"
+    df.write_parquet(f"{workdir}/{out_file}")
