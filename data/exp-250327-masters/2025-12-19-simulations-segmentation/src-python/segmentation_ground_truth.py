@@ -43,7 +43,7 @@ equation_dspecies: Literal[1] = 1
 def segment_threshold(
         trace: pl.Series, artifact: Literal["peak_artifacts", "photobleaching",
                                             "detector_dropout"],
-        threshold: pl.Float32
+        threshold: float
 ) -> np.ndarray:
     if artifact in ["peak_artifacts", "photobleaching"]:
         seg = trace.to_numpy() > threshold
@@ -101,7 +101,7 @@ def correlate_multipletau(
                         constant_values=np.array(None))
         cor.g = np.pad(cor.g, (0, pad_max_length - len(cor.g)),
                        constant_values=np.array(None))
-    except (ValueError, AssertionError) as e:
+    except (ValueError, AssertionError):
         cor.tc = np.tile(np.nan, pad_max_length)
         cor.g = np.tile(np.nan, pad_max_length)
     out = cor.to_polars().to_struct().struct.rename_fields([
@@ -122,7 +122,7 @@ def fcs_fit(
     )
     try:
         fit.minimize(tc, g)
-    except ValueError:
+    except (TypeError, ValueError):
         fit.tc = np.tile(np.nan, pad_max_length)
         fit.g = np.tile(np.nan, pad_max_length)
         fit.residual = np.tile(np.nan, pad_max_length)
@@ -175,6 +175,27 @@ def fcs_fit(
     return out
 
 
+def polars_correlate_and_fit(
+        df: pl.DataFrame, col_trace: str, col_cor: str, col_fit: str
+) -> pl.DataFrame:
+    df = df.with_columns(
+        (pl.struct("uuid", col_trace, "bin").map_elements(
+            lambda x: correlate_multipletau(
+                x, col_trace, col_cor, pad_max_length
+            ),
+           )).alias(col_cor)
+       )
+    df = df.with_columns(pl.col(col_cor).list.first().struct.unnest())
+    df = df.with_columns(
+        (pl.struct("uuid", f"{col_cor}_tc", f"{col_cor}_g").map_elements(
+            lambda x: fcs_fit(x, col_cor, col_fit, pad_max_length),
+           )).alias(col_fit)
+       )
+    df = df.with_columns(pl.col(col_fit).list.first().struct.unnest())
+    df = df.drop([col_cor, f"{col_cor}_params", col_fit])
+    return df
+
+
 for myfile in [
         "2025-05-28-peak-artifacts-training.parquet",
         # "2025-05-28-photobleaching-training.parquet",
@@ -205,15 +226,23 @@ for myfile in [
         bin=pl.col("ts_params").struct.field("bin")
     )
     df = df.drop(["sim_params", "ts_params"])
-    df = df.head()
-    display(df)
+    # df = df.head()
+    # display(df)
     testcor = multipletau.autocorrelate(
         df["feature"][0], m=multipletau_m, deltat=df["bin"][0],
         normalize=multipletau_norm, compress=multipletau_compress,
        )
     pad_max_length = testcor[1:].shape[0]
 
-    for t in np.arange(0.01, 0.11, 0.05):
+    df = polars_correlate_and_fit(
+        df, "feature", "corfeat", "fitfeat"
+    )
+    df = polars_correlate_and_fit(
+        df, "label_restoration", "corclean", "fitclean"
+    )
+
+    for t in np.arange(0.01, 0.11, 0.01):
+        print(f"threshold {t}")
         t = round(t, 2)
         seg = f"seg{t}".replace(".", "p")
         new = f"new{t}".replace(".", "p")
@@ -236,18 +265,10 @@ for myfile in [
            )
         df = df.cast({new: pl.Array(pl.Float32, shape=(16384))})
         df = df.with_columns(
-            (pl.struct("uuid", new, "bin").map_elements(
-                lambda x: correlate_multipletau(x, new, cor, pad_max_length),
-               )).alias(cor)
-           )
-        df = df.with_columns(pl.col(cor).list.first().struct.unnest())
-        df = df.with_columns(
-            (pl.struct("uuid", f"{cor}_tc", f"{cor}_g").map_elements(
-                lambda x: fcs_fit(x, cor, fit, pad_max_length),
-               )).alias(fit)
-           )
-        df = df.with_columns(pl.col(fit).list.first().struct.unnest())
-        df = df.drop([cor, f"{cor}_params", fit])
+            (pl.col(new).arr.len() - pl.col(new).arr.count_matches(np.nan)
+             ).alias(f"{new}_len")
+        )
+        df = polars_correlate_and_fit(df, new, cor, fit)
 
 
     out_file = myfile.split(".")
@@ -255,4 +276,4 @@ for myfile in [
     out_first = "-".join(out_first)
     out_date = datetime.today().date()
     out_file = f"{out_date}-{out_first}-segmentation-ground-truth.{out_file[1]}"
-    df.write_parquet(f"{workdir}/{out_file}")
+    # df.write_parquet(f"{workdir}/{out_file}")
