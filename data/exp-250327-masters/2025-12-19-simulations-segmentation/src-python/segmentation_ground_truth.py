@@ -101,7 +101,7 @@ def correlate_multipletau(
                         constant_values=np.array(None))
         cor.g = np.pad(cor.g, (0, pad_max_length - len(cor.g)),
                        constant_values=np.array(None))
-    except (ValueError, AssertionError):
+    except (ValueError, AssertionError, IndexError):
         cor.tc = np.tile(np.nan, pad_max_length)
         cor.g = np.tile(np.nan, pad_max_length)
     out = cor.to_polars().to_struct().struct.rename_fields([
@@ -198,7 +198,7 @@ def polars_correlate_and_fit(
 
 for myfile in [
         "2025-05-28-peak-artifacts-training.parquet",
-        # "2025-05-28-photobleaching-training.parquet",
+        "2025-05-28-photobleaching-training.parquet",
 ]:
     print(f"Computing segmentation thresholds for {myfile} ...")
     df = pl.read_parquet(f"{inputdir}/{myfile}")
@@ -241,9 +241,9 @@ for myfile in [
         df, "label_restoration", "corclean", "fitclean"
     )
 
-    for t in np.arange(0.01, 0.11, 0.01):
+    for t in [0.0001, 0.001, 0.005, 0.01, 0.025, 0.04, 0.06, 0.1]:
         print(f"threshold {t}")
-        t = round(t, 2)
+        t = round(t, 4)
         seg = f"seg{t}".replace(".", "p")
         new = f"new{t}".replace(".", "p")
         cor = f"cor{t}".replace(".", "p")
@@ -269,11 +269,22 @@ for myfile in [
              ).alias(f"{new}_len")
         )
         df = polars_correlate_and_fit(df, new, cor, fit)
+        # for evaluating which threshold is best, drop the trace and correlation
+        # data and only keep evaluation data
+        df = df.drop([seg, new, f"{cor}_tc", f"{cor}_g", f"{fit}_g",
+                      f"{fit}_residual"])
 
+    # for evaluating which threshold is best, drop the trace and correlation
+    # data and only keep evaluation data
+    df = df.drop([
+        "feature", "label_restoration", "label_segmentation", "corfeat_tc",
+        "corfeat_g", "fitfeat_g", "fitfeat_residual", "corclean_tc",
+        "corclean_g", "fitclean_g", "fitclean_residual"
+    ])
 
     out_file = myfile.split(".")
     out_first = out_file[0].split("-")[3:]
     out_first = "-".join(out_first)
     out_date = datetime.today().date()
     out_file = f"{out_date}-{out_first}-segmentation-ground-truth.{out_file[1]}"
-    # df.write_parquet(f"{workdir}/{out_file}")
+    df.write_parquet(f"{workdir}/{out_file}")
