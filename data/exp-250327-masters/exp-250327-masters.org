@@ -3405,10 +3405,10 @@ print([pa_pd.loc[(pa_pd["clean_nmol"] == n) & (pa_pd["peak_dmol"] == p)
 #+end_src
 
 *** 2025-12-19-simulations-segmentation
-**** Plot time-series examples with segmentation from simulation
+**** Apply different thresholds to =label_segmentation= to get ground truth threshold
 
 load modules, define constants and functions
-#+transclude: [[./2025-12-19-simulations-segmentation/src-python/segmentation_ground_truth.py]]  :lines 1-198 :src jupyter-python
+#+transclude: [[./2025-12-19-simulations-segmentation/src-python/segmentation_ground_truth.py]]  :lines 1-223 :src jupyter-python
 
 #+RESULTS:
 
@@ -3417,7 +3417,7 @@ using different thresholds on the simulated segmentation label trace to find the
 optimal segmentation for the ground truth the prediction algorithms are compared
 against
 
-#+transclude: [[./2025-12-19-simulations-segmentation/src-python/segmentation_ground_truth.py]]  :src jupyter-python :lines 201-292
+#+transclude: [[./2025-12-19-simulations-segmentation/src-python/segmentation_ground_truth.py]]  :src jupyter-python :lines 226-317
 
 #+RESULTS:
 #+begin_example
@@ -3525,22 +3525,14 @@ threshold 0.1
 
 
 
-#+begin_src jupyter-python
-df2 = (
-    df
-    .filter(pl.col("clean_dmol").is_in([0.1]) &
-            pl.col("clean_nmol").is_in([125, 1000, 3000]) &
-            pl.col("peak_dmol").is_in([0.01]))
-)
-pl.DataFrame.unpivot()
-#+end_src
+
+
+#+transclude: [[./2025-12-19-simulations-segmentation/src-python/segmentation_ground_truth.py]]  :lines 319-396 :src jupyter-python
 
 #+RESULTS:
-: 2f7a506e-1e2d-4ff4-a545-1fd102bfbbec
 
 
-#+transclude: [[./2025-12-19-simulations-segmentation/src-python/segmentation_ground_truth.py]]  :lines 294-358 :src jupyter-python
-
+Peak artifacts
 
 fit results: diffusion coefficients
 [[file:./2025-12-19-simulations-segmentation/jupyter-python/2026-01-13-peak-artifacts-diffcoeff.png]]
@@ -3559,6 +3551,32 @@ trace length after correction:
 
 outcome: a segmentation threshold of 0.01 seems to be a good measure
 
+Photobleaching
+
+fit results: diffusion coefficients
+[[file:./2025-12-19-simulations-segmentation/jupyter-python/2026-01-13-photobleaching-diffcoeff.png]]
+
+fit results: molecule number n
+[[file:./2025-12-19-simulations-segmentation/jupyter-python/2026-01-13-photobleaching-n.png]]
+
+fit quality: NRMSE
+[[file:./2025-12-19-simulations-segmentation/jupyter-python/2026-01-13-photobleaching-nrmse.png]]
+
+fit quality: adjusted R²
+[[file:./2025-12-19-simulations-segmentation/jupyter-python/2026-01-13-photobleaching-adjr2.png]]
+
+trace length after correction:
+[[file:./2025-12-19-simulations-segmentation/jupyter-python/2026-01-13-photobleaching-trace-length.png]]
+
+outcome: There is nearly no difference regarding different thresholds. The main
+effect is the shorter trace length for shallow bleaching, which leads to a
+higher variance in fit results of n in some groups. But even there the
+difference is small. Decision: use the threshold 0.01, as this was the best
+result for peak artifacts.
+
+For detector dropout, we just use a label_segmentation < 0
+
+**** Plot example traces with =label_segmentation= and ground truth segmentation
 
 
 #+begin_src jupyter-python
