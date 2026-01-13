@@ -5,9 +5,11 @@ import os
 import sys
 import lmfit
 
+import matplotlib.pyplot as plt
 import multipletau
 import numpy as np
 import polars as pl
+import seaborn as sns
 
 from datetime import datetime
 from pathlib import Path
@@ -22,7 +24,7 @@ sys.path.append(FLUOTRACIFY_PATH.as_posix())
 from fluotracify import fcsdc
 
 inputdir = "data/exp-250327-masters/2025-05-28-simulations/parquet"
-workdir = "data/exp-250327-masters/2025-12-19-simulations-segmentation/parquet"
+workdir = "data/exp-250327-masters/2025-12-19-simulations-segmentation"
 
 cor_method: Literal["multipletau"] = "multipletau"
 multipletau_m = 16
@@ -287,4 +289,70 @@ for myfile in [
     out_first = "-".join(out_first)
     out_date = datetime.today().date()
     out_file = f"{out_date}-{out_first}-segmentation-ground-truth.{out_file[1]}"
-    df.write_parquet(f"{workdir}/{out_file}")
+    df.write_parquet(f"{workdir}/parquet/{out_file}")
+
+# load the correlation and fit results for different segmentation thresholds
+# and plot them to determine a good threshold as a gold standard
+def plot_ground_truth_segmentations(
+        df: pl.DataFrame, sel: str, row: str, col: str, log_scale: bool,
+        sharex: bool, cut: int, vline_idx: int, outname: str
+) -> None:
+    df_dmol = (
+        df
+        .filter(pl.col("clean_dmol").is_in([0.1, 1., 10.]) &
+                pl.col("clean_nmol").is_in([125, 1000, 3000]))
+        .select(pl.selectors.matches(sel))
+        .unpivot(index=["clean_dmol", "clean_nmol", row])
+    )
+    g = sns.catplot(df_dmol, x="value", y="variable", hue="variable",
+                    row=row, col=col, kind="violin",
+                    log_scale=log_scale, sharex=sharex, cut=cut)
+
+    for ax in g.axes.flatten():
+        if vline_idx == 16384:
+            ax.axvline(16384, 0, 1, color="red")
+        else:
+            med = ax.lines[vline_idx].get_xdata()
+            ax.axvline(med, 0, 1, color="red")
+    out_date = datetime.today().date()
+    plt.savefig(f"{workdir}/jupyter-python/{out_date}-{outname}.png")
+
+
+df = pl.concat(
+    [pl.read_parquet(f"{workdir}/parquet/2026-01-09-peak-artifacts-training"
+                     "-segmentation-ground-truth.parquet"),
+     pl.read_parquet(f"{workdir}/parquet/2026-01-09-photobleaching-training"
+                     "-segmentation-ground-truth.parquet")],
+    how="vertical"
+)
+
+# peak artifacts, dmol
+plot_ground_truth_segmentations(
+    df, "(0p|clean|feat).*_diffcoeff|peak_dmol|clean_dmol|clean_nmol",
+    "peak_dmol", "clean_dmol", log_scale=True, sharex=True, cut=0, vline_idx=5,
+    outname="peak-artifacts-diffcoeff"
+)
+# peak artifacts, nmol
+plot_ground_truth_segmentations(
+    df, "(0p|clean|feat).*_n$|peak_dmol|clean_dmol|clean_nmol",
+    "peak_dmol", "clean_nmol", log_scale=False, sharex=False, cut=0, vline_idx=5,
+    outname="peak-artifacts-n"
+)
+# peak artifacts, nrmse
+plot_ground_truth_segmentations(
+    df, "(0p|clean|feat).*_nrmse|peak_dmol|clean_dmol|clean_nmol",
+    "peak_dmol", "clean_dmol", log_scale=False, sharex=False, cut=0, vline_idx=5,
+    outname="peak-artifacts-nrmse"
+)
+# peak artifacts, adjr2
+plot_ground_truth_segmentations(
+    df, "(0p|clean|feat).*_adjr2|peak_dmol|clean_dmol|clean_nmol",
+    "peak_dmol", "clean_dmol", log_scale=False, sharex=False, cut=0, vline_idx=5,
+    outname="peak-artifacts-adjr2"
+)
+# peak artifacts, trace length
+plot_ground_truth_segmentations(
+    df, "(0p)*_len|peak_dmol|clean_dmol|clean_nmol",
+    "peak_dmol", "clean_dmol", log_scale=False, sharex=True, cut=0,
+    vline_idx=16384, outname="peak-artifacts-trace-length"
+)

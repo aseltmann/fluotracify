@@ -3407,65 +3407,17 @@ print([pa_pd.loc[(pa_pd["clean_nmol"] == n) & (pa_pd["peak_dmol"] == p)
 *** 2025-12-19-simulations-segmentation
 **** Plot time-series examples with segmentation from simulation
 
-#+begin_src jupyter-python
-#!/usr/bin/env python3
-
-import os
-import sys
-import lmfit
-
-import multipletau
-import numpy as np
-import polars as pl
-
-from datetime import datetime
-from pathlib import Path
-
-from IPython.display import display
-
-os.chdir("/home/alva/Programs/drmed-git")
-FLUOTRACIFY_PATH = Path("/home/alva/Programs/drmed-git/src/")
-sys.path.append(FLUOTRACIFY_PATH.as_posix())
-
-from fluotracify import fcsdc
-
-inputdir = "data/exp-250327-masters/2025-05-28-simulations/parquet"
-workdir = "data/exp-250327-masters/2025-12-19-simulations-segmentation/parquet"
-
-cor_method = "multipletau"
-multipletau_m = 16
-multipletau_deltat = 1.
-multipletau_norm = True
-multipletau_compress = "average"
-
-fit_method = "lmfit"
-param_1sp = lmfit.Parameters()
-param_1sp.add("offset", value=0.01, min=-0.5, max=1.5, vary=True)
-param_1sp.add("gn0", value=1., min=-0.0001, max=3000., vary=True)
-param_1sp.add("a1", value=1., min=0.0001, max=1., vary=False)
-param_1sp.add("txy1", value=1., min=0.001, max=2000., vary=True)
-param_1sp.add("alpha1", value=1., min=0.6, max=2., vary=False)
-equation_dim = "2D"
-equation_dspecies = 1.
-#+end_src
+load modules, define constants and functions
+#+transclude: [[./2025-12-19-simulations-segmentation/src-python/segmentation_ground_truth.py]]  :lines 1-198 :src jupyter-python
 
 #+RESULTS:
 
-#+begin_src jupyter-python
-import importlib
-importlib.reload(fcsdc)
-#+end_src
+iterate through peak artifact and photobleaching simulations and segmentation
+using different thresholds on the simulated segmentation label trace to find the
+optimal segmentation for the ground truth the prediction algorithms are compared
+against
 
-#+RESULTS:
-: <module 'fluotracify.fcsdc' from '/home/alva/Programs/drmed-git/src/fluotracify/fcsdc.py'>
-
-
-#+begin_src jupyter-python
-df2 = pl.read_parquet(f"{inputdir}/2025-05-28-peak-artifacts-training.parquet")
-df2
-#+end_src
-
-#+transclude: [[./2025-12-19-simulations-segmentation/src-python/segmentation_ground_truth.py]]  :src jupyter-python
+#+transclude: [[./2025-12-19-simulations-segmentation/src-python/segmentation_ground_truth.py]]  :src jupyter-python :lines 201-292
 
 #+RESULTS:
 #+begin_example
@@ -3571,35 +3523,6 @@ threshold 0.1
 #+RESULTS:
 
 
-#+begin_src jupyter-python
-df = pl.concat(
-    [pl.read_parquet(f"{workdir}/2026-01-09-peak-artifacts-training"
-                     "-segmentation-ground-truth.parquet"),
-     pl.read_parquet(f"{workdir}/2026-01-09-photobleaching-training"
-                     "-segmentation-ground-truth.parquet")],
-    how="vertical"
-)
-df
-#+end_src
-
-#+RESULTS:
-:RESULTS:
-shape: (6_912, 69)
-| uuid                               | artifact         | clean_dmol | clean_nmol | peak_dmol | peak_nmol | bleach_exp_scale | bleach_type | dropout_n | dropout_maxdrop | bin | fitfeat_nrmse | fitfeat_adjr2 | fitfeat_txy1 | fitfeat_diffcoeff | fitfeat_n | fitclean_nrmse | fitclean_adjr2 | fitclean_txy1 | fitclean_diffcoeff | fitclean_n | new0p0001_len | fit0p0001_nrmse | fit0p0001_adjr2 | fit0p0001_txy1 | fit0p0001_diffcoeff | fit0p0001_n | new0p001_len | fit0p001_nrmse | fit0p001_adjr2 | fit0p001_txy1 | fit0p001_diffcoeff | fit0p001_n | new0p005_len | fit0p005_nrmse | fit0p005_adjr2 | fit0p005_txy1 | fit0p005_diffcoeff | fit0p005_n | new0p01_len | fit0p01_nrmse | fit0p01_adjr2 | fit0p01_txy1 | fit0p01_diffcoeff | fit0p01_n | new0p025_len | fit0p025_nrmse | fit0p025_adjr2 | fit0p025_txy1 | fit0p025_diffcoeff | fit0p025_n | new0p04_len | fit0p04_nrmse | fit0p04_adjr2 | fit0p04_txy1 | fit0p04_diffcoeff | fit0p04_n | new0p06_len | fit0p06_nrmse | fit0p06_adjr2 | fit0p06_txy1 | fit0p06_diffcoeff | fit0p06_n  | new0p1_len | fit0p1_nrmse | fit0p1_adjr2 | fit0p1_txy1 | fit0p1_diffcoeff | fit0p1_n   |
-|------------------------------------+------------------+------------+------------+-----------+-----------+------------------+-------------+-----------+-----------------+-----+---------------+---------------+--------------+-------------------+-----------+----------------+----------------+---------------+--------------------+------------+---------------+-----------------+-----------------+----------------+---------------------+-------------+--------------+----------------+----------------+---------------+--------------------+------------+--------------+----------------+----------------+---------------+--------------------+------------+-------------+---------------+---------------+--------------+-------------------+-----------+--------------+----------------+----------------+---------------+--------------------+------------+-------------+---------------+---------------+--------------+-------------------+-----------+-------------+---------------+---------------+--------------+-------------------+------------+------------+--------------+--------------+-------------+------------------+------------|
-| str                                | str              | f64        | u32        | f64       | u32       | f64              | str         | u32       | f32             | f32 | f32           | f32           | f32          | f32               | f32       | f32            | f32            | f32           | f32                | f32        | u32           | f32             | f32             | f32            | f32                 | f32         | u32          | f32            | f32            | f32           | f32                | f32        | u32          | f32            | f32            | f32           | f32                | f32        | u32         | f32           | f32           | f32          | f32               | f32       | u32          | f32            | f32            | f32           | f32                | f32        | u32         | f32           | f32           | f32          | f32               | f32       | u32         | f32           | f32           | f32          | f32               | f32        | u32        | f32          | f32          | f32         | f32              | f32        |
-| "2fec7df0-7c14-4ab6-8d77-fa7868... | "peak_artifacts" | 0.05       | 50         | 0.01      | 10        | null             | "None"      | null      | null            | 1.0 | 0.043734      | 0.977698      | 664.09021    | 0.016972          | 0.366678  | 0.062622       | 0.966177       | 186.04332     | 0.060583           | 0.85518    | 7314          | 0.05418         | 0.968865        | 174.491577     | 0.064594            | 0.695793    | 10855        | 0.062248       | 0.965968       | 190.442902    | 0.059183           | 0.711235   | 12054        | 0.066224       | 0.960979       | 218.952255    | 0.051477           | 0.731051   | 12477       | 0.061617      | 0.96821       | 229.072952   | 0.049203          | 0.749904  | 13268        | 0.05149        | 0.977156       | 236.490952    | 0.04766            | 0.78817    | 13819       | 0.048177      | 0.978131      | 237.082062   | 0.047541          | 0.816806  | 14108       | 0.049518      | 0.97795       | 227.784576   | 0.049481          | 0.842354   | 14232      | 0.049742     | 0.977967     | 215.084045  | 0.052403         | 0.860778   |
-| "b164008e-0b22-408e-afa3-9cafd8... | "peak_artifacts" | 0.05       | 50         | 0.01      | 10        | null             | "None"      | null      | null            | 1.0 | 0.041356      | 0.981667      | 236.882187   | 0.047581          | 1.102019  | 0.041356       | 0.981667       | 236.948227    | 0.047568           | 1.102022   | 16384         | 0.041356        | 0.981667        | 236.882187     | 0.047581            | 1.102019    | 16384        | 0.041356       | 0.981667       | 236.882187    | 0.047581           | 1.102019   | 16384        | 0.041356       | 0.981667       | 236.882187    | 0.047581           | 1.102019   | 16384       | 0.041356      | 0.981667      | 236.882187   | 0.047581          | 1.102019  | 16384        | 0.041356       | 0.981667       | 236.882187    | 0.047581           | 1.102019   | 16384       | 0.041356      | 0.981667      | 236.882187   | 0.047581          | 1.102019  | 16384       | 0.041356      | 0.981667      | 236.882187   | 0.047581          | 1.102019   | 16384      | 0.041356     | 0.981667     | 236.882187  | 0.047581         | 1.102019   |
-| "e50a42a8-79b6-4905-b501-2aa9b9... | "peak_artifacts" | 0.05       | 50         | 0.01      | 10        | null             | "None"      | null      | null            | 1.0 | 0.068181      | 0.956473      | 122.975075   | 0.091653          | 0.853201  | 0.071238       | 0.951078       | 138.304459    | 0.081495           | 0.792318   | 14195         | 0.065463        | 0.95799         | 151.878891     | 0.074211            | 0.818476    | 14751        | 0.066197       | 0.955547       | 148.26564     | 0.076019           | 0.825669   | 15281        | 0.066304       | 0.956368       | 140.340302    | 0.080312           | 0.818075   | 15426       | 0.067139      | 0.954933      | 142.429291   | 0.079134          | 0.817525  | 15776        | 0.065238       | 0.957442       | 136.260071    | 0.082717           | 0.82648    | 15948       | 0.067388      | 0.955081      | 138.007492   | 0.08167           | 0.83005   | 15982       | 0.067228      | 0.954691      | 137.118637   | 0.082199          | 0.832881   | 16061      | 0.066679     | 0.956444     | 134.237732  | 0.083963         | 0.839382   |
-| "540bf9f4-71a8-4fe5-9aa6-f7f8a1... | "peak_artifacts" | 0.05       | 50         | 0.01      | 10        | null             | "None"      | null      | null            | 1.0 | 0.045457      | 0.979811      | 121.956947   | 0.092418          | 0.928059  | 0.045422       | 0.980159       | 122.113747    | 0.0923             | 0.887866   | 13462         | 0.060759        | 0.96029         | 131.519836     | 0.085699            | 0.915596    | 14521        | 0.052854       | 0.966524       | 115.316589    | 0.09774            | 0.931805   | 15365        | 0.046022       | 0.977851       | 117.162697    | 0.0962             | 0.923933   | 15549       | 0.04506       | 0.978978      | 115.009888   | 0.098001          | 0.932644  | 16026        | 0.044942       | 0.979829       | 110.742188    | 0.101777           | 0.936017   | 16324       | 0.04283       | 0.983092      | 110.469086   | 0.102029          | 0.944797  | 16366       | 0.042014      | 0.983851      | 110.402855   | 0.10209           | 0.947617   | 16384      | 0.045457     | 0.979811     | 121.956947  | 0.092418         | 0.928059   |
-| "4f58a240-21d5-498a-947c-4157c9... | "peak_artifacts" | 0.05       | 50         | 0.01      | 10        | null             | "None"      | null      | null            | 1.0 | 0.083306      | 0.948759      | 135.108749   | 0.083422          | 0.764187  | 0.051768       | 0.970648       | 126.756622    | 0.088919           | 1.200388   | 10393         | 0.067382        | 0.953063        | 62.638733      | 0.179937            | 1.447346    | 13701        | 0.049838       | 0.97656        | 89.530907     | 0.12589            | 1.416646   | 14604        | 0.042249       | 0.982763       | 94.182007     | 0.119673           | 1.409476   | 14862       | 0.041672      | 0.983409      | 95.944588    | 0.117475          | 1.393258  | 15165        | 0.041102       | 0.984047       | 97.145813     | 0.116022           | 1.391166   | 15273       | 0.041004      | 0.984049      | 97.134453    | 0.116036          | 1.396859  | 15423       | 0.040316      | 0.984808      | 97.144661    | 0.116023          | 1.407013   | 15784      | 0.042019     | 0.983473     | 93.696587   | 0.120293         | 1.445925   |
-| ...                                | ...              | ...        | ...        | ...       | ...       | ...              | ...         | ...       | ...             | ... | ...           | ...           | ...          | ...               | ...       | ...            | ...            | ...           | ...                | ...        | ...           | ...             | ...             | ...            | ...                 | ...         | ...          | ...            | ...            | ...           | ...                | ...        | ...          | ...            | ...            | ...           | ...                | ...        | ...         | ...           | ...           | ...          | ...               | ...       | ...          | ...            | ...            | ...           | ...                | ...        | ...         | ...           | ...           | ...          | ...               | ...       | ...         | ...           | ...           | ...          | ...               | ...        | ...        | ...          | ...          | ...         | ...              | ...        |
-| "5669c4b9-11bc-46d7-99a0-2ddc7e... | "photobleaching" | 50.0       | 4000       | null      | null      | 0.12             | "both"      | null      | null            | 1.0 | 0.055883      | 0.937249      | 2000.0       | 0.005636          | 4.623798  | 0.029856       | 0.932112       | 0.001         | 11270.964844       | 0.376129   | 4184          | 0.061579        | 0.7357          | 0.001          | 11271.041016        | 0.514032    | 4621         | 0.053509       | 0.787879       | 0.001         | 11271.035156       | 0.488303   | 5026         | 0.055802       | 0.780891       | 0.001         | 11270.990234       | 0.498257   | 5210        | 0.045329      | 0.849232      | 0.001        | 11270.69043       | 0.484897  | 5640         | 0.047944       | 0.831784       | 0.001         | 11271.010742       | 0.464822   | 5851        | 0.048736      | 0.823804      | 0.001        | 11271.054688      | 0.470565  | 6089        | 0.049633      | 0.818975      | 0.001        | 11270.995117      | 0.469811   | 6419       | 0.051355     | 0.81338      | 0.001       | 11271.006836     | 0.43972    |
-| "d184bcc1-a46f-4e4a-b2bc-88aed9... | "photobleaching" | 50.0       | 4000       | null      | null      | 0.13             | "both"      | null      | null            | 1.0 | 0.069961      | 0.889343      | 1999.999878  | 0.005636          | 5.103149  | 0.028771       | 0.940399       | 0.001         | 11271.050781       | 0.346131   | 3237          | 0.06567         | 0.763307        | 0.021766       | 517.817505          | 8.223265    | 3691         | 0.0522         | 0.85588        | 0.219611      | 51.322704          | 63.93475   | 4034         | 0.051851       | 0.853758       | 0.218493      | 51.58535           | 63.728134  | 4205        | 0.051634      | 0.843203      | 0.185793     | 60.664608         | 55.118069 | 4438         | 0.044413       | 0.880232       | 0.004102      | 2747.973633        | 1.397918   | 4559        | 0.046194      | 0.86533       | 0.011108     | 1014.708008       | 3.786605  | 4693        | 0.044698      | 0.877472      | 0.017197     | 655.393799        | 5.839716   | 4841       | 0.044699     | 0.87994      | 0.062573    | 180.125046       | 20.292244  |
-| "18e61cac-877a-4584-826e-da150c... | "photobleaching" | 50.0       | 4000       | null      | null      | 0.14             | "both"      | null      | null            | 1.0 | 0.07382       | 0.877464      | 1999.999878  | 0.005636          | 4.76717   | 0.025535       | 0.946922       | 0.001         | 11270.704102       | 0.407857   | 693           | 0.110282        | 0.478646        | 0.001          | 11270.616211        | 0.35409     | 749          | 0.098461       | 0.484703       | 0.001         | 11271.019531       | 0.353937   | 792          | 0.101136       | 0.473351       | 0.001         | 11271.037109       | 0.374633   | 817         | 0.081102      | 0.599795      | 0.001        | 11270.991211      | 0.359217  | 833          | 0.095018       | 0.514329       | 0.001         | 11270.854492       | 0.377091   | 895         | 0.094912      | 0.483489      | 0.001        | 11270.743164      | 0.382033  | 1151        | 0.094323      | 0.441587      | 0.001        | 11271.052734      | 0.4665     | 2294       | 0.076328     | 0.5369       | 0.001       | 11270.915039     | 0.511802   |
-| "b96ab00e-f268-4a87-803d-def34d... | "photobleaching" | 50.0       | 4000       | null      | null      | 0.15             | "both"      | null      | null            | 1.0 | 0.083926      | 0.847712      | 2000.0       | 0.005636          | 4.048205  | 0.028126       | 0.943014       | 0.001         | 11271.047852       | 0.353063   | 0             | NaN             | NaN             | NaN            | NaN                 | NaN         | 0            | NaN            | NaN            | NaN           | NaN                | NaN        | 0            | NaN            | NaN            | NaN           | NaN                | NaN        | 0           | NaN           | NaN           | NaN          | NaN               | NaN       | 0            | NaN            | NaN            | NaN           | NaN                | NaN        | 99          | 0.199733      | -0.04663      | 0.001221     | 9229.668945       | 1.046833  | 497         | 0.22874       | -0.005622     | 0.190956     | 59.024368         | 230.385803 | 714        | 0.21247      | 0.031383     | 0.389417    | 28.943438        | 459.051758 |
-| "56f39eff-2b15-4326-940e-726c2f... | "photobleaching" | 50.0       | 4000       | null      | null      | 0.16             | "both"      | null      | null            | 1.0 | 0.078488      | 0.86167       | 2000.0       | 0.005636          | 5.082511  | 0.02855        | 0.936298       | 0.001         | 11271.053711       | 0.362075   | 822           | 0.155151        | 0.202496        | 0.001          | 11268.821289        | 0.656557    | 1300         | 0.086596       | 0.571688       | 0.001         | 11270.467773       | 0.483178   | 1849         | 0.078609       | 0.645591       | 0.001         | 11271.006836       | 0.480389   | 2071        | 0.080431      | 0.575216      | 0.001        | 11270.607422      | 0.521939  | 2397         | 0.088648       | 0.545096       | 0.001         | 11271.041992       | 0.568991   | 2622        | 0.081189      | 0.556455      | 0.001        | 11270.954102      | 0.560384  | 2853        | 0.097589      | 0.484121      | 0.001        | 11270.22168       | 0.635621   | 3225       | 0.083846     | 0.570524     | 0.001       | 11270.978516     | 0.70738    |
-:END:
 
 
 #+begin_src jupyter-python
@@ -3613,358 +3536,29 @@ pl.DataFrame.unpivot()
 #+end_src
 
 #+RESULTS:
-
-#+begin_src jupyter-python
-df_dmol = (
-    df
-    .filter(pl.col("clean_dmol").is_in([0.1, 1., 10.]) &
-            pl.col("clean_nmol").is_in([125, 1000, 3000]))
-    .select(pl.selectors.matches("(0p|clean).*_diffcoeff|peak_dmol|clean_dmol|clean_nmol"))
-    .unpivot(index=["clean_dmol", "clean_nmol", "peak_dmol"])
-)
-df_dmol.filter(pl.col("clean_dmol").eq(0.1) &
-               pl.col("peak_dmol").eq(0.01))
-#+end_src
-
-#+RESULTS:
-:RESULTS:
-shape: (528, 5)
-| clean_dmol | clean_nmol | peak_dmol | variable             | value    |
-|------------+------------+-----------+----------------------+----------|
-| f64        | u32        | f64       | str                  | f32      |
-| 0.1        | 125        | 0.01      | "fit0p01_diffcoeff"  | 0.244181 |
-| 0.1        | 125        | 0.01      | "fit0p01_diffcoeff"  | 0.119438 |
-| 0.1        | 125        | 0.01      | "fit0p01_diffcoeff"  | 0.16098  |
-| 0.1        | 125        | 0.01      | "fit0p01_diffcoeff"  | 0.122682 |
-| 0.1        | 125        | 0.01      | "fit0p01_diffcoeff"  | 0.138785 |
-| ...        | ...        | ...       | ...                  | ...      |
-| 0.1        | 3000       | 0.01      | "fitclean_diffcoeff" | 0.100006 |
-| 0.1        | 3000       | 0.01      | "fitclean_diffcoeff" | 0.039608 |
-| 0.1        | 3000       | 0.01      | "fitclean_diffcoeff" | 0.142787 |
-| 0.1        | 3000       | 0.01      | "fitclean_diffcoeff" | 0.180625 |
-| 0.1        | 3000       | 0.01      | "fitclean_diffcoeff" | 0.115496 |
-:END:
+: 2f7a506e-1e2d-4ff4-a545-1fd102bfbbec
 
 
-
-#+begin_src jupyter-python
-import matplotlib.pyplot as plt
-import seaborn as sns
-
-def pa_filter() -> pl.Expr:
-    return ((pl.col("artifact") == "peak_artifacts") &
-            (pl.col("clean_dmol").is_in([0.1, 1., 10.])) &
-            (pl.col("clean_nmol").is_in([125, 1000, 3000])))
+#+transclude: [[./2025-12-19-simulations-segmentation/src-python/segmentation_ground_truth.py]]  :lines 294-358 :src jupyter-python
 
 
-df_dmol = (
-    df
-    .filter(pl.col("clean_dmol").is_in([10.]) &
-            pl.col("clean_nmol").is_in([125, 1000, 3000]) &
-            pl.col("peak_dmol").is_in([1.]))
-    .select(pl.selectors.matches("(0p|clean).*_diffcoeff"))
-    .unpivot()
-)
+fit results: diffusion coefficients
+[[file:./2025-12-19-simulations-segmentation/jupyter-python/2026-01-13-peak-artifacts-diffcoeff.png]]
 
-sns.set_theme(style="white", rc={"axes.facecolor": (0, 0, 0, 0)})
-pal = sns.cubehelix_palette(11, rot=-.25, light=.7)
-g = sns.FacetGrid(df_dmol, row="variable", hue="variable", aspect=16,
-                  height=.5, palette=pal)
-g.map(sns.kdeplot, "value", log_scale=True, bw_adjust=.5, clip_on=False, fill=True, alpha=1,
-      linewidth=1.5)
-g.map(sns.kdeplot, "value", log_scale=True, clip_on=False, color="w", lw=2, bw_adjust=.5)
-g.refline(y=0, linewidth=2, linestyle="-", color=None, clip_on=False)
-# Define and use a simple function to label the plot in axes coordinates
-def label(x, color, label):
-    ax = plt.gca()
-    ax.text(0, .2, label, fontweight="bold", color=color,
-            ha="left", va="center", transform=ax.transAxes)
+fit results: molecule number n
+[[file:./2025-12-19-simulations-segmentation/jupyter-python/2026-01-13-peak-artifacts-n.png]]
 
+fit quality: NRMSE
+[[file:./2025-12-19-simulations-segmentation/jupyter-python/2026-01-13-peak-artifacts-nrmse.png]]
 
-g.map(label, "value")
-g.figure.subplots_adjust(hspace=-.25)
-g.set_titles("")
-g.set(yticks=[], ylabel="")
-g.despine(bottom=True, left=True)
+fit quality: adjusted R²
+[[file:./2025-12-19-simulations-segmentation/jupyter-python/2026-01-13-peak-artifacts-adjr2.png]]
 
-for ax in g.axes.flatten():
-    ax.axvline(10, 0, 1)
-#+end_src
+trace length after correction:
+[[file:./2025-12-19-simulations-segmentation/jupyter-python/2026-01-13-peak-artifacts-trace-length.png]]
 
-#+RESULTS:
-:RESULTS:
-#+begin_example
-/nix/store/8wkrpx7p2a98wa93rlbcg4iyiwvgr7yq-python3.12-seaborn-0.13.2/lib/python3.12/site-packages/seaborn/axisgrid.py:123: UserWarning: Tight layout not applied. tight_layout cannot make Axes height small enough to accommodate all Axes decorations.
-  self._figure.tight_layout(*args, **kwargs)
-/nix/store/8wkrpx7p2a98wa93rlbcg4iyiwvgr7yq-python3.12-seaborn-0.13.2/lib/python3.12/site-packages/seaborn/axisgrid.py:123: UserWarning: Tight layout not applied. tight_layout cannot make Axes height small enough to accommodate all Axes decorations.
-  self._figure.tight_layout(*args, **kwargs)
-/nix/store/8wkrpx7p2a98wa93rlbcg4iyiwvgr7yq-python3.12-seaborn-0.13.2/lib/python3.12/site-packages/seaborn/axisgrid.py:123: UserWarning: Tight layout not applied. tight_layout cannot make Axes height small enough to accommodate all Axes decorations.
-  self._figure.tight_layout(*args, **kwargs)
-/nix/store/8wkrpx7p2a98wa93rlbcg4iyiwvgr7yq-python3.12-seaborn-0.13.2/lib/python3.12/site-packages/seaborn/axisgrid.py:123: UserWarning: Tight layout not applied. tight_layout cannot make Axes height small enough to accommodate all Axes decorations.
-  self._figure.tight_layout(*args, **kwargs)
-/nix/store/8wkrpx7p2a98wa93rlbcg4iyiwvgr7yq-python3.12-seaborn-0.13.2/lib/python3.12/site-packages/seaborn/axisgrid.py:123: UserWarning: Tight layout not applied. tight_layout cannot make Axes height small enough to accommodate all Axes decorations.
-  self._figure.tight_layout(*args, **kwargs)
-#+end_example
-[[file:./.ob-jupyter/d4f2f131d72cc8f73c6ee1e00ee1c8cd3553b5fc.png]]
-:END:
+outcome: a segmentation threshold of 0.01 seems to be a good measure
 
-#+begin_src jupyter-python
-for ax in g.axes.flatten():
-    print(ax.lines[5].get_data())
-#+end_src
-
-#+RESULTS:
-: (array([0.11450562]), array([1.]))
-: (array([1.00722682]), array([1.]))
-: (array([13.60466356]), array([1.]))
-: (array([0.11192915]), array([1.]))
-: (array([0.98583764]), array([1.]))
-: (array([13.70741997]), array([1.]))
-: (array([0.10268063]), array([1.]))
-: (array([1.09189418]), array([1.]))
-: (array([12.3244124]), array([1.]))
-
-
-#+begin_src jupyter-python
-import seaborn as sns
-
-selectors = [
-    "(0p|clean|feat).*_diffcoeff|peak_dmol|clean_dmol|clean_nmol"),
-]
-
-rows = [
-    "peak_dmol"
-]
-
-
-def plot_ground_truth_segmentations(
-        df: pl.DataFrame, sel: str, row: str, col: str, log_scale: bool,
-        sharex: bool, cut: int, vline_idx: int, outname: str
-)
-    df_dmol = (
-        df
-        .filter(pl.col("clean_dmol").is_in([0.1, 1., 10.]) &
-                pl.col("clean_nmol").is_in([125, 1000, 3000]))
-        .select(pl.selectors.matches(sel)
-        .unpivot(index=["clean_dmol", "clean_nmol", row])
-    )
-    g = sns.catplot(df_dmol, x="value", y="variable", hue="variable",
-                    row=row, col=col, kind="violin",
-                    log_scale=log_scale, sharex=sharex, cut=cut)
-
-    for ax in g.axes.flatten():
-        med = ax.lines[vline_idx].get_xdata()
-        ax.axvline(med, 0, 1, color="red")
-    plt.save(f"{out_date}-{outname}.png")
-
-plot_ground_truth_segmentations(
-    df, "(0p|clean|feat).*_diffcoeff|peak_dmol|clean_dmol|clean_nmol",
-    "peak_dmol", "clean_dmol", log_scale=True, sharex=True, cut=0, vline_idx=5,
-    outname="peak-artifacts-diffcoeff"
-)
-#+end_src
-
-#+RESULTS:
-:RESULTS:
-# [goto error]
-:   Cell In[47], line 4
-:     "(0p|clean|feat).*_diffcoeff|peak_dmol|clean_dmol|clean_nmol"),
-:                                                                  ^
-: SyntaxError: closing parenthesis ')' does not match opening parenthesis '[' on line 3
-:END:
-
-#+begin_src jupyter-python
-df_dmol = (
-    df
-    .filter(pl.col("clean_dmol").is_in([0.1, 1., 10.]) &
-            pl.col("clean_nmol").is_in([125, 1000, 3000]))
-    .select(pl.selectors.matches("(0p|clean|feat).*_n$|peak_dmol|clean_dmol|clean_nmol"))
-    .unpivot(index=["clean_dmol", "clean_nmol", "peak_dmol"])
-)
-# df_dmol.filter(pl.col("clean_dmol").eq(0.1) &
-#                pl.col("peak_dmol").eq(0.01))
-g = sns.catplot(df_dmol, x="value", y="variable", hue="variable",
-                row="peak_dmol", col="clean_nmol", kind="violin",
-                log_scale=False, sharex=False, cut=0)
-
-for ax in g.axes.flatten():
-    med = ax.lines[5].get_xdata()
-    ax.axvline(med, 0, 1, color="red")
-# med = df_dmol.filter(pl.col("variable").eq("fitclean_diffcoeff"))["value"].median()
-# for ax in g.axes.flatten():
-#     ax.axvline(10, 0, 1)
-
-
-#+end_src
-
-#+RESULTS:
-[[file:./.ob-jupyter/e33e529362d18bf229c838cf0628f3b772fc1a10.png]]
-
-
-#+begin_src jupyter-python
-df_dmol = (
-    df
-    .filter(pl.col("clean_dmol").is_in([0.1, 1., 10.]) &
-            pl.col("clean_nmol").is_in([125, 1000, 3000]))
-    .select(pl.selectors.matches("(0p|clean|feat).*_nrmse|peak_dmol|clean_dmol|clean_nmol"))
-    .unpivot(index=["clean_dmol", "clean_nmol", "peak_dmol"])
-)
-# df_dmol.filter(pl.col("clean_dmol").eq(0.1) &
-#                pl.col("peak_dmol").eq(0.01))
-g = sns.catplot(df_dmol, x="value", y="variable", hue="variable",
-                row="peak_dmol", col="clean_dmol", kind="violin",
-                log_scale=False, sharex=True, cut=0)
-
-for ax in g.axes.flatten():
-    med = ax.lines[5].get_xdata()
-    ax.axvline(med, 0, 1, color="red")
-# med = df_dmol.filter(pl.col("variable").eq("fitclean_diffcoeff"))["value"].median()
-# for ax in g.axes.flatten():
-#     ax.axvline(10, 0, 1)
-
-
-#+end_src
-
-#+RESULTS:
-[[file:./.ob-jupyter/196863b6b1c9ddaa9710b3a1daad8abedbe69ca2.png]]
-
-#+begin_src jupyter-python
-df_dmol = (
-    df
-    .filter(pl.col("clean_dmol").is_in([0.1, 1., 10.]) &
-            pl.col("clean_nmol").is_in([125, 1000, 3000]))
-    .select(pl.selectors.matches("(0p|clean|feat).*_adjr2|peak_dmol|clean_dmol|clean_nmol"))
-    .unpivot(index=["clean_dmol", "clean_nmol", "peak_dmol"])
-)
-# df_dmol.filter(pl.col("clean_dmol").eq(0.1) &
-#                pl.col("peak_dmol").eq(0.01))
-g = sns.catplot(df_dmol, x="value", y="variable", hue="variable",
-                row="peak_dmol", col="clean_dmol", kind="violin",
-                log_scale=False, sharex=False, cut=0)
-
-for ax in g.axes.flatten():
-    med = ax.lines[5].get_xdata()
-    ax.axvline(med, 0, 1, color="red")
-
-#+end_src
-
-#+RESULTS:
-[[file:./.ob-jupyter/039c3d5ef376cf05eda0222b6fb2278de96a5b6b.png]]
-
-
-#+begin_src jupyter-python
-df_dmol = (
-    df
-    .filter(pl.col("clean_dmol").is_in([0.1, 1., 10.]) &
-            pl.col("clean_nmol").is_in([125, 1000, 3000]))
-    .select(pl.selectors.matches("(0p)*_len|peak_dmol|clean_dmol|clean_nmol"))
-    .unpivot(index=["clean_dmol", "clean_nmol", "peak_dmol"])
-)
-# df_dmol.filter(pl.col("clean_dmol").eq(0.1) &
-#                pl.col("peak_dmol").eq(0.01))
-g = sns.catplot(df_dmol, x="value", y="variable", hue="variable",
-                row="peak_dmol", col="clean_dmol", kind="violin",
-                log_scale=False, sharex=True, cut=0)
-
-for ax in g.axes.flatten():
-    # med = ax.lines[5].get_xdata()
-    ax.axvline(16384, 0, 1, color="red")
-
-#+end_src
-
-#+RESULTS:
-[[file:./.ob-jupyter/14cf3a706f619fb3bddfb79b44e340c625cf5a09.png]]
-
-
-#+begin_src jupyter-python
-df_dmol = (
-    df
-    .filter(pl.col("clean_dmol").is_in([0.1, 1., 10.]) &
-            pl.col("clean_nmol").is_in([125, 1000, 3000]))
-    .select(pl.selectors.matches("(^fit(0p|clean|feat).*_g)|(^cor(0p|clean|feat).*_tc)|peak_dmol|clean_dmol|clean_nmol"))
-    .unpivot(index=["clean_dmol", "clean_nmol", "peak_dmol"])
-    .with_columns(
-        variable=pl.col("variable").str.replace("cor", "fit")
-    )
-    .with_columns(
-        variable=pl.col("variable").str.split_exact("_", 1)
-        .struct.rename_fields(["variable", "axis"])
-    )
-    .with_columns(pl.col("variable").struct.unnest())
-    .with_columns(
-        idx=pl.int_range(pl.len()).over(
-            ["clean_dmol", "clean_nmol", "peak_dmol", "variable", "axis"])
-    )
-    .pivot("axis", values="value")
-)
-df_dmol
-
-#+end_src
-
-#+RESULTS:
-:RESULTS:
-shape: (5_184, 7)
-| clean_dmol | clean_nmol | peak_dmol | variable   | idx | tc                      | g                                   |
-|------------+------------+-----------+------------+-----+-------------------------+-------------------------------------|
-| f64        | u32        | f64       | str        | i64 | array[f32, 94]          | array[f32, 94]                      |
-| 0.1        | 125        | 0.01      | "fit0p01"  | 0   | [1.0, 2.0, ... NaN]     | [0.627911, 0.614441, ... NaN]       |
-| 0.1        | 125        | 0.01      | "fit0p01"  | 1   | [1.0, 2.0, ... 14336.0] | [0.434898, 0.430164, ... -0.018245] |
-| 0.1        | 125        | 0.01      | "fit0p01"  | 2   | [1.0, 2.0, ... NaN]     | [0.525533, 0.517575, ... NaN]       |
-| 0.1        | 125        | 0.01      | "fit0p01"  | 3   | [1.0, 2.0, ... NaN]     | [0.481399, 0.475674, ... NaN]       |
-| 0.1        | 125        | 0.01      | "fit0p01"  | 4   | [1.0, 2.0, ... NaN]     | [0.376234, 0.371303, ... NaN]       |
-| ...        | ...        | ...       | ...        | ... | ...                     | ...                                 |
-| 10.0       | 3000       | 1.0       | "fitclean" | 11  | [1.0, 2.0, ... 14336.0] | [0.010871, 0.007158, ... -0.00011]  |
-| 10.0       | 3000       | 1.0       | "fitclean" | 12  | [1.0, 2.0, ... 14336.0] | [0.010941, 0.007268, ... -0.000064] |
-| 10.0       | 3000       | 1.0       | "fitclean" | 13  | [1.0, 2.0, ... 14336.0] | [0.011036, 0.007252, ... -0.000112] |
-| 10.0       | 3000       | 1.0       | "fitclean" | 14  | [1.0, 2.0, ... 14336.0] | [0.010929, 0.006778, ... -0.000115] |
-| 10.0       | 3000       | 1.0       | "fitclean" | 15  | [1.0, 2.0, ... 14336.0] | [0.011255, 0.007351, ... -0.000132] |
-:END:
-
-#+begin_src jupyter-python
-for cd in [0.1, 1., 10.]:
-    for pd in [0.01, 0.1, 1.0]:
-        df_test = df_dmol.filter(pl.col("clean_dmol").eq(cd) & # pl.col("clean_nmol").eq(125) &
-                                 pl.col("peak_dmol").eq(pd) &
-                                 pl.col("idx").eq(0))
-
-
-for test in df_test.iter_rows(named=True):
-    plt.semilogx(test["tc"], test["g"], label=test["variable"])
-    
-plt.legend()
-# plt.semilogx("tc", "g", "-", data=df_test)
-
-#+end_src
-
-#+RESULTS:
-:RESULTS:
-: <matplotlib.legend.Legend at 0x7ff3c3f222d0>
-[[file:./.ob-jupyter/1a61c98a12bdcab967cdee43117f23f578223b73.png]]
-:END:
-
-
-#+begin_src jupyter-python
-df.select(pl.selectors.matches("label"))
-#+end_src
-
-#+RESULTS:
-:RESULTS:
-shape: (3_456, 2)
-| label_restoration                           | label_segmentation                       |
-|---------------------------------------------+------------------------------------------|
-| array[f32, 16384]                           | array[f32, 16384]                        |
-| [51.510159, 47.853531, ... 91.597885]       | [0.18192, 0.194886, ... 0.995669]        |
-| [49.690548, 45.99284, ... 2.082945]         | [7.1558e-8, 7.5528e-8, ... 4.3697e-10]   |
-| [15.354086, 13.855965, ... 21.743809]       | [0.014078, 0.014872, ... 5.2303e-7]      |
-| [18.362669, 15.591744, ... 126.506569]      | [4.9834e-7, 5.8128e-7, ... 1.5465e-12]   |
-| [66.106781, 69.821037, ... 0.650439]        | [0.000022, 0.000025, ... 0.083182]       |
-| ...                                         | ...                                      |
-| [2999.718262, 3304.553711, ... 4030.912109] | [0.000481, 0.000016, ... 5.9872e-23]     |
-| [3774.489014, 3314.133301, ... 2890.160156] | [0.002626, 0.007748, ... 0.000893]       |
-| [2764.681885, 2313.73999, ... 3681.885498]  | [5.7361e-18, 3.2779e-17, ... 1.1012e-29] |
-| [3483.495117, 2302.143799, ... 3137.643311] | [0.003617, 0.016136, ... 3.7988e-20]     |
-| [2674.079102, 2294.973145, ... 3381.0896]   | [1.2036e-15, 1.7764e-15, ... 3.1275e-12] |
-:END:
 
 
 #+begin_src jupyter-python
@@ -4361,18 +3955,6 @@ import matplotlib.image as mpimg
 import io
 df.head()
 #+end_src
-
-
-#+RESULTS:
-:RESULTS:
-|   | image                                             | segmentation_mask                                 |
-|---+---------------------------------------------------+---------------------------------------------------|
-| 0 | {'bytes': b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHD... | {'bytes': b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHD... |
-| 1 | {'bytes': b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHD... | {'bytes': b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHD... |
-| 2 | {'bytes': b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHD... | {'bytes': b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHD... |
-| 3 | {'bytes': b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHD... | {'bytes': b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHD... |
-| 4 | {'bytes': b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHD... | {'bytes': b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHD... |
-:END:
 shape: (576, 1)
 | ts_params                                                                   |
 |-----------------------------------------------------------------------------|
