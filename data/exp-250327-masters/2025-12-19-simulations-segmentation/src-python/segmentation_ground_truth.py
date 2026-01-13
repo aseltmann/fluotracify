@@ -198,6 +198,31 @@ def polars_correlate_and_fit(
     return df
 
 
+def plot_ground_truth_segmentations(
+        df: pl.DataFrame, sel: str, row: str, col: str, log_scale: bool,
+        sharex: bool, cut: int, vline_idx: int, outname: str
+) -> None:
+    df_dmol = (
+        df
+        .filter(pl.col("clean_dmol").is_in([0.1, 1., 10.]) &
+                pl.col("clean_nmol").is_in([125, 1000, 3000]))
+        .select(pl.selectors.matches(sel))
+        .unpivot(index=["clean_dmol", "clean_nmol", row])
+    )
+    g = sns.catplot(df_dmol, x="value", y="variable", hue="variable",
+                    row=row, col=col, kind="violin",
+                    log_scale=log_scale, sharex=sharex, cut=cut)
+
+    for ax in g.axes.flatten():
+        if vline_idx == 16384:
+            ax.axvline(16384, 0, 1, color="red")
+        else:
+            med = ax.lines[vline_idx].get_xdata()
+            ax.axvline(med, 0, 1, color="red")
+    out_date = datetime.today().date()
+    plt.savefig(f"{workdir}/jupyter-python/{out_date}-{outname}.png")
+
+
 for myfile in [
         "2025-05-28-peak-artifacts-training.parquet",
         "2025-05-28-photobleaching-training.parquet",
@@ -293,31 +318,6 @@ for myfile in [
 
 # load the correlation and fit results for different segmentation thresholds
 # and plot them to determine a good threshold as a gold standard
-def plot_ground_truth_segmentations(
-        df: pl.DataFrame, sel: str, row: str, col: str, log_scale: bool,
-        sharex: bool, cut: int, vline_idx: int, outname: str
-) -> None:
-    df_dmol = (
-        df
-        .filter(pl.col("clean_dmol").is_in([0.1, 1., 10.]) &
-                pl.col("clean_nmol").is_in([125, 1000, 3000]))
-        .select(pl.selectors.matches(sel))
-        .unpivot(index=["clean_dmol", "clean_nmol", row])
-    )
-    g = sns.catplot(df_dmol, x="value", y="variable", hue="variable",
-                    row=row, col=col, kind="violin",
-                    log_scale=log_scale, sharex=sharex, cut=cut)
-
-    for ax in g.axes.flatten():
-        if vline_idx == 16384:
-            ax.axvline(16384, 0, 1, color="red")
-        else:
-            med = ax.lines[vline_idx].get_xdata()
-            ax.axvline(med, 0, 1, color="red")
-    out_date = datetime.today().date()
-    plt.savefig(f"{workdir}/jupyter-python/{out_date}-{outname}.png")
-
-
 df = pl.concat(
     [pl.read_parquet(f"{workdir}/parquet/2026-01-09-peak-artifacts-training"
                      "-segmentation-ground-truth.parquet"),
@@ -325,34 +325,72 @@ df = pl.concat(
                      "-segmentation-ground-truth.parquet")],
     how="vertical"
 )
+df = df.with_columns(
+    pl.when(pl.col.bleach_exp_scale > 0.05,
+            pl.col.bleach_exp_scale <= 0.10)
+    .then(pl.lit("shallow"))
+    .otherwise(pl.when(pl.col.bleach_exp_scale <= 0.05)
+               .then(pl.lit("steep")))
+    .alias("bleach_exp_scale")
+)
 
 # peak artifacts, dmol
 plot_ground_truth_segmentations(
     df, "(0p|clean|feat).*_diffcoeff|peak_dmol|clean_dmol|clean_nmol",
-    "peak_dmol", "clean_dmol", log_scale=True, sharex=True, cut=0, vline_idx=5,
-    outname="peak-artifacts-diffcoeff"
+    "peak_dmol", "clean_dmol", log_scale=True, sharex=True, cut=0,
+    vline_idx=5, outname="peak-artifacts-diffcoeff"
 )
 # peak artifacts, nmol
 plot_ground_truth_segmentations(
     df, "(0p|clean|feat).*_n$|peak_dmol|clean_dmol|clean_nmol",
-    "peak_dmol", "clean_nmol", log_scale=False, sharex=False, cut=0, vline_idx=5,
-    outname="peak-artifacts-n"
+    "peak_dmol", "clean_nmol", log_scale=False, sharex=False, cut=0,
+    vline_idx=5, outname="peak-artifacts-n"
 )
 # peak artifacts, nrmse
 plot_ground_truth_segmentations(
     df, "(0p|clean|feat).*_nrmse|peak_dmol|clean_dmol|clean_nmol",
-    "peak_dmol", "clean_dmol", log_scale=False, sharex=False, cut=0, vline_idx=5,
-    outname="peak-artifacts-nrmse"
+    "peak_dmol", "clean_dmol", log_scale=False, sharex=False, cut=0,
+    vline_idx=5, outname="peak-artifacts-nrmse"
 )
 # peak artifacts, adjr2
 plot_ground_truth_segmentations(
     df, "(0p|clean|feat).*_adjr2|peak_dmol|clean_dmol|clean_nmol",
-    "peak_dmol", "clean_dmol", log_scale=False, sharex=False, cut=0, vline_idx=5,
-    outname="peak-artifacts-adjr2"
+    "peak_dmol", "clean_dmol", log_scale=False, sharex=False, cut=0,
+    vline_idx=5, outname="peak-artifacts-adjr2"
 )
 # peak artifacts, trace length
 plot_ground_truth_segmentations(
     df, "(0p)*_len|peak_dmol|clean_dmol|clean_nmol",
     "peak_dmol", "clean_dmol", log_scale=False, sharex=True, cut=0,
     vline_idx=16384, outname="peak-artifacts-trace-length"
+)
+# photobleaching, dmol
+plot_ground_truth_segmentations(
+    df, "(0p|clean|feat).*_diffcoeff|bleach_exp_scale|clean_dmol|clean_nmol",
+    "bleach_exp_scale", "clean_dmol", log_scale=True, sharex=True, cut=0,
+    vline_idx=5, outname="photobleaching-diffcoeff"
+)
+# photobleaching nmol
+plot_ground_truth_segmentations(
+    df, "(0p|clean|feat).*_n$|bleach_exp_scale|clean_dmol|clean_nmol",
+    "bleach_exp_scale", "clean_nmol", log_scale=False, sharex=False, cut=0,
+    vline_idx=5, outname="photobleaching-n"
+)
+# photobleaching, nrmse
+plot_ground_truth_segmentations(
+    df, "(0p|clean|feat).*_nrmse|bleach_exp_scale|clean_dmol|clean_nmol",
+    "bleach_exp_scale", "clean_dmol", log_scale=False, sharex=False, cut=0,
+    vline_idx=5, outname="photobleaching-nrmse"
+)
+# photobleaching, adjr2
+plot_ground_truth_segmentations(
+    df, "(0p|clean|feat).*_adjr2|bleach_exp_scale|clean_dmol|clean_nmol",
+    "bleach_exp_scale", "clean_dmol", log_scale=False, sharex=False, cut=0,
+    vline_idx=5, outname="photobleaching-adjr2"
+)
+# photobleaching, trace length
+plot_ground_truth_segmentations(
+    df, "(0p)*_len|bleach_exp_scale|clean_dmol|clean_nmol",
+    "bleach_exp_scale", "clean_dmol", log_scale=False, sharex=True, cut=0,
+    vline_idx=16384, outname="photobleaching-trace-length"
 )
