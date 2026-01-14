@@ -3522,11 +3522,8 @@ threshold 0.1
 #+end_example
 #+RESULTS:
 
-
-
-
-
-
+Now plot the different segmentation thresholds to find a good ground truth
+threshold
 #+transclude: [[./2025-12-19-simulations-segmentation/src-python/segmentation_ground_truth.py]]  :lines 319-396 :src jupyter-python
 
 #+RESULTS:
@@ -3576,7 +3573,25 @@ result for peak artifacts.
 
 For detector dropout, we just use a label_segmentation < 0
 
+#+transclude: [[./2025-12-19-simulations-segmentation/src-python/segmentation_ground_truth.py]]  :lines 398-431 :src jupyter-python
+
+
 **** Plot example traces with =label_segmentation= and ground truth segmentation
+
+#+transclude: [[./2025-12-19-simulations-segmentation/src-python/plot_ground_truth.py]]  :src jupyter-python
+
+#+RESULTS:
+
+#+begin_src jupyter-python
+df = pl.concat(
+    [pl.read_parquet(f"{inputdir}/parquet/2026-01-09-peak-artifacts-training"
+                     "-segmentation-ground-truth.parquet"),
+     pl.read_parquet(f"{workdir}/parquet/2026-01-09-photobleaching-training"
+                     "-segmentation-ground-truth.parquet")],
+    how="vertical"
+)
+#+end_src
+
 
 
 #+begin_src jupyter-python
@@ -3690,6 +3705,7 @@ sns.lineplot(data=pa_ts(0, 1.)["seg"], label="segmentation label")
 : <Axes: >
 [[file:./.ob-jupyter/5ccce02585d3e1221893000a8969a931549a3baf.png]]
 :END:
+
 
 
 *** test croissant

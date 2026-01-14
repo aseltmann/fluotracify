@@ -394,3 +394,38 @@ plot_ground_truth_segmentations(
     "bleach_exp_scale", "clean_dmol", log_scale=False, sharex=True, cut=0,
     vline_idx=16384, outname="photobleaching-trace-length"
 )
+
+# inspecting the plots: choose segmentation threshold of 0.01 for peak artifacts
+# and photobleaching simulations. For detector dropout choose < 0
+for myfile in [
+        "2025-05-28-detector-dropout-testing.parquet",
+        "2025-05-28-detector-dropout-training.parquet",
+        "2025-05-28-detector-dropout-validation.parquet",
+        "2025-05-28-peak-artifacts-testing.parquet",
+        "2025-05-28-peak-artifacts-training.parquet",
+        "2025-05-28-peak-artifacts-validation.parquet",
+        "2025-05-28-photobleaching-testing.parquet",
+        "2025-05-28-photobleaching-training.parquet",
+        "2025-05-28-photobleaching-validation.parquet",
+]:
+    print(f"Saving ground truth segmentation for {myfile} ...")
+    df = pl.read_parquet(f"{inputdir}/{myfile}")
+    artifact = df["sim_params"].struct.field("sim_artifact")[0]
+    if artifact in ["photobleaching", "peak_artifacts"]:
+        df = df.select("uuid", "label_segmentation").with_columns(
+            pl.col.label_segmentation.arr.to_list()
+            .list.eval(pl.element() > 0.01)
+            .list.to_array(16384)
+        )
+    else:
+        df = df.select("uuid", "label_segmentation").with_columns(
+            pl.col.label_segmentation.arr.to_list()
+            .list.eval(pl.element() < 0)
+            .list.to_array(16384)
+        )
+    out_file = myfile.split(".")
+    out_first = out_file[0].split("-")[3:]
+    out_first = "-".join(out_first)
+    out_date = datetime.today().date()
+    out_file = f"{out_date}-{out_first}-ground-truth.{out_file[1]}"
+    df.write_parquet(f"{workdir}/parquet/{out_file}")
