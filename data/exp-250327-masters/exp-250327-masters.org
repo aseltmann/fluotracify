@@ -848,7 +848,7 @@ peak_nclean_test = sum([len(v) for k, v in CLEAN_TEST.items()])
 peak_ntest = peak_nclean_test * len(PEAK_PARAMS) * PEAK_NREPEATS
 bleach_nart = sum([len(v) for k, v in BLEACH_PARAMS.items()])
 bleach_nclean_train = sum([len(v) for k, v in CLEAN_TRAIN.items()])
-bleach_ntrain = bleach_nclean_train * bleach_nart 
+bleach_ntrain = bleach_nclean_train * bleach_nart
 bleach_nclean_val = sum([len(v) for k, v in CLEAN_VAL.items()])
 bleach_nval = bleach_nclean_val * bleach_nart
 bleach_nclean_test = sum([len(v) for k, v in CLEAN_TEST.items()])
@@ -3578,20 +3578,115 @@ For detector dropout, we just use a label_segmentation < 0
 
 **** Plot example traces with =label_segmentation= and ground truth segmentation
 
+#+begin_src emacs-lisp
+(setq org-src-tab-acts-natively nil)
+#+end_src
+
+#+RESULTS:
+
+but set it back to true if you edit source blocks in org-mode, otherwise you
+have to manually indent everything...
+
+#+begin_src emacs-lisp
+(setq org-src-tab-acts-natively t)
+#+end_src
+
+#+RESULTS:
+: t
+
 #+transclude: [[./2025-12-19-simulations-segmentation/src-python/plot_ground_truth.py]]  :src jupyter-python
 
 #+RESULTS:
 
 #+begin_src jupyter-python
-df = pl.concat(
-    [pl.read_parquet(f"{inputdir}/parquet/2026-01-09-peak-artifacts-training"
-                     "-segmentation-ground-truth.parquet"),
-     pl.read_parquet(f"{workdir}/parquet/2026-01-09-photobleaching-training"
-                     "-segmentation-ground-truth.parquet")],
-    how="vertical"
-)
+df[""]
 #+end_src
 
+
+#+begin_src jupyter-python
+
+out_date = datetime.today().date()
+# df = get_data("2025-05-28-detector-dropout-training.parquet")
+# fig, axd = prepare_grid(2)
+# plot_ground_truth(axd, 1, get_record(df, 0, "dropout_n", "few"))
+# plot_ground_truth(axd, 2, get_record(df, 0, "dropout_n", "many"))
+# plt.savefig(f"{workdir}/jupyter-python/{out_date}"
+#             "-detector-dropout-ground-truth-ex.png")
+df = get_data("2025-05-28-peak-artifacts-training.parquet")
+fig, axd = prepare_grid(3)
+plot_ground_truth(axd, 1, get_record(df, 4, "peak_dmol", 0.01))
+plot_ground_truth(axd, 2, get_record(df, 3, "peak_dmol", 0.1))
+plot_ground_truth(axd, 3, get_record(df, 0, "peak_dmol", 1.))
+plt.savefig(f"{workdir}/jupyter-python/{out_date}"
+            "-peak-artifacts-ground-truth-ex.png")
+# df = get_data("2025-05-28-photobleaching-training.parquet")
+# fig, axd = prepare_grid(2)
+# plot_ground_truth(axd, 1, get_record(df, 0, "bleach_exp_scale", "steep"))
+# plot_ground_truth(axd, 2, get_record(df, 2, "bleach_exp_scale", "shallow"))
+# plt.savefig(f"{workdir}/jupyter-python/{out_date}"
+#             "-photobleaching-ground-truth-ex.png")
+
+# for myfile in [
+#         "2025-05-28-detector-dropout-training.parquet",
+#         # "2025-05-28-peak-artifacts-training.parquet",
+#         # "2025-05-28-photobleaching-training.parquet",
+# ]:
+# get_record(df, 0, "peak_dmol", 0.01)
+#+end_src
+
+#+RESULTS:
+[[file:./.ob-jupyter/772ec9fb78152c47c4aba080eb2685325818b858.png]]
+
+#+begin_src jupyter-python
+
+
+
+#+end_src
+
+#+RESULTS:
+
+#+begin_src jupyter-python
+
+
+
+# plot_ground_truth(axd, 2, dd_ts(df, 0, "many (>19)"))
+
+#+end_src
+
+
+#+RESULTS:
+[[file:./.ob-jupyter/586be912e7a62df2869e88b53076eced41626ea2.png]]
+
+#+begin_src jupyter-python
+
+fig, axd = prepare_grid(2)
+colf = "tab:pink"
+colgt = "tab:green"
+rec = dd_ts(df, 0, "few (<=19)")
+sns.lineplot(data=rec["feature"], label="artifact", color=colf, ax=axd["ts1"])
+sns.lineplot(data=rec["label_restoration"], label="no artifact", alpha=0.7, ax=axd["ts1"])
+sns.lineplot(data=rec["label_segmentation"], label="label (simulation)", ax=axd["lab1"])
+axd["lab1"].axhline(0, ls="--", c="tab:red", label="threshold")
+axd["lab1"].legend()
+# ax2 = axd["seg1"].twinx()
+# sns.lineplot(data=dd_ts(df, 0, "few (<=19)")["label_ground_truth"], label="label (simulation)", color="tab:orange", ax=ax2)
+p = np.array(rec["label_ground_truth"])
+x = np.arange(len(p))
+p_bool = max(rec["feature"]) * p
+p_invbool = max(rec["feature"]) * ~p
+sns.lineplot(data=p_bool, alpha=0.5, color="tab:pink", ax=axd["seg1"])
+axd["seg1"].fill_between(x=x, y1=0, y2=p_bool, label="ground truth:\nartifact", color="tab:pink")
+axd["seg1"].fill_between(x=x, y1=0, y2=p_invbool, alpha=0.5, label="ground truth:\nno artifacts", color="tab:green")
+sns.lineplot(data=dd_ts(df, 0, "few (<=19)")["feature"], ax=axd["seg1"])
+axd["seg1"].legend()
+
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+: <matplotlib.legend.Legend at 0x7efb29da7f20>
+[[file:./.ob-jupyter/197a701daf07cf6414a2f1900eb6964e887df103.png]]
+:END:
 
 
 #+begin_src jupyter-python
@@ -3604,6 +3699,7 @@ fit = fcsdc.FCSFit(
     uuid="", method="lmfit", params=param_1sp, equation_dim=equation_dim,
     equation_dspecies=equation_dspecies,
 )
+
 g = df2["cor0p01_g"][0].drop_nans().to_numpy()
 fit.minimize(df2["cor0p01_tc"][0].drop_nans().to_numpy(), g)
 out = fit.to_polars()
@@ -3617,7 +3713,25 @@ hasattr(fit.result_minimizer, "params")
 #+end_src
 
 #+RESULTS:
-: True
+:RESULTS:
+# [goto error]
+#+begin_example
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+Cell In[72], line 5
+      1 def diffcoeff(tau: float, fwhm: float = 250) -> float:
+      2     return np.round((fwhm / 1000)**2 /
+      3                     (8 * np.log(2.0) * tau / 1000), 2)
+----> 5 fit = fcsdc.FCSFit(
+      6     uuid="", method="lmfit", params=param_1sp, equation_dim=equation_dim,
+      7     equation_dspecies=equation_dspecies,
+      8 )
+      9 g = df2["cor0p01_g"][0].drop_nans().to_numpy()
+     10 fit.minimize(df2["cor0p01_tc"][0].drop_nans().to_numpy(), g)
+
+NameError: name 'fcsdc' is not defined
+#+end_example
+:END:
 
 #+begin_src jupyter-python
 fit = fcsdc.FCSFit(
