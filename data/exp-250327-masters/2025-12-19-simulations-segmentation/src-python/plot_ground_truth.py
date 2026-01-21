@@ -74,7 +74,7 @@ def get_data(myfile: str) -> pl.DataFrame:
 def get_record(
         df: pl.DataFrame, idx: int,
         group: Literal["dropout_n", "peak_dmol", "bleach_exp_scale"],
-        subgroup: str
+        subgroup: str | float,
 ) -> dict:
     return (df
             .filter(pl.col(group).eq(subgroup) &
@@ -161,3 +161,24 @@ def plot_ground_truth(axd: dict, idx: int, rec: dict) -> None:
     axseg.fill_between(x=x, y1=0, y2=p_invbool, alpha=0.5, color=colg,
                        label="0 = no artifact")
     axseg.legend(loc="lower right")
+
+out_date = datetime.today().date()
+df = get_data("2025-05-28-detector-dropout-training.parquet")
+fig, axd = prepare_grid(2)
+plot_ground_truth(axd, 1, get_record(df, 0, "dropout_n", "few"))
+plot_ground_truth(axd, 2, get_record(df, 0, "dropout_n", "many"))
+plt.savefig(f"{workdir}/jupyter-python/{out_date}"
+            "-detector-dropout-ground-truth-ex.png")
+df = get_data("2025-05-28-peak-artifacts-training.parquet")
+fig, axd = prepare_grid(3)
+plot_ground_truth(axd, 1, get_record(df, 4, "peak_dmol", 0.01))
+plot_ground_truth(axd, 2, get_record(df, 3, "peak_dmol", 0.1))
+plot_ground_truth(axd, 3, get_record(df, 0, "peak_dmol", 1.))
+plt.savefig(f"{workdir}/jupyter-python/{out_date}"
+            "-peak-artifacts-ground-truth-ex.png")
+df = get_data("2025-05-28-photobleaching-training.parquet")
+fig, axd = prepare_grid(2)
+plot_ground_truth(axd, 1, get_record(df, 0, "bleach_exp_scale", "steep"))
+plot_ground_truth(axd, 2, get_record(df, 2, "bleach_exp_scale", "shallow"))
+plt.savefig(f"{workdir}/jupyter-python/{out_date}"
+            "-photobleaching-ground-truth-ex.png")
