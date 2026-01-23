@@ -15,7 +15,7 @@ os.chdir("/home/alva/Programs/drmed-git")
 inputdir = "data/exp-250327-masters/2025-05-28-simulations/parquet"
 workdir = "data/exp-250327-masters/2025-12-19-simulations-segmentation"
 
-def get_data(myfile: str) -> pl.DataFrame:
+def get_data(myfile: str) -> tuple[pl.DataFrame, str]:
     out_file = myfile.split(".")
     out_first = out_file[0].split("-")[3:]
     out_first = "-".join(out_first)

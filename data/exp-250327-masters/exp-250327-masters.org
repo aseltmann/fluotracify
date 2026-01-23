@@ -3859,6 +3859,17 @@ print("IoU (SK micro)", skm.jaccard_score(true, pred, average="micro"))
 print("IoU (SK weighted)", skm.jaccard_score(true, pred, average="weighted"))
 #+end_src
 
+#+RESULTS:
+: IoU (TF mean) tf.Tensor(0.33104342, shape=(), dtype=float32)
+: MeanIoU tf.Tensor(0.33104342, shape=(), dtype=float32)
+: IoU (SK macro) 0.3310434391471683
+:
+: IoU (TF binary) tf.Tensor(0.3836506, shape=(), dtype=float32)
+: IoU (SK binary) 0.3836506497431248
+:
+: IoU (SK micro) 0.33518050688615436
+: IoU (SK weighted) 0.36343489059321377
+
 
 *** test croissant
 
