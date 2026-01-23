@@ -3575,7 +3575,6 @@ For detector dropout, we just use a label_segmentation < 0
 
 #+transclude: [[./2025-12-19-simulations-segmentation/src-python/segmentation_ground_truth.py]]  :lines 398-431 :src jupyter-python
 
-
 **** Plot example traces with =label_segmentation= and ground truth segmentation
 
 #+begin_src emacs-lisp
@@ -3598,228 +3597,267 @@ have to manually indent everything...
 
 #+RESULTS:
 
-#+begin_src jupyter-python
-df[""]
-#+end_src
+These are the plots:
 
+Detector dropout:
+[[file:./2025-12-19-simulations-segmentation/jupyter-python/2026-01-16-detector-dropout-ground-truth-ex.png]]
 
-#+begin_src jupyter-python
+Photobleaching:
+[[file:./2025-12-19-simulations-segmentation/jupyter-python/2026-01-16-photobleaching-ground-truth-ex.png]]
 
-out_date = datetime.today().date()
-# df = get_data("2025-05-28-detector-dropout-training.parquet")
-# fig, axd = prepare_grid(2)
-# plot_ground_truth(axd, 1, get_record(df, 0, "dropout_n", "few"))
-# plot_ground_truth(axd, 2, get_record(df, 0, "dropout_n", "many"))
-# plt.savefig(f"{workdir}/jupyter-python/{out_date}"
-#             "-detector-dropout-ground-truth-ex.png")
-df = get_data("2025-05-28-peak-artifacts-training.parquet")
-fig, axd = prepare_grid(3)
-plot_ground_truth(axd, 1, get_record(df, 4, "peak_dmol", 0.01))
-plot_ground_truth(axd, 2, get_record(df, 3, "peak_dmol", 0.1))
-plot_ground_truth(axd, 3, get_record(df, 0, "peak_dmol", 1.))
-plt.savefig(f"{workdir}/jupyter-python/{out_date}"
-            "-peak-artifacts-ground-truth-ex.png")
-# df = get_data("2025-05-28-photobleaching-training.parquet")
-# fig, axd = prepare_grid(2)
-# plot_ground_truth(axd, 1, get_record(df, 0, "bleach_exp_scale", "steep"))
-# plot_ground_truth(axd, 2, get_record(df, 2, "bleach_exp_scale", "shallow"))
-# plt.savefig(f"{workdir}/jupyter-python/{out_date}"
-#             "-photobleaching-ground-truth-ex.png")
+Peak artifacts:
+[[file:./2025-12-19-simulations-segmentation/jupyter-python/2026-01-16-peak-artifacts-ground-truth-ex.png]]
 
-# for myfile in [
-#         "2025-05-28-detector-dropout-training.parquet",
-#         # "2025-05-28-peak-artifacts-training.parquet",
-#         # "2025-05-28-photobleaching-training.parquet",
-# ]:
-# get_record(df, 0, "peak_dmol", 0.01)
-#+end_src
+**** Perform classical segmentation methods
+I chose 7 algorithms which automatically find an optimal threshold (1 floating
+point number) per trace:
+- isodata
+- li
+- mean
+- otsu
+- triangle
+- yen
+
+I chose 4 algorithms which automatically find a mask threshold
+- local
+- niblack
+- bradley
+- sauvola
+
+I chose 3 classical image segmentation methods
+- chan_vese
+- random_walker
+- watershed
+
+#+transclude: [[./2025-12-19-simulations-segmentation/src-python/segmentation_classical.py]]  :src jupyter-python
 
 #+RESULTS:
-[[file:./.ob-jupyter/772ec9fb78152c47c4aba080eb2685325818b858.png]]
-
-#+begin_src jupyter-python
-
-
-
-#+end_src
-
-#+RESULTS:
-
-#+begin_src jupyter-python
-
-
-
-# plot_ground_truth(axd, 2, dd_ts(df, 0, "many (>19)"))
-
-#+end_src
-
-
-#+RESULTS:
-[[file:./.ob-jupyter/586be912e7a62df2869e88b53076eced41626ea2.png]]
-
-#+begin_src jupyter-python
-
-fig, axd = prepare_grid(2)
-colf = "tab:pink"
-colgt = "tab:green"
-rec = dd_ts(df, 0, "few (<=19)")
-sns.lineplot(data=rec["feature"], label="artifact", color=colf, ax=axd["ts1"])
-sns.lineplot(data=rec["label_restoration"], label="no artifact", alpha=0.7, ax=axd["ts1"])
-sns.lineplot(data=rec["label_segmentation"], label="label (simulation)", ax=axd["lab1"])
-axd["lab1"].axhline(0, ls="--", c="tab:red", label="threshold")
-axd["lab1"].legend()
-# ax2 = axd["seg1"].twinx()
-# sns.lineplot(data=dd_ts(df, 0, "few (<=19)")["label_ground_truth"], label="label (simulation)", color="tab:orange", ax=ax2)
-p = np.array(rec["label_ground_truth"])
-x = np.arange(len(p))
-p_bool = max(rec["feature"]) * p
-p_invbool = max(rec["feature"]) * ~p
-sns.lineplot(data=p_bool, alpha=0.5, color="tab:pink", ax=axd["seg1"])
-axd["seg1"].fill_between(x=x, y1=0, y2=p_bool, label="ground truth:\nartifact", color="tab:pink")
-axd["seg1"].fill_between(x=x, y1=0, y2=p_invbool, alpha=0.5, label="ground truth:\nno artifacts", color="tab:green")
-sns.lineplot(data=dd_ts(df, 0, "few (<=19)")["feature"], ax=axd["seg1"])
-axd["seg1"].legend()
-
-#+end_src
-
-#+RESULTS:
-:RESULTS:
-: <matplotlib.legend.Legend at 0x7efb29da7f20>
-[[file:./.ob-jupyter/197a701daf07cf6414a2f1900eb6964e887df103.png]]
-:END:
-
-
-#+begin_src jupyter-python
-
-def diffcoeff(tau: float, fwhm: float = 250) -> float:
-    return np.round((fwhm / 1000)**2 /
-                    (8 * np.log(2.0) * tau / 1000), 2)
-
-fit = fcsdc.FCSFit(
-    uuid="", method="lmfit", params=param_1sp, equation_dim=equation_dim,
-    equation_dspecies=equation_dspecies,
-)
-
-g = df2["cor0p01_g"][0].drop_nans().to_numpy()
-fit.minimize(df2["cor0p01_tc"][0].drop_nans().to_numpy(), g)
-out = fit.to_polars()
-nvarys = pl.DataFrame(out["minimizer_params"].struct.field("fit_stats").struct.field("nvarys"))
-ndata = pl.DataFrame(out["minimizer_params"].struct.field("fit_stats").struct.field("ndata"))
-# out = pl.concat([out, nvarys, ndata], how="horizontal")
-# out
-ndata
-# fit.result_minimizer.nvarys
-hasattr(fit.result_minimizer, "params")
-#+end_src
-
-#+RESULTS:
-:RESULTS:
-# [goto error]
 #+begin_example
----------------------------------------------------------------------------
-NameError                                 Traceback (most recent call last)
-Cell In[72], line 5
-      1 def diffcoeff(tau: float, fwhm: float = 250) -> float:
-      2     return np.round((fwhm / 1000)**2 /
-      3                     (8 * np.log(2.0) * tau / 1000), 2)
-----> 5 fit = fcsdc.FCSFit(
-      6     uuid="", method="lmfit", params=param_1sp, equation_dim=equation_dim,
-      7     equation_dspecies=equation_dspecies,
-      8 )
-      9 g = df2["cor0p01_g"][0].drop_nans().to_numpy()
-     10 fit.minimize(df2["cor0p01_tc"][0].drop_nans().to_numpy(), g)
-
-NameError: name 'fcsdc' is not defined
+Perform and evaluate classical segmentation for 2025-05-28-detector-dropout-testing.parquet ...
+Dropping 28 traces without artifacts
+t_isodata
+t_li
+t_mean
+t_min
+t_otsu
+t_triangle
+t_yen
+tm_local
+tm_niblack
+tm_bradley
+tm_sauvola
+chan_vese
+random_walker
+/nix/store/pj8hzjzfy16mgn09iy1lg25hb3y95hab-python3.12-scikit-image-0.25.2/lib/python3.12/site-packages/skimage/_shared/utils.py:445: UserWarning: The probability range is outside [0, 1] given the tolerance `prob_tol`. Consider decreasing `beta` and/or decreasing `tol`.
+  return func(*args, **kwargs)
+watershed
+Perform and evaluate classical segmentation for 2025-05-28-peak-artifacts-testing.parquet ...
+Dropping 47 traces without artifacts
+t_isodata
+t_li
+t_mean
+t_min
+t_otsu
+t_triangle
+t_yen
+tm_local
+tm_niblack
+tm_bradley
+tm_sauvola
+chan_vese
+random_walker
+/nix/store/pj8hzjzfy16mgn09iy1lg25hb3y95hab-python3.12-scikit-image-0.25.2/lib/python3.12/site-packages/skimage/_shared/utils.py:445: UserWarning: The probability range is outside [0, 1] given the tolerance `prob_tol`. Consider decreasing `beta` and/or decreasing `tol`.
+  return func(*args, **kwargs)
+watershed
+Perform and evaluate classical segmentation for 2025-05-28-photobleaching-testing.parquet ...
+Dropping 1 traces without artifacts
+t_isodata
+t_li
+t_mean
+t_min
+t_otsu
+t_triangle
+t_yen
+tm_local
+tm_niblack
+tm_bradley
+tm_sauvola
+chan_vese
+random_walker
+/nix/store/pj8hzjzfy16mgn09iy1lg25hb3y95hab-python3.12-scikit-image-0.25.2/lib/python3.12/site-packages/skimage/_shared/utils.py:445: UserWarning: The probability range is outside [0, 1] given the tolerance `prob_tol`. Consider decreasing `beta` and/or decreasing `tol`.
+  return func(*args, **kwargs)
+watershed
 #+end_example
-:END:
+
+**** Plot classical segmentation methods
 
 #+begin_src jupyter-python
-fit = fcsdc.FCSFit(
-    uuid="uuid", method=fit_method, params=param_1sp,
-    equation_dim=equation_dim, equation_dspecies=equation_dspecies,
-)
-fit.tc = np.tile(np.nan, pad_max_length)
-fit.g = np.tile(np.nan, pad_max_length)
-fit.residual = np.tile(np.nan, pad_max_length)
-# fit.to_polars()["minimizer_params"].struct.field("fit_stats").struct.field("nvarys")
-# ndata = pl.DataFrame(out["minimizer_params"].struct.field("fit_stats").struct.field("ndata"))
-# out["tc"].cast(pl.Array(pl.Float32, shape=(88)))
-hasattr(fit.result_minimizer, "params")
-#+end_src
+myfile = "2025-05-28-peak-artifacts-testing.parquet"
+df = get_data(myfile)
 
-#+RESULTS:
-: False
-
-
-#+begin_src jupyter-python
-cor = fcsdc.FCSCor(
-    uuid=df2["uuid"][0], method="multipletau",
-    multipletau_m=16,
-    multipletau_deltat=1.,
-    multipletau_norm=True,
-    multipletau_compress="average",
-)
-cor.autocorrelate(df2["feature"][0])
-# print(len(cor.tc))
-cor.tc = np.pad(cor.tc, (0, pad_max_length - len(cor.tc)), constant_values=None)
-cor.g = np.pad(cor.g, (0, pad_max_length - len(cor.g)), constant_values=None)
-cor.to_polars().to_struct()
-# pl.Series.to_list
-# print(test3.to_list())
-# pl.Series(test3.to_list())
-# sns.lineplot(data=test1, label="artifact")
-# sns.lineplot(data=test3, label="artifact")
-# plt.show()
-# sns.lineplot(data=test2, label="segmentation label")
+df = df.head()
+df
 #+end_src
 
 #+RESULTS:
 :RESULTS:
-shape: (1,)
-| struct[3]                                                                                                                                               |
-| {[1.0, 2.0, ... 14336.0],[2.265887, 2.260584, ... 0.24747],{"2fec7df0-7c14-4ab6-8d77-fa78687cd5b1","multipletau",16,1.0,true,"average",null,null,null}} |
+shape: (5, 13)
+| uuid                               | feature                                     | label_segmentation                   | label_ground_truth        | artifact         | clean_dmol | clean_nmol | peak_dmol | peak_nmol | bleach_exp_scale | bleach_type | dropout_n | dropout_maxdrop |
+|------------------------------------+---------------------------------------------+--------------------------------------+---------------------------+------------------+------------+------------+-----------+-----------+------------------+-------------+-----------+-----------------|
+| str                                | array[f32, 16384]                           | array[f32, 16384]                    | array[bool, 16384]        | str              | f64        | u32        | f64       | u32       | f64              | str         | u32       | f32             |
+| "0025b35f-2f91-4e35-9976-8d352b... | [241.542877, 140.094513, ... 3.80286]       | [0.000537, 0.000577, ... 8.5213e-12] | [false, false, ... false] | "peak_artifacts" | 5.0        | 100        | 0.01      | 10        | null             | "None"      | null      | null            |
+| "003d5163-c1c3-4114-83a0-fdde17... | [172.374542, 210.063324, ... 310.880829]    | [0.000028, 0.000053, ... 6.0863e-7]  | [false, false, ... false] | "peak_artifacts" | 5.0        | 250        | 0.1       | 7         | null             | "None"      | null      | null            |
+| "004b6cd5-a223-4637-a89e-4d0518... | [509.845154, 544.0755, ... 158.90741]       | [0.112331, 0.121452, ... 0.021096]   | [true, true, ... true]    | "peak_artifacts" | 1.0        | 250        | 0.01      | 10        | null             | "None"      | null      | null            |
+| "00645066-8d56-4e16-b8c3-691586... | [1125.661743, 1377.368896, ... 2353.903809] | [0.004789, 0.005751, ... 3.6925e-14] | [false, false, ... false] | "peak_artifacts" | 25.0       | 2000       | 1.0       | 3         | null             | "None"      | null      | null            |
+| "00748b43-f589-4873-9eac-570b9f... | [326.193359, 321.815125, ... 209.357437]    | [0.000017, 0.000015, ... 2.3636e-14] | [false, false, ... false] | "peak_artifacts" | 0.075      | 250        | 0.1       | 7         | null             | "None"      | null      | null            |
 :END:
 
+**** Extra: comparison of =tensorflow.keras= and =sklearn= metrics implementations
+
+first, import modules and choose a test file (execute twice because of
+messageprotocol error for tensorflow)
 #+begin_src jupyter-python
+import os
+os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
 
-def pa_tsfilter(peak_dmol: float) -> pl.Expr:
-    return (pl.col("artifact").eq("peak_artifacts") &
-            pl.col("clean_dmol").eq(1.) &
-            pl.col("clean_nmol").eq(3000) &
-            pl.col("peak_dmol").eq(peak_dmol))
-
-def pa_ts(idx: int, peak_dmol: float, df: pl.DataFrame = df2) -> dict:
-    return (df
-            .filter(pa_tsfilter(peak_dmol))
-            .row(idx, named=True))
-pa_ts(0, 1.).keys()
-#+end_src
-
-#+RESULTS:
-: dict_keys(['uuid', 'feature', 'label_restoration', 'label_segmentation', 'sim_params', 'ts_params', 'artifact', 'clean_dmol', 'clean_nmol', 'peak_dmol', 'peak_nmol', 'bleach_exp_scale', 'bleach_type', 'dropout_n', 'dropout_maxdrop', 'seg'])
-
-
-#+begin_src jupyter-python
+import keras.metrics as km
 import matplotlib.pyplot as plt
-import seaborn as sns
+import polars as pl
+import sklearn.metrics as skm
 
-sns.lineplot(data=pa_ts(0, 1.)["feature"], label="artifact")
-plt.show()
-sns.lineplot(data=pa_ts(0, 1.)["label_segmentation"], label="segmentation label")
-plt.show()
-sns.lineplot(data=pa_ts(0, 1.)["seg"], label="segmentation label")
-# sns.lineplot(data=df["trace"], label="no artifact", alpha=0.7, ax=axts)
+os.chdir("/home/alva/Programs/drmed-git")
+#+end_src
+
+#+RESULTS:
+
+#+begin_src jupyter-python
+df = pl.read_parquet(
+    "data/exp-250327-masters/2025-12-19-simulations-segmentation/parquet/"
+    "2026-01-22-peak-artifacts-testing-classical.parquet"
+)
+
+idx = 2
+true = df["label_ground_truth"][idx]
+pred = df["t_isodata_seg"][idx]
+plt.plot(true)
+plt.plot(pred, alpha=0.5)
 
 #+end_src
 
 #+RESULTS:
 :RESULTS:
-[[file:./.ob-jupyter/c0bd1e80d622f20a91e2eb318c03beceb9186510.png]]
-[[file:./.ob-jupyter/f2773d1ce359184793f938441a51107555dadd85.png]]
-: <Axes: >
-[[file:./.ob-jupyter/5ccce02585d3e1221893000a8969a931549a3baf.png]]
+| <matplotlib.lines.Line2D | at | 0x7f4a4d6d4920> |
+[[file:./.ob-jupyter/c2531f29bea90780424ddd3278566d64f0459293.png]]
 :END:
 
+
+getting tn, tp, fn, fp and/or a confusion matrix
+- =tf= implemented them separately, in =skl= you have to extract them from a
+  confusion matrix
+
+#+begin_src jupyter-python
+m = km.TrueNegatives()
+m.update_state(true, pred)
+print("TN", m.result())
+print("TN", m.result().numpy())
+cm = skm.confusion_matrix(true, pred)
+print("(tn, fp, fn, tp)", cm)
+disp = skm.ConfusionMatrixDisplay(cm, display_labels=["no artifact", "artifact"])
+disp.plot()
+
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+: TN tf.Tensor(3148.0, shape=(), dtype=float32)
+: TN 3148.0
+: (tn, fp, fn, tp) [[3148    0]
+:  [8158 5078]]
+: <sklearn.metrics._plot.confusion_matrix.ConfusionMatrixDisplay at 0x7f4a4d60c4a0>
+[[file:./.ob-jupyter/192f6ad02d33ee81a0106fef841c4c9c5bb844da.png]]
+:END:
+
+accuracy → just to show that it is not meaningful
+- =skm= has ~balanced_accuracy_score~ - maybe use that?
+
+#+begin_src jupyter-python
+print("balanced accuracy:", skm.balanced_accuracy_score(true, pred))
+m = km.BinaryAccuracy()
+m.update_state(true, pred)
+print("accuracy", m.result())
+print("accuracy", skm.accuracy_score(true, pred))
+#+end_src
+
+#+RESULTS:
+: balanced accuracy: 0.6918253248715625
+: accuracy tf.Tensor(0.5020752, shape=(), dtype=float32)
+: accuracy 0.5020751953125
+
+precision (how many true positives of all positives) and recall = sensitivity =
+TPR (how many true positives of all TP and FN = that should have been identified
+as positive)
+
+#+begin_src jupyter-python
+m = km.Precision()
+m.update_state(true, pred)
+print("precision", m.result())
+print("precision", skm.precision_score(true, pred))
+m = km.Recall()
+m.update_state(true, pred)
+print("recall", m.result())
+print("recall", skm.recall_score(true, pred))
+#+end_src
+
+#+RESULTS:
+: precision tf.Tensor(1.0, shape=(), dtype=float32)
+: precision 1.0
+: recall tf.Tensor(0.38365066, shape=(), dtype=float32)
+: recall 0.3836506497431248
+
+dice coefficient = F1 score (harmonic mean of precision and recall) →
+potentially use fbeta with beta = 2, which makes recall twice as important as
+precision
+- =tf= needs 2D input here (why?^^)
+#+begin_src jupyter-python
+m = km.F1Score()
+m.update_state(true.to_numpy().reshape(16384, 1), pred.to_numpy().reshape(16384, 1))
+print("f1", m.result())
+print("f1", skm.f1_score(true, pred))
+m = km.FBetaScore(beta=2.)
+m.update_state(true.to_numpy().reshape(16384, 1), pred.to_numpy().reshape(16384, 1))
+print("fbeta2", m.result())
+print("fbeta2", skm.fbeta_score(true, pred, beta=2))
+
+#+end_src
+
+#+RESULTS:
+: f1 tf.Tensor([0.5545484], shape=(1,), dtype=float32)
+: f1 0.5545484328928688
+: fbeta2 tf.Tensor([0.43759263], shape=(1,), dtype=float32)
+: fbeta2 0.43759263727551617
+
+IoU = Jaccard Index → often used for image segmentation. MeanIoU is good for 2
+classes. Instead of binary IoU, use overlap coefficient to get meaningful
+overlap score if only few positives are in the dataset
+(https://en.wikipedia.org/wiki/Overlap_coefficient)
+
+#+begin_src jupyter-python
+m = km.BinaryIoU()
+m.update_state(true, pred)
+print("IoU (TF mean)", m.result())
+m = km.MeanIoU(num_classes=2)
+m.update_state(true, pred)
+print("MeanIoU", m.result())
+print("IoU (SK macro)", skm.jaccard_score(true, pred, average="macro"))
+print()
+m = km.BinaryIoU(target_class_ids=[1])
+m.update_state(true, pred)
+print("IoU (TF binary)", m.result())
+print("IoU (SK binary)", skm.jaccard_score(true, pred, average="binary"))
+print()
+print("IoU (SK micro)", skm.jaccard_score(true, pred, average="micro"))
+print("IoU (SK weighted)", skm.jaccard_score(true, pred, average="weighted"))
+#+end_src
 
 
 *** test croissant
@@ -3831,133 +3869,6 @@ https://huggingface.co/datasets/Semih34/UnetDestructionCivilWar
 from pprint import pprint
 pprint({"@context":{"@language":"en","@vocab":"https://schema.org/","citeAs":"cr:citeAs","column":"cr:column","conformsTo":"dct:conformsTo","cr":"http://mlcommons.org/croissant/","data":{"@id":"cr:data","@type":"@json"},"dataBiases":"cr:dataBiases","dataCollection":"cr:dataCollection","dataType":{"@id":"cr:dataType","@type":"@vocab"},"dct":"http://purl.org/dc/terms/","extract":"cr:extract","field":"cr:field","fileProperty":"cr:fileProperty","fileObject":"cr:fileObject","fileSet":"cr:fileSet","format":"cr:format","includes":"cr:includes","isLiveDataset":"cr:isLiveDataset","jsonPath":"cr:jsonPath","key":"cr:key","md5":"cr:md5","parentField":"cr:parentField","path":"cr:path","personalSensitiveInformation":"cr:personalSensitiveInformation","recordSet":"cr:recordSet","references":"cr:references","regex":"cr:regex","repeated":"cr:repeated","replace":"cr:replace","sc":"https://schema.org/","separator":"cr:separator","source":"cr:source","subField":"cr:subField","transform":"cr:transform"},"@type":"sc:Dataset","distribution":[{"@type":"cr:FileObject","@id":"repo","name":"repo","description":"The Hugging Face git repository.","contentUrl":"https://huggingface.co/datasets/Semih34/UnetDestructionCivilWar/tree/refs%2Fconvert%2Fparquet","encodingFormat":"git+https","sha256":"https://github.com/mlcommons/croissant/issues/80"},{"@type":"cr:FileSet","@id":"parquet-files-for-config-default","name":"parquet-files-for-config-default","description":"The underlying Parquet files as converted by Hugging Face (see: https://huggingface.co/docs/dataset-viewer/parquet).","containedIn":{"@id":"repo"},"encodingFormat":"application/x-parquet","includes":"default/*/*.parquet"}],"recordSet":[{"@type":"cr:RecordSet","dataType":"cr:Split","key":{"@id":"default_splits/split_name"},"@id":"default_splits","name":"default_splits","description":"Splits for the default config.","field":[{"@type":"cr:Field","@id":"default_splits/split_name","name":"split_name","description":"The name of the split.","dataType":"sc:Text"}],"data":[{"default_splits/split_name":"train"},{"default_splits/split_name":"validation"}]},{"@type":"cr:RecordSet","@id":"default","name":"default","description":"Semih34/UnetDestructionCivilWar - 'default' subset\n\nAdditional information:\n- 2 splits: train, validation","field":[{"@type":"cr:Field","@id":"default/split","name":"default/split","description":"Split to which the example belongs to.","dataType":"sc:Text","source":{"fileSet":{"@id":"parquet-files-for-config-default"},"extract":{"fileProperty":"fullpath"},"transform":{"regex":"default/(?:partial-)?(train|validation)/.+parquet$"}},"references":{"field":{"@id":"default_splits/split_name"}}},{"@type":"cr:Field","@id":"default/image","name":"default/image","description":"Image column 'image' from the Hugging Face parquet file.","dataType":"sc:ImageObject","source":{"fileSet":{"@id":"parquet-files-for-config-default"},"extract":{"column":"image"},"transform":{"jsonPath":"bytes"}}},{"@type":"cr:Field","@id":"default/segmentation_mask","name":"default/segmentation_mask","description":"Image column 'segmentation_mask' from the Hugging Face parquet file.","dataType":"sc:ImageObject","source":{"fileSet":{"@id":"parquet-files-for-config-default"},"extract":{"column":"segmentation_mask"},"transform":{"jsonPath":"bytes"}}}]}],"conformsTo":"http://mlcommons.org/croissant/1.0","name":"UnetDestructionCivilWar","description":"\n\t\n\t\t\n\t\tDataset Card for \"UnetDestructionCivilWar\"\n\t\n\nMore Information needed\n","alternateName":["Semih34/UnetDestructionCivilWar"],"creator":{"@type":"Person","name":"Semih ERKEN","url":"https://huggingface.co/Semih34"},"keywords":["< 1K","parquet","Image","Datasets","pandas","Croissant","Polars","🇺🇸 Region: US"],"url":"https://huggingface.co/datasets/Semih34/UnetDestructionCivilWar"})
 #+end_src
-
-#+RESULTS:
-#+begin_example
-{'@context': {'@language': 'en',
-              '@vocab': 'https://schema.org/',
-              'citeAs': 'cr:citeAs',
-              'column': 'cr:column',
-              'conformsTo': 'dct:conformsTo',
-              'cr': 'http://mlcommons.org/croissant/',
-              'data': {'@id': 'cr:data', '@type': '@json'},
-              'dataBiases': 'cr:dataBiases',
-              'dataCollection': 'cr:dataCollection',
-              'dataType': {'@id': 'cr:dataType', '@type': '@vocab'},
-              'dct': 'http://purl.org/dc/terms/',
-              'extract': 'cr:extract',
-              'field': 'cr:field',
-              'fileObject': 'cr:fileObject',
-              'fileProperty': 'cr:fileProperty',
-              'fileSet': 'cr:fileSet',
-              'format': 'cr:format',
-              'includes': 'cr:includes',
-              'isLiveDataset': 'cr:isLiveDataset',
-              'jsonPath': 'cr:jsonPath',
-              'key': 'cr:key',
-              'md5': 'cr:md5',
-              'parentField': 'cr:parentField',
-              'path': 'cr:path',
-              'personalSensitiveInformation': 'cr:personalSensitiveInformation',
-              'recordSet': 'cr:recordSet',
-              'references': 'cr:references',
-              'regex': 'cr:regex',
-              'repeated': 'cr:repeated',
-              'replace': 'cr:replace',
-              'sc': 'https://schema.org/',
-              'separator': 'cr:separator',
-              'source': 'cr:source',
-              'subField': 'cr:subField',
-              'transform': 'cr:transform'},
- '@type': 'sc:Dataset',
- 'alternateName': ['Semih34/UnetDestructionCivilWar'],
- 'conformsTo': 'http://mlcommons.org/croissant/1.0',
- 'creator': {'@type': 'Person',
-             'name': 'Semih ERKEN',
-             'url': 'https://huggingface.co/Semih34'},
- 'description': '\n'
-                '\t\n'
-                '\t\t\n'
-                '\t\tDataset Card for "UnetDestructionCivilWar"\n'
-                '\t\n'
-                '\n'
-                'More Information needed\n',
- 'distribution': [{'@id': 'repo',
-                   '@type': 'cr:FileObject',
-                   'contentUrl': 'https://huggingface.co/datasets/Semih34/UnetDestructionCivilWar/tree/refs%2Fconvert%2Fparquet',
-                   'description': 'The Hugging Face git repository.',
-                   'encodingFormat': 'git+https',
-                   'name': 'repo',
-                   'sha256': 'https://github.com/mlcommons/croissant/issues/80'},
-                  {'@id': 'parquet-files-for-config-default',
-                   '@type': 'cr:FileSet',
-                   'containedIn': {'@id': 'repo'},
-                   'description': 'The underlying Parquet files as converted '
-                                  'by Hugging Face (see: '
-                                  'https://huggingface.co/docs/dataset-viewer/parquet).',
-                   'encodingFormat': 'application/x-parquet',
-                   'includes': 'default/*/*.parquet',
-                   'name': 'parquet-files-for-config-default'}],
- 'keywords': ['< 1K',
-              'parquet',
-              'Image',
-              'Datasets',
-              'pandas',
-              'Croissant',
-              'Polars',
-              '🇺🇸 Region: US'],
- 'name': 'UnetDestructionCivilWar',
- 'recordSet': [{'@id': 'default_splits',
-                '@type': 'cr:RecordSet',
-                'data': [{'default_splits/split_name': 'train'},
-                         {'default_splits/split_name': 'validation'}],
-                'dataType': 'cr:Split',
-                'description': 'Splits for the default config.',
-                'field': [{'@id': 'default_splits/split_name',
-                           '@type': 'cr:Field',
-                           'dataType': 'sc:Text',
-                           'description': 'The name of the split.',
-                           'name': 'split_name'}],
-                'key': {'@id': 'default_splits/split_name'},
-                'name': 'default_splits'},
-               {'@id': 'default',
-                '@type': 'cr:RecordSet',
-                'description': "Semih34/UnetDestructionCivilWar - 'default' "
-                               'subset\n'
-                               '\n'
-                               'Additional information:\n'
-                               '- 2 splits: train, validation',
-                'field': [{'@id': 'default/split',
-                           '@type': 'cr:Field',
-                           'dataType': 'sc:Text',
-                           'description': 'Split to which the example belongs '
-                                          'to.',
-                           'name': 'default/split',
-                           'references': {'field': {'@id': 'default_splits/split_name'}},
-                           'source': {'extract': {'fileProperty': 'fullpath'},
-                                      'fileSet': {'@id': 'parquet-files-for-config-default'},
-                                      'transform': {'regex': 'default/(?:partial-)?(train|validation)/.+parquet$'}}},
-                          {'@id': 'default/image',
-                           '@type': 'cr:Field',
-                           'dataType': 'sc:ImageObject',
-                           'description': "Image column 'image' from the "
-                                          'Hugging Face parquet file.',
-                           'name': 'default/image',
-                           'source': {'extract': {'column': 'image'},
-                                      'fileSet': {'@id': 'parquet-files-for-config-default'},
-                                      'transform': {'jsonPath': 'bytes'}}},
-                          {'@id': 'default/segmentation_mask',
-                           '@type': 'cr:Field',
-                           'dataType': 'sc:ImageObject',
-                           'description': "Image column 'segmentation_mask' "
-                                          'from the Hugging Face parquet file.',
-                           'name': 'default/segmentation_mask',
-                           'source': {'extract': {'column': 'segmentation_mask'},
-                                      'fileSet': {'@id': 'parquet-files-for-config-default'},
-                                      'transform': {'jsonPath': 'bytes'}}}],
-                'name': 'default'}],
- 'url': 'https://huggingface.co/datasets/Semih34/UnetDestructionCivilWar'}
-#+end_example
 
 
 #+begin_src jupyter-python
@@ -4190,6 +4101,7 @@ print(
     f"ipykernel {version('ipykernel')}\n"
     f"ipywidgets {version('ipywidgets')}\n"
     f"jupyterlab {version('jupyterlab')}\n"
+    f"keras {version('keras')}\n"
     f"lmfit {version('lmfit')}\n"
     f"matplotlib {version('matplotlib')}\n"
     f"mlcroissant {version('mlcroissant')}\n"
@@ -4216,6 +4128,7 @@ cython 3.0.12
 ipykernel 6.29.5
 ipywidgets 8.1.5
 jupyterlab 4.4.1
+keras 3.11.3
 lmfit 1.3.3
 matplotlib 3.10.1
 mlcroissant 1.0.17

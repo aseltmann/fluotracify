@@ -2,15 +2,13 @@
 
 import os
 
-import matplotlib.pyplot as plt
 import numpy as np
 import polars as pl
-import seaborn as sns
 import skimage as ski
+import sklearn.metrics as skm
 
 from collections.abc import Callable, Iterable
 from datetime import datetime
-from typing import Literal
 
 os.chdir("/home/alva/Programs/drmed-git")
 
@@ -21,7 +19,13 @@ def get_data(myfile: str) -> pl.DataFrame:
     out_file = myfile.split(".")
     out_first = out_file[0].split("-")[3:]
     out_first = "-".join(out_first)
-    df = pl.read_parquet(f"{inputdir}/{myfile}")
+    df = pl.concat(
+        [pl.read_parquet(f"{inputdir}/{myfile}"),
+         (pl.read_parquet(f"{workdir}/parquet/2026-01-14-{out_first}-ground-"
+                          "truth.parquet")
+          .rename({"label_segmentation": "label_ground_truth"}))
+         ], how="align"
+    )
     df = df.with_columns(
         artifact=pl.col("sim_params").struct.field("sim_artifact"),
         clean_dmol=(
@@ -44,23 +48,14 @@ def get_data(myfile: str) -> pl.DataFrame:
             pl.col("sim_params").struct.field("dropout_maxdrop")
            ),
     )
-    df = df.drop(["sim_params", "ts_params"])
-    # df = df.with_columns(
-    #     (
-    #         pl.when(pl.col.bleach_exp_scale > 0.05,
-    #                 pl.col.bleach_exp_scale <= 0.10)
-    #         .then(pl.lit("shallow"))
-    #         .otherwise(pl.when(pl.col.bleach_exp_scale <= 0.05)
-    #                    .then(pl.lit("steep")))
-    #         .alias("bleach_exp_scale")),
-    #     (
-    #         pl.when(pl.col.dropout_n > 19)
-    #         .then(pl.lit("many"))
-    #         .otherwise(pl.when(pl.col.dropout_n <= 19)
-    #                    .then(pl.lit("few")))
-    #         .alias("dropout_n"))
-    # )
-    return df
+    df = df.drop(["label_restoration", "label_segmentation", "sim_params",
+                  "ts_params"])
+    df_clean = df.filter(pl.col.label_ground_truth.arr.sum().eq(0)).shape[0]
+    print(f"Dropping {df_clean} traces without artifacts")
+    df = df.filter(pl.col.label_ground_truth.arr.sum().ne(0))
+    out_date = datetime.today().date()
+    out_file = f"{out_date}-{out_first}-classical.{out_file[1]}"
+    return df, out_file
 
 
 def threshold_bradley(trace: list) -> Callable:
@@ -92,7 +87,7 @@ def random_walker_quant(trace: Iterable) -> Callable:
     labels = np.zeros_like(trace, dtype=int)
     labels[trace < np.quantile(trace, 0.05)] = 1
     labels[trace > np.quantile(trace, 0.95)] = 2
-    return ski.segmentation.random_walker(trace, labels=labels, mode="bf")
+    return ski.segmentation.random_walker(trace, labels=labels, mode="bf")  # type: ignore
 
 
 def watershed_quant(trace: Iterable) -> Callable:
@@ -106,7 +101,7 @@ def watershed_quant(trace: Iterable) -> Callable:
     markers = np.zeros_like(trace, dtype=int)
     markers[trace < np.quantile(trace, 0.05)] = 1
     markers[trace > np.quantile(trace, 0.95)] = 2
-    return ski.segmentation.watershed(trace, markers=markers)
+    return ski.segmentation.watershed(trace, markers=markers)  # type: ignore
 
 
 def seg_classical(
@@ -135,3 +130,107 @@ def seg_classical(
                 raise e
     out = out.reshape(trace.size)
     return out
+
+def jaccard(
+        true: list, pred: list, precision: float, recall: float, average: str
+) -> float:
+    if np.isnan(precision) | np.isnan(recall):
+        out = np.nan
+    else:
+        out = float(skm.jaccard_score(true, pred, average=average))
+    return out
+
+
+t_algos = {
+    # algos returning a float
+    "t_isodata": ski.filters.threshold_isodata,
+    "t_li": ski.filters.threshold_li,
+    "t_mean": ski.filters.threshold_mean,
+    "t_min": ski.filters.threshold_minimum,
+    "t_otsu": ski.filters.threshold_otsu,
+    "t_triangle": ski.filters.threshold_triangle,
+    "t_yen": ski.filters.threshold_yen,
+    # algos returning a threshold mask
+    "tm_local": ski.filters.threshold_local,
+    "tm_niblack": ski.filters.threshold_niblack,
+    "tm_bradley": threshold_bradley,
+    "tm_sauvola": threshold_sauvola,
+    # classical segmentation algorithms, outputting a mask
+    "chan_vese": ski.segmentation.chan_vese,
+    "random_walker": random_walker_quant,
+    "watershed": watershed_quant,
+}
+
+
+for myfile in [
+        "2025-05-28-detector-dropout-testing.parquet",
+        "2025-05-28-peak-artifacts-testing.parquet",
+        "2025-05-28-photobleaching-testing.parquet",
+]:
+    print(f"Perform and evaluate classical segmentation for {myfile} ...")
+    df, out_file = get_data(myfile)
+    for k, algo in t_algos.items():
+        print(f"{k}")
+        seg = f"{k}_seg"
+        cm = f"{k}_cm"
+        precision = f"{k}_precision"
+        recall = f"{k}_recall"
+        fbeta2 = f"{k}_fbeta2"
+        biniou = f"{k}_biniou"
+        meaniou = f"{k}_meaniou"
+        overlap = f"{k}_overlap"
+        df = df.with_columns(
+            (pl.struct("feature").map_elements(
+                lambda x: seg_classical(x["feature"], k, algo),
+                return_dtype=pl.List(pl.Float32)
+               )).alias(seg)
+           )
+        df = df.cast({seg: pl.Array(pl.Boolean, shape=(16384))})
+        df = df.with_columns(
+            (pl.struct("label_ground_truth", seg).map_elements(
+                lambda x: skm.confusion_matrix(
+                    x["label_ground_truth"], x[seg], labels=[0, 1],
+                   ), return_dtype=pl.List(pl.Array(pl.Int64, shape=(2)))
+               )).alias(cm),
+            (pl.struct("label_ground_truth", seg).map_elements(
+                lambda x: skm.precision_score(
+                    x["label_ground_truth"], x[seg], zero_division=np.nan  # type: ignore
+                   ), return_dtype=pl.Float32
+               )).alias(precision),
+            (pl.struct("label_ground_truth", seg).map_elements(
+                lambda x: skm.recall_score(
+                    x["label_ground_truth"], x[seg], zero_division=np.nan  # type: ignore
+                   ), return_dtype=pl.Float32
+               )).alias(recall),
+            (pl.struct("label_ground_truth", seg).map_elements(
+                lambda x: skm.fbeta_score(
+                    x["label_ground_truth"], x[seg], beta=2,
+                    zero_division=np.nan  # type: ignore
+                   ), return_dtype=pl.Float32
+               )).alias(fbeta2),
+        )
+        df = df.cast({cm: pl.Array(pl.Int64, shape=(2, 2))})
+        df = df.with_columns(
+            (pl.struct("label_ground_truth", seg, precision, recall)
+             .map_elements(
+                 lambda x: jaccard(x["label_ground_truth"], x[seg],
+                                   x[precision], x[recall], average="binary"),
+                 return_dtype=pl.Float32
+               )).alias(biniou),
+            (pl.struct("label_ground_truth", seg, precision, recall)
+             .map_elements(
+                 lambda x: jaccard(x["label_ground_truth"], x[seg],
+                                   x[precision], x[recall], average="macro"),
+                 return_dtype=pl.Float32
+               )).alias(meaniou),
+            # overlap coefficient see
+            # https://en.wikipedia.org/wiki/Overlap_coefficient
+            # from confusion matrix:
+            # overlap coef = tp / min((tn + fp), (fn + tp))
+            (pl.col(cm).arr.get(1).arr.get(1) /
+             pl.min_horizontal(pl.col(cm).arr.get(0).arr.sum(),
+                               pl.col(cm).arr.get(1).arr.sum())
+             ).alias(overlap),
+        )
+    df = df.drop("feature")
+    df.write_parquet(f"{workdir}/parquet/{out_file}")
