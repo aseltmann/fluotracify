@@ -43,10 +43,10 @@
               tag = "v${version}";
               hash = "sha256-eBi5s5BQ7XXTe5138m49JqAH0IdNpVFFfv6Vqs6MwQI=";
             };
-          build-system = with pkgs.python312Packages; [
+          build-system = with pkgs-unstable.python312Packages; [
             setuptools
           ];
-          dependencies = with pkgs.python312Packages; [
+          dependencies = with pkgs-unstable.python312Packages; [
             alembic
             cloudpickle
             databricks-sdk
@@ -65,6 +65,7 @@
             opentelemetry-sdk
             pandas
             protobuf
+            pyarrow
             pydantic
             pyyaml
             requests
@@ -86,11 +87,7 @@
           #   scikit-learn
           #   scipy
           #   sqlalchemy
-          ] ++ (
-            with pkgs-unstable.python312Packages; [
-              pyarrow
-            ]
-          );
+          ];
         };
       in {
         devShells.default = pkgs.mkShellNoCC {
