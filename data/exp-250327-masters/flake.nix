@@ -33,7 +33,7 @@
             numpy
           ];
         };
-        mlflow-pypi = pkgs.python312Packages.buildPythonPackage rec {
+        mlflow-pypi = pkgs-unstable.python312Packages.buildPythonPackage rec {
           pname = "mlflow";
           version = "2.22.1";
           pyproject = true;
