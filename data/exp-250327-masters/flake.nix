@@ -41,6 +41,9 @@
             inherit pname version;
             hash = "sha256-t9bLKUESEVywAxpVRimiFkfDi6iND9dFXg3erQK0uyg=";
           };
+          build-system = with pkgs.python312Packages; [
+            setuptools
+          ];
         };
       in {
         devShells.default = pkgs.mkShellNoCC {
