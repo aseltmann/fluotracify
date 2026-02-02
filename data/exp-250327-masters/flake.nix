@@ -46,7 +46,32 @@
           build-system = with pkgs.python312Packages; [
             setuptools
           ];
-          # dependencies = with pkgs.python312Packages; [
+          dependencies = with pkgs.python312Packages; [
+            cloudpickle
+            databricks-sdk
+            docker
+            fastapi
+            gitpython
+            graphene
+            gunicorn
+            importlib-metadata
+            markdown
+            matplotlib
+            numpy
+            opentelemetry-api
+            opentelemetry-sdk
+            pandas
+            protobuf
+            pyarrow
+            pydantic
+            pyyaml
+            requests
+            scikit-learn
+            scipy
+            sqlalchemy
+            sqlparse
+            typing-extensions
+            uvicorn
           #   # mlflow-skinny
           #   flask
           #   jinja2
@@ -62,7 +87,7 @@
           #   scikit-learn
           #   scipy
           #   sqlalchemy
-          # ];
+          ];
         };
       in {
         devShells.default = pkgs.mkShellNoCC {
