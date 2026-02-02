@@ -45,7 +45,7 @@
             setuptools
           ];
           dependencies = with pkgs.python312Packages; [
-            mlflow-skinny
+            # mlflow-skinny
             flask
             jinja2
             alembic
