@@ -41,7 +41,7 @@
               owner = "mlflow";
               repo = "mlflow";
               tag = "v${version}";
-              hash = "";
+              hash = "sha256-eBi5s5BQ7XXTe5138m49JqAH0IdNpVFFfv6Vqs6MwQI=";
             };
           build-system = with pkgs.python312Packages; [
             setuptools
