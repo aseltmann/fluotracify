@@ -33,62 +33,6 @@
             numpy
           ];
         };
-        mlflow-pypi = pkgs-unstable.python312Packages.buildPythonPackage rec {
-          pname = "mlflow";
-          version = "2.22.1";
-          pyproject = true;
-          src = pkgs.fetchFromGitHub {
-              owner = "mlflow";
-              repo = "mlflow";
-              tag = "v${version}";
-              hash = "sha256-eBi5s5BQ7XXTe5138m49JqAH0IdNpVFFfv6Vqs6MwQI=";
-            };
-          build-system = with pkgs-unstable.python312Packages; [
-            setuptools
-          ];
-          dependencies = with pkgs-unstable.python312Packages; [
-            alembic
-            cloudpickle
-            databricks-sdk
-            docker
-            fastapi
-            flask
-            gitpython
-            graphene
-            gunicorn
-            importlib-metadata
-            jinja2
-            markdown
-            matplotlib
-            numpy
-            opentelemetry-api
-            opentelemetry-sdk
-            pandas
-            protobuf
-            pyarrow
-            pydantic
-            pyyaml
-            requests
-            scikit-learn
-            scipy
-            sqlalchemy
-            sqlparse
-            typing-extensions
-            uvicorn
-          #   # mlflow-skinny
-          #   docker
-          #   graphene
-          #   gunicorn
-          #   markdown
-          #   matplotlib
-          #   numpy
-          #   pandas
-          #   pyarrow
-          #   scikit-learn
-          #   scipy
-          #   sqlalchemy
-          ];
-        };
       in {
         devShells.default = pkgs.mkShellNoCC {
           packages =
@@ -106,7 +50,6 @@
                 lmfit  # 1.3.3
                 matplotlib  # 3.10.1
                 mlcroissant  # 1.0.17
-                mlflow-pypi  # 2.20.3 (conda 2.21.3)
                 multipletau-pypi  # 0.4.1
                 numpy  # 2.2.5
                 pandas  # 2.2.3
@@ -118,6 +61,7 @@
                 tqdm  # 4.67.1
               ]) ++ (
                 with pkgs-unstable.python312Packages; [
+                  mlflow
                   polars  # 1.31.0  # polars jumped from 1.27.1 to 1.31.0 in nixpkgs, choose higher version
                 ]);
           # shellHook = ''
