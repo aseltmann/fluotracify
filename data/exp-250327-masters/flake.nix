@@ -6,20 +6,17 @@
     nixpkgs.url = "github:nixos/nixpkgs?ref=2b0d2b456e4e8452cf1c16d00118d145f31160f9";
     # version of nixos-unstable from 2025-07-06
     nixpkgs-unstable.url = "github:nixos/nixpkgs?ref=55b0d38442aac04f892f03b6a53cd9bb4c6cfc1c";
-    # version of nixos-unstable frmo 2025-08-26
-    nixpkgs-unstable2.url = "github:nixos/nixpkgs?ref=5160431e8a63440b46fd367ba822d79b82e82deb";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
   outputs =
-    { self, nixpkgs, nixpkgs-unstable, nixpkgs-unstable2, flake-utils, ...}:
+    { self, nixpkgs, nixpkgs-unstable, flake-utils, ...}:
     # Create system-specific outputs for the standard Nix systems
     # https://github.com/numtide/flake-utils/blob/main/lib.nix#L3-L9
     flake-utils.lib.eachDefaultSystem (
       system: let
         pkgs = nixpkgs.legacyPackages.${system};
         pkgs-unstable = nixpkgs-unstable.legacyPackages.${system};
-        pkgs-unstable2 = nixpkgs-unstable2.legacyPackages.${system};
         multipletau-pypi = pkgs.python312Packages.buildPythonPackage rec {
           pname = "multipletau";
           version = "0.4.1";
@@ -53,6 +50,7 @@
                 lmfit  # 1.3.3
                 matplotlib  # 3.10.1
                 mlcroissant  # 1.0.17
+                mlflow  # 2.20.3 (conda 2.21.3)
                 multipletau-pypi  # 0.4.1
                 numpy  # 2.2.5
                 pandas  # 2.2.3
@@ -65,10 +63,7 @@
               ]) ++ (
                 with pkgs-unstable.python312Packages; [
                   polars  # 1.31.0  # polars jumped from 1.27.1 to 1.31.0 in nixpkgs, choose higher version
-                ]) ++ (
-                  with pkgs-unstable2.python312Packages; [
-                    mlflow
-                  ]);
+                ]);
           # shellHook = ''
 
           # '';
