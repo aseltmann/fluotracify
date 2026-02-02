@@ -4,8 +4,10 @@
   inputs = {
     # version of nixos-25.05 from 2025-12-18
     nixpkgs.url = "github:nixos/nixpkgs?ref=2b0d2b456e4e8452cf1c16d00118d145f31160f9";
-    # version of nixos-unstable from 2025-07-06
-    nixpkgs-unstable.url = "github:nixos/nixpkgs?ref=55b0d38442aac04f892f03b6a53cd9bb4c6cfc1c";
+    # # version of nixos-unstable from 2025-07-06
+    # nixpkgs-unstable.url = "github:nixos/nixpkgs?ref=55b0d38442aac04f892f03b6a53cd9bb4c6cfc1c";
+    # version of nixos-unstable frmo 2025-10-23
+    nixpkgs-unstable.url = "github:nixos/nixpkgs?ref=667993862518f5a890747dfe7aba2c6d0c7787ce";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
