@@ -44,6 +44,23 @@
           build-system = with pkgs.python312Packages; [
             setuptools
           ];
+          dependencies = with pkgs.python312Packages; [
+            mlflow-skinny
+            flask
+            jinja2
+            alembic
+            docker
+            graphene
+            gunicorn
+            markdown
+            matplotlib
+            numpy
+            pandas
+            pyarrow
+            scikit-learn
+            scipy
+            sqlalchemy
+          ];
         };
       in {
         devShells.default = pkgs.mkShellNoCC {
