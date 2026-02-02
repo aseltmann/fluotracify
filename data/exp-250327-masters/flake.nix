@@ -47,14 +47,17 @@
             setuptools
           ];
           dependencies = with pkgs.python312Packages; [
+            alembic
             cloudpickle
             databricks-sdk
             docker
             fastapi
+            flask
             gitpython
             graphene
             gunicorn
             importlib-metadata
+            jinja2
             markdown
             matplotlib
             numpy
@@ -62,7 +65,6 @@
             opentelemetry-sdk
             pandas
             protobuf
-            pyarrow
             pydantic
             pyyaml
             requests
@@ -73,9 +75,6 @@
             typing-extensions
             uvicorn
           #   # mlflow-skinny
-          #   flask
-          #   jinja2
-          #   alembic
           #   docker
           #   graphene
           #   gunicorn
@@ -87,7 +86,11 @@
           #   scikit-learn
           #   scipy
           #   sqlalchemy
-          ];
+          ] ++ (
+            with pkgs-unstable.python312Packages; [
+              pyarrow
+            ]
+          );
         };
       in {
         devShells.default = pkgs.mkShellNoCC {
