@@ -39,7 +39,7 @@
           pyproject = true;
           src = pkgs.fetchPypi {
             inherit pname version;
-            hash = "";
+            hash = "sha256-t9bLKUESEVywAxpVRimiFkfDi6iND9dFXg3erQK0uyg=";
           };
         };
       in {
