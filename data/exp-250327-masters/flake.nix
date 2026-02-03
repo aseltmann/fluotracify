@@ -23,6 +23,7 @@
              "cuda_cuxxfilt" "cuda_nvml_dev" "cuda_nvrtc" "cuda_profiler_api"
              "cuda_nvtx" "cuda_sanitizer_api" "libcublas" "libcufft" "libcurand"
              "libcusolver" "libnvjitlink" "libcusparse" "cudnn" "libcusparse_lt"
+             "libcufile"
            ];
           config.cudaSupport = true;
          };
