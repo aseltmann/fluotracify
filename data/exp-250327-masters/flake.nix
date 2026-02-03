@@ -20,7 +20,8 @@
           config.allowUnfreePredicate = pkg: builtins.elem (nixpkgs.lib.getName pkg) [
              "cuda-merged" "cuda_cuobjdump" "cuda_gdb" "cuda_nvcc" "cuda_cccl"
              "cuda_nvdisasm" "cuda_nvprune" "cuda_cudart" "cuda_cupti"
-             "cuda_cuxxfilt" "cuda_nvml_dev" "cuda_nvrtc" "cuda_nvtx"
+             "cuda_cuxxfilt" "cuda_nvml_dev" "cuda_nvrtc" "cuda_profiler_api"
+             "cuda_nvtx"
            ];
          };
         pkgs-unstable = nixpkgs-unstable.legacyPackages.${system};
