@@ -22,7 +22,7 @@
              "cuda_nvdisasm" "cuda_nvprune" "cuda_cudart" "cuda_cupti"
              "cuda_cuxxfilt" "cuda_nvml_dev" "cuda_nvrtc" "cuda_profiler_api"
              "cuda_nvtx" "cuda_sanitizer_api" "libcublas" "libcufft" "libcurand"
-             "libcusolver" "libnvjitlink"
+             "libcusolver" "libnvjitlink" "libcusparse"
            ];
          };
         pkgs-unstable = nixpkgs-unstable.legacyPackages.${system};
