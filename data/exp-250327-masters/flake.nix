@@ -18,7 +18,7 @@
         pkgs = import nixpkgs {
           inherit system;
           config.allowUnfreePredicate = pkg: builtins.elem (nixpkgs.lib.getName pkg) [
-             "cuda-merged"
+             "cuda-merged" "cuda_cuobjdump"
            ];
          };
         pkgs-unstable = nixpkgs-unstable.legacyPackages.${system};
