@@ -9,6 +9,15 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
+  nixConfig = {
+    extra-substituters = [
+      "https://cache.nixos-cuda.org"
+    ];
+    extra-trusted-public-keys = [
+      "cache.nixos-cuda.org:74DUi4Ye579gUqzH4ziL9IyiJBlDpMRn9MBN8oNan9M="
+    ];
+  };
+
   outputs =
     { self, nixpkgs, nixpkgs-unstable, flake-utils, ...}:
     # Create system-specific outputs for the standard Nix systems
