@@ -24,6 +24,7 @@
              "cuda_nvtx" "cuda_sanitizer_api" "libcublas" "libcufft" "libcurand"
              "libcusolver" "libnvjitlink" "libcusparse" "cudnn"
            ];
+          config.cudaSupport = true;
          };
         pkgs-unstable = nixpkgs-unstable.legacyPackages.${system};
         multipletau-pypi = pkgs.python312Packages.buildPythonPackage rec {
