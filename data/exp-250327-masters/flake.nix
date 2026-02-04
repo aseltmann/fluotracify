@@ -10,7 +10,7 @@
   };
 
   outputs =
-    { self, nixpkgs, nixpkgs-polars, nixpkgs-tf, flake-utils, ...}:
+    { self, nixpkgs, nixpkgs-polars, flake-utils, ...}:
     # Create system-specific outputs for the standard Nix systems
     # https://github.com/numtide/flake-utils/blob/main/lib.nix#L3-L9
     flake-utils.lib.eachDefaultSystem (
