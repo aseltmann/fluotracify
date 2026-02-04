@@ -1,4 +1,22 @@
 {
+  nixConfig = {
+    extra-trusted-substituters = [
+      "https://cache.nixos.org/"
+      "https://nix-community.cachix.org"
+      "https://cache.nixos-cuda.org"
+    ];
+    extra-substituters = [
+      "https://cache.nixos.org/"
+      "https://nix-community.cachix.org"
+      "https://cuda-maintainers.cachix.org"
+    ];
+    extra-trusted-public-keys = [
+      "cache.nixos-cuda.org:74DUi4Ye579gUqzH4ziL9IyiJBlDpMRn9MBN8oNan9M="
+      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+      "cuda-maintainers.cachix.org-1:0dq3bujKpuEPMCX6U4WylrUDZ9JyUG0VpVZa7CNfq5E="
+    ];
+  };
+
   description = "Flake for exp-250327-masters branch of drmed-git repository";
 
   inputs = {
@@ -15,7 +33,18 @@
     # https://github.com/numtide/flake-utils/blob/main/lib.nix#L3-L9
     flake-utils.lib.eachDefaultSystem (
       system: let
-        pkgs = nixpkgs.legacyPackages.${system};
+        pkgs = import nixpkgs {
+          inherit system;
+          config.allowUnfreePredicate = pkg: builtins.elem (nixpkgs.lib.getName pkg) [
+             "cuda-merged" "cuda_cuobjdump" "cuda_gdb" "cuda_nvcc" "cuda_cccl"
+             "cuda_nvdisasm" "cuda_nvprune" "cuda_cudart" "cuda_cupti" "libnpp"
+             "cuda_cuxxfilt" "cuda_nvml_dev" "cuda_nvrtc" "cuda_profiler_api"
+             "cuda_nvtx" "cuda_sanitizer_api" "libcublas" "libcufft" "libcurand"
+             "libcusolver" "libnvjitlink" "libcusparse" "cudnn" "libcusparse_lt"
+             "libcufile"
+           ];
+          config.cudaSupport = true;
+         };
         pkgs-unstable = nixpkgs-unstable.legacyPackages.${system};
         multipletau-pypi = pkgs.python312Packages.buildPythonPackage rec {
           pname = "multipletau";
@@ -57,7 +86,7 @@
                 scikit-image  # 0.25.2
                 scikit-learn  # 1.6.1
                 scipy  # 1.15.3 (conda 1.15.2)
-                seaborn  # 0.13.2 
+                seaborn  # 0.13.2
                 tensorflow  # 2.19.0
                 tqdm  # 4.67.1
               ]) ++ (
