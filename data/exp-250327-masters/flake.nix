@@ -4,19 +4,22 @@
   inputs = {
     # version of nixos-25.05 from 2025-12-18
     nixpkgs.url = "github:nixos/nixpkgs?ref=2b0d2b456e4e8452cf1c16d00118d145f31160f9";
-    # version of nixos-unstable from 2025-07-06
-    nixpkgs-unstable.url = "github:nixos/nixpkgs?ref=55b0d38442aac04f892f03b6a53cd9bb4c6cfc1c";
+    # version from 2025-07-06 for polars 1.31.0
+    nixpkgs-polars.url = "github:nixos/nixpkgs?ref=55b0d38442aac04f892f03b6a53cd9bb4c6cfc1c";
+    # version from 2024-10-25 for tensorflow-bin version 2.17.0
+    nixpkgs-tf.url = "github:nixos/nixpkgs?ref=8c64c8887fd3c24b97781b49cc8ef87b283fc3bd";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
   outputs =
-    { self, nixpkgs, nixpkgs-unstable, flake-utils, ...}:
+    { self, nixpkgs, nixpkgs-polars, nixpkgs-tf, flake-utils, ...}:
     # Create system-specific outputs for the standard Nix systems
     # https://github.com/numtide/flake-utils/blob/main/lib.nix#L3-L9
     flake-utils.lib.eachDefaultSystem (
       system: let
         pkgs = nixpkgs.legacyPackages.${system};
-        pkgs-unstable = nixpkgs-unstable.legacyPackages.${system};
+        pkgs-polars = nixpkgs-polars.legacyPackages.${system};
+        pkgs-tf = nixpkgs-tf.legacyPackages.${system};
         multipletau-pypi = pkgs.python312Packages.buildPythonPackage rec {
           pname = "multipletau";
           version = "0.4.1";
@@ -58,12 +61,14 @@
                 scikit-learn  # 1.6.1
                 scipy  # 1.15.3 (conda 1.15.2)
                 seaborn  # 0.13.2 
-                tensorflow  # 2.19.0
                 tqdm  # 4.67.1
               ]) ++ (
-                with pkgs-unstable.python312Packages; [
+                with pkgs-polars.python312Packages; [
                   polars  # 1.31.0  # polars jumped from 1.27.1 to 1.31.0 in nixpkgs, choose higher version
-                ]);
+                ]) ++ (
+                  with pkgs-tf.python312Packages; [
+                    tensorflow-bin  # 2.17.0
+                  ]);
           # shellHook = ''
 
           # '';
