@@ -49,7 +49,6 @@
                 ipykernel  # 6.29.5
                 ipywidgets  # 8.1.5 (conda env: 8.1.7)
                 jupyterlab  # 4.4.1
-                keras
                 lmfit  # 1.3.3
                 matplotlib  # 3.10.1
                 mlcroissant  # 1.0.17
@@ -67,6 +66,7 @@
                   polars  # 1.31.0  # polars jumped from 1.27.1 to 1.31.0 in nixpkgs, choose higher version
                 ]) ++ (
                   with pkgs-tf.python312Packages; [
+                    keras
                     tensorflow-bin  # 2.17.0
                   ]);
           # shellHook = ''
