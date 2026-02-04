@@ -6,8 +6,6 @@
     nixpkgs.url = "github:nixos/nixpkgs?ref=2b0d2b456e4e8452cf1c16d00118d145f31160f9";
     # version from 2025-07-06 for polars 1.31.0
     nixpkgs-polars.url = "github:nixos/nixpkgs?ref=55b0d38442aac04f892f03b6a53cd9bb4c6cfc1c";
-    # version from 2024-09-26 for tensorflow-bin version 2.17.0
-    nixpkgs-tf.url = "github:nixos/nixpkgs?ref=ab7b6889ae9d484eed2876868209e33eb262511d";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
@@ -19,7 +17,6 @@
       system: let
         pkgs = nixpkgs.legacyPackages.${system};
         pkgs-polars = nixpkgs-polars.legacyPackages.${system};
-        pkgs-tf = nixpkgs-tf.legacyPackages.${system};
         multipletau-pypi = pkgs.python312Packages.buildPythonPackage rec {
           pname = "multipletau";
           version = "0.4.1";
@@ -49,6 +46,7 @@
                 ipykernel  # 6.29.5
                 ipywidgets  # 8.1.5 (conda env: 8.1.7)
                 jupyterlab  # 4.4.1
+                keras
                 lmfit  # 1.3.3
                 matplotlib  # 3.10.1
                 mlcroissant  # 1.0.17
@@ -59,17 +57,13 @@
                 scikit-image  # 0.25.2
                 scikit-learn  # 1.6.1
                 scipy  # 1.15.3 (conda 1.15.2)
-                seaborn  # 0.13.2 
+                seaborn  # 0.13.2
+                tensorflow   # 2.19.0
                 tqdm  # 4.67.1
               ]) ++ (
                 with pkgs-polars.python312Packages; [
                   polars  # 1.31.0  # polars jumped from 1.27.1 to 1.31.0 in nixpkgs, choose higher version
-                ]) ++ (
-                  with pkgs-tf.python312Packages; [
-                    # keras
-                    distutils
-                    tensorflow-bin  # 2.17.0
-                  ]);
+                ]);
           # shellHook = ''
 
           # '';
