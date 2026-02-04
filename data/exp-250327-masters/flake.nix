@@ -67,6 +67,7 @@
                 ]) ++ (
                   with pkgs-tf.python312Packages; [
                     # keras
+                    distutils
                     tensorflow-bin  # 2.17.0
                   ]);
           # shellHook = ''
