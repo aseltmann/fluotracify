@@ -1,0 +1,12 @@
+name: masters
+
+entry_points:
+  hparams_unet:
+    parameters:
+      num_session_groups: {type: float, default: 2}
+      file_train: {type: path, default: ~/Programs/drmed-git/data/exp-250327-masters/2025-05-28-simulations/parquet/2025-05-28-peak-artifacts-training.parquet}
+      file_val: {type: path, default: ~/Programs/drmed-git/data/exp-250327-masters/2025-05-28-simulations/parquet/2025-05-28-peak-artifacts-validation.parquet}
+    command: "python 2025-12-19-simulations-segmentation/src-python/search_hparams.py
+                 --num_session_groups {num_session_groups}
+                 --file_train {file_train}
+                 --file_val {file_val}"
