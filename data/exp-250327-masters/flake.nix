@@ -6,8 +6,8 @@
     nixpkgs.url = "github:nixos/nixpkgs?ref=2b0d2b456e4e8452cf1c16d00118d145f31160f9";
     # version from 2025-07-06 for polars 1.31.0
     nixpkgs-polars.url = "github:nixos/nixpkgs?ref=55b0d38442aac04f892f03b6a53cd9bb4c6cfc1c";
-    # version from 2024-10-25 for tensorflow-bin version 2.17.0
-    nixpkgs-tf.url = "github:nixos/nixpkgs?ref=8c64c8887fd3c24b97781b49cc8ef87b283fc3bd";
+    # version from 2024-09-26 for tensorflow-bin version 2.17.0
+    nixpkgs-tf.url = "github:nixos/nixpkgs?ref=ab7b6889ae9d484eed2876868209e33eb262511d";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
