@@ -6,17 +6,20 @@
     nixpkgs.url = "github:nixos/nixpkgs?ref=2b0d2b456e4e8452cf1c16d00118d145f31160f9";
     # version from 2025-07-06 for polars 1.31.0
     nixpkgs-polars.url = "github:nixos/nixpkgs?ref=55b0d38442aac04f892f03b6a53cd9bb4c6cfc1c";
+    # version from 2022-08-27 for tmux 3.2a
+    nixpkgs-tmux.url = "github:nixos/nixpkgs?ref=bf7d05e64d1172ad9356b87bc8c2a643f600e1f0";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
   outputs =
-    { self, nixpkgs, nixpkgs-polars, flake-utils, ...}:
+    { self, nixpkgs, nixpkgs-polars, nixpkgs-tmux, flake-utils, ...}:
     # Create system-specific outputs for the standard Nix systems
     # https://github.com/numtide/flake-utils/blob/main/lib.nix#L3-L9
     flake-utils.lib.eachDefaultSystem (
       system: let
         pkgs = nixpkgs.legacyPackages.${system};
         pkgs-polars = nixpkgs-polars.legacyPackages.${system};
+        pkgs-tmux = nixpkgs-tmux.legacyPackages.${system};
         multipletau-pypi = pkgs.python312Packages.buildPythonPackage rec {
           pname = "multipletau";
           version = "0.4.1";
@@ -60,10 +63,16 @@
                 seaborn  # 0.13.2
                 tensorflow   # 2.19.0
                 tqdm  # 4.67.1
-              ]) ++ (
-                with pkgs-polars.python312Packages; [
-                  polars  # 1.31.0  # polars jumped from 1.27.1 to 1.31.0 in nixpkgs, choose higher version
-                ]);
+              ]
+            ) ++ (
+              with pkgs-polars.python312Packages; [
+                polars  # 1.31.0  # polars jumped from 1.27.1 to 1.31.0 in nixpkgs, choose higher version
+              ]
+            ) ++ (
+              with pkgs-tmux; [
+                tmux
+              ]
+            );
           # shellHook = ''
 
           # '';
