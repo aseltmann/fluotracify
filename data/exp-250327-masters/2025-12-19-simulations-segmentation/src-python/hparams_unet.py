@@ -114,14 +114,10 @@ def tfds_from_pldf(
     return (dataset, num_total_examples)
 
 
-def get_data(myfile: str) -> tuple[pl.DataFrame, str]:
-    out_file = myfile.split(".")
-    out_first = out_file[0].split("-")[3:]
-    out_first = "-".join(out_first)
+def get_data(file_features: str, file_labels: str) -> pl.DataFrame:
     df = pl.concat(
-        [pl.read_parquet(f"{inputdir}/{myfile}"),
-         (pl.read_parquet(f"{workdir}/parquet/2026-01-14-{out_first}-ground-"
-                          "truth.parquet")
+        [pl.read_parquet(file_features),
+         (pl.read_parquet(file_labels)
           .rename({"label_segmentation": "label_ground_truth"}))
          ], how="align"
     )
@@ -152,9 +148,7 @@ def get_data(myfile: str) -> tuple[pl.DataFrame, str]:
     df_clean = df.filter(pl.col.label_ground_truth.arr.sum().eq(0)).shape[0]
     print(f"Dropping {df_clean} traces without artifacts")
     df = df.filter(pl.col.label_ground_truth.arr.sum().ne(0))
-    out_date = datetime.today().date()
-    out_file = f"{out_date}-{out_first}-classical.{out_file[1]}"
-    return df, out_file
+    return df
 
 
 # define model layers
@@ -774,32 +768,43 @@ def run_one(
               default=2,
               help="number of sessions for random search")
 @click.option(
-    "--file_train",
+    "--file_train_feature",
     type=str,
     default="2025-05-28-peak-artifacts-training.parquet"
 )
 @click.option(
-    "--file_val",
+    "--file_train_label",
+    type=str,
+    default="2025-05-28-peak-artifacts-training.parquet"
+)
+@click.option(
+    "--file_val_feature",
+    type=str,
+    default="2025-05-28-peak-artifacts-validation.parquet"
+)
+@click.option(
+    "--file_val_label",
     type=str,
     default="2025-05-28-peak-artifacts-validation.parquet"
 )
 @click.option("--mlflow_tracking_uri", type=str, default="file:./data/mlruns")
 @click.option("--experiment_name", type=str, default="hparams_unet")
 def hparams_run(
-        num_session_groups, file_train, file_val, mlflow_tracking_uri,
-        experiment_name, rng=rng
+        num_session_groups, file_train_feature, file_train_label,
+        file_val_feature, file_val_label, mlflow_tracking_uri, experiment_name,
+        rng=rng
 ):
     os.environ["MLFLOW_TRACKING_URI"] = mlflow_tracking_uri
     mlflow.set_experiment(experiment_name)
     experiment = mlflow.get_experiment_by_name(experiment_name)
 
-    df_train, out_file_train = get_data(file_train)
+    df_train = get_data(file_train_feature, file_train_label)
     df_train = df_train.head()
     ds_train, num_train_ex = tfds_from_pldf(
         df_train["feature"], df_train["label_ground_truth"]
        )
     file_val = "2025-05-28-peak-artifacts-validation.parquet"
-    df_val, out_file_val = get_data(file_val)
+    df_val = get_data(file_val_feature, file_val_label)
     df_val = df_val.head()
     ds_val, num_val_ex = tfds_from_pldf(
         df_val["feature"], df_val["label_ground_truth"]
@@ -876,6 +881,7 @@ def hparams_run(
             "best_auc_val": best_auc_val
         })
 
-
-if __name__ == "__main__":
+# small workaround to check for 'get_ipython' to not cause error when transcluding
+# the file in emacs
+if __name__ == "__main__" and "get_ipython" not in dir():
     hparams_run()

@@ -4,13 +4,17 @@ entry_points:
   hparams_unet:
     parameters:
       num_session_groups: {type: float, default: 2}
-      file_train: {type: path, default: ~/Programs/drmed-git/data/exp-250327-masters/2025-05-28-simulations/parquet/2025-05-28-peak-artifacts-training.parquet}
-      file_val: {type: path, default: ~/Programs/drmed-git/data/exp-250327-masters/2025-05-28-simulations/parquet/2025-05-28-peak-artifacts-validation.parquet}
+      file_train_feature: {type: path, default: ~/Programs/drmed-git/data/exp-250327-masters/2025-05-28-simulations/parquet/2025-05-28-peak-artifacts-training.parquet}
+      file_train_label: {type: path, default: ~/Programs/drmed-git/data/exp-250327-masters/2025-12-19-simulations-segmentation/parquet/2026-01-14-peak-artifacts-training-ground-truth.parquet}
+      file_val_feature: {type: path, default: ~/Programs/drmed-git/data/exp-250327-masters/2025-05-28-simulations/parquet/2025-05-28-peak-artifacts-validation.parquet}
+      file_val_label: {type: path, default: ~/Programs/drmed-git/data/exp-250327-masters/2025-12-19-simulations-segmentation/parquet/2026-01-14-peak-artifacts-validation-ground-truth.parquet}
       mlflow_tracking_uri: {type: path, default: file:./data/mlruns}
       experiment_name: {type: string, default: "hparams_unet"}
     command: "python 2025-12-19-simulations-segmentation/src-python/search_hparams.py
                  --num_session_groups {num_session_groups}
-                 --file_train {file_train}
-                 --file_val {file_val}
+                 --file_train_feature {file_train_feature}
+                 --file_train_label {file_train_label}
+                 --file_val_feature {file_val_feature}
+                 --file_val_label {file_val_label}
                  --mlflow_tracking_uri {mlflow_tracking_uri}
                  --experiment_name {experiment_name}"
