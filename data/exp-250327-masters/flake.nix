@@ -66,7 +66,7 @@
                   polars  # 1.31.0  # polars jumped from 1.27.1 to 1.31.0 in nixpkgs, choose higher version
                 ]) ++ (
                   with pkgs-tf.python312Packages; [
-                    keras
+                    # keras
                     tensorflow-bin  # 2.17.0
                   ]);
           # shellHook = ''
