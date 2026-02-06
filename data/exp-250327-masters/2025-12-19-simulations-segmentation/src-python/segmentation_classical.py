@@ -228,8 +228,8 @@ for myfile in [
             # from confusion matrix:
             # overlap coef = tp / min((tn + fp), (fn + tp))
             (pl.col(cm).arr.get(1).arr.get(1) /
-             pl.min_horizontal(pl.col(cm).arr.get(0).arr.sum(),
-                               pl.col(cm).arr.get(1).arr.sum())
+             pl.min_horizontal(pl.col.label_ground_truth.arr.sum(),
+                               pl.col(seg).arr.sum())
              ).alias(overlap),
         )
     df = df.drop("feature")
