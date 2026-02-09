@@ -22,11 +22,6 @@ from tensorboard.plugins.hparams import api as hp
 
 tf.experimental.numpy.experimental_enable_numpy_behavior(prefer_float32=False)
 
-os.chdir("/home/alva/Programs/drmed-git")
-
-inputdir = "data/exp-250327-masters/2025-05-28-simulations/parquet"
-workdir = "data/exp-250327-masters/2025-12-19-simulations-segmentation"
-
 logging.basicConfig(format="%(asctime)s - hparams - %(message)s")
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
@@ -215,7 +210,10 @@ class BinaryCrossentropyDice(keras.Loss):
 
 # define custom metric
 class MyFBetaScore(keras.Metric):
-    """Had to re-implement FBeta due to https://github.com/keras-team/tf-keras/issues/771"""
+    """Had to re-implement FBeta due to https://github.com/keras-team/tf-keras/issues/771
+
+    Note: reimplementation based on tf.keras.metrics.Recall and tf.keras.metrics.Precision
+    """
     def __init__(
         self, thresholds=None, top_k=None, class_id=None, beta=None, name=None, dtype=None
     ):
@@ -313,6 +311,94 @@ class MyFBetaScore(keras.Metric):
         base_config = keras.Metric().get_config()
         return {**base_config, **config}
 
+class MyOverlap(keras.Metric):
+    """Overlap coefficient. Currently only for target cla
+
+    see https://en.wikipedia.org/wiki/Overlap_coefficient
+    """
+    def __init__(
+        self, thresholds=None, top_k=None, class_id=None, name=None, dtype=None
+    ):
+        super().__init__(name=name, dtype=dtype)
+        # Metric should be maximized during optimization.
+        self._direction = "up"
+
+        self.init_thresholds = thresholds
+        self.top_k = top_k
+        self.class_id = class_id
+
+        default_threshold = 0.5 if top_k is None else metrics_utils.NEG_INF
+        self.thresholds = metrics_utils.parse_init_thresholds(
+            thresholds, default_threshold=default_threshold
+        )
+        self._thresholds_distributed_evenly = (
+            metrics_utils.is_evenly_distributed_thresholds(self.thresholds)
+        )
+        self.true_positives = self.add_variable(
+            shape=(len(self.thresholds),),
+            initializer=keras.initializers.Zeros(),
+            name="true_positives",
+        )
+        self.sum_true = self.add_variable(
+            shape=(1,),
+            initializer=keras.initializers.Zeros(),
+            name="sum_true",
+        )
+        self.sum_pred = self.add_variable(
+            shape=(1,),
+            initializer=keras.initializers.Zeros(),
+            name="sum_pred",
+        )
+
+    def reset_state(self):
+        num_thresholds = len(self.thresholds)
+        self.true_positives.assign(keras.ops.zeros((num_thresholds,)))
+        self.sum_true.assign(keras.ops.zeros((1,)))
+        self.sum_pred.assign(keras.ops.zeros((1,)))
+
+    def update_state(self, y_true, y_pred, sample_weight=None):
+        """Accumulates confusion matrix statistics.
+
+        Args:
+            y_true: The ground truth values.
+            y_pred: The predicted values.
+            sample_weight: Optional weighting of each example. Defaults to `1`.
+                Can be a tensor whose rank is either 0, or the same rank as
+                `y_true`, and must be broadcastable to `y_true`.
+        """
+        y_true = keras.ops.convert_to_tensor(y_true, dtype=self.dtype)
+        y_pred = keras.ops.convert_to_tensor(y_pred, dtype=self.dtype)
+        metrics_utils.update_confusion_matrix_variables(
+            {
+                metrics_utils.ConfusionMatrix.TRUE_POSITIVES: self.true_positives,  # noqa: E501
+            },
+            y_true,
+            y_pred,
+            thresholds=self.thresholds,
+            thresholds_distributed_evenly=self._thresholds_distributed_evenly,
+            top_k=self.top_k,
+            class_id=self.class_id,
+            sample_weight=sample_weight,
+        )
+        sum_true = keras.ops.add(self.sum_true, keras.ops.sum(y_true))
+        sum_pred = keras.ops.add(self.sum_pred, keras.ops.sum(y_pred))
+        self.sum_true.assign(sum_true)
+        self.sum_pred.assign(sum_pred)
+
+    def result(self):
+        denominator = keras.ops.minimum(self.sum_true, self.sum_pred)
+        result = keras.ops.divide_no_nan(self.true_positives, denominator)
+        return result[0] if len(self.thresholds) == 1 else result
+
+    def get_config(self):
+        config = {
+            "thresholds": self.init_thresholds,
+            "top_k": self.top_k,
+            "class_id": self.class_id,
+        }
+        base_config = keras.Metric().get_config()
+        return {**base_config, **config}
+
 def unet_metrics(metrics_thresholds):
     """Returns a selection of metrics for model training
 
@@ -353,6 +439,7 @@ def unet_metrics(metrics_thresholds):
         metrics.append(keras.metrics.BinaryIoU(
             name=f"biniou0_{thresh}", target_class_ids=[0], threshold=thresh
         ))
+        metrics.append(MyOverlap(name=f"ovl_{thresh}", thresholds=thresh))
     metrics.append(keras.metrics.MeanIoU(name=f"meaniou", num_classes=2))
     metrics.append(keras.metrics.AUC(name=f"auc", curve="PR"))
     return metrics
@@ -754,7 +841,7 @@ def run_one(
             artifact_path="model",
             # conda_env=mlflow.keras.get_default_conda_env(
             #     keras_module=keras),
-            # custom_objects={"binary_ce_dice": binary_ce_dice_loss()},
+            custom_objects={"BinaryCrossentropyDice": BinaryCrossentropyDice()},
             # keras_module=keras,
             )
         best_auc_val = result.history["auc"][-1]
@@ -789,11 +876,15 @@ def run_one(
 )
 @click.option("--mlflow_tracking_uri", type=str, default="file:./data/mlruns")
 @click.option("--experiment_name", type=str, default="hparams_unet")
+@click.option("--is_remote", type=bool, default=False)
 def hparams_run(
         num_session_groups, file_train_feature, file_train_label,
         file_val_feature, file_val_label, mlflow_tracking_uri, experiment_name,
-        rng=rng
+        is_remote, rng=rng
 ):
+    if not is_remote:
+        os.chdir("/home/alva/Programs/drmed-git")
+
     os.environ["MLFLOW_TRACKING_URI"] = mlflow_tracking_uri
     mlflow.set_experiment(experiment_name)
     experiment = mlflow.get_experiment_by_name(experiment_name)
