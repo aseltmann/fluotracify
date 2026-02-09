@@ -10,7 +10,7 @@ entry_points:
       file_val_label: {type: path, default: ~/Programs/drmed-git/data/exp-250327-masters/2025-12-19-simulations-segmentation/parquet/2026-01-14-peak-artifacts-validation-ground-truth.parquet}
       mlflow_tracking_uri: {type: path, default: file:./data/mlruns}
       experiment_name: {type: string, default: "hparams_unet"}
-    command: "python 2025-12-19-simulations-segmentation/src-python/search_hparams.py
+    command: "python 2025-12-19-simulations-segmentation/src-python/hparams_unet.py
                  --num_session_groups {num_session_groups}
                  --file_train_feature {file_train_feature}
                  --file_train_label {file_train_label}
