@@ -887,12 +887,12 @@ def hparams_run(
     experiment = mlflow.get_experiment_by_name(experiment_name)
 
     df_train = get_data(file_train_feature, file_train_label)
-    df_train = df_train.head()
+    # df_train = df_train.head()
     ds_train, num_train_ex = tfds_from_pldf(
         df_train["feature"], df_train["label_ground_truth"]
        )
     df_val = get_data(file_val_feature, file_val_label)
-    df_val = df_val.head()
+    # df_val = df_val.head()
     ds_val, num_val_ex = tfds_from_pldf(
         df_val["feature"], df_val["label_ground_truth"]
        )
