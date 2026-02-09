@@ -66,10 +66,6 @@ LOG_DIR = "../tmp/tb-" + datetime.now().strftime("%Y%m%d-%H%M%S")
 
 SESSIONS_PER_GROUP = 2
 
-SEED = 42
-
-rng = random.Random(SEED)
-
 
 def tfds_from_pldf(
         feature: pl.Series, label: pl.Series
@@ -871,16 +867,19 @@ def run_one(
     type=str,
     default="2025-05-28-peak-artifacts-validation.parquet"
 )
+@click.option("--seed", type=int, default=42)
 @click.option("--mlflow_tracking_uri", type=str, default="file:./data/mlruns")
 @click.option("--experiment_name", type=str, default="hparams_unet")
 @click.option("--is_remote", type=bool, default=False)
 def hparams_run(
         num_session_groups, file_train_feature, file_train_label,
-        file_val_feature, file_val_label, mlflow_tracking_uri, experiment_name,
-        is_remote, rng=rng
+        file_val_feature, file_val_label, seed, mlflow_tracking_uri,
+        experiment_name, is_remote,
 ):
     if not is_remote:
         os.chdir("/home/alva/Programs/drmed-git")
+
+    rng = random.Random(seed)
 
     os.environ["MLFLOW_TRACKING_URI"] = mlflow_tracking_uri
     mlflow.set_experiment(experiment_name)
