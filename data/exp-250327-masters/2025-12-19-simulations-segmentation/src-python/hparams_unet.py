@@ -202,6 +202,7 @@ def decoder(input_tensor,
 
 
 # define custom loss functions
+@keras.saving.register_keras_serializable()
 class BinaryCrossentropyDice(keras.Loss):
     def call(self, y_true, y_pred):
         loss = (keras.losses.Dice(axis=-1).call(y_true, y_pred) +
@@ -209,6 +210,7 @@ class BinaryCrossentropyDice(keras.Loss):
         return loss
 
 # define custom metric
+@keras.saving.register_keras_serializable()
 class MyFBetaScore(keras.Metric):
     """Had to re-implement FBeta due to https://github.com/keras-team/tf-keras/issues/771
 
@@ -311,6 +313,7 @@ class MyFBetaScore(keras.Metric):
         base_config = keras.Metric().get_config()
         return {**base_config, **config}
 
+@keras.saving.register_keras_serializable()
 class MyOverlap(keras.Metric):
     """Overlap coefficient. Currently only for target cla
 
@@ -675,7 +678,7 @@ def _get_pad_size_and_value(feature: tf.Tensor) -> tuple[int, float]:
     return pad_size, pad_value   # type: ignore
 
 
-def tfds_prepare(
+def tfds_prepare_hparams(
         ds: tf.data.Dataset, hparams: dict, num_examples: int
 ) -> tf.data.Dataset:
     return (
@@ -816,8 +819,8 @@ def run_one(
         Best validation AUC (currently)
     """
 
-    ds_train = tfds_prepare(ds_train, hparams, num_train_examples)
-    ds_val = tfds_prepare(ds_val, hparams, num_val_examples)
+    ds_train = tfds_prepare_hparams(ds_train, hparams, num_train_examples)
+    ds_val = tfds_prepare_hparams(ds_val, hparams, num_val_examples)
 
     model = unet_1d_hparams(hparams=hparams)
 
@@ -834,16 +837,8 @@ def run_one(
         validation_steps=2,  # steps_val
         callbacks=callbacks,
     )
-
     if result.history["auc"][-1] > best_auc_val:
-        mlflow.keras.save.log_model(
-            model=model,
-            artifact_path="model",
-            # conda_env=mlflow.keras.get_default_conda_env(
-            #     keras_module=keras),
-            custom_objects={"BinaryCrossentropyDice": BinaryCrossentropyDice()},
-            # keras_module=keras,
-            )
+        mlflow.keras.save.log_model(model=model, artifact_path="model")
         best_auc_val = result.history["auc"][-1]
 
     return best_auc_val
@@ -948,7 +943,7 @@ def hparams_run(
                 session_index += 1
 
         # Now log best values in parent run
-        client = mlflow.tracking.client.MlflowClient()
+        client = mlflow.client.MlflowClient()
         runs = client.search_runs(
             [parent_run.info.experiment_id],
             f"tags.mlflow.parentRunId = '{parent_run.info.run_id}'")
