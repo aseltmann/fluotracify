@@ -21,6 +21,7 @@ from keras.src.metrics import metrics_utils
 from tensorboard.plugins.hparams import api as hp
 
 tf.experimental.numpy.experimental_enable_numpy_behavior(prefer_float32=False)
+keras.saving.get_custom_objects().clear()
 
 logging.basicConfig(format="%(asctime)s - hparams - %(message)s")
 log = logging.getLogger(__name__)
@@ -177,8 +178,9 @@ def twoconv(filters, name):
 def encoder(input_tensor, filters, name, pool_size=2):
     """Functional API: Two Conv1D incl BatchNorm, MaxPool1D"""
     encode = twoconv(filters=filters, name=name)(input_tensor)
-    encode_pool = keras.layers.MaxPool1D(pool_size=pool_size,
-                                            name="mp_{}".format(name))(encode)
+    encode_pool = keras.layers.MaxPool1D(
+        pool_size=pool_size, name=f"mp_{name}"
+    )(encode)
     return encode_pool, encode
 
 
@@ -191,13 +193,13 @@ def decoder(input_tensor,
     """Functional API: Conv1DTrans, BatchNorm, Concat, Two Conv incl BatchNorm
     """
     decode = convtrans(filters=filters,
-                       name="conv_transpose_{}".format(name),
+                       name=f"conv_transpose_{name}",
                        kernel_size=kernel_size,
                        strides=strides)(input_tensor)
-    decode = keras.layers.concatenate([concat_tensor, decode],
-                                         axis=-1,
-                                         name=name)
-    decode = twoconv(filters=filters, name="two_conv_{}".format(name))(decode)
+    decode = keras.layers.concatenate(
+        [concat_tensor, decode], axis=-1, name=name
+    )
+    decode = twoconv(filters=filters, name=f"two_conv_{name}")(decode)
     return decode
 
 
@@ -208,6 +210,7 @@ class BinaryCrossentropyDice(keras.Loss):
         loss = (keras.losses.Dice(axis=-1).call(y_true, y_pred) +
                 keras.losses.BinaryCrossentropy(axis=-1).call(y_true, y_pred))
         return loss
+
 
 # define custom metric
 @keras.saving.register_keras_serializable()
@@ -501,36 +504,35 @@ def unet_1d_hparams(hparams):
         pool_size=hparams[HP_POOL_SIZE]
     )
     for i in range(1, hparams[HP_N_LEVELS]):
-        ldict["x{}_pool".format(i)], ldict["x{}".format(i)] = encoder(
-            input_tensor=ldict["x{}_pool".format(i - 1)],
+        ldict[f"x{i}_pool"], ldict[f"x{i}"] = encoder(
+            input_tensor=ldict[f"x{i - 1}_pool"],
             filters=filters[i],
-            name="encode{}".format(i),
+            name=f"encode{i}",
             pool_size=hparams[HP_POOL_SIZE]
         )
 
     # Center
-    center = twoconv(
-        2 * filters[hparams[HP_N_LEVELS] - 1], name="two_conv_center"
-    )(
-        ldict["x{}_pool".format(hparams[HP_N_LEVELS] - 1)]
+    center = (
+        twoconv(2 * filters[hparams[HP_N_LEVELS] - 1], name="two_conv_center")
+        (ldict[f"x{hparams[HP_N_LEVELS] - 1}_pool"])
     )
 
     # Upsampling through model
-    ldict["y{}".format(hparams[HP_N_LEVELS] - 1)] = decoder(
+    ldict[f"y{hparams[HP_N_LEVELS] - 1}"] = decoder(
         input_tensor=center,
-        concat_tensor=ldict["x{}".format(hparams[HP_N_LEVELS] - 1)],
+        concat_tensor=ldict[f"x{hparams[HP_N_LEVELS] - 1}"],
         filters=filters[-1],
-        name="decoder{}".format(hparams[HP_N_LEVELS] - 1),
+        name=f"decoder{hparams[HP_N_LEVELS] - 1}",
         kernel_size=hparams[HP_POOL_SIZE],
         strides=hparams[HP_POOL_SIZE]
     )
 
     for j in range(1, hparams[HP_N_LEVELS]):
-        ldict["y{}".format(hparams[HP_N_LEVELS] - 1 - j)] = decoder(
-            input_tensor=ldict["y{}".format(hparams[HP_N_LEVELS] - j)],
-            concat_tensor=ldict["x{}".format(hparams[HP_N_LEVELS] - 1 - j)],
+        ldict[f"y{hparams[HP_N_LEVELS] - 1 - j}"] = decoder(
+            input_tensor=ldict[f"y{hparams[HP_N_LEVELS] - j}"],
+            concat_tensor=ldict[f"x{hparams[HP_N_LEVELS] - 1 - j}"],
             filters=filters[-1 - j],
-            name="decoder{}".format(hparams[HP_N_LEVELS] - 1 - j),
+            name=f"decoder{hparams[HP_N_LEVELS] - 1 - j}",
             kernel_size=hparams[HP_POOL_SIZE],
             strides=hparams[HP_POOL_SIZE]
         )
@@ -548,7 +550,7 @@ def unet_1d_hparams(hparams):
     unet = keras.Model(
         inputs=inputs,
         outputs=outputs,
-        name="unet_depth{}".format(hparams[HP_N_LEVELS])
+        name=f"unet_depth{hparams[HP_N_LEVELS]}"
     )
 
     optimizer = keras.optimizers.Adam()
