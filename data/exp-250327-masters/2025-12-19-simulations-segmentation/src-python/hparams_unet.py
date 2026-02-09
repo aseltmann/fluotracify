@@ -833,10 +833,10 @@ def run_one(
 
     result = model.fit(
         x=ds_train,
-        epochs=2,  # hparams[HP_EPOCHS],
-        steps_per_epoch=3,  # steps_trani
+        epochs=hparams[HP_EPOCHS],
+        steps_per_epoch=steps_train,
         validation_data=ds_val,
-        validation_steps=2,  # steps_val
+        validation_steps=steps_val,
         callbacks=callbacks,
     )
     if result.history["auc"][-1] > best_auc_val:
@@ -891,7 +891,6 @@ def hparams_run(
     ds_train, num_train_ex = tfds_from_pldf(
         df_train["feature"], df_train["label_ground_truth"]
        )
-    file_val = "2025-05-28-peak-artifacts-validation.parquet"
     df_val = get_data(file_val_feature, file_val_label)
     df_val = df_val.head()
     ds_val, num_val_ex = tfds_from_pldf(
@@ -905,9 +904,6 @@ def hparams_run(
            ).min)
 
         num_sessions = num_session_groups * SESSIONS_PER_GROUP
-
-        # experiment_params_train.to_csv(EXP_PARAM_PATH_TRAIN)
-        # experiment_params_val.to_csv(EXP_PARAM_PATH_VAL)
 
         session_index = 0  # across all session groups
         for _ in range(num_session_groups):
