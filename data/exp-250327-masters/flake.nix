@@ -4,21 +4,21 @@
   inputs = {
     # version of nixos-25.05 from 2025-12-18
     nixpkgs.url = "github:nixos/nixpkgs?ref=2b0d2b456e4e8452cf1c16d00118d145f31160f9";
-    # version from 2025-07-06 for polars 1.31.0
-    nixpkgs-polars.url = "github:nixos/nixpkgs?ref=55b0d38442aac04f892f03b6a53cd9bb4c6cfc1c";
+    # version from 2025-07-06 for polars 1.31.0 and mlflow 3.3.1
+    nixpkgs-2025-10-23.url = "github:nixos/nixpkgs?ref=667993862518f5a890747dfe7aba2c6d0c7787ce";
     # version from 2022-08-27 for tmux 3.2a
     nixpkgs-tmux.url = "github:nixos/nixpkgs?ref=bf7d05e64d1172ad9356b87bc8c2a643f600e1f0";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
   outputs =
-    { self, nixpkgs, nixpkgs-polars, nixpkgs-tmux, flake-utils, ...}:
+    { self, nixpkgs, nixpkgs-2025-10-23, nixpkgs-tmux, flake-utils, ...}:
     # Create system-specific outputs for the standard Nix systems
     # https://github.com/numtide/flake-utils/blob/main/lib.nix#L3-L9
     flake-utils.lib.eachDefaultSystem (
       system: let
         pkgs = nixpkgs.legacyPackages.${system};
-        pkgs-polars = nixpkgs-polars.legacyPackages.${system};
+        pkgs-2025-10-23 = nixpkgs-2025-10-23.legacyPackages.${system};
         pkgs-tmux = nixpkgs-tmux.legacyPackages.${system};
         multipletau-pypi = pkgs.python312Packages.buildPythonPackage rec {
           pname = "multipletau";
@@ -65,8 +65,9 @@
                 tqdm  # 4.67.1
               ]
             ) ++ (
-              with pkgs-polars.python312Packages; [
+              with pkgs-2025-10-23.python312Packages; [
                 polars  # 1.31.0  # polars jumped from 1.27.1 to 1.31.0 in nixpkgs, choose higher version
+                mlflow  # 3.3.1
               ]
             ) ++ (
               with pkgs-tmux; [
