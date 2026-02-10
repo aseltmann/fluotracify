@@ -43,6 +43,11 @@
               pdf2svg
               python312  # 3.12.12
             ] ++ (
+              with pkgs-2025-10-23.python312Packages; [
+                polars  # 1.31.0  # polars jumped from 1.27.1 to 1.31.0 in nixpkgs, choose higher version
+                mlflow  # 3.3.1
+              ]
+            ) ++ (
               with pkgs.python312Packages; [
                 click  # 8.1.8
                 cython  # 3.0.12
@@ -62,11 +67,6 @@
                 seaborn  # 0.13.2
                 tensorflow   # 2.19.0
                 tqdm  # 4.67.1
-              ]
-            ) ++ (
-              with pkgs-2025-10-23.python312Packages; [
-                polars  # 1.31.0  # polars jumped from 1.27.1 to 1.31.0 in nixpkgs, choose higher version
-                mlflow  # 3.3.1
               ]
             ) ++ (
               with pkgs-tmux; [
