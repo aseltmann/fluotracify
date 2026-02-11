@@ -56,7 +56,7 @@
                 scikit-learn  # 1.6.1
                 scipy  # 1.15.3 (conda 1.15.2)
                 seaborn  # 0.13.2 
-                tensorflow  # 2.19.0
+                tensorflow-bin  # 2.19.0
                 tqdm  # 4.67.1
               ]);
           # ++ (
