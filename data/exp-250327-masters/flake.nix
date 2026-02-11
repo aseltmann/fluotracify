@@ -72,7 +72,7 @@
             ) ++ (
               with pkgs-tensorflow.python312Packages; [
                 keras # 2.15
-                tensorflow  # 2.15
+                tensorflow-bin  # 2.15
               ]
             ) ++ (
               with pkgs-tmux; [
