@@ -48,7 +48,6 @@
                 jupyterlab  # 4.4.1
                 lmfit  # 1.3.3
                 matplotlib  # 3.10.1
-                mlcroissant  # 1.0.17
                 mlflow  # 2.20.3 (conda 2.21.3)
                 multipletau-pypi  # 0.4.1
                 numpy  # 2.2.5
