@@ -4,26 +4,20 @@
   inputs = {
     # version of nixos-25.05 from 2025-12-18
     nixpkgs.url = "github:nixos/nixpkgs?ref=2b0d2b456e4e8452cf1c16d00118d145f31160f9";
-    # version from 2025-07-06 for polars 1.31.0
-    nixpkgs-polars.url = "github:nixos/nixpkgs?ref=55b0d38442aac04f892f03b6a53cd9bb4c6cfc1c";
-    # version from 2022-08-27 for tmux 3.2a
-    nixpkgs-tmux.url = "github:nixos/nixpkgs?ref=bf7d05e64d1172ad9356b87bc8c2a643f600e1f0";
-    # version from 2024-12-18 for tensorflow 2.13
-    nixpkgs-tensorflow.url = "github:nixos/nixpkgs?ref=30463d9064d976f3549d807491e594aa1235d852";
+    # version of nixos-unstable from 2025-07-06
+    nixpkgs-unstable.url = "github:nixos/nixpkgs?ref=55b0d38442aac04f892f03b6a53cd9bb4c6cfc1c";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
   outputs =
-    { self, nixpkgs, nixpkgs-polars, nixpkgs-tmux, nixpkgs-tensorflow, flake-utils, ...}:
+    { self, nixpkgs, nixpkgs-unstable, flake-utils, ...}:
     # Create system-specific outputs for the standard Nix systems
     # https://github.com/numtide/flake-utils/blob/main/lib.nix#L3-L9
     flake-utils.lib.eachDefaultSystem (
       system: let
         pkgs = nixpkgs.legacyPackages.${system};
-        pkgs-polars = nixpkgs-polars.legacyPackages.${system};
-        pkgs-tmux = nixpkgs-tmux.legacyPackages.${system};
-        pkgs-tensorflow = nixpkgs-tensorflow.legacyPackages.${system};
-        multipletau-pypi = pkgs.python311Packages.buildPythonPackage rec {
+        pkgs-unstable = nixpkgs-unstable.legacyPackages.${system};
+        multipletau-pypi = pkgs.python312Packages.buildPythonPackage rec {
           pname = "multipletau";
           version = "0.4.1";
           pyproject = true;
@@ -31,11 +25,11 @@
             inherit pname version;
             hash = "sha256-roP342FbjWKEtx32KSe6Ibgy0eiwLHgqoFwXUlnuVO8=";
           };
-          build-system = with pkgs.python311Packages; [
+          build-system = with pkgs.python312Packages; [
             setuptools
             setuptools-scm
           ];
-          dependencies = with pkgs.python311Packages; [
+          dependencies = with pkgs.python312Packages; [
             numpy
           ];
         };
@@ -44,14 +38,15 @@
           packages =
             with pkgs; [
               pdf2svg
-              python311  # 3.12.12
+              python312  # 3.12.12
             ] ++ (
-              with pkgs.python311Packages; [
+              with pkgs.python312Packages; [
                 click  # 8.1.8
                 cython  # 3.0.12
                 ipykernel  # 6.29.5
                 ipywidgets  # 8.1.5 (conda env: 8.1.7)
                 jupyterlab  # 4.4.1
+                keras
                 lmfit  # 1.3.3
                 matplotlib  # 3.10.1
                 mlcroissant  # 1.0.17
@@ -62,23 +57,13 @@
                 scikit-image  # 0.25.2
                 scikit-learn  # 1.6.1
                 scipy  # 1.15.3 (conda 1.15.2)
-                seaborn  # 0.13.2
+                seaborn  # 0.13.2 
+                tensorflow  # 2.19.0
                 tqdm  # 4.67.1
-              ]
-            ) ++ (
-              with pkgs-tensorflow.python311Packages; [
-                keras # 2.13
-                tensorflow # 2.13
-              ]
-            ) ++ (
-              with pkgs-polars.python311Packages; [
-                polars  # 1.31.0  # polars jumped from 1.27.1 to 1.31.0 in nixpkgs, choose higher version
-              ]
-            ) ++ (
-              with pkgs-tmux; [
-                tmux
-              ]
-            );
+              ]) ++ (
+                with pkgs-unstable.python312Packages; [
+                  polars  # 1.31.0  # polars jumped from 1.27.1 to 1.31.0 in nixpkgs, choose higher version
+                ]);
           # shellHook = ''
 
           # '';
