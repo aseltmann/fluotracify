@@ -48,7 +48,7 @@
             ] ++ (
               with pkgs-tensorflow.python311Packages; [
                 keras # 2.15
-                tensorflow # 2.15
+                tensorflow-bin # 2.15
               ]
             ) ++ (
               with pkgs.python311Packages; [
