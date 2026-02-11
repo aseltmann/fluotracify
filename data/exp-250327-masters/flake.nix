@@ -46,14 +46,9 @@
               pdf2svg
               python311  # 3.12.12
             ] ++ (
-              with pkgs-tensorflow.python311Packages; [
-                keras # 2.15
-                tensorflow-bin # 2.15
-              ]
-            ) ++ (
               with pkgs.python311Packages; [
                 click  # 8.1.8
-                # cython  # 3.0.12
+                cython  # 3.0.12
                 ipykernel  # 6.29.5
                 ipywidgets  # 8.1.5 (conda env: 8.1.7)
                 jupyterlab  # 4.4.1
@@ -69,6 +64,11 @@
                 scipy  # 1.15.3 (conda 1.15.2)
                 seaborn  # 0.13.2
                 tqdm  # 4.67.1
+              ]
+            ) ++ (
+              with pkgs-tensorflow.python311Packages; [
+                keras # 2.15
+                tensorflow-bin # 2.15
               ]
             ) ++ (
               with pkgs-polars.python311Packages; [
