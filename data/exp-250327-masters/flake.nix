@@ -8,8 +8,8 @@
     nixpkgs-polars.url = "github:nixos/nixpkgs?ref=55b0d38442aac04f892f03b6a53cd9bb4c6cfc1c";
     # version from 2022-08-27 for tmux 3.2a
     nixpkgs-tmux.url = "github:nixos/nixpkgs?ref=bf7d05e64d1172ad9356b87bc8c2a643f600e1f0";
-    # version from 2024-05-19 for tensorflow 2.15
-    nixpkgs-tensorflow.url = "github:nixos/nixpkgs?ref=bcdbb17a41d8fab94e8031a7c5e180fa5acd0809";
+    # version from 2024-12-18 for tensorflow 2.13
+    nixpkgs-tensorflow.url = "github:nixos/nixpkgs?ref=30463d9064d976f3549d807491e594aa1235d852";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
@@ -67,8 +67,8 @@
               ]
             ) ++ (
               with pkgs-tensorflow.python311Packages; [
-                keras # 2.15
-                tensorflow-bin # 2.15
+                keras # 2.13
+                tensorflow # 2.13
               ]
             ) ++ (
               with pkgs-polars.python311Packages; [
