@@ -1,4 +1,5 @@
-#!/usr/bin/env python3
+"""the original hparams training file for tensorflow 2.19 and keras 3"""
+#/usr/bin/env python3
 
 import logging
 import os
@@ -15,7 +16,6 @@ import sklearn.preprocessing as skp
 import tensorflow as tf
 import tensorflow.python.platform.build_info as build
 
-from collections.abc import Iterable
 from datetime import datetime
 from keras.src.metrics import metrics_utils
 from tensorboard.plugins.hparams import api as hp
@@ -829,10 +829,10 @@ def run_one(
 
     result = model.fit(
         x=ds_train,
-        epochs=hparams[HP_EPOCHS],
-        steps_per_epoch=steps_train,
+        epochs=2, # hparams[HP_EPOCHS],
+        steps_per_epoch=3,  # steps_train,
         validation_data=ds_val,
-        validation_steps=steps_val,
+        validation_steps=2,  # steps_val,
         callbacks=callbacks,
     )
     if result.history["auc"][-1] > best_auc_val:
@@ -886,12 +886,12 @@ def hparams_run(
     experiment = mlflow.get_experiment_by_name(experiment_name)
 
     df_train = get_data(file_train_feature, file_train_label)
-    # df_train = df_train.head()
+    df_train = df_train.head()
     ds_train, num_train_ex = tfds_from_pldf(
         df_train["feature"], df_train["label_ground_truth"]
        )
     df_val = get_data(file_val_feature, file_val_label)
-    # df_val = df_val.head()
+    df_val = df_val.head()
     ds_val, num_val_ex = tfds_from_pldf(
         df_val["feature"], df_val["label_ground_truth"]
        )
