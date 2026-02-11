@@ -46,6 +46,11 @@
               pdf2svg
               python312  # 3.12.12
             ] ++ (
+              with pkgs-tensorflow.python312Packages; [
+                keras # 2.15
+                tensorflow-bin  # 2.15
+              ]
+            ) ++ (
               with pkgs.python312Packages; [
                 click  # 8.1.8
                 cython  # 3.0.12
@@ -68,11 +73,6 @@
             ) ++ (
               with pkgs-polars.python312Packages; [
                 polars  # 1.31.0  # polars jumped from 1.27.1 to 1.31.0 in nixpkgs, choose higher version
-              ]
-            ) ++ (
-              with pkgs-tensorflow.python312Packages; [
-                keras # 2.15
-                tensorflow-bin  # 2.15
               ]
             ) ++ (
               with pkgs-tmux; [
