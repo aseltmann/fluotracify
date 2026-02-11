@@ -53,7 +53,7 @@
             ) ++ (
               with pkgs.python311Packages; [
                 click  # 8.1.8
-                cython  # 3.0.12
+                # cython  # 3.0.12
                 ipykernel  # 6.29.5
                 ipywidgets  # 8.1.5 (conda env: 8.1.7)
                 jupyterlab  # 4.4.1
