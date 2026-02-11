@@ -9,7 +9,7 @@
     # version from 2022-08-27 for tmux 3.2a
     nixpkgs-tmux.url = "github:nixos/nixpkgs?ref=bf7d05e64d1172ad9356b87bc8c2a643f600e1f0";
     # version from 2024-05-19 for tensorflow 2.15
-    nixpkgs-tensorflow.url = "github:nixos/nixpkgs?ref=30463d9064d976f3549d807491e594aa1235d852";
+    nixpkgs-tensorflow.url = "github:nixos/nixpkgs?ref=bcdbb17a41d8fab94e8031a7c5e180fa5acd0809";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
@@ -23,7 +23,7 @@
         pkgs-polars = nixpkgs-polars.legacyPackages.${system};
         pkgs-tmux = nixpkgs-tmux.legacyPackages.${system};
         pkgs-tensorflow = nixpkgs-tensorflow.legacyPackages.${system};
-        multipletau-pypi = pkgs.python312Packages.buildPythonPackage rec {
+        multipletau-pypi = pkgs.python311Packages.buildPythonPackage rec {
           pname = "multipletau";
           version = "0.4.1";
           pyproject = true;
@@ -31,11 +31,11 @@
             inherit pname version;
             hash = "sha256-roP342FbjWKEtx32KSe6Ibgy0eiwLHgqoFwXUlnuVO8=";
           };
-          build-system = with pkgs.python312Packages; [
+          build-system = with pkgs.python311Packages; [
             setuptools
             setuptools-scm
           ];
-          dependencies = with pkgs.python312Packages; [
+          dependencies = with pkgs.python311Packages; [
             numpy
           ];
         };
@@ -44,14 +44,14 @@
           packages =
             with pkgs; [
               pdf2svg
-              python312  # 3.12.12
+              python311  # 3.12.12
             ] ++ (
-              with pkgs-tensorflow.python312Packages; [
+              with pkgs-tensorflow.python311Packages; [
                 keras # 2.15
                 tensorflow # 2.15
               ]
             ) ++ (
-              with pkgs.python312Packages; [
+              with pkgs.python311Packages; [
                 click  # 8.1.8
                 cython  # 3.0.12
                 ipykernel  # 6.29.5
@@ -71,7 +71,7 @@
                 tqdm  # 4.67.1
               ]
             ) ++ (
-              with pkgs-polars.python312Packages; [
+              with pkgs-polars.python311Packages; [
                 polars  # 1.31.0  # polars jumped from 1.27.1 to 1.31.0 in nixpkgs, choose higher version
               ]
             ) ++ (
