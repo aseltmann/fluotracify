@@ -34,7 +34,7 @@
         "type": "github"
       }
     },
-    "nixpkgs-polars": {
+    "nixpkgs-unstable": {
       "locked": {
         "lastModified": 1751800441,
         "narHash": "sha256-4wwT0hH8Dd40SbAOkp5OWgCAQasGOl+H804ZXAWPBLo=",
@@ -50,28 +50,11 @@
         "type": "github"
       }
     },
-    "nixpkgs-tmux": {
-      "locked": {
-        "lastModified": 1661613556,
-        "narHash": "sha256-0Rj8jLEiiGVdfxjSwdipD4vuF+nG2iqPeeEMVq/ME78=",
-        "owner": "nixos",
-        "repo": "nixpkgs",
-        "rev": "bf7d05e64d1172ad9356b87bc8c2a643f600e1f0",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nixos",
-        "ref": "bf7d05e64d1172ad9356b87bc8c2a643f600e1f0",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
     "root": {
       "inputs": {
         "flake-utils": "flake-utils",
         "nixpkgs": "nixpkgs",
-        "nixpkgs-polars": "nixpkgs-polars",
-        "nixpkgs-tmux": "nixpkgs-tmux"
+        "nixpkgs-unstable": "nixpkgs-unstable"
       }
     },
     "systems": {
