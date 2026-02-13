@@ -27,7 +27,7 @@ from tensorboard.plugins.hparams import api as hp
 
 tf.experimental.numpy.experimental_enable_numpy_behavior(prefer_float32=False)
 
-HP_EPOCHS = hp.HParam("hp_epochs", hp.Discrete([20], dtype=int))
+HP_EPOCHS = hp.HParam("hp_epochs", hp.Discrete([50], dtype=int))
 HP_BATCH_SIZE = hp.HParam("hp_batch_size", hp.IntInterval(4, 30))
 HP_SCALER = hp.HParam(
     "hp_scaler",
@@ -824,16 +824,18 @@ def hparams_run(
         runs = client.search_runs(
             [parent_run.info.experiment_id],
             f"tags.mlflow.parentRunId = '{parent_run.info.run_id}'")
+        mlflow.log_artifact(logfile, artifact_path="logger")
         best_auc_val = float(tf.experimental.numpy.finfo(
             tf.experimental.numpy.float64).min)
         best_run = None
         best_auc_train = best_auc_val
         best_auc_val = best_auc_val
         for r in runs:
-            if r.data.metrics["val_auc"] > best_auc_val:
-                best_run = r
-                best_auc_train = r.data.metrics["auc"]
-                best_auc_val = r.data.metrics["val_auc"]
+            if val_auc := r.data.metrics.get("val_auc") is not None:
+                if val_auc > best_auc_val:
+                    best_run = r
+                    best_auc_train = r.data.metrics["auc"]
+                    best_auc_val = r.data.metrics["val_auc"]
         try:
             mlflow.set_tag("best_run", best_run.info.run_id)
         except AttributeError:
@@ -843,7 +845,6 @@ def hparams_run(
             "best_auc": best_auc_train,
             "best_auc_val": best_auc_val
         })
-        mlflow.log_artifact(logfile, artifact_path="logger")
 
 # small workaround to check for 'get_ipython' to not cause error when transcluding
 # the file in emacs
