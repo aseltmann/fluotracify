@@ -7,27 +7,24 @@ convenient keras.ops module is missing - so tf alternatives had to be used.
 
 import logging
 import os
-import random
 import sys
 
 # needed for tf to substitute tf.keras calls which by default use keras 3 with
 # the tf_keras module which is keras 2, see https://keras.io/getting_started/
 os.environ["TF_USE_LEGACY_KERAS"] = "1"
 
-import click
-import matplotlib.figure
-import matplotlib.pyplot as plt
 import mlflow
+import mlflow.client
+import mlflow.entities
+import numpy as np
 import polars as pl
+import sklearn.metrics as skm
 import sklearn.preprocessing as skp
 import tensorflow as tf
 import tf_keras as keras
 import tensorflow.python.platform.build_info as build
 
 from datetime import datetime
-# from tf_keras.src.metrics import metrics_utils
-# from mlflow.keras.callback import MlflowCallback
-from tensorboard.plugins.hparams import api as hp
 
 tf.experimental.numpy.experimental_enable_numpy_behavior(prefer_float32=False)
 keras.saving.get_custom_objects().clear()
@@ -52,73 +49,37 @@ try:
 except IndexError:
     log.debug("No GPU was found on this machine. ")
 
-HP_EPOCHS = hp.HParam("hp_epochs", hp.Discrete([20], dtype=int))
-HP_BATCH_SIZE = hp.HParam("hp_batch_size", hp.IntInterval(4, 30))
-HP_SCALER = hp.HParam(
-    "hp_scaler",
-    hp.Discrete(
-        ["robust", "minmax", "maxabs", "quant_g", "standard", "l1", "l2"],
-        dtype=str))
-HP_N_LEVELS = hp.HParam("hp_n_levels", hp.IntInterval(1, 9))
-HP_FIRST_FILTERS = hp.HParam("hp_first_filters", hp.IntInterval(1, 128))
-HP_POOL_SIZE = hp.HParam("hp_pool_size", hp.Discrete([2, 4, 8], dtype=int))
-HP_INPUT_SIZE = hp.HParam("hp_input_size", hp.Discrete([14000], dtype=int))
-HP_LR_START = hp.HParam("hp_lr_start", hp.RealInterval(1e-6, 0.06))
-HP_LR_POWER = hp.HParam("hp_lr_power", hp.IntInterval(1, 7))
+os.chdir("/home/alva/Programs/drmed-git")
 
-HPARAMS = [
-    HP_EPOCHS, HP_BATCH_SIZE, HP_SCALER, HP_N_LEVELS, HP_FIRST_FILTERS,
-    HP_POOL_SIZE, HP_INPUT_SIZE, HP_LR_START, HP_LR_POWER
-]
+inputdir = "data/exp-250327-masters/2025-05-28-simulations/parquet"
+workdir = "data/exp-250327-masters/2025-12-19-simulations-segmentation"
 
-LOG_DIR = "../tmp/tb-" + datetime.now().strftime("%Y%m%d-%H%M%S")
-
-SESSIONS_PER_GROUP = 2
+exp_dict = {
+    "peak-artifacts-testing": "peak_2",
+    "photobleaching-testing": "bleach_2",
+    "detector-dropout-testing": "dropout_2",
+}
 
 
-def tfds_from_pldf(
-        feature: pl.Series, label: pl.Series
-) -> tuple[tf.data.Dataset, int]:
-    """TensorFlow Dataset from polars Series
-
-    Parameters
-    ----------
-    feature, label: polars DataFrames
-        Contain row-wise features / labels
-
-    Returns
-    -------
-    dataset : TensorFlow Dataset
-        Contains features and labels
-    num_total_examples : int
-        Number of test examples
-    """
-
-    X_tensor = tf.convert_to_tensor(value=feature)
-    X_tensor = tf.where(
-        tf.math.is_nan(X_tensor), tf.zeros_like(X_tensor), X_tensor
-    )
-
-    y_tensor = tf.convert_to_tensor(value=label)
-    y_tensor = tf.cast(y_tensor, tf.float32)
-    y_tensor = tf.where(
-        tf.math.is_nan(y_tensor), tf.zeros_like(y_tensor), y_tensor
-    )
-
-    num_total_examples = X_tensor.shape[0]
-    X_tensor = tf.reshape(tensor=X_tensor, shape=(num_total_examples, -1, 1))
-    y_tensor = tf.reshape(tensor=y_tensor, shape=(num_total_examples, -1, 1))
-
-    dataset = tf.data.Dataset.from_tensor_slices((X_tensor, y_tensor))
-
-    log.debug("number of examples: %s", num_total_examples)
-    return (dataset, num_total_examples)
+def get_runs(exp_name: str):
+    client = mlflow.client.MlflowClient("file:data/mlruns")
+    experiment = client.get_experiment_by_name(exp_name)
+    if experiment is not None:
+        log.debug(f"found experiment {exp_name}: {experiment.experiment_id}")
+        runs = client.search_runs(experiment.experiment_id)
+    else:
+        raise ValueError(f"experiment {exp_name} is None.")
+    return client, runs
 
 
-def get_data(file_features: str, file_labels: str) -> pl.DataFrame:
+def get_data(myfile: str) -> tuple[pl.DataFrame, str]:
+    out_file = myfile.split(".")
+    out_first = out_file[0].split("-")[3:]
+    out_first = "-".join(out_first)
     df = pl.concat(
-        [pl.read_parquet(file_features),
-         (pl.read_parquet(file_labels)
+        [pl.read_parquet(f"{inputdir}/{myfile}"),
+         (pl.read_parquet(f"{workdir}/parquet/2026-01-14-{out_first}-ground-"
+                          "truth.parquet")
           .rename({"label_segmentation": "label_ground_truth"}))
          ], how="align"
     )
@@ -146,25 +107,38 @@ def get_data(file_features: str, file_labels: str) -> pl.DataFrame:
     )
     df = df.drop(["label_restoration", "label_segmentation", "sim_params",
                   "ts_params"])
-    df_clean = df.filter(pl.col.label_ground_truth.arr.sum().eq(0)).shape[0]
-    print(f"Dropping {df_clean} traces without artifacts")
-    df = df.filter(pl.col.label_ground_truth.arr.sum().ne(0))
-    return df
+    return df, out_first
 
 
-def tfds_crop(feature, label, length_delimiter):
-    """Part of tf.data pipeline. Crop feature and label to a maximum length of
-    length_delimiter
+def tfds_from_pldf(feature: pl.Series) -> tf.data.Dataset:
+    """TensorFlow Dataset from polars Series
+
+    Parameters
+    ----------
+    feature, label: polars DataFrames
+        Contain row-wise features
+
+    Returns
+    -------
+    dataset : TensorFlow Dataset
+        Contains features
+    num_examples : int
+        Number of examples
     """
-    feature = feature[:length_delimiter]
-    label = label[:length_delimiter]
-    trace_shape = feature.shape
-    label_shape = label.shape
-    feature.set_shape(trace_shape)
-    label.set_shape(label_shape)
-    return feature, label
 
-def tfds_scale(feature, label, scaler):
+    X_tensor = tf.convert_to_tensor(value=feature)
+    X_tensor = tf.where(
+        tf.math.is_nan(X_tensor), tf.zeros_like(X_tensor), X_tensor
+    )
+
+    num_total_examples = X_tensor.shape[0]
+    X_tensor = tf.reshape(tensor=X_tensor, shape=(num_total_examples, -1, 1))
+
+    dataset = tf.data.Dataset.from_tensor_slices((X_tensor))
+    return dataset
+
+
+def tfds_scale(feature, scaler):
     """Part of tf.data pipeline. Wrapper function to be able to .map()
     scale_feature()
     """
@@ -173,7 +147,7 @@ def tfds_scale(feature, label, scaler):
         func=scale_feature, inp=[feature, scaler], Tout=[tf.float32]
     )
     feature.set_shape(feature_shape)
-    return feature, label
+    return feature
 
 
 def scale_feature(feature, scaler):
@@ -223,7 +197,7 @@ def scale_feature(feature, scaler):
     return feature
 
 
-def tfds_pad(feature: tf.Tensor, label: tf.Tensor) -> tuple[tf.Tensor, tf.Tensor]:
+def tfds_pad(feature: tf.Tensor) -> tf.Tensor:
     """Part of tf.data pipeline. Pad the end of the feature with the
     median of the feature. Set the label for this pad to 0 (no artifact)
 
@@ -236,18 +210,15 @@ def tfds_pad(feature: tf.Tensor, label: tf.Tensor) -> tuple[tf.Tensor, tf.Tensor
     https://stackoverflow.com/questions/43824665/tensorflow-median-value)
     """
     pad_size, pad_median = _get_pad_size_and_value(feature)
-    feature = tf.experimental.numpy.pad(feature, pad_width=[[0, pad_size], [0, 0]],
-                    mode="constant",
-                    constant_values=pad_median)
-    label = tf.experimental.numpy.pad(label, pad_width=[[0, pad_size], [0, 0]],
-                    mode="constant",
-                    constant_values=0)
-
+    feature = tf.experimental.numpy.pad(
+        feature,
+        pad_width=[[0, pad_size], [0, 0]],
+        mode="constant",
+        constant_values=pad_median
+    )
     feature_shape = feature.shape
-    label_shape = label.shape
     feature.set_shape(feature_shape)
-    label.set_shape(label_shape)
-    return feature, label
+    return feature
 
 
 def _get_pad_size_and_value(trace):
@@ -272,22 +243,14 @@ def _get_pad_size_and_value(trace):
     return pad_size, pad_value
 
 
-def tfds_prepare(
-        ds: tf.data.Dataset, params: dict, num_examples: int
-) -> tf.data.Dataset:
+def tfds_prepare(ds: tf.data.Dataset, params: dict) -> tf.data.Dataset:
     return (
         ds
-        .map(lambda feature, label: tfds_crop(
-            feature, label, params["input_size"]
-        ), num_parallel_calls=tf.data.AUTOTUNE)
-        .map(lambda feature, label: tfds_scale(
-            feature, label, params["scaler"]
-        ), num_parallel_calls=tf.data.AUTOTUNE)
-        .map(lambda feature, label: tfds_pad(feature, label),
+        .map(lambda feature: tfds_scale(feature, params["scaler"]),
              num_parallel_calls=tf.data.AUTOTUNE)
-        .shuffle(buffer_size=num_examples)
-        .repeat()
-        .batch(params["batch_size"], drop_remainder=True)
+        .map(lambda feature: tfds_pad(feature),
+             num_parallel_calls=tf.data.AUTOTUNE)
+        .batch(1)
         .prefetch(tf.data.AUTOTUNE)
     )
 
@@ -359,3 +322,131 @@ def binary_ce_dice_loss(axis=-1, smooth=1e-5):
         return binary_ce_dice_loss_coef(y_true, y_pred, axis, smooth)
 
     return binary_ce_dice
+
+
+def predict_unet(trace: pl.Series, run: mlflow.entities.Run) -> np.ndarray:
+    params = {
+        "input_size": None,  # don't restrict input size for test data
+        "scaler": run.data.params["hp_scaler"],
+        "batch_size": int(run.data.params["hp_batch_size"]),
+    }
+    ds = tfds_from_pldf(trace)
+    ds = tfds_prepare(ds, params)
+    model_path = (
+        f"./data/mlruns/{run.info.experiment_id}/{run.info.run_id}/"
+        "artifacts/model/data/model"
+    )
+    with keras.saving.custom_object_scope(
+            {"binary_ce_dice": binary_ce_dice_loss()}
+    ):
+        model = keras.models.load_model(model_path, compile=False)
+    if model is not None:
+        out = model.predict(x=ds, verbose=0)
+        out = out.squeeze(-1)
+    else:
+        raise ValueError(f"problem in loading model of run {run.info.run_id} ")
+    return out
+
+
+def jaccard(
+        true: list, pred: list, precision: float, recall: float, average: str
+) -> float:
+    if np.isnan(precision) | np.isnan(recall):
+        out = np.nan
+    else:
+        out = float(skm.jaccard_score(true, pred, average=average))
+    return out
+
+
+for myfile in [
+        "2025-05-28-detector-dropout-testing.parquet",
+        "2025-05-28-peak-artifacts-testing.parquet",
+        "2025-05-28-photobleaching-testing.parquet",
+]:
+    log.debug(f"Perform and evaluate unet segmentation for {myfile} ...")
+    df, out_file = get_data(myfile)
+    exp = exp_dict[out_file]
+    out_date = datetime.today().date()
+    out_file = f"{out_date}-{out_file}-unet.parquet"
+    client, runs = get_runs(exp)
+    experiment = client.get_experiment_by_name(exp)
+    if experiment is not None:
+        exp_id = experiment.experiment_id
+    else:
+        raise ValueError(f"experiment {exp} is None.")
+
+    for r in runs:
+        run_id = f"{r.info.run_id:.5}"
+        full_id = f"{run_id}_full-id"
+        pred = f"{run_id}_pred"
+        seg = f"{run_id}_seg"
+        cm = f"{run_id}_cm"
+        precision = f"{run_id}_precision"
+        recall = f"{run_id}_recall"
+        fbeta2 = f"{run_id}_fbeta2"
+        biniou = f"{run_id}_biniou"
+        meaniou = f"{run_id}_meaniou"
+        overlap = f"{run_id}_overlap"
+        if r.data.metrics.get("loss") is None:
+            log.debug(f"run {run_id}: skipped")
+            continue
+        log.debug(f"run {run_id}: auc {str(r.data.metrics.get('auc')):.5}")
+        df = df.with_columns(
+            (pl.lit(r.info.run_id)).alias(full_id),
+            (pl.struct("feature").map_batches(
+                lambda x: predict_unet(x.struct.field("feature"), r)
+            )).alias(pred),
+        )
+        df = df.with_columns(
+            pl.col(pred).arr.to_list().list.eval(pl.element() > 0.5)
+            .cast(pl.Array(pl.Boolean, shape=(16384))).alias(seg)
+        )
+        df = df.with_columns(
+            (pl.struct("label_ground_truth", seg).map_elements(
+                lambda x: skm.confusion_matrix(
+                    x["label_ground_truth"], x[seg], labels=[0, 1],
+                   ), return_dtype=pl.List(pl.Array(pl.Int64, shape=(2)))
+               )).alias(cm),
+            (pl.struct("label_ground_truth", seg).map_elements(
+                lambda x: skm.precision_score(
+                    x["label_ground_truth"], x[seg], zero_division=np.nan  # type: ignore
+                   ), return_dtype=pl.Float32
+               )).alias(precision),
+            (pl.struct("label_ground_truth", seg).map_elements(
+                lambda x: skm.recall_score(
+                    x["label_ground_truth"], x[seg], zero_division=np.nan  # type: ignore
+                   ), return_dtype=pl.Float32
+               )).alias(recall),
+            (pl.struct("label_ground_truth", seg).map_elements(
+                lambda x: skm.fbeta_score(
+                    x["label_ground_truth"], x[seg], beta=2,
+                    zero_division=np.nan  # type: ignore
+                   ), return_dtype=pl.Float32
+               )).alias(fbeta2),
+        )
+        df = df.cast({cm: pl.Array(pl.Int64, shape=(2, 2))})
+        df = df.with_columns(
+            (pl.struct("label_ground_truth", seg, precision, recall)
+             .map_elements(
+                 lambda x: jaccard(x["label_ground_truth"], x[seg],
+                                   x[precision], x[recall], average="binary"),
+                 return_dtype=pl.Float32
+               )).alias(biniou),
+            (pl.struct("label_ground_truth", seg, precision, recall)
+             .map_elements(
+                 lambda x: jaccard(x["label_ground_truth"], x[seg],
+                                   x[precision], x[recall], average="macro"),
+                 return_dtype=pl.Float32
+               )).alias(meaniou),
+            # overlap coefficient see
+            # https://en.wikipedia.org/wiki/Overlap_coefficient
+            # from confusion matrix:
+            # overlap coef = tp / min((tn + fp), (fn + tp))
+            (pl.col(cm).arr.get(1).arr.get(1) /
+             pl.min_horizontal(pl.col.label_ground_truth.arr.sum(),
+                               pl.col(seg).arr.sum())
+             ).alias(overlap),
+        )
+
+    df = df.drop("feature")
+    df.write_parquet(f"{workdir}/parquet/{out_file}")
