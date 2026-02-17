@@ -812,11 +812,13 @@ def hparams_run(
                             log=log,
                         )
                     else:
-                        log.debug(
+                        skip_message = (
                             "This run is skipped, because the following "
                             "condition (needed to build the model) was not "
                             "given: 2 * pool_size**n_levels <= input_size"
                         )
+                        log.debug(skip_message)
+                        mlflow.set_tag("skip_run", skip_message)
                 session_index += 1
 
         # Now log best values in parent run
