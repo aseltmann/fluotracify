@@ -61,6 +61,13 @@ exp_dict = {
 }
 
 
+test_file_list = [
+    "2025-05-28-detector-dropout-testing.parquet",
+    "2025-05-28-peak-artifacts-testing.parquet",
+    "2025-05-28-photobleaching-testing.parquet",
+]
+
+
 def get_runs(exp_name: str):
     client = mlflow.client.MlflowClient("file:data/mlruns")
     experiment = client.get_experiment_by_name(exp_name)
@@ -358,11 +365,7 @@ def jaccard(
     return out
 
 
-for myfile in [
-        "2025-05-28-detector-dropout-testing.parquet",
-        "2025-05-28-peak-artifacts-testing.parquet",
-        "2025-05-28-photobleaching-testing.parquet",
-]:
+def process_file(myfile: str) -> None:
     log.debug(f"Perform and evaluate unet segmentation for {myfile} ...")
     df, out_file = get_data(myfile)
     exp = exp_dict[out_file]
@@ -450,3 +453,14 @@ for myfile in [
 
     df = df.drop("feature")
     df.write_parquet(f"{workdir}/parquet/{out_file}")
+
+
+def process_main() -> None:
+    for myfile in test_file_list:
+        process_file(myfile)
+
+
+# small workaround to check for 'get_ipython' to not cause error when transcluding
+# the file in emacs
+if __name__ == "__main__" and "get_ipython" not in dir():
+    process_main()
