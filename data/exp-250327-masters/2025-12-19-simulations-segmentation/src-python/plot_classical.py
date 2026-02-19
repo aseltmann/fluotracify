@@ -2,6 +2,7 @@
 
 import os
 
+import matplotlib.pyplot as plt
 import numpy as np
 import polars as pl
 import seaborn as sns
@@ -14,14 +15,22 @@ os.chdir("/home/alva/Programs/drmed-git")
 workdir = "data/exp-250327-masters/2025-12-19-simulations-segmentation"
 
 
-def get_data(myfile: str) -> tuple[pl.DataFrame, str]:
+def get_data(classical_file: str, unet_file: str) -> tuple[pl.DataFrame, str]:
     out_date = datetime.today().date()
-    out_file = myfile.split(".")
-    out_file = out_file[0].split("-")[3:]
+    out_file = classical_file.split(".")
+    out_file = out_file[0].split("-")[3:-1]
     out_file = "-".join(out_file)
     out_file = f"{out_date}-{out_file}"
-    df = pl.read_parquet(f"{workdir}/parquet/{myfile}")
-    df = df.with_columns(
+    dfa = pl.read_parquet(f"{workdir}/parquet/{classical_file}")
+    dfb = pl.read_parquet(f"{workdir}/parquet/{unet_file}")
+    df = dfa.join(dfb, on=["uuid"], how="full")
+    df = get_artifact_columns(df)
+    df = compute_score(df)
+    return df, out_file
+
+
+def get_artifact_columns(df: pl.DataFrame) -> pl.DataFrame:
+    return df.with_columns(
         (
             pl.when(pl.col.bleach_exp_scale > 0.05,
                     pl.col.bleach_exp_scale <= 0.10)
@@ -36,14 +45,31 @@ def get_data(myfile: str) -> tuple[pl.DataFrame, str]:
                        .then(pl.lit("few")))
             .alias("dropout_n"))
     )
-    return df, out_file
+
+
+def compute_score(df: pl.DataFrame) -> pl.DataFrame:
+    algos = [
+        c.removesuffix("_seg")
+        for c in df.select(pl.selectors.matches("_seg")).columns
+    ]
+
+
+    for a in algos:
+        df = df.with_columns(
+            (pl.col(f"{a}_fbeta2")
+             .add(pl.col(f"{a}_meaniou"))
+             .add(pl.col(f"{a}_overlap"))
+             ).truediv(3).alias(f"{a}_score")
+        )
+    return df
+
 
 def pivot_data(df: pl.DataFrame, col_artifact: str) -> pl.DataFrame:
     df = (
         df
         .unpivot(index=["clean_dmol", "clean_nmol", col_artifact],
                  on=pl.selectors.matches(
-                     "precision|recall|fbeta2|biniou|meaniou|overlap"
+                     "precision|recall|fbeta2|biniou|meaniou|overlap|score"
                     ))
         .with_columns(
             pl.col.variable
@@ -57,15 +83,55 @@ def pivot_data(df: pl.DataFrame, col_artifact: str) -> pl.DataFrame:
        )
     return df
 
-def groupby_mean_std(df: pl.DataFrame, metric: str) -> pl.DataFrame:
-    df = (
+def groupby_mean_std(df: pl.DataFrame, metrics: list[str]) -> pl.DataFrame:
+    out = pl.DataFrame()
+    for i, m in enumerate(metrics):
+        if i < 1:
+            how = "horizontal"
+        else:
+            how = "align"
+        out = pl.concat([
+            out,
+            (
+                df
+                .group_by(["method", "metric"], maintain_order=True)
+                .agg(
+                    pl.col.value.drop_nans().mean().alias(f"mean {m}"),
+                    pl.col.value.drop_nans().std().alias(f"std {m}")
+                )
+                .filter(pl.col.metric.eq(f"{m}"))
+                .drop("metric")
+            )
+        ], how=how)
+    return out
+
+
+def score_violin(df: pl.DataFrame) -> None:
+
+    order = (
         df
-        .group_by(["method", "metric"], maintain_order=True)
-        .agg(
-            pl.col.value.drop_nans().mean().alias(f"mean {metric}"),
-            pl.col.value.drop_nans().std().alias(f"std {metric}")
-        )
-        .filter(pl.col.metric.eq(f"{metric}"))
-        .drop("metric")
-    )
-    return df
+        .filter(pl.col.metric.eq("score"))
+        .group_by("method").agg(pl.col.value.drop_nans().mean())
+        .sort("value", descending=True)
+       )["method"].to_list()
+
+    _, ax = plt.subplots(1, 4, figsize=(14, 14), sharex=True, sharey=True)
+
+    sns.violinplot(
+        df.filter(pl.col.metric.eq("score")), x="value", y="method", cut=0,
+        density_norm="width", order=order, ax=ax[0]
+       ).set_title("score")
+    sns.violinplot(
+        df.filter(pl.col.metric.eq("fbeta2")), x="value", y="method", cut=0,
+        density_norm="width", order=order, ax=ax[1]
+       ).set_title("$F_2$")
+    sns.violinplot(
+        df.filter(pl.col.metric.eq("meaniou")), x="value", y="method", cut=0,
+        density_norm="width", order=order, ax=ax[2]
+       ).set_title("mean IOU")
+    sns.violinplot(
+        df.filter(pl.col.metric.eq("overlap")), x="value", y="method", cut=0,
+        density_norm="width", order=order, ax=ax[3]
+       ).set_title("OVL")
+    for axis in ax:
+        plt.setp(axis, xlabel="", ylabel="")
