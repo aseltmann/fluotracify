@@ -365,7 +365,7 @@ def jaccard(
     return out
 
 
-def process_file(myfile: str) -> None:
+def segment_file(myfile: str) -> None:
     log.debug(f"Perform and evaluate unet segmentation for {myfile} ...")
     df, out_file = get_data(myfile)
     exp = exp_dict[out_file]
@@ -373,10 +373,8 @@ def process_file(myfile: str) -> None:
     out_file = f"{out_date}-{out_file}-unet.parquet"
     client, runs = get_runs(exp)
     experiment = client.get_experiment_by_name(exp)
-    if experiment is not None:
-        exp_id = experiment.experiment_id
-    else:
-        raise ValueError(f"experiment {exp} is None.")
+    if experiment is None:
+        raise ValueError(f"experiment {exp} returns None.")
 
     for r in runs:
         run_id = f"{r.info.run_id:.5}"
@@ -455,12 +453,78 @@ def process_file(myfile: str) -> None:
     df.write_parquet(f"{workdir}/parquet/{out_file}")
 
 
-def process_main() -> None:
+def segment_main() -> None:
     for myfile in test_file_list:
-        process_file(myfile)
+        segment_file(myfile)
+
+
+def get_experiment_params_and_metrics() -> tuple[pl.DataFrame, pl.DataFrame]:
+    r_metrics = pl.DataFrame()
+    r_params = pl.DataFrame()
+    for exp in ["peak_2", "bleach_2", "dropout_2"]:
+        client, runs = get_runs(exp)
+        for r in runs:
+            if r.data.metrics.get("loss") is None:
+                continue
+            parent_id = hash(frozenset(
+                {k: v for k, v in r.data.params.items()
+                 if k.startswith("hp_")}.items()
+               ))
+            r_p = pl.DataFrame(
+                {
+                    "exp_name": exp,
+                    "parent_id": parent_id,
+                    "run_id": r.info.run_id,
+                   } | r.data.params,
+               ).cast({
+                "hp_batch_size": pl.Int64, "hp_epochs": pl.Int64,
+                "hp_first_filters": pl.Int64, "hp_input_size": pl.Int64,
+                "hp_lr_power": pl.Int64, "hp_lr_start": pl.Float32,
+                "hp_n_levels": pl.Int64, "hp_pool_size": pl.Int64,
+                "hp_scaler": pl.String, "num_train_examples": pl.Int64,
+                "num_val_examples": pl.Int64, "parent_id": pl.String,
+                  })
+            r_params = pl.concat([r_params, r_p])
+            for m in [
+                    "loss", "fn_0.5", "fp_0.5", "tn_0.5", "tp_0.5",
+                    "precision_0.5", "recall_0.5", "auc", "biniou0_0.5",
+                    "biniou1_0.5", "meaniou", "lr", "val_loss", "val_fn_0.5",
+                    "val_fp_0.5", "val_tn_0.5", "val_tp_0.5",
+                    "val_precision_0.5", "val_recall_0.5", "val_auc",
+                    "val_biniou0_0.5", "val_biniou1_0.5", "val_meaniou",
+               ]:
+                history = [
+                    m.value for m in client.get_metric_history(r.info.run_id, m)
+                ]
+                r_m = pl.DataFrame({
+                    "exp_name": exp,
+                    "parent_id": parent_id,
+                    "run_id": r.info.run_id,
+                    "metric": m,
+                    "metric_value": r.data.metrics[m],
+                    "metric_history": [history],
+                   }, schema={
+                    "exp_name": pl.String,
+                    "parent_id": pl.String,
+                    "run_id": pl.String,
+                    "metric": pl.String,
+                    "metric_value": pl.Float32,
+                    "metric_history": pl.Array(pl.Float32, shape=(50,))
+                      })
+                r_metrics = pl.concat([r_metrics, r_m])
+
+    out_date = datetime.today().date()
+    r_metrics.write_parquet(
+        f"{workdir}/parquet/{out_date}-hparams-metrics.parquet"
+    )
+    r_params.write_parquet(
+        f"{workdir}/parquet/{out_date}-hparams-params.parquet"
+    )
+    return r_metrics, r_params
+
 
 
 # small workaround to check for 'get_ipython' to not cause error when transcluding
 # the file in emacs
 if __name__ == "__main__" and "get_ipython" not in dir():
-    process_main()
+    segment_main()
