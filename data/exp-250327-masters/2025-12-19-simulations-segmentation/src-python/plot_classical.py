@@ -63,25 +63,6 @@ def compute_score(df: pl.DataFrame) -> pl.DataFrame:
     return df
 
 
-def pivot_data(df: pl.DataFrame, col_artifact: str) -> pl.DataFrame:
-    df = (
-        df
-        .unpivot(index=["clean_dmol", "clean_nmol", col_artifact],
-                 on=pl.selectors.matches(
-                     "precision|recall|fbeta2|biniou|meaniou|overlap|score"
-                    ))
-        .with_columns(
-            pl.col.variable
-            .str.replace("t_", "t-")
-            .str.replace("tm_", "tm-")
-            .str.replace("chan_vese", "chan-vese")
-            .str.replace("random_walker", "random-walker")
-            .str.split_exact("_", 1)
-            .struct.rename_fields(["method", "metric"])
-           ).unnest("variable")
-       )
-    return df
-
 def groupby_mean_std(df: pl.DataFrame, metrics: list[str]) -> pl.DataFrame:
     out = pl.DataFrame()
     for i, m in enumerate(metrics):
@@ -103,37 +84,6 @@ def groupby_mean_std(df: pl.DataFrame, metrics: list[str]) -> pl.DataFrame:
             )
         ], how=how)
     return out
-
-
-def score_violin(df: pl.DataFrame) -> None:
-
-    order = (
-        df
-        .filter(pl.col.metric.eq("score"))
-        .group_by("method").agg(pl.col.value.drop_nans().mean())
-        .sort("value", descending=True)
-       )["method"].to_list()
-
-    _, ax = plt.subplots(1, 4, figsize=(12, 10), sharex=True, sharey=True)
-
-    sns.violinplot(
-        df.filter(pl.col.metric.eq("score")), x="value", y="method", cut=0,
-        density_norm="width", order=order, ax=ax[0]
-       ).set_title("score")
-    sns.violinplot(
-        df.filter(pl.col.metric.eq("fbeta2")), x="value", y="method", cut=0,
-        density_norm="width", order=order, ax=ax[1]
-       ).set_title("$F_2$")
-    sns.violinplot(
-        df.filter(pl.col.metric.eq("meaniou")), x="value", y="method", cut=0,
-        density_norm="width", order=order, ax=ax[2]
-       ).set_title("mean IOU")
-    sns.violinplot(
-        df.filter(pl.col.metric.eq("overlap")), x="value", y="method", cut=0,
-        density_norm="width", order=order, ax=ax[3]
-       ).set_title("OVL")
-    for axis in ax:
-        plt.setp(axis, xlabel="", ylabel="")
 
 
 def get_unet_params(
@@ -240,12 +190,91 @@ def plot_loss_auc(
             plt.setp(axl, title=f"id {p} - loss")
             plt.setp(axr, title=f"id {p} - PR-AUC")
 
-    plt.setp(ax[:, 0::2], yscale="log")
+    plt.setp(ax[:, 0::2], yscale="log", ylim=[0, 100])
     plt.setp(ax[:, 1::2], ylim=[0, 1])
     plt.setp(ax.flatten(), xlabel="epoch")
     plt.setp(ax[:, 0], ylabel="loss or auc in a.u.")
     fig.tight_layout()
     fig.align_ylabels()
+    if out_file:
+        out_date = datetime.today().date()
+        plt.savefig(f"{workdir}/jupyter-python/{out_date}-{out_file}.png")
+    else:
+        plt.show()
+
+
+def pivot_data(df: pl.DataFrame, col_artifact: str) -> pl.DataFrame:
+    df = (
+        df
+        .unpivot(index=["clean_dmol", "clean_nmol", col_artifact],
+                 on=pl.selectors.matches("fbeta2|meaniou|overlap|score"))
+        .rename({"clean_nmol": "sim. n", "clean_dmol": "sim. D"})
+        .with_columns(
+            pl.col.variable
+            .str.replace("t_", "t-")
+            .str.replace("tm_", "tm-")
+            .str.replace("chan_vese", "chan-vese")
+            .str.replace("random_walker", "random-walker")
+            .str.split_exact("_", 1)
+            .struct.rename_fields(["method", "metric"])
+        ).unnest("variable")
+        .with_columns(
+            pl.col.method
+            .str.replace("t-mean", "GT: Mean")
+            .str.replace("t-isodata", "GTcluster: Isodata")
+            .str.replace("t-otsu", "GTcluster: Otsu")
+            .str.replace("t-min", "GThist: Minimum")
+            .str.replace("t-triangle", "GThist: Triangle")
+            .str.replace("t-yen", "GTentropy: Yen")
+            .str.replace("t-li", "GTentropy: Li")
+            .str.replace("tm-local", "LT: Local filter")
+            .str.replace("tm-niblack", "LT: Niblack")
+            .str.replace("tm-sauvola", "LT: Sauvola")
+            .str.replace("tm-bradley", "LT: Bradley")
+            .str.replace("watershed", "Watershed")
+            .str.replace("random-walker", "Random Walker")
+            .str.replace("chan-vese", "Chan-Vese")
+        )
+        .with_columns(
+            pl.col.metric
+            .str.replace("fbeta2", "$F2$")
+            .str.replace("meaniou", "mean IOU")
+            .str.replace("overlap", "OVL")
+        )
+    )
+    return df
+
+
+def score_violin(df: pl.DataFrame, out_file: str | None = None) -> None:
+
+    order = (
+        df
+        .filter(pl.col.metric.eq("score"))
+        .group_by("method").agg(pl.col.value.drop_nans().mean())
+        .sort("value", descending=True)
+       )["method"].to_list()
+
+    _, ax = plt.subplots(1, 4, figsize=(10, 10), sharex=True, sharey=True)
+
+    sns.violinplot(
+        df.filter(pl.col.metric.eq("score")), x="value", y="method", cut=0,
+        density_norm="width", order=order, ax=ax[0]
+       ).set_title("score")
+    sns.violinplot(
+        df.filter(pl.col.metric.eq("fbeta2")), x="value", y="method", cut=0,
+        density_norm="width", order=order, ax=ax[1]
+       ).set_title("$F_2$")
+    sns.violinplot(
+        df.filter(pl.col.metric.eq("meaniou")), x="value", y="method", cut=0,
+        density_norm="width", order=order, ax=ax[2]
+       ).set_title("mean IOU")
+    sns.violinplot(
+        df.filter(pl.col.metric.eq("overlap")), x="value", y="method", cut=0,
+        density_norm="width", order=order, ax=ax[3]
+       ).set_title("OVL")
+    for axis in ax:
+        plt.setp(axis, xlabel="", ylabel="")
+
     if out_file:
         out_date = datetime.today().date()
         plt.savefig(f"{workdir}/jupyter-python/{out_date}-{out_file}.png")

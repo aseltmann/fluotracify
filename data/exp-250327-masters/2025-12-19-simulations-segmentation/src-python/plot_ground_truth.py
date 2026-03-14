@@ -84,7 +84,7 @@ def get_record(
             .row(idx, named=True))
 
 
-def prepare_grid(n: int) -> tuple[Figure, dict[str, Axes]]:
+def prepare_grid(n: int, small=False) -> tuple[Figure, dict[str, Axes]]:
     gs_kw = dict(height_ratios=[1, 1, 1])
     g1 = ["ts1",]
     g2 = ["lab1",]
@@ -93,8 +93,12 @@ def prepare_grid(n: int) -> tuple[Figure, dict[str, Axes]]:
        g1 = g1 + [f"ts{i}",]
        g2 = g2 + [f"lab{i}",]
        g3 = g3 + [f"seg{i}",]
+    if small:
+        figsize=(4*n, 5)
+    else:
+        figsize=(5*n, 5)
     fig, axd = plt.subplot_mosaic(
-        mosaic=[g1, g2, g3], figsize=(5*n, 5), gridspec_kw=gs_kw,
+        mosaic=[g1, g2, g3], figsize=figsize, gridspec_kw=gs_kw,
         layout="constrained", sharex=True,
     )
     plt.setp([axd[g] for g in g1], ylabel=r"intensity [a.u.]")
@@ -127,7 +131,7 @@ def plot_ground_truth(axd: dict, idx: int, rec: dict) -> None:
     elif rec["subgroup"] == "shallow":
         ts_title = "shallow photobleaching, scale = 0.06...0.1"
     elif rec["subgroup"] == "steep":
-        ts_title = "broad photobleaching, scale = 0.01...0.05"
+        ts_title = "steep photobleaching, scale = 0.01...0.05"
     elif rec["subgroup"] == 0.01:
         ts_title = ("broad peak artifacts\n$D_{{sim}} = 0.01 "
                     "\\frac{{\\mu m^2}}{{s}}$, $n_{{clusters}}=10$")
@@ -162,23 +166,39 @@ def plot_ground_truth(axd: dict, idx: int, rec: dict) -> None:
                        label="0 = no artifact")
     axseg.legend(loc="lower right")
 
-out_date = datetime.today().date()
-df = get_data("2025-05-28-detector-dropout-training.parquet")
-fig, axd = prepare_grid(2)
-plot_ground_truth(axd, 1, get_record(df, 0, "dropout_n", "few"))
-plot_ground_truth(axd, 2, get_record(df, 0, "dropout_n", "many"))
-plt.savefig(f"{workdir}/jupyter-python/{out_date}"
-            "-detector-dropout-ground-truth-ex.png")
-df = get_data("2025-05-28-peak-artifacts-training.parquet")
-fig, axd = prepare_grid(3)
-plot_ground_truth(axd, 1, get_record(df, 4, "peak_dmol", 0.01))
-plot_ground_truth(axd, 2, get_record(df, 3, "peak_dmol", 0.1))
-plot_ground_truth(axd, 3, get_record(df, 0, "peak_dmol", 1.))
-plt.savefig(f"{workdir}/jupyter-python/{out_date}"
-            "-peak-artifacts-ground-truth-ex.png")
-df = get_data("2025-05-28-photobleaching-training.parquet")
-fig, axd = prepare_grid(2)
-plot_ground_truth(axd, 1, get_record(df, 0, "bleach_exp_scale", "steep"))
-plot_ground_truth(axd, 2, get_record(df, 2, "bleach_exp_scale", "shallow"))
-plt.savefig(f"{workdir}/jupyter-python/{out_date}"
-            "-photobleaching-ground-truth-ex.png")
+
+def save_dropout():
+    out_date = datetime.today().date()
+    df = get_data("2025-05-28-detector-dropout-training.parquet")
+    fig, axd = prepare_grid(2)
+    plot_ground_truth(axd, 1, get_record(df, 0, "dropout_n", "few"))
+    plot_ground_truth(axd, 2, get_record(df, 0, "dropout_n", "many"))
+    fig.align_ylabels()
+    fig.tight_layout()
+    plt.savefig(f"{workdir}/jupyter-python/{out_date}"
+                "-detector-dropout-ground-truth-ex.png")
+
+
+def save_peak():
+    out_date = datetime.today().date()
+    df = get_data("2025-05-28-peak-artifacts-training.parquet")
+    fig, axd = prepare_grid(3, small=True)
+    plot_ground_truth(axd, 1, get_record(df, 4, "peak_dmol", 0.01))
+    plot_ground_truth(axd, 2, get_record(df, 3, "peak_dmol", 0.1))
+    plot_ground_truth(axd, 3, get_record(df, 0, "peak_dmol", 1.))
+    fig.align_ylabels()
+    fig.tight_layout()
+    plt.savefig(f"{workdir}/jupyter-python/{out_date}"
+                "-peak-artifacts-ground-truth-ex.png")
+
+
+def save_bleach():
+    out_date = datetime.today().date()
+    df = get_data("2025-05-28-photobleaching-training.parquet")
+    fig, axd = prepare_grid(2)
+    plot_ground_truth(axd, 1, get_record(df, 0, "bleach_exp_scale", "steep"))
+    plot_ground_truth(axd, 2, get_record(df, 2, "bleach_exp_scale", "shallow"))
+    fig.align_ylabels()
+    fig.tight_layout()
+    plt.savefig(f"{workdir}/jupyter-python/{out_date}"
+                "-photobleaching-ground-truth-ex.png")
