@@ -19,6 +19,7 @@ os.chdir("/home/alva/Programs/drmed-git")
 
 inputdir = "data/exp-250327-masters/2025-05-28-simulations/parquet"
 segdir = "data/exp-250327-masters/2025-12-19-simulations-segmentation"
+workdir = "data/exp-250327-masters/2026-03-12-defense/jupyter-python"
 
 
 def get_data(myfile: str) -> pl.DataFrame:
@@ -74,14 +75,20 @@ def get_data(myfile: str) -> pl.DataFrame:
     return df
 
 
-def get_record(
-        df: pl.DataFrame, idx: int,
-        group: Literal["dropout_n", "peak_dmol", "bleach_exp_scale"],
-        subgroup: str | float,
-) -> dict:
-    return (df
-            .filter(pl.col(group).eq(subgroup) &
-                    pl.col.clean_dmol.eq(1.) &
-                    pl.col.clean_nmol.is_in([3000, 4000]))
-            .with_columns(group=pl.lit(group), subgroup=pl.lit(subgroup))
-            .row(idx, named=True))
+def ex_local_thresholding_gaussian():
+    out_date = datetime.today().date()
+    df = get_data("2025-05-28-peak-artifacts-training.parquet")
+    trace = df["feature"][0][:30].to_numpy()
+    thresh = ski.filters.threshold_local(trace, block_size=11)
+    p_bool = max(trace) * (trace > thresh)
+    p_invbool = max(trace) * ~(trace > thresh)
+    fig, ax = plt.subplots()
+    sns.lineplot(trace, ax=ax)
+    sns.lineplot(thresh, ax=ax)
+    ax.fill_between(x=np.arange(len(trace)), y1=0, y2=p_bool, alpha=0.5,
+                    where=p_bool, color="tab:pink", label="below thr")
+    ax.fill_between(x=np.arange(len(trace)), y1=0, y2=p_invbool, alpha=0.5,
+                    where=p_invbool, color="tab:green", label="above thr")
+    ax.set_axis_off()
+    plt.legend()
+    plt.savefig(f"{workdir}/{out_date}-local-thresholding-ex.png")
